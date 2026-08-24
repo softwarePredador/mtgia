@@ -23,7 +23,7 @@ Future<Response> onRequest(RequestContext context) async {
           'billing_enabled': false,
           'purchase_available': false,
           'message':
-              'A beta pública atual é gratuita e não oferece compra ou assinatura.',
+              'A beta controlada desta revisão é gratuita e não oferece compra ou assinatura.',
         },
       },
     );

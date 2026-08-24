@@ -6,7 +6,7 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 - Branch de partida: `codex/free-beta-release-candidate-2026-07-17`
 - SHA de partida: `b2d3fc04f823f1c58434349a0cf0b48d74919862`
 - Backlog/registry SHA-256: `9f7d05f128c94655e41254872516322dea13da28b11613c93e3540d5dc39f142`
-- Project logic source digest: `0043cb4094dacefa313db1d259177999a0716ba2b4cb2fafa9be9bff3b99c581`
+- Project logic source digest: `f3628ca3199dce784820a3dc63c9a6d7312a229098ce0ee5fc17a93f3d7e400a`
 - WIP máximo: `1`
 - Limite de subagentes: `15`
 

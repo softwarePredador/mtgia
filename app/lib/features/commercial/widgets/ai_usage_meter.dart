@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../models/manaloom_plan.dart';
 import '../providers/commercial_provider.dart';
@@ -13,6 +14,16 @@ class AiUsageMeter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final releaseCapabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final aiAvailable =
+        (releaseCapabilities?.isAllowed(
+              ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+            ) ??
+            false) ||
+        (releaseCapabilities?.isAllowed(ReleaseCapability.aiGenerateRebuild) ??
+            false);
+    if (!aiAvailable) return const SizedBox.shrink();
+
     final provider = context.watch<CommercialProvider?>();
     if (provider == null) return const SizedBox.shrink();
     if (!provider.isLoaded) {

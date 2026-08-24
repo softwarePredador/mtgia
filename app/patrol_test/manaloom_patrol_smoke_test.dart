@@ -82,7 +82,7 @@ void main() {
     await _expectTextEventually($, 'O que você quer fazer primeiro?');
     await _scrollUntilVisibleAndTap($, const Key('onboarding-skip-action'));
     await _expectTextEventually($, 'Beta gratuita');
-    expect($(find.byKey(const Key('ai-usage-meter'))), findsOneWidget);
+    expect($(find.byKey(const Key('ai-usage-meter'))), findsNothing);
   });
 
   patrolTest('auth register validates mismatch and accepts corrected form', (
@@ -693,6 +693,11 @@ Future<AuthProvider> _pumpProfilePatrolApp(PatrolIntegrationTester $) async {
 
   final apiClient = _PatrolProductApiClient();
   final authProvider = AuthProvider(apiClient: apiClient);
+  // ignore: invalid_use_of_visible_for_testing_member
+  final releaseCapabilitiesProvider = ReleaseCapabilitiesProvider.seeded(const {
+    ReleaseCapability.profilesPublic,
+    ReleaseCapability.trades,
+  });
   final commercialProvider = CommercialProvider(
     apiClient: apiClient,
     now: () => DateTime(2026, 7, 6),
@@ -733,6 +738,9 @@ Future<AuthProvider> _pumpProfilePatrolApp(PatrolIntegrationTester $) async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+        ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+          value: releaseCapabilitiesProvider,
+        ),
         ChangeNotifierProvider<CommercialProvider>.value(
           value: commercialProvider,
         ),
@@ -753,6 +761,7 @@ Future<AuthProvider> _pumpProfilePatrolApp(PatrolIntegrationTester $) async {
 
   addTearDown(router.dispose);
   addTearDown(authProvider.dispose);
+  addTearDown(releaseCapabilitiesProvider.dispose);
   addTearDown(commercialProvider.dispose);
 
   return authProvider;

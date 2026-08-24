@@ -39,10 +39,11 @@ done
 manaloom_public_web_assert_removed_response /marketplace 404 '' http://127.0.0.1:3000
 manaloom_public_web_assert_removed_response /marketplace 410 '' https://brewtact.com
 manaloom_public_web_assert_removed_response /marketplace 308 / https://brewtact.com
-manaloom_public_web_assert_removed_response /decks/example 307 /app/decks/example https://brewtact.com
-manaloom_public_web_assert_removed_response /players/example 301 https://brewtact.com/app/ https://brewtact.com
+manaloom_public_web_assert_removed_response /players/example 301 https://brewtact.com/pricing https://brewtact.com
 expect_failure manaloom_public_web_assert_removed_response /marketplace 200 '' https://brewtact.com
 expect_failure manaloom_public_web_assert_removed_response /marketplace 404 /app/ https://brewtact.com
+expect_failure manaloom_public_web_assert_removed_response /decks/example 307 /app/decks/example https://brewtact.com
+expect_failure manaloom_public_web_assert_removed_response /players/example 301 https://brewtact.com/app/ https://brewtact.com
 expect_failure manaloom_public_web_assert_removed_response /marketplace 308 http://brewtact.com/ https://brewtact.com
 expect_failure manaloom_public_web_assert_removed_response /marketplace 308 //attacker.example/ https://brewtact.com
 expect_failure manaloom_public_web_assert_removed_response /marketplace 308 /marketplace https://brewtact.com

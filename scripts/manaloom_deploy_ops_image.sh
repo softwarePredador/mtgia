@@ -213,7 +213,7 @@ fi
 
 # The candidate image and the runtime health must carry the exact policy blob
 # committed in this SHA. The current Free Beta contract accepts only the
-# canonical 28-key all-OFF matrix; a dirty or permissive working-tree file
+# canonical 29-key all-OFF matrix; a dirty or permissive working-tree file
 # cannot enable an ops job.
 manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$sha"
 readonly RELEASE_CAPABILITIES_DIGEST_SHA256="$MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256"

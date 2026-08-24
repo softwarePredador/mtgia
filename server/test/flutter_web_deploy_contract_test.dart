@@ -121,6 +121,9 @@ void main() {
     const approvalCall =
         'require_live_mutation_approval "ManaLoom Flutter Web deployment"';
     final buildOnlyBranch = deploy.indexOf(r'if [[ "$BUILD_ONLY" == "0" ]]');
+    final capabilityGate = deploy.indexOf(
+      'manaloom_require_public_app_release_open',
+    );
     final approval = deploy.indexOf(approvalCall);
     final envLoad = deploy.indexOf(r'load_manaloom_env_keys "$ENV_FILE"');
     final firstRemoteUpload = deploy.indexOf('COPYFILE_DISABLE=1 tar');
@@ -130,6 +133,8 @@ void main() {
     );
     expect(deploy, contains('readonly LIVE_MUTATION_APPROVED=0'));
     expect(buildOnlyBranch, greaterThanOrEqualTo(0));
+    expect(capabilityGate, greaterThan(buildOnlyBranch));
+    expect(approval, greaterThan(capabilityGate));
     expect(approval, greaterThan(buildOnlyBranch));
     expect(envLoad, greaterThan(approval));
     expect(
@@ -169,9 +174,12 @@ void main() {
       expect(blocked.exitCode, 2);
       expect(
         blocked.stderr,
-        contains('BLOCKED: ManaLoom Flutter Web deployment'),
+        contains('BLOCKED: release capabilities: /app permanece inacessivel'),
       );
-      expect(blocked.stderr, contains('only after approval was granted'));
+      expect(
+        blocked.stderr,
+        contains('capability ON com verificacao live datada ausente'),
+      );
 
       final buildOnly = Process.runSync(
         '/bin/bash',

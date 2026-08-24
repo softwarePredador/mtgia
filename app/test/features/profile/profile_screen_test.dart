@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/security/auth_token_store.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
@@ -127,10 +128,23 @@ void main() {
         'TestPassword123!',
       );
       expect(loggedIn, isTrue);
+      final releaseCapabilities = ReleaseCapabilitiesProvider.seeded(const {
+        ReleaseCapability.profilesPublic,
+        ReleaseCapability.collectionPrivate,
+        ReleaseCapability.binderPublic,
+        ReleaseCapability.marketplace,
+        ReleaseCapability.directMessages,
+        ReleaseCapability.trades,
+        ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+      });
+      addTearDown(releaseCapabilities.dispose);
 
       await tester.pumpWidget(
         MultiProvider(
           providers: [
+            ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+              value: releaseCapabilities,
+            ),
             ChangeNotifierProvider<AuthProvider>.value(value: auth),
             ChangeNotifierProvider<MessageProvider>(
               create: (_) => MessageProvider(),
@@ -464,6 +478,97 @@ void main() {
       expect(content.width, lessThanOrEqualTo(1280));
       expect(find.byKey(const Key('profile-wide-workbench')), findsOneWidget);
       expect(identity.right, lessThan(workspace.left));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'all-off policy keeps account controls and hides product surfaces',
+    (tester) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      SharedPreferences.setMockInitialValues({});
+      final api = _ProfileApiClient();
+      final auth = AuthProvider(
+        apiClient: api,
+        tokenStore: AuthTokenStore(secureBackend: _MemorySecureTokenBackend()),
+      );
+      final loggedIn = await auth.login(
+        'runtime_profile@example.com',
+        'TestPassword123!',
+      );
+      expect(loggedIn, isTrue);
+      final releaseCapabilities = ReleaseCapabilitiesProvider.seeded(const {});
+      addTearDown(releaseCapabilities.dispose);
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+              value: releaseCapabilities,
+            ),
+            ChangeNotifierProvider<AuthProvider>.value(value: auth),
+            ChangeNotifierProvider<MessageProvider>(
+              create: (_) => MessageProvider(),
+            ),
+            ChangeNotifierProvider<NotificationProvider>(
+              create: (_) => NotificationProvider(),
+            ),
+            ChangeNotifierProvider<SocialProvider>(
+              create: (_) => SocialProvider(apiClient: api),
+            ),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: ProfileScreen(apiClient: api),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Perfil não publicado'), findsOneWidget);
+      expect(
+        find.byKey(const Key('profile-display-name-field')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('profile-change-password-button')),
+        findsOneWidget,
+      );
+      expect(find.text('Beta e política de uso'), findsOneWidget);
+      for (final key in const [
+        'ai-usage-meter',
+        'profile-open-binder-button',
+        'profile-open-marketplace-button',
+        'profile-city-field',
+        'profile-trade-notes-field',
+        'profile-profile-visibility-field',
+        'profile-binder-visibility-field',
+        'profile-location-visibility-field',
+        'profile-message-visibility-field',
+        'profile-trade-visibility-field',
+        'profile-trade-notes-visibility-field',
+      ]) {
+        expect(find.byKey(Key(key)), findsNothing, reason: key);
+      }
+      expect(find.text('Marketplace'), findsNothing);
+      expect(find.text('Meu Fichário'), findsNothing);
+      expect(find.textContaining('Ações de IA'), findsNothing);
+
+      await tester.enterText(
+        find.byKey(const Key('profile-display-name-field')),
+        'Nome privado atualizado',
+      );
+      await tester.pump();
+      final saveButton = find.byKey(const Key('profile-save-button'));
+      expect(tester.widget<FilledButton>(saveButton).onPressed, isNotNull);
+      await tester.tap(saveButton);
+      await tester.pumpAndSettle();
+      expect(api.lastPatchBody, {'display_name': 'Nome privado atualizado'});
       expect(tester.takeException(), isNull);
     },
   );

@@ -29,6 +29,8 @@ void main() {
     expect(provider, contains("'webhook_status': 'beta_free_only'"));
     expect(planRoute, contains("'is_free': true"));
     expect(planRoute, contains("'purchase_available': false"));
+    expect(planRoute, contains('A beta controlada desta revisão'));
+    expect(planRoute, isNot(contains('A beta pública atual')));
     expect(planRoute, isNot(contains("'upgrade_offer'")));
     expect(planMiddleware, contains("'beta_mode': true"));
     expect(planMiddleware, contains("'purchase_available': false"));

@@ -1,16 +1,20 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "643fa0af0cbf0c99d3fcdef7355b17f1b89d04ece14934a02946214c5957d6af",
+  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-11T19:20:40Z",
+    "verified_at": "2026-08-24T15:57:57Z",
     "commands": [
-      "flutter test --no-pub --no-version-check --reporter compact",
-      "dart test --reporter compact no servidor",
-      "analyzers Flutter e servidor",
-      "./scripts/manaloom_p0_runtime_capture.sh em Chrome/WebDriver headless nos três perfis Web e no Samsung SM-A135M físico",
-      "MANALOOM_RUN_PATROL_DEVICE_TESTS=1 MANALOOM_PATROL_DEVICE=chrome MANALOOM_PATROL_WEB_HEADLESS=true ./scripts/quality_gate.sh patrol-smoke (Patrol CLI + Playwright, 9/9 no Chrome headless real)",
+      "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
+      "./gradlew :app:checkProfileAarMetadata --stacktrace",
+      "27 Flutter focused tests and analyzer checks for BT-GOV-001",
+      "4 focused backend tests for BT-GOV-001",
+      "./scripts/manaloom_release_capabilities_contract_test.sh",
+      "./scripts/manaloom_public_web_surface_contract_test.sh",
+      "./scripts/manaloom_release_ops_contract_test.sh (32/32)",
+      "./scripts/manaloom_p0_runtime_capture.sh on Web mobile/desktop/wide and physical Samsung SM-A135M",
+      "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
       "./scripts/manaloom_binder_import_visual_qa.sh",
       "./scripts/manaloom_deck_workshop_visual_qa.sh",
       "./scripts/manaloom_battle_learning_visual_qa.sh",
@@ -26,107 +30,107 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "32ed1fef2a47211256e38583da488a1dccc5ee41d25bc782695835eae906c4bc"
+        "sha256": "38afd0f21548a880fe851f4f3829aa73e6a2943c600a139446d43d774c80be7a"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "b38c8147742e261c66f1c65f93f22e82f04071d8cc089f60a6617eb57c0f2e6e"
+        "sha256": "18e2a04dcafecb043d939303bc6a00de7fa4fcefcd1fe9d2e8b09b00cd9a83d7"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "7f0f0e31709b5f87ef4888d7c7ace00328f937a8daf8a64b02a57c5ec0277aa7"
+        "sha256": "b5bc0f630504c1272416b509671b38c69e0a6a04324734c14a272fa225c8da05"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "266c1b387f59b22abf99449d6394e2c65b7fa8668a96fd50c2029c6d3197fe6a"
+        "sha256": "53ea5900b600e1cc5782c5c3f4e5c758c85af0f42fdf3cd108640e94444941b1"
       },
       {
         "path": "docs/qa/ui-live/current/battle-live-web/capture-manifest.json",
-        "sha256": "1c2836b8a6c461788cbf9914e820df826087db26035201e773d44cea3ad74067"
+        "sha256": "3cf2dc627a4d237adef2a9a8963b50c9896de549adece761873769127989db81"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-mobile/capture-manifest.json",
-        "sha256": "533120fe909b12871bf6dd0495af62f834e2b785c7f940c7a5ca8234f3d7fd61"
+        "sha256": "540e545dcb6b49fbd2161d718edf69f9abc97665b4241a7739562b8847c309c7"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/capture-manifest.json",
-        "sha256": "4697748e1ce7f92e00d9c220227789dbb83df92d1faeeae289af06c19baa3519"
+        "sha256": "46c0090832ed9220f64feca6a98af22a5206b94771140064f25fdcfc1023f191"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/capture-manifest.json",
-        "sha256": "c085011ecf2e541a8b7b1e77c9910956b8b4889c97678ae45884730aab66e227"
+        "sha256": "b3ef6206fb845b6847b4cd2d729ea41520220b4f217e8c1f61aded869f19c758"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/capture-manifest.json",
-        "sha256": "9c23e60221e6227fa0480977d0fba5d2a3958fd48118f16b8d7e0060e5d7817a"
+        "sha256": "8a65723bd007002a70999b9ecc5e19ef596967834aab7a913494988e234bf468"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/capture-manifest.json",
-        "sha256": "4cb245bc8a4b206d7d3f7d5e51e5d40a1e995d2421698c1fe4023f4219afb2af"
+        "sha256": "f9ae06bd4e5cdffb2a6211f0f06cf7b6beb9ccbe18d0ff5665c9a29b7b57df82"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-wide/capture-manifest.json",
-        "sha256": "215b5be7c0c649399cd3c3a955e63ac8e07e90fb86533fb435321196ca023e46"
+        "sha256": "00a1bf360c27e5bc13f53905110c58255adb7001119bc24a8c5ed15e74558ad3"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/capture-manifest.json",
-        "sha256": "8c621a09614dc3c6e595e2b5e1051d4d24f398fc0a3c7b1119ba97d096b44cda"
+        "sha256": "21e736107cae1b443094c1ea70c9f6017a5e0917f9c02702ddea4020086fb085"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/capture-manifest.json",
-        "sha256": "4b128296a1173834db49a2cbcd74f0a12014488033217a4ebbebc796ffe690b0"
+        "sha256": "574f597ca3f5358f49a67e4f583759e2d2ce33ad4d0a90173e839caa428d6c02"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/capture-manifest.json",
-        "sha256": "66d47b4b4c292fd5cf2a1df21f9989fdeb66a311523daa13504ea0f880051f37"
+        "sha256": "cd0a36380f0416f91ec3a8d1642a09a1724482b77c92fb70f5bb719da7e8fac6"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/capture-manifest.json",
-        "sha256": "648bd8267f9a974fb7c14eaba8a4ceac761da241c801d8e4c6a02081760f04df"
+        "sha256": "e07a5a6c2930946a65c42b7a2d5bfed1e3108812b1c1925240379f562d098138"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/capture-manifest.json",
-        "sha256": "cebb48b533710c65a3bb3491619e27cb216a7dcc6795691b59be5b8418438f80"
+        "sha256": "b616c69d247bef3f886417bf1d19fb045855c6aa0495dfda3fc13f87c483574d"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/capture-manifest.json",
-        "sha256": "d1403c56620413dd55773569eff7f7b7e125d68431c9dd78456048ef1af5b59d"
+        "sha256": "c782dd4fad2f709bc73f9fa59d7be8a72656da66de75b07d4ceb6def7161b811"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/capture-manifest.json",
-        "sha256": "5edac9e5ba541bd879a2a045e9c302cdbde867c001bb464154910f276ce95a3f"
+        "sha256": "061d27731c434e5ebd52b9f8d7d57ddc83a95dddbdbd1955f85f02f6dab6061c"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/capture-manifest.json",
-        "sha256": "4057f9c0d1878c3b360564eaef197d789b84c5b8f33df9209d00cf1dc650a31c"
+        "sha256": "8eb7937dc0346276619c05f140528521e9c03af9ab0d5884e8ecec0b950ace03"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-wide/capture-manifest.json",
-        "sha256": "0f4193011f95b934ee414842df66626d4ddc7288b317cff5a015306f46839553"
+        "sha256": "11d21ae9c8ba3776762cc15b937c78766f48db71ca9f479355daec687ca62c74"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/capture-manifest.json",
-        "sha256": "d54df59e2cbffe126d71a04575b73b88415bfcf5f25202192206c051c228b374"
+        "sha256": "891a1ac8404135db67cb7d207e6c21acb50be1939924cfe8086ac844de8243bd"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/capture-manifest.json",
-        "sha256": "b1839717bf47f89c871caf03b51a32856a02e4a4e8ee84575f8aef541e6ae149"
+        "sha256": "ab430cf3c09eea8a1cffac27033327d798fb2756967a05e75f7775fd58cc2f6a"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-wide/capture-manifest.json",
-        "sha256": "2f4b5c08ec02ceb6137ca9162f37c1f7c7fc7b87034b5031560ffcf2d150dc3b"
+        "sha256": "cd94106989b056e47476d903c751dc932f8c72d454e4c389df7588fc6162989b"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/capture-manifest.json",
-        "sha256": "5c572100c16d9c394528910536e28c8894f61689fab8fd32154be0a3f3d43e06"
+        "sha256": "1c8e61d14c9ac27599cb1bed3f4d9ca6f7d5dab12090339a58bd6120fd9b10b9"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-desktop/capture-manifest.json",
-        "sha256": "9f2add4c9d92f391c758d2245479a7e3523d07971f0ca031dfa2d4be91bbf4eb"
+        "sha256": "439bbcfce49f53b62c11ae6a18219f0b5c01f05bd42f7277604cde58ee414ae4"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/capture-manifest.json",
-        "sha256": "358cb77014daa4bb348c8864e5a97962d77b6d5701e50c97629db806297f0fd9"
+        "sha256": "3584361b497a58a16bf6adc76e382c4ebb40d57ac0ad4a81ff8755279f834587"
       }
     ],
     "evidence_notes": [
@@ -140,7 +144,7 @@
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-11T18:50:34Z",
+    "reviewed_at": "2026-08-24T15:57:57Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
@@ -191,32 +195,32 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "32ed1fef2a47211256e38583da488a1dccc5ee41d25bc782695835eae906c4bc",
-      "b38c8147742e261c66f1c65f93f22e82f04071d8cc089f60a6617eb57c0f2e6e",
-      "7f0f0e31709b5f87ef4888d7c7ace00328f937a8daf8a64b02a57c5ec0277aa7",
-      "266c1b387f59b22abf99449d6394e2c65b7fa8668a96fd50c2029c6d3197fe6a",
-      "1c2836b8a6c461788cbf9914e820df826087db26035201e773d44cea3ad74067",
-      "533120fe909b12871bf6dd0495af62f834e2b785c7f940c7a5ca8234f3d7fd61",
-      "4697748e1ce7f92e00d9c220227789dbb83df92d1faeeae289af06c19baa3519",
-      "c085011ecf2e541a8b7b1e77c9910956b8b4889c97678ae45884730aab66e227",
-      "9c23e60221e6227fa0480977d0fba5d2a3958fd48118f16b8d7e0060e5d7817a",
-      "4cb245bc8a4b206d7d3f7d5e51e5d40a1e995d2421698c1fe4023f4219afb2af",
-      "215b5be7c0c649399cd3c3a955e63ac8e07e90fb86533fb435321196ca023e46",
-      "8c621a09614dc3c6e595e2b5e1051d4d24f398fc0a3c7b1119ba97d096b44cda",
-      "4b128296a1173834db49a2cbcd74f0a12014488033217a4ebbebc796ffe690b0",
-      "66d47b4b4c292fd5cf2a1df21f9989fdeb66a311523daa13504ea0f880051f37",
-      "648bd8267f9a974fb7c14eaba8a4ceac761da241c801d8e4c6a02081760f04df",
-      "cebb48b533710c65a3bb3491619e27cb216a7dcc6795691b59be5b8418438f80",
-      "d1403c56620413dd55773569eff7f7b7e125d68431c9dd78456048ef1af5b59d",
-      "5edac9e5ba541bd879a2a045e9c302cdbde867c001bb464154910f276ce95a3f",
-      "4057f9c0d1878c3b360564eaef197d789b84c5b8f33df9209d00cf1dc650a31c",
-      "0f4193011f95b934ee414842df66626d4ddc7288b317cff5a015306f46839553",
-      "d54df59e2cbffe126d71a04575b73b88415bfcf5f25202192206c051c228b374",
-      "b1839717bf47f89c871caf03b51a32856a02e4a4e8ee84575f8aef541e6ae149",
-      "2f4b5c08ec02ceb6137ca9162f37c1f7c7fc7b87034b5031560ffcf2d150dc3b",
-      "5c572100c16d9c394528910536e28c8894f61689fab8fd32154be0a3f3d43e06",
-      "9f2add4c9d92f391c758d2245479a7e3523d07971f0ca031dfa2d4be91bbf4eb",
-      "358cb77014daa4bb348c8864e5a97962d77b6d5701e50c97629db806297f0fd9"
+      "38afd0f21548a880fe851f4f3829aa73e6a2943c600a139446d43d774c80be7a",
+      "18e2a04dcafecb043d939303bc6a00de7fa4fcefcd1fe9d2e8b09b00cd9a83d7",
+      "b5bc0f630504c1272416b509671b38c69e0a6a04324734c14a272fa225c8da05",
+      "53ea5900b600e1cc5782c5c3f4e5c758c85af0f42fdf3cd108640e94444941b1",
+      "3cf2dc627a4d237adef2a9a8963b50c9896de549adece761873769127989db81",
+      "540e545dcb6b49fbd2161d718edf69f9abc97665b4241a7739562b8847c309c7",
+      "46c0090832ed9220f64feca6a98af22a5206b94771140064f25fdcfc1023f191",
+      "b3ef6206fb845b6847b4cd2d729ea41520220b4f217e8c1f61aded869f19c758",
+      "8a65723bd007002a70999b9ecc5e19ef596967834aab7a913494988e234bf468",
+      "f9ae06bd4e5cdffb2a6211f0f06cf7b6beb9ccbe18d0ff5665c9a29b7b57df82",
+      "00a1bf360c27e5bc13f53905110c58255adb7001119bc24a8c5ed15e74558ad3",
+      "21e736107cae1b443094c1ea70c9f6017a5e0917f9c02702ddea4020086fb085",
+      "574f597ca3f5358f49a67e4f583759e2d2ce33ad4d0a90173e839caa428d6c02",
+      "cd0a36380f0416f91ec3a8d1642a09a1724482b77c92fb70f5bb719da7e8fac6",
+      "e07a5a6c2930946a65c42b7a2d5bfed1e3108812b1c1925240379f562d098138",
+      "b616c69d247bef3f886417bf1d19fb045855c6aa0495dfda3fc13f87c483574d",
+      "c782dd4fad2f709bc73f9fa59d7be8a72656da66de75b07d4ceb6def7161b811",
+      "061d27731c434e5ebd52b9f8d7d57ddc83a95dddbdbd1955f85f02f6dab6061c",
+      "8eb7937dc0346276619c05f140528521e9c03af9ab0d5884e8ecec0b950ace03",
+      "11d21ae9c8ba3776762cc15b937c78766f48db71ca9f479355daec687ca62c74",
+      "891a1ac8404135db67cb7d207e6c21acb50be1939924cfe8086ac844de8243bd",
+      "ab430cf3c09eea8a1cffac27033327d798fb2756967a05e75f7775fd58cc2f6a",
+      "cd94106989b056e47476d903c751dc932f8c72d454e4c389df7588fc6162989b",
+      "1c8e61d14c9ac27599cb1bed3f4d9ca6f7d5dab12090339a58bd6120fd9b10b9",
+      "439bbcfce49f53b62c11ae6a18219f0b5c01f05bd42f7277604cde58ee414ae4",
+      "3584361b497a58a16bf6adc76e382c4ebb40d57ac0ad4a81ff8755279f834587"
     ],
     "reviewed_profiles": [
       "android_physical_sm_a135m",

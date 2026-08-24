@@ -11,6 +11,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../core/api/api_client.dart';
 import '../../core/branding/product_identity.dart';
+import '../../core/config/release_capabilities.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/manaloom_theme_motif.dart';
 import '../../core/widgets/player_identity_name.dart';
@@ -25,6 +26,49 @@ import 'account_privacy_service.dart';
 typedef AccountDataShare = Future<void> Function(String content);
 
 enum _ProfileSaveFeedback { success, error }
+
+class _ProfileReleaseAccess {
+  const _ProfileReleaseAccess({
+    required this.profilesPublic,
+    required this.collectionPrivate,
+    required this.binderPublic,
+    required this.marketplace,
+    required this.directMessages,
+    required this.trades,
+    required this.aiUsage,
+  });
+
+  factory _ProfileReleaseAccess.fromProvider(
+    ReleaseCapabilitiesProvider? provider,
+  ) {
+    bool allowed(ReleaseCapability capability) =>
+        provider?.isAllowed(capability) ?? false;
+
+    return _ProfileReleaseAccess(
+      profilesPublic: allowed(ReleaseCapability.profilesPublic),
+      collectionPrivate: allowed(ReleaseCapability.collectionPrivate),
+      binderPublic: allowed(ReleaseCapability.binderPublic),
+      marketplace: allowed(ReleaseCapability.marketplace),
+      directMessages: allowed(ReleaseCapability.directMessages),
+      trades: allowed(ReleaseCapability.trades),
+      aiUsage:
+          allowed(ReleaseCapability.aiAnalyzeOptimizeAdvisory) ||
+          allowed(ReleaseCapability.aiGenerateRebuild),
+    );
+  }
+
+  final bool profilesPublic;
+  final bool collectionPrivate;
+  final bool binderPublic;
+  final bool marketplace;
+  final bool directMessages;
+  final bool trades;
+  final bool aiUsage;
+
+  bool get hasLocationContext => profilesPublic || trades;
+  bool get hasVisibilityControls =>
+      profilesPublic || binderPublic || directMessages || trades;
+}
 
 class _ProfileDraft {
   const _ProfileDraft({
@@ -262,21 +306,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _saveMessage = null;
     });
     final auth = context.read<AuthProvider>();
+    final access = _ProfileReleaseAccess.fromProvider(
+      context.read<ReleaseCapabilitiesProvider?>(),
+    );
     final avatarText = _avatarUrlController.text.trim();
     final cityText = _cityController.text.trim();
     final tradeNotesText = _tradeNotesController.text.trim();
     final ok = await auth.updateProfile(
       displayName: _displayNameController.text.trim(),
       avatarUrl: avatarText.isEmpty ? null : avatarText,
-      locationState: _selectedState,
-      locationCity: cityText.isEmpty ? null : cityText,
-      tradeNotes: tradeNotesText.isEmpty ? null : tradeNotesText,
-      profileVisibility: _profileVisibility,
-      binderVisibility: _binderVisibility,
-      locationVisibility: _locationVisibility,
-      messageVisibility: _messageVisibility,
-      tradeVisibility: _tradeVisibility,
-      tradeNotesVisibility: _tradeNotesVisibility,
+      locationState: access.hasLocationContext ? _selectedState : null,
+      locationCity: access.hasLocationContext && cityText.isNotEmpty
+          ? cityText
+          : null,
+      tradeNotes: access.trades && tradeNotesText.isNotEmpty
+          ? tradeNotesText
+          : null,
+      profileVisibility: access.profilesPublic ? _profileVisibility : null,
+      binderVisibility: access.binderPublic ? _binderVisibility : null,
+      locationVisibility: access.hasLocationContext
+          ? _locationVisibility
+          : null,
+      messageVisibility: access.directMessages ? _messageVisibility : null,
+      tradeVisibility: access.trades ? _tradeVisibility : null,
+      tradeNotesVisibility: access.trades ? _tradeNotesVisibility : null,
     );
     if (!mounted) return;
     if (ok) {
@@ -614,8 +667,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         key: const Key('profile-unblock-confirmation-dialog'),
         title: const Text('Desbloquear jogador?'),
         content: Text(
-          '${user.displayLabel} poderá voltar a encontrar seu conteúdo '
-          'público e iniciar interações permitidas.',
+          'O bloqueio de ${user.displayLabel} será removido. Qualquer '
+          'descoberta ou interação continuará sujeita às capabilities '
+          'liberadas pelo servidor.',
         ),
         actions: [
           TextButton(
@@ -659,6 +713,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final theme = Theme.of(context);
     final user = context.select<AuthProvider, User?>(
       (provider) => provider.user,
+    );
+    final releaseAccess = _ProfileReleaseAccess.fromProvider(
+      context.watch<ReleaseCapabilitiesProvider?>(),
     );
     final compact =
         MediaQuery.sizeOf(context).width < AppTheme.breakpointCompact;
@@ -710,8 +767,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         user,
                         theme,
                         compact: !useWorkbench,
+                        access: releaseAccess,
                       );
-                      final workspace = _buildProfileWorkspace(user, theme);
+                      final workspace = _buildProfileWorkspace(
+                        user,
+                        theme,
+                        access: releaseAccess,
+                      );
 
                       return KeyedSubtree(
                         key: const Key('profile-content'),
@@ -855,6 +917,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     User user,
     ThemeData theme, {
     required bool compact,
+    required _ProfileReleaseAccess access,
   }) {
     final draftName = _displayNameController.text.trim();
     final displayName = draftName.isNotEmpty
@@ -916,10 +979,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               runSpacing: AppTheme.space8,
               children: [
                 _IdentityBadge(
-                  icon: _profileVisibility == 'public'
+                  icon: access.profilesPublic && _profileVisibility == 'public'
                       ? Icons.public
                       : Icons.lock_outline,
-                  label: _profileVisibility == 'public'
+                  label: !access.profilesPublic
+                      ? 'Perfil não publicado'
+                      : _profileVisibility == 'public'
                       ? 'Perfil público'
                       : 'Perfil privado',
                 ),
@@ -931,7 +996,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ? 'Email verificado'
                       : 'Email pendente',
                 ),
-                if (location.isNotEmpty)
+                if (access.hasLocationContext && location.isNotEmpty)
                   _IdentityBadge(
                     icon: Icons.location_on_outlined,
                     label: location,
@@ -942,10 +1007,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               padding: EdgeInsets.symmetric(vertical: AppTheme.space20),
               child: Divider(height: 1),
             ),
-            const AiUsageMeter(compact: true),
-            const SizedBox(height: AppTheme.space16),
+            if (access.aiUsage) ...[
+              const AiUsageMeter(compact: true),
+              const SizedBox(height: AppTheme.space16),
+            ],
             Text(
-              'ATALHOS DO SEU ESPAÇO',
+              'ATALHOS DA CONTA',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: AppTheme.textSecondary,
                 fontWeight: FontWeight.w800,
@@ -953,22 +1020,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: AppTheme.space10),
-            _IdentityDestination(
-              buttonKey: const Key('profile-open-binder-button'),
-              icon: Icons.collections_bookmark_outlined,
-              label: 'Meu Fichário',
-              onPressed: () => context.push('/collection?tab=0'),
-            ),
-            _IdentityDestination(
-              buttonKey: const Key('profile-open-marketplace-button'),
-              icon: Icons.storefront_outlined,
-              label: 'Marketplace',
-              onPressed: () => context.push('/collection?tab=1'),
-            ),
+            if (access.collectionPrivate)
+              _IdentityDestination(
+                buttonKey: const Key('profile-open-binder-button'),
+                icon: Icons.collections_bookmark_outlined,
+                label: 'Meu Fichário',
+                onPressed: () => context.push('/collection?tab=0'),
+              ),
+            if (access.marketplace)
+              _IdentityDestination(
+                buttonKey: const Key('profile-open-marketplace-button'),
+                icon: Icons.storefront_outlined,
+                label: 'Marketplace',
+                onPressed: () => context.push('/collection?tab=1'),
+              ),
             _IdentityDestination(
               buttonKey: const Key('profile-open-plans-button'),
               icon: Icons.tune_outlined,
-              label: 'Planos e limites',
+              label: 'Beta e política de uso',
               onPressed: () => context.push('/plans'),
             ),
             _IdentityDestination(
@@ -1082,13 +1151,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileWorkspace(User user, ThemeData theme) {
+  Widget _buildProfileWorkspace(
+    User user,
+    ThemeData theme, {
+    required _ProfileReleaseAccess access,
+  }) {
     return Column(
       key: const Key('profile-settings-workspace'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Seu espaço de jogador',
+          'Seu perfil e sua conta',
           style: theme.textTheme.headlineMedium?.copyWith(
             color: AppTheme.textPrimary,
             fontFamily: AppTheme.displayFontFamily,
@@ -1097,7 +1170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: AppTheme.space6),
         Text(
-          'Defina como outros jogadores reconhecem você e quais portas ficam abertas para comunidade e trocas.',
+          'Atualize seus dados de conta. Recursos públicos e de produto só '
+          'aparecem quando autorizados pelo servidor.',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: AppTheme.textSecondary,
             height: 1.45,
@@ -1106,7 +1180,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: AppTheme.space24),
         _ProfileSectionPanel(
           title: 'Como você aparece',
-          subtitle: 'Identidade visível na busca, nos decks e nas trocas.',
+          subtitle:
+              'Nome e imagem usados na conta; publicação exige capability liberada.',
           icon: Icons.badge_outlined,
           child: TextField(
             key: const Key('profile-display-name-field'),
@@ -1118,24 +1193,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-        _ProfileSectionPanel(
-          title: 'Contexto para trocas',
-          subtitle:
-              'Localização e observações só aparecem conforme sua regra de privacidade.',
-          icon: Icons.location_on_outlined,
-          child: _buildLocationFields(),
-        ),
-        _ProfileSectionPanel(
-          title: 'Quem pode encontrar e chamar você',
-          subtitle:
-              'Controle separadamente perfil, fichário, localização, mensagens e propostas.',
-          icon: Icons.visibility_outlined,
-          child: _buildVisibilityGrid(),
-        ),
+        if (access.hasLocationContext)
+          _ProfileSectionPanel(
+            title: access.trades
+                ? 'Contexto para interações liberadas'
+                : 'Localização da conta',
+            subtitle:
+                'Estes dados só aparecem nas superfícies liberadas pelo servidor e conforme sua privacidade.',
+            icon: Icons.location_on_outlined,
+            child: _buildLocationFields(showTradeNotes: access.trades),
+          ),
+        if (access.hasVisibilityControls)
+          _ProfileSectionPanel(
+            title: 'Privacidade de recursos liberados',
+            subtitle:
+                'Somente controles de superfícies abertas nesta revisão são exibidos.',
+            icon: Icons.visibility_outlined,
+            child: _buildVisibilityGrid(access),
+          ),
         _ProfileSectionPanel(
           title: 'Acesso e sessões',
           subtitle:
-              'Segurança da conta fica separada da sua identidade pública.',
+              'Segurança da conta fica separada das superfícies de produto.',
           icon: Icons.lock_outline,
           child: _buildSecurityActions(user),
         ),
@@ -1151,7 +1230,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildLocationFields() {
+  Widget _buildLocationFields({required bool showTradeNotes}) {
     final stateField = DropdownButtonFormField<String>(
       key: const Key('profile-state-field'),
       initialValue: _selectedState,
@@ -1199,82 +1278,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
         ),
-        const SizedBox(height: AppTheme.space16),
-        TextField(
-          key: const Key('profile-trade-notes-field'),
-          controller: _tradeNotesController,
-          maxLines: 3,
-          maxLength: 500,
-          decoration: const InputDecoration(
-            labelText: 'Observação para trocas',
-            hintText: 'Ex: entrego em mãos em SP ou deixo na loja combinada.',
-            prefixIcon: Icon(Icons.info_outline, size: 20),
-            alignLabelWithHint: true,
+        if (showTradeNotes) ...[
+          const SizedBox(height: AppTheme.space16),
+          TextField(
+            key: const Key('profile-trade-notes-field'),
+            controller: _tradeNotesController,
+            maxLines: 3,
+            maxLength: 500,
+            decoration: const InputDecoration(
+              labelText: 'Observação para trocas',
+              hintText: 'Ex: entrego em mãos em SP ou deixo na loja combinada.',
+              prefixIcon: Icon(Icons.info_outline, size: 20),
+              alignLabelWithHint: true,
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
 
-  Widget _buildVisibilityGrid() {
+  Widget _buildVisibilityGrid(_ProfileReleaseAccess access) {
     final fields = <Widget>[
-      _VisibilityField(
-        fieldKey: const Key('profile-profile-visibility-field'),
-        label: 'Visibilidade do perfil',
-        value: _profileVisibility,
-        options: const {'public': 'Público', 'private': 'Privado'},
-        onChanged: (value) => _mutateDraft(() => _profileVisibility = value),
-      ),
-      _VisibilityField(
-        fieldKey: const Key('profile-binder-visibility-field'),
-        label: 'Fichário',
-        value: _binderVisibility,
-        options: const {'public': 'Público', 'private': 'Privado'},
-        onChanged: (value) => _mutateDraft(() => _binderVisibility = value),
-      ),
-      _VisibilityField(
-        fieldKey: const Key('profile-location-visibility-field'),
-        label: 'Localização',
-        value: _locationVisibility,
-        options: const {
-          'public': 'Pública',
-          'trade_only': 'Somente em trades',
-          'private': 'Privada',
-        },
-        onChanged: (value) => _mutateDraft(() => _locationVisibility = value),
-      ),
-      _VisibilityField(
-        fieldKey: const Key('profile-message-visibility-field'),
-        label: 'Mensagens',
-        value: _messageVisibility,
-        options: const {
-          'everyone': 'Todos',
-          'followers': 'Seguidores',
-          'none': 'Ninguém',
-        },
-        onChanged: (value) => _mutateDraft(() => _messageVisibility = value),
-      ),
-      _VisibilityField(
-        fieldKey: const Key('profile-trade-visibility-field'),
-        label: 'Novas propostas',
-        value: _tradeVisibility,
-        options: const {
-          'everyone': 'Todos',
-          'followers': 'Seguidores',
-          'none': 'Ninguém',
-        },
-        onChanged: (value) => _mutateDraft(() => _tradeVisibility = value),
-      ),
-      _VisibilityField(
-        fieldKey: const Key('profile-trade-notes-visibility-field'),
-        label: 'Notas de troca',
-        value: _tradeNotesVisibility,
-        options: const {
-          'trade_only': 'Somente em trades',
-          'private': 'Privadas',
-        },
-        onChanged: (value) => _mutateDraft(() => _tradeNotesVisibility = value),
-      ),
+      if (access.profilesPublic)
+        _VisibilityField(
+          fieldKey: const Key('profile-profile-visibility-field'),
+          label: 'Visibilidade do perfil',
+          value: _profileVisibility,
+          options: const {'public': 'Público', 'private': 'Privado'},
+          onChanged: (value) => _mutateDraft(() => _profileVisibility = value),
+        ),
+      if (access.binderPublic)
+        _VisibilityField(
+          fieldKey: const Key('profile-binder-visibility-field'),
+          label: 'Fichário',
+          value: _binderVisibility,
+          options: const {'public': 'Público', 'private': 'Privado'},
+          onChanged: (value) => _mutateDraft(() => _binderVisibility = value),
+        ),
+      if (access.hasLocationContext)
+        _VisibilityField(
+          fieldKey: const Key('profile-location-visibility-field'),
+          label: 'Localização',
+          value: _locationVisibility,
+          options: const {
+            'public': 'Pública',
+            'trade_only': 'Somente em trades',
+            'private': 'Privada',
+          },
+          onChanged: (value) => _mutateDraft(() => _locationVisibility = value),
+        ),
+      if (access.directMessages)
+        _VisibilityField(
+          fieldKey: const Key('profile-message-visibility-field'),
+          label: 'Mensagens',
+          value: _messageVisibility,
+          options: const {
+            'everyone': 'Todos',
+            'followers': 'Seguidores',
+            'none': 'Ninguém',
+          },
+          onChanged: (value) => _mutateDraft(() => _messageVisibility = value),
+        ),
+      if (access.trades) ...[
+        _VisibilityField(
+          fieldKey: const Key('profile-trade-visibility-field'),
+          label: 'Novas propostas',
+          value: _tradeVisibility,
+          options: const {
+            'everyone': 'Todos',
+            'followers': 'Seguidores',
+            'none': 'Ninguém',
+          },
+          onChanged: (value) => _mutateDraft(() => _tradeVisibility = value),
+        ),
+        _VisibilityField(
+          fieldKey: const Key('profile-trade-notes-visibility-field'),
+          label: 'Notas de troca',
+          value: _tradeNotesVisibility,
+          options: const {
+            'trade_only': 'Somente em trades',
+            'private': 'Privadas',
+          },
+          onChanged: (value) =>
+              _mutateDraft(() => _tradeNotesVisibility = value),
+        ),
+      ],
     ];
 
     return LayoutBuilder(

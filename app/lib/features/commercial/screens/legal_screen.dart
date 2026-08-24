@@ -137,13 +137,13 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                         title: 'Termos de uso',
                         icon: Icons.description_outlined,
                         body:
-                            '${ProductIdentity.displayName} ajuda a criar, analisar, otimizar e acompanhar decks de Magic. O usuário continua responsável por revisar legalidade, preços, recomendações, compras, trades e decisões de mesa antes de agir.',
+                            '${ProductIdentity.displayName} só pode criar, analisar, otimizar ou acompanhar decks quando a capability correspondente estiver liberada pelo servidor. Nesta revisão all-OFF, esses recursos permanecem indisponíveis. Quando liberados, o usuário continua responsável por revisar legalidade, preços, recomendações e decisões de mesa antes de agir.',
                       ),
                       const _LegalDocumentSection(
                         title: 'IP e conteúdo',
                         icon: Icons.copyright_outlined,
                         body:
-                            'Magic: The Gathering e nomes de cartas pertencem aos seus respectivos titulares. ${ProductIdentity.displayName} não reivindica propriedade sobre IP de terceiros. Listas, notas e comentários criados pelo usuário permanecem vinculados à conta do usuário.',
+                            'Magic: The Gathering e nomes de cartas pertencem aos seus respectivos titulares. ${ProductIdentity.displayName} não reivindica propriedade sobre IP de terceiros. Dados criados pelo usuário permanecem vinculados à conta; publicação e comentários só existem quando as capabilities correspondentes estiverem liberadas.',
                       ),
                       const _LegalDocumentSection(
                         anchorKey: Key('legal-card-source-section'),
@@ -156,20 +156,20 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                         title: 'Disclaimer de IA',
                         icon: Icons.auto_awesome_outlined,
                         body:
-                            'Sugestões de IA podem errar preço, disponibilidade, regra, bracket ou contexto local. O app mostra motivos e preview para revisão humana antes de aplicar mudanças no deck.',
+                            'As capabilities de IA permanecem indisponíveis nesta revisão. Se forem liberadas futuramente, sugestões poderão errar preço, disponibilidade, regra, bracket ou contexto local e exigirão preview e revisão humana antes de qualquer mudança no deck.',
                       ),
                       const _LegalDocumentSection(
                         title: 'Trocas entre usuários',
                         icon: Icons.swap_horiz_rounded,
                         body:
-                            '${ProductIdentity.displayName} coordena propostas e conversas, mas não recebe, guarda ou protege pagamentos e não garante entrega, estado ou autenticidade das cartas. Os usuários devem verificar os itens e combinar pagamento e envio diretamente entre si.',
+                            'Trocas, propostas, conversas de trade e pagamentos não são oferecidos nesta revisão. Uma abertura futura exigirá capability e termos próprios; ${ProductIdentity.displayName} não receberá, guardará ou protegerá pagamentos nem garantirá entrega, estado ou autenticidade das cartas.',
                       ),
                       const _LegalDocumentSection(
                         anchorKey: Key('legal-monetization-section'),
                         title: 'Monetização',
                         icon: Icons.payments_outlined,
                         body:
-                            'A beta pública atual é gratuita e não oferece assinatura, checkout ou cobrança. Se houver planos pagos no futuro, valores e condições serão apresentados separadamente antes de qualquer confirmação.',
+                            'A beta controlada desta revisão é gratuita e não oferece assinatura, checkout ou cobrança. Esta decisão não anuncia nem promete planos pagos; qualquer mudança de oferta exigirá nova decisão explícita e termos próprios.',
                       ),
                       _LegalDocumentSection(
                         key: _privacyKey,
@@ -177,7 +177,7 @@ class _CommercialLegalScreenState extends State<CommercialLegalScreen> {
                         title: 'Política de privacidade',
                         icon: Icons.privacy_tip_outlined,
                         body:
-                            'Decks privados, coleção, fichário, histórico pós-jogo e preferências de IA devem ser tratados como dados do usuário. Dados públicos só devem ser exibidos quando o usuário publicar deck, perfil, fichário ou lista de trade.',
+                            'Decks privados, coleção, fichário, histórico pós-jogo e preferências de IA devem ser tratados como dados do usuário, inclusive quando a superfície estiver indisponível. Nenhum deck, perfil, fichário ou dado de trade é publicado enquanto a capability correspondente estiver OFF.',
                         isLast: true,
                       ),
                     ],
@@ -373,8 +373,9 @@ class _LegalReviewStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     const status =
-        'Conteúdo informativo da beta. A revisão jurídica externa permanece '
-        'pendente antes do lançamento comercial.';
+        'Conteúdo informativo da beta controlada. A revisão jurídica externa '
+        'permanece pendente antes de qualquer ampliação pública ou oferta '
+        'comercial.';
     return Semantics(
       container: true,
       label: 'Status jurídico. $status',

@@ -47,6 +47,11 @@ for web_deploy in \
   fi
 done
 OPS_DEPLOY_SOURCE="$ROOT_DIR/scripts/manaloom_deploy_ops_image.sh"
+grep -Fq 'canonical 29-key all-OFF matrix' "$OPS_DEPLOY_SOURCE"
+if grep -Fq 'canonical 28-key all-OFF matrix' "$OPS_DEPLOY_SOURCE"; then
+  echo "deploy manaloom-ops documenta contagem obsoleta de capabilities" >&2
+  exit 1
+fi
 if ! grep -Fq 'IMAGE_DIGEST_OUTPUT="$(ssh ' "$OPS_DEPLOY_SOURCE" ||
    ! grep -Fq 'extract_manaloom_repo_digest_ref "$IMAGE_REPO"' \
      "$OPS_DEPLOY_SOURCE" ||
@@ -259,6 +264,18 @@ done
 
 NGINX="$ROOT_DIR/app/web/nginx.conf"
 FLUTTER_WEB_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+grep -Fq 'manaloom_require_public_app_release_open' "$FLUTTER_WEB_DEPLOY"
+flutter_app_gate_line="$(grep -n -m1 'manaloom_require_public_app_release_open' \
+  "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"
+flutter_approval_line="$(grep -n -m1 'require_live_mutation_approval "ManaLoom Flutter Web deployment"' \
+  "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"
+flutter_first_mutation_line="$(grep -n -m1 'DEPLOY_MUTATION_STARTED=1' \
+  "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"
+if (( flutter_app_gate_line >= flutter_approval_line ||
+      flutter_app_gate_line >= flutter_first_mutation_line )); then
+  echo "deploy Flutter Web valida abertura de /app tarde demais" >&2
+  exit 1
+fi
 grep -Fq '"/app/release.json" "no-cache, no-store, must-revalidate"' "$NGINX"
 grep -Fq '"/app/flutter_bootstrap.js" "no-cache, must-revalidate"' "$NGINX"
 grep -Fq '"/app/main.dart.js" "no-cache, must-revalidate"' "$NGINX"

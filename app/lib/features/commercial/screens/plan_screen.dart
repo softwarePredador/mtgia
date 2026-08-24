@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/responsive_page_frame.dart';
 import '../models/commercial_launch_policy.dart';
@@ -15,6 +16,14 @@ class PlanScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CommercialProvider>();
+    final releaseCapabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final aiAvailable =
+        (releaseCapabilities?.isAllowed(
+              ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+            ) ??
+            false) ||
+        (releaseCapabilities?.isAllowed(ReleaseCapability.aiGenerateRebuild) ??
+            false);
     if (!provider.isLoaded) {
       provider.load();
     }
@@ -44,8 +53,10 @@ class PlanScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const AiUsageMeter(),
-                        const SizedBox(height: AppTheme.space16),
+                        if (aiAvailable) ...[
+                          const AiUsageMeter(),
+                          const SizedBox(height: AppTheme.space16),
+                        ],
                         const FreeBetaNotice(
                           key: Key('beta-free-access-panel'),
                         ),

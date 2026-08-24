@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Executable scope shared by the local smoke and the post-deploy proof. The
-# public Beta keeps informational/legal pages and explicitly shared reports;
+# controlled Beta keeps informational/legal pages and explicitly shared reports;
 # marketplace, public deck pages and player profiles are retired.
 manaloom_public_web_required_routes() {
   printf '%s\n' \
@@ -28,14 +28,14 @@ manaloom_public_web_safe_retirement_location() {
   local canonical_base="${public_base_url%/}"
 
   case "$location" in
-    /|/pricing|/pricing/|/app|/app/|/app/*|/app\?*)
+    /|/pricing|/pricing/)
       return 0
       ;;
   esac
 
   if [[ "$canonical_base" == https://* ]]; then
     case "$location" in
-      "$canonical_base"|"$canonical_base/"|"$canonical_base/pricing"|"$canonical_base/pricing/"|"$canonical_base/app"|"$canonical_base/app/"|"$canonical_base/app/"*|"$canonical_base/app?"*)
+      "$canonical_base"|"$canonical_base/"|"$canonical_base/pricing"|"$canonical_base/pricing/")
         return 0
         ;;
     esac

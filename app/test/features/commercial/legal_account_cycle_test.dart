@@ -53,6 +53,15 @@ void main() {
       find.textContaining('revisão jurídica externa permanece pendente'),
       findsOneWidget,
     );
+    expect(
+      find.textContaining('permanecem indisponíveis nesta revisão'),
+      findsWidgets,
+    );
+    expect(
+      find.textContaining('não são oferecidos nesta revisão'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('coordena propostas e conversas'), findsNothing);
   });
 
   testWidgets(
@@ -153,4 +162,20 @@ void main() {
     expect(source, contains("path: '/legal'"));
     expect(source, contains("path: '/verify-email'"));
   });
+
+  test(
+    'legal copy states controlled free beta without future paid promise',
+    () {
+      final source = File(
+        'lib/features/commercial/screens/legal_screen.dart',
+      ).readAsStringSync();
+
+      expect(source, contains('A beta controlada desta revisão é gratuita'));
+      expect(source, contains('não anuncia nem promete planos pagos'));
+      expect(source, contains('antes de qualquer ampliação pública'));
+      expect(source, isNot(contains('A beta pública atual')));
+      expect(source, isNot(contains('Se houver planos pagos no futuro')));
+      expect(source, isNot(contains('antes do lançamento comercial')));
+    },
+  );
 }

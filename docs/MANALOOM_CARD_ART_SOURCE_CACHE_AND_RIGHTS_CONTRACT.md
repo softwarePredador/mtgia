@@ -25,10 +25,10 @@ até nova revisão.
 4. O ManaLoom não hospeda proxy nem republica um catálogo de imagens. O backend
    persiste identificadores, metadados e URLs; o cliente solicita a imagem
    diretamente da origem HTTPS.
-5. Dados e imagens Scryfall não podem ficar atrás de paywall. A beta pública
-   permanece gratuita. Assinatura, checkout ou outra monetização com arte ou
-   dados de cartas fica bloqueada até revisão jurídica externa e autorização
-   explícita de produto.
+5. Dados e imagens Scryfall não podem ficar atrás de paywall. A beta controlada
+   desta revisão permanece gratuita. Assinatura, checkout ou outra monetização
+   com arte ou dados de cartas fica bloqueada até revisão jurídica externa e
+   autorização explícita de produto.
 6. O app declara que é conteúdo de fã não oficial, que não é aprovado ou
    endossado pela Wizards e que Scryfall não aprova nem endossa o ManaLoom.
 

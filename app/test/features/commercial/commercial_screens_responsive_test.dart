@@ -28,12 +28,8 @@ void main() {
     );
     expect(find.byKey(const Key('plan-pro-upgrade-button')), findsNothing);
     expect(find.textContaining('R\$'), findsNothing);
-    expect(
-      tester
-          .getSize(find.byKey(const Key('ai-usage-open-plans-button')))
-          .height,
-      greaterThanOrEqualTo(AppTheme.touchTargetMin),
-    );
+    expect(find.byKey(const Key('ai-usage-meter')), findsNothing);
+    expect(find.byKey(const Key('ai-usage-open-plans-button')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

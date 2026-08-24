@@ -155,3 +155,23 @@ manaloom_require_exact_release_capabilities() {
     return 2
   fi
 }
+
+manaloom_require_public_app_release_open() {
+  local policy_json="$1"
+
+  if ! jq -e '
+    def verified_timestamp:
+      type == "string" and
+      test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$");
+    (.live_verified_as_of | verified_timestamp) and
+    any(.capabilities[];
+      .release_capability == "on" and
+      .allowed == true and
+      (.live_verified_as_of | verified_timestamp)
+    )
+  ' >/dev/null 2>&1 <<<"$policy_json"; then
+    manaloom_release_capabilities_block \
+      "/app permanece inacessivel: capability ON com verificacao live datada ausente"
+    return 2
+  fi
+}

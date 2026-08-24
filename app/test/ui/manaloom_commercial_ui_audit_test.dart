@@ -2,6 +2,7 @@ import 'package:accessibility_tools/accessibility_tools.dart';
 import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/commercial/models/manaloom_plan.dart';
 import 'package:manaloom/features/commercial/providers/commercial_provider.dart';
@@ -124,8 +125,15 @@ Widget _commercialShell({
   required CommercialProvider provider,
   required Widget child,
 }) {
-  return ChangeNotifierProvider<CommercialProvider>.value(
-    value: provider,
+  return MultiProvider(
+    providers: [
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+        create: (_) => ReleaseCapabilitiesProvider.seeded(const {
+          ReleaseCapability.aiAnalyzeOptimizeAdvisory,
+        }),
+      ),
+      ChangeNotifierProvider<CommercialProvider>.value(value: provider),
+    ],
     child: manaloomDecoratedAuditSurface(
       child: Padding(padding: const EdgeInsets.all(16), child: child),
     ),

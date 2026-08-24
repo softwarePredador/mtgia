@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "0043cb4094dacefa313db1d259177999a0716ba2b4cb2fafa9be9bff3b99c581",
+  "source_digest_sha256": "f3628ca3199dce784820a3dc63c9a6d7312a229098ce0ee5fc17a93f3d7e400a",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -56,12 +56,12 @@
     "dart_source_files": 684,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 33,
-    "dart_symbols": 5162,
+    "dart_symbols": 5164,
     "semantic_resolved_files": 684,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42580,
-    "semantic_resolved_call_sites": 67802,
-    "semantic_resolved_type_references": 16029,
+    "semantic_resolved_call_edges": 42588,
+    "semantic_resolved_call_sites": 67823,
+    "semantic_resolved_type_references": 16034,
     "modules": 153,
     "app_routes": 45,
     "web_routes": 11,
@@ -477,7 +477,7 @@
         "app/lib/features/profile/profile_screen.dart"
       ],
       "file_count": 2,
-      "symbol_count": 28,
+      "symbol_count": 30,
       "providers": [],
       "services": [
         "AccountPrivacyService"
@@ -8235,7 +8235,7 @@
       "name": "_LegalDocumentSection",
       "kind": "class",
       "source": "app/lib/features/commercial/screens/legal_screen.dart",
-      "line": 431,
+      "line": 432,
       "members": [
         "build"
       ]
@@ -8286,7 +8286,7 @@
       "name": "PlanScreen",
       "kind": "class",
       "source": "app/lib/features/commercial/screens/plan_screen.dart",
-      "line": 12,
+      "line": 13,
       "members": [
         "build"
       ]
@@ -8295,7 +8295,7 @@
       "name": "_LegalShortcutPanel",
       "kind": "class",
       "source": "app/lib/features/commercial/screens/plan_screen.dart",
-      "line": 113,
+      "line": 124,
       "members": [
         "build"
       ]
@@ -8304,7 +8304,7 @@
       "name": "_RemotePlanStatusPanel",
       "kind": "class",
       "source": "app/lib/features/commercial/screens/plan_screen.dart",
-      "line": 72,
+      "line": 83,
       "members": [
         "build"
       ]
@@ -8350,7 +8350,7 @@
       "name": "AiUsageMeter",
       "kind": "class",
       "source": "app/lib/features/commercial/widgets/ai_usage_meter.dart",
-      "line": 9,
+      "line": 10,
       "members": [
         "build"
       ]
@@ -16260,7 +16260,7 @@
       "name": "ProfileScreen",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 103,
+      "line": 147,
       "members": [
         "createState"
       ]
@@ -16269,13 +16269,13 @@
       "name": "_AvatarDialogResult",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1639
+      "line": 1727
     },
     {
       "name": "_AvatarUrlDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1688,
+      "line": 1776,
       "members": [
         "createState"
       ]
@@ -16284,7 +16284,7 @@
       "name": "_AvatarUrlDialogState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1697,
+      "line": 1785,
       "members": [
         "build",
         "dispose",
@@ -16295,7 +16295,7 @@
       "name": "_ChangePasswordDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1800,
+      "line": 1888,
       "members": [
         "createState"
       ]
@@ -16304,7 +16304,7 @@
       "name": "_ChangePasswordDialogState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1807,
+      "line": 1895,
       "members": [
         "build",
         "dispose"
@@ -16314,7 +16314,7 @@
       "name": "_DeleteAccountDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1987,
+      "line": 2075,
       "members": [
         "createState"
       ]
@@ -16323,7 +16323,7 @@
       "name": "_DeleteAccountDialogState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1996,
+      "line": 2084,
       "members": [
         "build",
         "dispose"
@@ -16333,13 +16333,13 @@
       "name": "_DeletionCredentials",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1629
+      "line": 1717
     },
     {
       "name": "_EscapeDismissibleDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2171,
+      "line": 2259,
       "members": [
         "build"
       ]
@@ -16348,7 +16348,7 @@
       "name": "_IdentityBadge",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1451,
+      "line": 1539,
       "members": [
         "build"
       ]
@@ -16357,7 +16357,7 @@
       "name": "_IdentityDestination",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1489,
+      "line": 1577,
       "members": [
         "build"
       ]
@@ -16366,7 +16366,7 @@
       "name": "_InlineAccountNotice",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1530,
+      "line": 1618,
       "members": [
         "build"
       ]
@@ -16375,7 +16375,7 @@
       "name": "_InlineSecurityHint",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2132,
+      "line": 2220,
       "members": [
         "build"
       ]
@@ -16384,13 +16384,13 @@
       "name": "_PasswordChangeCredentials",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1790
+      "line": 1878
     },
     {
       "name": "_PasswordVisibilityButton",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2114,
+      "line": 2202,
       "members": [
         "build"
       ]
@@ -16399,7 +16399,7 @@
       "name": "_ProfileDraft",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 29,
+      "line": 73,
       "members": [
         "==",
         "_normalized",
@@ -16407,16 +16407,26 @@
       ]
     },
     {
+      "name": "_ProfileReleaseAccess",
+      "kind": "class",
+      "source": "app/lib/features/profile/profile_screen.dart",
+      "line": 30,
+      "members": [
+        "hasLocationContext",
+        "hasVisibilityControls"
+      ]
+    },
+    {
       "name": "_ProfileSaveFeedback",
       "kind": "enum",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 27
+      "line": 28
     },
     {
       "name": "_ProfileScreenState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 113,
+      "line": 157,
       "members": [
         "_buildAccountActions",
         "_buildEditableAvatar",
@@ -16453,7 +16463,7 @@
       "name": "_ProfileSectionPanel",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2189,
+      "line": 2277,
       "members": [
         "build"
       ]
@@ -16462,7 +16472,7 @@
       "name": "_RevokeSessionsDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1926,
+      "line": 2014,
       "members": [
         "createState"
       ]
@@ -16471,7 +16481,7 @@
       "name": "_RevokeSessionsDialogState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1933,
+      "line": 2021,
       "members": [
         "build",
         "dispose"
@@ -16481,7 +16491,7 @@
       "name": "_VisibilityField",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1591,
+      "line": 1679,
       "members": [
         "build"
       ]
@@ -16490,13 +16500,19 @@
       "name": "_isPrivateAvatarHost",
       "kind": "function",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1665
+      "line": 1753
     },
     {
       "name": "_validatePublicAvatarUrl",
       "kind": "function",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 1645
+      "line": 1733
+    },
+    {
+      "name": "allowed",
+      "kind": "function",
+      "source": "app/lib/features/profile/profile_screen.dart",
+      "line": 44
     },
     {
       "name": "DeckEvolutionSummary",
@@ -26684,13 +26700,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -40804,9 +40820,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42580,
-    "resolved_call_site_count": 67802,
-    "workspace_call_edge_count": 13222,
+    "resolved_call_edge_count": 42588,
+    "resolved_call_site_count": 67823,
+    "workspace_call_edge_count": 13229,
     "unresolved_call_edge_count": 539,
     "unresolved_call_site_count": 749,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -62989,7 +63005,18 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 19,
+        "line": 21,
+        "caller": "PlanScreen.build",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilitiesProvider.isAllowed",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/commercial/screens/plan_screen.dart",
+        "line": 28,
         "caller": "PlanScreen.build",
         "kind": "method",
         "lexical_target": "load",
@@ -63000,7 +63027,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 34,
+        "line": 43,
         "caller": "PlanScreen.build",
         "kind": "constructor",
         "lexical_target": "ResponsivePageFrame",
@@ -63011,7 +63038,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 47,
+        "line": 57,
         "caller": "PlanScreen.build",
         "kind": "constructor",
         "lexical_target": "AiUsageMeter",
@@ -63022,7 +63049,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 49,
+        "line": 60,
         "caller": "PlanScreen.build",
         "kind": "constructor",
         "lexical_target": "FreeBetaNotice",
@@ -63033,7 +63060,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 55,
+        "line": 66,
         "caller": "PlanScreen.build",
         "kind": "constructor",
         "lexical_target": "_RemotePlanStatusPanel",
@@ -63044,7 +63071,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 58,
+        "line": 69,
         "caller": "PlanScreen.build",
         "kind": "constructor",
         "lexical_target": "_LegalShortcutPanel",
@@ -63155,6 +63182,17 @@
       {
         "source": "app/lib/features/commercial/widgets/ai_usage_meter.dart",
         "line": 19,
+        "caller": "AiUsageMeter.build",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilitiesProvider.isAllowed",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/commercial/widgets/ai_usage_meter.dart",
+        "line": 30,
         "caller": "AiUsageMeter.build",
         "kind": "method",
         "lexical_target": "load",
@@ -97276,7 +97314,29 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1029,
+        "line": 1011,
+        "caller": "_ProfileScreenState._buildIdentityRail",
+        "kind": "constructor",
+        "lexical_target": "AiUsageMeter",
+        "target": "AiUsageMeter.AiUsageMeter",
+        "target_library": "package:manaloom/features/commercial/widgets/ai_usage_meter.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1024,
+        "caller": "_ProfileScreenState._buildIdentityRail",
+        "kind": "constructor",
+        "lexical_target": "_IdentityDestination",
+        "target": "_IdentityDestination._IdentityDestination",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1098,
         "caller": "_ProfileScreenState._buildEditableAvatar",
         "kind": "method",
         "lexical_target": "_showAvatarDialog",
@@ -97287,7 +97347,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1052,
+        "line": 1121,
         "caller": "_ProfileScreenState._buildIdentityCopy",
         "kind": "constructor",
         "lexical_target": "PlayerIdentityName",
@@ -97298,18 +97358,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 110,
-        "caller": "ProfileScreen.createState",
-        "kind": "constructor",
-        "lexical_target": "_ProfileScreenState",
-        "target": "_ProfileScreenState._ProfileScreenState",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1107,
+        "line": 1181,
         "caller": "_ProfileScreenState._buildProfileWorkspace",
         "kind": "constructor",
         "lexical_target": "_ProfileSectionPanel",
@@ -97320,7 +97369,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1126,
+        "line": 1204,
         "caller": "_ProfileScreenState._buildProfileWorkspace",
         "kind": "method",
         "lexical_target": "_buildLocationFields",
@@ -97331,7 +97380,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1133,
+        "line": 1212,
         "caller": "_ProfileScreenState._buildProfileWorkspace",
         "kind": "method",
         "lexical_target": "_buildVisibilityGrid",
@@ -97342,7 +97391,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1140,
+        "line": 1219,
         "caller": "_ProfileScreenState._buildProfileWorkspace",
         "kind": "method",
         "lexical_target": "_buildSecurityActions",
@@ -97353,7 +97402,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1147,
+        "line": 1226,
         "caller": "_ProfileScreenState._buildProfileWorkspace",
         "kind": "method",
         "lexical_target": "_buildAccountActions",
@@ -97364,7 +97413,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1166,
+        "line": 1245,
         "caller": "_ProfileScreenState._buildLocationFields",
         "kind": "method",
         "lexical_target": "_mutateDraft",
@@ -97375,7 +97424,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1221,
+        "line": 1303,
         "caller": "_ProfileScreenState._buildVisibilityGrid",
         "kind": "constructor",
         "lexical_target": "_VisibilityField",
@@ -97386,7 +97435,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1226,
+        "line": 1308,
         "caller": "_ProfileScreenState._buildVisibilityGrid",
         "kind": "method",
         "lexical_target": "_mutateDraft",
@@ -97397,7 +97446,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1303,
+        "line": 1391,
         "caller": "_ProfileScreenState._buildSecurityActions",
         "kind": "constructor",
         "lexical_target": "_InlineAccountNotice",
@@ -97408,7 +97457,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1659,
+        "line": 154,
+        "caller": "ProfileScreen.createState",
+        "kind": "constructor",
+        "lexical_target": "_ProfileScreenState",
+        "target": "_ProfileScreenState._ProfileScreenState",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1747,
         "caller": "_validatePublicAvatarUrl",
         "kind": "method",
         "lexical_target": "_isPrivateAvatarHost",
@@ -97419,7 +97479,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1694,
+        "line": 1782,
         "caller": "_AvatarUrlDialog.createState",
         "kind": "constructor",
         "lexical_target": "_AvatarUrlDialogState",
@@ -97430,7 +97490,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1714,
+        "line": 1802,
         "caller": "_AvatarUrlDialogState.build",
         "kind": "constructor",
         "lexical_target": "_EscapeDismissibleDialog",
@@ -97441,18 +97501,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 172,
-        "caller": "_ProfileScreenState.initState",
-        "kind": "constructor",
-        "lexical_target": "AccountPrivacyService",
-        "target": "AccountPrivacyService.AccountPrivacyService",
-        "target_library": "package:manaloom/features/profile/account_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1748,
+        "line": 1836,
         "caller": "_AvatarUrlDialogState.build",
         "kind": "constructor",
         "lexical_target": "_InlineSecurityHint",
@@ -97463,7 +97512,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1768,
+        "line": 1856,
         "caller": "_AvatarUrlDialogState.build",
         "kind": "constructor",
         "lexical_target": "_AvatarDialogResult",
@@ -97474,18 +97523,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 178,
-        "caller": "_ProfileScreenState.initState",
-        "kind": "method",
-        "lexical_target": "refreshProfile",
-        "target": "AuthProvider.refreshProfile",
-        "target_library": "package:manaloom/features/auth/providers/auth_provider.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1804,
+        "line": 1892,
         "caller": "_ChangePasswordDialog.createState",
         "kind": "constructor",
         "lexical_target": "_ChangePasswordDialogState",
@@ -97496,18 +97534,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 181,
-        "caller": "_ProfileScreenState.initState",
-        "kind": "method",
-        "lexical_target": "_hydrateFromUser",
-        "target": "_ProfileScreenState._hydrateFromUser",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1825,
+        "line": 1913,
         "caller": "_ChangePasswordDialogState.build",
         "kind": "constructor",
         "lexical_target": "_EscapeDismissibleDialog",
@@ -97518,7 +97545,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1842,
+        "line": 1930,
         "caller": "_ChangePasswordDialogState.build",
         "kind": "constructor",
         "lexical_target": "_PasswordVisibilityButton",
@@ -97529,7 +97556,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1855,
+        "line": 1943,
         "caller": "_ChangePasswordDialogState.build",
         "kind": "constructor",
         "lexical_target": "_InlineSecurityHint",
@@ -97540,7 +97567,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1913,
+        "line": 2001,
         "caller": "_ChangePasswordDialogState.build",
         "kind": "constructor",
         "lexical_target": "_PasswordChangeCredentials",
@@ -97551,18 +97578,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 192,
-        "caller": "_ProfileScreenState._currentDraft",
-        "kind": "constructor",
-        "lexical_target": "_ProfileDraft",
-        "target": "_ProfileDraft._ProfileDraft",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1930,
+        "line": 2018,
         "caller": "_RevokeSessionsDialog.createState",
         "kind": "constructor",
         "lexical_target": "_RevokeSessionsDialogState",
@@ -97573,7 +97589,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1945,
+        "line": 2033,
         "caller": "_RevokeSessionsDialogState.build",
         "kind": "constructor",
         "lexical_target": "_EscapeDismissibleDialog",
@@ -97584,7 +97600,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1957,
+        "line": 2045,
         "caller": "_RevokeSessionsDialogState.build",
         "kind": "constructor",
         "lexical_target": "_PasswordVisibilityButton",
@@ -97595,7 +97611,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1993,
+        "line": 2081,
         "caller": "_DeleteAccountDialog.createState",
         "kind": "constructor",
         "lexical_target": "_DeleteAccountDialogState",
@@ -97606,7 +97622,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2011,
+        "line": 2099,
         "caller": "_DeleteAccountDialogState.build",
         "kind": "constructor",
         "lexical_target": "_EscapeDismissibleDialog",
@@ -97617,7 +97633,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2068,
+        "line": 2156,
         "caller": "_DeleteAccountDialogState.build",
         "kind": "constructor",
         "lexical_target": "_PasswordVisibilityButton",
@@ -97628,7 +97644,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2100,
+        "line": 216,
+        "caller": "_ProfileScreenState.initState",
+        "kind": "constructor",
+        "lexical_target": "AccountPrivacyService",
+        "target": "AccountPrivacyService.AccountPrivacyService",
+        "target_library": "package:manaloom/features/profile/account_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 2188,
         "caller": "_DeleteAccountDialogState.build",
         "kind": "constructor",
         "lexical_target": "_DeletionCredentials",
@@ -97640,6 +97667,39 @@
       {
         "source": "app/lib/features/profile/profile_screen.dart",
         "line": 222,
+        "caller": "_ProfileScreenState.initState",
+        "kind": "method",
+        "lexical_target": "refreshProfile",
+        "target": "AuthProvider.refreshProfile",
+        "target_library": "package:manaloom/features/auth/providers/auth_provider.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 225,
+        "caller": "_ProfileScreenState.initState",
+        "kind": "method",
+        "lexical_target": "_hydrateFromUser",
+        "target": "_ProfileScreenState._hydrateFromUser",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 236,
+        "caller": "_ProfileScreenState._currentDraft",
+        "kind": "constructor",
+        "lexical_target": "_ProfileDraft",
+        "target": "_ProfileDraft._ProfileDraft",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 266,
         "caller": "_ProfileScreenState._hydrateFromUser",
         "kind": "constructor",
         "lexical_target": "_ProfileDraft.fromUser",
@@ -97650,7 +97710,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 268,
+        "line": 309,
+        "caller": "_ProfileScreenState._save",
+        "kind": "constructor",
+        "lexical_target": "_ProfileReleaseAccess.fromProvider",
+        "target": "_ProfileReleaseAccess._ProfileReleaseAccess.fromProvider",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 315,
         "caller": "_ProfileScreenState._save",
         "kind": "method",
         "lexical_target": "updateProfile",
@@ -97661,7 +97732,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 312,
+        "line": 365,
         "caller": "_ProfileScreenState._exportData",
         "kind": "method",
         "lexical_target": "exportPortableData",
@@ -97672,7 +97743,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 322,
+        "line": 375,
         "caller": "_ProfileScreenState._exportData",
         "kind": "method",
         "lexical_target": "_showPrivacyError",
@@ -97683,7 +97754,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 348,
+        "line": 401,
         "caller": "_ProfileScreenState._deleteAccount",
         "kind": "method",
         "lexical_target": "_showDeleteAccountDialog",
@@ -97694,7 +97765,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 353,
+        "line": 406,
         "caller": "_ProfileScreenState._deleteAccount",
         "kind": "method",
         "lexical_target": "deleteAccount",
@@ -97705,7 +97776,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 358,
+        "line": 411,
         "caller": "_ProfileScreenState._deleteAccount",
         "kind": "method",
         "lexical_target": "logout",
@@ -97716,7 +97787,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 368,
+        "line": 421,
         "caller": "_ProfileScreenState._deleteAccount",
         "kind": "method",
         "lexical_target": "_showPrivacyError",
@@ -97727,7 +97798,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 382,
+        "line": 435,
         "caller": "_ProfileScreenState._showDeleteAccountDialog",
         "kind": "constructor",
         "lexical_target": "_DeleteAccountDialog",
@@ -97738,7 +97809,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 391,
+        "line": 444,
         "caller": "_ProfileScreenState._changePassword",
         "kind": "constructor",
         "lexical_target": "_ChangePasswordDialog",
@@ -97749,7 +97820,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 400,
+        "line": 45,
+        "caller": "allowed",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilitiesProvider.isAllowed",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 453,
         "caller": "_ProfileScreenState._changePassword",
         "kind": "method",
         "lexical_target": "changePassword",
@@ -97760,7 +97842,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 426,
+        "line": 47,
+        "caller": "_ProfileReleaseAccess.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "_ProfileReleaseAccess",
+        "target": "_ProfileReleaseAccess._ProfileReleaseAccess",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 479,
         "caller": "_ProfileScreenState._revokeSessions",
         "kind": "constructor",
         "lexical_target": "_RevokeSessionsDialog",
@@ -97771,7 +97864,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 435,
+        "line": 48,
+        "caller": "_ProfileReleaseAccess.<constructor>",
+        "kind": "method",
+        "lexical_target": "allowed",
+        "target": "allowed",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 488,
         "caller": "_ProfileScreenState._revokeSessions",
         "kind": "method",
         "lexical_target": "revokeOtherSessions",
@@ -97782,29 +97886,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 44,
-        "caller": "_ProfileDraft.<constructor>",
-        "kind": "constructor",
-        "lexical_target": "_ProfileDraft",
-        "target": "_ProfileDraft._ProfileDraft",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 45,
-        "caller": "_ProfileDraft.<constructor>",
-        "kind": "method",
-        "lexical_target": "_normalized",
-        "target": "_ProfileDraft._normalized",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 464,
+        "line": 517,
         "caller": "_ProfileScreenState._showBlockedUsers",
         "kind": "method",
         "lexical_target": "fetchBlockedUsers",
@@ -97815,7 +97897,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 545,
+        "line": 598,
         "caller": "_ProfileScreenState._showBlockedUsers",
         "kind": "method",
         "lexical_target": "_confirmUnblock",
@@ -97826,7 +97908,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 635,
+        "line": 689,
         "caller": "_ProfileScreenState._confirmUnblock",
         "kind": "method",
         "lexical_target": "unblockUser",
@@ -97837,7 +97919,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 650,
+        "line": 704,
         "caller": "_ProfileScreenState._showAvatarDialog",
         "kind": "constructor",
         "lexical_target": "_AvatarUrlDialog",
@@ -97848,7 +97930,18 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 668,
+        "line": 717,
+        "caller": "_ProfileScreenState.build",
+        "kind": "constructor",
+        "lexical_target": "_ProfileReleaseAccess.fromProvider",
+        "target": "_ProfileReleaseAccess._ProfileReleaseAccess.fromProvider",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 725,
         "caller": "_ProfileScreenState.build",
         "kind": "method",
         "lexical_target": "_buildSaveDock",
@@ -97859,7 +97952,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 686,
+        "line": 743,
         "caller": "_ProfileScreenState.build",
         "kind": "method",
         "lexical_target": "logout",
@@ -97870,7 +97963,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 690,
+        "line": 747,
         "caller": "_ProfileScreenState.build",
         "kind": "constructor",
         "lexical_target": "ShellAppBarActions",
@@ -97881,7 +97974,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 701,
+        "line": 758,
         "caller": "_ProfileScreenState.build",
         "kind": "constructor",
         "lexical_target": "ResponsivePageFrame",
@@ -97892,7 +97985,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 709,
+        "line": 766,
         "caller": "_ProfileScreenState.build",
         "kind": "method",
         "lexical_target": "_buildIdentityRail",
@@ -97903,7 +97996,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 714,
+        "line": 772,
         "caller": "_ProfileScreenState.build",
         "kind": "method",
         "lexical_target": "_buildProfileWorkspace",
@@ -97914,7 +98007,29 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 874,
+        "line": 88,
+        "caller": "_ProfileDraft.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "_ProfileDraft",
+        "target": "_ProfileDraft._ProfileDraft",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 89,
+        "caller": "_ProfileDraft.<constructor>",
+        "kind": "method",
+        "lexical_target": "_normalized",
+        "target": "_ProfileDraft._normalized",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 937,
         "caller": "_ProfileScreenState._buildIdentityRail",
         "kind": "method",
         "lexical_target": "_buildEditableAvatar",
@@ -97925,7 +98040,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 876,
+        "line": 939,
         "caller": "_ProfileScreenState._buildIdentityRail",
         "kind": "method",
         "lexical_target": "_buildIdentityCopy",
@@ -97936,7 +98051,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 888,
+        "line": 951,
         "caller": "_ProfileScreenState._buildIdentityRail",
         "kind": "constructor",
         "lexical_target": "ManaLoomThemeMotif",
@@ -97947,7 +98062,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 918,
+        "line": 981,
         "caller": "_ProfileScreenState._buildIdentityRail",
         "kind": "constructor",
         "lexical_target": "_IdentityBadge",
@@ -97955,28 +98070,6 @@
         "target_library": "package:manaloom/features/profile/profile_screen.dart",
         "target_scope": "workspace",
         "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 945,
-        "caller": "_ProfileScreenState._buildIdentityRail",
-        "kind": "constructor",
-        "lexical_target": "AiUsageMeter",
-        "target": "AiUsageMeter.AiUsageMeter",
-        "target_library": "package:manaloom/features/commercial/widgets/ai_usage_meter.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 956,
-        "caller": "_ProfileScreenState._buildIdentityRail",
-        "kind": "constructor",
-        "lexical_target": "_IdentityDestination",
-        "target": "_IdentityDestination._IdentityDestination",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
       },
       {
         "source": "app/lib/features/retention/models/post_game_note.dart",
@@ -187207,7 +187300,7 @@
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/basic.dart",
         "unique_references": 2392,
-        "occurrences": 4192
+        "occurrences": 4193
       },
       {
         "target_scope": "dependency",
@@ -187674,8 +187767,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:provider/src/provider.dart",
-        "unique_references": 176,
-        "occurrences": 235
+        "unique_references": 177,
+        "occurrences": 239
       },
       {
         "target_scope": "dependency",
@@ -187782,8 +187875,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/config/release_capabilities.dart",
-        "unique_references": 91,
-        "occurrences": 194
+        "unique_references": 94,
+        "occurrences": 199
       },
       {
         "target_scope": "workspace",
@@ -188958,8 +189051,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "unique_references": 49,
-        "occurrences": 79
+        "unique_references": 53,
+        "occurrences": 90
       },
       {
         "target_scope": "workspace",
@@ -194281,7 +194374,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1623,
+        "line": 1711,
         "caller": "_VisibilityField.build",
         "kind": "function_expression",
         "lexical_target": "onChanged",
@@ -194289,7 +194382,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 239,
+        "line": 283,
         "caller": "_ProfileScreenState._mutateDraft",
         "kind": "function_expression",
         "lexical_target": "mutation",
@@ -194297,7 +194390,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 313,
+        "line": 366,
         "caller": "_ProfileScreenState._exportData",
         "kind": "function_expression",
         "lexical_target": "(widget.shareData ?? _sharePortableData)",
@@ -195688,8 +195781,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16029,
-    "workspace_type_reference_count": 3380,
+    "resolved_type_reference_count": 16034,
+    "workspace_type_reference_count": 3385,
     "unresolved_type_reference_count": 345,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -203195,7 +203288,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 17,
+        "line": 18,
         "lexical_type": "CommercialProvider",
         "resolved_type": "CommercialProvider",
         "target": "CommercialProvider",
@@ -203205,7 +203298,17 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 34,
+        "line": 19,
+        "lexical_type": "ReleaseCapabilitiesProvider?",
+        "resolved_type": "ReleaseCapabilitiesProvider?",
+        "target": "ReleaseCapabilitiesProvider",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/commercial/screens/plan_screen.dart",
+        "line": 43,
         "lexical_type": "ResponsivePageFrame",
         "resolved_type": "ResponsivePageFrame",
         "target": "ResponsivePageFrame",
@@ -203215,7 +203318,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 47,
+        "line": 57,
         "lexical_type": "AiUsageMeter",
         "resolved_type": "AiUsageMeter",
         "target": "AiUsageMeter",
@@ -203225,7 +203328,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 49,
+        "line": 60,
         "lexical_type": "FreeBetaNotice",
         "resolved_type": "FreeBetaNotice",
         "target": "FreeBetaNotice",
@@ -203235,7 +203338,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 55,
+        "line": 66,
         "lexical_type": "_RemotePlanStatusPanel",
         "resolved_type": "_RemotePlanStatusPanel",
         "target": "_RemotePlanStatusPanel",
@@ -203245,7 +203348,7 @@
       },
       {
         "source": "app/lib/features/commercial/screens/plan_screen.dart",
-        "line": 58,
+        "line": 69,
         "lexical_type": "_LegalShortcutPanel",
         "resolved_type": "_LegalShortcutPanel",
         "target": "_LegalShortcutPanel",
@@ -203315,7 +203418,17 @@
       },
       {
         "source": "app/lib/features/commercial/widgets/ai_usage_meter.dart",
-        "line": 16,
+        "line": 17,
+        "lexical_type": "ReleaseCapabilitiesProvider?",
+        "resolved_type": "ReleaseCapabilitiesProvider?",
+        "target": "ReleaseCapabilitiesProvider",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/commercial/widgets/ai_usage_meter.dart",
+        "line": 27,
         "lexical_type": "CommercialProvider?",
         "resolved_type": "CommercialProvider?",
         "target": "CommercialProvider",
@@ -213675,377 +213788,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1052,
-        "lexical_type": "PlayerIdentityName",
-        "resolved_type": "PlayerIdentityName",
-        "target": "PlayerIdentityName",
-        "target_library": "package:manaloom/core/widgets/player_identity_name.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 106,
-        "lexical_type": "ApiClient?",
-        "resolved_type": "ApiClient?",
-        "target": "ApiClient",
-        "target_library": "package:manaloom/core/api/api_client.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 107,
-        "lexical_type": "AccountDataShare?",
-        "resolved_type": "Future<void> Function(String)?",
-        "target": "AccountDataShare",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 110,
-        "lexical_type": "ProfileScreen",
-        "resolved_type": "ProfileScreen",
-        "target": "ProfileScreen",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 110,
-        "lexical_type": "_ProfileScreenState",
-        "resolved_type": "_ProfileScreenState",
-        "target": "_ProfileScreenState",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1107,
-        "lexical_type": "_ProfileSectionPanel",
-        "resolved_type": "_ProfileSectionPanel",
-        "target": "_ProfileSectionPanel",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1221,
-        "lexical_type": "_VisibilityField",
-        "resolved_type": "_VisibilityField",
-        "target": "_VisibilityField",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 6
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1303,
-        "lexical_type": "_InlineAccountNotice",
-        "resolved_type": "_InlineAccountNotice",
-        "target": "_InlineAccountNotice",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 134,
-        "lexical_type": "_ProfileDraft?",
-        "resolved_type": "_ProfileDraft?",
-        "target": "_ProfileDraft",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 135,
-        "lexical_type": "_ProfileSaveFeedback?",
-        "resolved_type": "_ProfileSaveFeedback?",
-        "target": "_ProfileSaveFeedback",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 137,
-        "lexical_type": "AccountPrivacyService",
-        "resolved_type": "AccountPrivacyService",
-        "target": "AccountPrivacyService",
-        "target_library": "package:manaloom/features/profile/account_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1694,
-        "lexical_type": "_AvatarUrlDialogState",
-        "resolved_type": "_AvatarUrlDialogState",
-        "target": "_AvatarUrlDialogState",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1714,
-        "lexical_type": "_EscapeDismissibleDialog",
-        "resolved_type": "_EscapeDismissibleDialog",
-        "target": "_EscapeDismissibleDialog",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1748,
-        "lexical_type": "_InlineSecurityHint",
-        "resolved_type": "_InlineSecurityHint",
-        "target": "_InlineSecurityHint",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 177,
-        "lexical_type": "AuthProvider",
-        "resolved_type": "AuthProvider",
-        "target": "AuthProvider",
-        "target_library": "package:manaloom/features/auth/providers/auth_provider.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1804,
-        "lexical_type": "_ChangePasswordDialogState",
-        "resolved_type": "_ChangePasswordDialogState",
-        "target": "_ChangePasswordDialogState",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1842,
-        "lexical_type": "_PasswordVisibilityButton",
-        "resolved_type": "_PasswordVisibilityButton",
-        "target": "_PasswordVisibilityButton",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1930,
-        "lexical_type": "_RevokeSessionsDialogState",
-        "resolved_type": "_RevokeSessionsDialogState",
-        "target": "_RevokeSessionsDialogState",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 1993,
-        "lexical_type": "_DeleteAccountDialogState",
-        "resolved_type": "_DeleteAccountDialogState",
-        "target": "_DeleteAccountDialogState",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 320,
-        "lexical_type": "AccountPrivacyException",
-        "resolved_type": "AccountPrivacyException",
-        "target": "AccountPrivacyException",
-        "target_library": "package:manaloom/features/profile/account_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 377,
-        "lexical_type": "_DeletionCredentials?",
-        "resolved_type": "_DeletionCredentials?",
-        "target": "_DeletionCredentials",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 378,
-        "lexical_type": "_DeletionCredentials",
-        "resolved_type": "_DeletionCredentials",
-        "target": "_DeletionCredentials",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 382,
-        "lexical_type": "_DeleteAccountDialog",
-        "resolved_type": "_DeleteAccountDialog",
-        "target": "_DeleteAccountDialog",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 388,
-        "lexical_type": "_PasswordChangeCredentials",
-        "resolved_type": "_PasswordChangeCredentials",
-        "target": "_PasswordChangeCredentials",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 391,
-        "lexical_type": "_ChangePasswordDialog",
-        "resolved_type": "_ChangePasswordDialog",
-        "target": "_ChangePasswordDialog",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 426,
-        "lexical_type": "_RevokeSessionsDialog",
-        "resolved_type": "_RevokeSessionsDialog",
-        "target": "_RevokeSessionsDialog",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 44,
-        "lexical_type": "User",
-        "resolved_type": "User",
-        "target": "User",
-        "target_library": "package:manaloom/features/auth/models/user.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 44,
-        "lexical_type": "_ProfileDraft",
-        "resolved_type": "_ProfileDraft",
-        "target": "_ProfileDraft",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 463,
-        "lexical_type": "SocialProvider",
-        "resolved_type": "SocialProvider",
-        "target": "SocialProvider",
-        "target_library": "package:manaloom/features/social/providers/social_provider.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 608,
-        "lexical_type": "BlockedUser",
-        "resolved_type": "BlockedUser",
-        "target": "BlockedUser",
-        "target_library": "package:manaloom/features/social/providers/social_provider.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 648,
-        "lexical_type": "_AvatarDialogResult",
-        "resolved_type": "_AvatarDialogResult",
-        "target": "_AvatarDialogResult",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 650,
-        "lexical_type": "_AvatarUrlDialog",
-        "resolved_type": "_AvatarUrlDialog",
-        "target": "_AvatarUrlDialog",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 660,
-        "lexical_type": "User?",
-        "resolved_type": "User?",
-        "target": "User",
-        "target_library": "package:manaloom/features/auth/models/user.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 690,
-        "lexical_type": "ShellAppBarActions",
-        "resolved_type": "ShellAppBarActions",
-        "target": "ShellAppBarActions",
-        "target_library": "package:manaloom/core/widgets/shell_app_bar_actions.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 701,
-        "lexical_type": "ResponsivePageFrame",
-        "resolved_type": "ResponsivePageFrame",
-        "target": "ResponsivePageFrame",
-        "target_library": "package:manaloom/core/widgets/responsive_page_frame.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 888,
-        "lexical_type": "ManaLoomThemeMotif",
-        "resolved_type": "ManaLoomThemeMotif",
-        "target": "ManaLoomThemeMotif",
-        "target_library": "package:manaloom/core/widgets/manaloom_theme_motif.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 918,
-        "lexical_type": "_IdentityBadge",
-        "resolved_type": "_IdentityBadge",
-        "target": "_IdentityBadge",
-        "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 945,
+        "line": 1011,
         "lexical_type": "AiUsageMeter",
         "resolved_type": "AiUsageMeter",
         "target": "AiUsageMeter",
@@ -214055,13 +213798,413 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 956,
+        "line": 1024,
         "lexical_type": "_IdentityDestination",
         "resolved_type": "_IdentityDestination",
         "target": "_IdentityDestination",
         "target_library": "package:manaloom/features/profile/profile_screen.dart",
         "target_scope": "workspace",
         "occurrences": 4
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1121,
+        "lexical_type": "PlayerIdentityName",
+        "resolved_type": "PlayerIdentityName",
+        "target": "PlayerIdentityName",
+        "target_library": "package:manaloom/core/widgets/player_identity_name.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1181,
+        "lexical_type": "_ProfileSectionPanel",
+        "resolved_type": "_ProfileSectionPanel",
+        "target": "_ProfileSectionPanel",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1303,
+        "lexical_type": "_VisibilityField",
+        "resolved_type": "_VisibilityField",
+        "target": "_VisibilityField",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1391,
+        "lexical_type": "_InlineAccountNotice",
+        "resolved_type": "_InlineAccountNotice",
+        "target": "_InlineAccountNotice",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 150,
+        "lexical_type": "ApiClient?",
+        "resolved_type": "ApiClient?",
+        "target": "ApiClient",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 151,
+        "lexical_type": "AccountDataShare?",
+        "resolved_type": "Future<void> Function(String)?",
+        "target": "AccountDataShare",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 154,
+        "lexical_type": "ProfileScreen",
+        "resolved_type": "ProfileScreen",
+        "target": "ProfileScreen",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 154,
+        "lexical_type": "_ProfileScreenState",
+        "resolved_type": "_ProfileScreenState",
+        "target": "_ProfileScreenState",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 178,
+        "lexical_type": "_ProfileDraft?",
+        "resolved_type": "_ProfileDraft?",
+        "target": "_ProfileDraft",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1782,
+        "lexical_type": "_AvatarUrlDialogState",
+        "resolved_type": "_AvatarUrlDialogState",
+        "target": "_AvatarUrlDialogState",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 179,
+        "lexical_type": "_ProfileSaveFeedback?",
+        "resolved_type": "_ProfileSaveFeedback?",
+        "target": "_ProfileSaveFeedback",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1802,
+        "lexical_type": "_EscapeDismissibleDialog",
+        "resolved_type": "_EscapeDismissibleDialog",
+        "target": "_EscapeDismissibleDialog",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 181,
+        "lexical_type": "AccountPrivacyService",
+        "resolved_type": "AccountPrivacyService",
+        "target": "AccountPrivacyService",
+        "target_library": "package:manaloom/features/profile/account_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1836,
+        "lexical_type": "_InlineSecurityHint",
+        "resolved_type": "_InlineSecurityHint",
+        "target": "_InlineSecurityHint",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1892,
+        "lexical_type": "_ChangePasswordDialogState",
+        "resolved_type": "_ChangePasswordDialogState",
+        "target": "_ChangePasswordDialogState",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 1930,
+        "lexical_type": "_PasswordVisibilityButton",
+        "resolved_type": "_PasswordVisibilityButton",
+        "target": "_PasswordVisibilityButton",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 2018,
+        "lexical_type": "_RevokeSessionsDialogState",
+        "resolved_type": "_RevokeSessionsDialogState",
+        "target": "_RevokeSessionsDialogState",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 2081,
+        "lexical_type": "_DeleteAccountDialogState",
+        "resolved_type": "_DeleteAccountDialogState",
+        "target": "_DeleteAccountDialogState",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 221,
+        "lexical_type": "AuthProvider",
+        "resolved_type": "AuthProvider",
+        "target": "AuthProvider",
+        "target_library": "package:manaloom/features/auth/providers/auth_provider.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 373,
+        "lexical_type": "AccountPrivacyException",
+        "resolved_type": "AccountPrivacyException",
+        "target": "AccountPrivacyException",
+        "target_library": "package:manaloom/features/profile/account_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 42,
+        "lexical_type": "ReleaseCapabilitiesProvider?",
+        "resolved_type": "ReleaseCapabilitiesProvider?",
+        "target": "ReleaseCapabilitiesProvider",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 430,
+        "lexical_type": "_DeletionCredentials?",
+        "resolved_type": "_DeletionCredentials?",
+        "target": "_DeletionCredentials",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 431,
+        "lexical_type": "_DeletionCredentials",
+        "resolved_type": "_DeletionCredentials",
+        "target": "_DeletionCredentials",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 435,
+        "lexical_type": "_DeleteAccountDialog",
+        "resolved_type": "_DeleteAccountDialog",
+        "target": "_DeleteAccountDialog",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 44,
+        "lexical_type": "ReleaseCapability",
+        "resolved_type": "ReleaseCapability",
+        "target": "ReleaseCapability",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 441,
+        "lexical_type": "_PasswordChangeCredentials",
+        "resolved_type": "_PasswordChangeCredentials",
+        "target": "_PasswordChangeCredentials",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 444,
+        "lexical_type": "_ChangePasswordDialog",
+        "resolved_type": "_ChangePasswordDialog",
+        "target": "_ChangePasswordDialog",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 47,
+        "lexical_type": "_ProfileReleaseAccess",
+        "resolved_type": "_ProfileReleaseAccess",
+        "target": "_ProfileReleaseAccess",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 479,
+        "lexical_type": "_RevokeSessionsDialog",
+        "resolved_type": "_RevokeSessionsDialog",
+        "target": "_RevokeSessionsDialog",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 516,
+        "lexical_type": "SocialProvider",
+        "resolved_type": "SocialProvider",
+        "target": "SocialProvider",
+        "target_library": "package:manaloom/features/social/providers/social_provider.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 661,
+        "lexical_type": "BlockedUser",
+        "resolved_type": "BlockedUser",
+        "target": "BlockedUser",
+        "target_library": "package:manaloom/features/social/providers/social_provider.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 702,
+        "lexical_type": "_AvatarDialogResult",
+        "resolved_type": "_AvatarDialogResult",
+        "target": "_AvatarDialogResult",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 704,
+        "lexical_type": "_AvatarUrlDialog",
+        "resolved_type": "_AvatarUrlDialog",
+        "target": "_AvatarUrlDialog",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 714,
+        "lexical_type": "User?",
+        "resolved_type": "User?",
+        "target": "User",
+        "target_library": "package:manaloom/features/auth/models/user.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 747,
+        "lexical_type": "ShellAppBarActions",
+        "resolved_type": "ShellAppBarActions",
+        "target": "ShellAppBarActions",
+        "target_library": "package:manaloom/core/widgets/shell_app_bar_actions.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 758,
+        "lexical_type": "ResponsivePageFrame",
+        "resolved_type": "ResponsivePageFrame",
+        "target": "ResponsivePageFrame",
+        "target_library": "package:manaloom/core/widgets/responsive_page_frame.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 88,
+        "lexical_type": "User",
+        "resolved_type": "User",
+        "target": "User",
+        "target_library": "package:manaloom/features/auth/models/user.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 88,
+        "lexical_type": "_ProfileDraft",
+        "resolved_type": "_ProfileDraft",
+        "target": "_ProfileDraft",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 951,
+        "lexical_type": "ManaLoomThemeMotif",
+        "resolved_type": "ManaLoomThemeMotif",
+        "target": "ManaLoomThemeMotif",
+        "target_library": "package:manaloom/core/widgets/manaloom_theme_motif.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/features/profile/profile_screen.dart",
+        "line": 981,
+        "lexical_type": "_IdentityBadge",
+        "resolved_type": "_IdentityBadge",
+        "target": "_IdentityBadge",
+        "target_library": "package:manaloom/features/profile/profile_screen.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
       },
       {
         "source": "app/lib/features/retention/models/post_game_note.dart",
@@ -229523,7 +229666,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6143,
-        "occurrences": 39179
+        "occurrences": 39190
       },
       {
         "target_scope": "dart_sdk",
@@ -230459,7 +230602,7 @@
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/basic.dart",
         "unique_references": 765,
-        "occurrences": 4192
+        "occurrences": 4193
       },
       {
         "target_scope": "dependency",
@@ -231004,8 +231147,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/config/release_capabilities.dart",
-        "unique_references": 24,
-        "occurrences": 99
+        "unique_references": 28,
+        "occurrences": 105
       },
       {
         "target_scope": "workspace",
@@ -232054,8 +232197,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/features/profile/profile_screen.dart",
-        "unique_references": 27,
-        "occurrences": 66
+        "unique_references": 28,
+        "occurrences": 72
       },
       {
         "target_scope": "workspace",
@@ -234311,7 +234454,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 25,
+        "line": 26,
         "lexical_type": "void",
         "occurrences": 22
       },
@@ -277399,7 +277542,7 @@
       "receipt_bindings_declared": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "0043cb4094dacefa313db1d259177999a0716ba2b4cb2fafa9be9bff3b99c581"
+    "project_logic_source_digest_sha256": "f3628ca3199dce784820a3dc63c9a6d7312a229098ce0ee5fc17a93f3d7e400a"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

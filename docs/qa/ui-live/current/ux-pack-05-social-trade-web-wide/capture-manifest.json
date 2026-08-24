@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-13T16:58:29.487672Z",
-  "source_digest": "7cf7c82d73fbd64a773e926692bf8bc131f8cbab6cd4b2357e76d84efd2c6e01",
+  "generated_at": "2026-08-24T15:36:14.957300Z",
+  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
   "surface": "social_trade",
   "profile": "web_social_trade_wide_1920x1080",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "91fe30ebb9e111e0cba1a00310515a689df6678e09493d93f163a4edfb498976",
+  "log_sha256": "818b3bf6e427bed322ad47fbaac4afa73765d9038f97413b4322ae5609ad9426",
   "checkpoint_count": 16,
   "required_checkpoints": [
     "social_trade_00_matches_populated",
@@ -36,16 +36,16 @@
     {
       "checkpoint": "social_trade_00_matches_populated",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_00_matches_populated.png",
-      "sha256": "31ae4f70964b4f50732918b0c8efec381bae6dfd23cc5467cae8e8e3e2578341",
-      "bytes": 71361,
+      "sha256": "6c17b9e20688724cdbc054780371a183292f4d768650bda21db4128ba04ca1af",
+      "bytes": 71485,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_01_marketplace_populated",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_01_marketplace_populated.png",
-      "sha256": "0075a9730c1a8d80845e664d27a9798b922bf587a382cc4bd0c3c243e23459c2",
-      "bytes": 64700,
+      "sha256": "a3ae0bc9891173b889a4fddfe2893f99bd5e5a1ab829f9b43dec285e260d3e22",
+      "bytes": 64848,
       "width": 1920,
       "height": 1080
     },

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-13T16:50:58.801585Z",
-  "source_digest": "7cf7c82d73fbd64a773e926692bf8bc131f8cbab6cd4b2357e76d84efd2c6e01",
+  "generated_at": "2026-08-24T15:28:27.104886Z",
+  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
   "surface": "battle_learning",
   "profile": "web_battle_learning_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "cce9d77dd16c9c2a2decd9c50376f0ce835dbd9ca4caa00380df4eae44a6bd95",
+  "log_sha256": "49ecc5976c9c6aab1073094a456d7e8b2bad3df7caf1afba54ce593469124adf",
   "checkpoint_count": 10,
   "required_checkpoints": [
     "battle_learning_00_play_entry",
@@ -94,8 +94,8 @@
     {
       "checkpoint": "battle_learning_08_postgame_receipt",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/battle_learning_08_postgame_receipt.png",
-      "sha256": "f894bac66c0e73faad010f244b9657ce6043ff11aa8a1509a6b098a2b9348ecb",
-      "bytes": 106418,
+      "sha256": "2d8bd376d3cb996aabe1cd2cbfd97b39641264bcbcac3a52bdb1e95fb379d444",
+      "bytes": 106386,
       "width": 390,
       "height": 844
     },

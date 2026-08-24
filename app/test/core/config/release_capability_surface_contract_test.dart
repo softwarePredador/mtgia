@@ -36,6 +36,27 @@ void main() {
         'ReleaseCapability.aiGenerateRebuild',
         'ReleaseCapability.battleBatch',
       ],
+      'lib/features/profile/profile_screen.dart': [
+        '_ProfileReleaseAccess.fromProvider',
+        'ReleaseCapability.profilesPublic',
+        'ReleaseCapability.collectionPrivate',
+        'ReleaseCapability.binderPublic',
+        'ReleaseCapability.marketplace',
+        'ReleaseCapability.directMessages',
+        'ReleaseCapability.trades',
+        'Perfil não publicado',
+      ],
+      'lib/features/commercial/widgets/ai_usage_meter.dart': [
+        'ReleaseCapabilitiesProvider',
+        'ReleaseCapability.aiAnalyzeOptimizeAdvisory',
+        'ReleaseCapability.aiGenerateRebuild',
+        'if (!aiAvailable) return const SizedBox.shrink()',
+      ],
+      'lib/features/commercial/screens/legal_screen.dart': [
+        'capability correspondente estiver liberada pelo servidor',
+        'não são oferecidos nesta revisão',
+        'enquanto a capability correspondente estiver OFF',
+      ],
       'lib/features/collection/screens/collection_screen.dart': [
         'ReleaseCapabilitiesProvider',
         'routeId',
@@ -61,6 +82,19 @@ void main() {
         expect(source, contains(token), reason: '${entry.key}: $token');
       }
     }
+
+    final legalSource = File(
+      'lib/features/commercial/screens/legal_screen.dart',
+    ).readAsStringSync();
+    final profileSource = File(
+      'lib/features/profile/profile_screen.dart',
+    ).readAsStringSync();
+    expect(legalSource, isNot(contains('coordena propostas e conversas')));
+    expect(
+      legalSource,
+      isNot(contains('O app mostra motivos e preview para revisão humana')),
+    );
+    expect(profileSource, isNot(contains('sua identidade pública')));
 
     for (final hub in const [
       'lib/features/collection/screens/collection_screen.dart',

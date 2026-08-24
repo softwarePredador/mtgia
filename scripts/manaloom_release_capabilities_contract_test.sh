@@ -61,6 +61,27 @@ BACKEND_KEYS_JSON="$(
 jq -e --argjson expected "$MANALOOM_RELEASE_CAPABILITY_KEYS_JSON" \
   '$expected == sort' >/dev/null <<<"$BACKEND_KEYS_JSON"
 
+manaloom_load_release_capabilities_from_git "$REPO" "$SHA"
+if manaloom_require_public_app_release_open \
+  "$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON" >/dev/null 2>&1; then
+  echo "contrato abriu /app com a matriz all-OFF" >&2
+  exit 1
+fi
+PUBLIC_APP_OPEN_FIXTURE="$(jq -c '
+  .live_verified_as_of = "2026-08-14T18:30:00Z" |
+  .capabilities.catalog_private.release_capability = "on" |
+  .capabilities.catalog_private.allowed = true |
+  .capabilities.catalog_private.live_verified_as_of = "2026-08-14T18:30:00Z"
+' <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")"
+manaloom_require_public_app_release_open "$PUBLIC_APP_OPEN_FIXTURE"
+PUBLIC_APP_UNVERIFIED_FIXTURE="$(jq -c \
+  '.live_verified_as_of = null' <<<"$PUBLIC_APP_OPEN_FIXTURE")"
+if manaloom_require_public_app_release_open \
+  "$PUBLIC_APP_UNVERIFIED_FIXTURE" >/dev/null 2>&1; then
+  echo "contrato abriu /app sem verificacao live datada" >&2
+  exit 1
+fi
+
 expect_invalid_policy() {
   local label="$1"
   local filter="$2"
@@ -123,6 +144,8 @@ grep -Fq '.release_capabilities == $release_capabilities' \
   "$ROOT_DIR/scripts/manaloom_publish_android_release.sh"
 grep -Fq 'manaloom_require_exact_release_capabilities' \
   "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'manaloom_require_public_app_release_open' \
+  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
 
 BATTLE_SIDECAR_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
 grep -Fq 'manaloom_load_release_capabilities_from_git' \

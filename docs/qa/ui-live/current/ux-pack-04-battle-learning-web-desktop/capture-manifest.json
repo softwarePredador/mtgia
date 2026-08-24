@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-13T16:52:14.549939Z",
-  "source_digest": "7cf7c82d73fbd64a773e926692bf8bc131f8cbab6cd4b2357e76d84efd2c6e01",
+  "generated_at": "2026-08-24T15:29:47.703593Z",
+  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
   "surface": "battle_learning",
   "profile": "web_battle_learning_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "35fc4a1b58266b1f22dd504fcc2c870cb556197368cc407fbabcd255db25b6df",
+  "log_sha256": "8f7143721050cc4c458397e683cbd90863cdf007bb520e3731c82e9180906c2d",
   "checkpoint_count": 10,
   "required_checkpoints": [
     "battle_learning_00_play_entry",
@@ -30,16 +30,16 @@
     {
       "checkpoint": "battle_learning_00_play_entry",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_00_play_entry.png",
-      "sha256": "99d8c610702833a24f15d5af87d58651e43618e52d8fd2be1759480dded549f2",
-      "bytes": 111505,
+      "sha256": "53b97986d9e55f1bb5a0d2ac7955c5fdac81b86aa658423f12d3488200a1b7d1",
+      "bytes": 111532,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "battle_learning_01_active_session",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_01_active_session.png",
-      "sha256": "b0877c0ab7ae2bc97bba191e1613ab4e01d7396908591389d90297adde2d976b",
-      "bytes": 123185,
+      "sha256": "70491e8989fd87aa7f7bf4c10af1463e92f9490db0e5a4740378c5c90e8519ef",
+      "bytes": 123207,
       "width": 1440,
       "height": 900
     },
@@ -94,8 +94,8 @@
     {
       "checkpoint": "battle_learning_08_postgame_receipt",
       "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/battle_learning_08_postgame_receipt.png",
-      "sha256": "d536777da4cb3fa7c7051ea19fdfa4cc7fcb1fff25c60b065f9a5e0443657e45",
-      "bytes": 122413,
+      "sha256": "11d417932dc23b0f53a6833cc592381179fd138bbfa79cb5743134b4e445f946",
+      "bytes": 122733,
       "width": 1440,
       "height": 900
     },

@@ -32,6 +32,13 @@ if [[ "$BUILD_ONLY" != "0" && "$BUILD_ONLY" != "1" ]]; then
 fi
 readonly BUILD_ONLY
 if [[ "$BUILD_ONLY" == "0" ]]; then
+  # shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+  source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
+  FLUTTER_WEB_RELEASE_SOURCE_SHA="${MANALOOM_RELEASE_SOURCE_SHA:-$(git -C "$ROOT_DIR" rev-parse HEAD)}"
+  manaloom_load_release_capabilities_from_git \
+    "$ROOT_DIR" "$FLUTTER_WEB_RELEASE_SOURCE_SHA"
+  manaloom_require_public_app_release_open \
+    "$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON"
   require_live_mutation_approval "ManaLoom Flutter Web deployment"
   readonly LIVE_MUTATION_APPROVED=1
 else
