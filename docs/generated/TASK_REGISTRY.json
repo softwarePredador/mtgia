@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
     "sha256": "5109f0e0e5585c2c6ce3655514d2f8a5f38331105f6a6471ee9069e520d25864"
@@ -4574,6 +4574,40 @@
     "TRD-P1-01",
     "TRD-P2-01"
   ],
+  "execution_ledger": {
+    "schema_version": 1,
+    "generated_from": {
+      "path": "docs/execution/CURRENT_QUEUE.md",
+      "sha256": "18acb0ec492f0feb45d3331e70a9ebc990b5f573f96dd7b23b864c85c7e24a2e"
+    },
+    "wip_limit": 1,
+    "active_slot_count": 1,
+    "active_slot": {
+      "label": "NOW",
+      "task_id": "BT-DOC-004",
+      "packet_path": "docs/execution/tasks/BT-DOC-004.md",
+      "packet_identity_validated": true,
+      "canonical_status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+      "canonical_dependencies": [
+        {
+          "id": "BT-DOC-001",
+          "status": "PASS"
+        }
+      ],
+      "dependency_gate": {
+        "all_dependencies_pass": true,
+        "containment_exception": false
+      }
+    },
+    "authority": {
+      "priority": false,
+      "status": false,
+      "dependencies": false,
+      "delivery": false,
+      "acceptance": false,
+      "live_mutation": false
+    }
+  },
   "documentation_lifecycle": {
     "schema_version": 1,
     "precedence": [
@@ -4961,6 +4995,10 @@
         "state": "current_context"
       },
       {
+        "prefix": "docs/execution/tasks/",
+        "state": "supporting_reference_non_authoritative"
+      },
+      {
         "prefix": "docs/generated/",
         "state": "generated_snapshot"
       },
@@ -4988,6 +5026,7 @@
     "default_state": "supporting_reference_non_authoritative",
     "guards": {
       "historical_or_generated_may_set_priority": false,
+      "derived_execution_ledger_may_set_priority": false,
       "document_may_authorize_live_mutation": false,
       "historical_commands_are_examples_only": true,
       "historical_header_markers": [
@@ -5017,13 +5056,13 @@
           "screen": "ForgotPasswordScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/auth_runtime_policy.dart",
         "server/lib/auth_service.dart",
         "server/routes/auth/login.dart",
         "server/routes/auth/register.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/core/security/auth_token_store.dart",
         "app/lib/features/auth/providers/auth_provider.dart"
       ],
@@ -5053,13 +5092,13 @@
           "screen": "LoginScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/auth_runtime_policy.dart",
         "server/lib/auth_service.dart",
         "server/routes/auth/login.dart",
         "server/routes/auth/register.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/core/security/auth_token_store.dart",
         "app/lib/features/auth/providers/auth_provider.dart"
       ],
@@ -5089,13 +5128,13 @@
           "screen": "RegisterScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/auth_runtime_policy.dart",
         "server/lib/auth_service.dart",
         "server/routes/auth/login.dart",
         "server/routes/auth/register.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/core/security/auth_token_store.dart",
         "app/lib/features/auth/providers/auth_provider.dart"
       ],
@@ -5125,13 +5164,13 @@
           "screen": "VerifyEmailScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/auth_runtime_policy.dart",
         "server/lib/auth_service.dart",
         "server/routes/auth/login.dart",
         "server/routes/auth/register.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/core/security/auth_token_store.dart",
         "app/lib/features/auth/providers/auth_provider.dart"
       ],
@@ -5167,7 +5206,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5187,7 +5226,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5232,7 +5271,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5252,7 +5291,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5295,7 +5334,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5315,7 +5354,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5358,7 +5397,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5378,7 +5417,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5417,7 +5456,7 @@
           "screen": "BattleCoachScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5437,7 +5476,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5476,7 +5515,7 @@
           "screen": "BattleCoachScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5496,7 +5535,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5539,7 +5578,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5559,7 +5598,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5609,7 +5648,7 @@
           "screen": "BattleReplaysScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5629,7 +5668,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5674,7 +5713,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -5694,7 +5733,7 @@
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
@@ -5737,12 +5776,12 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/collection_availability_contract.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/cards/providers/card_provider.dart",
         "app/lib/features/collection/screens/sets_catalog_screen.dart"
       ],
@@ -5773,12 +5812,12 @@
           "screen": "CollectionScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/collection_availability_contract.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/cards/providers/card_provider.dart",
         "app/lib/features/collection/screens/sets_catalog_screen.dart"
       ],
@@ -5809,12 +5848,12 @@
           "screen": "SetsCatalogScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/collection_availability_contract.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/cards/providers/card_provider.dart",
         "app/lib/features/collection/screens/sets_catalog_screen.dart"
       ],
@@ -5849,12 +5888,12 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/collection_availability_contract.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/cards/providers/card_provider.dart",
         "app/lib/features/collection/screens/sets_catalog_screen.dart"
       ],
@@ -5889,7 +5928,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -5906,7 +5945,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -5950,7 +5989,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -5967,7 +6006,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -6011,7 +6050,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -6028,7 +6067,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -6072,7 +6111,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -6089,7 +6128,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -6133,7 +6172,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -6150,7 +6189,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -6194,7 +6233,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -6211,7 +6250,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -6255,7 +6294,7 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/ai/commander_deckbuilding_contract_support.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/optimization_quality_gate.dart",
@@ -6272,7 +6311,7 @@
         "server/routes/decks/[id]/ai-analysis/index.dart",
         "server/routes/decks/[id]/analysis/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider_support_ai.dart",
         "app/lib/features/decks/providers/deck_provider_support_generation.dart",
         "app/lib/features/decks/widgets/deck_analysis_tab.dart"
@@ -6325,12 +6364,12 @@
           "screen": "DeckListScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/deck_rules_service.dart",
         "server/routes/decks/index.dart",
         "server/routes/import/to-deck/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider.dart",
         "app/lib/features/decks/screens/deck_details_screen.dart"
       ],
@@ -6361,12 +6400,12 @@
           "screen": "DeckGenerateScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/deck_rules_service.dart",
         "server/routes/decks/index.dart",
         "server/routes/import/to-deck/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider.dart",
         "app/lib/features/decks/screens/deck_details_screen.dart"
       ],
@@ -6397,12 +6436,12 @@
           "screen": "DeckImportScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/deck_rules_service.dart",
         "server/routes/decks/index.dart",
         "server/routes/import/to-deck/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider.dart",
         "app/lib/features/decks/screens/deck_details_screen.dart"
       ],
@@ -6437,12 +6476,12 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/deck_rules_service.dart",
         "server/routes/decks/index.dart",
         "server/routes/import/to-deck/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/decks/providers/deck_provider.dart",
         "app/lib/features/decks/screens/deck_details_screen.dart"
       ],
@@ -6473,11 +6512,11 @@
           "screen": "PostGameNotesScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/retention/post_game_note_service.dart",
         "server/routes/decks/[id]/post-game-notes/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/home/life_counter/life_counter_session_store.dart",
         "app/lib/features/home/lotus_life_counter_screen.dart",
         "app/lib/features/retention/services/post_game_note_store.dart"
@@ -6510,11 +6549,11 @@
           "screen": "LotusLifeCounterScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/lib/retention/post_game_note_service.dart",
         "server/routes/decks/[id]/post-game-notes/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/home/life_counter/life_counter_session_store.dart",
         "app/lib/features/home/lotus_life_counter_screen.dart",
         "app/lib/features/retention/services/post_game_note_store.dart"
@@ -6551,11 +6590,16 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
+        "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_deploy_backend_image.sh",
+        "scripts/manaloom_deploy_battle_sidecars.sh",
+        "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_generate_release_sbom.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart"
       ],
-      "consumers": [],
+      "flow_consumers": [],
       "storage": [
         "schema_migrations",
         "sync_log"
@@ -6591,11 +6635,16 @@
           ]
         }
       ],
-      "producers": [
+      "flow_producers": [
+        "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_deploy_backend_image.sh",
+        "scripts/manaloom_deploy_battle_sidecars.sh",
+        "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_generate_release_sbom.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart"
       ],
-      "consumers": [],
+      "flow_consumers": [],
       "storage": [
         "schema_migrations",
         "sync_log"
@@ -6627,13 +6676,13 @@
           "screen": "CollectionScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/routes/binder/index.dart",
         "server/routes/community/_middleware.dart",
         "server/routes/conversations/_middleware.dart",
         "server/routes/trades/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/trades/providers/trade_provider.dart"
       ],
       "storage": [
@@ -6668,13 +6717,13 @@
           "screen": "CommunityScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/routes/binder/index.dart",
         "server/routes/community/_middleware.dart",
         "server/routes/conversations/_middleware.dart",
         "server/routes/trades/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/trades/providers/trade_provider.dart"
       ],
       "storage": [
@@ -6709,13 +6758,13 @@
           "screen": "MessageInboxScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/routes/binder/index.dart",
         "server/routes/community/_middleware.dart",
         "server/routes/conversations/_middleware.dart",
         "server/routes/trades/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/trades/providers/trade_provider.dart"
       ],
       "storage": [
@@ -6763,13 +6812,13 @@
           "screen": "TradeInboxScreen"
         }
       ],
-      "producers": [
+      "flow_producers": [
         "server/routes/binder/index.dart",
         "server/routes/community/_middleware.dart",
         "server/routes/conversations/_middleware.dart",
         "server/routes/trades/index.dart"
       ],
-      "consumers": [
+      "flow_consumers": [
         "app/lib/features/trades/providers/trade_provider.dart"
       ],
       "storage": [
@@ -6792,13 +6841,40 @@
   "non_route_entrypoints": [
     {
       "flow_id": "release_operations",
-      "entrypoint": "quality gates"
+      "entrypoint": "quality gates",
+      "flow_producers": [
+        "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_deploy_backend_image.sh",
+        "scripts/manaloom_deploy_battle_sidecars.sh",
+        "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_generate_release_sbom.py",
+        "server/bin/migrate.dart",
+        "server/lib/health_readiness_support.dart"
+      ],
+      "flow_consumers": []
     },
     {
       "flow_id": "release_operations",
-      "entrypoint": "release scripts"
+      "entrypoint": "release scripts",
+      "flow_producers": [
+        "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_deploy_backend_image.sh",
+        "scripts/manaloom_deploy_battle_sidecars.sh",
+        "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_generate_release_sbom.py",
+        "server/bin/migrate.dart",
+        "server/lib/health_readiness_support.dart"
+      ],
+      "flow_consumers": []
     }
   ],
+  "route_consumer_semantics": {
+    "binding_granularity": "entrypoint",
+    "route_sources_granularity": "matched_entrypoint",
+    "flow_producers_granularity": "declared_flow_implementation",
+    "flow_consumers_granularity": "declared_flow_implementation",
+    "empty_flow_consumers_allowed": true
+  },
   "receipt_contracts": [
     {
       "id": "project_logic_manifest_v1",
@@ -6969,13 +7045,21 @@
   "guards": {
     "unique_task_ids": true,
     "required_task_schema": true,
+    "task_placeholders": 0,
     "dependencies_resolved": true,
     "dependency_graph_acyclic": true,
     "out_of_table_task_definitions": 0,
+    "execution_wip_limit": 1,
+    "execution_active_slots": 1,
+    "execution_dependencies_closed_or_contained": true,
+    "execution_ledger_priority_authority": false,
+    "execution_ledger_status_authority": false,
+    "execution_ledger_acceptance_authority": false,
     "historical_or_generated_priority_authority": false,
     "historical_documents_in_canonical_inputs": false,
     "receipt_bindings_declared": true,
+    "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "c1ddf67874b4861c9736cd64c5519887a3e59106e9658f12276a6905d9387a96"
+  "project_logic_source_digest_sha256": "bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0"
 }

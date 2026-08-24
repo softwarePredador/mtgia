@@ -24,3 +24,23 @@ instruções/perfis `.github`. Perfis de agente precisam herdar
 autoridade histórica, ferramentas de subagente ou mutação GitHub implícita.
 Documentos classificados como `historical_evidence` continuam versionados, mas
 não entram no digest de fontes ativas.
+
+O `TASK_REGISTRY.json` schema `2` também valida o ledger operacional derivado.
+O schema `2` substitui os nomes ambíguos `producers`/`consumers` pelos campos
+flow-granulares abaixo. A fila deve
+declarar WIP `1`, conter exatamente um slot `NOW` e apontar para
+`docs/execution/tasks/<TASK-ID>.md`; o ID da ficha deve coincidir com uma task
+canônica. Dependências do `NOW` devem estar `PASS`; a única exceção exige
+estado canônico `IN_PROGRESS_CONTAINED`, Task ID e motivo fail-closed
+estruturados na fila. Fila e ficha não possuem autoridade sobre prioridade,
+estado, dependências, entrega, aceite ou mutação live.
+
+Bindings de rota têm granularidade por entrypoint somente para `sources`,
+`surfaces` e `methods`. Os campos `flow_producers` e `flow_consumers` são a
+implementação declarada do fluxo e não alegam um call graph por rota. A
+rastreabilidade completa de chamadas continua sendo um gate separado.
+
+O parser de tasks falha fechado para IDs duplicados, dependências inválidas ou
+cíclicas, placeholders em entrega/aceite e definições inequívocas fora das
+tabelas canônicas. O receipt `project_logic_manifest_v1` deve vincular
+explicitamente `source_digest_sha256`.

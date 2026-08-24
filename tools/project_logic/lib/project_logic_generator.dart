@@ -12,9 +12,10 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
-const _generatorVersion = '1.4.0';
+const _generatorVersion = '1.5.0';
 const _taskBacklogPath = 'docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md';
-const _taskRegistrySchemaVersion = 1;
+const _currentQueuePath = 'docs/execution/CURRENT_QUEUE.md';
+const _taskRegistrySchemaVersion = 2;
 const _taskRequiredColumns = <String>[
   'id',
   'pri',
@@ -105,6 +106,24 @@ class ProjectLogicGenerator {
   Map<String, Object?> taskBacklogForTesting(String source) =>
       _parseTaskBacklog(source, sourcePath: _taskBacklogPath);
 
+  Map<String, Object?> executionLedgerForTesting({
+    required String queueSource,
+    required Map<String, Object?> backlog,
+    required Map<String, String> packetSources,
+  }) => _executionLedger(
+    queueSource,
+    sourcePath: _currentQueuePath,
+    backlog: backlog,
+    packetSourceFor: (path) => packetSources[path],
+  );
+
+  Map<String, Object?> routeConsumerRegistryForTesting({
+    required Map<String, dynamic> contracts,
+    List<Map<String, Object?>> apiRoutes = const [],
+    List<Map<String, Object?>> appRoutes = const [],
+    List<Map<String, Object?>> webRoutes = const [],
+  }) => _routeConsumerRegistry(contracts, apiRoutes, appRoutes, webRoutes);
+
   void validateContractsForTesting(Map<String, dynamic> contracts) =>
       _validateContracts(contracts);
 
@@ -116,6 +135,7 @@ class ProjectLogicGenerator {
     final migrationFile = _file('server/bin/migrate.dart');
     final databaseSetupFile = _file('server/database_setup.sql');
     final taskBacklogFile = _file(_taskBacklogPath);
+    final currentQueueFile = _file(_currentQueuePath);
 
     for (final file in [
       contractFile,
@@ -123,6 +143,7 @@ class ProjectLogicGenerator {
       migrationFile,
       databaseSetupFile,
       taskBacklogFile,
+      currentQueueFile,
     ]) {
       if (!file.existsSync()) {
         throw ProjectLogicException('Required source is missing: ${file.path}');
@@ -164,6 +185,7 @@ class ProjectLogicGenerator {
     _validateDeclaredTables(contracts, database);
     final taskRegistryBase = _taskRegistry(
       taskBacklogFile,
+      currentQueueFile,
       contracts,
       apiRoutes,
       appRoutes,
@@ -471,6 +493,7 @@ class ProjectLogicGenerator {
     }
 
     final prefixes = <String>{};
+    final prefixStates = <String, String>{};
     final rawPrefixRules = lifecycle['prefix_rules'];
     if (rawPrefixRules is! List) {
       throw ProjectLogicException(
@@ -501,11 +524,13 @@ class ProjectLogicGenerator {
           'Documentation prefix $prefix references an unknown state: $state',
         );
       }
+      prefixStates[prefix] = state;
     }
 
     final guards = lifecycle['guards'];
     if (guards is! Map<String, dynamic> ||
         guards['historical_or_generated_may_set_priority'] != false ||
+        guards['derived_execution_ledger_may_set_priority'] != false ||
         guards['document_may_authorize_live_mutation'] != false ||
         guards['historical_commands_are_examples_only'] != true) {
       throw ProjectLogicException(
@@ -533,6 +558,14 @@ class ProjectLogicGenerator {
         overrideStates[_taskBacklogPath] != 'current_task_index') {
       throw ProjectLogicException(
         'Current decision and task backlog require explicit authoritative lifecycle overrides.',
+      );
+    }
+    if (overrideStates[_currentQueuePath] != 'current_context' ||
+        prefixStates['docs/execution/tasks/'] !=
+            'supporting_reference_non_authoritative') {
+      throw ProjectLogicException(
+        'The execution queue must be current non-authoritative context and '
+        'task packets must be explicit non-authoritative supporting ledgers.',
       );
     }
   }
@@ -658,7 +691,7 @@ class ProjectLogicGenerator {
       );
     }
     final ids = <String>{};
-    var hasDigestBoundReceipt = false;
+    var hasProjectLogicDigestReceipt = false;
     for (final rawReceipt in rawReceipts) {
       if (rawReceipt is! Map<String, dynamic>) {
         throw ProjectLogicException('Each receipt contract must be an object.');
@@ -703,10 +736,9 @@ class ProjectLogicGenerator {
       }
       final requiredBindings =
           (rawReceipt['required_bindings'] as List<dynamic>).cast<String>();
-      if (requiredBindings.any(
-        (binding) => binding.contains('digest') || binding.contains('sha256'),
-      )) {
-        hasDigestBoundReceipt = true;
+      if (id == 'project_logic_manifest_v1' &&
+          requiredBindings.contains('source_digest_sha256')) {
+        hasProjectLogicDigestReceipt = true;
       }
       if (id == 'manaloom_e2e_suite_v1') {
         final semantics = rawReceipt['status_semantics'];
@@ -724,10 +756,9 @@ class ProjectLogicGenerator {
         }
       }
     }
-    if (!hasDigestBoundReceipt) {
+    if (!hasProjectLogicDigestReceipt) {
       throw ProjectLogicException(
-        'At least one receipt contract must bind evidence to a digest or '
-        'sha256 field.',
+        'Receipt project_logic_manifest_v1 must bind source_digest_sha256.',
       );
     }
   }
@@ -817,6 +848,7 @@ class ProjectLogicGenerator {
 
   Map<String, Object?> _taskRegistry(
     File backlogFile,
+    File currentQueueFile,
     Map<String, dynamic> contracts,
     List<Map<String, Object?>> apiRoutes,
     List<Map<String, Object?>> appRoutes,
@@ -825,6 +857,15 @@ class ProjectLogicGenerator {
     final backlog = _parseTaskBacklog(
       backlogFile.readAsStringSync(),
       sourcePath: _relative(backlogFile),
+    );
+    final executionLedger = _executionLedger(
+      currentQueueFile.readAsStringSync(),
+      sourcePath: _relative(currentQueueFile),
+      backlog: backlog,
+      packetSourceFor: (path) {
+        final file = _file(path);
+        return file.existsSync() ? file.readAsStringSync() : null;
+      },
     );
     final routes = _routeConsumerRegistry(
       contracts,
@@ -853,20 +894,212 @@ class ProjectLogicGenerator {
         'acceptance',
       ],
       ...backlog,
+      'execution_ledger': executionLedger,
       'documentation_lifecycle': lifecycle,
       'route_consumers': routes['route_consumers'],
       'non_route_entrypoints': routes['non_route_entrypoints'],
+      'route_consumer_semantics': {
+        'binding_granularity': 'entrypoint',
+        'route_sources_granularity': 'matched_entrypoint',
+        'flow_producers_granularity': 'declared_flow_implementation',
+        'flow_consumers_granularity': 'declared_flow_implementation',
+        'empty_flow_consumers_allowed': true,
+      },
       'receipt_contracts': receipts,
       'guards': {
         'unique_task_ids': true,
         'required_task_schema': true,
+        'task_placeholders': 0,
         'dependencies_resolved': true,
         'dependency_graph_acyclic': true,
         'out_of_table_task_definitions': 0,
+        'execution_wip_limit': 1,
+        'execution_active_slots': 1,
+        'execution_dependencies_closed_or_contained': true,
+        'execution_ledger_priority_authority': false,
+        'execution_ledger_status_authority': false,
+        'execution_ledger_acceptance_authority': false,
         'historical_or_generated_priority_authority': false,
         'historical_documents_in_canonical_inputs': false,
         'receipt_bindings_declared': true,
+        'project_logic_receipt_source_digest_bound': true,
         'registry_source_digest_bound': true,
+      },
+    };
+  }
+
+  Map<String, Object?> _executionLedger(
+    String source, {
+    required String sourcePath,
+    required Map<String, Object?> backlog,
+    required String? Function(String path) packetSourceFor,
+  }) {
+    final wipMatches = RegExp(
+      r'^- WIP máximo:\s*`([0-9]+)`\s*$',
+      multiLine: true,
+    ).allMatches(source).toList();
+    if (wipMatches.length != 1 || wipMatches.single.group(1) != '1') {
+      throw ProjectLogicException(
+        '$sourcePath must declare exactly one WIP máximo of 1.',
+      );
+    }
+
+    final activeSlots = <Map<String, String>>[];
+    for (final line in const LineSplitter().convert(source)) {
+      if (!line.trimLeft().startsWith('|')) continue;
+      final cells = _markdownTableCells(line);
+      if (cells.length < 3 || _stripSingleBacktickPair(cells.first) != 'NOW') {
+        continue;
+      }
+      activeSlots.add({
+        'task_id': _stripSingleBacktickPair(cells[1]),
+        'packet_path': _stripSingleBacktickPair(cells[2]),
+      });
+    }
+    if (activeSlots.length != 1) {
+      throw ProjectLogicException(
+        '$sourcePath must contain exactly one NOW slot; found '
+        '${activeSlots.length}.',
+      );
+    }
+
+    final active = activeSlots.single;
+    final taskId = active['task_id']!;
+    final packetPath = active['packet_path']!;
+    final tasks = (backlog['tasks'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+    final matchingTasks = tasks.where((task) => task['id'] == taskId).toList();
+    if (matchingTasks.length != 1) {
+      throw ProjectLogicException(
+        'NOW task $taskId from $sourcePath must resolve exactly once in the '
+        'canonical task registry.',
+      );
+    }
+    final expectedPacketPath = 'docs/execution/tasks/$taskId.md';
+    if (packetPath != expectedPacketPath ||
+        !_isNormalizedRepositoryPath(packetPath)) {
+      throw ProjectLogicException(
+        'NOW task $taskId must bind its canonical packet '
+        '$expectedPacketPath; found $packetPath.',
+      );
+    }
+
+    final packetSource = packetSourceFor(packetPath);
+    if (packetSource == null) {
+      throw ProjectLogicException(
+        'NOW task packet does not exist: $packetPath',
+      );
+    }
+    final packetTaskMatches = RegExp(
+      r'^- Task ID:\s*`([^`]+)`\s*$',
+      multiLine: true,
+    ).allMatches(packetSource).toList();
+    if (packetTaskMatches.length != 1 ||
+        packetTaskMatches.single.group(1) != taskId) {
+      throw ProjectLogicException(
+        'NOW task packet $packetPath must declare exactly Task ID $taskId.',
+      );
+    }
+    final packetHeader = const LineSplitter()
+        .convert(packetSource)
+        .take(12)
+        .join('\n')
+        .toLowerCase();
+    if (!packetHeader.contains('não autoritativo')) {
+      throw ProjectLogicException(
+        'NOW task packet $packetPath must identify itself as a '
+        'non-authoritative ledger.',
+      );
+    }
+    if (!RegExp(
+      r'^- Autorização [^:\n]+:\s*\S+',
+      multiLine: true,
+    ).hasMatch(packetSource)) {
+      throw ProjectLogicException(
+        'NOW task packet $packetPath must declare its authorization boundary.',
+      );
+    }
+
+    final canonicalTask = matchingTasks.single;
+    final tasksById = <String, Map<String, Object?>>{
+      for (final task in tasks) task['id']! as String: task,
+    };
+    final dependencies = (canonicalTask['depends_on'] as List<dynamic>)
+        .cast<String>();
+    final dependencyStates = dependencies
+        .map(
+          (dependency) => <String, Object?>{
+            'id': dependency,
+            'status': tasksById[dependency]!['status'],
+          },
+        )
+        .toList(growable: false);
+    final containmentMatches = RegExp(
+      r'^- Exceção de contenção fail-closed do NOW:\s*`([^`]+)`'
+      r'(?:\s*—\s*(\S.*))?\s*$',
+      multiLine: true,
+    ).allMatches(source).toList();
+    if (containmentMatches.length != 1) {
+      throw ProjectLogicException(
+        '$sourcePath must declare exactly one structured NOW containment '
+        'exception marker.',
+      );
+    }
+    final containmentValue = containmentMatches.single.group(1)!;
+    final containmentReason = containmentMatches.single.group(2)?.trim();
+    final openDependencies = dependencyStates
+        .where((dependency) => dependency['status'] != 'PASS')
+        .toList(growable: false);
+    final hasContainmentException = openDependencies.isNotEmpty;
+    if (!hasContainmentException) {
+      if (containmentValue != 'none' || containmentReason != null) {
+        throw ProjectLogicException(
+          '$sourcePath must use containment marker `none` when all NOW '
+          'dependencies are PASS.',
+        );
+      }
+    } else if (canonicalTask['status'] != 'IN_PROGRESS_CONTAINED' ||
+        containmentValue != taskId ||
+        containmentReason == null ||
+        containmentReason.length < 12) {
+      throw ProjectLogicException(
+        'NOW task $taskId has non-PASS dependencies and must be canonically '
+        'IN_PROGRESS_CONTAINED with a matching structured fail-closed '
+        'containment reason in $sourcePath.',
+      );
+    }
+
+    return <String, Object?>{
+      'schema_version': 1,
+      'generated_from': {
+        'path': sourcePath,
+        'sha256': sha256.convert(utf8.encode(source)).toString(),
+      },
+      'wip_limit': 1,
+      'active_slot_count': 1,
+      'active_slot': {
+        'label': 'NOW',
+        'task_id': taskId,
+        'packet_path': packetPath,
+        'packet_identity_validated': true,
+        'canonical_status': canonicalTask['status'],
+        'canonical_dependencies': dependencyStates,
+        'dependency_gate': {
+          'all_dependencies_pass': openDependencies.isEmpty,
+          'containment_exception': hasContainmentException,
+          if (hasContainmentException) ...{
+            'containment_task_id': taskId,
+            'containment_reason': containmentReason!,
+          },
+        },
+      },
+      'authority': {
+        'priority': false,
+        'status': false,
+        'dependencies': false,
+        'delivery': false,
+        'acceptance': false,
+        'live_mutation': false,
       },
     };
   }
@@ -880,7 +1113,9 @@ class ProjectLogicGenerator {
       r'^`[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+[^`]*`$',
     );
     final outOfTablePattern = RegExp(
-      r'^\s*(?:[-*]|\d+\.)\s+`([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)`\s*:',
+      r'^\s*(?:(?:[-*+]\s+(?:\[[ xX]\]\s*)?)|(?:\d+[.)]\s+)|'
+      r'(?:#{1,6}\s+))`([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+)`'
+      r'(?:\s*[:\-–—]|\s*$)',
       multiLine: true,
     );
     final outOfTable = outOfTablePattern.allMatches(source).toList();
@@ -988,6 +1223,18 @@ class ProjectLogicGenerator {
           'minimum acceptance.',
         );
       }
+      final placeholderFields =
+          <String, String>{'delivery': delivery, 'acceptance': acceptance}
+              .entries
+              .where((entry) => _taskFieldHasPlaceholder(entry.value))
+              .toList();
+      if (placeholderFields.isNotEmpty) {
+        throw ProjectLogicException(
+          'Task $id at $sourcePath:${lineIndex + 1} contains placeholder '
+          'content in: '
+          '${placeholderFields.map((entry) => entry.key).join(', ')}.',
+        );
+      }
 
       final task = <String, Object?>{
         'id': id,
@@ -1042,6 +1289,53 @@ class ProjectLogicGenerator {
       'dependency_edges': graph['dependency_edges'],
       'topological_order': graph['topological_order'],
     };
+  }
+
+  bool _taskFieldHasPlaceholder(String value) {
+    final trimmed = value.trim();
+    if (const {'—', '-', '...', '…', '???'}.contains(trimmed)) {
+      return true;
+    }
+    final normalizedMarker = trimmed
+        .replaceFirst(RegExp(r'[.!?:;]+$'), '')
+        .trim()
+        .toLowerCase();
+    if (const {
+      'n/a',
+      'tbd',
+      'todo',
+      'fixme',
+      'xxx',
+      'placeholder',
+      'pending',
+    }.contains(normalizedMarker)) {
+      return true;
+    }
+    if (RegExp(r'<[^>\n]+>').hasMatch(value) ||
+        RegExp(r'\{\{[^}\n]+\}\}').hasMatch(value) ||
+        RegExp(r'\$\{[^}\n]+\}').hasMatch(value)) {
+      return true;
+    }
+    if (RegExp(
+          r'(^|[\s(\[<{/:;,.!?—–-])(?:TODO|PLACEHOLDER)'
+          r'(?=$|[\s)\]}>/:;,.!?—–-])',
+        ).hasMatch(value) ||
+        RegExp(
+          r'(^|[\s(\[<{/:;,.!?—–-])(?:TBD|FIXME|XXX|PENDING)'
+          r'(?=$|[\s)\]}>/:;,.!?—–-])',
+          caseSensitive: false,
+        ).hasMatch(value) ||
+        RegExp(
+          r'(^|[\s(\[<{/:;,.!?—–-])todo'
+          r'(?=\s*(?:$|[)\]}>/:;,.!?—–-]))',
+          caseSensitive: false,
+        ).hasMatch(value)) {
+      return true;
+    }
+    return RegExp(
+      r'\b(?:a|por)\s+definir\b',
+      caseSensitive: false,
+    ).hasMatch(value);
   }
 
   Map<String, Object?> _taskDependencyGraph(
@@ -1211,7 +1505,7 @@ class ProjectLogicGenerator {
       final flowId = flow['id']! as String;
       final implementations = (flow['implementation'] as List<dynamic>)
           .cast<String>();
-      final consumers =
+      final flowConsumers =
           implementations
               .where(
                 (path) =>
@@ -1220,12 +1514,13 @@ class ProjectLogicGenerator {
               .toSet()
               .toList()
             ..sort();
-      final producers =
+      final flowProducers =
           implementations
               .where(
                 (path) =>
                     path.startsWith('server/') ||
                     path.startsWith('services/') ||
+                    path.startsWith('scripts/') ||
                     path.startsWith('docs/hermes-analysis/manaloom-knowledge/'),
               )
               .toSet()
@@ -1238,6 +1533,8 @@ class ProjectLogicGenerator {
           nonRouteEntrypoints.add({
             'flow_id': flowId,
             'entrypoint': entrypoint,
+            'flow_producers': flowProducers,
+            'flow_consumers': flowConsumers,
           });
           continue;
         }
@@ -1309,8 +1606,8 @@ class ProjectLogicGenerator {
           'surfaces': surfaces,
           'methods': methods.toList()..sort(),
           'sources': sources,
-          'producers': producers,
-          'consumers': consumers,
+          'flow_producers': flowProducers,
+          'flow_consumers': flowConsumers,
           'storage': List<String>.from(flow['storage'] as List<dynamic>),
           'gates': List<String>.from(flow['gates'] as List<dynamic>),
           'receipt_contract_ids': receiptIds,

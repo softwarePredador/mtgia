@@ -58,6 +58,9 @@ slot `NOW`; assim, não surgem 217 cópias que envelhecem fora do backlog.
 - O limite operacional desta rodada é de no máximo 15 subagentes.
 - Um ID só entra em `NOW` depois de todas as dependências canônicas estarem
   fechadas ou de o trabalho ser explicitamente apenas contenção fail-closed.
+- A fila declara `Exceção de contenção fail-closed do NOW: none` quando todas
+  as dependências estão `PASS`. Uma exceção usa o próprio Task ID, exige motivo
+  explícito e só é válida para estado canônico `IN_PROGRESS_CONTAINED`.
 - Se a task bloquear, sua ficha registra o bloqueio e a prova. Ela sai de
   `NOW`; a próxima task elegível só entra depois de a fila ser atualizada.
 - `SKIP`, `PARTIAL`, teste focal, checkout sujo ou capability `OFF` nunca são

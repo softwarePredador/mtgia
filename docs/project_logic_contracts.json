@@ -179,6 +179,10 @@
         "state": "current_context"
       },
       {
+        "prefix": "docs/execution/tasks/",
+        "state": "supporting_reference_non_authoritative"
+      },
+      {
         "prefix": "docs/generated/",
         "state": "generated_snapshot"
       },
@@ -205,6 +209,7 @@
     ],
     "guards": {
       "historical_or_generated_may_set_priority": false,
+      "derived_execution_ledger_may_set_priority": false,
       "document_may_authorize_live_mutation": false,
       "historical_commands_are_examples_only": true,
       "historical_header_markers": [

@@ -14,6 +14,7 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 - Project logic baseline na abertura de `BT-DOC-004`:
   `be3bf02dba40befead607ba4f34a55595e1322ef9dc1a7bccc6396b1ccac9cee`
 - WIP máximo: `1`
+- Exceção de contenção fail-closed do NOW: `none`
 - Limite de subagentes nesta execução: `3`, sem descendentes, por solicitação
   do usuário
 

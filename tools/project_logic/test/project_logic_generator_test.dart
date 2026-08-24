@@ -277,9 +277,9 @@ void main() {
           .cast<String>();
       final guards = registry['guards'] as Map<String, Object?>;
 
-      expect(registry['schema_version'], 1);
-      expect(registry['task_count'], 217);
-      expect(tasks, hasLength(217));
+      expect(registry['schema_version'], 2);
+      expect(tasks, isNotEmpty);
+      expect(registry['task_count'], tasks.length);
       expect(idsSet, hasLength(ids.length));
       expect(ids.where((id) => id.contains('*') || id.contains('..')), isEmpty);
       expect(topologicalOrder, hasLength(tasks.length));
@@ -292,6 +292,22 @@ void main() {
       );
       expect(guards, containsPair('dependency_graph_acyclic', true));
       expect(guards, containsPair('out_of_table_task_definitions', 0));
+      expect(guards, containsPair('task_placeholders', 0));
+
+      final orderIndex = <String, int>{
+        for (var index = 0; index < topologicalOrder.length; index++)
+          topologicalOrder[index]: index,
+      };
+      for (final task in tasks) {
+        for (final dependency
+            in (task['depends_on'] as List<dynamic>).cast<String>()) {
+          expect(
+            orderIndex[dependency],
+            lessThan(orderIndex[task['id']]!),
+            reason: '$dependency must precede ${task['id']}',
+          );
+        }
+      }
 
       final databaseBaseline = tasks.singleWhere(
         (task) => task['id'] == 'BT-DB-005',
@@ -321,8 +337,12 @@ void main() {
 | ID | Pri. | Estado | Entrega | Depende de | Aceite mínimo |
 |---|---|---|---|---|---|
 ''';
-      String row(String id, String dependencies) =>
-          '| `$id` | P1 | TODO | Entrega. | $dependencies | Aceite. |';
+      String row(
+        String id,
+        String dependencies, {
+        String delivery = 'Entrega.',
+        String acceptance = 'Aceite.',
+      }) => '| `$id` | P1 | TODO | $delivery | $dependencies | $acceptance |';
 
       expect(
         () => generator.taskBacklogForTesting(
@@ -352,6 +372,45 @@ void main() {
       );
       expect(
         () => generator.taskBacklogForTesting(
+          '$header${row('BT-TST-001', '`BT-TST-001`')}',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      expect(
+        () => generator.taskBacklogForTesting(
+          '$header${row('BT-TST-001', '`BT-TST-002`, `BT-TST-002`')}\n'
+          '${row('BT-TST-002', '—')}',
+        ),
+        throwsA(isA<ProjectLogicException>()),
+      );
+      for (final placeholder in [
+        '<preencher>',
+        'TBD',
+        'tBd',
+        'Entrega Todo.',
+        'Pending',
+        '???',
+        '{{acceptance}}',
+        r'${delivery}',
+        'por definir',
+      ]) {
+        expect(
+          () => generator.taskBacklogForTesting(
+            '$header${row('BT-TST-001', '—', delivery: placeholder)}',
+          ),
+          throwsA(isA<ProjectLogicException>()),
+          reason: placeholder,
+        );
+        expect(
+          () => generator.taskBacklogForTesting(
+            '$header${row('BT-TST-001', '—', acceptance: placeholder)}',
+          ),
+          throwsA(isA<ProjectLogicException>()),
+          reason: placeholder,
+        );
+      }
+      expect(
+        () => generator.taskBacklogForTesting(
           '- `BT-TST-001`: definição fora da tabela',
         ),
         throwsA(isA<ProjectLogicException>()),
@@ -362,8 +421,171 @@ void main() {
         ),
         throwsA(isA<ProjectLogicException>()),
       );
+      for (final definition in [
+        '- [ ] `BT-TST-001`: definição fora da tabela',
+        '## `BT-TST-001` — definição fora da tabela',
+      ]) {
+        expect(
+          () => generator.taskBacklogForTesting(definition),
+          throwsA(isA<ProjectLogicException>()),
+          reason: definition,
+        );
+      }
     },
   );
+
+  test('keeps task registry ordering deterministic', () {
+    final generator = ProjectLogicGenerator(root);
+    const source = '''
+| ID | Pri. | Estado | Entrega | Depende de | Aceite mínimo |
+|---|---|---|---|---|---|
+| `BT-TST-003` | P1 | TODO | Entrega C. | — | Aceite C. |
+| `BT-TST-001` | P1 | TODO | Entrega A. | — | Aceite A. |
+| `BT-TST-002` | P1 | TODO | Entrega B. | `BT-TST-001` | Aceite B. |
+''';
+
+    final first = generator.taskBacklogForTesting(source);
+    final second = generator.taskBacklogForTesting(source);
+    expect(jsonEncode(first), jsonEncode(second));
+    expect(first['topological_order'], [
+      'BT-TST-001',
+      'BT-TST-002',
+      'BT-TST-003',
+    ]);
+  });
+
+  test('validates WIP 1 and the NOW task packet identity', () {
+    final generator = ProjectLogicGenerator(root);
+    const backlogSource = '''
+| ID | Pri. | Estado | Entrega | Depende de | Aceite mínimo |
+|---|---|---|---|---|---|
+| `BT-TST-000` | P1 | PASS | Entrega base. | — | Aceite base. |
+| `BT-TST-001` | P1 | TODO | Entrega. | `BT-TST-000` | Aceite. |
+''';
+    final backlog = generator.taskBacklogForTesting(backlogSource);
+    const packetPath = 'docs/execution/tasks/BT-TST-001.md';
+    const packet = '''
+# Ficha de execução — `BT-TST-001`
+
+> Ledger de execução não autoritativo.
+
+## Autoridade
+
+- Task ID: `BT-TST-001`
+- Autorização máxima: `local-read-only`
+''';
+    const queue = '''
+# Fila
+
+- WIP máximo: `1`
+- Exceção de contenção fail-closed do NOW: `none`
+
+| Slot | ID | Ficha | Objetivo |
+| --- | --- | --- | --- |
+| `NOW` | `BT-TST-001` | `docs/execution/tasks/BT-TST-001.md` | Provar. |
+''';
+
+    final ledger = generator.executionLedgerForTesting(
+      queueSource: queue,
+      backlog: backlog,
+      packetSources: const {packetPath: packet},
+    );
+    expect(ledger['wip_limit'], 1);
+    expect(ledger['active_slot_count'], 1);
+    expect(ledger['active_slot'], containsPair('task_id', 'BT-TST-001'));
+    expect(
+      (ledger['active_slot'] as Map<String, Object?>)['dependency_gate'],
+      allOf(
+        containsPair('all_dependencies_pass', true),
+        containsPair('containment_exception', false),
+      ),
+    );
+    expect(
+      ledger['authority'],
+      allOf(
+        containsPair('priority', false),
+        containsPair('status', false),
+        containsPair('acceptance', false),
+        containsPair('live_mutation', false),
+      ),
+    );
+
+    for (final invalidQueue in [
+      queue.replaceFirst('| `NOW` |', '| `NEXT` |'),
+      '$queue| `NOW` | `BT-TST-001` | `$packetPath` | Duplicado. |\n',
+      queue.replaceFirst('WIP máximo: `1`', 'WIP máximo: `2`'),
+      queue.replaceFirst('BT-TST-001` | `docs/', 'BT-TST-404` | `docs/'),
+    ]) {
+      expect(
+        () => generator.executionLedgerForTesting(
+          queueSource: invalidQueue,
+          backlog: backlog,
+          packetSources: const {packetPath: packet},
+        ),
+        throwsA(isA<ProjectLogicException>()),
+        reason: invalidQueue,
+      );
+    }
+    expect(
+      () => generator.executionLedgerForTesting(
+        queueSource: queue,
+        backlog: backlog,
+        packetSources: const {
+          packetPath: '''
+> Ledger de execução não autoritativo.
+- Task ID: `BT-TST-404`
+- Autorização máxima: `local-read-only`
+''',
+        },
+      ),
+      throwsA(isA<ProjectLogicException>()),
+    );
+
+    final blockedBacklog = generator.taskBacklogForTesting(
+      backlogSource.replaceFirst(
+        '| `BT-TST-000` | P1 | PASS |',
+        '| `BT-TST-000` | P1 | TODO |',
+      ),
+    );
+    expect(
+      () => generator.executionLedgerForTesting(
+        queueSource: queue,
+        backlog: blockedBacklog,
+        packetSources: const {packetPath: packet},
+      ),
+      throwsA(isA<ProjectLogicException>()),
+    );
+
+    final containedBacklog = generator.taskBacklogForTesting(
+      backlogSource
+          .replaceFirst(
+            '| `BT-TST-000` | P1 | PASS |',
+            '| `BT-TST-000` | P1 | TODO |',
+          )
+          .replaceFirst(
+            '| `BT-TST-001` | P1 | TODO |',
+            '| `BT-TST-001` | P1 | IN_PROGRESS_CONTAINED |',
+          ),
+    );
+    final containedLedger = generator.executionLedgerForTesting(
+      queueSource: queue.replaceFirst(
+        'Exceção de contenção fail-closed do NOW: `none`',
+        'Exceção de contenção fail-closed do NOW: `BT-TST-001` — '
+            'Mitigar localmente sem liberar a dependência.',
+      ),
+      backlog: containedBacklog,
+      packetSources: const {packetPath: packet},
+    );
+    expect(
+      (containedLedger['active_slot']
+          as Map<String, Object?>)['dependency_gate'],
+      allOf(
+        containsPair('all_dependencies_pass', false),
+        containsPair('containment_exception', true),
+        containsPair('containment_task_id', 'BT-TST-001'),
+      ),
+    );
+  });
 
   test('rejects an operational historical document without a safe banner', () {
     final contracts =
@@ -411,6 +633,132 @@ void main() {
     );
   });
 
+  test(
+    'rejects historical authority and receipt contracts without bindings',
+    () {
+      final generator = ProjectLogicGenerator(root);
+      final sourceContracts =
+          jsonDecode(
+                File(
+                  p.join(root.path, 'docs/project_logic_contracts.json'),
+                ).readAsStringSync(),
+              )
+              as Map<String, dynamic>;
+
+      final historicalAuthority =
+          jsonDecode(jsonEncode(sourceContracts)) as Map<String, dynamic>;
+      (historicalAuthority['canonical_documents'] as List<dynamic>).add(
+        'ROADMAP.md',
+      );
+      expect(
+        () => generator.validateContractsForTesting(historicalAuthority),
+        throwsA(
+          isA<ProjectLogicException>().having(
+            (error) => error.toString(),
+            'message',
+            contains('non-current lifecycle'),
+          ),
+        ),
+      );
+
+      final missingBindings =
+          jsonDecode(jsonEncode(sourceContracts)) as Map<String, dynamic>;
+      final missingBindingReceipts =
+          (missingBindings['receipt_contracts'] as List<dynamic>)
+              .cast<Map<String, dynamic>>();
+      missingBindingReceipts.first['required_bindings'] = <String>[];
+      expect(
+        () => generator.validateContractsForTesting(missingBindings),
+        throwsA(
+          isA<ProjectLogicException>().having(
+            (error) => error.toString(),
+            'message',
+            contains('required_bindings'),
+          ),
+        ),
+      );
+
+      final unboundProjectLogic =
+          jsonDecode(jsonEncode(sourceContracts)) as Map<String, dynamic>;
+      final projectLogicReceipt =
+          (unboundProjectLogic['receipt_contracts'] as List<dynamic>)
+              .cast<Map<String, dynamic>>()
+              .singleWhere(
+                (receipt) => receipt['id'] == 'project_logic_manifest_v1',
+              );
+      projectLogicReceipt['required_bindings'] = [
+        'lineage.digest_inputs',
+        'generator.version',
+      ];
+      expect(
+        () => generator.validateContractsForTesting(unboundProjectLogic),
+        throwsA(
+          isA<ProjectLogicException>().having(
+            (error) => error.toString(),
+            'message',
+            contains('source_digest_sha256'),
+          ),
+        ),
+      );
+    },
+  );
+
+  test('fails closed for an unresolved flow entrypoint', () {
+    final generator = ProjectLogicGenerator(root);
+    final contracts = <String, dynamic>{
+      'receipt_contracts': [
+        {
+          'id': 'sample_receipt_v1',
+          'flows': ['sample_flow'],
+        },
+      ],
+      'flows': [
+        {
+          'id': 'sample_flow',
+          'implementation': [
+            'server/routes/sample/[id]/index.dart',
+            'app/lib/features/sample/sample_provider.dart',
+          ],
+          'entrypoints': ['/sample/{id}'],
+          'storage': ['sample_rows'],
+          'gates': ['sample-gate'],
+        },
+      ],
+    };
+
+    expect(
+      () => generator.routeConsumerRegistryForTesting(contracts: contracts),
+      throwsA(
+        isA<ProjectLogicException>().having(
+          (error) => error.toString(),
+          'message',
+          contains('does not resolve'),
+        ),
+      ),
+    );
+
+    final registry = generator.routeConsumerRegistryForTesting(
+      contracts: contracts,
+      apiRoutes: const [
+        {
+          'path': '/sample/:id',
+          'methods': ['GET'],
+          'source': 'server/routes/sample/[id]/index.dart',
+        },
+      ],
+    );
+    final binding = (registry['route_consumers'] as List<dynamic>)
+        .cast<Map<String, Object?>>()
+        .single;
+    expect(binding['normalized_pattern'], '/sample/{}');
+    expect(binding['flow_producers'], ['server/routes/sample/[id]/index.dart']);
+    expect(binding['flow_consumers'], [
+      'app/lib/features/sample/sample_provider.dart',
+    ]);
+    expect(binding, isNot(contains('producers')));
+    expect(binding, isNot(contains('consumers')));
+  });
+
   test('resolves document lifecycle, route consumers and receipt bindings', () {
     final registry = result.manifest['task_registry'] as Map<String, Object?>;
     final lifecycle =
@@ -423,6 +771,10 @@ void main() {
         .cast<Map<String, Object?>>();
     final receipts = (registry['receipt_contracts'] as List<dynamic>)
         .cast<Map<String, Object?>>();
+    final executionLedger =
+        registry['execution_ledger'] as Map<String, Object?>;
+    final routeSemantics =
+        registry['route_consumer_semantics'] as Map<String, Object?>;
 
     expect(
       canonical.singleWhere(
@@ -445,6 +797,20 @@ void main() {
     expect(executionQueue['state'], 'current_context');
     expect(executionQueue['priority_authority'], false);
     expect(executionQueue['mutation_authority'], false);
+    expect(executionLedger['wip_limit'], 1);
+    expect(executionLedger['active_slot_count'], 1);
+    expect(
+      executionLedger['active_slot'],
+      containsPair('task_id', 'BT-DOC-004'),
+    );
+    expect(
+      (lifecycle['prefix_rules'] as List<dynamic>)
+          .cast<Map<String, Object?>>()
+          .singleWhere(
+            (rule) => rule['prefix'] == 'docs/execution/tasks/',
+          )['state'],
+      'supporting_reference_non_authoritative',
+    );
     for (final entry in {
       '.github/AGENT_POLICY.md': 'current_contract',
       '.github/instructions/guia.instructions.md': 'current_context',
@@ -482,10 +848,16 @@ void main() {
     );
     expect(generate['surfaces'], contains('api'));
     expect(
-      generate['consumers'],
+      generate['flow_consumers'],
       contains(
         'app/lib/features/decks/providers/deck_provider_support_ai.dart',
       ),
+    );
+    expect(generate, isNot(contains('consumers')));
+    expect(generate, isNot(contains('producers')));
+    expect(
+      routeSemantics['flow_consumers_granularity'],
+      'declared_flow_implementation',
     );
     expect(
       generate['receipt_contract_ids'],
@@ -497,6 +869,24 @@ void main() {
           route['entrypoint'] == '/decks/{id}/battle-coach',
     );
     expect(battleCoach['surfaces'], contains('app'));
+
+    final releaseScripts = (registry['non_route_entrypoints'] as List<dynamic>)
+        .cast<Map<String, Object?>>()
+        .singleWhere(
+          (entrypoint) => entrypoint['entrypoint'] == 'release scripts',
+        );
+    expect(
+      releaseScripts['flow_producers'],
+      contains('scripts/manaloom_build_beta_release.sh'),
+    );
+
+    final projectLogicReceipt = receipts.singleWhere(
+      (receipt) => receipt['id'] == 'project_logic_manifest_v1',
+    );
+    expect(
+      projectLogicReceipt['required_bindings'],
+      contains('source_digest_sha256'),
+    );
 
     final deckReceipt = receipts.singleWhere(
       (receipt) => receipt['id'] == 'deck_ai_learning_gate_v2',
