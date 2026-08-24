@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "f3628ca3199dce784820a3dc63c9a6d7312a229098ce0ee5fc17a93f3d7e400a",
+  "source_digest_sha256": "44ab0563e6703bad2d1a8a47128d318d88401c050fb98b07d38a3b2a299ab042",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -270684,7 +270684,7 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "9f7d05f128c94655e41254872516322dea13da28b11613c93e3540d5dc39f142"
+      "sha256": "baed1f2b2ccd0cbc9620fa073d13311d5a8354513d2222a324881ca70d003016"
     },
     "required_task_fields": [
       "id",
@@ -270699,10 +270699,10 @@
       {
         "id": "BT-GOV-001",
         "priority": "P0 CORE",
-        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+        "status": "PASS",
         "delivery": "Publicar decisão corrente única: beta gratuita, público, plataformas, domínio, oferta, flags, IA, Battle e módulos adiados.",
         "depends_on": [],
-        "acceptance": "Documento curto, datado e sem conflito com UI/API/deploy.",
+        "acceptance": "Documento curto, datado e sem conflito com UI/API/deploy. Receipt: `docs/qa/execution/2026-08-14/BT-GOV-001.md`; implementação: `fd0397a5a97742bcb5127c7b2d08d80aca4bf738`.",
         "section": "Épico A — Verdade de produto, escopo e documentação",
         "source_line": 221
       },
@@ -277542,7 +277542,7 @@
       "receipt_bindings_declared": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "f3628ca3199dce784820a3dc63c9a6d7312a229098ce0ee5fc17a93f3d7e400a"
+    "project_logic_source_digest_sha256": "44ab0563e6703bad2d1a8a47128d318d88401c050fb98b07d38a3b2a299ab042"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
