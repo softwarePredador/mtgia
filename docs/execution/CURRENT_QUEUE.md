@@ -4,13 +4,15 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 
 - Atualizada em: `2026-08-24`
 - Branch de partida: `codex/free-beta-release-candidate-2026-07-17`
-- SHA local na abertura de `BT-DOC-001`: `b09ac6dbb6b88f2ea235404431049609da3215ff`
+- SHA baseline na abertura de `BT-DOC-004`:
+  `c6e2725af0995e01dcf675f20e3a8b608b84d555`
 - Upstream observado na abertura: `b2d3fc04f823f1c58434349a0cf0b48d74919862`
-- Divergência observada: `ahead_by=3`, `behind_by=0`, `NOT_PUSHED`
-- Observado em UTC: `2026-08-24T18:56:24Z`
-- Backlog/registry SHA-256: `baed1f2b2ccd0cbc9620fa073d13311d5a8354513d2222a324881ca70d003016`
-- Project logic baseline na abertura de `BT-DOC-001`:
-  `44ab0563e6703bad2d1a8a47128d318d88401c050fb98b07d38a3b2a299ab042`
+- Divergência observada: `ahead_by=4`, `behind_by=0`, `NOT_PUSHED`
+- Observado em UTC: `2026-08-24T19:43:25Z`
+- Backlog/registry SHA-256 de abertura:
+  `5109f0e0e5585c2c6ce3655514d2f8a5f38331105f6a6471ee9069e520d25864`
+- Project logic baseline na abertura de `BT-DOC-004`:
+  `be3bf02dba40befead607ba4f34a55595e1322ef9dc1a7bccc6396b1ccac9cee`
 - WIP máximo: `1`
 - Limite de subagentes nesta execução: `3`, sem descendentes, por solicitação
   do usuário
@@ -22,7 +24,7 @@ backlog mestre e o registry gerado.
 
 | Slot | ID | Ficha | Objetivo de coordenação |
 | --- | --- | --- | --- |
-| `NOW` | `BT-DOC-001` | `docs/execution/tasks/BT-DOC-001.md` | Eliminar precedência ambígua entre documentos correntes e históricos sem iniciar outra frente funcional. |
+| `NOW` | `BT-DOC-004` | `docs/execution/tasks/BT-DOC-004.md` | Fechar o registry/ledger operacional, sua DAG, lifecycle, consumers, receipts e guards sem iniciar outra frente funcional. |
 
 Nenhum outro ID pode receber implementação enquanto este slot estiver aberto.
 Auditorias paralelas servem apenas ao mesmo ID.
@@ -31,19 +33,18 @@ Auditorias paralelas servem apenas ao mesmo ID.
 
 | Ordem | ID | Por que vem aqui |
 | ---: | --- | --- |
-| 1 | `BT-DOC-001` | elimina precedência ambígua entre documentos correntes e históricos |
-| 2 | `BT-DOC-004` | fecha o registry/ledger operacional e seus guards |
-| 3 | `BT-SCP-001` | prova default-deny server-side e a matriz 29/29 OFF |
-| 4 | `BT-OFFER-001` | prova uma única oferta pública, sem comércio ou paywall |
-| 5 | `BT-GATE-001` | garante que `SKIP/PARTIAL` não pareça sucesso |
-| 6 | `BT-GATE-002` | fecha receipts fortes e duráveis por SHA/digest/target |
-| 7 | `BT-DB-001` | produz o baseline PostgreSQL fresco exigido antes do ledger de deck |
-| 8 | `BT-DB-004` | prova que somente migrations alteram schema |
-| 9 | `BT-DB-005` | classifica relações suplementares consumidas pela IA |
-| 10 | `BT-CAP-001` | mede capacidade real antes de abrir runtimes caros |
-| 11 | `BT-DR-001` | prova backup/restore antes de mutações estruturais futuras |
-| 12 | `BT-KPI-001` | define telemetria sem decklist/UGC |
-| 13 | `BT-OBS-001` | conecta SLO, alerta, owner e runbook |
+| 1 | `BT-DOC-004` | fecha o registry/ledger operacional e seus guards |
+| 2 | `BT-SCP-001` | prova default-deny server-side e a matriz 29/29 OFF |
+| 3 | `BT-OFFER-001` | prova uma única oferta pública, sem comércio ou paywall |
+| 4 | `BT-GATE-001` | garante que `SKIP/PARTIAL` não pareça sucesso |
+| 5 | `BT-GATE-002` | fecha receipts fortes e duráveis por SHA/digest/target |
+| 6 | `BT-DB-001` | produz o baseline PostgreSQL fresco exigido antes do ledger de deck |
+| 7 | `BT-DB-004` | prova que somente migrations alteram schema |
+| 8 | `BT-DB-005` | classifica relações suplementares consumidas pela IA |
+| 9 | `BT-CAP-001` | mede capacidade real antes de abrir runtimes caros |
+| 10 | `BT-DR-001` | prova backup/restore antes de mutações estruturais futuras |
+| 11 | `BT-KPI-001` | define telemetria sem decklist/UGC |
+| 12 | `BT-OBS-001` | conecta SLO, alerta, owner e runbook |
 
 Ao concluir cada ID, a fila é reavaliada contra o registry. Uma dependência que
 continue sem `PASS` impede a promoção do próximo ID afetado.
@@ -77,6 +78,10 @@ do core enquanto suas capabilities permanecerem comprovadamente OFF.
   `fd0397a5a97742bcb5127c7b2d08d80aca4bf738`; o gate `full` passou, e a
   evidência UI corrente contém 456 capturas no digest `d517adb65b…`, incluindo
   54 checkpoints no Samsung SM-A135M físico, todos revisados.
+- `BT-DOC-001` fechou em `PASS` local no commit
+  `c6e2725af0995e01dcf675f20e3a8b608b84d555`, digest de implementação
+  `be3bf02dba40…`, após auditoria independente `GO`; nenhum push ou deploy foi
+  executado.
 - `BT-UX-PROOF-001` fica na onda final porque novas mudanças app-facing
   invalidariam capturas feitas agora.
 - Parecer jurídico, expansão social/comercial e iOS continuam fora desta fila

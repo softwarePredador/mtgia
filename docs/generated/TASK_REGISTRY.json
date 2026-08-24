@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "f8d2ed1ace379fe250ef04259b4d2fbf4fd58e83d905491abe78d7dded118804"
+    "sha256": "5109f0e0e5585c2c6ce3655514d2f8a5f38331105f6a6471ee9069e520d25864"
   },
   "required_task_fields": [
     "id",
@@ -51,12 +51,12 @@
     {
       "id": "BT-DOC-001",
       "priority": "P0 CORE",
-      "status": "IN_PROGRESS_CONTAINED",
+      "status": "PASS",
       "delivery": "Reconciliar docs ativos e marcar relatórios antigos como históricos para prioridade.",
       "depends_on": [
         "BT-GOV-001"
       ],
-      "acceptance": "Deck/IA ganhou mapa canônico; qualquer plano/manual/Hermes antigo recebe lifecycle inequívoco; zero comando mutante em documento histórico pode parecer operacional.",
+      "acceptance": "Deck/IA ganhou mapa canônico; qualquer plano/manual/Hermes antigo recebe lifecycle inequívoco; zero comando mutante em documento histórico pode parecer operacional. Receipt: `docs/qa/execution/2026-08-24/BT-DOC-001.md`; implementação: `c6e2725af0995e01dcf675f20e3a8b608b84d555`.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 224
     },
@@ -6977,5 +6977,5 @@
     "receipt_bindings_declared": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "be3bf02dba40befead607ba4f34a55595e1322ef9dc1a7bccc6396b1ccac9cee"
+  "project_logic_source_digest_sha256": "c1ddf67874b4861c9736cd64c5519887a3e59106e9658f12276a6905d9387a96"
 }
