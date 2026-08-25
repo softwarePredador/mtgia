@@ -34,6 +34,14 @@ readonly MANALOOM_RELEASE_CAPABILITY_KEYS_JSON='[
   "trades",
   "user_search"
 ]'
+readonly MANALOOM_RELEASE_IMPLEMENTATION_STATUS_VALUES_JSON='[
+  "contained_legacy",
+  "experimental_guarded",
+  "experimental_p0_open",
+  "implemented_guarded",
+  "implemented_p0_open",
+  "not_implemented"
+]'
 
 manaloom_release_capabilities_block() {
   echo "BLOCKED: release capabilities: $1" >&2
@@ -62,7 +70,9 @@ manaloom_load_release_capabilities_from_git() {
 
   if ! jq -e \
     --argjson expected_capability_keys \
-      "$MANALOOM_RELEASE_CAPABILITY_KEYS_JSON" '
+      "$MANALOOM_RELEASE_CAPABILITY_KEYS_JSON" \
+    --argjson implementation_status_values \
+      "$MANALOOM_RELEASE_IMPLEMENTATION_STATUS_VALUES_JSON" '
     def nonempty_string:
       type == "string" and length > 0;
     def timestamp_or_null:
@@ -85,7 +95,8 @@ manaloom_load_release_capabilities_from_git() {
     .release_channel == "free_beta" and
     .offer_mode == "free_beta_no_commerce" and
     (.policy_version | nonempty_string) and
-    (.implementation_status | nonempty_string) and
+    (.implementation_status as $status |
+      $implementation_status_values | index($status) != null) and
     (.live_verified_as_of | timestamp_or_null) and
     (.capabilities | type == "object" and
       keys == $expected_capability_keys) and
@@ -98,7 +109,8 @@ manaloom_load_release_capabilities_from_git() {
         "live_verified_as_of",
         "release_capability"
       ] and
-      (.implementation_status | nonempty_string) and
+      (.implementation_status as $status |
+        $implementation_status_values | index($status) != null) and
       (.release_capability == "off") and
       (.allowed == false) and
       (.live_verified_as_of | timestamp_or_null)

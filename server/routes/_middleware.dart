@@ -43,6 +43,16 @@ const _securityHeaders = {
 };
 
 Handler middleware(Handler handler) {
+  return middlewareWithReleaseCapabilityPolicy(
+    handler,
+    releaseCapabilityPolicy: _releaseCapabilityPolicy,
+  );
+}
+
+Handler middlewareWithReleaseCapabilityPolicy(
+  Handler handler, {
+  required ReleaseCapabilityPolicy releaseCapabilityPolicy,
+}) {
   return (context) async {
     final startedAt = DateTime.now();
     final requestId = resolveRequestId(context.request.headers);
@@ -92,23 +102,38 @@ Handler middleware(Handler handler) {
       );
     }
 
-    final releaseCapabilityDecision = _releaseCapabilityPolicy.decisionFor(
+    final releaseCapabilityDecision = releaseCapabilityPolicy.decisionFor(
       path: context.request.uri.path,
       method: context.request.method.name,
       queryParameters: context.request.uri.queryParameters,
     );
     if (!releaseCapabilityDecision.allowed) {
-      final capability = releaseCapabilityDecision.capability!;
-      final entry = _releaseCapabilityPolicy.entry(capability);
+      final capability = releaseCapabilityDecision.capability;
+      final entry =
+          capability == null ? null : releaseCapabilityPolicy.entry(capability);
+      final statusCode = releaseCapabilityDecision.statusCode!;
+      final denialReason = releaseCapabilityDecision.errorCode!;
+      final latencyMs = DateTime.now().difference(startedAt).inMilliseconds;
+      RequestMetricsService.instance.record(
+        endpoint: 'RELEASE_CAPABILITY_DENIAL $denialReason',
+        statusCode: statusCode,
+        latencyMs: latencyMs,
+      );
+      Log.w(
+        '[release_capability_denial] reason=$denialReason '
+        'capability=${capability ?? 'unclassified'} status=$statusCode '
+        'policy_version=${releaseCapabilityPolicy.policyVersion} '
+        'policy_digest=${releaseCapabilityPolicy.policyDigestSha256}',
+      );
       return Response.json(
-        statusCode: releaseCapabilityDecision.statusCode!,
+        statusCode: statusCode,
         body: {
           'error': releaseCapabilityDecision.errorCode,
           'capability': capability,
-          'release_capability': entry.releaseCapability,
-          'policy_version': _releaseCapabilityPolicy.policyVersion,
-          'policy_digest_sha256': _releaseCapabilityPolicy.policyDigestSha256,
-          'offer_mode': _releaseCapabilityPolicy.offerMode,
+          'release_capability': entry?.releaseCapability ?? 'off',
+          'policy_version': releaseCapabilityPolicy.policyVersion,
+          'policy_digest_sha256': releaseCapabilityPolicy.policyDigestSha256,
+          'offer_mode': releaseCapabilityPolicy.offerMode,
         },
         headers: {
           ...responseHeaders,
@@ -140,7 +165,7 @@ Handler middleware(Handler handler) {
               ? await handler
                   .use(
                     provider<ReleaseCapabilityPolicy>(
-                      (_) => _releaseCapabilityPolicy,
+                      (_) => releaseCapabilityPolicy,
                     ),
                   )
                   .use(provider<RequestTrace>((_) => trace))(context)
@@ -148,7 +173,7 @@ Handler middleware(Handler handler) {
                   .use(provider<Pool>((_) => _db.connection))
                   .use(
                     provider<ReleaseCapabilityPolicy>(
-                      (_) => _releaseCapabilityPolicy,
+                      (_) => releaseCapabilityPolicy,
                     ),
                   )
                   .use(provider<RequestTrace>((_) => trace))(context);

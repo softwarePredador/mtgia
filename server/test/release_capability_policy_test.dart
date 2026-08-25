@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:test/test.dart';
 
+import '../lib/request_metrics_service.dart';
 import '../lib/release_capability_policy.dart';
 import '../routes/_middleware.dart' as root_middleware;
 import '../routes/capabilities/index.dart' as capabilities_route;
@@ -66,6 +67,44 @@ void main() {
         contradictory.capabilities.values.every((entry) => !entry.allowed),
         true,
       );
+    });
+
+    test('unknown implementation status values fail closed', () {
+      final directory = Directory.systemTemp.createTempSync(
+        'brewtact-release-capability-status-',
+      );
+      addTearDown(() => directory.deleteSync(recursive: true));
+      final canonical =
+          jsonDecode(File(releaseCapabilitiesDefaultPath).readAsStringSync())
+              as Map<String, dynamic>;
+
+      final mutations = <void Function(Map<String, dynamic>)>[
+        (payload) => payload['implementation_status'] = 'future_unknown',
+        (payload) =>
+            (payload['capabilities']
+                    as Map<
+                      String,
+                      dynamic
+                    >)['battle_batch']['implementation_status'] =
+                'future_unknown',
+      ];
+
+      for (var index = 0; index < mutations.length; index++) {
+        final candidate =
+            jsonDecode(jsonEncode(canonical)) as Map<String, dynamic>;
+        mutations[index](candidate);
+        final file = File('${directory.path}/invalid-$index.json')
+          ..writeAsStringSync(jsonEncode(candidate));
+
+        final policy = ReleaseCapabilityPolicy.load(configPath: file.path);
+
+        expect(policy.isValid, isFalse, reason: 'mutation $index');
+        expect(
+          policy.capabilities.values.every((entry) => !entry.allowed),
+          isTrue,
+          reason: 'mutation $index',
+        );
+      }
     });
 
     test('isolated runtime override is temporary and fail-closed', () {
@@ -253,6 +292,20 @@ void main() {
       );
     });
 
+    test('fails closed for an unclassified future route', () {
+      final policy = ReleaseCapabilityPolicy.load();
+
+      final decision = policy.decisionFor(
+        method: 'POST',
+        path: '/future-unclassified-mutation',
+      );
+
+      expect(decision.allowed, isFalse);
+      expect(decision.capability, isNull);
+      expect(decision.errorCode, 'capability_route_unclassified');
+      expect(decision.statusCode, HttpStatus.notFound);
+    });
+
     test('every route handler is classified or explicitly control-plane', () {
       final handlers =
           Directory('routes')
@@ -268,17 +321,49 @@ void main() {
 
       for (final handler in handlers) {
         final path = _routePath(handler.path);
-        for (final method in const ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']) {
+        final methods = _declaredRouteMethods(handler, path);
+        expect(methods, isNotEmpty, reason: handler.path);
+        for (final method in methods) {
           final capability = requiredCapabilityForRequest(
             path: path,
             method: method,
           );
           expect(
-            capability != null || _isExplicitControlPlane(path, method),
+            capability != null ||
+                isReleaseCapabilityControlPlaneRequest(
+                  path: path,
+                  method: method,
+                ),
             isTrue,
             reason: '$method $path (${handler.path})',
           );
         }
+      }
+    });
+
+    test('control-plane allowlist is exact by route and method', () {
+      const denied = <String>[
+        'POST /health',
+        'GET /health/future',
+        'GET /auth/future',
+        'GET /content-reports',
+        'DELETE /community/decks/deck/comments',
+        'GET /moderation/reports/report',
+        'GET /reports',
+        'GET /reports/report/extra',
+        'GET /users/me/plan/checkout',
+        'GET /billing/webhook',
+      ];
+      for (final request in denied) {
+        final separator = request.indexOf(' ');
+        expect(
+          isReleaseCapabilityControlPlaneRequest(
+            method: request.substring(0, separator),
+            path: request.substring(separator + 1),
+          ),
+          isFalse,
+          reason: request,
+        );
       }
     });
   });
@@ -286,14 +371,20 @@ void main() {
   test('central gate executes before observability and PostgreSQL', () {
     final source = File('routes/_middleware.dart').readAsStringSync();
     final decision = source.indexOf(
-      'final releaseCapabilityDecision = _releaseCapabilityPolicy.decisionFor',
+      'final releaseCapabilityDecision = releaseCapabilityPolicy.decisionFor',
     );
     final observability = source.indexOf(
       'await ensureObservabilityInitialized',
     );
     final database = source.indexOf('await _db.connect()');
+    final denialMetric = source.indexOf(
+      "endpoint: 'RELEASE_CAPABILITY_DENIAL \$denialReason'",
+    );
 
     expect(decision, greaterThanOrEqualTo(0));
+    expect(denialMetric, greaterThan(decision));
+    expect(denialMetric, lessThan(observability));
+    expect(denialMetric, lessThan(database));
     expect(decision, lessThan(observability));
     expect(decision, lessThan(database));
     expect(source, contains("path == '/capabilities'"));
@@ -346,6 +437,75 @@ void main() {
     },
   );
 
+  test(
+    'central middleware denies an invalid policy before handler or PG',
+    () async {
+      final invalid = ReleaseCapabilityPolicy.load(
+        configPath: 'config/does-not-exist.json',
+      );
+      var handlerCalled = false;
+      final handler = root_middleware.middlewareWithReleaseCapabilityPolicy((
+        context,
+      ) {
+        handlerCalled = true;
+        return Response.json(body: const {'unexpected': true});
+      }, releaseCapabilityPolicy: invalid);
+
+      final response = await handler(
+        _CapabilityRequestContext(
+          Request.get(Uri.parse('http://localhost/decks')),
+        ),
+      );
+      final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+
+      expect(response.statusCode, HttpStatus.serviceUnavailable);
+      expect(handlerCalled, isFalse);
+      expect(body['error'], 'capability_policy_invalid');
+      expect(body['capability'], 'decks_private');
+    },
+  );
+
+  test(
+    'central middleware denies an unclassified route before handler or PG',
+    () async {
+      const metricKey =
+          'RELEASE_CAPABILITY_DENIAL capability_route_unclassified';
+      final metricsBefore = RequestMetricsService.instance.snapshot();
+      final countBefore =
+          ((metricsBefore['endpoints'] as Map<String, dynamic>)[metricKey]
+                  as Map<String, dynamic>?)?['request_count']
+              as int? ??
+          0;
+      var handlerCalled = false;
+      final handler = root_middleware.middleware((context) {
+        handlerCalled = true;
+        return Response.json(body: const {'unexpected': true});
+      });
+
+      for (var attempt = 0; attempt < 2; attempt++) {
+        final response = await handler(
+          _CapabilityRequestContext(
+            Request.post(
+              Uri.parse('http://localhost/future-unclassified-mutation'),
+            ),
+          ),
+        );
+        final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+
+        expect(response.statusCode, HttpStatus.notFound);
+        expect(body['error'], 'capability_route_unclassified');
+        expect(body['capability'], isNull);
+      }
+      expect(handlerCalled, isFalse);
+      final metricsAfter = RequestMetricsService.instance.snapshot();
+      final countAfter =
+          ((metricsAfter['endpoints'] as Map<String, dynamic>)[metricKey]
+                  as Map<String, dynamic>)['request_count']
+              as int;
+      expect(countAfter, countBefore + 2);
+    },
+  );
+
   test('runtime identity and legacy launch flags use the same policy', () {
     final dockerfile = File('Dockerfile').readAsStringSync();
     final entrypoint = File('bin/api_with_battle_worker.sh').readAsStringSync();
@@ -391,34 +551,15 @@ String _routePath(String filePath) {
   return relative.isEmpty ? '/' : relative;
 }
 
-bool _isExplicitControlPlane(String path, String method) {
-  if (path == '/' ||
-      path == '/capabilities' ||
-      path == '/ready' ||
-      path == '/users/me' ||
-      path == '/users/me/export' ||
-      path == '/users/me/plan' ||
-      path == '/users/me/plan/checkout' ||
-      path == '/users/me/activation-events' ||
-      (path == '/users/me/fcm-token' && method == 'DELETE') ||
-      path == '/billing/webhook' ||
-      path == '/reports' ||
-      path.startsWith('/reports/') ||
-      path == '/users/me/blocks' ||
-      path.startsWith('/users/me/blocks/')) {
-    return true;
+Set<String> _declaredRouteMethods(File handler, String path) {
+  final source = handler.readAsStringSync();
+  final methods =
+      RegExp(r'HttpMethod\.(get|post|put|patch|delete)')
+          .allMatches(source)
+          .map((match) => match.group(1)!.toUpperCase())
+          .toSet();
+  if (methods.isEmpty && (path == '/health/live' || path == '/ready')) {
+    return const {'GET'};
   }
-  if (path.startsWith('/health') ||
-      (path.startsWith('/auth/') && path != '/auth/register') ||
-      path.startsWith('/content-reports') ||
-      path.startsWith('/moderation/')) {
-    return true;
-  }
-  if (RegExp(r'^/users/[^/]+/block$').hasMatch(path)) return true;
-  if (method == 'DELETE' && RegExp(r'^/users/[^/]+/follow$').hasMatch(path)) {
-    return true;
-  }
-  if (RegExp(r'^/community/decks/[^/]+/reports$').hasMatch(path)) return true;
-  return method == 'DELETE' &&
-      RegExp(r'^/community/decks/[^/]+/comments(?:/[^/]+)?$').hasMatch(path);
+  return methods;
 }

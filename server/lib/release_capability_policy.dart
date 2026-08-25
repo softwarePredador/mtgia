@@ -68,6 +68,15 @@ const _releaseCapabilityValues = <String>{
   'experimental_allowlist',
 };
 
+const releaseImplementationStatusValues = <String>{
+  'contained_legacy',
+  'experimental_guarded',
+  'experimental_p0_open',
+  'implemented_guarded',
+  'implemented_p0_open',
+  'not_implemented',
+};
+
 class ReleaseCapabilityEntry {
   const ReleaseCapabilityEntry({
     required this.implementationStatus,
@@ -157,7 +166,15 @@ class ReleaseCapabilityPolicy {
       queryParameters: queryParameters,
     );
     if (capability == null) {
-      return const ReleaseCapabilityDecision.allowed();
+      if (isReleaseCapabilityControlPlaneRequest(path: path, method: method)) {
+        return const ReleaseCapabilityDecision.allowed();
+      }
+      return const ReleaseCapabilityDecision._(
+        allowed: false,
+        capability: null,
+        errorCode: 'capability_route_unclassified',
+        statusCode: HttpStatus.notFound,
+      );
     }
     if (!isValid) {
       return ReleaseCapabilityDecision._(
@@ -272,7 +289,9 @@ class ReleaseCapabilityPolicy {
         decoded['release_channel'] != 'free_beta' ||
         decoded['offer_mode'] != 'free_beta_no_commerce' ||
         !_isNonEmptyString(decoded['policy_version']) ||
-        !_isNonEmptyString(decoded['implementation_status']) ||
+        !releaseImplementationStatusValues.contains(
+          decoded['implementation_status'],
+        ) ||
         !_isValidTimestamp(decoded['live_verified_as_of'])) {
       return _invalidPolicy(digest);
     }
@@ -288,7 +307,9 @@ class ReleaseCapabilityPolicy {
       final raw = rawCapabilities[key];
       if (raw is! Map<String, dynamic> ||
           !_hasExactKeys(raw, _entryKeys) ||
-          !_isNonEmptyString(raw['implementation_status']) ||
+          !releaseImplementationStatusValues.contains(
+            raw['implementation_status'],
+          ) ||
           !_releaseCapabilityValues.contains(raw['release_capability']) ||
           raw['allowed'] is! bool ||
           !_isValidTimestamp(raw['live_verified_as_of'])) {
@@ -522,6 +543,81 @@ String? requiredCapabilityForRequest({
 
   return null;
 }
+
+bool isReleaseCapabilityControlPlaneRequest({
+  required String path,
+  required String method,
+}) {
+  final normalizedPath = _normalizePath(path);
+  final normalizedMethod = method.toUpperCase();
+  final request = '$normalizedMethod $normalizedPath';
+
+  if (_exactControlPlaneRequests.contains(request)) {
+    return true;
+  }
+  if (_userBlockControlPlaneMethods.contains(normalizedMethod) &&
+      RegExp(r'^/users/[^/]+/block$').hasMatch(normalizedPath)) {
+    return true;
+  }
+  if (normalizedMethod == 'DELETE' &&
+      RegExp(r'^/users/[^/]+/follow$').hasMatch(normalizedPath)) {
+    return true;
+  }
+  if (normalizedMethod == 'POST' &&
+      RegExp(r'^/community/decks/[^/]+/reports$').hasMatch(normalizedPath)) {
+    return true;
+  }
+  if (normalizedMethod == 'DELETE' &&
+      RegExp(
+        r'^/community/decks/[^/]+/comments/[^/]+$',
+      ).hasMatch(normalizedPath)) {
+    return true;
+  }
+  if (normalizedMethod == 'POST' &&
+      RegExp(r'^/content-reports/[^/]+/appeals$').hasMatch(normalizedPath)) {
+    return true;
+  }
+  if (normalizedMethod == 'PUT' &&
+      RegExp(r'^/moderation/reports/[^/]+$').hasMatch(normalizedPath)) {
+    return true;
+  }
+  return normalizedMethod == 'GET' &&
+      RegExp(r'^/reports/[^/]+$').hasMatch(normalizedPath);
+}
+
+const _userBlockControlPlaneMethods = <String>{'GET', 'POST', 'DELETE'};
+
+const _exactControlPlaneRequests = <String>{
+  'GET /',
+  'GET /capabilities',
+  'GET /ready',
+  'GET /health',
+  'GET /health/live',
+  'GET /health/ready',
+  'GET /health/ai-history',
+  'GET /health/commercial',
+  'GET /health/dashboard',
+  'GET /health/metrics',
+  'POST /auth/login',
+  'POST /auth/forgot-password',
+  'POST /auth/reset-password',
+  'POST /auth/change-password',
+  'POST /auth/resend-verification',
+  'POST /auth/revoke-sessions',
+  'POST /auth/verify-email',
+  'GET /auth/me',
+  'GET /users/me',
+  'PATCH /users/me',
+  'DELETE /users/me',
+  'GET /users/me/export',
+  'GET /users/me/plan',
+  'GET /users/me/blocks',
+  'GET /users/me/activation-events',
+  'POST /users/me/activation-events',
+  'DELETE /users/me/fcm-token',
+  'POST /content-reports',
+  'GET /moderation/reports',
+};
 
 const _disabledEntry = ReleaseCapabilityEntry(
   implementationStatus: 'configuration_invalid',

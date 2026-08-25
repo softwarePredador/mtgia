@@ -85,16 +85,19 @@ fi
 expect_invalid_policy() {
   local label="$1"
   local filter="$2"
-  jq "$filter" "$ROOT_DIR/server/config/release_capabilities.json" \
-    > "$REPO/server/config/release_capabilities.json"
+  git -C "$REPO" show \
+    "$SHA:server/config/release_capabilities.json" |
+    jq "$filter" > "$REPO/server/config/release_capabilities.json"
   git -C "$REPO" add server/config/release_capabilities.json
   git -C "$REPO" commit --quiet -m "$label"
   local invalid_sha
   invalid_sha="$(git -C "$REPO" rev-parse HEAD)"
-  if (
-    source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
-    manaloom_load_release_capabilities_from_git "$REPO" "$invalid_sha"
-  ) 2>/dev/null; then
+  if bash -c '
+    set -euo pipefail
+    source "$1"
+    manaloom_load_release_capabilities_from_git "$2" "$3"
+  ' _ "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh" \
+    "$REPO" "$invalid_sha" 2>/dev/null; then
     # shellcheck disable=SC2031
     echo "contrato aceitou policy invalida: $label" >&2
     exit 1
@@ -104,21 +107,37 @@ expect_invalid_policy() {
 expect_invalid_policy missing-key 'del(.capabilities.ads)'
 expect_invalid_policy extra-key '.capabilities.unknown_capability = .capabilities.ads'
 expect_invalid_policy non-default-deny '.capabilities.ads.allowed = true'
+expect_invalid_policy invalid-release-enum \
+  '.capabilities.ads.release_capability = "future_unknown"'
+expect_invalid_policy invalid-allowed-type '.capabilities.ads.allowed = "false"'
+expect_invalid_policy invalid-top-level-implementation-status \
+  '.implementation_status = "future_unknown"'
+expect_invalid_policy invalid-entry-implementation-status \
+  '.capabilities.battle_batch.implementation_status = "future_unknown"'
+
+MIXED_DIGEST_JSON="$(jq -c \
+  '.policy_digest_sha256 = ("b" * 64)' \
+  <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")"
+if manaloom_require_exact_release_capabilities \
+  mixed-digest "$MIXED_DIGEST_JSON" >/dev/null 2>&1; then
+  echo "contrato aceitou digest de policy misto" >&2
+  exit 1
+fi
 
 git -C "$REPO" rm --quiet server/config/release_capabilities.json
 git -C "$REPO" commit --quiet -m missing-policy
 MISSING_POLICY_SHA="$(git -C "$REPO" rev-parse HEAD)"
-if (
-  source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
-  manaloom_load_release_capabilities_from_git "$REPO" "$MISSING_POLICY_SHA"
-) 2>/dev/null; then
+if bash -c '
+  set -euo pipefail
+  source "$1"
+  manaloom_load_release_capabilities_from_git "$2" "$3"
+' _ "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh" \
+  "$REPO" "$MISSING_POLICY_SHA" 2>/dev/null; then
   echo "contrato aceitou policy ausente" >&2
   exit 1
 fi
 
 if (
-  source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
-  manaloom_load_release_capabilities_from_git "$REPO" "$SHA"
   unknown_json="$(jq -c '.unexpected = true' \
     <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")"
   manaloom_require_exact_release_capabilities fixture "$unknown_json"

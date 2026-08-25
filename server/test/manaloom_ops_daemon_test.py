@@ -137,10 +137,47 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             candidate.write_text(json.dumps(malformed), encoding="utf-8")
             self.assertFalse(module._load_release_policy(candidate).valid)
 
+            malformed = deepcopy(payload)
+            malformed["implementation_status"] = "future_unknown"
+            candidate.write_text(json.dumps(malformed), encoding="utf-8")
+            self.assertFalse(module._load_release_policy(candidate).valid)
+
+            malformed = deepcopy(payload)
+            malformed["capabilities"]["battle_batch"][
+                "implementation_status"
+            ] = "future_unknown"
+            candidate.write_text(json.dumps(malformed), encoding="utf-8")
+            self.assertFalse(module._load_release_policy(candidate).valid)
+
         missing = module._load_release_policy(Path(tmp) / "missing.json")
         self.assertFalse(missing.valid)
         self.assertFalse(missing.allowed("learning_writes"))
         self.assertFalse(missing.allowed("battle_batch"))
+
+    def test_runtime_policy_rejects_alternate_file_even_when_schema_is_valid(
+        self,
+    ) -> None:
+        module = _load_module()
+        source = module.REPO_ROOT / "server/config/release_capabilities.json"
+        payload = json.loads(source.read_text(encoding="utf-8"))
+        payload["capabilities"]["battle_batch"].update(
+            {"release_capability": "on", "allowed": True}
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            candidate = Path(tmp) / "release_capabilities.json"
+            candidate.write_text(json.dumps(payload), encoding="utf-8")
+
+            parsed = module._load_release_policy(candidate)
+            runtime = module._load_runtime_release_policy(candidate)
+
+        self.assertTrue(parsed.allowed("battle_batch"))
+        self.assertFalse(runtime.valid)
+        self.assertFalse(runtime.allowed("battle_batch"))
+        self.assertEqual(
+            [job.name for job in module._jobs_for_release_policy(runtime)],
+            ["hermes_cron_governor_report"],
+        )
 
     def test_all_off_or_invalid_policy_schedules_only_safe_governor(self) -> None:
         module = _load_module()
@@ -270,6 +307,37 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             with self.assertRaises(urllib.error.HTTPError) as blocked:
                 urllib.request.urlopen(f"http://{host}:{port}/simulate", timeout=2)
             self.assertEqual(blocked.exception.code, 404)
+        finally:
+            server.shutdown()
+            server.server_close()
+
+    def test_invalid_policy_health_is_unhealthy_but_keeps_liveness_endpoint(
+        self,
+    ) -> None:
+        module = _load_module()
+        policy = module.ReleasePolicy(False, "invalid-policy", {})
+        server = module._start_disabled_ops_health(
+            policy,
+            enabled_jobs=("hermes_cron_governor_report",),
+            host="127.0.0.1",
+            port=0,
+        )
+        try:
+            host, port = server.server_address
+            with urllib.request.urlopen(
+                f"http://{host}:{port}/health", timeout=2
+            ) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+                self.assertEqual(response.status, 200)
+
+            self.assertEqual(payload["status"], "unhealthy")
+            self.assertEqual(
+                payload["release_capabilities"]["configuration_status"],
+                "invalid_fail_closed",
+            )
+            self.assertEqual(
+                payload["enabled_jobs"], ["hermes_cron_governor_report"]
+            )
         finally:
             server.shutdown()
             server.server_close()

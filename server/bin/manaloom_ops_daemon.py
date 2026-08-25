@@ -50,10 +50,13 @@ RUN_PREFLIGHT_ON_BOOT = os.environ.get("MANALOOM_RUN_PREFLIGHT_ON_BOOT", "0") ==
 BOOT_PULL_PENDING_EVENTS = os.environ.get("MANALOOM_BOOT_PULL_PENDING_EVENTS", "0") == "1"
 NATIVE_BATTLE_HTTP_ENABLED = os.environ.get("MANALOOM_NATIVE_BATTLE_HTTP_ENABLED", "0") == "1"
 NATIVE_BATTLE_SYNC_ON_BOOT = os.environ.get("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT", "0") == "1"
+CANONICAL_RELEASE_CAPABILITIES_FILE = (
+    REPO_ROOT / "server/config/release_capabilities.json"
+).resolve()
 RELEASE_CAPABILITIES_FILE = Path(
     os.environ.get(
         "MANALOOM_RELEASE_CAPABILITIES_FILE",
-        str(REPO_ROOT / "server/config/release_capabilities.json"),
+        str(CANONICAL_RELEASE_CAPABILITIES_FILE),
     )
 ).resolve()
 
@@ -105,6 +108,14 @@ EXPECTED_RELEASE_CAPABILITY_ENTRY_KEYS = {
     "live_verified_as_of",
 }
 RELEASE_CAPABILITY_VALUES = {"on", "off", "experimental_allowlist"}
+RELEASE_IMPLEMENTATION_STATUS_VALUES = {
+    "contained_legacy",
+    "experimental_guarded",
+    "experimental_p0_open",
+    "implemented_guarded",
+    "implemented_p0_open",
+    "not_implemented",
+}
 _UTC_TIMESTAMP_RE = re.compile(
     r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:"
     r"[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?Z$"
@@ -143,7 +154,8 @@ def _load_release_policy(path: Path = RELEASE_CAPABILITIES_FILE) -> ReleasePolic
             and payload.get("release_channel") == "free_beta"
             and payload.get("offer_mode") == "free_beta_no_commerce"
             and _is_nonempty_string(payload.get("policy_version"))
-            and _is_nonempty_string(payload.get("implementation_status"))
+            and payload.get("implementation_status")
+            in RELEASE_IMPLEMENTATION_STATUS_VALUES
             and _is_valid_timestamp(payload.get("live_verified_as_of"))
         )
         capabilities = payload.get("capabilities") if valid else None
@@ -158,7 +170,8 @@ def _load_release_policy(path: Path = RELEASE_CAPABILITIES_FILE) -> ReleasePolic
                 if (
                     not isinstance(entry, dict)
                     or set(entry) != EXPECTED_RELEASE_CAPABILITY_ENTRY_KEYS
-                    or not _is_nonempty_string(entry.get("implementation_status"))
+                    or entry.get("implementation_status")
+                    not in RELEASE_IMPLEMENTATION_STATUS_VALUES
                     or not _is_valid_timestamp(entry.get("live_verified_as_of"))
                 ):
                     valid = False
@@ -181,6 +194,14 @@ def _load_release_policy(path: Path = RELEASE_CAPABILITIES_FILE) -> ReleasePolic
     except Exception:
         marker = str(path).encode("utf-8")
         return ReleasePolicy(False, hashlib.sha256(marker).hexdigest(), {})
+
+
+def _load_runtime_release_policy(path: Path | None = None) -> ReleasePolicy:
+    candidate = (path or RELEASE_CAPABILITIES_FILE).resolve()
+    if candidate != CANONICAL_RELEASE_CAPABILITIES_FILE:
+        marker = f"unauthorized_release_policy_path:{candidate}".encode("utf-8")
+        return ReleasePolicy(False, hashlib.sha256(marker).hexdigest(), {})
+    return _load_release_policy(candidate)
 
 
 @dataclass(frozen=True)
@@ -394,7 +415,7 @@ def _start_disabled_ops_health(
                 return
             body = json.dumps(
                 {
-                    "status": "ok",
+                    "status": "ok" if policy.valid else "unhealthy",
                     "engine_contract": engine_contract,
                     "git_sha": os.environ.get("GIT_SHA"),
                     "operational_mode": "safe_housekeeping_only",
@@ -1044,7 +1065,7 @@ def main() -> int:
     CRON_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     KNOWLEDGE_DB.parent.mkdir(parents=True, exist_ok=True)
 
-    policy = _load_release_policy()
+    policy = _load_runtime_release_policy()
     runtime_jobs = _jobs_for_release_policy(policy)
     battle_batch_allowed = policy.allowed("battle_batch")
     learning_writes_allowed = policy.allowed("learning_writes")

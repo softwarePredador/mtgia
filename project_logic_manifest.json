@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "abf4957c7646a4189edc833a02eb343fe32b283e8a7cfe409ff993d706557fe9",
+  "source_digest_sha256": "c1782de003b85ae65ddec7408798963d12dc4bad6b5ef14af96bac25d56693b3",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,11 +63,11 @@
     "dart_source_files": 684,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 33,
-    "dart_symbols": 5164,
+    "dart_symbols": 5166,
     "semantic_resolved_files": 684,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42588,
-    "semantic_resolved_call_sites": 67823,
+    "semantic_resolved_call_edges": 42596,
+    "semantic_resolved_call_sites": 67848,
     "semantic_resolved_type_references": 16034,
     "modules": 153,
     "app_routes": 45,
@@ -1887,7 +1887,7 @@
         "server/lib/release_capability_policy.dart"
       ],
       "file_count": 1,
-      "symbol_count": 10,
+      "symbol_count": 11,
       "providers": [],
       "services": []
     },
@@ -2051,7 +2051,7 @@
         "server/routes/_middleware.dart"
       ],
       "file_count": 1,
-      "symbol_count": 5,
+      "symbol_count": 6,
       "providers": [],
       "services": []
     },
@@ -26707,13 +26707,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -36427,13 +36427,13 @@
       "name": "ReleaseCapabilityDecision",
       "kind": "class",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 92
+      "line": 101
     },
     {
       "name": "ReleaseCapabilityEntry",
       "kind": "class",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 71,
+      "line": 80,
       "members": [
         "toJson"
       ]
@@ -36442,7 +36442,7 @@
       "name": "ReleaseCapabilityPolicy",
       "kind": "class",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 114,
+      "line": 123,
       "members": [
         "_parse",
         "decisionFor",
@@ -36458,43 +36458,49 @@
       "name": "_hasExactKeys",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 550
+      "line": 646
     },
     {
       "name": "_invalidPolicy",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 533
+      "line": 629
     },
     {
       "name": "_isNonEmptyString",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 555
+      "line": 651
     },
     {
       "name": "_isValidTimestamp",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 559
+      "line": 655
     },
     {
       "name": "_isolatedConfigIsAuthorized",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 325
+      "line": 346
     },
     {
       "name": "_normalizePath",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 566
+      "line": 662
+    },
+    {
+      "name": "isReleaseCapabilityControlPlaneRequest",
+      "kind": "function",
+      "source": "server/lib/release_capability_policy.dart",
+      "line": 547
     },
     {
       "name": "requiredCapabilityForRequest",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 356
+      "line": 377
     },
     {
       "name": "ShareableReportService",
@@ -36945,31 +36951,37 @@
       "name": "_header",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 232
+      "line": 257
     },
     {
       "name": "_recordHttpObservability",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 240
+      "line": 265
     },
     {
       "name": "_safeUserId",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 311
+      "line": 336
     },
     {
       "name": "isDatabaseIndependentHealthPath",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 221
+      "line": 246
     },
     {
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
       "line": 45
+    },
+    {
+      "name": "middlewareWithReleaseCapabilityPolicy",
+      "kind": "function",
+      "source": "server/routes/_middleware.dart",
+      "line": 52
     },
     {
       "name": "AiEndpointAccessPolicy",
@@ -40827,9 +40839,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42588,
-    "resolved_call_site_count": 67823,
-    "workspace_call_edge_count": 13229,
+    "resolved_call_edge_count": 42596,
+    "resolved_call_site_count": 67848,
+    "workspace_call_edge_count": 13233,
     "unresolved_call_edge_count": 539,
     "unresolved_call_site_count": 749,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -163717,7 +163729,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 154,
+        "line": 163,
         "caller": "ReleaseCapabilityPolicy.decisionFor",
         "kind": "method",
         "lexical_target": "requiredCapabilityForRequest",
@@ -163728,7 +163740,18 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 160,
+        "line": 169,
+        "caller": "ReleaseCapabilityPolicy.decisionFor",
+        "kind": "method",
+        "lexical_target": "isReleaseCapabilityControlPlaneRequest",
+        "target": "isReleaseCapabilityControlPlaneRequest",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/release_capability_policy.dart",
+        "line": 170,
         "caller": "ReleaseCapabilityPolicy.decisionFor",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityDecision.allowed",
@@ -163739,18 +163762,18 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 163,
+        "line": 172,
         "caller": "ReleaseCapabilityPolicy.decisionFor",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityDecision._",
         "target": "ReleaseCapabilityDecision.ReleaseCapabilityDecision._",
         "target_library": "package:server/release_capability_policy.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 170,
+        "line": 187,
         "caller": "ReleaseCapabilityPolicy.decisionFor",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -163761,7 +163784,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 192,
+        "line": 209,
         "caller": "ReleaseCapabilityPolicy.toPublicJson",
         "kind": "method",
         "lexical_target": "entry",
@@ -163772,7 +163795,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 192,
+        "line": 209,
         "caller": "ReleaseCapabilityPolicy.toPublicJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -163783,7 +163806,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 214,
+        "line": 231,
         "caller": "ReleaseCapabilityPolicy.load",
         "kind": "method",
         "lexical_target": "_isolatedConfigIsAuthorized",
@@ -163794,7 +163817,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 221,
+        "line": 238,
         "caller": "ReleaseCapabilityPolicy.load",
         "kind": "method",
         "lexical_target": "_invalidPolicy",
@@ -163805,7 +163828,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 259,
+        "line": 276,
         "caller": "ReleaseCapabilityPolicy.load",
         "kind": "method",
         "lexical_target": "_parse",
@@ -163816,7 +163839,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 269,
+        "line": 286,
         "caller": "ReleaseCapabilityPolicy._parse",
         "kind": "method",
         "lexical_target": "_hasExactKeys",
@@ -163827,18 +163850,18 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 274,
+        "line": 291,
         "caller": "ReleaseCapabilityPolicy._parse",
         "kind": "method",
         "lexical_target": "_isNonEmptyString",
         "target": "_isNonEmptyString",
         "target_library": "package:server/release_capability_policy.dart",
         "target_scope": "workspace",
-        "occurrences": 3
+        "occurrences": 1
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 276,
+        "line": 295,
         "caller": "ReleaseCapabilityPolicy._parse",
         "kind": "method",
         "lexical_target": "_isValidTimestamp",
@@ -163849,7 +163872,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 277,
+        "line": 296,
         "caller": "ReleaseCapabilityPolicy._parse",
         "kind": "method",
         "lexical_target": "_invalidPolicy",
@@ -163860,7 +163883,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 302,
+        "line": 323,
         "caller": "ReleaseCapabilityPolicy._parse",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityEntry",
@@ -163871,7 +163894,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 310,
+        "line": 331,
         "caller": "ReleaseCapabilityPolicy._parse",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityPolicy._",
@@ -163882,7 +163905,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 361,
+        "line": 382,
         "caller": "requiredCapabilityForRequest",
         "kind": "method",
         "lexical_target": "_normalizePath",
@@ -163893,7 +163916,18 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 526,
+        "line": 551,
+        "caller": "isReleaseCapabilityControlPlaneRequest",
+        "kind": "method",
+        "lexical_target": "_normalizePath",
+        "target": "_normalizePath",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/release_capability_policy.dart",
+        "line": 622,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityEntry",
@@ -163904,7 +163938,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 534,
+        "line": 630,
         "caller": "_invalidPolicy",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityPolicy._",
@@ -165664,8 +165698,19 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 102,
-        "caller": "middleware",
+        "line": 105,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "decisionFor",
+        "target": "ReleaseCapabilityPolicy.decisionFor",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 113,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "entry",
         "target": "ReleaseCapabilityPolicy.entry",
@@ -165675,8 +165720,30 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 123,
-        "caller": "middleware",
+        "line": 117,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "record",
+        "target": "RequestMetricsService.record",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 122,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 148,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "ensureObservabilityInitialized",
         "target": "ensureObservabilityInitialized",
@@ -165686,25 +165753,14 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 126,
-        "caller": "middleware",
+        "line": 151,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "connect",
         "target": "Database.connect",
         "target_library": "package:server/database.dart",
         "target_scope": "workspace",
         "occurrences": 1
-      },
-      {
-        "source": "server/routes/_middleware.dart",
-        "line": 176,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "record",
-        "target": "RequestMetricsService.record",
-        "target_library": "package:server/request_metrics_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
       },
       {
         "source": "server/routes/_middleware.dart",
@@ -165719,34 +165775,12 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 181,
-        "caller": "middleware",
+        "line": 206,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "_recordHttpObservability",
         "target": "_recordHttpObservability",
         "target_library": "workspace:server/routes/_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/_middleware.dart",
-        "line": 191,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "captureObservedException",
-        "target": "captureObservedException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/_middleware.dart",
-        "line": 200,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "e",
-        "target": "Log.e",
-        "target_library": "package:server/logger.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -165763,12 +165797,34 @@
       },
       {
         "source": "server/routes/_middleware.dart",
+        "line": 216,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "captureObservedException",
+        "target": "captureObservedException",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
         "line": 22,
         "caller": "<top-level>",
         "kind": "method",
         "lexical_target": "load",
         "target": "ReleaseCapabilityPolicy.load",
         "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 225,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "e",
+        "target": "Log.e",
+        "target_library": "package:server/logger.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -165785,7 +165841,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 264,
+        "line": 289,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "_safeUserId",
@@ -165796,7 +165852,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 278,
+        "line": 303,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "e",
@@ -165807,7 +165863,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 280,
+        "line": 305,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "w",
@@ -165818,7 +165874,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 284,
+        "line": 309,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "captureObservedMessage",
@@ -165829,7 +165885,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 328,
+        "line": 353,
         "caller": "_safeUserId",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -165840,7 +165896,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 328,
+        "line": 353,
         "caller": "_safeUserId",
         "kind": "method",
         "lexical_target": "verifyToken",
@@ -165851,8 +165907,19 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 48,
+        "line": 46,
         "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "middlewareWithReleaseCapabilityPolicy",
+        "target": "middlewareWithReleaseCapabilityPolicy",
+        "target_library": "workspace:server/routes/_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 58,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "resolveRequestId",
         "target": "resolveRequestId",
@@ -165862,8 +165929,8 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 49,
-        "caller": "middleware",
+        "line": 59,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "constructor",
         "lexical_target": "RequestTrace",
         "target": "RequestTrace.RequestTrace",
@@ -165873,8 +165940,8 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 52,
-        "caller": "middleware",
+        "line": 62,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "_header",
         "target": "_header",
@@ -165884,8 +165951,8 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 55,
-        "caller": "middleware",
+        "line": 65,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "headersFor",
         "target": "CorsPolicy.headersFor",
@@ -165895,8 +165962,8 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 57,
-        "caller": "middleware",
+        "line": 67,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isDatabaseIndependentHealthPath",
         "target": "isDatabaseIndependentHealthPath",
@@ -165906,8 +165973,8 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 61,
-        "caller": "middleware",
+        "line": 71,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isAllowed",
         "target": "CorsPolicy.isAllowed",
@@ -165917,23 +165984,12 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 72,
-        "caller": "middleware",
+        "line": 82,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isValidPreflight",
         "target": "CorsPolicy.isValidPreflight",
         "target_library": "package:server/cors_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/_middleware.dart",
-        "line": 95,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "decisionFor",
-        "target": "ReleaseCapabilityPolicy.decisionFor",
-        "target_library": "package:server/release_capability_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -186382,8 +186438,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14163,
-        "occurrences": 24693
+        "unique_references": 14167,
+        "occurrences": 24714
       },
       {
         "target_scope": "dart_sdk",
@@ -190462,8 +190518,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 174,
-        "occurrences": 298
+        "unique_references": 175,
+        "occurrences": 299
       },
       {
         "target_scope": "workspace",
@@ -190636,8 +190692,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/release_capability_policy.dart",
-        "unique_references": 30,
-        "occurrences": 52
+        "unique_references": 32,
+        "occurrences": 53
       },
       {
         "target_scope": "workspace",
@@ -190649,7 +190705,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/request_metrics_service.dart",
         "unique_references": 9,
-        "occurrences": 10
+        "occurrences": 11
       },
       {
         "target_scope": "workspace",
@@ -191020,8 +191076,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/routes/_middleware.dart",
-        "unique_references": 4,
-        "occurrences": 6
+        "unique_references": 5,
+        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -195661,18 +195717,18 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 140,
-        "caller": "middleware",
+        "line": 165,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "function_expression",
-        "lexical_target": "handler.use(provider<ReleaseCapabilityPolicy>((_) => _releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
+        "lexical_target": "handler.use(provider<ReleaseCapabilityPolicy>((_) => releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
         "occurrences": 1
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 147,
-        "caller": "middleware",
+        "line": 172,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "function_expression",
-        "lexical_target": "handler.use(provider<Pool>((_) => _db.connection)).use(provider<ReleaseCapabilityPolicy>((_) => _releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
+        "lexical_target": "handler.use(provider<Pool>((_) => _db.connection)).use(provider<ReleaseCapabilityPolicy>((_) => releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
         "occurrences": 1
       },
       {
@@ -226555,7 +226611,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 137,
+        "line": 146,
         "lexical_type": "ReleaseCapabilityEntry",
         "resolved_type": "ReleaseCapabilityEntry",
         "target": "ReleaseCapabilityEntry",
@@ -226565,17 +226621,17 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 149,
+        "line": 158,
         "lexical_type": "ReleaseCapabilityDecision",
         "resolved_type": "ReleaseCapabilityDecision",
         "target": "ReleaseCapabilityDecision",
         "target_library": "package:server/release_capability_policy.dart",
         "target_scope": "workspace",
-        "occurrences": 5
+        "occurrences": 6
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 204,
+        "line": 221,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -226765,16 +226821,6 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 142,
-        "lexical_type": "ReleaseCapabilityPolicy",
-        "resolved_type": "ReleaseCapabilityPolicy",
-        "target": "ReleaseCapabilityPolicy",
-        "target_library": "package:server/release_capability_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/_middleware.dart",
         "line": 18,
         "lexical_type": "Database",
         "resolved_type": "Database",
@@ -226795,7 +226841,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 328,
+        "line": 353,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -226805,7 +226851,17 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 49,
+        "line": 54,
+        "lexical_type": "ReleaseCapabilityPolicy",
+        "resolved_type": "ReleaseCapabilityPolicy",
+        "target": "ReleaseCapabilityPolicy",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 59,
         "lexical_type": "RequestTrace",
         "resolved_type": "RequestTrace",
         "target": "RequestTrace",
@@ -229673,7 +229729,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6143,
-        "occurrences": 39190
+        "occurrences": 39204
       },
       {
         "target_scope": "dart_sdk",
@@ -229763,7 +229819,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/handler.dart",
         "unique_references": 17,
-        "occurrences": 33
+        "occurrences": 35
       },
       {
         "target_scope": "dependency",
@@ -233345,7 +233401,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/release_capability_policy.dart",
         "unique_references": 10,
-        "occurrences": 26
+        "occurrences": 28
       },
       {
         "target_scope": "workspace",
@@ -235583,7 +235639,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 240,
+        "line": 265,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -277750,7 +277806,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "abf4957c7646a4189edc833a02eb343fe32b283e8a7cfe409ff993d706557fe9"
+    "project_logic_source_digest_sha256": "c1782de003b85ae65ddec7408798963d12dc4bad6b5ef14af96bac25d56693b3"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
