@@ -12,6 +12,10 @@
   `5109f0e0e5585c2c6ce3655514d2f8a5f38331105f6a6471ee9069e520d25864`
 - Project logic source digest inicial:
   `c1ddf67874b4861c9736cd64c5519887a3e59106e9658f12276a6905d9387a96`
+- Project logic source digest de implementação:
+  `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
+- Project logic source digest de fechamento:
+  `abf4957c7646a4189edc833a02eb343fe32b283e8a7cfe409ff993d706557fe9`
 - Linha canônica: `227`
 - Decisão corrente: `docs/status/CURRENT_PRODUCT_DECISION.md`
 
@@ -19,17 +23,20 @@
 
 - Owner: `/root`
 - Início UTC: `2026-08-24T19:43:25Z`
-- Fim UTC: `pending`
+- Fim UTC: `2026-08-25T11:40:24Z`
 - Branch: `codex/free-beta-release-candidate-2026-07-17`
 - Git SHA inicial: `c1bd186633a479f62eae0ba4db6eb29463e94419`
 - Git SHA anterior ao commit de abertura:
   `c6e2725af0995e01dcf675f20e3a8b608b84d555`
-- Git SHA final: `pending`
+- Git SHA final da implementação:
+  `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`
 - Worktree digest inicial:
   `ee254fdbc66babfe86ddd041b8a28e3c458e5c13a536e0599d88d55b2b4f08a7`
   (`manaloom-worktree-v2`, checkout limpo)
-- Worktree digest final: `pending`
-- Fonte estável: `true` na abertura; verificação final pendente
+- Worktree digest final da implementação:
+  `ee254fdbc66babfe86ddd041b8a28e3c458e5c13a536e0599d88d55b2b4f08a7`
+  (`manaloom-worktree-v2`, checkout limpo no SHA focal)
+- Fonte estável: `true` no SHA focal; fechamento documental posterior
 - Classe de fechamento: `LOCAL_CODE`
 - Autorização máxima: código/documentação local, commits e push da branch;
   nenhum PR/merge, deploy, migration live, escrita live, capability, pin, regra
@@ -151,13 +158,15 @@
 | Secret scan | `./scripts/manaloom_secret_scan.sh --worktree` | `PASS` | zero credencial live literal; gitleaks `8.30.1` | `0` | worktree | saída local |
 | Estrutura | `git diff --check` | `PASS` | sem erro | `0` | worktree | saída local |
 | Retenção | `./scripts/manaloom_report_retention_audit.sh` | `PASS` | 17/17 testes | `0` | worktree | JSON `3bd0d2be6e731560bb63463bdcfd0477b8c40dc03b5e2bb658d7358b9d92edf6`; Markdown `ea9ba8570182d45e7224924989cdf68a4f265b2b40ab479eaa8b0a66eccc05b4` |
+| Full no SHA focal | `./scripts/manaloom_local_ci.sh full` | `PASS` | 124 auditorias, 32 contratos, backend completo, app 1.564 testes + 1 skip explícito, Web, UI/lint, Patrol 9/9, dependências e PostgreSQL descartável | `0` | `d9f7a59cd87d032df3d076c35ffbdb17e41525a6` | UI aggregate `d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee` |
+| Regeneração de fechamento | `./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check` | `PASS` | 9 artefatos sincronizados; `NOW=BT-SCP-001`, ficha válida e dependência `PASS` | `0` | worktree de fechamento | source digest `abf4957c7646a4189edc833a02eb343fe32b283e8a7cfe409ff993d706557fe9` |
 
 ## Receipts
 
 | Contrato | Producer | Status | Path/hash | Durável | Bindings revisados |
 | --- | --- | --- | --- | --- | --- |
 | `project_logic_manifest_v1` | `scripts/manaloom_project_logic.sh` | pass | `project_logic_manifest.json`; SHA-256 `624610e83e30d2011e20311fccc32dfee95be981a376874d8f14899a12668f9b` | yes | `source_digest_sha256=bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0` |
-| `BT-DOC-004` | `/root` | pending | `docs/qa/execution/2026-08-24/BT-DOC-004.md` | yes | pending |
+| `BT-DOC-004` | `/root` | pass | `docs/qa/execution/2026-08-24/BT-DOC-004.md`; SHA-256 `4cf555fee575ca464310b6719454b2b5f1ff9a8d9be55771284f9db9619a8bb0` | yes | SHA focal, source digest, manifest e gates |
 
 ## Aceite canônico
 
@@ -172,14 +181,17 @@
 ## Fechamento
 
 - Resultado E2E estrito: `n/a` para mudança local de tooling documental
-- Gate-eligible: `false` até gates, commit e auditoria finais
+- Gate-eligible: `true` para fechamento local; não autoriza release/deploy
 - Release identity: `n/a`; nenhuma release executada
-- Bloqueios: nenhum conhecido; fechamento pendente
+- Bloqueios: nenhum para o fechamento local
 - Riscos residuais: traceability completa e receipts fortes dos demais fluxos
   permanecem em suas tasks canônicas
-- Rollback verificado: `pending`
+- Rollback verificado: `yes`, procedimental e sem estado live
 - Auditor independente: `GO` final após resolver os quatro gaps e os achados
   adicionais de schema, scripts e normalização
-- Veredito da execução: `pending`
-- Commit que atualiza o estado canônico: `pending`
-- Próximo ID elegível: `BT-SCP-001`, condicionado ao fechamento desta task
+- Veredito da execução: `PASS`
+- Commit de implementação:
+  `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`
+- Commit que fecha o ledger: posterior ao SHA de implementação; comunicado no
+  handoff para evitar autorreferência
+- Próximo ID elegível: `BT-SCP-001`, aberto sem implementação funcional

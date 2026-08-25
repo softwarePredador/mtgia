@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0",
+  "source_digest_sha256": "abf4957c7646a4189edc833a02eb343fe32b283e8a7cfe409ff993d706557fe9",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -270691,7 +270691,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "5109f0e0e5585c2c6ce3655514d2f8a5f38331105f6a6471ee9069e520d25864"
+      "sha256": "0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd"
     },
     "required_task_fields": [
       "id",
@@ -270776,12 +270776,12 @@
       {
         "id": "BT-DOC-004",
         "priority": "P0 CORE",
-        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+        "status": "PASS",
         "delivery": "Registry machine-readable de tasks, dependências, lifecycle documental, rotas/consumers e receipts.",
         "depends_on": [
           "BT-DOC-001"
         ],
-        "acceptance": "IDs únicos; dependências resolvidas; nenhum placeholder; ciclo detectado; histórico não entra como fonte ativa; receipt vinculado ao digest.",
+        "acceptance": "IDs únicos; dependências resolvidas; nenhum placeholder; ciclo detectado; histórico não entra como fonte ativa; receipt vinculado ao digest. Receipt: `docs/qa/execution/2026-08-24/BT-DOC-004.md`; implementação: `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`.",
         "section": "Épico A — Verdade de produto, escopo e documentação",
         "source_line": 227
       },
@@ -275267,19 +275267,19 @@
       "schema_version": 1,
       "generated_from": {
         "path": "docs/execution/CURRENT_QUEUE.md",
-        "sha256": "18acb0ec492f0feb45d3331e70a9ebc990b5f573f96dd7b23b864c85c7e24a2e"
+        "sha256": "01a7b56ab0cbbf82cfd1b2538b14da3fc5aa1dc5c948bd2d1e3b08e3c7b05d7d"
       },
       "wip_limit": 1,
       "active_slot_count": 1,
       "active_slot": {
         "label": "NOW",
-        "task_id": "BT-DOC-004",
-        "packet_path": "docs/execution/tasks/BT-DOC-004.md",
+        "task_id": "BT-SCP-001",
+        "packet_path": "docs/execution/tasks/BT-SCP-001.md",
         "packet_identity_validated": true,
-        "canonical_status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+        "canonical_status": "IN_PROGRESS_CONTAINED",
         "canonical_dependencies": [
           {
-            "id": "BT-DOC-001",
+            "id": "BT-GOV-001",
             "status": "PASS"
           }
         ],
@@ -277750,7 +277750,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0"
+    "project_logic_source_digest_sha256": "abf4957c7646a4189edc833a02eb343fe32b283e8a7cfe409ff993d706557fe9"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

@@ -773,6 +773,8 @@ void main() {
         .cast<Map<String, Object?>>();
     final executionLedger =
         registry['execution_ledger'] as Map<String, Object?>;
+    final tasks = (registry['tasks'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
     final routeSemantics =
         registry['route_consumer_semantics'] as Map<String, Object?>;
 
@@ -799,9 +801,19 @@ void main() {
     expect(executionQueue['mutation_authority'], false);
     expect(executionLedger['wip_limit'], 1);
     expect(executionLedger['active_slot_count'], 1);
+    final activeSlot = executionLedger['active_slot'] as Map<String, Object?>;
+    final activeTaskId = activeSlot['task_id']! as String;
+    final activeTask = tasks.singleWhere((task) => task['id'] == activeTaskId);
+    expect(activeTaskId, matches(RegExp(r'^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$')));
+    expect(activeSlot['packet_path'], 'docs/execution/tasks/$activeTaskId.md');
+    expect(activeSlot['packet_identity_validated'], true);
+    expect(activeSlot['canonical_status'], activeTask['status']);
+    final dependencyGate =
+        activeSlot['dependency_gate'] as Map<String, Object?>;
     expect(
-      executionLedger['active_slot'],
-      containsPair('task_id', 'BT-DOC-004'),
+      dependencyGate['all_dependencies_pass'] == true ||
+          dependencyGate['containment_exception'] == true,
+      true,
     );
     expect(
       (lifecycle['prefix_rules'] as List<dynamic>)
