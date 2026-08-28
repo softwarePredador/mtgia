@@ -287,6 +287,503 @@ void main() {
     );
   });
 
+  test('R10 native DataTransport request is a reproducible egress failure', () {
+    final assessment = assessAndroidNetworkEgress(
+      '08-27 13:25:00.000 25921 25999 I TRuntime.CctTransportBackend: '
+      'Making request to: '
+      'https://firebaselogging-pa.googleapis.com/v1/firelog/legacy/batchlog\n'
+      '08-27 13:25:00.200 25921 25999 I TRuntime.CctTransportBackend: '
+      'Status Code: 200\n',
+    );
+
+    expect(assessment.isClean, isFalse);
+    expect(
+      assessment.findings.join('\n'),
+      contains('firebaselogging-pa.googleapis.com'),
+    );
+  });
+
+  test('Android egress detector accepts only exact loopback attempts', () {
+    final clean = assessAndroidNetworkEgress(
+      'Making request to: http://127.0.0.1:8080/api/ready\n'
+      'SocketException: connection refused, host=::1\n'
+      'Making request to: http://localhost:9090/app/\n',
+    );
+    final deniedDns = assessAndroidNetworkEgress(
+      'UnknownHostException: Unable to resolve host '
+      '"firebaselogging-pa.googleapis.com"\n',
+    );
+
+    expect(clean.isClean, isTrue);
+    expect(clean.loopbackAttempts, 3);
+    expect(deniedDns.isClean, isFalse);
+  });
+
+  test('seals and verifies a same-run physical Android egress receipt', () {
+    const runId = 'android-egress-test-pass-0001';
+    final policy = _writeAndroidPolicy(temp);
+    final runtime = File('${temp.path}/runtime.log')
+      ..writeAsStringSync(
+        'Making request to: http://127.0.0.1:8080/api/ready\n',
+      );
+    final native = File('${temp.path}/native.log')
+      ..writeAsStringSync(
+        _androidNativeWindow(
+          runId,
+          body:
+              '1700000000.100 10342 4242 4243 I ManaLoomRuntime: '
+              'Making request to: http://localhost:9090/app/\n',
+        ),
+      );
+    final support = _writeAndroidEgressSupport(temp, runId);
+    final receipt = File('${temp.path}/receipt.json')
+      ..writeAsStringSync(
+        jsonEncode(_androidReceiptCandidate(temp, runId, native, support)),
+      );
+
+    final sealed = sealAndroidEgressReceipt(
+      receiptFile: receipt,
+      runtimeLog: runtime,
+      nativeLog: native,
+      pidTrace: support['pidTrace']!,
+      policyFile: policy,
+      expectedRunId: runId,
+      expectedSourceDigest: _digest,
+      expectedProfile: 'android_physical_sm_a135m',
+      expectedTarget: 'android_physical',
+    );
+    final verified = verifyAndroidEgressReceipt(
+      receiptFile: receipt,
+      runtimeLog: runtime,
+      policyFile: policy,
+      expectedRunId: runId,
+      expectedSourceDigest: _digest,
+      expectedProfile: 'android_physical_sm_a135m',
+      expectedTarget: 'android_physical',
+    );
+
+    expect(sealed.receipt['status'], 'PASS_ANDROID_EGRESS');
+    expect(verified.receiptSha256, sealed.receiptSha256);
+    expect((verified.receipt['network_egress'] as Map)['loopback_attempts'], 2);
+  });
+
+  test('external attempt seals FAIL and forged or cross-run receipt fails', () {
+    const runId = 'android-egress-test-fail-0001';
+    final policy = _writeAndroidPolicy(temp);
+    final runtime = File('${temp.path}/runtime.log')
+      ..writeAsStringSync(
+        'TRuntime.CctTransportBackend: Making request to: '
+        'https://firebaselogging-pa.googleapis.com/v1/firelog\n',
+      );
+    final native = File('${temp.path}/native.log')
+      ..writeAsStringSync(_androidNativeWindow(runId));
+    final support = _writeAndroidEgressSupport(temp, runId);
+    final receipt = File('${temp.path}/receipt.json')
+      ..writeAsStringSync(
+        jsonEncode(_androidReceiptCandidate(temp, runId, native, support)),
+      );
+
+    expect(
+      () => sealAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        nativeLog: native,
+        pidTrace: support['pidTrace']!,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+    expect(
+      (jsonDecode(receipt.readAsStringSync()) as Map)['status'],
+      'FAIL_ANDROID_EGRESS',
+    );
+    expect(
+      () => verifyAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        policyFile: policy,
+        expectedRunId: 'android-egress-other-run-0002',
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+  });
+
+  test(
+    'stale egress before BEGIN is excluded but an in-window R10 event fails',
+    () {
+      const cleanRunId = 'android-egress-window-clean-0001';
+      final policy = _writeAndroidPolicy(temp);
+      final runtime = File('${temp.path}/runtime.log')
+        ..writeAsStringSync('ok\n');
+      final staleNative = File('${temp.path}/native.log')
+        ..writeAsStringSync(
+          '1699999999.000 10342 9999 9999 I TRuntime.CctTransportBackend: '
+          'Making request to: https://firebaselogging-pa.googleapis.com/v1/log\n'
+          '${_androidNativeWindow(cleanRunId)}',
+        );
+      final support = _writeAndroidEgressSupport(temp, cleanRunId);
+      final receipt = File('${temp.path}/receipt.json')
+        ..writeAsStringSync(
+          jsonEncode(
+            _androidReceiptCandidate(temp, cleanRunId, staleNative, support),
+          ),
+        );
+
+      final sealed = sealAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        nativeLog: staleNative,
+        pidTrace: support['pidTrace']!,
+        policyFile: policy,
+        expectedRunId: cleanRunId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      );
+      expect(sealed.receipt['status'], 'PASS_ANDROID_EGRESS');
+
+      const failRunId = 'android-egress-window-fail-0002';
+      final second = Directory('${temp.path}/second')..createSync();
+      final secondPolicy = _writeAndroidPolicy(second);
+      final secondRuntime = File('${second.path}/runtime.log')
+        ..writeAsStringSync('ok\n');
+      final offensiveNative = File('${second.path}/native.log')
+        ..writeAsStringSync(
+          _androidNativeWindow(
+            failRunId,
+            body:
+                '1700000000.100 10342 4242 4243 I '
+                'TRuntime.CctTransportBackend: Making request to: '
+                'https://firebaselogging-pa.googleapis.com/v1/log\n',
+          ),
+        );
+      final secondSupport = _writeAndroidEgressSupport(second, failRunId);
+      final secondReceipt = File('${second.path}/receipt.json')
+        ..writeAsStringSync(
+          jsonEncode(
+            _androidReceiptCandidate(
+              second,
+              failRunId,
+              offensiveNative,
+              secondSupport,
+            ),
+          ),
+        );
+      expect(
+        () => sealAndroidEgressReceipt(
+          receiptFile: secondReceipt,
+          runtimeLog: secondRuntime,
+          nativeLog: offensiveNative,
+          pidTrace: secondSupport['pidTrace']!,
+          policyFile: secondPolicy,
+          expectedRunId: failRunId,
+          expectedSourceDigest: _digest,
+          expectedProfile: 'android_physical_sm_a135m',
+          expectedTarget: 'android_physical',
+        ),
+        throwsA(isA<UiRuntimeEvidenceException>()),
+      );
+      expect(
+        (jsonDecode(secondReceipt.readAsStringSync()) as Map)['status'],
+        'FAIL_ANDROID_EGRESS',
+      );
+    },
+  );
+
+  test('v1, duplicate markers and incomplete PID traces are ineligible', () {
+    const runId = 'android-egress-v2-negative-0001';
+    final policy = _writeAndroidPolicy(temp);
+    final runtime = File('${temp.path}/runtime.log')..writeAsStringSync('ok\n');
+    final native = File('${temp.path}/native.log')
+      ..writeAsStringSync(
+        '${_androidNativeWindow(runId)}${_androidNativeWindow(runId)}',
+      );
+    final support = _writeAndroidEgressSupport(temp, runId);
+    final candidate = _androidReceiptCandidate(temp, runId, native, support);
+    candidate['schema_version'] = 'manaloom.android_ui_egress_receipt.v1';
+    final receipt = File('${temp.path}/receipt.json')
+      ..writeAsStringSync(jsonEncode(candidate));
+
+    expect(
+      () => sealAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        nativeLog: native,
+        pidTrace: support['pidTrace']!,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+
+    candidate['schema_version'] = 'manaloom.android_ui_egress_receipt.v2';
+    receipt.writeAsStringSync(jsonEncode(candidate));
+    expect(
+      () => sealAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        nativeLog: native,
+        pidTrace: support['pidTrace']!,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+
+    final singleNative = File('${temp.path}/single-native.log')
+      ..writeAsStringSync(_androidNativeWindow(runId));
+    (candidate['artifacts'] as Map<String, Object>)['native_log_path'] =
+        singleNative.absolute.path;
+    support['pidTrace']!.writeAsStringSync(
+      'sample\tcontinuous\t1700000000\t10342\t4242\t'
+      'com.mtgia.mtg_app\t$runId\n',
+    );
+    receipt.writeAsStringSync(jsonEncode(candidate));
+    expect(
+      () => sealAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        nativeLog: singleNative,
+        pidTrace: support['pidTrace']!,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+
+    support['pidTrace']!.writeAsStringSync(
+      _writeAndroidEgressSupport(temp, runId)['pidTrace']!
+          .readAsStringSync()
+          .replaceAll(runId, 'android-egress-foreign-run-0002'),
+    );
+    receipt.writeAsStringSync(jsonEncode(candidate));
+    expect(
+      () => sealAndroidEgressReceipt(
+        receiptFile: receipt,
+        runtimeLog: runtime,
+        nativeLog: singleNative,
+        pidTrace: support['pidTrace']!,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+  });
+
+  test('missing, malformed and symlink egress receipts fail closed', () {
+    const runId = 'android-egress-test-invalid-0001';
+    final policy = _writeAndroidPolicy(temp);
+    final runtime = File('${temp.path}/runtime.log')..writeAsStringSync('ok\n');
+    final missing = File('${temp.path}/missing.json');
+
+    expect(
+      () => verifyAndroidEgressReceipt(
+        receiptFile: missing,
+        runtimeLog: runtime,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+
+    final malformed = File('${temp.path}/malformed.json')
+      ..writeAsStringSync('{');
+    expect(
+      () => verifyAndroidEgressReceipt(
+        receiptFile: malformed,
+        runtimeLog: runtime,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+
+    final target = File('${temp.path}/target.json')..writeAsStringSync('{}');
+    final link = Link('${temp.path}/receipt-link.json')
+      ..createSync(target.path);
+    expect(
+      () => verifyAndroidEgressReceipt(
+        receiptFile: File(link.path),
+        runtimeLog: runtime,
+        policyFile: policy,
+        expectedRunId: runId,
+        expectedSourceDigest: _digest,
+        expectedProfile: 'android_physical_sm_a135m',
+        expectedTarget: 'android_physical',
+      ),
+      throwsA(isA<UiRuntimeEvidenceException>()),
+    );
+  });
+
+  test('aggregate rejects a forged physical Android receipt summary', () {
+    const runId = 'android-egress-aggregate-0001';
+    final policy = _writeAndroidPolicy(temp);
+    final screenshotDirectory = Directory(
+      '${temp.path}/app/test/ui/goldens/runtime/android_physical',
+    )..createSync(recursive: true);
+    final png = _proofPng(8, 10);
+    File('${screenshotDirectory.path}/login_empty.png').writeAsBytesSync(png);
+    final runtime = File('${temp.path}/android-physical.log')
+      ..writeAsStringSync(
+        _directoryRuntimeLog(
+          profile: 'android_physical_sm_a135m',
+          target: 'android_physical',
+          deviceContract: 'Samsung SM-A135M Android 14 physical USB device',
+          checkpoints: const ['login_empty'],
+        ),
+      );
+    final native = File('${temp.path}/android-physical-native.log')
+      ..writeAsStringSync(_androidNativeWindow(runId));
+    final support = _writeAndroidEgressSupport(temp, runId);
+    final receipt = File('${temp.path}/android-physical-receipt.json')
+      ..writeAsStringSync(
+        jsonEncode(_androidReceiptCandidate(temp, runId, native, support)),
+      );
+    sealAndroidEgressReceipt(
+      receiptFile: receipt,
+      runtimeLog: runtime,
+      nativeLog: native,
+      pidTrace: support['pidTrace']!,
+      policyFile: policy,
+      expectedRunId: runId,
+      expectedSourceDigest: _digest,
+      expectedProfile: 'android_physical_sm_a135m',
+      expectedTarget: 'android_physical',
+    );
+    final extraction = indexUiRuntimeScreenshotDirectory(
+      screenshotDirectory: screenshotDirectory,
+      runtimeLog: runtime,
+      repoRoot: temp,
+      manifestRelativePath:
+          'docs/qa/ui-live/current/p0-matrix/android_physical.json',
+      expectedSourceDigest: _digest,
+      surface: 'authenticated_p0_matrix',
+      profile: 'android_physical_sm_a135m',
+      runtime: 'flutter_drive',
+      target: 'android_physical',
+      deviceContract: 'Samsung SM-A135M Android 14 physical USB device',
+      androidEgressReceipt: receipt,
+      androidEgressRunId: runId,
+      generatedAt: DateTime.utc(2026, 8, 28, 12),
+    );
+    final manifest = extraction.manifest;
+    final screenshots = (manifest['screenshots'] as List).cast<Map>();
+    final review = File('${temp.path}/docs/qa/ui-live/latest.json');
+
+    void writeReview() {
+      review.parent.createSync(recursive: true);
+      final manifestHash = sha256
+          .convert(extraction.manifestFile.readAsBytesSync())
+          .toString();
+      review.writeAsStringSync(
+        const JsonEncoder.withIndent('  ').convert(<String, Object>{
+          'schema_version': 'manaloom_ui_live_review_v1',
+          'status': 'PASS',
+          'source_digest': _digest,
+          'automated': <String, Object>{
+            'status': 'PASS_AUTOMATED',
+            'verified_at': '2026-08-28T12:00:00Z',
+            'commands': <String>['flutter test'],
+          },
+          'runtime': <String, Object>{
+            'status': 'PASS_RUNTIME',
+            'capture_manifest': <String, Object>{
+              'path':
+                  'docs/qa/ui-live/current/p0-matrix/'
+                  'android_physical.json',
+              'sha256': manifestHash,
+            },
+          },
+          'visual_review': <String, Object>{
+            'status': 'PASS_VISUAL_REVIEWED',
+            'reviewed_at': '2026-08-28T12:05:00Z',
+            'reviewer': <String, String>{'kind': 'agent', 'name': 'Codex'},
+            'visual_thesis': 'Physical Android proof.',
+            'content_plan': 'Identity, state, action and recovery.',
+            'interaction_thesis': 'The next action remains explicit.',
+            'criteria': <String, Object>{
+              for (final criterion in uiLiveEvidenceCriteria)
+                criterion: <String, String>{
+                  'status': 'pass',
+                  'note': 'Inspected and coherent.',
+                },
+            },
+            'reviewed_checkpoints': screenshots
+                .map((entry) => entry['checkpoint']!)
+                .toList(),
+            'reviewed_screenshot_sha256': screenshots
+                .map((entry) => entry['sha256']!)
+                .toList(),
+            'blocking_findings': const <String>[],
+          },
+        }),
+      );
+    }
+
+    writeReview();
+    expect(
+      verifyUiLiveEvidence(
+        reviewFile: review,
+        repoRoot: temp,
+        expectedSourceDigest: _digest,
+      ).screenshotCount,
+      1,
+    );
+
+    final forged =
+        jsonDecode(extraction.manifestFile.readAsStringSync())
+            as Map<String, dynamic>;
+    final egress = forged['android_network_egress'] as Map<String, dynamic>;
+    egress['receipt_schema'] = 'manaloom.android_ui_egress_receipt.v1';
+    egress['uid'] = 0;
+    egress['observed_pids'] = <int>[4242, 4242];
+    extraction.manifestFile.writeAsStringSync(
+      '${const JsonEncoder.withIndent('  ').convert(forged)}\n',
+    );
+    writeReview();
+    expect(
+      () => verifyUiLiveEvidence(
+        reviewFile: review,
+        repoRoot: temp,
+        expectedSourceDigest: _digest,
+      ),
+      throwsA(
+        isA<UiRuntimeEvidenceException>().having(
+          (error) => error.message,
+          'message',
+          contains(
+            'physical Android capture lacks a clean bound egress receipt',
+          ),
+        ),
+      ),
+    );
+  });
+
   test('verifies all three evidence levels and every reviewed screenshot', () {
     final png = _proofPng(5, 7);
     final log = File('${temp.path}/runtime.log')
@@ -688,7 +1185,7 @@ String _runtimeLog(
 }) {
   final requiredCheckpoints = required ?? screenshots.keys.toList();
   final lines = <String>[
-    'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'battle_coach', 'source_digest': _digest, 'profile': 'android_phone', 'runtime': 'flutter_integration_test', 'target': 'android_physical', 'device_contract': 'physical_android', 'required_checkpoints': requiredCheckpoints})}',
+    'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'battle_coach', 'source_digest': _digest, 'profile': 'android_emulator', 'runtime': 'flutter_integration_test', 'target': 'android_emulator', 'device_contract': 'android emulator runtime', 'required_checkpoints': requiredCheckpoints})}',
   ];
   for (final entry in screenshots.entries) {
     final encoded = base64Encode(entry.value);
@@ -718,4 +1215,196 @@ String _directoryRuntimeLog({
     'required_checkpoints': checkpoints,
   };
   return 'VISUAL_PROOF_CONTEXT ${jsonEncode(context)}\nAll tests passed.\n';
+}
+
+File _writeAndroidPolicy(Directory root) {
+  final policy = File(
+    '${root.path}/app/test/ui/fixtures/ui_live_evidence_policy.json',
+  );
+  policy.parent.createSync(recursive: true);
+  policy.writeAsStringSync(
+    jsonEncode(<String, Object>{
+      'schema_version': 'manaloom_ui_live_evidence_policy_v1',
+      'android_physical_egress': {
+        'receipt_schema': 'manaloom.android_ui_egress_receipt.v2',
+        'package': 'com.mtgia.mtg_app',
+        'allowed_loopback_hosts': ['127.0.0.1', 'localhost', '::1'],
+      },
+      'surfaces': <Object>[
+        <String, Object>{
+          'id': 'authenticated_p0_matrix',
+          'required_profiles': <String, int>{'android_physical_sm_a135m': 1},
+          'android_runtime_contract': <String, Object>{
+            'accepted_targets': <String>['android_physical'],
+            'emulator_must_not_be_reported_as_physical': true,
+            'current_profile': 'android_physical_sm_a135m',
+          },
+        },
+      ],
+    }),
+  );
+  return policy;
+}
+
+Map<String, Object> _androidReceiptCandidate(
+  Directory runRoot,
+  String runId,
+  File nativeLog,
+  Map<String, File> support,
+) => <String, Object>{
+  'schema_version': 'manaloom.android_ui_egress_receipt.v2',
+  'status': 'PENDING_DERIVED_ASSESSMENT',
+  'run_id': runId,
+  'run_root': runRoot.resolveSymbolicLinksSync(),
+  'source_digest': _digest,
+  'profile': 'android_physical_sm_a135m',
+  'target': 'android_physical',
+  'identity': <String, Object>{
+    'serial': 'R58T300SREH',
+    'model': 'SM-A135M',
+    'api': 34,
+    'package': 'com.mtgia.mtg_app',
+    'uid': 10342,
+    'sampled_pids': <int>[4242, 4243],
+    'logged_pids': <int>[],
+    'observed_pids': <int>[],
+  },
+  'detector': const <String, Object>{
+    'temporal_anchor': '-T 1',
+    'log_format': 'epoch_uid',
+    'logcat_started_before_begin': true,
+    'begin_marker_count': 1,
+    'end_marker_count': 1,
+    'begin_before_child': true,
+    'end_after_force_stop_and_drain': true,
+    'sampler_started_before_launch': true,
+    'sampler_failures': 0,
+    'samples_before_launch': 1,
+    'samples_during_journey': 2,
+    'drain_samples': 6,
+    'consecutive_zero_samples_before_end': 3,
+    'consecutive_zero_samples_after_end': 3,
+    'all_uid_pids_enumerated': true,
+  },
+  'app_data': const <String, Object>{
+    'pre_launch_clean': true,
+    'post_run_clean': true,
+    'datatransport_store_absent': true,
+  },
+  'network': const <String, Object>{
+    'snapshot_complete': true,
+    'isolation_confirmed': true,
+    'adb_usb_preserved': true,
+    'reverse_loopback_only': true,
+    'restored_exactly': true,
+    'api_port': 58001,
+    'web_port': 58002,
+  },
+  'presentation': <String, Object>{
+    'snapshot_complete': true,
+    'rotation_and_immersive_restored_exactly': true,
+    'before_sha256': sha256
+        .convert(support['stateBefore']!.readAsBytesSync())
+        .toString(),
+    'isolated_sha256': sha256
+        .convert(support['stateIsolated']!.readAsBytesSync())
+        .toString(),
+    'restored_sha256': sha256
+        .convert(support['stateAfter']!.readAsBytesSync())
+        .toString(),
+  },
+  'cleanup': const <String, Object>{
+    'app_processes': 0,
+    'sampler_processes': 0,
+    'logcat_processes': 0,
+    'external_routes': 0,
+    'restore_failures': 0,
+    'guard_processes': 0,
+    'state_dir_absent': true,
+  },
+  'artifacts': <String, Object>{
+    'native_log_path': nativeLog.absolute.path,
+    'pid_trace_path': support['pidTrace']!.absolute.path,
+    'state_before_path': support['stateBefore']!.absolute.path,
+    'state_isolated_path': support['stateIsolated']!.absolute.path,
+    'state_after_path': support['stateAfter']!.absolute.path,
+  },
+};
+
+String _androidNativeWindow(String runId, {String body = ''}) =>
+    '1700000000.000 10342 4242 4242 I ManaLoomEgress: '
+    'MANALOOM_ANDROID_EGRESS_BEGIN run_id=$runId uid=10342\n'
+    '$body'
+    '1700000001.000 10342 4243 4243 I ManaLoomEgress: '
+    'MANALOOM_ANDROID_EGRESS_END run_id=$runId uid=10342\n';
+
+Map<String, File> _writeAndroidEgressSupport(Directory root, String runId) {
+  final pidTrace = File('${root.path}/pids.tsv')
+    ..writeAsStringSync(
+      'empty\tpre_launch\t1700000000\t10342\t0\t-\t$runId\n'
+      'sample\tcontinuous\t1700000000\t10342\t4242\t'
+      'com.mtgia.mtg_app\t$runId\n'
+      'sample\tcontinuous\t1700000000\t10342\t4243\t'
+      'com.mtgia.mtg_app:remote\t$runId\n'
+      'empty\tdrain_before_end\t1700000001\t10342\t0\t-\t$runId\n'
+      'empty\tdrain_before_end\t1700000001\t10342\t0\t-\t$runId\n'
+      'empty\tdrain_before_end\t1700000001\t10342\t0\t-\t$runId\n'
+      'empty\tdrain_after_end\t1700000002\t10342\t0\t-\t$runId\n'
+      'empty\tdrain_after_end\t1700000002\t10342\t0\t-\t$runId\n'
+      'empty\tdrain_after_end\t1700000002\t10342\t0\t-\t$runId\n',
+    );
+  final restored =
+      '${jsonEncode(<String, Object>{
+        'network': <String, Object>{
+          'wifi_on': '1',
+          'mobile_data': '1',
+          'airplane_mode_on': '0',
+          'reverse_sha256': sha256.convert(const <int>[]).toString(),
+          'routes4_sha256': sha256.convert(utf8.encode('default via 192.168.2.1 dev wlan0\n')).toString(),
+          'routes6_sha256': sha256.convert(utf8.encode('default via fe80::1 dev wlan0\n')).toString(),
+          'connectivity_sha256': sha256.convert(utf8.encode('cellular_connected=0\nvpn_connected=0\nwifi_connected=1\n')).toString(),
+          'adb_reverse': <String>[],
+          'routes4': <String>['default via 192.168.2.1 dev wlan0'],
+          'routes6': <String>['default via fe80::1 dev wlan0'],
+          'connectivity': <String>['cellular_connected=0', 'vpn_connected=0', 'wifi_connected=1'],
+        },
+        'presentation': <String, Object>{
+          'accelerometer_rotation': <String, Object>{'present': true, 'value': '1'},
+          'user_rotation': <String, Object>{'present': true, 'value': '3'},
+          'immersive_mode_confirmations': <String, Object>{'present': true, 'value': 'immersive'},
+        },
+      })}\n';
+  final stateBefore = File('${root.path}/state-before.json')
+    ..writeAsStringSync(restored);
+  final stateIsolated = File('${root.path}/state-isolated.json')
+    ..writeAsStringSync(
+      '${jsonEncode(<String, Object>{
+        'network': <String, Object>{
+          'wifi_on': '0',
+          'mobile_data': '0',
+          'airplane_mode_on': '0',
+          'reverse_sha256': sha256.convert(utf8.encode('R58T300SREH tcp:58001 tcp:58001\nR58T300SREH tcp:58002 tcp:58002\n')).toString(),
+          'routes4_sha256': sha256.convert(const <int>[]).toString(),
+          'routes6_sha256': sha256.convert(const <int>[]).toString(),
+          'connectivity_sha256': sha256.convert(utf8.encode('cellular_connected=0\nvpn_connected=0\nwifi_connected=0\n')).toString(),
+          'adb_reverse': <String>['R58T300SREH tcp:58001 tcp:58001', 'R58T300SREH tcp:58002 tcp:58002'],
+          'routes4': <String>[],
+          'routes6': <String>[],
+          'connectivity': <String>['cellular_connected=0', 'vpn_connected=0', 'wifi_connected=0'],
+        },
+        'presentation': <String, Object>{
+          'accelerometer_rotation': <String, Object>{'present': true, 'value': '0'},
+          'user_rotation': <String, Object>{'present': true, 'value': '0'},
+          'immersive_mode_confirmations': <String, Object>{'present': true, 'value': 'confirmed'},
+        },
+      })}\n',
+    );
+  final stateAfter = File('${root.path}/state-after.json')
+    ..writeAsStringSync(restored);
+  return <String, File>{
+    'pidTrace': pidTrace,
+    'stateBefore': stateBefore,
+    'stateIsolated': stateIsolated,
+    'stateAfter': stateAfter,
+  };
 }

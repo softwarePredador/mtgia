@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/logger.dart';
@@ -52,6 +53,7 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   Map<String, dynamic>? _generatedDeck;
   DeckCardItem? _selectedCommanderCard;
   final Map<String, Map<String, dynamic>> _learnedDecksByCommander = {};
+  bool _learningAvailabilityRequested = false;
   GenerateDeckCancellation? _generateCancellation;
   String? _activeGenerateJobId;
   String? _activeGenerateRequestKey;
@@ -76,7 +78,6 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       unawaited(_restoreDraft());
-      unawaited(_loadLearnedDeckAvailability());
     });
   }
 
@@ -276,6 +277,13 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     return value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
   }
 
+  bool _isLearningReadsAllowed() {
+    return context.read<ReleaseCapabilitiesProvider?>()?.isAllowed(
+          ReleaseCapability.learningReads,
+        ) ??
+        false;
+  }
+
   String _learnedDeckButtonHelperText(Map<String, dynamic> deck) {
     final legalStatus = deck['legal_status']?.toString().trim();
     final legalLabel = legalStatus == 'commander_legal'
@@ -287,11 +295,12 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   }
 
   Future<void> _loadLearnedDeckAvailability() async {
+    if (!_isLearningReadsAllowed()) return;
     try {
       final decks = await context
           .read<DeckProvider>()
           .fetchCommanderLearningDecks();
-      if (!mounted) return;
+      if (!mounted || !_isLearningReadsAllowed()) return;
       setState(() {
         _learnedDecksByCommander
           ..clear()
@@ -574,6 +583,14 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   }
 
   Future<void> _loadLearnedCommanderDeck() async {
+    if (!_isLearningReadsAllowed()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Deck aprendido indisponível nesta versão.'),
+        ),
+      );
+      return;
+    }
     final commanderName = _selectedCommanderName();
     if (commanderName == null || commanderName.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -596,6 +613,10 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
           .read<DeckProvider>()
           .fetchCommanderLearningDeck(commanderName: commanderName);
       if (!mounted) return;
+      if (!_isLearningReadsAllowed()) {
+        setState(() => _isLoadingLearnedDeck = false);
+        return;
+      }
 
       final learning =
           (result['commander_learning'] as Map?)?.cast<String, dynamic>() ??
@@ -930,6 +951,19 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final releaseCapabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final canUseLearningReads =
+        releaseCapabilities?.isAllowed(ReleaseCapability.learningReads) ??
+        false;
+    if (canUseLearningReads && !_learningAvailabilityRequested) {
+      _learningAvailabilityRequested = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        unawaited(_loadLearnedDeckAvailability());
+      });
+    } else if (!canUseLearningReads) {
+      _learningAvailabilityRequested = false;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -972,7 +1006,11 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                           SizedBox(
                             key: const Key('deck-generate-form-pane'),
                             width: 460,
-                            child: _buildGenerationForm(theme, isDesktop: true),
+                            child: _buildGenerationForm(
+                              theme,
+                              isDesktop: true,
+                              canUseLearningReads: canUseLearningReads,
+                            ),
                           ),
                           const SizedBox(width: AppTheme.paneGap),
                           Expanded(
@@ -991,7 +1029,11 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
                     else ...[
                       _buildAiTrustSection(),
                       const SizedBox(height: AppTheme.space24),
-                      _buildGenerationForm(theme, isDesktop: false),
+                      _buildGenerationForm(
+                        theme,
+                        isDesktop: false,
+                        canUseLearningReads: canUseLearningReads,
+                      ),
                       const SizedBox(height: AppTheme.space20),
                       _buildGenerationOutput(theme, isDesktop: false),
                     ],
@@ -1046,7 +1088,11 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
     );
   }
 
-  Widget _buildGenerationForm(ThemeData theme, {required bool isDesktop}) {
+  Widget _buildGenerationForm(
+    ThemeData theme, {
+    required bool isDesktop,
+    required bool canUseLearningReads,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1284,7 +1330,9 @@ class _DeckGenerateScreenState extends State<DeckGenerateScreen> {
             ),
           ),
         ),
-        if (_usesCommanderField && _selectedLearnedDeckSummary != null) ...[
+        if (canUseLearningReads &&
+            _usesCommanderField &&
+            _selectedLearnedDeckSummary != null) ...[
           const SizedBox(height: AppTheme.space12),
           _LearnedDeckCallout(
             calloutKey: const Key('deck-generate-learned-deck-button'),

@@ -417,6 +417,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     final canUseLifeCounter =
         releaseCapabilities?.isAllowed(ReleaseCapability.lifeCounterLocal) ??
         false;
+    final canUseDeckReplaceAll =
+        releaseCapabilities?.isAllowed(ReleaseCapability.deckReplaceAll) ??
+        false;
 
     return Scaffold(
       appBar: AppBar(
@@ -460,16 +463,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               final deck = context.read<DeckProvider>().selectedDeck;
               final isPublic = deck?.isPublic ?? false;
               return [
-                const PopupMenuItem(
-                  key: Key('deck-details-menu-import-list'),
-                  value: 'paste',
-                  child: ListTile(
-                    leading: Icon(Icons.content_paste_go),
-                    title: Text('Colar lista de cartas'),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
+                if (canUseDeckReplaceAll)
+                  const PopupMenuItem(
+                    key: Key('deck-details-menu-import-list'),
+                    value: 'paste',
+                    child: ListTile(
+                      leading: Icon(Icons.content_paste_go),
+                      title: Text('Colar lista de cartas'),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
                   ),
-                ),
                 const PopupMenuItem(
                   value: 'validate',
                   child: ListTile(
@@ -773,7 +777,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     : null,
                 onSelectCommander: () =>
                     context.go('/decks/${widget.deckId}/search?mode=commander'),
-                onImportList: () => _showImportListDialog(context),
+                onImportList: canUseDeckReplaceAll
+                    ? () => _showImportListDialog(context)
+                    : null,
                 onEditDescription: _showEditDescriptionDialog,
                 onShowCardDetails: (card) => _showCardDetails(context, card),
               ),
@@ -1647,16 +1653,26 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }
 
   void _showImportListDialog(BuildContext context) {
+    if (!_isReleaseCapabilityAllowed(ReleaseCapability.deckReplaceAll)) return;
     showDeckImportListDialog(
       context: context,
       deckId: widget.deckId,
       importListToDeck:
-          ({required deckId, required list, required replaceAll}) =>
-              context.read<DeckProvider>().importListToDeck(
-                deckId: deckId,
-                list: list,
-                replaceAll: replaceAll,
-              ),
+          ({required deckId, required list, required replaceAll}) {
+            if (!_isReleaseCapabilityAllowed(
+              ReleaseCapability.deckReplaceAll,
+            )) {
+              return Future.value(const {
+                'success': false,
+                'error': 'Ação indisponível nesta versão.',
+              });
+            }
+            return context.read<DeckProvider>().importListToDeck(
+              deckId: deckId,
+              list: list,
+              replaceAll: replaceAll,
+            );
+          },
       refreshDeckDetails: (deckId) => context
           .read<DeckProvider>()
           .fetchDeckDetails(deckId, forceRefresh: true),

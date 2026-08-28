@@ -9,8 +9,52 @@
   },
   "source_digest": {
     "command": "../scripts/manaloom_ui_source_digest.sh",
-    "scope": "all app-facing Flutter sources, assets, Web shell, Android resources, visual surface contract and live-proof harness",
+    "scope": "all app-facing Flutter sources, assets, Web shell, Android build inputs/source sets, visual surface contract and live-proof harness",
     "stale_evidence_fails_closed": true
+  },
+  "android_physical_egress": {
+    "schema_version": "manaloom_android_ui_egress_policy_v2",
+    "receipt_schema": "manaloom.android_ui_egress_receipt.v2",
+    "package": "com.mtgia.mtg_app",
+    "required_profile": "android_physical_sm_a135m",
+    "allowed_loopback_hosts": [
+      "127.0.0.1",
+      "localhost",
+      "::1"
+    ],
+    "receipt_required_before_png_publication": true,
+    "receipt_required_before_manifest_indexing": true,
+    "detector_window": "pre_launch_through_force_stop_and_drain",
+    "logcat_temporal_anchor": "-T 1",
+    "pid_sampler": "all_processes_for_package_uid",
+    "presentation_state_must_restore_exactly": true,
+    "gradle_dynamic_selector_receipt_schema": "manaloom.gradle_dynamic_selector_adapter_receipt.v1",
+    "network_state_must_restore_exactly": true,
+    "adb_usb_must_remain_available": true,
+    "app_data_and_datatransport_must_be_clean_pre_and_post": true,
+    "forbidden_profile_components": [
+      "io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingBackgroundService",
+      "io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingService",
+      "io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingReceiver",
+      "com.google.firebase.components.ComponentDiscoveryService",
+      "io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingInitProvider",
+      "com.google.firebase.iid.FirebaseInstanceIdReceiver",
+      "com.google.firebase.messaging.FirebaseMessagingService",
+      "com.google.firebase.sessions.SessionLifecycleService",
+      "com.google.firebase.provider.FirebaseInitProvider",
+      "com.google.mlkit.common.internal.MlKitComponentDiscoveryService",
+      "com.google.mlkit.common.internal.MlKitInitProvider",
+      "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery",
+      "com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService",
+      "com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver",
+      "io.sentry.android.core.SentryPerformanceProvider"
+    ],
+    "required_profile_metadata": {
+      "firebase_performance_collection_deactivated": "true",
+      "firebase_messaging_auto_init_enabled": "false",
+      "firebase_sessions_enabled": "false",
+      "io.sentry.auto-init": "false"
+    }
   },
   "gate": {
     "command": "../scripts/manaloom_ui_live_evidence_gate.sh --check",
@@ -24,7 +68,7 @@
     "visual_system_workspace_capture_command": "../scripts/manaloom_visual_system_workspace_qa.sh",
     "critical_overlays_states_capture_command": "../scripts/manaloom_critical_overlays_states_visual_qa.sh",
     "p0_capture_command": "../scripts/manaloom_p0_runtime_capture.sh --profile <PROFILE> --ready-manifest <READY_JSON> --runtime-log <LOG> [--device <ANDROID_RUNTIME_ID>]",
-    "p0_index_command": "MANALOOM_P0_*_DIR=<REPO_CAPTURE_DIR> MANALOOM_P0_*_LOG=<RUNTIME_LOG> ../scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
+    "p0_index_command": "MANALOOM_P0_*_DIR=<REPO_CAPTURE_DIR> MANALOOM_P0_*_LOG=<RUNTIME_LOG> MANALOOM_P0_ANDROID_EGRESS_RECEIPT=<JSON> MANALOOM_P0_ANDROID_EGRESS_RUN_ID=<ID> ../scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
     "current_review": "../docs/qa/ui-live/latest.json",
     "reviewer_must_open_every_screenshot": true,
     "widget_or_golden_alone_can_pass_visual": false,

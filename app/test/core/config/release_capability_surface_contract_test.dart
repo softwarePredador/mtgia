@@ -30,6 +30,15 @@ void main() {
         'ReleaseCapability.aiGenerateRebuild',
         'ReleaseCapability.lifeCounterLocal',
         'ReleaseCapability.battleBatch',
+        'ReleaseCapability.deckReplaceAll',
+      ],
+      'lib/features/decks/screens/deck_generate_screen.dart': [
+        'ReleaseCapabilitiesProvider',
+        'ReleaseCapability.learningReads',
+      ],
+      'lib/features/decks/widgets/deck_details_overview_tab.dart': [
+        'final VoidCallback? onImportList',
+        'if (onImportList != null)',
       ],
       'lib/features/retention/screens/post_game_notes_screen.dart': [
         'ReleaseCapability.aiAnalyzeOptimizeAdvisory',

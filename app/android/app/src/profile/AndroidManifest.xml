@@ -1,7 +1,81 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <!-- The INTERNET permission is required for development. Specifically,
          the Flutter tool needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!--
+      Profile is the governed physical-device capture variant. Release keeps
+      its own manifest untouched. These removals prevent Android components
+      from initializing Firebase, DataTransport, ML Kit or Sentry before Dart
+      can apply the capture-only DISABLE_* guards.
+    -->
+    <application>
+        <service
+            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingBackgroundService"
+            tools:node="remove" />
+        <service
+            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingService"
+            tools:node="remove" />
+        <service
+            android:name="com.google.firebase.components.ComponentDiscoveryService"
+            tools:node="remove" />
+        <service
+            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+            tools:node="remove" />
+        <service
+            android:name="com.google.firebase.sessions.SessionLifecycleService"
+            tools:node="remove" />
+        <service
+            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+            tools:node="remove" />
+        <service
+            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+            tools:node="remove" />
+        <service
+            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+            tools:node="remove" />
+
+        <receiver
+            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingReceiver"
+            tools:node="remove" />
+        <receiver
+            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+            tools:node="remove" />
+        <receiver
+            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+            tools:node="remove" />
+
+        <provider
+            android:name="io.flutter.plugins.firebase.messaging.FlutterFirebaseMessagingInitProvider"
+            tools:node="remove" />
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            tools:node="remove" />
+        <provider
+            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+            tools:node="remove" />
+        <provider
+            android:name="io.sentry.android.core.SentryPerformanceProvider"
+            tools:node="remove" />
+
+        <meta-data
+            android:name="firebase_performance_collection_deactivated"
+            android:value="true"
+            tools:replace="android:value" />
+        <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false"
+            tools:replace="android:value" />
+        <meta-data
+            android:name="firebase_sessions_enabled"
+            android:value="false"
+            tools:replace="android:value" />
+        <meta-data
+            android:name="io.sentry.auto-init"
+            android:value="false"
+            tools:replace="android:value" />
+    </application>
 </manifest>

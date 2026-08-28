@@ -1,0 +1,300 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption
+import java.security.MessageDigest
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.result.UnresolvedDependencyResult
+
+/**
+ * Process-scoped Gradle init used only by the governed ManaLoom profile proof.
+ *
+ * All mutable values come from the adapter-generated, run-bound JSON config.
+ * The adapter installs this file in an ephemeral GRADLE_USER_HOME; it is never
+ * copied into the Flutter SDK, the application Gradle tree or the global cache.
+ */
+class ManaLoomDynamicSelectorAudit {
+  static boolean isDynamicVersion(String version) {
+    if (version == null || version.trim().isEmpty()) {
+      return false
+    }
+    String value = version.trim()
+    String first = value.substring(0, 1)
+    String last = value.substring(value.length() - 1)
+    return value.contains('+') ||
+      value.toLowerCase(Locale.ROOT).startsWith('latest.') ||
+      (value.contains(',') &&
+        ['[', '(', ']'].contains(first) &&
+        [']', ')', '['].contains(last))
+  }
+
+  static String sha256(File file) {
+    MessageDigest digest = MessageDigest.getInstance('SHA-256')
+    file.withInputStream { input ->
+      byte[] buffer = new byte[64 * 1024]
+      int read
+      while ((read = input.read(buffer)) != -1) {
+        digest.update(buffer, 0, read)
+      }
+    }
+    return digest.digest().collect { String.format('%02x', it & 0xff) }.join()
+  }
+
+  static synchronized void append(File file, Map<String, Object> event) {
+    String line = JsonOutput.toJson(event) + '\n'
+    Files.write(
+      file.toPath(),
+      line.getBytes(StandardCharsets.UTF_8),
+      StandardOpenOption.APPEND,
+      StandardOpenOption.WRITE,
+    )
+  }
+}
+
+String configPath = System.getenv('MANALOOM_GRADLE_DYNAMIC_SELECTOR_CONFIG') ?: ''
+if (configPath.isEmpty()) {
+  throw new GradleException('ManaLoom dynamic-selector adapter config is missing')
+}
+File configFile = new File(configPath)
+if (!configFile.isAbsolute() || !configFile.isFile()) {
+  throw new GradleException('ManaLoom dynamic-selector adapter config is unsafe')
+}
+Map<String, Object> config = (Map<String, Object>) new JsonSlurper().parse(configFile)
+if (config.schema_version != 'manaloom.gradle_dynamic_selector_adapter_config.v1') {
+  throw new GradleException('Unsupported ManaLoom dynamic-selector adapter config')
+}
+String runId = config.run_id as String
+if (!(runId ==~ /[A-Za-z0-9][A-Za-z0-9._-]{7,127}/)) {
+  throw new GradleException('ManaLoom dynamic-selector adapter run ID is invalid')
+}
+File eventDirectory = new File(config.event_directory as String)
+if (!eventDirectory.isAbsolute() || !eventDirectory.isDirectory()) {
+  throw new GradleException('ManaLoom dynamic-selector event directory is unsafe')
+}
+Map<String, String> selectors = (Map<String, String>) config.selectors
+Map<String, String> pins = (Map<String, String>) config.pins
+Map<String, String> expectedRoots = (Map<String, String>) config.build_roots
+Map<String, String> expectedSettingsHashes =
+  (Map<String, String>) config.settings_sha256
+List<String> profileConfigurations =
+  ((List<Object>) config.profile_configurations).collect { it as String }
+String expectedGradleVersion = config.gradle_version as String
+
+if (selectors.size() != 3 || pins.size() != 3 || selectors.keySet() != pins.keySet()) {
+  throw new GradleException('ManaLoom dynamic-selector pin set must contain exactly three coordinates')
+}
+if (profileConfigurations.toSet() != [
+  'profileCompileClasspath',
+  'profileRuntimeClasspath',
+  'profileUnitTestCompileClasspath',
+  'profileUnitTestRuntimeClasspath',
+] as Set) {
+  throw new GradleException('ManaLoom profile configuration set is not canonical')
+}
+
+gradle.startParameter.offline = true
+
+// Plugin requests happen before settingsEvaluated. Reject every dynamic plugin
+// selector, including a request introduced by an included build.
+gradle.beforeSettings { settings ->
+  settings.pluginManagement.resolutionStrategy.eachPlugin { details ->
+    String version = details.requested.version
+    if (ManaLoomDynamicSelectorAudit.isDynamicVersion(version)) {
+      throw new GradleException(
+        "Unexpected dynamic Gradle plugin selector: ${details.requested.id}:${version}",
+      )
+    }
+  }
+}
+
+gradle.settingsEvaluated { settings ->
+  if (!gradle.startParameter.offline) {
+    throw new GradleException('ManaLoom profile proof must keep Gradle offline')
+  }
+  if (gradle.gradleVersion != expectedGradleVersion) {
+    throw new GradleException(
+      "Unexpected Gradle version ${gradle.gradleVersion}; expected ${expectedGradleVersion}",
+    )
+  }
+  File root = settings.rootDir.canonicalFile
+  String role = expectedRoots.find { entry ->
+    new File(entry.value).canonicalFile == root
+  }?.key
+  if (role == null) {
+    throw new GradleException("Unexpected Gradle settings root: ${root}")
+  }
+  File settingsFile = settings.settingsScript.resource.file.canonicalFile
+  String settingsHash = ManaLoomDynamicSelectorAudit.sha256(settingsFile)
+  if (expectedSettingsHashes[role] != settingsHash) {
+    throw new GradleException("Gradle settings hash drift for ${role}")
+  }
+  String rootToken = MessageDigest.getInstance('SHA-256')
+    .digest(root.path.getBytes(StandardCharsets.UTF_8))
+    .collect { String.format('%02x', it & 0xff) }.join()
+  File eventFile = new File(eventDirectory, "${rootToken}.jsonl")
+  if (!eventFile.createNewFile()) {
+    throw new GradleException("Duplicate Gradle settings root event: ${root}")
+  }
+  gradle.ext.manaloomDynamicSelectorEventFile = eventFile
+  gradle.ext.manaloomDynamicSelectorRootRole = role
+  ManaLoomDynamicSelectorAudit.append(eventFile, [
+    schema_version: 'manaloom.gradle_dynamic_selector_adapter_event.v1',
+    type: 'settings_root',
+    run_id: runId,
+    role: role,
+    root: root.path,
+    settings_file: settingsFile.path,
+    settings_sha256: settingsHash,
+    gradle_version: gradle.gradleVersion,
+    offline: gradle.startParameter.offline,
+    init_sha256: config.init_sha256,
+  ])
+}
+
+gradle.beforeProject { project ->
+  File eventFile = (File) gradle.ext.manaloomDynamicSelectorEventFile
+  String rootRole = gradle.ext.manaloomDynamicSelectorRootRole as String
+
+  Closure<Void> inspectConfiguration
+  inspectConfiguration = { configuration, String scope ->
+    configuration.dependencies.all { dependency ->
+      String version = dependency.version
+      if (!ManaLoomDynamicSelectorAudit.isDynamicVersion(version)) {
+        return
+      }
+      String coordinate = "${dependency.group}:${dependency.name}"
+      if (rootRole != 'app_root' ||
+          project.path != ':integration_test' ||
+          configuration.name != 'api' ||
+          selectors[coordinate] != version) {
+        throw new GradleException(
+          "Unexpected dynamic dependency declaration ${coordinate}:${version} " +
+            "at ${rootRole}:${project.path}:${configuration.name}",
+        )
+      }
+      ManaLoomDynamicSelectorAudit.append(eventFile, [
+        schema_version: 'manaloom.gradle_dynamic_selector_adapter_event.v1',
+        type: 'dynamic_declaration',
+        run_id: runId,
+        root_role: rootRole,
+        project: project.path,
+        configuration: configuration.name,
+        scope: scope,
+        coordinate: coordinate,
+        requested: version,
+        pin: pins[coordinate],
+      ])
+    }
+    configuration.dependencyConstraints.all { constraint ->
+      def versionConstraint = constraint.versionConstraint
+      List<String> constraintVersions = [
+        constraint.version,
+        versionConstraint.requiredVersion,
+        versionConstraint.preferredVersion,
+        versionConstraint.strictVersion,
+      ]
+      constraintVersions.addAll(versionConstraint.rejectedVersions ?: [])
+      constraintVersions.findAll { it != null && !it.trim().isEmpty() }.each { version ->
+        if (ManaLoomDynamicSelectorAudit.isDynamicVersion(version)) {
+          throw new GradleException(
+            "Unexpected dynamic dependency constraint ${constraint.group}:" +
+              "${constraint.name}:${version} at ${rootRole}:${project.path}:" +
+              "${configuration.name}",
+          )
+        }
+      }
+    }
+    configuration.resolutionStrategy.eachDependency { details ->
+      String version = details.requested.version
+      if (!ManaLoomDynamicSelectorAudit.isDynamicVersion(version)) {
+        return
+      }
+      String coordinate = "${details.requested.group}:${details.requested.name}"
+      if (rootRole != 'app_root' ||
+          ![':app', ':integration_test'].contains(project.path) ||
+          !profileConfigurations.contains(configuration.name) ||
+          selectors[coordinate] != version) {
+        throw new GradleException(
+          "Unexpected dynamic resolved selector ${coordinate}:${version} " +
+            "at ${rootRole}:${project.path}:${configuration.name}",
+        )
+      }
+      details.useVersion(pins[coordinate])
+      details.because('ManaLoom process-scoped offline profile proof pin')
+      ManaLoomDynamicSelectorAudit.append(eventFile, [
+        schema_version: 'manaloom.gradle_dynamic_selector_adapter_event.v1',
+        type: 'substitution',
+        run_id: runId,
+        root_role: rootRole,
+        project: project.path,
+        configuration: configuration.name,
+        scope: scope,
+        coordinate: coordinate,
+        requested: version,
+        pin: pins[coordinate],
+      ])
+    }
+    if (rootRole == 'app_root' &&
+        [':app', ':integration_test'].contains(project.path) &&
+        ['profileCompileClasspath', 'profileRuntimeClasspath'].contains(configuration.name)) {
+      configuration.incoming.afterResolve {
+        List<String> unresolved = configuration.incoming.resolutionResult.allDependencies
+          .findAll { it instanceof UnresolvedDependencyResult }
+          .collect { it.requested.displayName as String }
+          .sort()
+        if (!unresolved.isEmpty()) {
+          throw new GradleException(
+            "Unresolved integration_test dependencies in ${configuration.name}: ${unresolved}",
+          )
+        }
+        List<String> graph = configuration.incoming.resolutionResult.allComponents
+          .collect { component ->
+            if (component.id instanceof ModuleComponentIdentifier) {
+              ModuleComponentIdentifier id = (ModuleComponentIdentifier) component.id
+              return "${id.group}:${id.module}:${id.version}"
+            }
+            return component.id.displayName as String
+          }
+          .sort()
+        Map<String, String> selected = [:]
+        configuration.incoming.resolutionResult.allComponents.each { component ->
+          if (component.id instanceof ModuleComponentIdentifier) {
+            ModuleComponentIdentifier id = (ModuleComponentIdentifier) component.id
+            String coordinate = "${id.group}:${id.module}"
+            if (pins.containsKey(coordinate)) {
+              selected[coordinate] = id.version
+            }
+          }
+        }
+        if (selected != pins) {
+          throw new GradleException(
+            "Resolved integration_test pin set drift in ${configuration.name}: ${selected}",
+          )
+        }
+        String graphJson = JsonOutput.toJson(graph)
+        String graphHash = MessageDigest.getInstance('SHA-256')
+          .digest(graphJson.getBytes(StandardCharsets.UTF_8))
+          .collect { String.format('%02x', it & 0xff) }.join()
+        ManaLoomDynamicSelectorAudit.append(eventFile, [
+          schema_version: 'manaloom.gradle_dynamic_selector_adapter_event.v1',
+          type: 'resolved_graph',
+          run_id: runId,
+          root_role: rootRole,
+          project: project.path,
+          configuration: configuration.name,
+          selected: selected,
+          graph: graph,
+          graph_sha256: graphHash,
+        ])
+      }
+    }
+  }
+
+  project.configurations.configureEach { configuration ->
+    inspectConfiguration(configuration, 'project')
+  }
+  project.buildscript.configurations.configureEach { configuration ->
+    inspectConfiguration(configuration, 'buildscript')
+  }
+}

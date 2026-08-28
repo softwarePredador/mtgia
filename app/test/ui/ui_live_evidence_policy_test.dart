@@ -286,6 +286,76 @@ void main() {
     );
     expect(digest, contains('scripts/manaloom_p0_runtime_capture.sh'));
     expect(digest, contains('scripts/lib/manaloom_ui_runtime_contract.sh'));
+    expect(
+      digest,
+      contains('scripts/manaloom_gradle_dynamic_selector_adapter.sh'),
+    );
+    expect(
+      digest,
+      contains('scripts/lib/manaloom_gradle_dynamic_selector_pins.init.gradle'),
+    );
+  });
+
+  test('physical Android evidence is fail-closed before publication', () {
+    final contract = policy['android_physical_egress'] as Map<String, dynamic>;
+    final gate = policy['gate'] as Map<String, dynamic>;
+    final guard = File(
+      '../scripts/manaloom_android_ui_egress_guard.sh',
+    ).readAsStringSync();
+    final runner = File(
+      '../scripts/manaloom_p0_runtime_capture.sh',
+    ).readAsStringSync();
+    final liveGate = File(
+      '../scripts/manaloom_ui_live_evidence_gate.sh',
+    ).readAsStringSync();
+    final detector = File('tool/ui_runtime_evidence.dart').readAsStringSync();
+
+    expect(contract['schema_version'], 'manaloom_android_ui_egress_policy_v2');
+    expect(contract['receipt_schema'], 'manaloom.android_ui_egress_receipt.v2');
+    expect(contract['package'], 'com.mtgia.mtg_app');
+    expect(contract['allowed_loopback_hosts'], <String>[
+      '127.0.0.1',
+      'localhost',
+      '::1',
+    ]);
+    expect(contract['receipt_required_before_png_publication'], isTrue);
+    expect(contract['receipt_required_before_manifest_indexing'], isTrue);
+    expect(contract['logcat_temporal_anchor'], '-T 1');
+    expect(contract['pid_sampler'], 'all_processes_for_package_uid');
+    expect(contract['presentation_state_must_restore_exactly'], isTrue);
+    expect(
+      contract['gradle_dynamic_selector_receipt_schema'],
+      'manaloom.gradle_dynamic_selector_adapter_receipt.v1',
+    );
+    expect(
+      (contract['forbidden_profile_components'] as List<dynamic>).length,
+      15,
+    );
+    expect(guard, contains('NO_GO_ANDROID_NETWORK_ISOLATION_UNPROVABLE'));
+    expect(guard, contains('settings get global wifi_on'));
+    expect(guard, contains('settings get global mobile_data'));
+    expect(guard, contains('dumpsys connectivity'));
+    expect(guard, contains('ip -6 -o route show table all'));
+    expect(guard, contains('reverse --list'));
+    expect(guard, contains(r'run-as "$PACKAGE"'));
+    expect(guard, contains('ps -A -n -o UID,PID,NAME'));
+    expect(guard, contains('-T 1'));
+    expect(guard, contains('manaloom.android_ui_egress_receipt.v2'));
+    expect(guard, isNot(contains('all_uid_pids_covered: true')));
+    expect(runner, contains('build_and_attest_physical_profile_apk'));
+    expect(runner, contains('verify-android-egress-receipt'));
+    expect(liveGate, contains('MANALOOM_P0_ANDROID_EGRESS_RECEIPT'));
+    expect(liveGate, contains('MANALOOM_P0_ANDROID_EGRESS_RUN_ID'));
+    expect(liveGate, contains('manaloom.android_ui_egress_receipt.v2'));
+    expect(liveGate, contains(r'.run_id == $run_id'));
+    expect(liveGate, contains(r'.source_digest == $source_digest'));
+    expect(detector, contains('CctTransportBackend'));
+    expect(detector, contains('UnknownHostException'));
+    expect(detector, contains('external_or_unclassified_attempts'));
+    expect(
+      gate['p0_index_command'],
+      contains('MANALOOM_P0_ANDROID_EGRESS_RECEIPT'),
+    );
   });
 
   test(

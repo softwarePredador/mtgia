@@ -71,7 +71,7 @@ class ReleaseCapabilityEntry {
     final json = _stringKeyedMap(value);
     if (json == null ||
         !_hasExactKeys(json, _entryKeys) ||
-        !_isNonEmptyString(json['implementation_status']) ||
+        !_implementationStatusValues.contains(json['implementation_status']) ||
         !_releaseCapabilityValues.contains(json['release_capability']) ||
         json['allowed'] is! bool ||
         !_isValidTimestamp(json['live_verified_as_of'])) {
@@ -201,7 +201,7 @@ class ReleaseCapabilitiesSnapshot {
         json['configuration_status'] == 'valid' &&
         policyVersion is String &&
         policyVersion.trim().isNotEmpty &&
-        _isNonEmptyString(json['implementation_status']) &&
+        _implementationStatusValues.contains(json['implementation_status']) &&
         _isValidTimestamp(json['live_verified_as_of']) &&
         digest is String &&
         _sha256Pattern.hasMatch(digest.trim());
@@ -219,6 +219,15 @@ const _releaseCapabilityValues = <String>{
   'on',
   'off',
   'experimental_allowlist',
+};
+
+const _implementationStatusValues = <String>{
+  'contained_legacy',
+  'experimental_guarded',
+  'experimental_p0_open',
+  'implemented_guarded',
+  'implemented_p0_open',
+  'not_implemented',
 };
 
 typedef ReleaseCapabilitiesFetcher =
@@ -612,10 +621,6 @@ Map<String, Object?>? _stringKeyedMap(Object? value) {
 bool _hasExactKeys(Map<String, Object?> value, Set<String> expected) {
   return value.length == expected.length &&
       value.keys.toSet().containsAll(expected);
-}
-
-bool _isNonEmptyString(Object? value) {
-  return value is String && value.trim().isNotEmpty;
 }
 
 bool _isValidTimestamp(Object? value) {

@@ -612,6 +612,7 @@ capture_core_product() {
 
 index_p0_matrix() {
   local source_digest android_profile android_target android_device_contract
+  local android_egress_receipt android_egress_run_id
   local device_id="${MANALOOM_UI_PROOF_DEVICE:-}"
   source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
   if [[ -z "$device_id" ]]; then
@@ -633,6 +634,49 @@ index_p0_matrix() {
     exit 2
   fi
 
+  android_egress_receipt="${MANALOOM_P0_ANDROID_EGRESS_RECEIPT:-}"
+  android_egress_run_id="${MANALOOM_P0_ANDROID_EGRESS_RUN_ID:-}"
+  if [[ "$android_target" == "android_physical" ]]; then
+    if [[ "$android_egress_receipt" != /* ||
+          ! -f "$android_egress_receipt" ||
+          -z "$android_egress_run_id" ||
+          -z "${MANALOOM_P0_ANDROID_LOG:-}" ||
+          ! -f "${MANALOOM_P0_ANDROID_LOG:-}" ]]; then
+      echo "Physical P0 indexing requires the terminal egress receipt, run ID and raw log" >&2
+      exit 2
+    fi
+    # This validation intentionally runs before the first Web manifest is
+    # written. A missing, forged, stale or cross-run Android receipt leaves the
+    # complete P0 matrix untouched.
+    jq -e \
+      --arg run_id "$android_egress_run_id" \
+      --arg source_digest "$source_digest" \
+      --arg profile "$android_profile" '
+        .schema_version == "manaloom.android_ui_egress_receipt.v2" and
+        .status == "PASS_ANDROID_EGRESS" and
+        .run_id == $run_id and
+        .source_digest == $source_digest and
+        .profile == $profile and
+        .target == "android_physical"
+      ' "$android_egress_receipt" >/dev/null || {
+      echo "Physical P0 egress receipt is malformed, non-PASS or cross-run" >&2
+      exit 2
+    }
+    (
+      cd "$ROOT_DIR/app"
+      "$DART_BIN" --packages="$ROOT_DIR/app/.dart_tool/package_config.json" \
+        "$ROOT_DIR/app/tool/ui_runtime_evidence.dart" \
+        verify-android-egress-receipt \
+        --receipt "$android_egress_receipt" \
+        --runtime-log "$MANALOOM_P0_ANDROID_LOG" \
+        --policy "$ROOT_DIR/app/test/ui/fixtures/ui_live_evidence_policy.json" \
+        --run-id "$android_egress_run_id" \
+        --source-digest "$source_digest" \
+        --profile "$android_profile" \
+        --target "$android_target"
+    )
+  fi
+
   index_profile() {
     local profile="$1"
     local target="$2"
@@ -651,6 +695,13 @@ index_p0_matrix() {
       exit 2
     fi
 
+    local index_args=()
+    if [[ "$target" == "android_physical" ]]; then
+      index_args+=(
+        --android-egress-receipt "$android_egress_receipt"
+        --android-egress-run-id "$android_egress_run_id"
+      )
+    fi
     (
       cd "$ROOT_DIR/app"
       "$DART_BIN" run tool/ui_runtime_evidence.dart index-directory \
@@ -663,7 +714,8 @@ index_p0_matrix() {
         --profile "$profile" \
         --runtime flutter_drive \
         --target "$target" \
-        --device-contract "$device_contract"
+        --device-contract "$device_contract" \
+        "${index_args[@]}"
     )
   }
 
@@ -716,7 +768,7 @@ case "$MODE" in
       "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-battle-coach" \
       "       [MANALOOM_CHROMEDRIVER_BIN=<path>] $0 --capture-battle-live-web" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-core-product" \
-      "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
+      "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> MANALOOM_P0_ANDROID_EGRESS_RECEIPT=<json> MANALOOM_P0_ANDROID_EGRESS_RUN_ID=<id> $0 --index-p0-matrix"
     ;;
   *)
     echo "unknown mode: $MODE" >&2

@@ -199,6 +199,47 @@ e 456 capturas. Battle Coach Android e teclado Web continuam superfícies
 opcionais/separadas enquanto não forem declarados como perfis obrigatórios pela
 política executável.
 
+Uma captura P0 em Android físico é fail-closed em três camadas. O source set
+`profile` remove providers, services, receivers e registrars de telemetria que
+inicializariam antes do Dart; `DISABLE_PUSH_INIT` também bloqueia entradas
+tardias e de background. O guard físico fotografa Wi-Fi, dados, VPN, rotas e
+`adb reverse`, exige transporte ADB USB, desliga os transportes externos e
+mantém somente os dois forwards loopback governados. Dispositivo sem root que
+não permita provar isolamento ou restauração exata recebe
+`NO_GO_ANDROID_NETWORK_ISOLATION_UNPROVABLE`, nunca crédito parcial.
+
+O detector v2 inicia `logcat` por package/UID antes do marcador `BEGIN`, amostra
+todos os PIDs daquele UID durante a jornada e só encerra a janela depois de
+`force-stop`, limpeza e drain. Ele fotografa e restaura byte a byte rotação,
+modo imersivo, rede, rotas e forwards; limpa/atesta dados do app e
+DataTransport antes e depois da jornada; e deriva findings somente do log
+bruto delimitado e do trace de PIDs. DNS, socket ou HTTP externo falha mesmo
+quando a conexão foi negada. Receipt v1, ausente, malformado, de outro run ou
+com hash divergente é inelegível e impede a cópia dos PNGs; no gate, o receipt
+`manaloom.android_ui_egress_receipt.v2` é validado antes da escrita do primeiro
+manifest P0. O caminho opcional Battle Coach Android não recebe crédito físico
+enquanto não usar o mesmo guard.
+
+O build profile da prova usa
+`scripts/manaloom_gradle_dynamic_selector_adapter.sh`. O adapter atesta o SDK
+Flutter/Dart pinado, o plugin `integration_test`, lock, verification metadata e
+os seis AAR/POM já presentes; cria `GRADLE_USER_HOME` efêmero; mantém o Gradle
+offline dentro de sandbox deny-all; e substitui somente os três seletores
+dinâmicos conhecidos pelos pins derivados do lock. Um quarto seletor, outro
+settings root, cache miss, mutação de SDK/cache/lock ou receipt ausente,
+malformado ou cross-run encerra a prova. O receipt
+`manaloom.gradle_dynamic_selector_adapter_receipt.v1` registra dois roots,
+eventos, grafo resolvido, hashes e manifests merged/empacotado analisados por
+parser XML namespace-aware. Esse adapter é exclusivo do profile de prova e não
+altera Gradle, lock, SDK, cache ou o artefato release.
+
+Esta onda não reivindica igualdade byte a byte com release: o source
+compartilhado de push já possui delta. A garantia é mais estreita — defaults e
+semântica release continuam preservados, o overlay profile não participa de
+release e o adapter desaparece quando sua invocação process-scoped não ocorre.
+Comparação de artefato release permanece `BLOCKED_NOT_RUN_PROFILE_ONLY` até
+existir um caminho offline canônico sem signing ou provider secreto.
+
 Os manifests ficam sob `docs/qa/ui-live/current`. O aggregate `latest.json`
 registra o hash de cada manifesto, todos os perfis revisados e a quantidade
 total de screenshots. O verificador exige igualdade exata desses conjuntos;
@@ -229,7 +270,8 @@ não substitui esse roteiro.
 `./scripts/quality_gate.sh ui-proof`, `ui-audit`, `battle-lab` e o gate local
 rápido verificam a prova corrente. O digest é calculado por
 `scripts/manaloom_ui_source_digest.sh` sobre código Flutter, assets, shell Web,
-resources Android, contrato de superfícies e o próprio harness de prova.
+todos os source sets e inputs de build Android, contrato de superfícies e o
+próprio harness de prova.
 
 ## O que a prova não autoriza
 
@@ -273,6 +315,11 @@ resources Android, contrato de superfícies e o próprio harness de prova.
   `scripts/manaloom_critical_overlays_states_visual_qa.sh`;
 - extração/verificação: `app/tool/ui_runtime_evidence.dart`;
 - gate: `scripts/manaloom_ui_live_evidence_gate.sh`;
+- guard Android físico: `scripts/manaloom_android_ui_egress_guard.sh`;
+- adapter Gradle profile offline:
+  `scripts/manaloom_gradle_dynamic_selector_adapter.sh`;
+- init Gradle process-scoped:
+  `scripts/lib/manaloom_gradle_dynamic_selector_pins.init.gradle`;
 - digest: `scripts/manaloom_ui_source_digest.sh`;
 - captura nativa de platform view:
   `scripts/manaloom_capture_android_platform_view.sh`;

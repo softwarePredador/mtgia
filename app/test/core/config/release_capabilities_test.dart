@@ -6,6 +6,7 @@ import 'package:manaloom/core/config/release_capabilities.dart';
 
 Map<String, dynamic> _validPayload({
   Set<ReleaseCapability> allowed = const {},
+  String implementationStatus = 'implemented_guarded',
 }) {
   return {
     'schema_version': ReleaseCapabilitiesSnapshot.schemaVersion,
@@ -13,14 +14,14 @@ Map<String, dynamic> _validPayload({
     'product': 'brewtact',
     'release_channel': 'free_beta',
     'offer_mode': 'free_beta_no_commerce',
-    'implementation_status': 'implemented_guarded',
+    'implementation_status': implementationStatus,
     'live_verified_as_of': null,
     'policy_digest_sha256': List.filled(64, 'a').join(),
     'configuration_status': 'valid',
     'capabilities': {
       for (final capability in ReleaseCapability.values)
         capability.wireName: {
-          'implementation_status': 'implemented_guarded',
+          'implementation_status': implementationStatus,
           'release_capability': allowed.contains(capability) ? 'on' : 'off',
           'allowed': allowed.contains(capability),
           'live_verified_as_of': null,
@@ -46,6 +47,27 @@ void main() {
         ReleaseCapability.values.map((capability) => capability.wireName),
         containsAll(const ['account_registration', 'life_counter_local']),
       );
+    });
+
+    test('accepts every canonical implementation status', () {
+      for (final implementationStatus in const {
+        'contained_legacy',
+        'experimental_guarded',
+        'experimental_p0_open',
+        'implemented_guarded',
+        'implemented_p0_open',
+        'not_implemented',
+      }) {
+        final snapshot = ReleaseCapabilitiesSnapshot.fromJson(
+          _validPayload(implementationStatus: implementationStatus),
+        );
+
+        expect(
+          snapshot.isValid,
+          isTrue,
+          reason: 'implementation_status=$implementationStatus',
+        );
+      }
     });
 
     test(
@@ -75,6 +97,12 @@ void main() {
         (payload) => payload['schema_version'] = 'release_capabilities_v2',
         (payload) => payload['configuration_status'] = 'invalid_fail_closed',
         (payload) => payload['product'] = 'another_product',
+        (payload) => payload['implementation_status'] = 'future_unknown',
+        (payload) =>
+            (payload['capabilities'] as Map<String, dynamic>)[ReleaseCapability
+                    .battleBatch
+                    .wireName]['implementation_status'] =
+                'future_unknown',
         (payload) => payload['policy_digest_sha256'] = 'not-a-sha256',
         (payload) => payload.remove('capabilities'),
         (payload) => payload['unexpected'] = true,
@@ -239,6 +267,102 @@ void main() {
 
         expect(await pendingRefresh, isFalse);
         expect(provider.loadState, ReleaseCapabilitiesLoadState.initial);
+        expect(
+          provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
+          isFalse,
+        );
+      },
+    );
+
+    for (final failureCase
+        in <({String label, Future<ApiResponse> Function() fetch})>[
+          (
+            label: '503',
+            fetch: () async => ApiResponse(503, const {'error': 'unavailable'}),
+          ),
+          (
+            label: 'malformed 200',
+            fetch: () async =>
+                ApiResponse(200, const {'configuration_status': 'valid'}),
+          ),
+          (
+            label: 'fetch exception',
+            fetch: () async => throw StateError('offline'),
+          ),
+        ]) {
+      test(
+        'a ${failureCase.label} refresh never preserves an older permission',
+        () async {
+          var requestCount = 0;
+          final provider = ReleaseCapabilitiesProvider(
+            fetcher: (_) async {
+              requestCount++;
+              if (requestCount == 1) {
+                return ApiResponse(
+                  200,
+                  _validPayload(
+                    allowed: const {ReleaseCapability.aiGenerateRebuild},
+                  ),
+                );
+              }
+              return failureCase.fetch();
+            },
+          );
+          addTearDown(provider.dispose);
+
+          expect(await provider.refresh(), isTrue);
+          expect(
+            provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
+            isTrue,
+          );
+
+          expect(await provider.refresh(), isFalse);
+          expect(provider.loadState, ReleaseCapabilitiesLoadState.unavailable);
+          expect(
+            provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
+            isFalse,
+          );
+        },
+      );
+    }
+
+    test(
+      'an older concurrent response cannot replace the latest matrix',
+      () async {
+        final firstResponse = Completer<ApiResponse>();
+        final secondResponse = Completer<ApiResponse>();
+        var requestCount = 0;
+        final provider = ReleaseCapabilitiesProvider(
+          fetcher: (_) {
+            requestCount++;
+            return requestCount == 1
+                ? firstResponse.future
+                : secondResponse.future;
+          },
+        );
+        addTearDown(provider.dispose);
+
+        final firstRefresh = provider.refresh();
+        final secondRefresh = provider.refresh();
+        secondResponse.complete(
+          ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.catalogPrivate}),
+          ),
+        );
+
+        expect(await secondRefresh, isTrue);
+        expect(provider.isAllowed(ReleaseCapability.catalogPrivate), isTrue);
+
+        firstResponse.complete(
+          ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.aiGenerateRebuild}),
+          ),
+        );
+
+        expect(await firstRefresh, isFalse);
+        expect(provider.isAllowed(ReleaseCapability.catalogPrivate), isTrue);
         expect(
           provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
           isFalse,

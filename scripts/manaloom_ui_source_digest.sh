@@ -27,11 +27,17 @@ SOURCE_ROOTS=(
   "app/lib"
   "app/assets"
   "app/web"
-  "app/android/app/src/main/res"
+  "app/android/app/src/main"
+  "app/android/app/src/profile"
+  "app/android/app/src/release"
+  "app/android/app/src/debug"
   "app/android/settings.gradle.kts"
   "app/android/build.gradle.kts"
   "app/android/app/build.gradle.kts"
   "app/android/app/gradle.lockfile"
+  "app/android/app/google-services.json"
+  "app/android/app/proguard-rules.pro"
+  "app/android/gradle.properties"
   "app/android/gradle/verification-metadata.xml"
   "app/android/gradle/wrapper/gradle-wrapper.properties"
   "app/pubspec.yaml"
@@ -58,6 +64,10 @@ SOURCE_ROOTS=(
   "app/test/ui/fixtures/ui_live_evidence_policy.json"
   "app/test/ui/fixtures/ui_surface_inventory.json"
   "server/config/premium_visual_qa_surfaces.json"
+  "server/pubspec.yaml"
+  "server/pubspec.lock"
+  "server/test/manaloom_offline_dart_frog_build_adapter_contract_test.dart"
+  "tools/manaloom_lints"
   "scripts/manaloom_authenticated_visual_qa_isolated.sh"
   "scripts/manaloom_binder_import_visual_qa.sh"
   "scripts/manaloom_deck_workshop_visual_qa.sh"
@@ -68,9 +78,16 @@ SOURCE_ROOTS=(
   "scripts/manaloom_critical_overlays_states_visual_qa.sh"
   "scripts/lib/manaloom_ui_runtime_contract.sh"
   "scripts/manaloom_p0_runtime_capture.sh"
+  "scripts/manaloom_android_ui_egress_guard.sh"
+  "scripts/manaloom_gradle_dynamic_selector_adapter.sh"
+  "scripts/lib/manaloom_gradle_dynamic_selector_pins.init.gradle"
   "scripts/manaloom_server_contract_e2e_isolated.sh"
+  "scripts/manaloom_dart_frog_offline_build.sh"
+  "scripts/manaloom_dart_frog_offline_build.dart"
+  "scripts/lib/manaloom_dart_toolchain.sh"
   "scripts/manaloom_ui_live_evidence_gate.sh"
   "scripts/manaloom_ui_source_digest.sh"
+  "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md"
 )
 
 for source_root in "${SOURCE_ROOTS[@]}"; do
@@ -79,6 +96,7 @@ for source_root in "${SOURCE_ROOTS[@]}"; do
   elif [[ -d "$source_root" ]]; then
     find "$source_root" -type f \
       ! -name '.DS_Store' \
+      ! -name 'GeneratedPluginRegistrant.*' \
       ! -path '*/.dart_tool/*' \
       ! -path '*/build/*'
   else

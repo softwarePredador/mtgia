@@ -37,6 +37,262 @@ class UiRuntimeExtractionResult {
   final Map<String, Object?> manifest;
 }
 
+class AndroidEgressAssessment {
+  const AndroidEgressAssessment({
+    required this.findings,
+    required this.loopbackAttempts,
+  });
+
+  final List<String> findings;
+  final int loopbackAttempts;
+
+  bool get isClean => findings.isEmpty;
+
+  Map<String, Object> toJson() => <String, Object>{
+    'status': isClean ? 'pass' : 'fail',
+    'external_or_unclassified_attempts': findings.length,
+    'loopback_attempts': loopbackAttempts,
+    'findings': findings,
+  };
+}
+
+class AndroidEgressReceiptVerification {
+  const AndroidEgressReceiptVerification({
+    required this.receipt,
+    required this.receiptSha256,
+  });
+
+  final Map<String, dynamic> receipt;
+  final String receiptSha256;
+
+  Map<String, Object> toManifestJson() {
+    final identity = _objectOrEmpty(receipt['identity']);
+    final assessment = _objectOrEmpty(receipt['network_egress']);
+    return <String, Object>{
+      'status': 'pass',
+      'receipt_schema': receipt['schema_version']!.toString(),
+      'receipt_sha256': receiptSha256,
+      'run_id': receipt['run_id']!.toString(),
+      'package': identity['package']!.toString(),
+      'uid': identity['uid']!,
+      'observed_pids': _integerList(identity['observed_pids']),
+      'external_or_unclassified_attempts':
+          assessment['external_or_unclassified_attempts']!,
+      'loopback_attempts': assessment['loopback_attempts']!,
+    };
+  }
+}
+
+AndroidEgressAssessment assessAndroidNetworkEgress(
+  String log, {
+  Set<String> allowedLoopbackHosts = const {'127.0.0.1', 'localhost', '::1'},
+}) {
+  final findings = <String>[];
+  var loopbackAttempts = 0;
+  final marker = RegExp(
+    r'(Making request to:|https?://|UnknownHostException|Unable to resolve host|'
+    r'getaddrinfo|ConnectException|SocketException|CctTransportBackend)',
+    caseSensitive: false,
+  );
+  final url = RegExp(r'https?://[^\s,)]+', caseSensitive: false);
+  final hostAfterMarker = RegExp(
+    r'(?:host|to:|address)[= ]+\[?([A-Za-z0-9._:-]+)\]?',
+    caseSensitive: false,
+  );
+
+  for (final rawLine in const LineSplitter().convert(log)) {
+    if (!marker.hasMatch(rawLine)) continue;
+    final hosts = <String>{};
+    for (final match in url.allMatches(rawLine)) {
+      final parsed = Uri.tryParse(match.group(0) ?? '');
+      final value = parsed?.host.toLowerCase() ?? '';
+      if (value.isNotEmpty) hosts.add(value);
+    }
+    for (final match in hostAfterMarker.allMatches(rawLine)) {
+      var value = match.group(1)?.toLowerCase() ?? '';
+      if (value == 'http:' || value == 'https:') continue;
+      if (':'.allMatches(value).length == 1) {
+        value = value.replaceAll(RegExp(r':\d+$'), '');
+      }
+      if (value.isNotEmpty) hosts.add(value);
+    }
+    final external = hosts.difference(allowedLoopbackHosts);
+    if (external.isNotEmpty) {
+      findings.add('external:${external.toList()..sort()}:${rawLine.trim()}');
+      continue;
+    }
+    if (hosts.isNotEmpty) {
+      loopbackAttempts++;
+      continue;
+    }
+    findings.add('unclassified:${rawLine.trim()}');
+  }
+  return AndroidEgressAssessment(
+    findings: List<String>.unmodifiable(findings),
+    loopbackAttempts: loopbackAttempts,
+  );
+}
+
+AndroidEgressReceiptVerification sealAndroidEgressReceipt({
+  required File receiptFile,
+  required File runtimeLog,
+  required File nativeLog,
+  required File pidTrace,
+  required File policyFile,
+  required String expectedRunId,
+  required String expectedSourceDigest,
+  required String expectedProfile,
+  required String expectedTarget,
+}) {
+  final candidate = _validateAndroidEgressReceiptEnvelope(
+    receiptFile: receiptFile,
+    runtimeLog: runtimeLog,
+    nativeLog: nativeLog,
+    pidTrace: pidTrace,
+    policyFile: policyFile,
+    expectedRunId: expectedRunId,
+    expectedSourceDigest: expectedSourceDigest,
+    expectedProfile: expectedProfile,
+    expectedTarget: expectedTarget,
+    requireTerminal: false,
+  );
+  final identity = _objectOrEmpty(candidate['identity']);
+  final uid = identity['uid'] as int;
+  final window = _extractAndroidEgressWindow(
+    nativeLog.readAsStringSync(),
+    runId: expectedRunId,
+    uid: uid,
+  );
+  final pidAssessment = _parseAndroidPidTrace(
+    pidTrace.readAsStringSync(),
+    expectedUid: uid,
+    expectedRunId: expectedRunId,
+  );
+  final sampledPids = _integerList(identity['sampled_pids']).toSet();
+  if (!_sameIntSet(sampledPids, pidAssessment.sampledPids)) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress sampled PID set does not match the raw trace.',
+    );
+  }
+  final observedPids = <int>{
+    ...pidAssessment.sampledPids,
+    ...window.loggedPids,
+  }.toList()..sort();
+  identity['logged_pids'] = window.loggedPids.toList()..sort();
+  identity['observed_pids'] = observedPids;
+  candidate['identity'] = identity;
+  final allowedHosts = _androidLoopbackHosts(policyFile);
+  final assessment = assessAndroidNetworkEgress(
+    '${runtimeLog.readAsStringSync()}\n${window.text}',
+    allowedLoopbackHosts: allowedHosts,
+  );
+  candidate['network_egress'] = assessment.toJson();
+  candidate['status'] = assessment.isClean
+      ? 'PASS_ANDROID_EGRESS'
+      : 'FAIL_ANDROID_EGRESS';
+  candidate['sealed_at'] = DateTime.now().toUtc().toIso8601String();
+  final artifacts = _objectOrEmpty(candidate['artifacts']);
+  artifacts['runtime_log_sha256'] = sha256
+      .convert(runtimeLog.readAsBytesSync())
+      .toString();
+  artifacts['native_log_sha256'] = sha256
+      .convert(nativeLog.readAsBytesSync())
+      .toString();
+  artifacts['native_window_sha256'] = sha256
+      .convert(utf8.encode(window.text))
+      .toString();
+  artifacts['pid_trace_sha256'] = sha256
+      .convert(pidTrace.readAsBytesSync())
+      .toString();
+  artifacts['policy_sha256'] = sha256
+      .convert(policyFile.readAsBytesSync())
+      .toString();
+  candidate['artifacts'] = artifacts;
+  _writeJsonAtomically(receiptFile, candidate);
+  if (!assessment.isClean) {
+    throw UiRuntimeEvidenceException(
+      'Android network egress attempt detected: '
+      '${assessment.findings.join(' | ')}',
+    );
+  }
+  return verifyAndroidEgressReceipt(
+    receiptFile: receiptFile,
+    runtimeLog: runtimeLog,
+    policyFile: policyFile,
+    expectedRunId: expectedRunId,
+    expectedSourceDigest: expectedSourceDigest,
+    expectedProfile: expectedProfile,
+    expectedTarget: expectedTarget,
+  );
+}
+
+AndroidEgressReceiptVerification verifyAndroidEgressReceipt({
+  required File receiptFile,
+  required File runtimeLog,
+  required File policyFile,
+  required String expectedRunId,
+  required String expectedSourceDigest,
+  required String expectedProfile,
+  required String expectedTarget,
+}) {
+  if (!receiptFile.existsSync() ||
+      FileSystemEntity.typeSync(receiptFile.path, followLinks: false) !=
+          FileSystemEntityType.file) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt is missing, non-regular or a symlink.',
+    );
+  }
+  final receipt = _readJsonObject(receiptFile, 'Android egress receipt');
+  final artifacts = _objectOrEmpty(receipt['artifacts']);
+  final nativePath = artifacts['native_log_path']?.toString() ?? '';
+  final pidTracePath = artifacts['pid_trace_path']?.toString() ?? '';
+  if (nativePath.isEmpty || pidTracePath.isEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt is missing native log or PID trace path.',
+    );
+  }
+  final nativeLog = File(nativePath);
+  final pidTrace = File(pidTracePath);
+  final validated = _validateAndroidEgressReceiptEnvelope(
+    receiptFile: receiptFile,
+    runtimeLog: runtimeLog,
+    nativeLog: nativeLog,
+    pidTrace: pidTrace,
+    policyFile: policyFile,
+    expectedRunId: expectedRunId,
+    expectedSourceDigest: expectedSourceDigest,
+    expectedProfile: expectedProfile,
+    expectedTarget: expectedTarget,
+    requireTerminal: true,
+  );
+  final identity = _objectOrEmpty(validated['identity']);
+  final uid = identity['uid'] as int;
+  final window = _extractAndroidEgressWindow(
+    nativeLog.readAsStringSync(),
+    runId: expectedRunId,
+    uid: uid,
+  );
+  final assessment = assessAndroidNetworkEgress(
+    '${runtimeLog.readAsStringSync()}\n${window.text}',
+    allowedLoopbackHosts: _androidLoopbackHosts(policyFile),
+  );
+  final embedded = _objectOrEmpty(validated['network_egress']);
+  if (!assessment.isClean ||
+      embedded['status'] != 'pass' ||
+      embedded['external_or_unclassified_attempts'] != 0 ||
+      embedded['loopback_attempts'] != assessment.loopbackAttempts ||
+      !_sameStringList(embedded['findings'], assessment.findings)) {
+    throw UiRuntimeEvidenceException(
+      'Android egress receipt assessment does not match the raw logs: '
+      '${assessment.findings.join(' | ')}',
+    );
+  }
+  return AndroidEgressReceiptVerification(
+    receipt: validated,
+    receiptSha256: sha256.convert(receiptFile.readAsBytesSync()).toString(),
+  );
+}
+
 class UiLiveEvidenceVerification {
   const UiLiveEvidenceVerification({
     required this.reviewFile,
@@ -106,7 +362,7 @@ UiRuntimeExtractionResult extractUiRuntimeEvidence({
 
   final logBytes = logFile.readAsBytesSync();
   final log = utf8.decode(logBytes, allowMalformed: false);
-  _expectCleanRuntimeLog(log);
+  final runtimeConsole = _expectCleanRuntimeLog(log);
   final parsed = _parseRuntimeLog(log);
   final context = parsed.context;
   if (context['schema_version'] != 'manaloom_ui_runtime_context_v1') {
@@ -191,10 +447,7 @@ UiRuntimeExtractionResult extractUiRuntimeEvidence({
     'runtime': _requiredText(context, 'runtime'),
     'target': target,
     'device_contract': deviceContract,
-    'runtime_console': const <String, Object>{
-      'status': 'pass',
-      'forbidden_entries': 0,
-    },
+    'runtime_console': runtimeConsole,
     'log_sha256': sha256.convert(logBytes).toString(),
     'checkpoint_count': screenshotEntries.length,
     'required_checkpoints': requiredCheckpoints,
@@ -219,6 +472,8 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
   required String runtime,
   required String target,
   required String deviceContract,
+  File? androidEgressReceipt,
+  String? androidEgressRunId,
   DateTime? generatedAt,
 }) {
   _expectSha256(expectedSourceDigest, 'expected source digest');
@@ -257,7 +512,7 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
 
   final logBytes = runtimeLog.readAsBytesSync();
   final log = utf8.decode(logBytes, allowMalformed: false);
-  _expectCleanRuntimeLog(log);
+  final runtimeConsole = _expectCleanRuntimeLog(log);
   final context = _parseRuntimeContextMarker(log);
   if (context['schema_version'] != 'manaloom_ui_runtime_context_v1') {
     throw const UiRuntimeEvidenceException(
@@ -288,6 +543,27 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
   if (!_runtimeTargetContractIsCoherent(target, deviceContract)) {
     throw UiRuntimeEvidenceException(
       'Runtime target $target contradicts its device contract.',
+    );
+  }
+  AndroidEgressReceiptVerification? androidEgress;
+  if (target == 'android_physical') {
+    if (androidEgressReceipt == null ||
+        androidEgressRunId == null ||
+        androidEgressRunId.trim().isEmpty) {
+      throw const UiRuntimeEvidenceException(
+        'Physical Android runtime requires a bound egress receipt and run ID.',
+      );
+    }
+    androidEgress = verifyAndroidEgressReceipt(
+      receiptFile: androidEgressReceipt,
+      runtimeLog: runtimeLog,
+      policyFile: File(
+        '$repoPath/app/test/ui/fixtures/ui_live_evidence_policy.json',
+      ),
+      expectedRunId: androidEgressRunId,
+      expectedSourceDigest: expectedSourceDigest,
+      expectedProfile: profile,
+      expectedTarget: target,
     );
   }
   final requiredCheckpoints = _stringList(
@@ -364,10 +640,9 @@ UiRuntimeExtractionResult indexUiRuntimeScreenshotDirectory({
     'runtime': runtime,
     'target': target,
     'device_contract': deviceContract,
-    'runtime_console': const <String, Object>{
-      'status': 'pass',
-      'forbidden_entries': 0,
-    },
+    'runtime_console': runtimeConsole,
+    if (androidEgress != null)
+      'android_network_egress': androidEgress.toManifestJson(),
     'log_sha256': sha256.convert(logBytes).toString(),
     'checkpoint_count': screenshotEntries.length,
     'required_checkpoints': requiredCheckpoints,
@@ -616,6 +891,30 @@ UiLiveEvidenceVerification verifyUiLiveEvidence({
             runtimeConsole['forbidden_entries'] == 0,
         'runtime console is not clean',
       );
+      if (target == 'android_physical') {
+        final androidEgress = _objectOrEmpty(capture['android_network_egress']);
+        final observedPidList = _integerList(androidEgress['observed_pids']);
+        final observedPids = observedPidList.toSet();
+        final uid = androidEgress['uid'];
+        final loopbackAttempts = androidEgress['loopback_attempts'];
+        expect(
+          androidEgress['status'] == 'pass' &&
+              androidEgress['receipt_schema'] ==
+                  'manaloom.android_ui_egress_receipt.v2' &&
+              _isSha256(androidEgress['receipt_sha256']?.toString() ?? '') &&
+              (androidEgress['run_id']?.toString().isNotEmpty ?? false) &&
+              androidEgress['package'] == 'com.mtgia.mtg_app' &&
+              uid is int &&
+              uid > 0 &&
+              androidEgress['external_or_unclassified_attempts'] == 0 &&
+              loopbackAttempts is int &&
+              loopbackAttempts >= 0 &&
+              observedPids.isNotEmpty &&
+              observedPidList.length == observedPids.length &&
+              observedPids.every((pid) => pid > 0),
+          'physical Android capture lacks a clean bound egress receipt',
+        );
+      }
 
       final profile = capture['profile']?.toString() ?? '';
       final surface = capture['surface']?.toString() ?? '';
@@ -1038,7 +1337,7 @@ _ParsedRuntimeLog _parseRuntimeLog(String log) {
   return _ParsedRuntimeLog(context: context, screenshots: completed);
 }
 
-void _expectCleanRuntimeLog(String log) {
+Map<String, Object> _expectCleanRuntimeLog(String log) {
   final forbidden = <String>[
     '══╡ EXCEPTION CAUGHT',
     'A RenderFlex overflowed',
@@ -1057,6 +1356,685 @@ void _expectCleanRuntimeLog(String log) {
       'Runtime console contains forbidden entries: ${findings.join(', ')}.',
     );
   }
+  return <String, Object>{
+    'status': 'pass',
+    'forbidden_entries': findings.length,
+    'derived_from_raw_log': true,
+  };
+}
+
+class _AndroidEgressWindow {
+  const _AndroidEgressWindow({required this.text, required this.loggedPids});
+
+  final String text;
+  final Set<int> loggedPids;
+}
+
+class _AndroidLogcatIdentity {
+  const _AndroidLogcatIdentity({required this.uid, required this.pid});
+
+  final int uid;
+  final int pid;
+}
+
+class _AndroidPidTraceAssessment {
+  const _AndroidPidTraceAssessment({
+    required this.sampledPids,
+    required this.samplesBeforeLaunch,
+    required this.samplesDuringJourney,
+    required this.drainSamples,
+    required this.drainAfterEndSamples,
+    required this.consecutiveZeroBeforeEnd,
+    required this.consecutiveZeroAfterEnd,
+    required this.samplerFailures,
+  });
+
+  final Set<int> sampledPids;
+  final int samplesBeforeLaunch;
+  final int samplesDuringJourney;
+  final int drainSamples;
+  final int drainAfterEndSamples;
+  final int consecutiveZeroBeforeEnd;
+  final int consecutiveZeroAfterEnd;
+  final int samplerFailures;
+}
+
+_AndroidEgressWindow _extractAndroidEgressWindow(
+  String nativeText, {
+  required String runId,
+  required int uid,
+}) {
+  final lines = const LineSplitter().convert(nativeText);
+  final begin = 'MANALOOM_ANDROID_EGRESS_BEGIN run_id=$runId uid=$uid';
+  final end = 'MANALOOM_ANDROID_EGRESS_END run_id=$runId uid=$uid';
+  final beginIndexes = <int>[];
+  final endIndexes = <int>[];
+  for (var index = 0; index < lines.length; index++) {
+    final line = lines[index];
+    if (line.contains('MANALOOM_ANDROID_EGRESS_BEGIN')) {
+      if (!line.contains(begin)) {
+        throw const UiRuntimeEvidenceException(
+          'Android native log contains a foreign BEGIN marker.',
+        );
+      }
+      beginIndexes.add(index);
+    }
+    if (line.contains('MANALOOM_ANDROID_EGRESS_END')) {
+      if (!line.contains(end)) {
+        throw const UiRuntimeEvidenceException(
+          'Android native log contains a foreign END marker.',
+        );
+      }
+      endIndexes.add(index);
+    }
+  }
+  if (beginIndexes.length != 1 ||
+      endIndexes.length != 1 ||
+      beginIndexes.single >= endIndexes.single) {
+    throw const UiRuntimeEvidenceException(
+      'Android native log markers must be unique and ordered.',
+    );
+  }
+  final windowLines = lines.sublist(beginIndexes.single, endIndexes.single + 1);
+  final loggedPids = <int>{};
+  for (final line in windowLines) {
+    if (line.trim().isEmpty || line.startsWith('--------- beginning of ')) {
+      continue;
+    }
+    final identity = _androidLogcatIdentity(line);
+    if (identity == null || identity.uid != uid) {
+      throw UiRuntimeEvidenceException(
+        'Android native log line is not attributable to the expected UID/PID: '
+        '$line',
+      );
+    }
+    loggedPids.add(identity.pid);
+  }
+  if (loggedPids.isEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'Android native log window has no attributable UID process.',
+    );
+  }
+  for (final line in lines.skip(endIndexes.single + 1)) {
+    if (_androidLogcatIdentity(line) != null) {
+      throw const UiRuntimeEvidenceException(
+        'Android native log contains an app UID event after END.',
+      );
+    }
+  }
+  return _AndroidEgressWindow(
+    text: '${windowLines.join('\n')}\n',
+    loggedPids: Set<int>.unmodifiable(loggedPids),
+  );
+}
+
+_AndroidLogcatIdentity? _androidLogcatIdentity(String line) {
+  final epochUid = RegExp(
+    r'^\s*\d+(?:\.\d+)?\s+(\d+)\s+(\d+)\s+\d+\s+[VDIWEFAS]\s+',
+  ).firstMatch(line);
+  if (epochUid != null) {
+    final uid = int.tryParse(epochUid.group(1)!);
+    final pid = int.tryParse(epochUid.group(2)!);
+    if (uid != null && pid != null) {
+      return _AndroidLogcatIdentity(uid: uid, pid: pid);
+    }
+  }
+  final threadtimeUid = RegExp(
+    r'^\s*\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+\s+(\d+)\s+'
+    r'(\d+)\s+\d+\s+[VDIWEFAS]\s+',
+  ).firstMatch(line);
+  if (threadtimeUid == null) return null;
+  final uid = int.tryParse(threadtimeUid.group(1)!);
+  final pid = int.tryParse(threadtimeUid.group(2)!);
+  return uid == null || pid == null
+      ? null
+      : _AndroidLogcatIdentity(uid: uid, pid: pid);
+}
+
+_AndroidPidTraceAssessment _parseAndroidPidTrace(
+  String trace, {
+  required int expectedUid,
+  required String expectedRunId,
+}) {
+  final sampledPids = <int>{};
+  var samplesBeforeLaunch = 0;
+  var samplesDuringJourney = 0;
+  var drainSamples = 0;
+  var drainAfterEndSamples = 0;
+  var consecutiveZeroBeforeEnd = 0;
+  var consecutiveZeroAfterEnd = 0;
+  var samplerFailures = 0;
+  var preLaunchClean = true;
+  for (final line in const LineSplitter().convert(trace)) {
+    if (line.trim().isEmpty) continue;
+    final fields = line.split('\t');
+    if (fields.length != 7 ||
+        !const {'sample', 'empty', 'error'}.contains(fields[0])) {
+      throw const UiRuntimeEvidenceException(
+        'Android PID trace contains a malformed row.',
+      );
+    }
+    final phase = fields[1];
+    final timestamp = int.tryParse(fields[2]);
+    final uid = int.tryParse(fields[3]);
+    final pid = int.tryParse(fields[4]);
+    if (timestamp == null ||
+        timestamp <= 0 ||
+        uid != expectedUid ||
+        pid == null ||
+        fields[6] != expectedRunId) {
+      throw const UiRuntimeEvidenceException(
+        'Android PID trace identity is malformed or cross-run.',
+      );
+    }
+    if (phase == 'pre_launch') {
+      samplesBeforeLaunch++;
+      if (fields[0] != 'empty') preLaunchClean = false;
+    }
+    if (phase == 'continuous') samplesDuringJourney++;
+    if (phase.startsWith('drain')) drainSamples++;
+    if (phase == 'drain_after_end') drainAfterEndSamples++;
+    if (fields[0] == 'error') {
+      samplerFailures++;
+      continue;
+    }
+    if (fields[0] == 'sample') {
+      if (pid <= 0 || fields[5].trim().isEmpty || fields[5] == '-') {
+        throw const UiRuntimeEvidenceException(
+          'Android PID trace sample is incomplete.',
+        );
+      }
+      sampledPids.add(pid);
+      if (phase == 'drain_before_end') consecutiveZeroBeforeEnd = 0;
+      if (phase == 'drain_after_end') consecutiveZeroAfterEnd = 0;
+    } else if (pid != 0) {
+      throw const UiRuntimeEvidenceException(
+        'Android PID trace empty row has a PID.',
+      );
+    } else {
+      if (phase == 'drain_before_end') consecutiveZeroBeforeEnd++;
+      if (phase == 'drain_after_end') consecutiveZeroAfterEnd++;
+    }
+  }
+  if (samplerFailures != 0 ||
+      samplesBeforeLaunch < 1 ||
+      samplesDuringJourney < 1 ||
+      drainSamples < 6 ||
+      drainAfterEndSamples < 3 ||
+      consecutiveZeroBeforeEnd < 3 ||
+      consecutiveZeroAfterEnd < 3 ||
+      !preLaunchClean ||
+      sampledPids.isEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'Android PID trace does not cover pre-launch, journey and final drain.',
+    );
+  }
+  return _AndroidPidTraceAssessment(
+    sampledPids: Set<int>.unmodifiable(sampledPids),
+    samplesBeforeLaunch: samplesBeforeLaunch,
+    samplesDuringJourney: samplesDuringJourney,
+    drainSamples: drainSamples,
+    drainAfterEndSamples: drainAfterEndSamples,
+    consecutiveZeroBeforeEnd: consecutiveZeroBeforeEnd,
+    consecutiveZeroAfterEnd: consecutiveZeroAfterEnd,
+    samplerFailures: samplerFailures,
+  );
+}
+
+Map<String, dynamic> _validateAndroidEgressReceiptEnvelope({
+  required File receiptFile,
+  required File runtimeLog,
+  required File nativeLog,
+  required File pidTrace,
+  required File policyFile,
+  required String expectedRunId,
+  required String expectedSourceDigest,
+  required String expectedProfile,
+  required String expectedTarget,
+  required bool requireTerminal,
+}) {
+  _expectSha256(expectedSourceDigest, 'expected Android egress source digest');
+  for (final entry in <String, File>{
+    'receipt': receiptFile,
+    'runtime log': runtimeLog,
+    'native log': nativeLog,
+    'PID trace': pidTrace,
+    'policy': policyFile,
+  }.entries) {
+    if (!entry.value.existsSync() ||
+        FileSystemEntity.typeSync(entry.value.path, followLinks: false) !=
+            FileSystemEntityType.file) {
+      throw UiRuntimeEvidenceException(
+        'Android egress ${entry.key} is missing, non-regular or a symlink.',
+      );
+    }
+  }
+
+  final receipt = _readJsonObject(receiptFile, 'Android egress receipt');
+  final policy = _readJsonObject(policyFile, 'UI live evidence policy');
+  final contract = _objectOrEmpty(policy['android_physical_egress']);
+  final expectedSchema = contract['receipt_schema']?.toString() ?? '';
+  final expectedPackage = contract['package']?.toString() ?? '';
+  if (expectedSchema != 'manaloom.android_ui_egress_receipt.v2' ||
+      expectedPackage.isEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'UI policy does not define the governed Android egress v2 contract.',
+    );
+  }
+  if (receipt['schema_version'] != expectedSchema ||
+      receipt['run_id'] != expectedRunId ||
+      receipt['source_digest'] != expectedSourceDigest ||
+      receipt['profile'] != expectedProfile ||
+      receipt['target'] != expectedTarget) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt identity is stale or cross-run.',
+    );
+  }
+  if (!RegExp(r'^[A-Za-z0-9][A-Za-z0-9._-]{7,127}$').hasMatch(expectedRunId)) {
+    throw const UiRuntimeEvidenceException('Android egress run ID is invalid.');
+  }
+  if (requireTerminal && receipt['status'] != 'PASS_ANDROID_EGRESS') {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt is not terminal PASS.',
+    );
+  }
+  if (!requireTerminal && receipt['status'] != 'PENDING_DERIVED_ASSESSMENT') {
+    throw const UiRuntimeEvidenceException(
+      'Android egress candidate receipt has an invalid status.',
+    );
+  }
+
+  final runRootValue = receipt['run_root']?.toString() ?? '';
+  if (!File(runRootValue).isAbsolute) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt run_root must be absolute.',
+    );
+  }
+  final runRoot = Directory(runRootValue);
+  if (!runRoot.existsSync() ||
+      FileSystemEntity.typeSync(runRoot.path, followLinks: false) !=
+          FileSystemEntityType.directory) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt run_root is missing or unsafe.',
+    );
+  }
+  final resolvedRoot = runRoot.resolveSymbolicLinksSync();
+  final artifacts = _objectOrEmpty(receipt['artifacts']);
+  final stateFiles = <String, File>{
+    'state_before_path': File(artifacts['state_before_path']?.toString() ?? ''),
+    'state_isolated_path': File(
+      artifacts['state_isolated_path']?.toString() ?? '',
+    ),
+    'state_after_path': File(artifacts['state_after_path']?.toString() ?? ''),
+  };
+  for (final file in [
+    receiptFile,
+    runtimeLog,
+    nativeLog,
+    pidTrace,
+    ...stateFiles.values,
+  ]) {
+    if (!file.isAbsolute ||
+        !file.existsSync() ||
+        FileSystemEntity.typeSync(file.path, followLinks: false) !=
+            FileSystemEntityType.file) {
+      throw const UiRuntimeEvidenceException(
+        'Android egress artifact is missing or unsafe.',
+      );
+    }
+    final resolved = file.resolveSymbolicLinksSync();
+    if (resolved != resolvedRoot &&
+        !resolved.startsWith('$resolvedRoot${Platform.pathSeparator}')) {
+      throw const UiRuntimeEvidenceException(
+        'Android egress artifact escapes its canonical run root.',
+      );
+    }
+  }
+  if (artifacts['native_log_path'] != nativeLog.absolute.path ||
+      artifacts['pid_trace_path'] != pidTrace.absolute.path) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress log or PID trace path is cross-run.',
+    );
+  }
+
+  final identity = _objectOrEmpty(receipt['identity']);
+  final uid = identity['uid'];
+  final sampledPids = _integerList(identity['sampled_pids']);
+  if (identity['package'] != expectedPackage ||
+      (identity['serial']?.toString().isEmpty ?? true) ||
+      (identity['model']?.toString().isEmpty ?? true) ||
+      (identity['api'] is! int) ||
+      (uid is! int) ||
+      uid <= 0 ||
+      sampledPids.isEmpty ||
+      sampledPids.any((pid) => pid <= 0) ||
+      sampledPids.toSet().length != sampledPids.length) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt package/UID/PID/device identity is invalid.',
+    );
+  }
+  final window = _extractAndroidEgressWindow(
+    nativeLog.readAsStringSync(),
+    runId: expectedRunId,
+    uid: uid,
+  );
+  final pidAssessment = _parseAndroidPidTrace(
+    pidTrace.readAsStringSync(),
+    expectedUid: uid,
+    expectedRunId: expectedRunId,
+  );
+  if (!_sameIntSet(sampledPids.toSet(), pidAssessment.sampledPids)) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt sampled PID set is not derived from the trace.',
+    );
+  }
+  final derivedObserved = <int>{
+    ...pidAssessment.sampledPids,
+    ...window.loggedPids,
+  };
+  final loggedPidList = _integerList(identity['logged_pids']);
+  final observedPidList = _integerList(identity['observed_pids']);
+  final loggedPids = loggedPidList.toSet();
+  final observedPids = observedPidList.toSet();
+  if (requireTerminal) {
+    if (loggedPidList.length != loggedPids.length ||
+        observedPidList.length != observedPids.length ||
+        !_sameIntSet(loggedPids, window.loggedPids) ||
+        !_sameIntSet(observedPids, derivedObserved)) {
+      throw const UiRuntimeEvidenceException(
+        'Android egress terminal PID coverage is not derived from raw artifacts.',
+      );
+    }
+  } else if (loggedPids.isNotEmpty || observedPids.isNotEmpty) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress candidate must not predeclare derived PID coverage.',
+    );
+  }
+
+  final detector = _objectOrEmpty(receipt['detector']);
+  final appData = _objectOrEmpty(receipt['app_data']);
+  final network = _objectOrEmpty(receipt['network']);
+  final presentation = _objectOrEmpty(receipt['presentation']);
+  final cleanup = _objectOrEmpty(receipt['cleanup']);
+  final requiredTrue = <Object?>[
+    detector['logcat_started_before_begin'],
+    detector['begin_before_child'],
+    detector['end_after_force_stop_and_drain'],
+    detector['sampler_started_before_launch'],
+    detector['all_uid_pids_enumerated'],
+    appData['pre_launch_clean'],
+    appData['post_run_clean'],
+    appData['datatransport_store_absent'],
+    network['snapshot_complete'],
+    network['isolation_confirmed'],
+    network['adb_usb_preserved'],
+    network['reverse_loopback_only'],
+    network['restored_exactly'],
+    presentation['snapshot_complete'],
+    presentation['rotation_and_immersive_restored_exactly'],
+    cleanup['state_dir_absent'],
+  ];
+  if (requiredTrue.any((value) => value != true) ||
+      detector['temporal_anchor'] != '-T 1' ||
+      detector['log_format'] != 'epoch_uid' ||
+      detector['begin_marker_count'] != 1 ||
+      detector['end_marker_count'] != 1 ||
+      detector['sampler_failures'] != pidAssessment.samplerFailures ||
+      detector['samples_before_launch'] != pidAssessment.samplesBeforeLaunch ||
+      detector['samples_during_journey'] !=
+          pidAssessment.samplesDuringJourney ||
+      detector['drain_samples'] != pidAssessment.drainSamples ||
+      detector['consecutive_zero_samples_before_end'] !=
+          pidAssessment.consecutiveZeroBeforeEnd ||
+      detector['consecutive_zero_samples_after_end'] !=
+          pidAssessment.consecutiveZeroAfterEnd ||
+      cleanup['app_processes'] != 0 ||
+      cleanup['sampler_processes'] != 0 ||
+      cleanup['logcat_processes'] != 0 ||
+      cleanup['external_routes'] != 0 ||
+      cleanup['restore_failures'] != 0 ||
+      cleanup['guard_processes'] != 0) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt does not prove detector coverage and cleanup.',
+    );
+  }
+
+  final stateHashes = <String, String>{
+    for (final entry in stateFiles.entries)
+      entry.key: sha256.convert(entry.value.readAsBytesSync()).toString(),
+  };
+  if (presentation['before_sha256'] != stateHashes['state_before_path'] ||
+      presentation['isolated_sha256'] != stateHashes['state_isolated_path'] ||
+      presentation['restored_sha256'] != stateHashes['state_after_path'] ||
+      stateHashes['state_before_path'] != stateHashes['state_after_path']) {
+    throw const UiRuntimeEvidenceException(
+      'Android presentation/network state was not restored byte-exactly.',
+    );
+  }
+  _validateAndroidStateArtifacts(
+    beforeFile: stateFiles['state_before_path']!,
+    isolatedFile: stateFiles['state_isolated_path']!,
+    afterFile: stateFiles['state_after_path']!,
+    identity: identity,
+    receiptNetwork: network,
+  );
+
+  if (requireTerminal) {
+    final expectedHashes = <String, String>{
+      'runtime_log_sha256': sha256
+          .convert(runtimeLog.readAsBytesSync())
+          .toString(),
+      'native_log_sha256': sha256
+          .convert(nativeLog.readAsBytesSync())
+          .toString(),
+      'native_window_sha256': sha256
+          .convert(utf8.encode(window.text))
+          .toString(),
+      'pid_trace_sha256': sha256.convert(pidTrace.readAsBytesSync()).toString(),
+      'policy_sha256': sha256.convert(policyFile.readAsBytesSync()).toString(),
+    };
+    for (final entry in expectedHashes.entries) {
+      if (artifacts[entry.key] != entry.value) {
+        throw UiRuntimeEvidenceException(
+          'Android egress receipt ${entry.key} hash is stale.',
+        );
+      }
+    }
+  }
+  return receipt;
+}
+
+void _validateAndroidStateArtifacts({
+  required File beforeFile,
+  required File isolatedFile,
+  required File afterFile,
+  required Map<String, dynamic> identity,
+  required Map<String, dynamic> receiptNetwork,
+}) {
+  final before = _readJsonObject(beforeFile, 'Android state before');
+  final isolated = _readJsonObject(isolatedFile, 'Android state isolated');
+  final after = _readJsonObject(afterFile, 'Android state after');
+  final beforeNetwork = _objectOrEmpty(before['network']);
+  final isolatedNetwork = _objectOrEmpty(isolated['network']);
+  final afterNetwork = _objectOrEmpty(after['network']);
+  final isolatedPresentation = _objectOrEmpty(isolated['presentation']);
+  final serial = identity['serial']?.toString() ?? '';
+  final apiPort = receiptNetwork['api_port'];
+  final webPort = receiptNetwork['web_port'];
+  if (serial.isEmpty ||
+      apiPort is! int ||
+      webPort is! int ||
+      apiPort <= 0 ||
+      apiPort >= 65536 ||
+      webPort <= 0 ||
+      webPort >= 65536 ||
+      apiPort == webPort) {
+    throw const UiRuntimeEvidenceException(
+      'Android isolation receipt ports or serial are invalid.',
+    );
+  }
+
+  for (final entry in <String, Map<String, dynamic>>{
+    'before': beforeNetwork,
+    'isolated': isolatedNetwork,
+    'after': afterNetwork,
+  }.entries) {
+    _validateAndroidStateInventoryHashes(entry.value, entry.key);
+  }
+  if (beforeFile.readAsBytesSync().toString() !=
+      afterFile.readAsBytesSync().toString()) {
+    throw const UiRuntimeEvidenceException(
+      'Android before/after state artifacts differ.',
+    );
+  }
+  if (_stringList(
+        beforeNetwork['adb_reverse'],
+        'before adb_reverse',
+      ).isNotEmpty ||
+      _stringList(
+        afterNetwork['adb_reverse'],
+        'after adb_reverse',
+      ).isNotEmpty ||
+      isolatedNetwork['wifi_on'] != '0' ||
+      isolatedNetwork['mobile_data'] != '0' ||
+      isolatedNetwork['airplane_mode_on'] !=
+          beforeNetwork['airplane_mode_on']) {
+    throw const UiRuntimeEvidenceException(
+      'Android isolated network state is not canonical.',
+    );
+  }
+
+  final expectedReverse = <String>[
+    '$serial tcp:$apiPort tcp:$apiPort',
+    '$serial tcp:$webPort tcp:$webPort',
+  ]..sort();
+  final actualReverse = _stringList(
+    isolatedNetwork['adb_reverse'],
+    'isolated adb_reverse',
+  );
+  if (!_sameStringList(actualReverse, expectedReverse)) {
+    throw const UiRuntimeEvidenceException(
+      'Android isolated ADB reverse mappings are not the exact loopback set.',
+    );
+  }
+  for (final key in const ['routes4', 'routes6']) {
+    final routes = _stringList(isolatedNetwork[key], 'isolated $key');
+    if (routes.any((route) => RegExp(r'(^|\s)default(\s|$)').hasMatch(route))) {
+      throw const UiRuntimeEvidenceException(
+        'Android isolated state still contains an external default route.',
+      );
+    }
+  }
+  const isolatedConnectivity = <String>[
+    'cellular_connected=0',
+    'vpn_connected=0',
+    'wifi_connected=0',
+  ];
+  if (!_sameStringList(isolatedNetwork['connectivity'], isolatedConnectivity) ||
+      !_androidConnectivitySnapshotIsCanonical(beforeNetwork['connectivity']) ||
+      !_androidConnectivitySnapshotIsCanonical(afterNetwork['connectivity'])) {
+    throw const UiRuntimeEvidenceException(
+      'Android connectivity snapshot is incomplete or not isolated.',
+    );
+  }
+
+  final accel = _objectOrEmpty(isolatedPresentation['accelerometer_rotation']);
+  final user = _objectOrEmpty(isolatedPresentation['user_rotation']);
+  final immersive = _objectOrEmpty(
+    isolatedPresentation['immersive_mode_confirmations'],
+  );
+  if (accel['present'] != true ||
+      accel['value'] != '0' ||
+      user['present'] != true ||
+      user['value'] != '0' ||
+      immersive['present'] != true ||
+      immersive['value'] != 'confirmed') {
+    throw const UiRuntimeEvidenceException(
+      'Android isolated rotation or immersive state is not canonical.',
+    );
+  }
+}
+
+void _validateAndroidStateInventoryHashes(
+  Map<String, dynamic> network,
+  String label,
+) {
+  for (final key in const [
+    'adb_reverse',
+    'routes4',
+    'routes6',
+    'connectivity',
+  ]) {
+    final lines = _stringList(network[key], '$label $key');
+    final bytes = utf8.encode(lines.isEmpty ? '' : '${lines.join('\n')}\n');
+    final expected = sha256.convert(bytes).toString();
+    if (network['${key == 'adb_reverse' ? 'reverse' : key}_sha256'] !=
+        expected) {
+      throw UiRuntimeEvidenceException(
+        'Android $label $key inventory hash is inconsistent.',
+      );
+    }
+  }
+}
+
+bool _androidConnectivitySnapshotIsCanonical(Object? value) {
+  if (value is! List || value.any((entry) => entry is! String)) return false;
+  final lines = value.cast<String>();
+  if (lines.length != 3 ||
+      !lines[0].startsWith('cellular_connected=') ||
+      !lines[1].startsWith('vpn_connected=') ||
+      !lines[2].startsWith('wifi_connected=')) {
+    return false;
+  }
+  if (lines.any((line) => !RegExp(r'^[a-z_]+=[01]$').hasMatch(line))) {
+    return false;
+  }
+  return lines[1] == 'vpn_connected=0';
+}
+
+Set<String> _androidLoopbackHosts(File policyFile) {
+  final policy = _readJsonObject(policyFile, 'UI live evidence policy');
+  final contract = _objectOrEmpty(policy['android_physical_egress']);
+  final hosts = _stringList(
+    contract['allowed_loopback_hosts'],
+    'android_physical_egress.allowed_loopback_hosts',
+  ).map((host) => host.toLowerCase()).toSet();
+  if (!_sameSet(hosts, const {'127.0.0.1', 'localhost', '::1'})) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress loopback policy is not the canonical exact set.',
+    );
+  }
+  return hosts;
+}
+
+List<int> _integerList(Object? value) {
+  if (value is! List) return const [];
+  return value.whereType<int>().toList(growable: false);
+}
+
+bool _sameStringList(Object? value, List<String> expected) {
+  if (value is! List || value.any((entry) => entry is! String)) return false;
+  final actual = value.cast<String>();
+  return actual.length == expected.length &&
+      List<int>.generate(
+        actual.length,
+        (index) => index,
+      ).every((index) => actual[index] == expected[index]);
+}
+
+void _writeJsonAtomically(File file, Object value) {
+  file.parent.createSync(recursive: true);
+  final temporary = File('${file.path}.tmp.$pid');
+  if (temporary.existsSync() ||
+      FileSystemEntity.typeSync(temporary.path, followLinks: false) ==
+          FileSystemEntityType.link) {
+    throw const UiRuntimeEvidenceException(
+      'Android egress receipt temporary path already exists.',
+    );
+  }
+  final encoded = const JsonEncoder.withIndent('  ').convert(value);
+  temporary.writeAsStringSync('$encoded\n', flush: true);
+  temporary.renameSync(file.path);
 }
 
 Map<String, dynamic> _readJsonObject(File file, String label) {
@@ -1133,6 +2111,9 @@ bool _isSha256(String value) => RegExp(r'^[0-9a-f]{64}$').hasMatch(value);
 bool _sameSet(Set<String> left, Set<String> right) =>
     left.length == right.length && left.containsAll(right);
 
+bool _sameIntSet(Set<int> left, Set<int> right) =>
+    left.length == right.length && left.containsAll(right);
+
 bool _hasIsoTimestamp(Object? value) {
   final parsed = DateTime.tryParse(value?.toString() ?? '');
   return parsed != null && value.toString().contains('T');
@@ -1155,7 +2136,17 @@ Never _usage([String? message]) {
     '--repo-root <dir> --screenshots <relative-dir> --log <file> '
     '--manifest <relative-json> --source-digest <sha256> '
     '--surface <id> --profile <id> --runtime <id> --target <id> '
-    '--device-contract <text>\n'
+    '--device-contract <text> [--android-egress-receipt <json> '
+    '--android-egress-run-id <id>]\n'
+    '  dart run tool/ui_runtime_evidence.dart seal-android-egress-receipt '
+    '--receipt <json> --runtime-log <file> --native-log <file> '
+    '--pid-trace <tsv> '
+    '--policy <json> --run-id <id> --source-digest <sha256> '
+    '--profile <id> --target android_physical\n'
+    '  dart run tool/ui_runtime_evidence.dart verify-android-egress-receipt '
+    '--receipt <json> --runtime-log <file> --policy <json> '
+    '--run-id <id> --source-digest <sha256> --profile <id> '
+    '--target android_physical\n'
     '  dart run tool/ui_runtime_evidence.dart validate-directory '
     '--screenshots <directory>\n'
     '  dart run tool/ui_runtime_evidence.dart verify '
@@ -1203,6 +2194,69 @@ void main(List<String> args) {
     return;
   }
 
+  if (command == 'seal-android-egress-receipt' ||
+      command == 'verify-android-egress-receipt') {
+    final receiptPath = values['--receipt'];
+    final runtimeLogPath = values['--runtime-log'];
+    final nativeLogPath = values['--native-log'];
+    final pidTracePath = values['--pid-trace'];
+    final policyPath = values['--policy'];
+    final runId = values['--run-id'];
+    final sourceDigest = values['--source-digest'];
+    final profile = values['--profile'];
+    final target = values['--target'];
+    if (<String?>[
+          receiptPath,
+          runtimeLogPath,
+          policyPath,
+          runId,
+          sourceDigest,
+          profile,
+          target,
+        ].any((value) => value == null || value.trim().isEmpty) ||
+        (command == 'seal-android-egress-receipt' &&
+            (nativeLogPath == null ||
+                nativeLogPath.trim().isEmpty ||
+                pidTracePath == null ||
+                pidTracePath.trim().isEmpty))) {
+      _usage('$command is missing a required argument');
+    }
+    try {
+      final result = command == 'seal-android-egress-receipt'
+          ? sealAndroidEgressReceipt(
+              receiptFile: File(receiptPath!),
+              runtimeLog: File(runtimeLogPath!),
+              nativeLog: File(nativeLogPath!),
+              pidTrace: File(pidTracePath!),
+              policyFile: File(policyPath!),
+              expectedRunId: runId!,
+              expectedSourceDigest: sourceDigest!,
+              expectedProfile: profile!,
+              expectedTarget: target!,
+            )
+          : verifyAndroidEgressReceipt(
+              receiptFile: File(receiptPath!),
+              runtimeLog: File(runtimeLogPath!),
+              policyFile: File(policyPath!),
+              expectedRunId: runId!,
+              expectedSourceDigest: sourceDigest!,
+              expectedProfile: profile!,
+              expectedTarget: target!,
+            );
+      stdout.writeln(
+        const JsonEncoder.withIndent('  ').convert(<String, Object>{
+          'status': 'PASS_ANDROID_EGRESS',
+          'receipt_sha256': result.receiptSha256,
+          'run_id': result.receipt['run_id']!.toString(),
+        }),
+      );
+    } on Object catch (error) {
+      stderr.writeln(error);
+      exitCode = 1;
+    }
+    return;
+  }
+
   final repoRootPath = values['--repo-root'];
   final sourceDigest = values['--source-digest'];
   if (repoRootPath == null || sourceDigest == null) _usage();
@@ -1238,6 +2292,8 @@ void main(List<String> args) {
       final runtime = values['--runtime'];
       final target = values['--target'];
       final deviceContract = values['--device-contract'];
+      final androidEgressReceipt = values['--android-egress-receipt'];
+      final androidEgressRunId = values['--android-egress-run-id'];
       if (<String?>[
         screenshotPath,
         logPath,
@@ -1264,6 +2320,10 @@ void main(List<String> args) {
         runtime: runtime!,
         target: target!,
         deviceContract: deviceContract!,
+        androidEgressReceipt: androidEgressReceipt == null
+            ? null
+            : File(androidEgressReceipt),
+        androidEgressRunId: androidEgressRunId,
       );
       stdout.writeln(
         const JsonEncoder.withIndent('  ').convert(<String, Object>{

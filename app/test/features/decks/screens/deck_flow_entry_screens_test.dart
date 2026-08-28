@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
 import 'package:manaloom/features/decks/screens/deck_generate_screen.dart';
@@ -13,6 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../ui/support/manaloom_ui_audit_harness.dart';
 
 class _FakeApiClient extends ApiClient {
+  _FakeApiClient({this.commanderLearningAvailability});
+
+  final Future<ApiResponse> Function()? commanderLearningAvailability;
   final getCalls = <String>[];
   final postCalls = <String>[];
   final deleteCalls = <String>[];
@@ -22,6 +28,8 @@ class _FakeApiClient extends ApiClient {
   Future<ApiResponse> get(String endpoint) async {
     getCalls.add(endpoint);
     if (endpoint == '/ai/commander-learning') {
+      final override = commanderLearningAvailability;
+      if (override != null) return override();
       return ApiResponse(200, {
         'available': true,
         'count': 1,
@@ -211,9 +219,10 @@ void main() {
   Widget wrapSimple(
     Widget child, {
     DeckProvider? deckProvider,
+    Iterable<ReleaseCapability>? allowedCapabilities,
     double textScale = 1,
   }) {
-    final app = MaterialApp(
+    Widget app = MaterialApp(
       theme: AppTheme.darkTheme.copyWith(
         splashFactory: InkRipple.splashFactory,
       ),
@@ -225,18 +234,27 @@ void main() {
       ),
       home: child,
     );
-    if (deckProvider == null) return app;
-    return ChangeNotifierProvider<DeckProvider>.value(
-      value: deckProvider,
-      child: app,
-    );
+    if (deckProvider != null) {
+      app = ChangeNotifierProvider<DeckProvider>.value(
+        value: deckProvider,
+        child: app,
+      );
+    }
+    if (allowedCapabilities != null) {
+      app = ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+        create: (_) => ReleaseCapabilitiesProvider.seeded(allowedCapabilities),
+        child: app,
+      );
+    }
+    return app;
   }
 
   Widget wrapWithRouter(
     DeckProvider deckProvider, {
+    Iterable<ReleaseCapability>? allowedCapabilities,
     Future<bool> Function(String format)? onOnboardingTaskCompleted,
   }) {
-    return MaterialApp.router(
+    Widget app = MaterialApp.router(
       theme: AppTheme.darkTheme.copyWith(
         splashFactory: InkRipple.splashFactory,
       ),
@@ -266,6 +284,13 @@ void main() {
         ],
       ),
     );
+    if (allowedCapabilities != null) {
+      app = ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+        create: (_) => ReleaseCapabilitiesProvider.seeded(allowedCapabilities),
+        child: app,
+      );
+    }
+    return app;
   }
 
   Widget wrapImportWithRouter(
@@ -484,6 +509,100 @@ void main() {
     },
   );
 
+  testWidgets('DeckGenerateScreen não lê aprendizado com learning_reads OFF', (
+    tester,
+  ) async {
+    final apiClient = _FakeApiClient();
+    await tester.pumpWidget(
+      wrapSimple(
+        const DeckGenerateScreen(),
+        deckProvider: DeckProvider(apiClient: apiClient),
+        allowedCapabilities: const {ReleaseCapability.aiGenerateRebuild},
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      apiClient.getCalls.where(
+        (call) => call.startsWith('/ai/commander-learning'),
+      ),
+      isEmpty,
+    );
+
+    await tester.enterText(
+      find.byKey(const Key('deck-generate-commander-field')),
+      'Lorehold, the Historian',
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(const Key('deck-generate-learned-deck-button')),
+      findsNothing,
+    );
+    expect(
+      apiClient.getCalls.where(
+        (call) => call.startsWith('/ai/commander-learning'),
+      ),
+      isEmpty,
+    );
+  });
+
+  testWidgets(
+    'DeckGenerateScreen descarta GET quando learning_reads é revogada em voo',
+    (tester) async {
+      final availability = Completer<ApiResponse>();
+      final apiClient = _FakeApiClient(
+        commanderLearningAvailability: () => availability.future,
+      );
+      await tester.pumpWidget(
+        wrapSimple(
+          const DeckGenerateScreen(),
+          deckProvider: DeckProvider(apiClient: apiClient),
+          allowedCapabilities: const {ReleaseCapability.learningReads},
+        ),
+      );
+      await tester.pump();
+
+      expect(apiClient.getCalls, contains('/ai/commander-learning'));
+      final releaseCapabilities = Provider.of<ReleaseCapabilitiesProvider>(
+        tester.element(find.byType(DeckGenerateScreen)),
+        listen: false,
+      );
+      releaseCapabilities.reset();
+      availability.complete(
+        ApiResponse(200, {
+          'available': true,
+          'count': 1,
+          'commanders': const [
+            {
+              'commander': 'Lorehold, the Historian',
+              'source_ref': 'learned_deck:82',
+              'score': 136.5,
+              'legal_status': 'commander_legal',
+            },
+          ],
+        }),
+      );
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('deck-generate-commander-field')),
+        'Lorehold, the Historian',
+      );
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('deck-generate-learned-deck-button')),
+        findsNothing,
+      );
+      expect(
+        apiClient.getCalls.where(
+          (call) => call.startsWith('/ai/commander-learning'),
+        ),
+        hasLength(1),
+      );
+    },
+  );
+
   testWidgets(
     'DeckGenerateScreen mostra atalho de deck aprendido em Commander',
     (tester) async {
@@ -492,6 +611,7 @@ void main() {
         wrapSimple(
           const DeckGenerateScreen(),
           deckProvider: DeckProvider(apiClient: apiClient),
+          allowedCapabilities: const {ReleaseCapability.learningReads},
         ),
       );
       await tester.pump();
@@ -880,6 +1000,7 @@ void main() {
       await tester.pumpWidget(
         wrapWithRouter(
           DeckProvider(apiClient: apiClient),
+          allowedCapabilities: const {ReleaseCapability.learningReads},
           onOnboardingTaskCompleted: (format) async {
             completedFormats.add(format);
             return true;

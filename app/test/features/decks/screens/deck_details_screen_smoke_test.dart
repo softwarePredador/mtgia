@@ -194,6 +194,8 @@ Future<GoRouter> _pumpScreen(
   WidgetTester tester, {
   required ApiClient apiClient,
   required DeckProvider provider,
+  ReleaseCapabilitiesProvider? releaseCapabilities,
+  Iterable<ReleaseCapability> allowedCapabilities = ReleaseCapability.values,
 }) async {
   final router = GoRouter(
     initialLocation: '/decks/deck-1',
@@ -206,12 +208,17 @@ Future<GoRouter> _pumpScreen(
     ],
   );
   addTearDown(router.dispose);
+  final effectiveReleaseCapabilities =
+      releaseCapabilities ??
+      ReleaseCapabilitiesProvider.seeded(allowedCapabilities);
+  if (releaseCapabilities == null) {
+    addTearDown(effectiveReleaseCapabilities.dispose);
+  }
   await tester.pumpWidget(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) =>
-              ReleaseCapabilitiesProvider.seeded(ReleaseCapability.values),
+        ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+          value: effectiveReleaseCapabilities,
         ),
         ChangeNotifierProvider<DeckProvider>.value(value: provider),
         ChangeNotifierProvider<CardProvider>(
@@ -478,6 +485,173 @@ void main() {
         ),
         findsOneWidget,
       );
+    },
+  );
+
+  testWidgets(
+    'direct deck deep link hides replace-all surfaces when capability is OFF',
+    (tester) async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(200, {
+            'id': 'deck-1',
+            'name': 'Novo Deck',
+            'format': 'commander',
+            'description': null,
+            'archetype': null,
+            'is_public': false,
+            'created_at': '2026-03-25T00:00:00.000Z',
+            'color_identity': const <String>[],
+            'stats': const {'total_cards': 0},
+            'commander': const <Map<String, dynamic>>[],
+            'main_board': const <String, dynamic>{},
+          }),
+        },
+      );
+
+      final provider = DeckProvider(apiClient: apiClient);
+      final router = await _pumpScreen(
+        tester,
+        apiClient: apiClient,
+        provider: provider,
+        allowedCapabilities: const {ReleaseCapability.decksPrivate},
+      );
+      await tester.pumpAndSettle();
+
+      expect(router.routeInformationProvider.value.uri.path, '/decks/deck-1');
+      expect(find.text('Colar lista'), findsNothing);
+      await tester.tap(find.byKey(const Key('deck-details-menu')));
+      await tester.pumpAndSettle();
+      expect(find.text('Colar lista de cartas'), findsNothing);
+      expect(apiClient.postCalls, isEmpty);
+    },
+  );
+
+  testWidgets(
+    'deck replace-all capability permits import from the direct deck route',
+    (tester) async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(200, {
+            'id': 'deck-1',
+            'name': 'Novo Deck',
+            'format': 'commander',
+            'description': null,
+            'archetype': null,
+            'is_public': false,
+            'created_at': '2026-03-25T00:00:00.000Z',
+            'color_identity': const <String>[],
+            'stats': const {'total_cards': 0},
+            'commander': const <Map<String, dynamic>>[],
+            'main_board': const <String, dynamic>{},
+          }),
+        },
+        postHandlers: {
+          '/import/to-deck': (_) =>
+              ApiResponse(200, const {'success': true, 'cards_imported': 1}),
+        },
+      );
+      final provider = DeckProvider(apiClient: apiClient);
+      await _pumpScreen(
+        tester,
+        apiClient: apiClient,
+        provider: provider,
+        allowedCapabilities: const {
+          ReleaseCapability.decksPrivate,
+          ReleaseCapability.deckReplaceAll,
+        },
+      );
+      await tester.pumpAndSettle();
+
+      final importButton = find.byKey(
+        const Key('deck-details-empty-import-list'),
+      );
+      expect(importButton, findsOneWidget);
+      await tester.ensureVisible(importButton);
+      await tester.tap(importButton);
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-replace-switch')),
+      );
+      await tester.enterText(
+        find.byKey(const Key('deck-import-list-dialog-field')),
+        '1 Sol Ring',
+      );
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(apiClient.postCalls, contains('/import/to-deck'));
+      expect(
+        apiClient.postBodies.single,
+        equals({
+          'deck_id': 'deck-1',
+          'list': '1 Sol Ring',
+          'replace_all': true,
+        }),
+      );
+      expect(find.byKey(const Key('deck-import-list-dialog')), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'revoking deck replace-all while its dialog is open blocks the API call',
+    (tester) async {
+      final apiClient = _FakeApiClient(
+        getHandlers: {
+          '/decks/deck-1': () => ApiResponse(200, {
+            'id': 'deck-1',
+            'name': 'Novo Deck',
+            'format': 'commander',
+            'description': null,
+            'archetype': null,
+            'is_public': false,
+            'created_at': '2026-03-25T00:00:00.000Z',
+            'color_identity': const <String>[],
+            'stats': const {'total_cards': 0},
+            'commander': const <Map<String, dynamic>>[],
+            'main_board': const <String, dynamic>{},
+          }),
+        },
+        postHandlers: {
+          '/import/to-deck': (_) =>
+              ApiResponse(200, const {'success': true, 'cards_imported': 1}),
+        },
+      );
+      final releaseCapabilities = ReleaseCapabilitiesProvider.seeded(const {
+        ReleaseCapability.decksPrivate,
+        ReleaseCapability.deckReplaceAll,
+      });
+      addTearDown(releaseCapabilities.dispose);
+      final provider = DeckProvider(apiClient: apiClient);
+      await _pumpScreen(
+        tester,
+        apiClient: apiClient,
+        provider: provider,
+        releaseCapabilities: releaseCapabilities,
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('deck-details-menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Colar lista de cartas'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('deck-import-list-dialog')), findsOneWidget);
+
+      releaseCapabilities.reset();
+      await tester.pump();
+      await tester.enterText(
+        find.byKey(const Key('deck-import-list-dialog-field')),
+        '1 Sol Ring',
+      );
+      await tester.tap(
+        find.byKey(const Key('deck-import-list-dialog-submit-button')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(apiClient.postCalls, isEmpty);
+      expect(find.text('Ação indisponível nesta versão.'), findsOneWidget);
     },
   );
 

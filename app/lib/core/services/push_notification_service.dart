@@ -8,10 +8,18 @@ import 'package:flutter/material.dart';
 import '../../firebase_options.dart';
 import '../api/api_client.dart';
 
+const _disablePushInitialization = bool.fromEnvironment(
+  'DISABLE_PUSH_INIT',
+  defaultValue: false,
+);
+
 /// Handler de background — precisa ser top-level function.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (kIsWeb) {
+  if (!PushNotificationService.initializationIsAllowed(
+    isWeb: kIsWeb,
+    disabledByBuild: _disablePushInitialization,
+  )) {
     return;
   }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -34,6 +42,14 @@ class PushNotificationService {
   static void reset() {
     _instance = PushNotificationService._internal();
   }
+
+  /// Mantém o comportamento release por padrão e fecha qualquer entrada
+  /// tardia de Firebase/push no artefato governado de captura.
+  @visibleForTesting
+  static bool initializationIsAllowed({
+    required bool isWeb,
+    required bool disabledByBuild,
+  }) => !isWeb && !disabledByBuild;
 
   final _api = ApiClient();
   FirebaseMessaging? _messaging;
@@ -75,9 +91,12 @@ class PushNotificationService {
 
   Future<void> _initInternal() async {
     try {
-      if (kIsWeb) {
+      if (!initializationIsAllowed(
+        isWeb: kIsWeb,
+        disabledByBuild: _disablePushInitialization,
+      )) {
         debugPrint(
-          '[Push] Web detectado: push Firebase desabilitado neste build.',
+          '[Push] Inicialização Firebase/push desabilitada neste build.',
         );
         return;
       }

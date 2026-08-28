@@ -1761,8 +1761,13 @@ class ProjectLogicGenerator {
     ],
     (file) {
       final name = p.basename(file.path);
+      final relative = _relative(file);
       if (name.startsWith('test_') || name.endsWith('_test.py')) {
         return false;
+      }
+      if (relative ==
+          'scripts/lib/manaloom_gradle_dynamic_selector_pins.init.gradle') {
+        return true;
       }
       return name.endsWith('.sh') ||
           name.endsWith('.py') ||
@@ -1779,6 +1784,7 @@ class ProjectLogicGenerator {
       '.java',
       '.js',
       '.json',
+      '.kt',
       '.kts',
       '.m',
       '.mm',
@@ -1794,6 +1800,9 @@ class ProjectLogicGenerator {
         'web-public/src',
         'app/web',
         'app/android/app/src/main',
+        'app/android/app/src/profile',
+        'app/android/app/src/release',
+        'app/android/app/src/debug',
         'app/ios/Runner',
       ],
       (file) {
@@ -1811,6 +1820,16 @@ class ProjectLogicGenerator {
       'web-public/tsconfig.json',
       'server/Dockerfile',
       'app/Dockerfile.web',
+      'app/android/settings.gradle.kts',
+      'app/android/build.gradle.kts',
+      'app/android/gradle.properties',
+      'app/android/app/build.gradle.kts',
+      'app/android/app/gradle.lockfile',
+      'app/android/app/google-services.json',
+      'app/android/app/proguard-rules.pro',
+      'app/android/gradle/verification-metadata.xml',
+      'app/android/gradle/wrapper/gradle-wrapper.properties',
+      'app/test/ui/fixtures/ui_live_evidence_policy.json',
     ]) {
       final file = _file(path);
       if (file.existsSync()) files.add(file);

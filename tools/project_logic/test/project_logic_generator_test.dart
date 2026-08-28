@@ -1114,6 +1114,24 @@ sdks:
     );
     expect(
       digestInputs,
+      containsAll(<String>[
+        'app/android/app/src/profile/AndroidManifest.xml',
+        'app/android/app/src/release/AndroidManifest.xml',
+        'app/android/app/src/debug/AndroidManifest.xml',
+        'app/android/app/src/main/kotlin/com/mtgia/mtg_app/MainActivity.kt',
+        'app/android/app/build.gradle.kts',
+        'app/android/app/gradle.lockfile',
+        'app/android/build.gradle.kts',
+        'app/android/settings.gradle.kts',
+        'app/android/gradle/verification-metadata.xml',
+        'app/android/gradle/wrapper/gradle-wrapper.properties',
+        'app/test/ui/fixtures/ui_live_evidence_policy.json',
+        'scripts/manaloom_gradle_dynamic_selector_adapter.sh',
+        'scripts/lib/manaloom_gradle_dynamic_selector_pins.init.gradle',
+      ]),
+    );
+    expect(
+      digestInputs,
       isNot(
         contains(
           'app/android/app/src/main/java/io/flutter/plugins/'
@@ -1135,6 +1153,14 @@ sdks:
     expect(paths, contains('server/bin/manaloom_battle_product_e2e_audit.py'));
     expect(paths, contains('server/bin/migrate.dart'));
     expect(paths, contains('app/tool/authenticated_visual_diff.dart'));
+    expect(
+      paths,
+      contains('scripts/manaloom_gradle_dynamic_selector_adapter.sh'),
+    );
+    expect(
+      paths,
+      contains('scripts/lib/manaloom_gradle_dynamic_selector_pins.init.gradle'),
+    );
   });
 
   test('emits the expected Mermaid diagram families', () {
