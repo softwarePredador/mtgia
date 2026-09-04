@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `c1782de003b85ae65ddec7408798963d12dc4bad6b5ef14af96bac25d56693b3`
+**Digest das fontes:** `5a0dbbc8b56a4131a9bda1eba3772104c95870aed294d28502fc03cfdc63b8b7`
 
 ## Fontes de verdade
 
@@ -32,8 +32,8 @@
 | `database_views` | 6 |
 | `migrations` | 58 |
 | `scripts_and_jobs` | 680 |
-| `environment_variables` | 692 |
-| `tests` | 1215 |
+| `environment_variables` | 695 |
+| `tests` | 1216 |
 | `flows` | 8 |
 | `traceability_rules` | 12 |
 | `tasks` | 217 |

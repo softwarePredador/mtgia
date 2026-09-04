@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generator": {
     "name": "manaloom_project_logic",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "command": "scripts/manaloom_project_logic.sh --write",
     "check_command": "scripts/manaloom_project_logic.sh --check",
     "generated_files": [
@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c1782de003b85ae65ddec7408798963d12dc4bad6b5ef14af96bac25d56693b3",
+  "source_digest_sha256": "5a0dbbc8b56a4131a9bda1eba3772104c95870aed294d28502fc03cfdc63b8b7",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -77,8 +77,8 @@
     "database_views": 6,
     "migrations": 58,
     "scripts_and_jobs": 680,
-    "environment_variables": 692,
-    "tests": 1215,
+    "environment_variables": 695,
+    "tests": 1216,
     "flows": 8,
     "traceability_rules": 12,
     "tasks": 217,
@@ -260455,7 +260455,12 @@
       "path": "scripts/manaloom_project_logic.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
-      "environment_variables": []
+      "environment_variables": [
+        "MANALOOM_PROJECT_LOGIC_GLOBAL_PUB_CACHE",
+        "MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE",
+        "PUB_CACHE",
+        "TMPDIR"
+      ]
     },
     {
       "path": "scripts/manaloom_public_web_smoke.sh",
@@ -266470,6 +266475,22 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_PROJECT_LOGIC_GLOBAL_PUB_CACHE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_project_logic.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_project_logic.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_PROJECT_NETWORK",
       "classification": "configuration",
       "sources": [
@@ -267791,6 +267812,14 @@
       "value_captured": false
     },
     {
+      "name": "PUB_CACHE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_project_logic.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PULL_LEARNING_EVENTS_CRON",
       "classification": "configuration",
       "sources": [
@@ -268416,6 +268445,7 @@
         "scripts/manaloom_migrations_038_040_isolated.sh",
         "scripts/manaloom_onboarding_intent_visual_qa.sh",
         "scripts/manaloom_p0_runtime_capture.sh",
+        "scripts/manaloom_project_logic.sh",
         "scripts/manaloom_server_contract_e2e_isolated.sh",
         "scripts/manaloom_social_trade_visual_qa.sh",
         "scripts/manaloom_tbls_local_gate.sh",
@@ -269989,6 +270019,7 @@
     "services/xmage-sidecar/src/test/java/com/manaloom/xmage/XmageBattleServiceTest.java",
     "tools/manaloom_lints/test/avoid_legacy_manaloom_endpoint_literal_test.dart",
     "tools/manaloom_lints/test/avoid_manaloom_secret_literal_test.dart",
+    "tools/project_logic/test/project_logic_cold_repro_contract_test.dart",
     "tools/project_logic/test/project_logic_generator_test.dart"
   ],
   "flows": [
@@ -277806,7 +277837,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c1782de003b85ae65ddec7408798963d12dc4bad6b5ef14af96bac25d56693b3"
+    "project_logic_source_digest_sha256": "5a0dbbc8b56a4131a9bda1eba3772104c95870aed294d28502fc03cfdc63b8b7"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -280824,7 +280855,9 @@
       "tools/project_logic/analysis_options.yaml",
       "tools/project_logic/bin/manaloom_project_logic.dart",
       "tools/project_logic/lib/project_logic_generator.dart",
+      "tools/project_logic/pubspec.lock",
       "tools/project_logic/pubspec.yaml",
+      "tools/project_logic/test/project_logic_cold_repro_contract_test.dart",
       "tools/project_logic/test/project_logic_generator_test.dart",
       "web-public/next.config.ts",
       "web-public/package-lock.json",

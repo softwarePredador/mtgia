@@ -12,7 +12,8 @@ import 'package:analyzer/source/line_info.dart';
 import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as p;
 
-const _generatorVersion = '1.5.0';
+const _generatorVersion = '1.6.0';
+const _requiredDartSdkVersion = '3.12.2';
 const _taskBacklogPath = 'docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md';
 const _currentQueuePath = 'docs/execution/CURRENT_QUEUE.md';
 const _taskRegistrySchemaVersion = 2;
@@ -53,6 +54,152 @@ class ProjectLogicException implements Exception {
   String toString() => message;
 }
 
+Directory _canonicalWorkspaceRoot(Directory candidate) {
+  final absolute = candidate.absolute;
+  if (!absolute.existsSync()) {
+    throw ProjectLogicException(
+      'Project root does not exist: ${absolute.path}.',
+    );
+  }
+  try {
+    return Directory(absolute.resolveSymbolicLinksSync());
+  } on FileSystemException catch (error) {
+    throw ProjectLogicException(
+      'Project root cannot be resolved physically: ${error.message}.',
+    );
+  }
+}
+
+String _canonicalExistingDirectory(
+  Directory directory, {
+  required String label,
+}) {
+  if (!directory.existsSync()) {
+    throw ProjectLogicException('$label does not exist: ${directory.path}.');
+  }
+  try {
+    return p.normalize(directory.resolveSymbolicLinksSync());
+  } on FileSystemException catch (error) {
+    throw ProjectLogicException(
+      '$label cannot be resolved physically: ${error.message}.',
+    );
+  }
+}
+
+String _canonicalFileUriDirectory(String value, {required String label}) {
+  final uri = _validatedFileUri(value, label: label);
+  try {
+    return _canonicalExistingDirectory(Directory.fromUri(uri), label: label);
+  } on ArgumentError catch (error) {
+    throw ProjectLogicException('$label is not a portable file URI: $error.');
+  }
+}
+
+String _canonicalResolvedDirectoryUri(
+  Uri base,
+  String value, {
+  required String label,
+}) {
+  Uri resolved;
+  try {
+    final parsed = Uri.parse(value);
+    if (parsed.hasQuery || parsed.hasFragment || parsed.host.isNotEmpty) {
+      throw ProjectLogicException('$label contains a forbidden URI suffix.');
+    }
+    resolved = base.resolveUri(parsed);
+  } on FormatException catch (error) {
+    throw ProjectLogicException('$label is malformed: ${error.message}.');
+  }
+  if (resolved.scheme != 'file') {
+    throw ProjectLogicException('$label must resolve to a file URI.');
+  }
+  try {
+    return _canonicalExistingDirectory(
+      Directory.fromUri(resolved),
+      label: label,
+    );
+  } on ArgumentError catch (error) {
+    throw ProjectLogicException('$label is not a portable file URI: $error.');
+  }
+}
+
+Uri _validatedFileUri(String value, {required String label}) {
+  Uri uri;
+  try {
+    uri = Uri.parse(value);
+  } on FormatException catch (error) {
+    throw ProjectLogicException('$label is malformed: ${error.message}.');
+  }
+  if (uri.scheme != 'file' ||
+      uri.hasQuery ||
+      uri.hasFragment ||
+      uri.host.isNotEmpty ||
+      uri.userInfo.isNotEmpty ||
+      uri.hasPort) {
+    throw ProjectLogicException(
+      '$label must be an absolute local file URI without authority, query, '
+      'or fragment.',
+    );
+  }
+  if (RegExp(r'%(?![0-9A-Fa-f]{2})').hasMatch(value) ||
+      RegExp(r'%(?:25)*(?:2f|5c)', caseSensitive: false).hasMatch(value) ||
+      RegExp(r'%25[0-9A-Fa-f]{2}', caseSensitive: false).hasMatch(value)) {
+    throw ProjectLogicException(
+      '$label contains ambiguous or encoded path separators.',
+    );
+  }
+  String path;
+  try {
+    path = uri.toFilePath(windows: Platform.isWindows);
+  } on UnsupportedError catch (error) {
+    throw ProjectLogicException('$label is not portable: $error.');
+  }
+  if (!p.isAbsolute(path)) {
+    throw ProjectLogicException('$label must contain an absolute path.');
+  }
+  return uri;
+}
+
+String? _canonicalWorkspaceLibraryUri(String? library, String workspaceRoot) {
+  if (library == null) return null;
+  final looksLikeFileUri = library.startsWith('file:');
+  Uri uri;
+  try {
+    uri = Uri.parse(library);
+  } on FormatException catch (error) {
+    if (!looksLikeFileUri) return library;
+    throw ProjectLogicException(
+      'Semantic library URI is malformed: ${error.message}.',
+    );
+  }
+  if (uri.scheme != 'file') return library;
+  final validated = _validatedFileUri(library, label: 'Semantic library URI');
+  String targetPath;
+  try {
+    targetPath = p.normalize(
+      File.fromUri(validated).resolveSymbolicLinksSync(),
+    );
+  } on FileSystemException catch (error) {
+    throw ProjectLogicException(
+      'Semantic library target cannot be resolved: ${error.message}.',
+    );
+  } on ArgumentError catch (error) {
+    throw ProjectLogicException(
+      'Semantic library URI is not portable: $error.',
+    );
+  }
+  if (!p.equals(targetPath, workspaceRoot) &&
+      !p.isWithin(workspaceRoot, targetPath)) {
+    throw ProjectLogicException(
+      'Semantic library target escapes the workspace.',
+    );
+  }
+  final relative = p
+      .relative(targetPath, from: workspaceRoot)
+      .replaceAll(r'\', '/');
+  return 'workspace:$relative';
+}
+
 class ProjectLogicResult {
   ProjectLogicResult(this.root, this.outputs, this.manifest);
 
@@ -81,7 +228,7 @@ class ProjectLogicResult {
 }
 
 class ProjectLogicGenerator {
-  ProjectLogicGenerator(this.root);
+  ProjectLogicGenerator(Directory root) : root = _canonicalWorkspaceRoot(root);
 
   final Directory root;
 
@@ -97,8 +244,16 @@ class ProjectLogicGenerator {
     'docs/generated/TASK_REGISTRY.json',
   ];
 
-  Future<Map<String, Object?>> dependencyInventoryForTesting() =>
-      _dependencies();
+  Future<Map<String, Object?>> dependencyInventoryForTesting() async {
+    _validateWorkspacePackageMetadata();
+    return _dependencies();
+  }
+
+  void validateWorkspacePackageMetadataForTesting() =>
+      _validateWorkspacePackageMetadata();
+
+  String? canonicalLibraryUriForTesting(String? library) =>
+      _canonicalWorkspaceLibraryUri(library, root.path);
 
   List<String> dependencyInputPathsForTesting() =>
       _dependencyFiles().map(_relative).toList();
@@ -128,6 +283,8 @@ class ProjectLogicGenerator {
       _validateContracts(contracts);
 
   Future<ProjectLogicResult> generate() async {
+    _validateWorkspacePackageMetadata();
+
     final contractFile = _file('docs/project_logic_contracts.json');
     final inventoryFile = _file(
       'app/test/ui/fixtures/ui_surface_inventory.json',
@@ -161,6 +318,7 @@ class ProjectLogicGenerator {
       units.add(_readDartUnit(file));
     }
     final semanticAnalysis = await _semanticAnalysis(dartFiles);
+    _validateSemanticPayload(semanticAnalysis);
 
     final testFiles = _testFiles();
     final scriptFiles = _scriptFiles();
@@ -338,6 +496,443 @@ class ProjectLogicGenerator {
       return jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
     } on Object catch (error) {
       throw ProjectLogicException('Invalid JSON in ${_relative(file)}: $error');
+    }
+  }
+
+  void _validateWorkspacePackageMetadata() {
+    final taskCacheValue = Platform.environment['PUB_CACHE'];
+    final declaredTaskCache =
+        Platform.environment['MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE'];
+    if (taskCacheValue == null ||
+        taskCacheValue.isEmpty ||
+        declaredTaskCache == null ||
+        declaredTaskCache.isEmpty) {
+      throw ProjectLogicException(
+        'Project logic requires a task-scoped PUB_CACHE declared by '
+        'MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE.',
+      );
+    }
+
+    final taskCache = _canonicalExistingDirectory(
+      Directory(taskCacheValue),
+      label: 'PUB_CACHE',
+    );
+    final declaredCache = _canonicalExistingDirectory(
+      Directory(declaredTaskCache),
+      label: 'MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE',
+    );
+    if (!p.equals(taskCache, declaredCache)) {
+      throw ProjectLogicException(
+        'PUB_CACHE must equal MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE.',
+      );
+    }
+
+    final globalCacheValue =
+        Platform.environment['MANALOOM_PROJECT_LOGIC_GLOBAL_PUB_CACHE'];
+    if (globalCacheValue != null && globalCacheValue.isNotEmpty) {
+      final globalCache = _canonicalExistingDirectory(
+        Directory(globalCacheValue),
+        label: 'MANALOOM_PROJECT_LOGIC_GLOBAL_PUB_CACHE',
+      );
+      if (p.equals(taskCache, globalCache) ||
+          p.isWithin(globalCache, taskCache) ||
+          p.isWithin(taskCache, globalCache)) {
+        throw ProjectLogicException(
+          'Project logic task PUB_CACHE must not alias or overlap the global '
+          'cache.',
+        );
+      }
+    }
+
+    for (final relativePackage in const ['', 'app', 'server']) {
+      _validateWorkspacePackage(
+        relativePackage: relativePackage,
+        taskCache: taskCache,
+      );
+    }
+  }
+
+  void _validateWorkspacePackage({
+    required String relativePackage,
+    required String taskCache,
+  }) {
+    final packageDirectory = Directory(
+      relativePackage.isEmpty ? root.path : p.join(root.path, relativePackage),
+    );
+    final packageLabel = relativePackage.isEmpty ? '.' : relativePackage;
+    final physicalPackageDirectory = _canonicalExistingDirectory(
+      packageDirectory,
+      label: '$packageLabel package root',
+    );
+    final pubspec = File(p.join(packageDirectory.path, 'pubspec.yaml'));
+    final lock = File(p.join(packageDirectory.path, 'pubspec.lock'));
+    final packageConfig = File(
+      p.join(packageDirectory.path, '.dart_tool', 'package_config.json'),
+    );
+    final packageGraph = File(
+      p.join(packageDirectory.path, '.dart_tool', 'package_graph.json'),
+    );
+    for (final requiredFile in [pubspec, lock, packageConfig, packageGraph]) {
+      if (FileSystemEntity.typeSync(requiredFile.path, followLinks: false) !=
+          FileSystemEntityType.file) {
+        throw ProjectLogicException(
+          'Required package metadata is missing or not a regular file: '
+          '${_relative(requiredFile)}.',
+        );
+      }
+    }
+
+    final pubspecSource = pubspec.readAsStringSync();
+    final packageName = _topLevelPubspecValue(pubspecSource, 'name');
+    if (packageName == null ||
+        !RegExp(r'^[A-Za-z_][A-Za-z0-9_]*$').hasMatch(packageName)) {
+      throw ProjectLogicException(
+        'Invalid or missing package name in ${_relative(pubspec)}.',
+      );
+    }
+    final packageVersion =
+        _topLevelPubspecValue(pubspecSource, 'version') ?? '0.0.0';
+    final lockedPackages = _lockedPackages(lock);
+
+    final config = _decodeMap(packageConfig);
+    if (config['configVersion'] != 2 ||
+        config['generator'] != 'pub' ||
+        config['generatorVersion'] != _requiredDartSdkVersion) {
+      throw ProjectLogicException(
+        '${_relative(packageConfig)} must be package_config v2 generated by '
+        'pub $_requiredDartSdkVersion.',
+      );
+    }
+    final cacheUriValue = config['pubCache'];
+    if (cacheUriValue is! String) {
+      throw ProjectLogicException(
+        '${_relative(packageConfig)} must bind the task PUB_CACHE.',
+      );
+    }
+    final configCache = _canonicalFileUriDirectory(
+      cacheUriValue,
+      label: '${_relative(packageConfig)} pubCache',
+    );
+    if (!p.equals(configCache, taskCache)) {
+      throw ProjectLogicException(
+        '${_relative(packageConfig)} points outside the task PUB_CACHE.',
+      );
+    }
+
+    final configPackagesValue = config['packages'];
+    if (configPackagesValue is! List || configPackagesValue.isEmpty) {
+      throw ProjectLogicException(
+        '${_relative(packageConfig)} has no resolved packages.',
+      );
+    }
+    final configPackages = <String, Map<String, dynamic>>{};
+    final configUri = packageConfig.uri;
+    for (final value in configPackagesValue) {
+      if (value is! Map) {
+        throw ProjectLogicException(
+          '${_relative(packageConfig)} contains a malformed package entry.',
+        );
+      }
+      final entry = Map<String, dynamic>.from(value);
+      final name = entry['name'];
+      final rootUriValue = entry['rootUri'];
+      final packageUriValue = entry['packageUri'];
+      final languageVersion = entry['languageVersion'];
+      if (name is! String ||
+          name.isEmpty ||
+          rootUriValue is! String ||
+          packageUriValue is! String ||
+          languageVersion is! String ||
+          languageVersion.isEmpty ||
+          configPackages.containsKey(name)) {
+        throw ProjectLogicException(
+          '${_relative(packageConfig)} contains an incomplete or duplicate '
+          'package entry.',
+        );
+      }
+      final packageRoot = _canonicalResolvedDirectoryUri(
+        configUri,
+        rootUriValue,
+        label: '${_relative(packageConfig)} package $name',
+      );
+      _validatePackageUri(
+        packageUriValue,
+        packageRoot: packageRoot,
+        label: '${_relative(packageConfig)} packageUri for $name',
+      );
+      if (name == packageName) {
+        if (!p.equals(packageRoot, physicalPackageDirectory)) {
+          throw ProjectLogicException(
+            '${_relative(packageConfig)} rootUri for $packageName does not '
+            'match the physical package root.',
+          );
+        }
+      } else {
+        final lockEntry = lockedPackages[name];
+        if (lockEntry == null) {
+          throw ProjectLogicException(
+            '${_relative(packageConfig)} contains unlocked package $name.',
+          );
+        }
+        final source = lockEntry.source;
+        if (source == 'hosted') {
+          final expectedHostedRoot = p.join(
+            taskCache,
+            'hosted',
+            'pub.dev',
+            '$name-${lockEntry.version}',
+          );
+          if (!p.equals(packageRoot, expectedHostedRoot)) {
+            throw ProjectLogicException(
+              '${_relative(packageConfig)} hosted package $name does not '
+              'match its exact locked cache root.',
+            );
+          }
+        } else if (source == 'git') {
+          if (!p.equals(packageRoot, taskCache) &&
+              !p.isWithin(taskCache, packageRoot)) {
+            throw ProjectLogicException(
+              '${_relative(packageConfig)} package $name escapes the task '
+              'PUB_CACHE.',
+            );
+          }
+        } else if (source == 'path') {
+          if (!p.equals(packageRoot, root.path) &&
+              !p.isWithin(root.path, packageRoot)) {
+            throw ProjectLogicException(
+              '${_relative(packageConfig)} path package $name escapes the '
+              'workspace.',
+            );
+          }
+        } else if (source == 'sdk') {
+          final flutterRootValue = Platform.environment['FLUTTER_ROOT'];
+          if (flutterRootValue == null || flutterRootValue.isEmpty) {
+            throw ProjectLogicException(
+              'FLUTTER_ROOT is required to validate SDK package $name.',
+            );
+          }
+          final flutterRoot = _canonicalExistingDirectory(
+            Directory(flutterRootValue),
+            label: 'FLUTTER_ROOT',
+          );
+          if (!p.equals(packageRoot, flutterRoot) &&
+              !p.isWithin(flutterRoot, packageRoot)) {
+            throw ProjectLogicException(
+              '${_relative(packageConfig)} SDK package $name escapes the '
+              'pinned Flutter SDK.',
+            );
+          }
+        } else {
+          throw ProjectLogicException(
+            '${_relative(lock)} uses unsupported source $source for $name.',
+          );
+        }
+      }
+      configPackages[name] = entry;
+    }
+
+    final graph = _decodeMap(packageGraph);
+    if (graph['configVersion'] != 1) {
+      throw ProjectLogicException(
+        '${_relative(packageGraph)} must use package graph configVersion 1.',
+      );
+    }
+    final roots = graph['roots'];
+    if (roots is! List || roots.length != 1 || roots.single != packageName) {
+      throw ProjectLogicException(
+        '${_relative(packageGraph)} must declare exactly root $packageName.',
+      );
+    }
+    final graphPackagesValue = graph['packages'];
+    if (graphPackagesValue is! List || graphPackagesValue.isEmpty) {
+      throw ProjectLogicException(
+        '${_relative(packageGraph)} has no resolved packages.',
+      );
+    }
+    final graphPackages = <String, Map<String, dynamic>>{};
+    for (final value in graphPackagesValue) {
+      if (value is! Map) {
+        throw ProjectLogicException(
+          '${_relative(packageGraph)} contains a malformed package entry.',
+        );
+      }
+      final entry = Map<String, dynamic>.from(value);
+      final name = entry['name'];
+      final version = entry['version'];
+      if (name is! String ||
+          name.isEmpty ||
+          version is! String ||
+          version.isEmpty ||
+          graphPackages.containsKey(name)) {
+        throw ProjectLogicException(
+          '${_relative(packageGraph)} contains an incomplete or duplicate '
+          'package entry.',
+        );
+      }
+      graphPackages[name] = entry;
+    }
+    if (!_sameStringSet(configPackages.keys, graphPackages.keys)) {
+      throw ProjectLogicException(
+        '${_relative(packageConfig)} and ${_relative(packageGraph)} resolve '
+        'different package sets.',
+      );
+    }
+
+    final expectedGraphNames = <String>{packageName, ...lockedPackages.keys};
+    if (!_sameStringSet(graphPackages.keys, expectedGraphNames)) {
+      throw ProjectLogicException(
+        '${_relative(packageGraph)} does not match ${_relative(lock)}.',
+      );
+    }
+    for (final entry in graphPackages.entries) {
+      final expectedVersion = entry.key == packageName
+          ? packageVersion
+          : lockedPackages[entry.key]!.version;
+      if (entry.value['version'] != expectedVersion) {
+        throw ProjectLogicException(
+          '${_relative(packageGraph)} version mismatch for ${entry.key}.',
+        );
+      }
+      for (final field in [
+        'dependencies',
+        'devDependencies',
+        'directDependencies',
+      ]) {
+        final dependencies = entry.value[field];
+        if (dependencies == null) {
+          if (field == 'dependencies' ||
+              (field == 'devDependencies' && entry.key == packageName)) {
+            throw ProjectLogicException(
+              '${_relative(packageGraph)} omits required $field for '
+              '${entry.key}.',
+            );
+          }
+          continue;
+        }
+        if (dependencies is! List ||
+            dependencies.any(
+              (dependency) =>
+                  dependency is! String ||
+                  !graphPackages.containsKey(dependency),
+            )) {
+          throw ProjectLogicException(
+            '${_relative(packageGraph)} contains an unresolved $field edge '
+            'for ${entry.key}.',
+          );
+        }
+      }
+    }
+  }
+
+  String? _topLevelPubspecValue(String source, String key) {
+    final match = RegExp(
+      '^${RegExp.escape(key)}:[ \\t]*["\\\']?([^"\\\'#\\r\\n]+)',
+      multiLine: true,
+    ).firstMatch(source);
+    return match?.group(1)?.trim();
+  }
+
+  void _validatePackageUri(
+    String value, {
+    required String packageRoot,
+    required String label,
+  }) {
+    Uri uri;
+    try {
+      uri = Uri.parse(value);
+    } on FormatException catch (error) {
+      throw ProjectLogicException('$label is malformed: ${error.message}.');
+    }
+    if (uri.isAbsolute ||
+        uri.hasQuery ||
+        uri.hasFragment ||
+        uri.host.isNotEmpty ||
+        RegExp(r'%(?![0-9A-Fa-f]{2})').hasMatch(value) ||
+        RegExp(r'%(?:25)*(?:2f|5c)', caseSensitive: false).hasMatch(value) ||
+        RegExp(r'%25[0-9A-Fa-f]{2}', caseSensitive: false).hasMatch(value)) {
+      throw ProjectLogicException(
+        '$label must be an unambiguous relative URI.',
+      );
+    }
+    final resolved = p.normalize(p.join(packageRoot, uri.path));
+    if (!p.equals(resolved, packageRoot) &&
+        !p.isWithin(packageRoot, resolved)) {
+      throw ProjectLogicException('$label escapes its package root.');
+    }
+  }
+
+  Map<String, _LockedPackage> _lockedPackages(File lock) {
+    final packages = <String, _LockedPackage>{};
+    String? name;
+    String? source;
+    for (final line in lock.readAsLinesSync()) {
+      final packageMatch = RegExp(
+        r'^  ([A-Za-z_][A-Za-z0-9_]*):$',
+      ).firstMatch(line);
+      if (packageMatch != null) {
+        name = packageMatch.group(1);
+        source = null;
+        continue;
+      }
+      final sourceMatch = RegExp(
+        r'^    source: ([A-Za-z_]+)$',
+      ).firstMatch(line);
+      if (sourceMatch != null) {
+        source = sourceMatch.group(1);
+        continue;
+      }
+      final versionMatch = RegExp(r'^    version: "([^"]+)"$').firstMatch(line);
+      if (versionMatch != null && name != null && source != null) {
+        if (packages.containsKey(name)) {
+          throw ProjectLogicException(
+            '${_relative(lock)} contains duplicate package $name.',
+          );
+        }
+        packages[name] = _LockedPackage(
+          source: source,
+          version: versionMatch.group(1)!,
+        );
+      }
+    }
+    return packages;
+  }
+
+  bool _sameStringSet(Iterable<String> left, Iterable<String> right) {
+    final leftSet = left.toSet();
+    final rightSet = right.toSet();
+    return leftSet.length == rightSet.length && leftSet.containsAll(rightSet);
+  }
+
+  void _validateSemanticPayload(Map<String, Object?> semanticAnalysis) {
+    final payload = jsonEncode(semanticAnalysis);
+    if (payload.contains('file://')) {
+      throw ProjectLogicException(
+        'Semantic analysis emitted a forbidden file URI.',
+      );
+    }
+    final forbiddenPaths = <String>{
+      root.path,
+      for (final name in [
+        'MANALOOM_PROJECT_LOGIC_LOGICAL_ROOT',
+        'MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE',
+        'MANALOOM_PROJECT_LOGIC_GLOBAL_PUB_CACHE',
+        'PUB_CACHE',
+        'FLUTTER_ROOT',
+      ])
+        if ((Platform.environment[name] ?? '').trim().isNotEmpty)
+          Platform.environment[name]!.trim(),
+    };
+    for (final rawPath in forbiddenPaths) {
+      final candidates = <String>{
+        rawPath,
+        p.normalize(rawPath),
+        rawPath.replaceAll('\\', '/'),
+      }..removeWhere((value) => value.length < 2);
+      if (candidates.any(payload.contains)) {
+        throw ProjectLogicException(
+          'Semantic analysis emitted a forbidden absolute runtime path.',
+        );
+      }
     }
   }
 
@@ -1923,14 +2518,24 @@ class ProjectLogicGenerator {
         ].where((file) => file.existsSync()).toList()
         ..sort((a, b) => _relative(a).compareTo(_relative(b)));
 
-  List<File> _generatorSourceFiles() => _filesUnder(
-    ['tools/project_logic'],
-    (file) =>
-        file.path.endsWith('.dart') ||
-        file.path.endsWith('.md') ||
-        file.path.endsWith('.yaml') ||
-        file.path.endsWith('.yml'),
-  );
+  List<File> _generatorSourceFiles() {
+    final lock = _file('tools/project_logic/pubspec.lock');
+    if (!lock.existsSync()) {
+      throw ProjectLogicException(
+        'Required generator lock is missing: ${_relative(lock)}.',
+      );
+    }
+    final files = _filesUnder(
+      ['tools/project_logic'],
+      (file) =>
+          file.path.endsWith('.dart') ||
+          file.path.endsWith('.md') ||
+          file.path.endsWith('.yaml') ||
+          file.path.endsWith('.yml'),
+    );
+    files.add(lock);
+    return files..sort((a, b) => _relative(a).compareTo(_relative(b)));
+  }
 
   List<File> _filesUnder(
     List<String> roots,
@@ -2055,6 +2660,8 @@ class ProjectLogicGenerator {
           _mergeSemanticAggregates(unresolvedCalls, visitor.unresolvedCalls);
           _mergeSemanticAggregates(resolvedTypes, visitor.resolvedTypes);
           _mergeSemanticAggregates(unresolvedTypes, visitor.unresolvedTypes);
+        } on ProjectLogicException {
+          rethrow;
         } on Object catch (error) {
           unresolvedFiles.add({
             'source': source,
@@ -3701,19 +4308,7 @@ class _ProjectLogicSemanticVisitor extends RecursiveAstVisitor<void> {
   }
 
   String? _canonicalLibraryUri(String? library) {
-    if (library == null) return null;
-    final uri = Uri.tryParse(library);
-    if (uri == null || uri.scheme != 'file') return library;
-
-    final targetPath = p.normalize(File.fromUri(uri).absolute.path);
-    if (!p.equals(targetPath, workspaceRoot) &&
-        !p.isWithin(workspaceRoot, targetPath)) {
-      return library;
-    }
-    final relative = p
-        .relative(targetPath, from: workspaceRoot)
-        .replaceAll(r'\', '/');
-    return 'workspace:$relative';
+    return _canonicalWorkspaceLibraryUri(library, workspaceRoot);
   }
 
   String _targetScope(String? library) {
@@ -3823,4 +4418,11 @@ class _SqlRelation {
     }
     return true;
   }
+}
+
+class _LockedPackage {
+  const _LockedPackage({required this.source, required this.version});
+
+  final String source;
+  final String version;
 }
