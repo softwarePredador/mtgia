@@ -266,11 +266,21 @@ Para a proposta da cadeia de qualidade de deck, ver
 `scripts/quality_gate.sh` tem ~25 modos. `.githooks/pre-commit` roda
 `manaloom_local_ci.sh quick`; `pre-push` roda `full`.
 
-**Três gates falham hoje por motivo de ambiente, não de conteúdo:**
+**O bloqueio difere por arm.** `pre-commit` roda `quick`; `pre-push` roda
+`full`. Medido em 2026-09-18, com o drift já resolvido:
+
+- **`quick` falha em um único ponto** — `project_logic_generator_test`
+  aborta em `setUpAll` (`8 passed, 1 failed`). Todo o resto passa: contratos
+  de shell, fonte de Game Changers, MCP local, secret scan e
+  `Project logic is synchronized`.
+- **`full` acrescenta dois** — `ui_live_evidence` e
+  `manaloom_public_web_surface_contract.sh:81`.
+
+**Os três gates que falham por motivo de ambiente, não de conteúdo:**
 
 | Gate | Falha | Causa |
 | --- | --- | --- |
-| `project_logic_generator_test` | `.dart_tool` aponta fora do PUB_CACHE task-scoped | contrato de cold bootstrap do `BT-SCP-001`; o CI não propaga a variável para o subshell |
+| `project_logic_generator_test` | `.dart_tool` da raiz aponta fora do PUB_CACHE task-scoped | contrato de cold bootstrap do `BT-SCP-001`. Propagar a variável **não** resolve — ver a contradição documentada em `docs/execution/PROPOSED_TASKS_DECK_QUALITY_2026-09-18.md` |
 | `ui_live_evidence` | digest de captura stale | captura de UI desatualizada |
 | `manaloom_public_web_surface_contract.sh:81` | landing/pricing renderizado sem os termos | build local; os fontes contêm os termos |
 

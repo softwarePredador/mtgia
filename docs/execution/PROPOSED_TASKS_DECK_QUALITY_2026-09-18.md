@@ -83,43 +83,62 @@ Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependência
 
 ### Justificativa de cada uma
 
-**`BT-CI-001`** — bloqueia tudo, e a causa é mais funda do que parecia.
-Investigado em 2026-09-18, com três camadas isoladas:
+**`BT-CI-001`** — bloqueia tudo. Investigado em 2026-09-18 até o ponto em que
+a continuação exige contexto de desenho do `BT-SCP-001`. O que está
+estabelecido, o que foi descartado, e a pergunta que resta:
 
-1. **O bug do CI é real e independente.** `run_project_logic()`
-   (`scripts/manaloom_local_ci.sh:105-112`) chama
-   `manaloom_project_logic.sh --check`, que materializa um `PUB_CACHE`
-   task-scoped, reescreve o `.dart_tool` dos quatro pacotes
-   (`tools/project_logic`, raiz, `app`, `server`), roda o gerador e **limpa**.
-   Só então o CI roda `"$DART_BIN" test` num subshell — que nunca vê o
-   ambiente preparado.
+**Fatos verificados**
 
-2. **Mover o teste para dentro não basta.** Foi implementado e testado um modo
-   `--test` que roda a suíte dentro do ambiente materializado. O `setUpAll`
-   continua abortando com
-   `.dart_tool/package_config.json points outside the task PUB_CACHE`,
-   e o caminho relativo é o da **raiz** do workspace. A mudança foi revertida
-   por não corrigir.
+| Fato | Onde |
+| --- | --- |
+| O CI roda `dart test` fora do ambiente preparado | `scripts/manaloom_local_ci.sh:105-112` |
+| O script **não reescreve** `package_config.json` — faz snapshot e restaura byte a byte | `manaloom_project_logic.sh:439-470` |
+| Existe **um único** `pub get`, e só em `tools/project_logic` | `:544` |
+| `generate()` chama `_validateWorkspacePackageMetadata()` como primeira instrução, sem guarda | `project_logic_generator.dart:285-286` |
+| A validação exige que raiz, `app` e `server` apontem para o task cache | `:547` |
+| Modificar o próprio script muda o digest de fonte do project logic | observado: uma sonda temporária causou drift sozinha |
 
-3. **O próprio `dart test` desfaz o binding.** Na mesma execução, o check de
-   integridade do script acusou
-   `Bootstrap criou/alterou conteúdo inesperado em tools/project_logic/.dart_tool`.
+**Hipóteses descartadas com evidência**
 
-Ou seja: existe um ovo-e-galinha. A suíte valida que o workspace está amarrado
-a um cache isolado, e **o ato de rodá-la desfaz essa amarração**. Descartada a
-hipótese de Dart workspace: o repositório é Melos, sem `workspace:` nem
-`resolution: workspace`, então resolver um membro não deveria reescrever a
-raiz — e reescreve.
+1. *"Basta propagar `MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE` para o subshell."*
+   Não basta. Foi implementado um modo `--test` que roda a suíte dentro do
+   ambiente materializado; o `setUpAll` continua abortando com
+   `.dart_tool/package_config.json points outside the task PUB_CACHE`, e o
+   caminho relativo é o da raiz. A mudança foi revertida.
+2. *"É um Dart workspace, então resolver um membro reescreve a raiz."*
+   Não é. O repositório é Melos: não há `workspace:` no `pubspec.yaml` da raiz
+   nem `resolution: workspace` nos membros.
 
-Correção exige decisão de desenho, não flag: ou o `dart test` passa a
-participar explicitamente do cold bootstrap (com o script revalidando o
-binding depois dele), ou o `setUpAll` do gerador ganha um ponto de injeção
-para o caso "rodando sob teste". Ambas pertencem a `BT-SCP-001`.
+**A contradição em aberto**
 
-Evidência do custo de não ter esse gate: ao registrar dois documentos em
-`canonical_documents` nesta sessão, o digest de fonte do project logic mudou e
-os artefatos ficaram defasados. Com o gate funcionando isso teria sido barrado
-no commit; com `--no-verify`, passou e precisou de correção posterior.
+Os fatos acima são mutuamente inconsistentes. Se o script nunca reescreve o
+config da raiz, e a validação exige a raiz no task cache sem guarda, então
+`--check` deveria falhar sempre. **E `--check` passa.**
+
+Uma sonda temporária leu, no momento imediatamente anterior à chamada do
+gerador, `raiz pubCache = file:///Users/<user>/.pub-cache` — o cache global.
+Ou a sonda estava mal posicionada de forma não identificada, ou o seeding faz
+algo não rastreado nas partes do script que não foram lidas.
+
+**Escopo medido em 2026-09-18.** Com o drift resolvido, foi feita uma
+tentativa de commit com o hook **ativo**. O `manaloom_local_ci.sh quick`
+passou em tudo — contratos de shell, fonte de Game Changers, MCP local,
+secret scan, e `Project logic is synchronized (9 artifacts)` — e parou em
+`8 passed, 1 failed`, com a única falha sendo
+`test/project_logic_generator_test.dart: (setUpAll)`.
+
+Ou seja: **o escopo desta ficha é um único `setUpAll`.** Destravado ele,
+`git commit` e `git push` voltam a passar sem bypass.
+
+**Pergunta que fecha a ficha:** por que `--check` passa se a raiz não aponta
+para o task cache? Respondida isso, a correção do CI decorre — e só então faz
+sentido escolher entre fazer o `dart test` participar do cold bootstrap ou dar
+ao `setUpAll` um ponto de injeção para o caso "sob teste".
+
+**Custo de não ter o gate**, observado nesta sessão: registrar dois documentos
+em `canonical_documents` mudou o digest de fonte e deixou os artefatos
+defasados. O gate de drift existe para barrar isso no commit; com
+`--no-verify` passou e exigiu correção posterior.
 
 **`BT-META-001`** — maior retorno por esforço de toda a cadeia, e é um `WHERE`.
 `server/bin/extract_meta_insights.dart:134-149` lê `SELECT ... FROM meta_decks
