@@ -232,6 +232,11 @@ run_ai_prompt_eval() {
   "$ROOT_DIR/scripts/manaloom_ai_prompt_eval.sh"
 }
 
+run_deck_quality_gate() {
+  print_header "Deck mana-consistency gate (deterministic)"
+  "$ROOT_DIR/scripts/manaloom_deck_quality_gate.sh"
+}
+
 run_app_ai_bridge() {
   run_old_server_reference_audit
   print_header "App AI knowledge bridge audit"
@@ -372,6 +377,7 @@ Uso:
   ./scripts/quality_gate.sh custom-lint # roda regras customizadas ManaLoom no app/server
   ./scripts/quality_gate.sh patrol-smoke # valida fluxos E2E criticos do Patrol
   ./scripts/quality_gate.sh ai-eval # eval fixa de prompt/saída da IA Commander
+  ./scripts/quality_gate.sh deck-quality # score determinístico de consistência de mana vs baseline
   ./scripts/quality_gate.sh ai-bridge # ponte app/IA: auditoria + eval Commander
   ./scripts/quality_gate.sh server-target # bloqueia referencias ativas ao servidor antigo
   ./scripts/quality_gate.sh report-retention # bloqueia dados brutos/locais sem uso em reports
@@ -490,6 +496,9 @@ main() {
       ;;
     ai-eval)
       run_ai_prompt_eval
+      ;;
+    deck-quality)
+      run_deck_quality_gate
       ;;
     ai-bridge)
       run_app_ai_bridge

@@ -1,0 +1,153 @@
+{
+  "schema_version": "deck_quality_baseline_v1",
+  "report_schema_version": "deck_quality_report_v1",
+  "fixture_content_digest_sha256": "24ccb9c250e63d9fd80e2a05f9fa693c5898fc79e13d70f10bf3d7d5888cce73",
+  "fixture_declared_digest_sha256": "25bdb284296ebfee562cd6823e0eae43bfa7f5384477f88ffa60d5f78be50604",
+  "simulations": 1000,
+  "deck_count": 17,
+  "decks": {
+    "6": {
+      "consistency_score": 79,
+      "land_count": 34,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 74,
+      "issue_codes": []
+    },
+    "606": {
+      "consistency_score": 84,
+      "land_count": 39,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 70,
+      "issue_codes": []
+    },
+    "607": {
+      "consistency_score": 79,
+      "land_count": 34,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 74,
+      "issue_codes": []
+    },
+    "608": {
+      "consistency_score": 70,
+      "land_count": 31,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 62,
+      "issue_codes": [
+        "insufficient_color_sources",
+        "land_count_below_minimum"
+      ]
+    },
+    "609": {
+      "consistency_score": 72,
+      "land_count": 30,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 85,
+      "issue_codes": [
+        "land_count_below_minimum"
+      ]
+    },
+    "610": {
+      "consistency_score": 75,
+      "land_count": 30,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 57,
+      "issue_codes": [
+        "land_count_below_minimum"
+      ]
+    },
+    "611": {
+      "consistency_score": 74,
+      "land_count": 34,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 80,
+      "issue_codes": []
+    },
+    "612": {
+      "consistency_score": 68,
+      "land_count": 27,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 83,
+      "issue_codes": [
+        "insufficient_color_sources",
+        "insufficient_color_sources",
+        "land_count_below_minimum"
+      ]
+    },
+    "613": {
+      "consistency_score": 73,
+      "land_count": 32,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 77,
+      "issue_codes": [
+        "land_count_below_minimum"
+      ]
+    },
+    "614": {
+      "consistency_score": 80,
+      "land_count": 33,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 84,
+      "issue_codes": [
+        "insufficient_color_sources",
+        "land_count_below_minimum"
+      ]
+    },
+    "615": {
+      "consistency_score": 76,
+      "land_count": 34,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 87,
+      "issue_codes": []
+    },
+    "616": {
+      "consistency_score": 70,
+      "land_count": 29,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 87,
+      "issue_codes": [
+        "land_count_below_minimum"
+      ]
+    },
+    "617": {
+      "consistency_score": 70,
+      "land_count": 36,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 91,
+      "issue_codes": []
+    },
+    "618": {
+      "consistency_score": 83,
+      "land_count": 37,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 70,
+      "issue_codes": []
+    },
+    "619": {
+      "consistency_score": 77,
+      "land_count": 34,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 71,
+      "issue_codes": [
+        "insufficient_color_sources"
+      ]
+    },
+    "620": {
+      "consistency_score": 81,
+      "land_count": 36,
+      "mana_foundation_satisfied": true,
+      "total_strict_pips": 75,
+      "issue_codes": []
+    },
+    "621": {
+      "consistency_score": 75,
+      "land_count": 32,
+      "mana_foundation_satisfied": false,
+      "total_strict_pips": 74,
+      "issue_codes": [
+        "insufficient_color_sources",
+        "insufficient_color_sources",
+        "land_count_below_minimum"
+      ]
+    }
+  }
+}
