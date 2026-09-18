@@ -2,7 +2,7 @@
 
 Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 
-- Atualizada em: `2026-08-25`
+- Atualizada em: `2026-09-09`
 - Branch de partida: `codex/free-beta-release-candidate-2026-07-17`
 - SHA baseline na abertura de `BT-SCP-001`:
   `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`
@@ -15,8 +15,8 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
 - WIP máximo: `1`
 - Exceção de contenção fail-closed do NOW: `none`
-- Limite de subagentes nesta execução: `3`, sem descendentes, por solicitação
-  do usuário
+- Subagentes de Desenvolvimento nesta execução: `0`; `/root` permanece único
+  writer. Gerência coordena revisores externos somente leitura, sem outro NOW.
 
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
 backlog mestre e o registry gerado.
@@ -67,6 +67,19 @@ do core enquanto suas capabilities permanecerem comprovadamente OFF.
 
 ## Estado operacional conhecido
 
+- Em `2026-09-09`, a consolidação autorizada preserva o conjunto herdado de
+  `271` paths sobre `354983a1e8a37f8fe1139b6282ca9e909a4f886d`, mais um
+  teste existente diretamente ligado à segurança dos dois harnesses locais
+  e o vínculo mínimo do runner P0 ao SDK lateral aprovado (`273` no total).
+  Código guardado e decisões de Jogar contra IA não serão descartados para
+  simular um checkout limpo; integração não promove nenhum ID funcional.
+- O pacote ainda é `NOT_READY`: faltam freeze/geração corrente, auditoria dos
+  harnesses, campanha UI local da policy (`23` manifests / `439` PNGs), gates
+  aplicáveis e commit/push normais. Evidência antiga permanece histórica, sem
+  crédito para o digest atual. Android emulador não é Android físico;
+  TalkBack e teclado Web humano continuam separados.
+- Os registros de abertura e de agosto abaixo são históricos, não uma nova
+  observação de Git, runtime ou produção em setembro.
 - Na abertura de `BT-SCP-001`, a branch local estava um commit à frente do
   upstream. Essa é uma observação Git local, não PR, deploy ou release.
 - A validação pública read-only observou produção no SHA
@@ -76,7 +89,7 @@ do core enquanto suas capabilities permanecerem comprovadamente OFF.
 - Não existe autorização de deploy. Divergência live é observação, não ação.
 - `BT-GOV-001` fechou em `PASS` local no commit
   `fd0397a5a97742bcb5127c7b2d08d80aca4bf738`; o gate `full` passou, e a
-  evidência UI corrente contém 456 capturas no digest `d517adb65b…`, incluindo
+  evidência UI daquela rodada contém 456 capturas no digest `d517adb65b…`, incluindo
   54 checkpoints no Samsung SM-A135M físico, todos revisados.
 - `BT-DOC-001` fechou em `PASS` local no commit
   `c6e2725af0995e01dcf675f20e3a8b608b84d555`, digest de implementação
@@ -88,6 +101,11 @@ do core enquanto suas capabilities permanecerem comprovadamente OFF.
   implementação ainda está pendente neste snapshot, e nenhum deploy ocorreu.
 - `BT-UX-PROOF-001` fica na onda final porque novas mudanças app-facing
   invalidariam capturas feitas agora.
+- A implementação contida de `BT-SCP-001` já produziu um `PASS` focal de Jogar
+  contra IA em build Web real, API/PostgreSQL loopback e XMage pinado, registrado
+  em `docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md`. Isso reduz
+  risco técnico, mas não abre um segundo slot `NOW`, não move `BT-PLAY-*` e não
+  libera capability/release.
 - Parecer jurídico, expansão social/comercial e iOS continuam fora desta fila
   funcional até seus bloqueios/decisões próprios.
 

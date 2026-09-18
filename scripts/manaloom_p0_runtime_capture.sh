@@ -3,8 +3,10 @@ set -euo pipefail
 
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 APP_DIR="$ROOT_DIR/app"
-PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
-PINNED_DART="${PINNED_FLUTTER%/flutter}/dart"
+source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
+resolve_manaloom_flutter_dart_pair
+PINNED_FLUTTER="$MANALOOM_FLUTTER_BIN_RESOLVED"
+PINNED_DART="$MANALOOM_DART_BIN_RESOLVED"
 source "$ROOT_DIR/scripts/lib/manaloom_ui_runtime_contract.sh"
 
 PROFILE=""

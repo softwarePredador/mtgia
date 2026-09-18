@@ -585,7 +585,6 @@ void main() {
           deckId: _deckId,
           gateway: _RuntimeReplayGateway(detail: replay),
           initialReplayId: replay.summary.id,
-          battleLiveEnabled: false,
         ),
       ),
     );

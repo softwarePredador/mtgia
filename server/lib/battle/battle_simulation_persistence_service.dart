@@ -112,7 +112,10 @@ class BattleSimulationPersistenceService {
           if (hasSimulationType) 'simulationType': type,
           if (hasMetrics)
             'metrics': jsonEncode(
-              _simulationMetrics(sanitizedResult, winnerDeckId: winnerDeckId),
+              battleSimulationMetricsForStorage(
+                sanitizedResult,
+                winnerDeckId: winnerDeckId,
+              ),
             ),
           if (hasWinnerDeckId) 'winnerDeckId': winnerDeckId,
           if (hasTurnsPlayed) 'turnsPlayed': turnsPlayed,
@@ -156,7 +159,7 @@ String? canonicalBattleWinnerDeckId({
   };
 }
 
-Map<String, dynamic> _simulationMetrics(
+Map<String, dynamic> battleSimulationMetricsForStorage(
   Map<String, dynamic> result, {
   required String? winnerDeckId,
 }) {

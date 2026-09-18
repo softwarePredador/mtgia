@@ -1,161 +1,144 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
+  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-24T15:57:57Z",
+    "verified_at": "2026-08-26T11:46:54Z",
     "commands": [
-      "./scripts/manaloom_project_logic.sh --write && ./scripts/manaloom_project_logic.sh --check",
-      "./gradlew :app:checkProfileAarMetadata --stacktrace",
-      "27 Flutter focused tests and analyzer checks for BT-GOV-001",
-      "4 focused backend tests for BT-GOV-001",
-      "./scripts/manaloom_release_capabilities_contract_test.sh",
-      "./scripts/manaloom_public_web_surface_contract_test.sh",
-      "./scripts/manaloom_release_ops_contract_test.sh (32/32)",
-      "./scripts/manaloom_p0_runtime_capture.sh on Web mobile/desktop/wide and physical Samsung SM-A135M",
-      "./scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix",
+      "Flutter analyze and 180 focused Flutter tests for capability, deck, battle and UI contracts",
+      "31 focused server tests for interactive battle and release contracts",
+      "focused XMage sidecar Maven tests",
+      "focused Python contract tests",
+      "./scripts/manaloom_p0_runtime_capture.sh for Android emulator and Web mobile/desktop/wide",
       "./scripts/manaloom_binder_import_visual_qa.sh",
       "./scripts/manaloom_deck_workshop_visual_qa.sh",
-      "./scripts/manaloom_battle_learning_visual_qa.sh",
       "./scripts/manaloom_social_trade_visual_qa.sh",
       "./scripts/manaloom_onboarding_intent_visual_qa.sh",
       "./scripts/manaloom_visual_system_workspace_qa.sh",
       "./scripts/manaloom_critical_overlays_states_visual_qa.sh",
-      "flutter test --release -d chrome integration_test/battle_live_visual_runtime_proof_test.dart"
+      "MANALOOM_PLAY_VS_AI_BROWSER_QA=1 ./scripts/manaloom_play_vs_ai_e2e.sh"
     ]
   },
   "runtime": {
     "status": "PASS_RUNTIME",
     "capture_manifests": [
       {
-        "path": "docs/qa/ui-live/current/p0-matrix/android_physical_sm_a135m.json",
-        "sha256": "38afd0f21548a880fe851f4f3829aa73e6a2943c600a139446d43d774c80be7a"
-      },
-      {
-        "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "18e2a04dcafecb043d939303bc6a00de7fa4fcefcd1fe9d2e8b09b00cd9a83d7"
+        "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
+        "sha256": "838b233cf9eae6261c1168c03d5429fdb3728bb99a88d2c8d27b426751887f14"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "b5bc0f630504c1272416b509671b38c69e0a6a04324734c14a272fa225c8da05"
+        "sha256": "80821f6f3c9ade2f28643f91fea9d41a80bfe1f076ded422c1dac2f8907042e8"
+      },
+      {
+        "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
+        "sha256": "057d7a0c0e83a7ba7683d4fb2af9416758e5f9b7035252147ec25d7b190bec6d"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "53ea5900b600e1cc5782c5c3f4e5c758c85af0f42fdf3cd108640e94444941b1"
+        "sha256": "cb9734d2f097342f1f6e5e1c22ec151b3d1cfd01f54a0b8e6d1c95c478a29a44"
       },
       {
-        "path": "docs/qa/ui-live/current/battle-live-web/capture-manifest.json",
-        "sha256": "3cf2dc627a4d237adef2a9a8963b50c9896de549adece761873769127989db81"
+        "path": "docs/qa/ui-live/current/play-vs-ai-web-real/capture-manifest.json",
+        "sha256": "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-mobile/capture-manifest.json",
-        "sha256": "540e545dcb6b49fbd2161d718edf69f9abc97665b4241a7739562b8847c309c7"
+        "sha256": "03c62c9c1dc8dfe96ce308c9e6d2821643255d3bb735d87e04166e6bd0ed426f"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/capture-manifest.json",
-        "sha256": "46c0090832ed9220f64feca6a98af22a5206b94771140064f25fdcfc1023f191"
+        "sha256": "4c212262ec20ded0eea26b0b69f83c52ec1bd184d5f1b547bd5134b6da9bca65"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/capture-manifest.json",
-        "sha256": "b3ef6206fb845b6847b4cd2d729ea41520220b4f217e8c1f61aded869f19c758"
+        "sha256": "b82ee7961d9bee44d992ff8435881d03106ae3419165e3bbbf8e41976eb79af0"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/capture-manifest.json",
-        "sha256": "8a65723bd007002a70999b9ecc5e19ef596967834aab7a913494988e234bf468"
+        "sha256": "c7d71b75557e3769234abbd06c055bb7b8622be1ce92a53904d852e63fbc7285"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/capture-manifest.json",
-        "sha256": "f9ae06bd4e5cdffb2a6211f0f06cf7b6beb9ccbe18d0ff5665c9a29b7b57df82"
+        "sha256": "ec9cb61ce57e40b2b308da1975c2313da197f2b8bfba4a6423f0e01877c40d63"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-wide/capture-manifest.json",
-        "sha256": "00a1bf360c27e5bc13f53905110c58255adb7001119bc24a8c5ed15e74558ad3"
-      },
-      {
-        "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-mobile/capture-manifest.json",
-        "sha256": "21e736107cae1b443094c1ea70c9f6017a5e0917f9c02702ddea4020086fb085"
-      },
-      {
-        "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-desktop/capture-manifest.json",
-        "sha256": "574f597ca3f5358f49a67e4f583759e2d2ce33ad4d0a90173e839caa428d6c02"
-      },
-      {
-        "path": "docs/qa/ui-live/current/ux-pack-04-battle-learning-web-wide/capture-manifest.json",
-        "sha256": "cd0a36380f0416f91ec3a8d1642a09a1724482b77c92fb70f5bb719da7e8fac6"
+        "sha256": "e05b82203f43142f25a80456acca2611aeb4bcde94271cd469135c0e1f40374a"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/capture-manifest.json",
-        "sha256": "e07a5a6c2930946a65c42b7a2d5bfed1e3108812b1c1925240379f562d098138"
+        "sha256": "c40fe82c8727c366447c84590deb390cecd220ffb7607604bd389a6e675a865a"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/capture-manifest.json",
-        "sha256": "b616c69d247bef3f886417bf1d19fb045855c6aa0495dfda3fc13f87c483574d"
+        "sha256": "3752e27a9c848c618a0b5ff2d25c41a16e348a4a02b5962bacd7c884d0ccecb9"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/capture-manifest.json",
-        "sha256": "c782dd4fad2f709bc73f9fa59d7be8a72656da66de75b07d4ceb6def7161b811"
+        "sha256": "bcbbb447cbc4c11c3fddc185c597aee45c2b72b4b71034b7aee4c42adcba3092"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/capture-manifest.json",
-        "sha256": "061d27731c434e5ebd52b9f8d7d57ddc83a95dddbdbd1955f85f02f6dab6061c"
+        "sha256": "aaf07bd78ee59d90f9f64e6ab68e5a324e720a9d7a3cfad0026aa50e2e55d5d1"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/capture-manifest.json",
-        "sha256": "8eb7937dc0346276619c05f140528521e9c03af9ab0d5884e8ecec0b950ace03"
+        "sha256": "e9a3a37b398967b7b83c9fea1056cd531378a5694a235b7d95e565bf00698ae6"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-wide/capture-manifest.json",
-        "sha256": "11d21ae9c8ba3776762cc15b937c78766f48db71ca9f479355daec687ca62c74"
+        "sha256": "2552b3b932221734de486868f866517548b55119104207cc1c05f43c1849a0dd"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/capture-manifest.json",
-        "sha256": "891a1ac8404135db67cb7d207e6c21acb50be1939924cfe8086ac844de8243bd"
+        "sha256": "032e74b5808439e01a6ae4496a9ac60980598eea246c78f8c60557c6d398a411"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/capture-manifest.json",
-        "sha256": "ab430cf3c09eea8a1cffac27033327d798fb2756967a05e75f7775fd58cc2f6a"
+        "sha256": "f884914a474ac2b200a28457582280249610e1604b5a98671814023cb9613b26"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-wide/capture-manifest.json",
-        "sha256": "cd94106989b056e47476d903c751dc932f8c72d454e4c389df7588fc6162989b"
+        "sha256": "ec162afdfc9a6816f81b74c0245cee62e25250541653d9ec8ee62203577fa7b8"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/capture-manifest.json",
-        "sha256": "1c8e61d14c9ac27599cb1bed3f4d9ca6f7d5dab12090339a58bd6120fd9b10b9"
+        "sha256": "67a5b5707acc86055c6f90686300d1954ae4a54da8f3bd9a581eb0d0fc66407d"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-desktop/capture-manifest.json",
-        "sha256": "439bbcfce49f53b62c11ae6a18219f0b5c01f05bd42f7277604cde58ee414ae4"
+        "sha256": "1214eebdd64dec70b362f5ecbf371a7da1cd37908cfba4b29becd504b374bbe7"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/capture-manifest.json",
-        "sha256": "3584361b497a58a16bf6adc76e382c4ebb40d57ac0ad4a81ff8755279f834587"
+        "sha256": "66e277de703363b8c8965f3c67e6a77dea1876ce3879bbdcae56bcdac0af9798"
       }
     ],
     "evidence_notes": [
-      "Os quatro perfis P0, Battle Live e os sete pacotes focais 02–08 foram recapturados integralmente no mesmo digest, sem carry-forward de PNGs do aggregate anterior.",
-      "As 402 capturas Web foram executadas em Chrome/WebDriver headless; a inspeção humana foi feita posteriormente sobre as pranchas geradas.",
-      "Os 26 manifests referenciam 456 capturas PASS_RUNTIME; as 456 telas foram abertas em 42 pranchas de revisão visual, e bytes, dimensões e SHA-256 foram reconciliados sem divergências.",
-      "O Samsung SM-A135M físico concluiu 54/54 checkpoints em Android 14, incluindo captura ADB nativa do Life Counter em landscape.",
-      "Os Packs 02–08 somam 237 capturas focais e cobrem Binder, Workshop, Battle Learning, Social/Trade, Onboarding Intent, Visual System Workspace e Critical Overlays and States nos três breakpoints Web.",
+      "Os quatro perfis P0, Jogar contra IA Web real e os seis pacotes focais públicos foram recapturados integralmente no mesmo digest, sem crédito para Battle Live ou Battle Learning internos e antigos.",
+      "Os 23 manifests referenciam 439 capturas PASS_RUNTIME: 385 Web e 54 Android emulator; bytes, PNGs, dimensões e SHA-256 foram reconciliados pelo verificador.",
+      "As 430 capturas fora de Jogar contra IA foram abertas em 44 pranchas de contato, e as nove capturas do jogo real foram abertas individualmente.",
+      "Jogar contra IA atravessou Flutter Web release, proxy same-origin, API loopback, PostgreSQL descartável e XMage pinado; sessão, ação, dano, reconexão, concessão, replay e rematch foram observados sem mutação de produção.",
+      "A matriz Android corrente foi atestada em emulator; ela recebe crédito de runtime Android, mas não de hardware físico, TalkBack humano ou desempenho do fabricante.",
       "Fixtures de QA ficaram limitadas a PostgreSQL loopback ou gateways em memória, foram encerradas e não escreveram em PostgreSQL live, Hermes ou SQLite."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-24T15:57:57Z",
+    "reviewed_at": "2026-08-26T11:46:54Z",
     "reviewer": {
       "kind": "agent",
       "name": "Codex"
     },
     "visual_thesis": "BrewTact apresenta uma mesa tática contemporânea: Abyss organiza o fundo, Frost sustenta leitura, Brass indica prioridade e arte de carta ou ilustração própria ancora as jornadas em Magic sem copiar trade dress proprietário.",
-    "content_plan": "Cada superfície prioriza identidade e contexto, depois estado, evidência, próxima ação e recuperação; arte exata é usada quando a identidade está disponível e o fallback permanece textual quando não está.",
+    "content_plan": "Cada superfície prioriza identidade e contexto, depois estado, evidência, próxima ação e recuperação; Jogar contra IA é card-first e mostra ao jogador mão, campo, vida, pilha, opções legais e resultado.",
     "interaction_thesis": "A próxima ação permanece encontrável, com espera, progresso, erro recuperável, confirmação, conclusão e histórico visualmente distintos; operações destrutivas exigem confirmação e nenhuma fixture executa escrita live.",
     "criteria": {
       "visual_hierarchy": {
         "status": "pass",
-        "note": "Nas 456 capturas, títulos, contexto, evidência e CTA mantêm ordem clara; Home, decks, Binder, Oficina, Battle, onboarding, perfis e Trade possuem âncoras próprias."
+        "note": "Nas 439 capturas, títulos, contexto, evidência e CTA mantêm ordem clara; Home, decks, Binder, Oficina, Jogar contra IA, onboarding, perfis e Trade possuem âncoras próprias."
       },
       "brand_and_mtg_identity": {
         "status": "pass",
@@ -167,76 +150,70 @@
       },
       "typography": {
         "status": "pass",
-        "note": "A combinação serifada para identidade e sans-serif para operação permaneceu legível nos três viewports Web e no Samsung; truncamentos responsivos restantes foram registrados como follow-up."
+        "note": "A combinação serifada para identidade e sans-serif para operação permaneceu legível nos três viewports Web e no Android emulator; truncamentos responsivos restantes foram registrados como follow-up."
       },
       "spacing_and_density": {
         "status": "pass",
-        "note": "Formulários, modais e barras fixas preservam gutters e alvos sem sobreposição destrutiva; telas desktop/wide com pouco conteúdo ainda precisam de recomposição e densidade proporcional."
+        "note": "Formulários, modais, mesa e barras fixas preservam gutters e alvos sem sobreposição destrutiva; telas desktop/wide com pouco conteúdo ainda precisam de recomposição e densidade proporcional."
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Web mobile, 53 desktop, 53 wide, 54 Android físico, cinco de Battle Live e 237 focais; não houve overflow bloqueante, campo estreito ou perda permanente de navegação."
+        "note": "Foram revisadas 54 capturas Android emulator, 160 Web P0, nove Jogar contra IA Web real e 216 capturas focais; não houve overflow bloqueante ou perda permanente de navegação."
       },
       "interaction_clarity": {
         "status": "pass",
-        "note": "Importação, criação, busca, propostas, sessão, replay, pós-jogo e Optimize explicam o próximo passo; ações críticas distinguem cancelar, retry e confirmação, e o seletor de comandante focal foi reconhecido como componente isolado da ação do formulário."
+        "note": "Importação, criação, busca, propostas, sessão, replay e rematch explicam o próximo passo; Jogar contra IA expõe ações legais e mudanças reais de estado em vez de uma visão de espectador."
       },
       "state_coverage": {
         "status": "pass",
-        "note": "A prova cobre vazio, preenchido, loading, validação, saving, erro, retry, histórico, reconnect, timeout, conclusão, consentimento, sessão expirada, permissão negada e indisponibilidade."
+        "note": "A prova cobre vazio, preenchido, loading, validação, saving, erro, retry, mulligan, terreno, conjuração, combate, reconnect, terminal, replay, rematch, consentimento, sessão expirada, permissão negada e indisponibilidade."
       },
       "accessibility_visual": {
         "status": "pass",
-        "note": "Labels, foco, redundância por texto/ícone e alvos foram inspecionados; TalkBack humano e teclado Web de hardware continuam pendentes e não receberam crédito."
+        "note": "Labels, foco visível, redundância por texto/ícone e alvos foram inspecionados; TalkBack humano e teclado Web de hardware continuam pendentes e não receberam crédito."
       },
       "attractiveness": {
         "status": "pass",
-        "note": "As jornadas principais são reconhecíveis e image-led, especialmente Home, decks, carta, Binder, Battle e Trade; densidade wide, carrosséis e estados administrativos permanecem no backlog de polish."
+        "note": "As jornadas principais são reconhecíveis e image-led, especialmente Home, decks, carta, Binder, Jogar contra IA e Trade; densidade wide, carrosséis e estados administrativos permanecem no backlog de polish."
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "38afd0f21548a880fe851f4f3829aa73e6a2943c600a139446d43d774c80be7a",
-      "18e2a04dcafecb043d939303bc6a00de7fa4fcefcd1fe9d2e8b09b00cd9a83d7",
-      "b5bc0f630504c1272416b509671b38c69e0a6a04324734c14a272fa225c8da05",
-      "53ea5900b600e1cc5782c5c3f4e5c758c85af0f42fdf3cd108640e94444941b1",
-      "3cf2dc627a4d237adef2a9a8963b50c9896de549adece761873769127989db81",
-      "540e545dcb6b49fbd2161d718edf69f9abc97665b4241a7739562b8847c309c7",
-      "46c0090832ed9220f64feca6a98af22a5206b94771140064f25fdcfc1023f191",
-      "b3ef6206fb845b6847b4cd2d729ea41520220b4f217e8c1f61aded869f19c758",
-      "8a65723bd007002a70999b9ecc5e19ef596967834aab7a913494988e234bf468",
-      "f9ae06bd4e5cdffb2a6211f0f06cf7b6beb9ccbe18d0ff5665c9a29b7b57df82",
-      "00a1bf360c27e5bc13f53905110c58255adb7001119bc24a8c5ed15e74558ad3",
-      "21e736107cae1b443094c1ea70c9f6017a5e0917f9c02702ddea4020086fb085",
-      "574f597ca3f5358f49a67e4f583759e2d2ce33ad4d0a90173e839caa428d6c02",
-      "cd0a36380f0416f91ec3a8d1642a09a1724482b77c92fb70f5bb719da7e8fac6",
-      "e07a5a6c2930946a65c42b7a2d5bfed1e3108812b1c1925240379f562d098138",
-      "b616c69d247bef3f886417bf1d19fb045855c6aa0495dfda3fc13f87c483574d",
-      "c782dd4fad2f709bc73f9fa59d7be8a72656da66de75b07d4ceb6def7161b811",
-      "061d27731c434e5ebd52b9f8d7d57ddc83a95dddbdbd1955f85f02f6dab6061c",
-      "8eb7937dc0346276619c05f140528521e9c03af9ab0d5884e8ecec0b950ace03",
-      "11d21ae9c8ba3776762cc15b937c78766f48db71ca9f479355daec687ca62c74",
-      "891a1ac8404135db67cb7d207e6c21acb50be1939924cfe8086ac844de8243bd",
-      "ab430cf3c09eea8a1cffac27033327d798fb2756967a05e75f7775fd58cc2f6a",
-      "cd94106989b056e47476d903c751dc932f8c72d454e4c389df7588fc6162989b",
-      "1c8e61d14c9ac27599cb1bed3f4d9ca6f7d5dab12090339a58bd6120fd9b10b9",
-      "439bbcfce49f53b62c11ae6a18219f0b5c01f05bd42f7277604cde58ee414ae4",
-      "3584361b497a58a16bf6adc76e382c4ebb40d57ac0ad4a81ff8755279f834587"
+      "838b233cf9eae6261c1168c03d5429fdb3728bb99a88d2c8d27b426751887f14",
+      "80821f6f3c9ade2f28643f91fea9d41a80bfe1f076ded422c1dac2f8907042e8",
+      "057d7a0c0e83a7ba7683d4fb2af9416758e5f9b7035252147ec25d7b190bec6d",
+      "cb9734d2f097342f1f6e5e1c22ec151b3d1cfd01f54a0b8e6d1c95c478a29a44",
+      "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d",
+      "03c62c9c1dc8dfe96ce308c9e6d2821643255d3bb735d87e04166e6bd0ed426f",
+      "4c212262ec20ded0eea26b0b69f83c52ec1bd184d5f1b547bd5134b6da9bca65",
+      "b82ee7961d9bee44d992ff8435881d03106ae3419165e3bbbf8e41976eb79af0",
+      "c7d71b75557e3769234abbd06c055bb7b8622be1ce92a53904d852e63fbc7285",
+      "ec9cb61ce57e40b2b308da1975c2313da197f2b8bfba4a6423f0e01877c40d63",
+      "e05b82203f43142f25a80456acca2611aeb4bcde94271cd469135c0e1f40374a",
+      "c40fe82c8727c366447c84590deb390cecd220ffb7607604bd389a6e675a865a",
+      "3752e27a9c848c618a0b5ff2d25c41a16e348a4a02b5962bacd7c884d0ccecb9",
+      "bcbbb447cbc4c11c3fddc185c597aee45c2b72b4b71034b7aee4c42adcba3092",
+      "aaf07bd78ee59d90f9f64e6ab68e5a324e720a9d7a3cfad0026aa50e2e55d5d1",
+      "e9a3a37b398967b7b83c9fea1056cd531378a5694a235b7d95e565bf00698ae6",
+      "2552b3b932221734de486868f866517548b55119104207cc1c05f43c1849a0dd",
+      "032e74b5808439e01a6ae4496a9ac60980598eea246c78f8c60557c6d398a411",
+      "f884914a474ac2b200a28457582280249610e1604b5a98671814023cb9613b26",
+      "ec162afdfc9a6816f81b74c0245cee62e25250541653d9ec8ee62203577fa7b8",
+      "67a5b5707acc86055c6f90686300d1954ae4a54da8f3bd9a581eb0d0fc66407d",
+      "1214eebdd64dec70b362f5ecbf371a7da1cd37908cfba4b29becd504b374bbe7",
+      "66e277de703363b8c8965f3c67e6a77dea1876ce3879bbdcae56bcdac0af9798"
     ],
     "reviewed_profiles": [
-      "android_physical_sm_a135m",
-      "web_desktop_1440x900",
+      "android_emulator_manaloom_api34",
       "web_mobile_390x844",
+      "web_desktop_1440x900",
       "web_wide_1920x1080",
-      "web_battle_live_1440x900",
+      "web_play_vs_ai_1440x900",
       "web_binder_import_mobile_390x844",
       "web_binder_import_desktop_1440x900",
       "web_binder_import_wide_1920x1080",
       "web_deck_workshop_mobile_390x844",
       "web_deck_workshop_desktop_1440x900",
       "web_deck_workshop_wide_1920x1080",
-      "web_battle_learning_mobile_390x844",
-      "web_battle_learning_desktop_1440x900",
-      "web_battle_learning_wide_1920x1080",
       "web_social_trade_mobile_390x844",
       "web_social_trade_desktop_1440x900",
       "web_social_trade_wide_1920x1080",
@@ -250,33 +227,36 @@
       "web_critical_overlays_desktop_1440x900",
       "web_critical_overlays_wide_1920x1080"
     ],
-    "reviewed_screenshot_count": 456,
+    "reviewed_screenshot_count": 439,
     "blocking_findings": [],
     "follow_up_findings": [
-      "P1 — Detalhes do Deck corta Visão Geral para Visão Ge em mobile/Android; preservar acesso e corrigir compactação ou affordance das abas.",
+      "P1 — a tela de replay ainda expõe os nomes internos legados Battle Lab e interactive_coach; alinhar a cópia pública a Jogar contra IA sem confundir replay pós-partida com modo espectador.",
       "P1 — telas desktop/wide com um único resultado, estado vazio ou conteúdo administrativo subutilizam o canvas e parecem uma composição mobile ampliada.",
-      "P2 — identidades muito longas quebram agressivamente no Profile e devem ter regras consistentes de wrap/ellipsis sem perder o nome acessível.",
-      "P2 — carrosséis móveis de cartas, edições e evidências deixam o próximo item parcialmente visível, mas não explicam claramente a rolagem horizontal.",
+      "P1 — Detalhes do Deck corta Visão Geral para Visão Ge em mobile/Android; preservar acesso e corrigir compactação ou affordance das abas.",
+      "P2 — identidades e títulos muito longos quebram ou truncam agressivamente e devem ter regras consistentes de wrap/ellipsis sem perder o nome acessível.",
+      "P2 — carrosséis móveis de cartas, edições e evidências deixam o próximo item parcialmente visível, mas nem sempre explicam claramente a rolagem horizontal.",
       "P2 — a captura focal de recuperação de comandante isola somente o seletor e produz grande área vazia; manter a prova de recuperação, mas adicionar contexto do CTA pai em uma futura matriz.",
-      "P2 — a fixture de Battle Learning expõe o texto artificial Revisão aaaaaaaa preservada; substituir por dado determinístico com aparência realista na próxima recaptura que tocar a superfície.",
       "P2 — em alguns estados de consentimento do cadastro mobile, o título Criar conta fica parcialmente acima do frame após a rolagem; manter ações acessíveis e ajustar o anchor/offset visual.",
       "P2 — Legal/Privacy permanece informativo de beta, usa grande área vazia em alguns anchors e requer revisão jurídica externa antes de lançamento comercial.",
       "TalkBack humano, hardware smoke Android e teclado Web real permanecem verificações de release separadas."
     ]
   },
   "release_checks": {
+    "overall_release": "NO_GO_CAPABILITIES_OFF",
     "android_talkback_human": "pending",
     "android_hardware_smoke": "pending",
-    "android_physical_p0_matrix": "pass_current_digest",
+    "android_emulator_p0_matrix": "pass_current_digest",
+    "android_physical_p0_matrix": "stale_not_claimed",
     "web_hardware_keyboard": "pending",
-    "battle_live_web_real": "pass_current_digest",
+    "play_vs_ai_web_real": "pass_current_digest",
     "binder_import_web_real": "pass_current_digest",
     "deck_workshop_web_real": "pass_current_digest",
-    "battle_learning_web_real": "pass_current_digest",
     "social_trade_web_real": "pass_current_digest",
     "onboarding_intent_web_real": "pass_current_digest",
     "visual_system_workspace_web_real": "pass_current_digest",
     "critical_overlays_states_web_real": "pass_current_digest",
+    "battle_live_internal": "stale_not_claimed",
+    "battle_learning_internal": "stale_not_claimed",
     "battle_coach_optional_manifests": "stale_not_claimed",
     "ios_voiceover": "DEFERRED_BY_SCOPE"
   }

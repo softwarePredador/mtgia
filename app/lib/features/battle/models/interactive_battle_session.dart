@@ -33,9 +33,9 @@ extension InteractiveBattleStatusUi on InteractiveBattleStatus {
 
   String get label => switch (this) {
     InteractiveBattleStatus.starting => 'Preparando a mesa',
-    InteractiveBattleStatus.running => 'Motor jogando',
+    InteractiveBattleStatus.running => 'IA jogando',
     InteractiveBattleStatus.waitingForAction => 'Sua prioridade',
-    InteractiveBattleStatus.actionPending => 'Aplicando sua decisão',
+    InteractiveBattleStatus.actionPending => 'Aplicando sua jogada',
     InteractiveBattleStatus.completed => 'Partida concluída',
     InteractiveBattleStatus.censored => 'Partida encerrada pelo limite',
     InteractiveBattleStatus.conceded => 'Você concedeu',

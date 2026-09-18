@@ -68,7 +68,10 @@ void main() {
             'id': 'o_abcdefghijklmnop',
             'label': 'Conjurar Swords to Plowshares',
             'role': 'card',
-            'card': {'name': 'Swords to Plowshares'},
+            'card': {
+              'id': '11111111-1111-4111-8111-111111111111',
+              'name': 'Swords to Plowshares',
+            },
           },
         ],
       },
@@ -89,6 +92,10 @@ void main() {
       reason: 'Only public opponent zones may be represented as card lists.',
     );
     expect(session.prompt?.options.single.card?.name, 'Swords to Plowshares');
+    expect(
+      session.prompt?.options.single.card?.id,
+      '11111111-1111-4111-8111-111111111111',
+    );
   });
 
   test('classifies every terminal status used by the API contract', () {

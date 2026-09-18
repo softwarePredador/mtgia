@@ -18,6 +18,7 @@ import '../../../lib/decks/optimization_functional_role_floor_support.dart';
 import '../../../lib/decks/optimization_mana_floor_support.dart';
 import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/card_identity_support.dart';
+import '../../../lib/battle/interactive_battle_deck_lifecycle.dart';
 import '../../../lib/http_responses.dart';
 import '../../../lib/scryfall_image_url.dart';
 
@@ -44,37 +45,30 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
   final conn = context.read<Pool>();
 
   try {
-    // Usamos uma transação para garantir que o deck e suas cartas sejam removidos atomicamente.
-    await conn.runTx((session) async {
-      // 1. Verifica se o deck existe e pertence ao usuário antes de deletar
-      final result = await session.execute(
-        Sql.named(
-          'DELETE FROM decks WHERE id = @deckId AND user_id = @userId RETURNING id',
-        ),
-        parameters: {'deckId': deckId, 'userId': userId},
-      );
-
-      // Se nenhum registro foi retornado, o deck não foi encontrado ou o usuário não tem permissão
-      if (result.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
-      }
-
-      // A tabela `deck_cards` deve ter uma restrição de chave estrangeira com `ON DELETE CASCADE`,
-      // o que removeria as cartas automaticamente. Se não, precisaríamos deletar manualmente:
-      // await session.execute(
-      //   Sql.named('DELETE FROM deck_cards WHERE deck_id = @deckId'),
-      //   parameters: {'deckId': deckId},
-      // );
-    });
-
-    return Response(
-      statusCode: HttpStatus.noContent,
-    ); // 204 No Content é a resposta padrão para sucesso em DELETE
+    final result = await deleteDeckAfterBattleGuard(
+      conn,
+      userId: userId,
+      deckId: deckId,
+    );
+    return switch (result) {
+      InteractiveBattleDeckDeleteResult.deleted => Response(
+        statusCode: HttpStatus.noContent,
+      ),
+      InteractiveBattleDeckDeleteResult.notFound => notFound(
+        'Deck not found or permission denied.',
+      ),
+      InteractiveBattleDeckDeleteResult.activeBattle => Response.json(
+        statusCode: HttpStatus.conflict,
+        body: {
+          'error': 'deck_has_active_interactive_battle',
+          'message':
+              'Este deck está em uso por uma partida em andamento. '
+              'Tente novamente quando ela terminar.',
+        },
+      ),
+    };
   } on Exception catch (e) {
     print('[ERROR] Failed to delete deck: $e');
-    if (e.toString().contains('permission denied')) {
-      return notFound(e.toString());
-    }
     return internalServerError('Failed to delete deck');
   }
 }

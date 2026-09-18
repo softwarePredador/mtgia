@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-24T15:39:36.102154Z",
-  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
+  "generated_at": "2026-09-10T13:56:13.068385Z",
+  "source_digest": "e9accd9433541ee73368393f3311930d3da878da7fb4f6c85a45eeed4ca5122c",
   "surface": "onboarding_intent",
   "profile": "web_onboarding_intent_wide_1920x1080",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "c58731f39d4e8227b171a300c92e3493fa68cd59c733cd5d24665d5545d003ba",
+  "log_sha256": "c5573fc82908e37a8532a2bdf5cd10a173a10450501862f9c1b6042ee5fd4508",
   "checkpoint_count": 5,
   "required_checkpoints": [
     "onboarding_intent_00_first_run",
@@ -57,8 +57,8 @@
     {
       "checkpoint": "onboarding_intent_04_completed_home",
       "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-wide/onboarding_intent_04_completed_home.png",
-      "sha256": "e694c5c2aa7c55e3faef26310bd1f8d4631aee022ae30fb2943e8da00b9613ec",
-      "bytes": 122098,
+      "sha256": "febf6e0c77b221b4fb19a1cd6afe1e0a917ecdf6d94829cf34541a1f98614604",
+      "bytes": 122192,
       "width": 1920,
       "height": 1080
     }

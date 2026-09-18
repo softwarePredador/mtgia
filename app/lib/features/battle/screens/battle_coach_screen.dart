@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -18,11 +19,20 @@ import '../services/interactive_battle_service.dart';
 import '../utils/battle_runtime_presentation.dart';
 import 'battle_replays_screen.dart';
 
-String battleCoachRouteLocation(String deckId) =>
-    '/decks/${Uri.encodeComponent(deckId)}/battle-coach';
+String playVsAiRouteLocation(String deckId) =>
+    '/decks/${Uri.encodeComponent(deckId)}/play-vs-ai';
 
+String playVsAiSessionRouteLocation(String deckId, String sessionId) =>
+    '${playVsAiRouteLocation(deckId)}/${Uri.encodeComponent(sessionId)}';
+
+@Deprecated('Use playVsAiRouteLocation; Battle Coach is a legacy route name.')
+String battleCoachRouteLocation(String deckId) => playVsAiRouteLocation(deckId);
+
+@Deprecated(
+  'Use playVsAiSessionRouteLocation; Battle Coach is a legacy route name.',
+)
 String battleCoachSessionRouteLocation(String deckId, String sessionId) =>
-    '${battleCoachRouteLocation(deckId)}/${Uri.encodeComponent(sessionId)}';
+    playVsAiSessionRouteLocation(deckId, sessionId);
 
 class BattleCoachScreen extends StatefulWidget {
   const BattleCoachScreen({
@@ -31,6 +41,7 @@ class BattleCoachScreen extends StatefulWidget {
     this.sessionId,
     this.gateway,
     this.opponentGateway,
+    this.replayHistoryEnabled = false,
     this.pollInterval = const Duration(milliseconds: 1200),
   });
 
@@ -38,6 +49,7 @@ class BattleCoachScreen extends StatefulWidget {
   final String? sessionId;
   final InteractiveBattleGateway? gateway;
   final BattleReplayGateway? opponentGateway;
+  final bool replayHistoryEnabled;
   final Duration pollInterval;
 
   @override
@@ -108,40 +120,10 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       context: context,
       gateway: _opponentGateway,
       currentDeckId: widget.deckId,
-      mode: BattleOpponentPickerMode.coach,
+      mode: BattleOpponentPickerMode.playVsAi,
     );
     if (setup == null || !mounted) return;
-    if (setup.launchMode == BattleTestLaunchMode.automatic) {
-      await _runAutomaticSimulation(setup);
-      return;
-    }
     await _start(setup);
-  }
-
-  Future<void> _runAutomaticSimulation(BattleTestSetup setup) async {
-    setState(() {
-      _starting = true;
-      _error = null;
-    });
-    try {
-      final replay = await _opponentGateway.runBattleTest(
-        deckId: widget.deckId,
-        setup: setup,
-      );
-      if (!mounted) return;
-      setState(() => _starting = false);
-      final location = battleReplaysRouteLocation(
-        widget.deckId,
-        replayId: replay.summary.id,
-      );
-      context.go(location);
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _starting = false;
-        _error = _friendlyError(error);
-      });
-    }
   }
 
   Future<void> _start(BattleTestSetup setup) async {
@@ -157,10 +139,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
       if (!mounted) return;
       _acceptSession(session);
       setState(() => _starting = false);
-      final location = battleCoachSessionRouteLocation(
-        widget.deckId,
-        session.id,
-      );
+      final location = playVsAiSessionRouteLocation(widget.deckId, session.id);
       if (GoRouterState.of(context).uri.path != location) {
         context.replace(location);
       }
@@ -226,10 +205,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
         _starting = false;
         _activeSession = null;
       });
-      final location = battleCoachSessionRouteLocation(
-        widget.deckId,
-        session.id,
-      );
+      final location = playVsAiSessionRouteLocation(widget.deckId, session.id);
       if (GoRouterState.of(context).uri.path != location) {
         context.replace(location);
       }
@@ -391,6 +367,10 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
     context.go('${battleReplaysRouteLocation(widget.deckId)}$query');
   }
 
+  void _playAgain() {
+    context.go(playVsAiRouteLocation(widget.deckId));
+  }
+
   @override
   Widget build(BuildContext context) {
     final session = _session;
@@ -402,7 +382,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
             ? _BattleCoachKeyboardFocusHalo(
                 haloKey: const Key('battle-coach-back-focus-halo'),
                 borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-                debugLabel: 'Battle Coach back',
+                debugLabel: 'Play vs AI back',
                 builder: (focusNode) => IconButton(
                   key: const Key('battle-coach-back-button'),
                   focusNode: focusNode,
@@ -412,28 +392,29 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
                 ),
               )
             : null,
-        title: const Text('Battle Coach'),
+        title: const Text('Jogar contra IA'),
         actions: [
-          _BattleCoachKeyboardFocusHalo(
-            haloKey: const Key('battle-coach-history-focus-halo'),
-            borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-            debugLabel: 'Battle Coach replays',
-            builder: (focusNode) => IconButton(
-              key: const Key('battle-coach-history-button'),
-              focusNode: focusNode,
-              tooltip: 'Abrir replays',
-              onPressed: _openReplay,
-              icon: const ManaLoomGlyph(
-                ManaLoomGlyphKind.battleReplay,
-                size: 22,
+          if (widget.replayHistoryEnabled)
+            _BattleCoachKeyboardFocusHalo(
+              haloKey: const Key('battle-coach-history-focus-halo'),
+              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+              debugLabel: 'Play vs AI replays',
+              builder: (focusNode) => IconButton(
+                key: const Key('battle-coach-history-button'),
+                focusNode: focusNode,
+                tooltip: 'Abrir replays',
+                onPressed: _openReplay,
+                icon: const ManaLoomGlyph(
+                  ManaLoomGlyphKind.battleReplay,
+                  size: 22,
+                ),
               ),
             ),
-          ),
           if (session != null && !session.isTerminal)
             _BattleCoachKeyboardFocusHalo(
               haloKey: const Key('battle-coach-refresh-focus-halo'),
               borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-              debugLabel: 'Battle Coach reconnect',
+              debugLabel: 'Play vs AI reconnect',
               builder: (focusNode) => IconButton(
                 key: const Key('battle-coach-refresh-button'),
                 focusNode: focusNode,
@@ -446,7 +427,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
             _BattleCoachKeyboardFocusHalo(
               haloKey: const Key('battle-coach-concede-focus-halo'),
               borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-              debugLabel: 'Battle Coach concede',
+              debugLabel: 'Play vs AI concede',
               builder: (focusNode) => IconButton(
                 key: const Key('battle-coach-concede-button'),
                 focusNode: focusNode,
@@ -462,7 +443,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
         child: SafeArea(
           child: Column(
             children: [
-              const _BattleCoachAlphaBanner(),
+              if (session == null) const _BattleCoachAlphaBanner(),
               Expanded(child: _buildBody()),
             ],
           ),
@@ -487,6 +468,7 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
         sessionsLoading: _sessionsLoading,
         sessionsError: _sessionsError,
         activeSession: _activeSession,
+        replayHistoryEnabled: widget.replayHistoryEnabled,
         onChooseOpponent: _chooseOpponent,
         onResume: _resumeActiveSession,
         onRetrySessions: _loadActiveSession,
@@ -502,15 +484,42 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final expanded = constraints.maxWidth >= 1040;
-              final board = _BattleCoachBoard(session: session);
+              void selectOption(InteractiveBattlePromptOption option) {
+                unawaited(
+                  _respond(InteractiveBattleResponse.option(option.id)),
+                );
+              }
+
+              final compactHand = constraints.maxHeight < 560;
+              final handHeight = compactHand ? 126.0 : 194.0;
+              final visibleActionCards = _visibleActionCards(
+                session.privateState,
+              );
+              final hasDirectCardAction = _hasSafeDirectCardAction(
+                session.prompt,
+                visibleActionCards,
+              );
+              final board = _BattleCoachBoard(
+                session: session,
+                busy: _submitting,
+                visibleActionCards: visibleActionCards,
+                onOption: selectOption,
+              );
+              final hand = _OwnHand(
+                cards: session.privateState.ownHand,
+                visibleActionCards: visibleActionCards,
+                prompt: session.prompt,
+                busy: _submitting,
+                compact: compactHand,
+                onOption: selectOption,
+              );
               final decisions = _BattleCoachDecisionPanel(
                 session: session,
                 busy: _submitting,
+                hasDirectCardAction: hasDirectCardAction,
                 integerValue: _integerValue,
                 multiAmountController: _multiAmountController,
-                onOption: (option) =>
-                    _respond(InteractiveBattleResponse.option(option.id)),
+                onOption: selectOption,
                 onIntegerChanged: (value) {
                   setState(() => _integerValue = value);
                 },
@@ -528,28 +537,42 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
                 },
                 onDelegate: () =>
                     _respond(const InteractiveBattleResponse.delegate()),
-                onOpenReplay: _openReplay,
+                onOpenReplay: widget.replayHistoryEnabled ? _openReplay : null,
+                onPlayAgain: _playAgain,
               );
-              if (!expanded) {
-                final preferredDecisionHeight = session.prompt != null
-                    ? constraints.maxHeight * 0.48
-                    : constraints.maxHeight * 0.34;
-                final decisionHeight = constraints.maxHeight < 194
-                    ? constraints.maxHeight * 0.58
-                    : preferredDecisionHeight.clamp(
-                        112.0,
-                        constraints.maxHeight * 0.58,
-                      );
+              final sideBySide = constraints.maxWidth >= 760;
+              if (!sideBySide) {
+                final desiredActionHeight = session.prompt == null
+                    ? 128.0
+                    : 232.0;
+                final actionHeight = math.min(
+                  desiredActionHeight,
+                  math.max(96.0, constraints.maxHeight * 0.34),
+                );
                 return Column(
-                  key: const Key('battle-coach-compact-scroll'),
+                  key: const Key('play-vs-ai-stacked-workspace'),
                   children: [
-                    SizedBox(
-                      key: const Key('battle-coach-compact-decision-region'),
-                      height: decisionHeight,
+                    Expanded(
                       child: SingleChildScrollView(
+                        key: const Key('battle-coach-compact-board-scroll'),
                         padding: const EdgeInsets.fromLTRB(
                           AppTheme.pageGutterCompact,
                           AppTheme.pageGutterCompact,
+                          AppTheme.pageGutterCompact,
+                          AppTheme.space8,
+                        ),
+                        child: board,
+                      ),
+                    ),
+                    const Divider(height: 1),
+                    SizedBox(
+                      key: const Key('battle-coach-compact-decision-region'),
+                      height: actionHeight,
+                      child: SingleChildScrollView(
+                        key: const Key('play-vs-ai-action-tray'),
+                        padding: const EdgeInsets.fromLTRB(
+                          AppTheme.pageGutterCompact,
+                          AppTheme.space8,
                           AppTheme.pageGutterCompact,
                           AppTheme.space8,
                         ),
@@ -557,30 +580,46 @@ class _BattleCoachScreenState extends State<BattleCoachScreen>
                       ),
                     ),
                     const Divider(height: 1),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        key: const Key('battle-coach-compact-board-scroll'),
-                        padding: const EdgeInsets.fromLTRB(
-                          AppTheme.pageGutterCompact,
-                          AppTheme.space8,
-                          AppTheme.pageGutterCompact,
-                          AppTheme.pageGutterCompact,
-                        ),
-                        child: board,
-                      ),
+                    SizedBox(
+                      key: const Key('play-vs-ai-hand-dock'),
+                      height: handHeight,
+                      child: hand,
                     ),
                   ],
                 );
               }
+              final inspectorWidth = math.min(
+                AppTheme.inspectorWidth,
+                constraints.maxWidth * 0.38,
+              );
               return Padding(
-                padding: const EdgeInsets.all(AppTheme.pageGutter),
+                key: const Key('play-vs-ai-side-by-side-workspace'),
+                padding: const EdgeInsets.all(AppTheme.pageGutterCompact),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(child: SingleChildScrollView(child: board)),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              key: const Key('play-vs-ai-board-scroll'),
+                              child: board,
+                            ),
+                          ),
+                          const Divider(height: 1),
+                          SizedBox(
+                            key: const Key('play-vs-ai-hand-dock'),
+                            height: handHeight,
+                            child: hand,
+                          ),
+                        ],
+                      ),
+                    ),
                     const SizedBox(width: AppTheme.paneGap),
                     SizedBox(
-                      width: AppTheme.inspectorWidth,
+                      key: const Key('play-vs-ai-action-tray'),
+                      width: inspectorWidth,
                       child: SingleChildScrollView(child: decisions),
                     ),
                   ],
@@ -600,8 +639,7 @@ class _BattleCoachAlphaBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     container: true,
-    label:
-        'Battle Coach Alpha experimental. Decisões assistidas e suporte limitado.',
+    label: 'Partida contra IA experimental. Você controla seu lado da mesa.',
     child: Container(
       key: const Key('battle-coach-alpha-banner'),
       width: double.infinity,
@@ -631,7 +669,7 @@ class _BattleCoachAlphaBanner extends StatelessWidget {
               ),
             ),
             child: Text(
-              'ALPHA',
+              'TESTE',
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: AppTheme.warning,
                 fontWeight: FontWeight.w900,
@@ -642,7 +680,7 @@ class _BattleCoachAlphaBanner extends StatelessWidget {
           const SizedBox(width: AppTheme.space8),
           Expanded(
             child: Text(
-              'Experimental · decisões assistidas e suporte limitado',
+              'Experimental · você joga contra um adversário controlado pela IA',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
@@ -664,6 +702,7 @@ class _BattleCoachWelcome extends StatelessWidget {
     required this.sessionsLoading,
     required this.sessionsError,
     required this.activeSession,
+    required this.replayHistoryEnabled,
     required this.onChooseOpponent,
     required this.onResume,
     required this.onRetrySessions,
@@ -674,6 +713,7 @@ class _BattleCoachWelcome extends StatelessWidget {
   final bool sessionsLoading;
   final String? sessionsError;
   final InteractiveBattleSession? activeSession;
+  final bool replayHistoryEnabled;
   final VoidCallback onChooseOpponent;
   final VoidCallback onResume;
   final VoidCallback onRetrySessions;
@@ -704,7 +744,7 @@ class _BattleCoachWelcome extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'MÃO · PILHA · CAMPO · DECISÕES COMPATÍVEIS',
+                    'MÃO · CAMPO · PILHA · AÇÕES LEGAIS',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.brass400,
@@ -729,7 +769,7 @@ class _BattleCoachWelcome extends StatelessWidget {
                   ),
                   const SizedBox(height: AppTheme.space18),
                   Text(
-                    'Participe das decisões compatíveis',
+                    'Jogue seu deck contra a IA',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.headlineSmall?.copyWith(
                       color: AppTheme.textPrimary,
@@ -738,9 +778,9 @@ class _BattleCoachWelcome extends StatelessWidget {
                   ),
                   const SizedBox(height: AppTheme.space8),
                   Text(
-                    'Durante o Alpha, o motor conduz a partida e pausa somente '
-                    'quando uma decisão compatível estiver disponível. Você '
-                    'escolhe nesses momentos; as demais ações seguem automaticamente.',
+                    'Você controla seu lado da mesa; a IA controla o adversário. '
+                    'Escolha cartas, mana, alvos, prioridade e combate sempre que '
+                    'o jogo apresentar uma ação legal.',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: AppTheme.textSecondary,
@@ -752,23 +792,25 @@ class _BattleCoachWelcome extends StatelessWidget {
                     builder: (context, constraints) {
                       const validated = _CoachTrustChip(
                         icon: Icons.rule_rounded,
-                        label: 'Deck validado para execução',
+                        label: 'Você controla suas jogadas',
                       );
-                      const replay = _CoachTrustChip(
+                      final replay = _CoachTrustChip(
                         icon: Icons.history_rounded,
-                        label: 'Decisões registradas; replay ao concluir',
+                        label: replayHistoryEnabled
+                            ? 'Regras aplicadas e replay ao concluir'
+                            : 'Regras aplicadas pelo motor da partida',
                       );
                       if (constraints.maxWidth < 380) {
-                        return const Column(
+                        return Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             validated,
-                            SizedBox(height: AppTheme.space8),
+                            const SizedBox(height: AppTheme.space8),
                             replay,
                           ],
                         );
                       }
-                      return const Wrap(
+                      return Wrap(
                         alignment: WrapAlignment.center,
                         spacing: AppTheme.space8,
                         runSpacing: AppTheme.space8,
@@ -846,8 +888,8 @@ class _BattleCoachWelcome extends StatelessWidget {
                     ),
                     borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     debugLabel: activeSession == null
-                        ? 'Battle Coach choose opponent'
-                        : 'Battle Coach resume active session',
+                        ? 'Play vs AI choose opponent'
+                        : 'Play vs AI resume active session',
                     builder: (focusNode) => FilledButton.icon(
                       key: Key(
                         activeSession == null
@@ -1182,9 +1224,17 @@ class _BattleCoachErrorBanner extends StatelessWidget {
 }
 
 class _BattleCoachBoard extends StatelessWidget {
-  const _BattleCoachBoard({required this.session});
+  const _BattleCoachBoard({
+    required this.session,
+    required this.busy,
+    required this.visibleActionCards,
+    required this.onOption,
+  });
 
   final InteractiveBattleSession session;
+  final bool busy;
+  final List<InteractiveBattleCard> visibleActionCards;
+  final ValueChanged<InteractiveBattlePromptOption> onOption;
 
   @override
   Widget build(BuildContext context) {
@@ -1214,16 +1264,29 @@ class _BattleCoachBoard extends StatelessWidget {
           _PlayerZone(
             player: opponent,
             isOwn: false,
+            prompt: session.prompt,
+            busy: busy,
+            visibleActionCards: visibleActionCards,
+            onOption: onOption,
             hasPriority:
                 priorityPlayer != null && opponent?.name == priorityPlayer,
           ),
-          _SharedBattleZone(state: state),
+          _SharedBattleZone(
+            state: state,
+            prompt: session.prompt,
+            busy: busy,
+            visibleActionCards: visibleActionCards,
+            onOption: onOption,
+          ),
           _PlayerZone(
             player: own,
             isOwn: true,
+            prompt: session.prompt,
+            busy: busy,
+            visibleActionCards: visibleActionCards,
+            onOption: onOption,
             hasPriority: priorityPlayer != null && own?.name == priorityPlayer,
           ),
-          _OwnHand(cards: state.ownHand),
         ],
       ),
     );
@@ -1235,11 +1298,19 @@ class _PlayerZone extends StatelessWidget {
     required this.player,
     required this.isOwn,
     required this.hasPriority,
+    required this.prompt,
+    required this.busy,
+    required this.visibleActionCards,
+    required this.onOption,
   });
 
   final InteractiveBattlePlayer? player;
   final bool isOwn;
   final bool hasPriority;
+  final InteractiveBattlePrompt? prompt;
+  final bool busy;
+  final List<InteractiveBattleCard> visibleActionCards;
+  final ValueChanged<InteractiveBattlePromptOption> onOption;
 
   @override
   Widget build(BuildContext context) {
@@ -1348,6 +1419,10 @@ class _PlayerZone extends StatelessWidget {
             cards: value?.battlefield ?? const <InteractiveBattleCard>[],
             emptyLabel: 'Nenhuma permanente no campo',
             compact: true,
+            prompt: prompt,
+            busy: busy,
+            visibleActionCards: visibleActionCards,
+            onOption: onOption,
           ),
           if (value != null &&
               (value.command.isNotEmpty || value.graveyard.isNotEmpty)) ...[
@@ -1384,9 +1459,19 @@ class _PlayerZone extends StatelessWidget {
 }
 
 class _SharedBattleZone extends StatelessWidget {
-  const _SharedBattleZone({required this.state});
+  const _SharedBattleZone({
+    required this.state,
+    required this.prompt,
+    required this.busy,
+    required this.visibleActionCards,
+    required this.onOption,
+  });
 
   final InteractiveBattlePrivateState state;
+  final InteractiveBattlePrompt? prompt;
+  final bool busy;
+  final List<InteractiveBattleCard> visibleActionCards;
+  final ValueChanged<InteractiveBattlePromptOption> onOption;
 
   @override
   Widget build(BuildContext context) {
@@ -1432,7 +1517,15 @@ class _SharedBattleZone extends StatelessWidget {
           ),
           if (state.stack.isNotEmpty) ...[
             const SizedBox(height: AppTheme.space8),
-            _ZoneCards(cards: state.stack, emptyLabel: '', compact: true),
+            _ZoneCards(
+              cards: state.stack,
+              emptyLabel: '',
+              compact: true,
+              prompt: prompt,
+              busy: busy,
+              visibleActionCards: visibleActionCards,
+              onOption: onOption,
+            ),
           ],
           if (hasCombat) ...[
             const SizedBox(height: AppTheme.space8),
@@ -1456,14 +1549,26 @@ class _SharedBattleZone extends StatelessWidget {
 }
 
 class _OwnHand extends StatelessWidget {
-  const _OwnHand({required this.cards});
+  const _OwnHand({
+    required this.cards,
+    required this.visibleActionCards,
+    required this.prompt,
+    required this.busy,
+    required this.compact,
+    required this.onOption,
+  });
 
   final List<InteractiveBattleCard> cards;
+  final List<InteractiveBattleCard> visibleActionCards;
+  final InteractiveBattlePrompt? prompt;
+  final bool busy;
+  final bool compact;
+  final ValueChanged<InteractiveBattlePromptOption> onOption;
 
   @override
   Widget build(BuildContext context) => Container(
     key: const Key('battle-coach-own-hand'),
-    padding: const EdgeInsets.all(AppTheme.space12),
+    padding: EdgeInsets.all(compact ? AppTheme.space7 : AppTheme.space12),
     decoration: BoxDecoration(
       color: AppTheme.surfaceElevated.withValues(alpha: 0.8),
       border: const Border(top: BorderSide(color: AppTheme.outlineMuted)),
@@ -1488,11 +1593,17 @@ class _OwnHand extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppTheme.space10),
+        SizedBox(height: compact ? AppTheme.space4 : AppTheme.space10),
         _ZoneCards(
           cards: cards,
           emptyLabel: 'Sua mão está vazia',
           compact: false,
+          prompt: prompt,
+          busy: busy,
+          visibleActionCards: visibleActionCards,
+          onOption: onOption,
+          cardWidth: compact ? 58 : 96,
+          cardHeight: compact ? 81 : 134,
         ),
       ],
     ),
@@ -1503,13 +1614,25 @@ class _ZoneCards extends StatelessWidget {
   const _ZoneCards({
     super.key,
     required this.cards,
+    required this.visibleActionCards,
     required this.emptyLabel,
     required this.compact,
+    this.prompt,
+    this.busy = false,
+    this.onOption,
+    this.cardWidth,
+    this.cardHeight,
   });
 
   final List<InteractiveBattleCard> cards;
+  final List<InteractiveBattleCard> visibleActionCards;
   final String emptyLabel;
   final bool compact;
+  final InteractiveBattlePrompt? prompt;
+  final bool busy;
+  final ValueChanged<InteractiveBattlePromptOption>? onOption;
+  final double? cardWidth;
+  final double? cardHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -1532,14 +1655,22 @@ class _ZoneCards extends StatelessWidget {
         ),
       );
     }
-    final width = compact ? 68.0 : 96.0;
-    final height = compact ? 95.0 : 134.0;
+    final width = cardWidth ?? (compact ? 68.0 : 96.0);
+    final height = cardHeight ?? (compact ? 95.0 : 134.0);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
           for (final card in cards) ...[
-            _BattleCard(card: card, width: width, height: height),
+            _BattleCard(
+              card: card,
+              width: width,
+              height: height,
+              legalOption: busy
+                  ? null
+                  : _legalOptionForCard(prompt, card, visibleActionCards),
+              onLegalOption: onOption,
+            ),
             const SizedBox(width: AppTheme.space8),
           ],
         ],
@@ -1548,19 +1679,79 @@ class _ZoneCards extends StatelessWidget {
   }
 }
 
+InteractiveBattlePromptOption? _legalOptionForCard(
+  InteractiveBattlePrompt? prompt,
+  InteractiveBattleCard card,
+  List<InteractiveBattleCard> visibleCards,
+) {
+  if (prompt == null || prompt.inputMode != 'options') return null;
+  final cardOptions = prompt.options
+      .where((option) => option.card != null)
+      .toList(growable: false);
+  final matchingOptions = cardOptions
+      .where((option) => _hasSameObjectId(option.card!, card))
+      .toList(growable: false);
+  if (matchingOptions.length != 1) return null;
+
+  final option = matchingOptions.single;
+  final matchingVisibleCards = visibleCards
+      .where((candidate) => _hasSameObjectId(option.card!, candidate))
+      .toList(growable: false);
+  return matchingVisibleCards.length == 1 ? option : null;
+}
+
+bool _hasSameObjectId(
+  InteractiveBattleCard promptCard,
+  InteractiveBattleCard visibleCard,
+) {
+  final promptId = promptCard.id?.trim();
+  final visibleId = visibleCard.id?.trim();
+  return promptId != null &&
+      _interactiveObjectIdPattern.hasMatch(promptId) &&
+      visibleId != null &&
+      _interactiveObjectIdPattern.hasMatch(visibleId) &&
+      promptId == visibleId;
+}
+
+bool _hasSafeDirectCardAction(
+  InteractiveBattlePrompt? prompt,
+  List<InteractiveBattleCard> visibleCards,
+) => visibleCards.any(
+  (card) => _legalOptionForCard(prompt, card, visibleCards) != null,
+);
+
+final _interactiveObjectIdPattern = RegExp(
+  r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-'
+  r'[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$',
+);
+
+List<InteractiveBattleCard> _visibleActionCards(
+  InteractiveBattlePrivateState state,
+) => <InteractiveBattleCard>[
+  ...state.ownHand,
+  for (final player in state.players) ...player.battlefield,
+  ...state.stack,
+];
+
 class _BattleCard extends StatelessWidget {
   const _BattleCard({
     required this.card,
     required this.width,
     required this.height,
+    required this.legalOption,
+    required this.onLegalOption,
   });
 
   final InteractiveBattleCard card;
   final double width;
   final double height;
+  final InteractiveBattlePromptOption? legalOption;
+  final ValueChanged<InteractiveBattlePromptOption>? onLegalOption;
 
   @override
   Widget build(BuildContext context) {
+    final option = legalOption;
+    final isLegal = option != null && onLegalOption != null;
     final cardBody = Stack(
       fit: StackFit.expand,
       children: [
@@ -1576,6 +1767,34 @@ class _BattleCard extends StatelessWidget {
             errorPlaceholder: _CardFallback(name: card.name),
           ),
         ),
+        if (isLegal)
+          Positioned(
+            left: AppTheme.space3,
+            top: AppTheme.space3,
+            child: Container(
+              key: Key('play-vs-ai-legal-card-badge-${option.id}'),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.space5,
+                vertical: AppTheme.space2,
+              ),
+              decoration: BoxDecoration(
+                color: AppTheme.brass400,
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                boxShadow: const [
+                  BoxShadow(
+                    color: AppTheme.overlayBlack65,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.touch_app_rounded,
+                size: 13,
+                color: AppTheme.backgroundAbyss,
+              ),
+            ),
+          ),
         if ((card.damage != null && card.damage! > 0) ||
             card.counters.isNotEmpty)
           Positioned(
@@ -1608,22 +1827,50 @@ class _BattleCard extends StatelessWidget {
           ),
       ],
     );
+    final highlightedBody = AnimatedContainer(
+      key: isLegal ? Key('play-vs-ai-legal-card-${option.id}') : null,
+      duration: _motionDuration(context),
+      padding: EdgeInsets.all(isLegal ? AppTheme.space2 : 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+        border: isLegal ? Border.all(color: AppTheme.brass400, width: 2) : null,
+        boxShadow: isLegal
+            ? [
+                BoxShadow(
+                  color: AppTheme.brass400.withValues(alpha: 0.42),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                ),
+              ]
+            : const [],
+      ),
+      child: cardBody,
+    );
     return _BattleCardPreviewTarget(
       card: card,
+      onActivate: isLegal ? () => onLegalOption!(option) : null,
+      actionLabel: isLegal ? option.label : null,
       child: Semantics(
-        image: true,
+        image: !isLegal,
         label: '${card.name}${card.tapped ? ', virada' : ''}',
-        child: SizedBox(width: width, height: height, child: cardBody),
+        child: SizedBox(width: width, height: height, child: highlightedBody),
       ),
     );
   }
 }
 
 class _BattleCardPreviewTarget extends StatefulWidget {
-  const _BattleCardPreviewTarget({required this.card, required this.child});
+  const _BattleCardPreviewTarget({
+    required this.card,
+    required this.child,
+    this.onActivate,
+    this.actionLabel,
+  });
 
   final InteractiveBattleCard card;
   final Widget child;
+  final VoidCallback? onActivate;
+  final String? actionLabel;
 
   @override
   State<_BattleCardPreviewTarget> createState() =>
@@ -1641,7 +1888,7 @@ class _BattleCardPreviewTargetState extends State<_BattleCardPreviewTarget> {
   void initState() {
     super.initState();
     _focusNode = FocusNode(
-      debugLabel: 'Battle Coach card preview ${widget.card.name}',
+      debugLabel: 'Play vs AI card preview ${widget.card.name}',
     );
   }
 
@@ -1758,7 +2005,13 @@ class _BattleCardPreviewTargetState extends State<_BattleCardPreviewTarget> {
     if (event is KeyDownEvent &&
         (event.logicalKey == LogicalKeyboardKey.enter ||
             event.logicalKey == LogicalKeyboardKey.space)) {
-      unawaited(_openPreview());
+      final onActivate = widget.onActivate;
+      if (onActivate != null) {
+        _removePreview();
+        onActivate();
+      } else {
+        unawaited(_openPreview());
+      }
       return KeyEventResult.handled;
     }
     return KeyEventResult.ignored;
@@ -1768,8 +2021,12 @@ class _BattleCardPreviewTargetState extends State<_BattleCardPreviewTarget> {
   Widget build(BuildContext context) => Semantics(
     key: Key('battle-coach-card-preview-${_cardPreviewKey(widget.card)}'),
     button: true,
-    label: 'Ver prévia de ${widget.card.name}',
-    hint: 'Passe o mouse, use o foco ou toque para ampliar a carta.',
+    label: widget.onActivate == null
+        ? 'Ver prévia de ${widget.card.name}'
+        : '${widget.actionLabel}. ${widget.card.name}',
+    hint: widget.onActivate == null
+        ? 'Passe o mouse, use o foco ou toque para ampliar a carta.'
+        : 'Toque ou pressione Enter para jogar esta ação legal. Pressione e segure para ampliar a carta.',
     child: Focus(
       key: Key(
         'battle-coach-card-preview-${_cardPreviewKey(widget.card)}-focus',
@@ -1786,13 +2043,17 @@ class _BattleCardPreviewTargetState extends State<_BattleCardPreviewTarget> {
           _hovered = true;
           _syncPreview();
         },
+        onHover: (_) {
+          _hovered = true;
+          _syncPreview();
+        },
         onExit: (_) {
           _hovered = false;
           _syncPreview();
         },
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => unawaited(_openPreview()),
+          onTap: widget.onActivate ?? () => unawaited(_openPreview()),
           onLongPress: () => unawaited(_openPreview()),
           child: widget.child,
         ),
@@ -1997,6 +2258,7 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
   const _BattleCoachDecisionPanel({
     required this.session,
     required this.busy,
+    required this.hasDirectCardAction,
     required this.integerValue,
     required this.multiAmountController,
     required this.onOption,
@@ -2005,10 +2267,12 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
     required this.onMultiSubmit,
     required this.onDelegate,
     required this.onOpenReplay,
+    required this.onPlayAgain,
   });
 
   final InteractiveBattleSession session;
   final bool busy;
+  final bool hasDirectCardAction;
   final int? integerValue;
   final TextEditingController multiAmountController;
   final ValueChanged<InteractiveBattlePromptOption> onOption;
@@ -2016,7 +2280,8 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
   final VoidCallback onIntegerSubmit;
   final VoidCallback onMultiSubmit;
   final VoidCallback onDelegate;
-  final VoidCallback onOpenReplay;
+  final VoidCallback? onOpenReplay;
+  final VoidCallback onPlayAgain;
 
   @override
   Widget build(BuildContext context) {
@@ -2024,6 +2289,7 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
       return _BattleCoachTerminalPanel(
         session: session,
         onOpenReplay: onOpenReplay,
+        onPlayAgain: onPlayAgain,
       );
     }
     final prompt = session.prompt;
@@ -2077,6 +2343,17 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
                 height: 1.4,
               ),
             ),
+            if (prompt.inputMode == 'options' && hasDirectCardAction) ...[
+              const SizedBox(height: AppTheme.space8),
+              Text(
+                'Toque em uma carta destacada na mesa ou escolha a mesma ação abaixo.',
+                key: const Key('play-vs-ai-card-action-hint'),
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: AppTheme.brass400,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
             const SizedBox(height: AppTheme.space14),
             if (busy)
               const LinearProgressIndicator(
@@ -2114,19 +2391,19 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
             _BattleCoachKeyboardFocusHalo(
               haloKey: const Key('battle-coach-delegate-focus-halo'),
               borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-              debugLabel: 'Battle Coach delegate decision',
+              debugLabel: 'Play vs AI delegate decision',
               builder: (focusNode) => OutlinedButton.icon(
                 key: const Key('battle-coach-delegate-button'),
                 focusNode: focusNode,
                 onPressed: busy ? null : onDelegate,
                 icon: const Icon(Icons.auto_mode_rounded),
-                label: const Text('Delegar esta decisão ao motor'),
+                label: const Text('Deixar esta ação no automático'),
               ),
             ),
             const SizedBox(height: AppTheme.space6),
             Text(
-              'Delegar vale somente para este prompt. A próxima decisão '
-              'interativa voltará para você.',
+              'O automático vale somente para esta ação. A próxima jogada '
+              'legal volta para você.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.labelSmall?.copyWith(
                 color: AppTheme.textHint,
@@ -2192,7 +2469,7 @@ class _PromptOptionTile extends StatelessWidget {
     return _BattleCoachKeyboardFocusHalo(
       haloKey: Key('battle-coach-option-${option.id}-focus-halo'),
       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-      debugLabel: 'Battle Coach option ${option.label}',
+      debugLabel: 'Play vs AI option ${option.label}',
       builder: (focusNode) => Material(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -2292,7 +2569,7 @@ class _IntegerDecision extends StatelessWidget {
         _BattleCoachKeyboardFocusHalo(
           haloKey: const Key('battle-coach-integer-submit-focus-halo'),
           borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-          debugLabel: 'Battle Coach confirm quantity',
+          debugLabel: 'Play vs AI confirm quantity',
           builder: (focusNode) => FilledButton(
             key: const Key('battle-coach-integer-submit-button'),
             focusNode: focusNode,
@@ -2321,8 +2598,8 @@ class _DecisionInputUnavailable extends StatelessWidget {
         border: Border.all(color: AppTheme.warning.withValues(alpha: 0.32)),
       ),
       child: const Text(
-        'Os detalhes desta decisão não estão disponíveis. Você pode delegá-la '
-        'ao motor ou reconectar à mesa.',
+        'Os detalhes desta decisão não estão disponíveis. Você pode deixá-la '
+        'no automático ou reconectar à mesa.',
         textAlign: TextAlign.center,
       ),
     ),
@@ -2359,7 +2636,7 @@ class _MultiAmountDecision extends StatelessWidget {
       _BattleCoachKeyboardFocusHalo(
         haloKey: const Key('battle-coach-multi-submit-focus-halo'),
         borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-        debugLabel: 'Battle Coach confirm distribution',
+        debugLabel: 'Play vs AI confirm distribution',
         builder: (focusNode) => FilledButton(
           key: const Key('battle-coach-multi-submit-button'),
           focusNode: focusNode,
@@ -2392,7 +2669,7 @@ class _BattleCoachAutoplayPanel extends StatelessWidget {
         ),
         const SizedBox(height: AppTheme.space12),
         Text(
-          'O motor está jogando',
+          'A IA está resolvendo a jogada',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.w800,
@@ -2400,7 +2677,7 @@ class _BattleCoachAutoplayPanel extends StatelessWidget {
         ),
         const SizedBox(height: AppTheme.space6),
         Text(
-          'A mesa atualiza automaticamente e para quando uma decisão sua for necessária.',
+          'A mesa continua pelas regras do jogo e devolve o controle quando houver uma ação legal para você.',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: AppTheme.textSecondary,
@@ -2418,10 +2695,12 @@ class _BattleCoachTerminalPanel extends StatelessWidget {
   const _BattleCoachTerminalPanel({
     required this.session,
     required this.onOpenReplay,
+    required this.onPlayAgain,
   });
 
   final InteractiveBattleSession session;
-  final VoidCallback onOpenReplay;
+  final VoidCallback? onOpenReplay;
+  final VoidCallback onPlayAgain;
 
   @override
   Widget build(BuildContext context) {
@@ -2478,18 +2757,27 @@ class _BattleCoachTerminalPanel extends StatelessWidget {
             ],
             const SizedBox(height: AppTheme.space16),
             FilledButton.icon(
-              key: const Key('battle-coach-open-replay-button'),
-              onPressed: onOpenReplay,
-              icon: const ManaLoomGlyph(
-                ManaLoomGlyphKind.battleReplay,
-                size: 19,
-              ),
-              label: Text(
-                session.replayId == null
-                    ? 'Abrir histórico'
-                    : 'Analisar replay',
-              ),
+              key: const Key('play-vs-ai-rematch-button'),
+              onPressed: onPlayAgain,
+              icon: const Icon(Icons.replay_rounded),
+              label: const Text('Jogar novamente'),
             ),
+            if (onOpenReplay != null) ...[
+              const SizedBox(height: AppTheme.space8),
+              OutlinedButton.icon(
+                key: const Key('battle-coach-open-replay-button'),
+                onPressed: onOpenReplay,
+                icon: const ManaLoomGlyph(
+                  ManaLoomGlyphKind.battleReplay,
+                  size: 19,
+                ),
+                label: Text(
+                  session.replayId == null
+                      ? 'Abrir histórico'
+                      : 'Analisar replay',
+                ),
+              ),
+            ],
           ],
         ),
       ),

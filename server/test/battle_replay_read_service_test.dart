@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:postgres/postgres.dart';
@@ -492,6 +493,71 @@ void main() {
         containsPair('advisory_only', true),
       );
     });
+
+    test(
+      'removes nested hand and hand_cards payloads from realistic replays',
+      () {
+        final sanitized = sanitizeBattleReplayForStorage({
+          'events': [
+            {
+              'action': 'private_state_checkpoint',
+              'payload': {
+                'players': [
+                  {
+                    'id': 'human-player',
+                    'hand_count': 2,
+                    'hand_cards': [
+                      {'id': 'card-1', 'name': 'Plains'},
+                      {'id': 'card-2', 'name': 'Secret Commander'},
+                    ],
+                  },
+                ],
+              },
+            },
+          ],
+          'visual_snapshots': [
+            {
+              'turn': 3,
+              'players': [
+                {
+                  'name': 'Human',
+                  'hand': [
+                    {'name': 'Hidden Human Card'},
+                  ],
+                },
+                {
+                  'name': 'Opponent',
+                  'zones': {
+                    'hand_cards': [
+                      {'name': 'Hidden Opponent Card'},
+                      {'name': 'Another Hidden Opponent Card'},
+                    ],
+                  },
+                },
+              ],
+            },
+          ],
+        });
+
+        expect(
+          _nestedKeyPaths(sanitized, const {'hand', 'hand_cards'}),
+          isEmpty,
+        );
+        final event = (sanitized['events'] as List).single as Map;
+        final eventPayload = event['payload'] as Map;
+        final eventPlayer = (eventPayload['players'] as List).single as Map;
+        expect(eventPlayer['hand_count'], 2);
+        expect(eventPlayer['hand_size'], 2);
+        final snapshot = (sanitized['visual_snapshots'] as List).single as Map;
+        final players = snapshot['players'] as List;
+        expect((players.first as Map)['hand_size'], 1);
+        expect(((players.last as Map)['zones'] as Map)['hand_size'], 2);
+        final serialized = jsonEncode(sanitized);
+        expect(serialized, isNot(contains('Secret Commander')));
+        expect(serialized, isNot(contains('Hidden Human Card')));
+        expect(serialized, isNot(contains('Hidden Opponent Card')));
+      },
+    );
 
     test(
       'adds accepted Battle Coach choices only for the initiating user',
@@ -994,4 +1060,25 @@ Result _result({
     affectedRows: rows.length,
     schema: schema,
   );
+}
+
+List<String> _nestedKeyPaths(
+  Object? value,
+  Set<String> keys, [
+  String path = r'$',
+]) {
+  final matches = <String>[];
+  if (value is Map) {
+    for (final entry in value.entries) {
+      final key = entry.key.toString();
+      final childPath = '$path.$key';
+      if (keys.contains(key)) matches.add(childPath);
+      matches.addAll(_nestedKeyPaths(entry.value, keys, childPath));
+    }
+  } else if (value is List) {
+    for (var index = 0; index < value.length; index++) {
+      matches.addAll(_nestedKeyPaths(value[index], keys, '$path[$index]'));
+    }
+  }
+  return matches;
 }

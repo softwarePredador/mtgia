@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "inventory_id": "manaloom-web-android-free-beta-2026-08-06-ux-pack-08",
+  "inventory_id": "manaloom-web-android-free-beta-2026-08-25-play-vs-ai",
   "source_root": "lib",
   "required_contract_fields": [
     "job",
@@ -15,7 +15,7 @@
     "deep_link"
   ],
   "expected_totals": {
-    "go_route": 45,
+    "go_route": 46,
     "shell_route": 1,
     "material_page_route": 7,
     "dialog": 51,
@@ -39,16 +39,16 @@
       "deep_link": "Rotas públicas aceitam redirect/token sanitizados; segredo nunca entra em evidência."
     },
     "battle": {
-      "job": "Executar Battle homologado, jogar sessões privadas do Battle Coach, acompanhar jobs assíncronos habilitados e consultar replays sem inventar resultado ou expor dado privado.",
+      "job": "Jogar uma partida privada contra um adversário controlado pela IA e consultar replays sem inventar resultado ou expor dado privado.",
       "owner": "Battle",
       "source_of_truth": "PostgreSQL via APIs de battle/sessions/replays; runtime XMage isolado somente executa a partida.",
       "states": ["loading", "progress", "saving", "disabled", "offline", "empty", "error", "retry", "success", "permission_denied"],
-      "stable_key": "battle coach private board/prompt, replay list/detail and battle-live status/timeline anchors plus canonical deck-scoped routes",
+      "stable_key": "Play vs AI private board, own hand, typed action tray and replay list/detail anchors plus canonical deck-scoped routes",
       "criticality": "P0",
-      "action": "Iniciar sessão privada, responder ou delegar prompt autorizado, conceder, acompanhar job ou abrir replay persistido.",
+      "action": "Iniciar sessão privada, jogar uma carta ou responder uma ação legal tipada, conceder, reconectar ou abrir replay persistido.",
       "success": "Sessão retoma sem repetir decisão, estado privado permanece restrito ao dono e o replay correto mantém identidade de engine.",
       "recovery": "Feature gate falha fechado; erro offline preserva cursor/sessão e oferece reconexão segura; timeout encerra por concessão.",
-      "deep_link": "Rotas canônicas /decks/:id/battle-coach[/sessionId], /decks/:id/battle-replays e /decks/:id/battle-live/:jobId recarregam sem state.extra."
+      "deep_link": "Rotas canônicas /decks/:id/play-vs-ai[/sessionId] e /decks/:id/battle-replays recarregam sem state.extra; /battle-coach existe somente como redirect legado. Não há rota pública de espectador."
     },
     "binder": {
       "job": "Consultar, importar e editar posse, desejo e disponibilidade de cartas com revisão antes da escrita.",
@@ -262,9 +262,10 @@
     {"id":"route.deck_scan","declared_path":"scan","canonical_path":"/decks/:id/scan","screen":"CardScannerScreen","domain":"scanner","scope":"deferred_by_scope"},
     {"id":"route.deck_post_game","declared_path":"post-game","canonical_path":"/decks/:id/post-game","screen":"PostGameNotesScreen","domain":"retention","scope":"active"},
     {"id":"route.deck_battle_replays","declared_path":"battle-replays","canonical_path":"/decks/:id/battle-replays","screen":"BattleReplaysScreen","domain":"battle","scope":"active"},
-    {"id":"route.deck_battle_coach_session","declared_path":"battle-coach/:sessionId","canonical_path":"/decks/:id/battle-coach/:sessionId","screen":"BattleCoachScreen","domain":"battle","scope":"deferred_by_scope"},
-    {"id":"route.deck_battle_coach","declared_path":"battle-coach","canonical_path":"/decks/:id/battle-coach","screen":"BattleCoachScreen","domain":"battle","scope":"deferred_by_scope"},
-    {"id":"route.deck_battle_live","declared_path":"battle-live/:jobId","canonical_path":"/decks/:id/battle-live/:jobId","screen":"BattleLiveSpectatorScreen","domain":"battle","scope":"active"},
+    {"id":"route.deck_play_vs_ai_session","declared_path":"play-vs-ai/:sessionId","canonical_path":"/decks/:id/play-vs-ai/:sessionId","screen":"BattleCoachScreen","domain":"battle","scope":"deferred_by_scope"},
+    {"id":"route.deck_play_vs_ai","declared_path":"play-vs-ai","canonical_path":"/decks/:id/play-vs-ai","screen":"BattleCoachScreen","domain":"battle","scope":"deferred_by_scope"},
+    {"id":"route.deck_battle_coach_session_redirect","declared_path":"battle-coach/:sessionId","canonical_path":"/decks/:id/battle-coach/:sessionId","screen":"redirect:/decks/:id/play-vs-ai/:sessionId","domain":"battle","scope":"compatibility_redirect"},
+    {"id":"route.deck_battle_coach_redirect","declared_path":"battle-coach","canonical_path":"/decks/:id/battle-coach","screen":"redirect:/decks/:id/play-vs-ai","domain":"battle","scope":"compatibility_redirect"},
     {"id":"route.plans","declared_path":"/plans","canonical_path":"/plans","screen":"PlanScreen","domain":"commercial","scope":"active"},
     {"id":"route.card_detail","declared_path":"/cards/:cardId","canonical_path":"/cards/:cardId","screen":"CardDetailRouteScreen","domain":"cards","scope":"active"},
     {"id":"route.upgrade","declared_path":"/upgrade","canonical_path":"/upgrade","screen":"UpgradeScreen","domain":"commercial","scope":"active"},
@@ -297,7 +298,7 @@
     {"source":"lib/features/auth/screens/register_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/auth/screens/reset_password_screen.dart","domain":"auth","occurrences":{"transient":1}},
     {"source":"lib/features/battle/screens/battle_coach_screen.dart","domain":"battle","occurrences":{"dialog":2}},
-    {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":5,"menu":1,"transient":5}},
+    {"source":"lib/features/battle/screens/battle_replays_screen.dart","domain":"battle","occurrences":{"dialog":5,"menu":1,"transient":4}},
     {"source":"lib/features/binder/screens/binder_screen.dart","domain":"binder","occurrences":{"material_page_route":2,"tabs":1}},
     {"source":"lib/features/binder/screens/binder_import_screen.dart","domain":"binder","occurrences":{"material_page_route":2,"dialog":2}},
     {"source":"lib/features/binder/widgets/binder_item_editor.dart","domain":"binder","occurrences":{"dialog":1,"bottom_sheet":1,"transient":1}},
@@ -311,7 +312,7 @@
     {"source":"lib/features/community/screens/community_deck_detail_screen.dart","domain":"community","occurrences":{"dialog":1,"menu":1,"transient":7}},
     {"source":"lib/features/community/screens/community_screen.dart","domain":"community","occurrences":{"tabs":2}},
     {"source":"lib/features/decks/screens/deck_details_screen.dart","domain":"decks","occurrences":{"dialog":3,"bottom_sheet":1,"menu":1,"tabs":1,"transient":21}},
-    {"source":"lib/features/decks/screens/deck_generate_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":14}},
+    {"source":"lib/features/decks/screens/deck_generate_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":15}},
     {"source":"lib/features/decks/screens/deck_import_screen.dart","domain":"decks","occurrences":{"dialog":1,"transient":4}},
     {"source":"lib/features/decks/screens/deck_list_screen.dart","domain":"decks","occurrences":{"dialog":2,"menu":3,"transient":4}},
     {"source":"lib/features/decks/widgets/deck_add_cards_menu.dart","domain":"decks","occurrences":{"menu":1}},

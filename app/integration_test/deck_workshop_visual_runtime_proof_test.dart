@@ -6,12 +6,15 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/cards/providers/card_provider.dart';
 import 'package:manaloom/features/decks/models/deck_card_item.dart';
 import 'package:manaloom/features/decks/models/deck_details.dart';
 import 'package:manaloom/features/decks/models/deck_optimization_event.dart';
 import 'package:manaloom/features/decks/providers/deck_provider.dart';
+import 'package:manaloom/features/decks/screens/deck_details_screen.dart';
 import 'package:manaloom/features/decks/screens/deck_generate_screen.dart';
 import 'package:manaloom/features/decks/screens/deck_import_screen.dart';
 import 'package:manaloom/features/decks/services/deck_entry_draft_store.dart';
@@ -58,6 +61,9 @@ const _requiredCheckpoints = <String>[
   'deck_workshop_06_history_undo',
   'deck_workshop_07_conflict',
   'deck_workshop_08_sample_hand_continuity',
+  'deck_workshop_09_replace_all_off_empty',
+  'deck_workshop_10_replace_all_off_menu',
+  'deck_workshop_11_learning_reads_off',
 ];
 
 String get _artificerImageUrl => _artifactImageUrl.isEmpty
@@ -88,6 +94,8 @@ class _FlutterTesterCacheManager implements BaseCacheManager {
 }
 
 class _RuntimeDeckWorkshopApi extends ApiClient {
+  final getCalls = <String>[];
+
   Map<String, dynamic> get _commander => <String, dynamic>{
     'id': '10000000-0000-4000-8000-000000000003',
     'oracle_id': '20000000-0000-4000-8000-000000000003',
@@ -115,6 +123,22 @@ class _RuntimeDeckWorkshopApi extends ApiClient {
 
   @override
   Future<ApiResponse> get(String endpoint, {Duration? timeout}) async {
+    getCalls.add(endpoint);
+    if (endpoint == '/decks/capability-scope') {
+      return ApiResponse(200, const <String, dynamic>{
+        'id': 'capability-scope',
+        'name': 'Deck em construção',
+        'format': 'commander',
+        'description': null,
+        'archetype': null,
+        'is_public': false,
+        'created_at': '2026-08-25T00:00:00.000Z',
+        'color_identity': <String>[],
+        'stats': <String, dynamic>{'total_cards': 0},
+        'commander': <Map<String, dynamic>>[],
+        'main_board': <String, dynamic>{},
+      });
+    }
     if (endpoint == '/ai/commander-learning') {
       return ApiResponse(200, {'commanders': const <dynamic>[]});
     }
@@ -535,6 +559,16 @@ void main() {
       await _reveal(tester, parentSubmit);
       expect(parentSubmit, findsOneWidget);
       expect(selectedCommander, findsOneWidget);
+      await _reveal(tester, selectedCommander);
+      final commanderRect = tester.getRect(selectedCommander);
+      final viewport =
+          Offset.zero & Size(_visualWidth.toDouble(), _visualHeight.toDouble());
+      expect(commanderRect.isEmpty, isFalse);
+      expect(
+        commanderRect.intersect(viewport),
+        commanderRect,
+        reason: 'Commander name, artwork and colors must be in the capture.',
+      );
       await _capture(binding, tester, 'deck_workshop_00_commander');
 
       await tester.pumpWidget(
@@ -819,6 +853,93 @@ void main() {
         tester,
         'deck_workshop_08_sample_hand_continuity',
       );
+
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+              create: (_) => ReleaseCapabilitiesProvider.seeded(const {
+                ReleaseCapability.decksPrivate,
+              }),
+            ),
+            ChangeNotifierProvider<DeckProvider>(
+              create: (_) => DeckProvider(apiClient: api),
+            ),
+            ChangeNotifierProvider<CardProvider>(
+              create: (_) => CardProvider(apiClient: api),
+            ),
+            ChangeNotifierProvider<AuthProvider>(
+              create: (_) => AuthProvider(apiClient: api),
+            ),
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.darkTheme,
+            home: const DeckDetailsScreen(deckId: 'capability-scope'),
+          ),
+        ),
+      );
+      await pumpUntilFound(tester, find.text('Escolha o comandante primeiro'));
+      expect(find.text('Colar lista'), findsNothing);
+      expect(find.text('Buscar cartas'), findsOneWidget);
+      await _capture(binding, tester, 'deck_workshop_09_replace_all_off_empty');
+
+      await tester.tap(find.byKey(const Key('deck-details-menu')));
+      await tester.pumpAndSettle();
+      expect(find.text('Colar lista de cartas'), findsNothing);
+      await _capture(binding, tester, 'deck_workshop_10_replace_all_off_menu');
+
+      final learningCallsBefore = api.getCalls
+          .where((call) => call.startsWith('/ai/commander-learning'))
+          .length;
+      await tester.pumpWidget(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+              create: (_) => ReleaseCapabilitiesProvider.seeded(const {
+                ReleaseCapability.aiGenerateRebuild,
+              }),
+            ),
+            ChangeNotifierProvider<DeckProvider>(
+              create: (_) => DeckProvider(apiClient: api),
+            ),
+            ChangeNotifierProvider<CardProvider>(
+              create: (_) => CardProvider(apiClient: api),
+            ),
+          ],
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.darkTheme,
+            home: DeckGenerateScreen(
+              draftOwnerId: 'capability-scope-runtime-generate',
+              draftStore: draftStore,
+            ),
+          ),
+        ),
+      );
+      await pumpUntilFound(
+        tester,
+        find.byKey(const Key('deck-generate-commander-field')),
+      );
+      await tester.enterText(
+        find.byKey(const Key('deck-generate-commander-field')),
+        'Lorehold, the Historian',
+      );
+      final generateSubmit = find.byKey(
+        const Key('deck-generate-submit-cta-frame'),
+      );
+      await _reveal(tester, generateSubmit);
+      expect(
+        find.byKey(const Key('deck-generate-learned-deck-button')),
+        findsNothing,
+      );
+      expect(
+        api.getCalls
+            .where((call) => call.startsWith('/ai/commander-learning'))
+            .length,
+        learningCallsBefore,
+      );
+      await _capture(binding, tester, 'deck_workshop_11_learning_reads_off');
       expect(tester.takeException(), isNull);
     },
   );

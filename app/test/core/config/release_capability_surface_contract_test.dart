@@ -14,6 +14,9 @@ void main() {
         'ReleaseCapability.socialPush',
         'ReleaseCapability.directMessages',
         '_authenticatedAccountId',
+        "path: 'play-vs-ai/:sessionId'",
+        "path: 'play-vs-ai'",
+        'playVsAiRouteLocation(',
       ],
       'lib/features/home/home_screen.dart': [
         'ReleaseCapability.lifeCounterLocal',
@@ -30,6 +33,15 @@ void main() {
         'ReleaseCapability.aiGenerateRebuild',
         'ReleaseCapability.lifeCounterLocal',
         'ReleaseCapability.battleBatch',
+        'ReleaseCapability.deckReplaceAll',
+      ],
+      'lib/features/decks/screens/deck_generate_screen.dart': [
+        'ReleaseCapabilitiesProvider',
+        'ReleaseCapability.learningReads',
+      ],
+      'lib/features/decks/widgets/deck_details_overview_tab.dart': [
+        'final VoidCallback? onImportList',
+        'if (onImportList != null)',
       ],
       'lib/features/retention/screens/post_game_notes_screen.dart': [
         'ReleaseCapability.aiAnalyzeOptimizeAdvisory',
@@ -71,7 +83,6 @@ void main() {
         'scannerBuildSupported',
       ],
       'lib/features/battle/screens/battle_replays_screen.dart': [
-        'this.battleLiveEnabled = false',
         'this.interactiveBattleEnabled = false',
       ],
     };
@@ -95,6 +106,46 @@ void main() {
       isNot(contains('O app mostra motivos e preview para revisão humana')),
     );
     expect(profileSource, isNot(contains('sua identidade pública')));
+    final mainSource = File('lib/main.dart').readAsStringSync();
+    expect(
+      mainSource,
+      isNot(contains("path: 'battle-live/:jobId'")),
+      reason: 'Battle Live is internal infrastructure, not a public route',
+    );
+    expect(
+      mainSource,
+      isNot(contains('BattleLiveSpectatorScreen')),
+      reason: 'The product router must not build a spectator view',
+    );
+    final playVsAiSource = File(
+      'lib/features/battle/screens/battle_coach_screen.dart',
+    ).readAsStringSync();
+    expect(
+      playVsAiSource,
+      isNot(contains('.runBattleTest(')),
+      reason: 'Play vs AI must never degrade into an automatic simulation',
+    );
+    expect(
+      playVsAiSource,
+      isNot(contains('BattleTestLaunchMode.automatic')),
+      reason: 'Play vs AI may only create interactive XMage sessions',
+    );
+    final battleLabSource = File(
+      'lib/features/battle/screens/battle_replays_screen.dart',
+    ).readAsStringSync();
+    for (final forbiddenSpectatorToken in const [
+      'battle_live_spectator_screen.dart',
+      'battleLiveEnabled',
+      'battleLiveRouteLocation(',
+      'Acompanhar ao vivo',
+      '_BattleLiveJobStrip',
+    ]) {
+      expect(
+        battleLabSource,
+        isNot(contains(forbiddenSpectatorToken)),
+        reason: 'Battle Lab must not expose $forbiddenSpectatorToken',
+      );
+    }
 
     for (final hub in const [
       'lib/features/collection/screens/collection_screen.dart',

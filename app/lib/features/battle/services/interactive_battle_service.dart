@@ -271,7 +271,7 @@ String _friendlyMessage(int statusCode, Map<String, dynamic> payload) {
     'interactive_battle_option_not_allowed' =>
       'A mesa avançou antes desta escolha. O estado será atualizado.',
     'interactive_battle_not_found' =>
-      'Battle Coach não está habilitado neste ambiente, ou esta mesa não existe mais.',
+      'Jogar contra IA não está habilitado neste ambiente, ou esta mesa não existe mais.',
     'interactive_battle_engine_unavailable' ||
     'interactive_battle_runtime_unavailable' =>
       'O motor de regras interativo está indisponível agora.',
@@ -284,7 +284,7 @@ String _friendlyMessage(int statusCode, Map<String, dynamic> payload) {
     return sanitizeBattleUserMessage(backendMessage);
   }
   return switch (statusCode) {
-    404 => 'Battle Coach ainda não está habilitado neste ambiente.',
+    404 => 'Jogar contra IA ainda não está habilitado neste ambiente.',
     429 => 'O limite de mesas ativas foi atingido. Aguarde alguns segundos.',
     _ when statusCode >= 500 =>
       'Não foi possível falar com o motor da partida.',

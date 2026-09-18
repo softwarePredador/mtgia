@@ -3,8 +3,114 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/widgets/card_artwork.dart';
 import 'package:manaloom/core/widgets/cached_card_image.dart';
+import 'cached_card_image_test.dart'
+    show
+        ArtworkTestCache,
+        artworkDecoded,
+        artworkTestHost,
+        withArtworkCache,
+        pumpArtworkUntil,
+        settleArtwork;
 
 void main() {
+  CachedNetworkImageProvider.defaultCacheManager = ArtworkTestCache(
+    allowUnconfigured: true,
+  );
+  testWidgets('real fallback and exhausted error preserve artwork semantics', (
+    tester,
+  ) async {
+    for (final succeeds in [true, false]) {
+      await withArtworkCache(tester, (cache) async {
+        const primary = 'https://artwork-lifecycle.invalid/normal/primary.webp';
+        const fallback =
+            'https://artwork-lifecycle.invalid/normal/fallback.webp';
+        cache.register(primary);
+        cache.register(fallback);
+        await tester.pumpWidget(
+          artworkTestHost(
+            const CardArtwork(
+              variant: CardArtworkVariant.fullCard,
+              imageUrl: primary,
+              fallbackImageUrl: fallback,
+              semanticLabel: 'Fallback card',
+            ),
+          ),
+        );
+        cache.complete(primary, success: false);
+        await pumpArtworkUntil(tester, () => cache.requests.contains(fallback));
+        cache.complete(fallback, success: succeeds);
+        final badge = Key(
+          succeeds
+              ? 'card-artwork-status-reference'
+              : 'card-artwork-status-error',
+        );
+        await pumpArtworkUntil(
+          tester,
+          () => find.byKey(badge).evaluate().isNotEmpty,
+        );
+        if (succeeds) {
+          await pumpArtworkUntil(tester, () => artworkDecoded(tester));
+        }
+        await settleArtwork(tester);
+        expect(
+          find.bySemanticsLabel(
+            succeeds
+                ? 'Fallback card, arte de referência'
+                : 'Fallback card, falha ao carregar imagem',
+          ),
+          findsOneWidget,
+        );
+      });
+    }
+  });
+  testWidgets(
+    'decoded artwork settles and retains readiness across reference changes',
+    (tester) async {
+      await withArtworkCache(tester, (cache) async {
+        const url = 'https://artwork-lifecycle.invalid/normal/artwork.webp';
+        cache.register(url);
+        const key = ValueKey('artwork');
+        Widget image({bool reference = false, bool offline = false}) =>
+            artworkTestHost(
+              CardArtwork(
+                key: key,
+                variant: CardArtworkVariant.fullCard,
+                imageUrl: url,
+                semanticLabel: 'Loaded card',
+                imageIsReference: reference,
+                offline: offline,
+              ),
+            );
+        await tester.pumpWidget(image());
+        expect(artworkDecoded(tester), isFalse);
+        cache.complete(url);
+        await pumpArtworkUntil(tester, () => artworkDecoded(tester));
+        await settleArtwork(tester);
+        expect(find.bySemanticsLabel('Loaded card'), findsOneWidget);
+        final requests = cache.requests.length;
+        final originalState = tester.state(find.byKey(key));
+        await tester.pumpWidget(image(reference: true));
+        await settleArtwork(tester);
+        expect(
+          find.byKey(const Key('card-artwork-status-reference')),
+          findsOneWidget,
+        );
+        await tester.pumpWidget(image());
+        await settleArtwork(tester);
+        expect(tester.state(find.byKey(key)), same(originalState));
+        expect(find.bySemanticsLabel('Loaded card'), findsOneWidget);
+        expect(cache.requests.length, requests);
+        await tester.pumpWidget(image(offline: true));
+        await settleArtwork(tester);
+        expect(
+          find.byKey(const Key('card-artwork-status-offline')),
+          findsOneWidget,
+        );
+        expect(cache.requests.length, requests);
+      });
+    },
+  );
+
   test('full-card variants preserve the printed card geometry', () {
     for (final variant in const [
       CardArtworkVariant.gallery,

@@ -19,13 +19,13 @@ import '../models/deck_details.dart';
 class DeckAnalysisTab extends StatefulWidget {
   final DeckDetails deck;
   final VoidCallback? onOpenBattleLab;
-  final VoidCallback? onOpenBattleCoach;
+  final VoidCallback? onOpenPlayVsAi;
 
   const DeckAnalysisTab({
     super.key,
     required this.deck,
     this.onOpenBattleLab,
-    this.onOpenBattleCoach,
+    this.onOpenPlayVsAi,
   });
 
   @override
@@ -206,12 +206,13 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
             averageCmc: averageCmc,
             landCount: landCount,
           ),
-          if (widget.onOpenBattleLab != null) ...[
+          if (widget.onOpenBattleLab != null ||
+              widget.onOpenPlayVsAi != null) ...[
             const SizedBox(height: AppTheme.space16),
             _BattleLabLaunch(
               deckName: effectiveDeck.name,
-              onOpen: widget.onOpenBattleLab!,
-              onOpenCoach: widget.onOpenBattleCoach,
+              onOpen: widget.onOpenBattleLab,
+              onPlayVsAi: widget.onOpenPlayVsAi,
             ),
           ],
           if (functionalAnalysis?.battleLearningEvidence != null) ...[
@@ -584,26 +585,38 @@ class _DeckAnalysisTabState extends State<DeckAnalysisTab> {
 }
 
 class _BattleLabLaunch extends StatelessWidget {
-  const _BattleLabLaunch({
-    required this.deckName,
-    required this.onOpen,
-    this.onOpenCoach,
-  });
+  const _BattleLabLaunch({required this.deckName, this.onOpen, this.onPlayVsAi})
+    : assert(onOpen != null || onPlayVsAi != null);
 
   final String deckName;
-  final VoidCallback onOpen;
-  final VoidCallback? onOpenCoach;
+  final VoidCallback? onOpen;
+  final VoidCallback? onPlayVsAi;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasBattleLab = onOpen != null;
+    final hasPlayVsAi = onPlayVsAi != null;
+    final title = hasPlayVsAi ? 'Jogar contra IA' : 'Battle Lab';
+    final description = switch ((hasPlayVsAi, hasBattleLab)) {
+      (true, true) =>
+        'Jogue seu deck contra um adversário controlado pela IA ou revise simulações no Battle Lab.',
+      (true, false) =>
+        'Jogue seu deck contra um adversário controlado pela IA e escolha cada ação legal.',
+      _ =>
+        'Teste consistência, simule contra um adversário e revise as evidências do replay.',
+    };
     return Semantics(
       container: true,
       explicitChildNodes: true,
-      label: 'Battle Lab para $deckName',
-      hint: onOpenCoach == null
-          ? 'Oferece testes de consistência, confrontos e replays'
-          : 'Oferece simulações, replays e o Coach interativo',
+      label: hasPlayVsAi
+          ? 'Jogar contra IA com $deckName'
+          : 'Battle Lab para $deckName',
+      hint: switch ((hasPlayVsAi, hasBattleLab)) {
+        (true, true) => 'Oferece partida contra IA, simulações e replays',
+        (true, false) => 'Oferece partida contra IA controlada pelo usuário',
+        _ => 'Oferece testes de consistência, confrontos e replays',
+      },
       child: Material(
         key: const Key('deck-analysis-battle-lab-entry'),
         color: Colors.transparent,
@@ -624,7 +637,8 @@ class _BattleLabLaunch extends StatelessWidget {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final compact =
-                  constraints.maxWidth < (onOpenCoach == null ? 620 : 900);
+                  constraints.maxWidth <
+                  (hasPlayVsAi && hasBattleLab ? 900 : 620);
               final copy = Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -636,8 +650,10 @@ class _BattleLabLaunch extends StatelessWidget {
                       color: AppTheme.brass400.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
-                    child: const ManaLoomGlyph(
-                      ManaLoomGlyphKind.battleReplay,
+                    child: ManaLoomGlyph(
+                      hasPlayVsAi
+                          ? ManaLoomGlyphKind.commander
+                          : ManaLoomGlyphKind.battleReplay,
                       color: AppTheme.brass400,
                       size: 24,
                     ),
@@ -648,9 +664,7 @@ class _BattleLabLaunch extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          onOpenCoach == null
-                              ? 'Battle Lab'
-                              : 'Battle Lab e Coach',
+                          title,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: AppTheme.textPrimary,
                             fontWeight: FontWeight.w800,
@@ -658,9 +672,7 @@ class _BattleLabLaunch extends StatelessWidget {
                         ),
                         const SizedBox(height: AppTheme.space4),
                         Text(
-                          onOpenCoach == null
-                              ? 'Teste consistência, simule contra um adversário e revise as evidências do replay.'
-                              : 'Simule confrontos ou jogue com o Coach nas decisões disponíveis.',
+                          description,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppTheme.textSecondary,
                             height: 1.35,
@@ -676,17 +688,17 @@ class _BattleLabLaunch extends StatelessWidget {
                 spacing: AppTheme.space8,
                 runSpacing: AppTheme.space8,
                 children: [
-                  if (onOpenCoach != null)
+                  if (hasPlayVsAi)
                     FilledButton.icon(
-                      key: const Key('deck-analysis-open-battle-coach-button'),
-                      onPressed: onOpenCoach,
+                      key: const Key('deck-analysis-open-play-vs-ai-button'),
+                      onPressed: onPlayVsAi,
                       icon: const ManaLoomGlyph(
                         ManaLoomGlyphKind.commander,
                         size: 19,
                       ),
-                      label: const Text('Jogar com Coach'),
+                      label: const Text('Jogar contra IA'),
                     ),
-                  if (onOpenCoach != null)
+                  if (hasBattleLab && hasPlayVsAi)
                     OutlinedButton.icon(
                       key: const Key('deck-analysis-open-battle-lab-button'),
                       onPressed: onOpen,
@@ -696,7 +708,7 @@ class _BattleLabLaunch extends StatelessWidget {
                       ),
                       label: const Text('Abrir Battle Lab'),
                     )
-                  else
+                  else if (hasBattleLab)
                     FilledButton.icon(
                       key: const Key('deck-analysis-open-battle-lab-button'),
                       onPressed: onOpen,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -31,6 +32,9 @@ void main() {
     final p0Runner = File(
       '../scripts/manaloom_p0_runtime_capture.sh',
     ).readAsStringSync();
+    final authenticatedFixture = File(
+      '../scripts/manaloom_authenticated_visual_qa_isolated.sh',
+    ).readAsStringSync();
     final liveGate = File(
       '../scripts/manaloom_ui_live_evidence_gate.sh',
     ).readAsStringSync();
@@ -53,7 +57,12 @@ void main() {
     expect(p0Runner, contains('runtime-without-context.log'));
     expect(p0Runner, contains("sed '/VISUAL_PROOF_CONTEXT /d'"));
     expect(p0Runner, contains('manaloom_ui_runtime_contract.sh'));
+    expect(authenticatedFixture, contains(r'DB_PORT="${DB_PORT:-5432}"'));
+    expect(authenticatedFixture, contains('resolve_manaloom_dart'));
+    expect(authenticatedFixture, contains('MANALOOM_DART_BIN'));
+    expect(authenticatedFixture, contains(r'-p "$DB_PORT" -U "$DB_USER"'));
     expect(liveGate, contains('manaloom_ui_runtime_contract.sh'));
+    expect(liveGate, contains('--capture-play-vs-ai'));
     expect(p0Runtime, contains('_prepareDeckImportDetectedState(tester)'));
     expect(
       p0Runtime,
@@ -100,6 +109,10 @@ void main() {
       gate['battle_live_capture_command'],
       '../scripts/manaloom_ui_live_evidence_gate.sh '
       '--capture-battle-live-web',
+    );
+    expect(
+      gate['battle_live_capture_scope'],
+      'internal_runtime_evidence_only_no_public_route',
     );
     expect(liveGate, contains('--capture-battle-live-web'));
     expect(liveGate, contains('battle_live_visual_runtime_proof_test.dart'));
@@ -354,6 +367,9 @@ void main() {
       final p0Matrix = surfaces.singleWhere(
         (surface) => surface['id'] == 'authenticated_p0_matrix',
       );
+      final playVsAi = surfaces.singleWhere(
+        (surface) => surface['id'] == 'play_vs_ai',
+      );
       final battleLive = surfaces.singleWhere(
         (surface) => surface['id'] == 'battle_live',
       );
@@ -378,9 +394,45 @@ void main() {
       final criticalOverlays = surfaces.singleWhere(
         (surface) => surface['id'] == 'critical_overlays_states',
       );
-      expect(battleLive['required_profiles'], <String, dynamic>{
-        'web_battle_live_1440x900': 5,
+      expect(playVsAi['route'], '/decks/:id/play-vs-ai[/sessionId]');
+      expect(playVsAi['visibility'], 'product');
+      expect(playVsAi['runtime_surface_id'], 'play_vs_ai');
+      expect(playVsAi['required_profiles'], <String, dynamic>{
+        'web_play_vs_ai_1440x900': 9,
       });
+      expect(
+        playVsAi['real_runtime_capture_manifest'],
+        'docs/qa/ui-live/current/play-vs-ai-web-real/capture-manifest.json',
+      );
+      expect(
+        (playVsAi['real_runtime_required_checkpoints'] as List).cast<String>(),
+        <String>[
+          '01-opponent-picker',
+          '02-private-hand-mulligan',
+          '03-land-played',
+          '04-commander-cast',
+          '05-combat-damage',
+          '06-reconnected-session',
+          '07-terminal-replay-rematch',
+          '08-replay',
+          '09-rematch-picker',
+        ],
+      );
+      expect(
+        (playVsAi['stable_keys'] as List).cast<String>().toSet(),
+        containsAll(<String>{
+          'play-vs-ai-hand-dock',
+          'play-vs-ai-action-tray',
+          'play-vs-ai-legal-card-',
+          'play-vs-ai-rematch-button',
+        }),
+      );
+      expect(battleLive['visibility'], 'internal_runtime_evidence');
+      expect(
+        battleLive['route'],
+        'internal://battle-live-evidence/no-go-router-route',
+      );
+      expect(battleLive['required_profiles'], isNull);
       expect(
         (battleLive['required_checkpoints'] as List).cast<String>(),
         <String>[
@@ -403,6 +455,21 @@ void main() {
           'battle-live-open-replay-button',
         }),
       );
+      for (final surface in surfaces) {
+        final visibility = surface['visibility']?.toString() ?? 'product';
+        if (visibility != 'product') continue;
+        final route = surface['route']?.toString() ?? '';
+        expect(
+          route,
+          isNot(contains('/battle-live')),
+          reason: '${surface['id']} must not expose spectator navigation',
+        );
+        expect(
+          route,
+          isNot(contains('/battle-coach')),
+          reason: '${surface['id']} must use the Play vs AI identity',
+        );
+      }
       expect(binderImport['required_profiles'], <String, dynamic>{
         'web_binder_import_mobile_390x844': 7,
         'web_binder_import_desktop_1440x900': 7,
@@ -421,9 +488,9 @@ void main() {
         ],
       );
       expect(deckWorkshop['required_profiles'], <String, dynamic>{
-        'web_deck_workshop_mobile_390x844': 9,
-        'web_deck_workshop_desktop_1440x900': 9,
-        'web_deck_workshop_wide_1920x1080': 9,
+        'web_deck_workshop_mobile_390x844': 12,
+        'web_deck_workshop_desktop_1440x900': 12,
+        'web_deck_workshop_wide_1920x1080': 12,
       });
       expect(
         (deckWorkshop['required_checkpoints'] as List).cast<String>(),
@@ -437,13 +504,13 @@ void main() {
           'deck_workshop_06_history_undo',
           'deck_workshop_07_conflict',
           'deck_workshop_08_sample_hand_continuity',
+          'deck_workshop_09_replace_all_off_empty',
+          'deck_workshop_10_replace_all_off_menu',
+          'deck_workshop_11_learning_reads_off',
         ],
       );
-      expect(battleLearning['required_profiles'], <String, dynamic>{
-        'web_battle_learning_mobile_390x844': 10,
-        'web_battle_learning_desktop_1440x900': 10,
-        'web_battle_learning_wide_1920x1080': 10,
-      });
+      expect(battleLearning['visibility'], 'internal_historical_evidence');
+      expect(battleLearning['required_profiles'], isNull);
       expect(
         (battleLearning['required_checkpoints'] as List).cast<String>(),
         <String>[
@@ -537,7 +604,7 @@ void main() {
         'web_mobile_390x844': 54,
         'web_desktop_1440x900': 53,
         'web_wide_1920x1080': 53,
-        'android_physical_sm_a135m': 54,
+        'android_emulator_manaloom_api34': 54,
       });
       final androidRuntime =
           p0Matrix['android_runtime_contract'] as Map<String, dynamic>;
@@ -550,12 +617,83 @@ void main() {
         androidRuntime['emulator_must_not_be_reported_as_physical'],
         isTrue,
       );
-      expect(androidRuntime['current_profile'], 'android_physical_sm_a135m');
+      expect(
+        androidRuntime['current_profile'],
+        'android_emulator_manaloom_api34',
+      );
       final p0Checkpoints = (p0Matrix['required_checkpoints'] as List)
           .cast<String>()
           .toSet();
       expect(p0Checkpoints, hasLength(54));
       expect(p0Checkpoints, contains('decks_empty'));
+    },
+  );
+
+  test(
+    'Play vs AI focal review binds the canonical manifest and checkpoints',
+    () {
+      final playVsAi = (policy['surfaces'] as List)
+          .cast<Map<String, dynamic>>()
+          .singleWhere((surface) => surface['id'] == 'play_vs_ai');
+      final captureManifestPath =
+          playVsAi['real_runtime_capture_manifest'] as String;
+      final captureManifestFile = File('../$captureManifestPath');
+      final visualReviewFile = File(
+        '${captureManifestFile.parent.path}/visual-review.json',
+      );
+
+      expect(captureManifestFile.existsSync(), isTrue);
+      expect(visualReviewFile.existsSync(), isTrue);
+
+      final captureManifest =
+          jsonDecode(captureManifestFile.readAsStringSync())
+              as Map<String, dynamic>;
+      final visualReview =
+          jsonDecode(visualReviewFile.readAsStringSync())
+              as Map<String, dynamic>;
+      final requiredCheckpoints =
+          (playVsAi['real_runtime_required_checkpoints'] as List)
+              .cast<String>();
+      final requiredProfiles =
+          playVsAi['required_profiles'] as Map<String, dynamic>;
+      final screenshots = (captureManifest['screenshots'] as List)
+          .cast<Map<String, dynamic>>();
+      final screenshotCheckpoints = screenshots
+          .map((screenshot) => screenshot['checkpoint'] as String)
+          .toList(growable: false);
+      final screenshotHashes = screenshots
+          .map((screenshot) => screenshot['sha256'] as String)
+          .toList(growable: false);
+      final captureManifestSha256 = sha256
+          .convert(captureManifestFile.readAsBytesSync())
+          .toString();
+
+      expect(captureManifest['status'], 'PASS_RUNTIME');
+      expect(visualReview['status'], 'PASS_VISUAL_REVIEWED');
+      expect(captureManifest['surface'], playVsAi['runtime_surface_id']);
+      expect(visualReview['surface'], playVsAi['runtime_surface_id']);
+      expect(captureManifest['profile'], requiredProfiles.keys.single);
+      expect(visualReview['profile'], captureManifest['profile']);
+      expect(captureManifest['source_digest'], visualReview['source_digest']);
+      expect(
+        (captureManifest['required_checkpoints'] as List).cast<String>(),
+        requiredCheckpoints,
+      );
+      expect(screenshotCheckpoints, requiredCheckpoints);
+      expect(
+        (visualReview['reviewed_checkpoints'] as List).cast<String>(),
+        requiredCheckpoints,
+      );
+      expect(captureManifest['checkpoint_count'], screenshots.length);
+      expect(visualReview['reviewed_screenshot_count'], screenshots.length);
+      expect(
+        (visualReview['reviewed_screenshot_sha256'] as List).cast<String>(),
+        screenshotHashes,
+      );
+      expect(
+        visualReview['reviewed_capture_manifest_sha256'],
+        captureManifestSha256,
+      );
     },
   );
 

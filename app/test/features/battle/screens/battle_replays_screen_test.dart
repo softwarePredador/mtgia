@@ -25,6 +25,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     this.moreReplays,
     this.replayDetail,
     this.automaticPreflight,
+    this.preflightCompleter,
     this.battleCompleter,
     List<BattleReplayAnnotation> annotations = const [],
     this.preflight = const BattlePreflight(
@@ -47,6 +48,7 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   final BattleReplayDetail? replayDetail;
   final BattlePreflight preflight;
   final BattlePreflight? automaticPreflight;
+  final Completer<BattlePreflight>? preflightCompleter;
   final Completer<BattleReplayDetail>? battleCompleter;
   final List<BattleReplayAnnotation> _annotations;
   final List<String> listedDeckIds = [];
@@ -367,6 +369,8 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
     if (!interactive && automaticPreflight != null) {
       return automaticPreflight!;
     }
+    final pending = preflightCompleter;
+    if (pending != null) return pending.future;
     return preflight;
   }
 
@@ -393,14 +397,99 @@ class _FakeBattleReplayGateway implements BattleReplayGateway {
   }
 }
 
-class _EmptyBattleJobGateway extends BattleJobGateway {
+class _SeriesBattleJobGateway extends BattleJobGateway {
+  _SeriesBattleJobGateway({this.completeOnCreate = true});
+
+  final bool completeOnCreate;
+  final List<BattleJobCreateRequest> requests = [];
+  final List<String> cancelledJobIds = [];
+
   @override
-  Future<List<BattleJob>> list({
-    int limit = 20,
-    BattleJobStatus? status,
-    String? deckId,
-  }) async => const <BattleJob>[];
+  Future<BattleJobCreation> create(BattleJobCreateRequest request) async {
+    requests.add(request);
+    final jobId = 'series-job-${requests.length}';
+    return BattleJobCreation(
+      job: _seriesJob(
+        jobId: jobId,
+        request: request,
+        status: completeOnCreate
+            ? BattleJobStatus.completed
+            : BattleJobStatus.queued,
+      ),
+      created: true,
+    );
+  }
+
+  @override
+  Future<BattleJob> get(String jobId) async {
+    final index = int.parse(jobId.split('-').last) - 1;
+    return _seriesJob(
+      jobId: jobId,
+      request: requests[index],
+      status: completeOnCreate
+          ? BattleJobStatus.completed
+          : BattleJobStatus.running,
+    );
+  }
+
+  @override
+  Future<BattleJobCancellation> cancel(String jobId) async {
+    cancelledJobIds.add(jobId);
+    final index = int.parse(jobId.split('-').last) - 1;
+    return BattleJobCancellation(
+      job: _seriesJob(
+        jobId: jobId,
+        request: requests[index],
+        status: BattleJobStatus.cancelled,
+      ),
+      accepted: true,
+    );
+  }
 }
+
+BattleJob _seriesJob({
+  required String jobId,
+  required BattleJobCreateRequest request,
+  required BattleJobStatus status,
+}) {
+  final terminal = status.isTerminal;
+  return BattleJob.fromJson({
+    'schema_version': 'battle_job_v1',
+    'job_id': jobId,
+    'idempotency_key': request.idempotencyKey,
+    'status': status.wireValue,
+    'stage': status.wireValue,
+    'progress': terminal
+        ? const {'current': 6, 'total': 6, 'ratio': 1.0}
+        : const {'current': 1, 'total': 6, 'ratio': 0.1666666667},
+    'deck_a_id': request.deckId,
+    'deck_b_id': request.setup.opponentDeckId,
+    'deck_hashes': {
+      'schema_version': 'external_battle_deck_hash_v1',
+      'algorithm': 'sha256',
+      'deck_a': _testHash('a'),
+      'deck_b': _testHash('b'),
+    },
+    'request_schema_version': battleJobRequestSchemaVersion,
+    'request_hash': _testHash('c'),
+    'requested_engine': 'auto',
+    if (terminal) 'engine': 'manaloom_native_reviewed',
+    'timeout_ms': 40000,
+    'attempt_count': terminal ? 1 : 0,
+    if (terminal) 'attempt_id': 'attempt-$jobId',
+    if (status == BattleJobStatus.completed) 'replay_id': 'replay-$jobId',
+    if (terminal) 'terminal_reason': status.wireValue,
+    'created_at': '2026-07-26T12:00:00Z',
+    'updated_at': terminal ? '2026-07-26T12:00:02Z' : '2026-07-26T12:00:00Z',
+    if (terminal) 'finished_at': '2026-07-26T12:00:02Z',
+    'can_cancel': status.canCancel,
+    'can_resume': !terminal,
+    'poll_url': '/ai/battle/jobs/$jobId',
+    'cancel_url': '/ai/battle/jobs/$jobId',
+  });
+}
+
+String _testHash(String value) => List<String>.filled(64, value).join();
 
 void main() {
   test('battle replay location is canonical and URL-safe', () {
@@ -779,7 +868,7 @@ void main() {
     expect(find.textContaining('Vencedor:'), findsNothing);
   });
 
-  testWidgets('labels an accepted Battle Coach action as the user choice', (
+  testWidgets('labels an accepted Play vs AI action as the user choice', (
     tester,
   ) async {
     final gateway = _FakeBattleReplayGateway(
@@ -842,10 +931,12 @@ void main() {
     await tester.tap(decisionsTab);
     await tester.pumpAndSettle();
 
-    expect(find.text('Sua escolha no Battle Coach'), findsOneWidget);
+    expect(find.text('Sua escolha na partida contra IA'), findsOneWidget);
     expect(find.text('Manter esta mão'), findsOneWidget);
     expect(find.textContaining('fazer mulligan'), findsOneWidget);
     expect(find.text('Decisão do simulador'), findsNothing);
+    expect(find.textContaining('interactive_coach'), findsNothing);
+    expect(find.textContaining('Jogar contra IA'), findsWidgets);
   });
 
   testWidgets('keeps a replay as an explicit comparison baseline', (
@@ -1608,38 +1699,155 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('offers independent 1/3/5/10 samples for async Battle', (
+  testWidgets('does not expose live jobs or spectator controls in Battle Lab', (
     tester,
   ) async {
     final gateway = _FakeBattleReplayGateway();
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.darkTheme,
-        home: BattleReplaysScreen(
-          deckId: 'deck-1',
-          gateway: gateway,
-          jobGateway: _EmptyBattleJobGateway(),
-          battleLiveEnabled: true,
-        ),
+        home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
       ),
     );
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('battle-live-jobs-strip')), findsNothing);
+    expect(find.text('Acompanhar ao vivo'), findsNothing);
     await tester.tap(find.byKey(const Key('battle-run-battle-button')));
     await tester.pumpAndSettle();
 
-    final seriesField = find.byKey(const Key('battle-series-size-field'));
-    expect(seriesField, findsOneWidget);
-    await tester.ensureVisible(seriesField);
-    await tester.tap(seriesField);
-    await tester.pumpAndSettle();
-
-    expect(find.text('1 tentativa').last, findsOneWidget);
-    expect(find.text('Série de 3').last, findsOneWidget);
-    expect(find.text('Série de 5').last, findsOneWidget);
-    expect(find.text('Série de 10').last, findsOneWidget);
-    expect(find.textContaining('não há RNG pareado'), findsOneWidget);
+    expect(find.byKey(const Key('battle-series-size-field')), findsNothing);
+    expect(
+      find.byKey(const Key('battle-opponent-submit-button')),
+      findsOneWidget,
+    );
   });
+
+  testWidgets(
+    'runs a three-attempt Battle Lab series as independent batch jobs',
+    (tester) async {
+      final gateway = _FakeBattleReplayGateway();
+      final jobGateway = _SeriesBattleJobGateway();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: BattleReplaysScreen(
+            deckId: 'deck-1',
+            gateway: gateway,
+            jobGateway: jobGateway,
+            battleBatchEnabled: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final seriesField = find.byKey(const Key('battle-series-size-field'));
+      expect(seriesField, findsOneWidget);
+      await tester.ensureVisible(seriesField);
+      await tester.tap(seriesField);
+      await tester.pumpAndSettle();
+      expect(find.text('Série de 3').last, findsOneWidget);
+      expect(find.text('Série de 5').last, findsOneWidget);
+      expect(find.text('Série de 10').last, findsOneWidget);
+      await tester.tap(find.text('Série de 3').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+      await tester.pumpAndSettle();
+
+      expect(gateway.runBattleCalls, 0);
+      expect(jobGateway.requests, hasLength(3));
+      expect(
+        jobGateway.requests.map((request) => request.idempotencyKey).toSet(),
+        hasLength(3),
+      );
+      expect(
+        jobGateway.requests.map((request) => request.seed).toSet(),
+        hasLength(3),
+      );
+      expect(
+        jobGateway.requests.every(
+          (request) => request.setup.seriesSize == BattleSeriesSize.three,
+        ),
+        isTrue,
+      );
+      expect(
+        find.byKey(const Key('battle-series-progress-panel')),
+        findsOneWidget,
+      );
+      expect(find.text('Série independente · 3/3 encerradas'), findsOneWidget);
+      expect(find.byKey(const Key('battle-series-attempt-3')), findsOneWidget);
+      expect(find.byKey(const Key('battle-live-jobs-strip')), findsNothing);
+      expect(find.text('Acompanhar ao vivo'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'cancels the active batch job and does not create remaining attempts',
+    (tester) async {
+      final gateway = _FakeBattleReplayGateway();
+      final jobGateway = _SeriesBattleJobGateway(completeOnCreate: false);
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme.copyWith(
+            splashFactory: NoSplash.splashFactory,
+          ),
+          home: BattleReplaysScreen(
+            deckId: 'deck-1',
+            gateway: gateway,
+            jobGateway: jobGateway,
+            battleBatchEnabled: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final seriesField = find.byKey(const Key('battle-series-size-field'));
+      await tester.ensureVisible(seriesField);
+      await tester.tap(seriesField);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Série de 10').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+      await tester.pump();
+      await tester.pump();
+
+      expect(jobGateway.requests, hasLength(1));
+      final cancel = find.byKey(const Key('battle-series-cancel-button'));
+      expect(cancel, findsOneWidget);
+      await tester.tap(cancel);
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
+
+      expect(jobGateway.requests, hasLength(1));
+      expect(jobGateway.cancelledJobIds, ['series-job-1']);
+      expect(find.text('Série independente · 1/10 encerradas'), findsOneWidget);
+      expect(
+        find.byKey(const Key('battle-series-dismiss-button')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('battle-live-jobs-strip')), findsNothing);
+    },
+  );
 
   testWidgets('runs a focused objective only after a ready preflight', (
     tester,
@@ -1732,7 +1940,7 @@ void main() {
     );
     expect(find.textContaining('Valide novamente o deck'), findsOneWidget);
     expect(
-      find.textContaining('Battle Coach interativo está desativado'),
+      find.textContaining('Jogar contra IA está desativado'),
       findsOneWidget,
     );
     final button = tester.widget<FilledButton>(
@@ -1784,7 +1992,7 @@ void main() {
   });
 
   testWidgets(
-    'offers an explicit automatic simulation when Coach coverage is incomplete',
+    'never offers an automatic simulation when Play vs AI coverage is incomplete',
     (tester) async {
       final gateway = _FakeBattleReplayGateway(
         preflight: const BattlePreflight(
@@ -1810,27 +2018,24 @@ void main() {
           selectedEngine: 'forge',
         ),
       );
-      BattleTestSetup? result;
       await tester.pumpWidget(
         MaterialApp(
           theme: AppTheme.darkTheme,
           home: Builder(
             builder: (context) => TextButton(
-              onPressed: () async {
-                result = await showBattleOpponentPicker(
-                  context: context,
-                  gateway: gateway,
-                  currentDeckId: 'deck-1',
-                  mode: BattleOpponentPickerMode.coach,
-                );
-              },
-              child: const Text('Abrir Coach'),
+              onPressed: () => showBattleOpponentPicker(
+                context: context,
+                gateway: gateway,
+                currentDeckId: 'deck-1',
+                mode: BattleOpponentPickerMode.playVsAi,
+              ),
+              child: const Text('Jogar contra IA'),
             ),
           ),
         ),
       );
 
-      await tester.tap(find.text('Abrir Coach'));
+      await tester.tap(find.text('Jogar contra IA'));
       await tester.pumpAndSettle();
       await tester.tap(
         find.byKey(
@@ -1841,32 +2046,25 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(gateway.preflightCalls, 2);
+      expect(gateway.preflightCalls, 1);
       expect(
         find.byKey(const Key('battle-automatic-fallback-ready')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
         find.byKey(const Key('battle-opponent-automatic-fallback-button')),
-        findsOneWidget,
+        findsNothing,
       );
       expect(
-        find.textContaining('Você não escolherá as jogadas'),
+        find.textContaining(
+          'Cobertura de regras em preparação para Lorehold, the Historian',
+        ),
         findsOneWidget,
       );
-      expect(find.textContaining('XMage'), findsNothing);
-      final coachButton = tester.widget<FilledButton>(
+      final playVsAiButton = tester.widget<FilledButton>(
         find.byKey(const Key('battle-opponent-submit-button')),
       );
-      expect(coachButton.onPressed, isNull);
-
-      await tester.tap(
-        find.byKey(const Key('battle-opponent-automatic-fallback-button')),
-      );
-      await tester.pumpAndSettle();
-
-      expect(result?.launchMode, BattleTestLaunchMode.automatic);
-      expect(result?.opponentDeckId, isNotEmpty);
+      expect(playVsAiButton.onPressed, isNull);
     },
   );
 
@@ -1903,15 +2101,15 @@ void main() {
               context: context,
               gateway: gateway,
               currentDeckId: 'deck-1',
-              mode: BattleOpponentPickerMode.coach,
+              mode: BattleOpponentPickerMode.playVsAi,
             ),
-            child: const Text('Abrir Coach'),
+            child: const Text('Jogar contra IA'),
           ),
         ),
       ),
     );
 
-    await tester.tap(find.text('Abrir Coach'));
+    await tester.tap(find.text('Jogar contra IA'));
     await tester.pumpAndSettle();
     await tester.tap(
       find.byKey(
@@ -1920,6 +2118,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(gateway.preflightCalls, 1);
     expect(
       find.byKey(const Key('battle-opponent-automatic-fallback-button')),
       findsNothing,
@@ -2044,6 +2243,65 @@ void main() {
 
     expect(gateway.lastOpponentDeckId, '33333333-3333-4333-8333-333333333333');
   });
+
+  testWidgets(
+    'cancels a stale preflight when switching to a technical opponent ID',
+    (tester) async {
+      final preflightCompleter = Completer<BattlePreflight>();
+      final gateway = _FakeBattleReplayGateway(
+        preflightCompleter: preflightCompleter,
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.darkTheme.copyWith(
+            splashFactory: NoSplash.splashFactory,
+          ),
+          home: BattleReplaysScreen(deckId: 'deck-1', gateway: gateway),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('battle-run-battle-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(
+          const Key(
+            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
+          ),
+        ),
+      );
+      await tester.pump();
+      expect(gateway.preflightCalls, 1);
+
+      final technicalToggle = find.byKey(
+        const Key('battle-opponent-technical-toggle'),
+      );
+      await tester.ensureVisible(technicalToggle);
+      await tester.tap(technicalToggle);
+      await tester.pump();
+      await tester.enterText(
+        find.byKey(const Key('battle-opponent-deck-id-field')),
+        '33333333-3333-4333-8333-333333333333',
+      );
+      await tester.pump();
+
+      FilledButton submitButton() => tester.widget<FilledButton>(
+        find.byKey(const Key('battle-opponent-submit-button')),
+      );
+      expect(submitButton().onPressed, isNotNull);
+
+      preflightCompleter.complete(gateway.preflight);
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('battle-opponent-deck-id-field')),
+        findsOneWidget,
+      );
+      expect(submitButton().onPressed, isNotNull);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('keeps opponent selection usable at 390px without overflow', (
     tester,

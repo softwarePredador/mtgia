@@ -16,7 +16,7 @@ Este documento reúne em um único backlog executável:
 - segurança, privacidade, autorização e preservação de dados;
 - ciclo completo de decks e IA Commander;
 - catálogo, cartas, coleção, preços, Scanner e arte;
-- Life Counter, pós-jogo, Battle Lab e Coach;
+- Life Counter, pós-jogo, Battle Lab interno e Jogar contra IA;
 - arquitetura horizontal de XMage/Forge para múltiplos usuários;
 - UX visual orientada por cartas, com menos texto e mais reconhecimento;
 - social, comunidade, marketplace e trades;
@@ -63,7 +63,7 @@ Pode entrar no escopo da beta core depois dos seus P0:
 Devem permanecer inacessíveis no app **e na API direta**, salvo uma liberação
 específica posterior:
 
-- Battle público, Battle Live e Coach;
+- Battle público e Jogar contra IA; Battle Live nunca é produto espectador;
 - Scanner/OCR;
 - geração IA generalizada ou promoção autônoma de aprendizado;
 - galeria pública, perfis públicos, busca de usuários, comments e follows;
@@ -219,7 +219,7 @@ flowchart TD
 | ID | Pri. | Estado | Entrega | Depende de | Aceite mínimo |
 | --- | --- | --- | --- | --- | --- |
 | `BT-GOV-001` | P0 CORE | PASS | Publicar decisão corrente única: beta gratuita, público, plataformas, domínio, oferta, flags, IA, Battle e módulos adiados. | — | Documento curto, datado e sem conflito com UI/API/deploy. Receipt: `docs/qa/execution/2026-08-14/BT-GOV-001.md`; implementação: `fd0397a5a97742bcb5127c7b2d08d80aca4bf738`. |
-| `BT-SCP-001` | P0 CORE | IN_PROGRESS_CONTAINED | Manifesto server-authoritative de capabilities, default-deny e versionado no release identity. | `BT-GOV-001` | Flag ausente/inválida fica OFF; API nega antes de PG; app só apresenta o permitido; cadastro novo tem capability própria e fica OFF, enquanto login/recuperação/privacidade de contas existentes permanecem control-plane; same-SHA registra a matriz; `implementation_status`, `release_capability` e `live_verified_as_of` são eixos distintos. |
+| `BT-SCP-001` | P0 CORE | IN_PROGRESS_CONTAINED | Manifesto server-authoritative de capabilities, default-deny e versionado no release identity. | `BT-GOV-001` | Flag ausente/inválida fica OFF; API nega antes de PG; app só apresenta o permitido; nenhuma rota espectador fica pública e a implementação interativa guardada usa a direção Jogar contra IA; cadastro novo tem capability própria e fica OFF, enquanto login/recuperação/privacidade de contas existentes permanecem control-plane; same-SHA registra a matriz; `implementation_status`, `release_capability` e `live_verified_as_of` são eixos distintos. |
 | `BT-OFFER-001` | P0 CORE | IMPLEMENTED_LOCAL_PENDING_FULL_GATE | Unificar a oferta pública da beta e remover promessas conflitantes de Free/Pro/checkout/limites. | `BT-GOV-001` | Landing, app, backend e contratos usam a mesma oferta; checkout e paywall inacessíveis se beta gratuita. |
 | `BT-DOC-001` | P0 CORE | PASS | Reconciliar docs ativos e marcar relatórios antigos como históricos para prioridade. | `BT-GOV-001` | Deck/IA ganhou mapa canônico; qualquer plano/manual/Hermes antigo recebe lifecycle inequívoco; zero comando mutante em documento histórico pode parecer operacional. Receipt: `docs/qa/execution/2026-08-24/BT-DOC-001.md`; implementação: `c6e2725af0995e01dcf675f20e3a8b608b84d555`. |
 | `BT-DOC-002` | P1 | IMPLEMENTED_LOCAL_PENDING_FULL_GATE | Corrigir duplicidade de IDs de ADR e registry de decisões. | `BT-DOC-001` | ADR XMage foi renumerado canonicamente para 0012, 0004 duplicado ficou histórico; 0011 pertence ao domínio BrewTact; project-logic/link checks precisam fechar. |
@@ -241,7 +241,7 @@ Decisão de escopo inicial de `BT-SCP-001`:
 | Analyze/Optimize advisory | `ON` após P0 próprios |
 | Generate/Rebuild | `EXPERIMENTAL_ALLOWLIST` |
 | Battle batch | `OFF` até Épico G |
-| Battle Live/Coach | `OFF` até Épico G |
+| Battle interativo/Jogar contra IA | `OFF` até Épico G; Live é infraestrutura interna, nunca CTA espectador |
 | Scanner | `OFF` |
 | Galeria/social/DM/push | `OFF` |
 | Binder público/trades/marketplace | `OFF` |
@@ -446,7 +446,7 @@ Desktop:
 | `BT-AI-030` | P0 LEARNING | TODO | Retração, purge e reconciliação de learning por sujeito em PG e Hermes. | `DCK-P0-05`, `BT-PRIV-002` | Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. |
 | `BT-AI-031` | P0 AI | TODO | Router efetivo de Optimize/Complete e exatamente um job por request. | `BT-AI-021` | Modo solicitado/política/tamanho produzem decisão explícita; zero segundo job órfão; parity de gates e quota por modo. |
 
-## Épico G — Battle, Coach e escala horizontal
+## Épico G — Battle, Jogar contra IA e escala horizontal
 
 ### P0 antes de qualquer abertura Battle
 
@@ -469,6 +469,24 @@ Desktop:
 | `BT-BAT-EVD-004` | P0 BATTLE | TODO | Tornar lane/natural sample/controls atestados pelo servidor e comparar request↔echo. | `BT-BAT-007` | Cliente não autodeclara `natural_sample`/`same_lane`; qualquer echo divergente ou ausente falha fechado. |
 | `BT-BAT-EVD-005` | P1 | TODO | Sanitizar evidência inválida e separar disponibilidade de adapter de prontidão Battle. | `DCK-P1-06` | Nome de carta inválida não vaza; `pending_adapter` não significa ausência de XMage/Forge; provenance/coverage visíveis. |
 | `BT-BAT-EVD-006` | P1 | TODO | Remover semântica histórica ambígua de `promotion_allowed`. | `BT-DOC-001` | Scripts/relatórios distinguem “pode rodar próximo gate” de promoção de produto; nomes/DTOs impossibilitam confusão. |
+| `BT-PLAY-001` | P0 BATTLE | BLOCKED_BY_P0 | Entregar a mesa card-first de Jogar contra IA e eliminar espectador da superfície pública. | `BT-SCP-001`, `BT-BAT-004`, `BT-BAT-005`, `BT-BAT-007` | Rota canônica `/play-vs-ai`; redirects legados sem CTA; zero rota pública `/battle-live`; mão própria sempre visível; carta legal acionável; painel acessível cobre opções sem carta, inteiro e distribuição; preflight XMage bloqueado nunca consulta Forge, simula nem abre replay substituto; capabilities continuam OFF até promoção. |
+| `BT-PLAY-002` | P0 BATTLE | BLOCKED_BY_P0 | Provar os casos de uso em partida XMage real completa, não apenas fixture/widget. | `BT-PLAY-001`, `BT-BAT-010` | Mesma SHA/pin cobre escolha de oponente, mulligan, mana, cast, alvo, prioridade/passe, combate, reconexão, concessão e resultado terminal esperado; erro não fabrica resultado; replay/rematch validados. |
+| `BT-PLAY-003` | P0 BATTLE | BLOCKED_BY_P0 | Fechar resiliência, acessibilidade, capacidade e rollout de Jogar contra IA. | `BT-PLAY-002`, `BT-BAT-008`, `BT-BAT-009` | Web real e Android físico; teclado/TalkBack; timeout/retry/idempotência; SLO/custo/kill switch/rollback e coorte allowlisted com receipts same-SHA. |
+
+### Evidência antecipada, sem avanço de estado
+
+Em 2026-08-25, o trabalho contido do slot `BT-SCP-001` produziu uma prova
+focal candidata a `BT-PLAY-001/002`: build Web release real, API/PostgreSQL
+loopback, XMage upstream/patch pinados, jornada do mulligan ao dano,
+reconexão, concessão, replay e rematch, além dos três níveis de evidência UI.
+O receipt é
+`docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md`.
+
+As linhas acima continuam `BLOCKED_BY_P0`. Um teste antecipado não contorna
+dependências, WIP 1, clean-SHA, `BT-BAT-010`, Android físico,
+teclado/TalkBack, capacidade, custo/SLO, kill switch ou decisão de coorte. Ele
+reduz risco técnico e torna o próximo aceite auditável; não é promoção de
+produto nem release.
 
 ### P1 horizontal
 

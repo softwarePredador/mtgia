@@ -14,6 +14,7 @@ MINIMUM_TOTAL_FILES = 178
 MINIMUM_CATEGORY_COUNTS = {
     "core runtime": 36,
     "focused evidence/promotion": 37,
+    "historical/deprecated": 1,
     "learned-deck source": 16,
     "optimizer/scorecard": 30,
     "recurring audit gate": 33,
@@ -25,12 +26,14 @@ MINIMUM_AUTOMATION_COVERAGE_COUNTS = {
     "covered_by_recurring_run": 33,
     "imported_by_core_runtime": 7,
     "outside_recurring_run": 138,
+    "outside_recurring_run_historical": 1,
 }
 MINIMUM_GATE_EXPECTED_COUNTS = {
     "core_runtime_import_regression": 7,
     "recurring_audit_required": 33,
     "targeted_manual_gate_required_before_change": 64,
     "targeted_test_required_before_change": 74,
+    "freshness_check_before_use": 1,
 }
 REQUIRED_HIGH_SIGNAL_PATHS = {
     "docs/hermes-analysis/manaloom-knowledge/scripts/battle_card_adjustment_throughput_benchmark.py",
@@ -62,6 +65,7 @@ REQUIRED_HIGH_SIGNAL_PATHS = {
     "server/bin/manaloom_battle_rule_focused_evidence.py",
     "server/bin/manaloom_battle_product_e2e_audit.py",
     "server/test/manaloom_battle_product_e2e_audit_test.py",
+    "server/test/optimizer_loop_tombstone_contract_test.py",
     "server/bin/native_battle_sidecar.py",
     "server/bin/native_battle_worker.py",
     "server/bin/learned_deck_coherence_audit.py",
@@ -133,6 +137,7 @@ def test_manifest_classifies_current_battle_surface() -> None:
         "rule registry/sync",
         "review queue",
         "focused evidence/promotion",
+        "historical/deprecated",
         "learned-deck source",
         "optimizer/scorecard",
     } <= categories
@@ -145,6 +150,7 @@ def test_manifest_classifies_current_battle_surface() -> None:
         "focused evidence/promotion",
         "learned-deck source",
         "optimizer/scorecard",
+        "historical/deprecated",
     } <= outside
 
     for record in manifest["files"]:

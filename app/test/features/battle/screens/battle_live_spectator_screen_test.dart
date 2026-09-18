@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/battle/models/battle_job.dart';
 import 'package:manaloom/features/battle/models/battle_live_cursor.dart';
@@ -460,75 +459,25 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
-  testWidgets('creates a live job from the single opponent simulation action', (
+  testWidgets('Battle Lab never exposes the internal spectator surface', (
     tester,
   ) async {
-    final queuedJob = _job();
-    final jobGateway = _FakeBattleJobGateway(
-      job: queuedJob,
-      listedJobs: [queuedJob],
-      creation: BattleJobCreation(job: queuedJob, created: true),
-    );
     final replayGateway = _BattleReplayGatewayStub();
-    final router = GoRouter(
-      initialLocation: '/',
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => BattleReplaysScreen(
-            deckId: 'deck-a',
-            gateway: replayGateway,
-            jobGateway: jobGateway,
-            battleLiveEnabled: true,
-          ),
-        ),
-        GoRoute(
-          path: '/decks/:id/battle-live/:jobId',
-          builder: (context, state) => const Scaffold(
-            body: Center(
-              child: Text(
-                'Espectador aberto',
-                key: Key('battle-live-route-target'),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-
     await tester.pumpWidget(
-      MaterialApp.router(
+      MaterialApp(
         theme: AppTheme.darkTheme.copyWith(
           splashFactory: NoSplash.splashFactory,
         ),
-        routerConfig: router,
+        home: BattleReplaysScreen(deckId: 'deck-a', gateway: replayGateway),
       ),
     );
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('battle-run-battle-button')), findsOneWidget);
     expect(find.byKey(const Key('battle-run-live-button')), findsNothing);
-    expect(find.byKey(const Key('battle-live-job-job-1')), findsOneWidget);
-    expect(jobGateway.listCalls, 1);
-
-    await tester.tap(find.byKey(const Key('battle-run-battle-button')));
-    await tester.pumpAndSettle();
-    await tester.tap(
-      find.byKey(
-        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
-      ),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
-    await tester.pumpAndSettle();
-
-    expect(jobGateway.createCalls, 1);
-    expect(jobGateway.lastCreateRequest?.deckId, 'deck-a');
-    expect(
-      jobGateway.lastCreateRequest?.setup.opponentDeckId,
-      '11111111-1111-4111-8111-111111111111',
-    );
-    expect(find.byKey(const Key('battle-live-route-target')), findsOneWidget);
+    expect(find.byKey(const Key('battle-live-jobs-strip')), findsNothing);
+    expect(find.text('Acompanhar ao vivo'), findsNothing);
+    expect(find.byType(BattleLiveSpectatorScreen), findsNothing);
   });
 
   testWidgets(

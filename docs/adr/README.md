@@ -16,3 +16,10 @@ Dois arquivos receberam o número `0004`. O registro
 renumerado canonicamente para `0012-xmage-human-spike-go.md`. Novas referências
 devem usar ADR 0012; o ADR 0004 canônico continua sendo o contrato de polling e
 checkpoints duráveis de Battle Live.
+
+## Decisão Battle corrente
+
+O ADR 0013 substitui o ADR 0005 quanto ao produto e à UX: a superfície
+interativa é **Jogar contra IA**, e Battle Live não é uma visão pública. Os
+limites técnicos de privacidade, autenticação, persistência e respostas tipadas
+do ADR 0005 continuam válidos.

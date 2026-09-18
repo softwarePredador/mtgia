@@ -130,13 +130,18 @@ Map<String, dynamic> _sanitizeMap(
       }
       final normalizedKey = _normalizeKey(key);
       if (_isSensitiveKey(normalizedKey)) continue;
+      if (normalizedKey == 'private_state') continue;
       if (hidesIdentity && _hiddenIdentityKeys.contains(normalizedKey)) {
         continue;
       }
 
       final hiddenCountKey = _hiddenZoneCountKeys[normalizedKey];
-      if (hiddenCountKey != null && entry.value is List) {
-        hiddenZoneCounts[hiddenCountKey] = (entry.value as List).length;
+      if (hiddenCountKey != null) {
+        final count = _safeHiddenZoneCount(entry.value);
+        final prior = hiddenZoneCounts[hiddenCountKey];
+        if (count != null && (prior == null || count > prior)) {
+          hiddenZoneCounts[hiddenCountKey] = count;
+        }
         continue;
       }
 
@@ -154,6 +159,29 @@ Map<String, dynamic> _sanitizeMap(
   } finally {
     ancestors.remove(value);
   }
+}
+
+int? _safeHiddenZoneCount(Object? value) {
+  if (value is List) {
+    return value.length <= _maximumSafeHiddenZoneCount ? value.length : null;
+  }
+  if (value is! Map) return null;
+
+  for (final entry in value.entries) {
+    final key = entry.key;
+    if (key is! String || entry.value is! List) continue;
+    if (!_hiddenZoneCollectionKeys.contains(_normalizeKey(key))) continue;
+    final count = (entry.value as List).length;
+    if (count <= _maximumSafeHiddenZoneCount) return count;
+  }
+  for (final entry in value.entries) {
+    final key = entry.key;
+    final count = entry.value;
+    if (key is! String || count is! int) continue;
+    if (!_hiddenZoneCountValueKeys.contains(_normalizeKey(key))) continue;
+    if (count >= 0 && count <= _maximumSafeHiddenZoneCount) return count;
+  }
+  return null;
 }
 
 bool _isHiddenObject(Map<dynamic, dynamic> value) {
@@ -212,11 +240,33 @@ const _hiddenZoneCountKeys = <String, String>{
   'hand': 'hand_size',
   'hand_cards': 'hand_size',
   'private_hand': 'hand_size',
+  'own_hand': 'hand_size',
   'library': 'library_size',
   'library_cards': 'library_size',
   'draw_pile': 'library_size',
   'draw_pile_cards': 'library_size',
 };
+
+const _hiddenZoneCollectionKeys = <String>{
+  'cards',
+  'entries',
+  'items',
+  'objects',
+  'values',
+};
+
+const _hiddenZoneCountValueKeys = <String>{
+  'count',
+  'size',
+  'card_count',
+  'cards_count',
+  'hand_count',
+  'hand_size',
+  'library_count',
+  'library_size',
+};
+
+const _maximumSafeHiddenZoneCount = 100000;
 
 const _hiddenIdentityKeys = <String>{
   'id',

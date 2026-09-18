@@ -34,7 +34,7 @@ enum CardImageLoadState {
 ///   height: 84,
 /// )
 /// ```
-class CachedCardImage extends StatelessWidget {
+class CachedCardImage extends StatefulWidget {
   static const bool _allowLoopbackHttpImages = bool.fromEnvironment(
     'MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES',
     defaultValue: false,
@@ -136,130 +136,6 @@ class CachedCardImage extends StatelessWidget {
     return uri.toString();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final effectiveImageUrl = _sanitizeImageUrl(imageUrl);
-    final effectiveFallbackUrl = _sanitizeImageUrl(fallbackImageUrl);
-    final primaryUrl = effectiveImageUrl ?? effectiveFallbackUrl;
-    final fallbackUrl =
-        effectiveFallbackUrl != null && effectiveFallbackUrl != primaryUrl
-        ? effectiveFallbackUrl
-        : null;
-
-    if (primaryUrl == null) {
-      return _placeholder();
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final decodeTarget = AppImageCachePolicy.targetFor(
-          width: width,
-          height: height,
-          constrainedWidth: constraints.maxWidth,
-          constrainedHeight: constraints.maxHeight,
-          devicePixelRatio: MediaQuery.maybeDevicePixelRatioOf(context) ?? 1,
-        );
-        final sizedPrimaryUrl = _sizeScryfallImageUrl(primaryUrl, decodeTarget);
-        final sizedFallbackUrl = fallbackUrl == null
-            ? null
-            : _sizeScryfallImageUrl(fallbackUrl, decodeTarget);
-        final image = _networkImage(
-          sizedPrimaryUrl,
-          fallbackUrl: sizedFallbackUrl,
-          decodeTarget: decodeTarget,
-        );
-
-        if (borderRadius != null) {
-          return ClipRRect(borderRadius: borderRadius!, child: image);
-        }
-
-        return image;
-      },
-    );
-  }
-
-  Widget _networkImage(
-    String effectiveImageUrl, {
-    String? fallbackUrl,
-    required ImageDecodeTarget decodeTarget,
-  }) {
-    final needsScryfallWebResilience =
-        kIsWeb &&
-        (isScryfallArtworkImageUrl(effectiveImageUrl) ||
-            (fallbackUrl != null && isScryfallArtworkImageUrl(fallbackUrl)));
-    if (needsScryfallWebResilience) {
-      return _ScryfallWebCardImage(
-        key: networkImageKey,
-        primaryUrl: effectiveImageUrl,
-        fallbackUrl: fallbackUrl,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: alignment,
-        loadingWidget: _loadingWidget,
-        errorWidget: _errorWidget,
-        onLoadStateChanged: _notifyLoadState,
-      );
-    }
-
-    final image = CachedNetworkImage(
-      key: networkImageKey,
-      imageUrl: effectiveImageUrl,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      httpHeaders: _scryfallHeaders,
-      memCacheWidth: decodeTarget.width,
-      memCacheHeight: decodeTarget.height,
-      fadeInDuration: const Duration(milliseconds: 200),
-      placeholder: (_, __) => _loadingWidget(),
-      imageBuilder: (_, provider) {
-        _notifyLoadState(CardImageLoadState.primaryReady);
-        return Image(
-          image: provider,
-          width: width,
-          height: height,
-          fit: fit,
-          alignment: alignment,
-        );
-      },
-      errorWidget: (_, __, error) {
-        debugPrint(
-          '[🖼️ CachedCardImage] falha ao carregar $effectiveImageUrl -> $error',
-        );
-        if (fallbackUrl != null) {
-          return CachedNetworkImage(
-            imageUrl: fallbackUrl,
-            width: width,
-            height: height,
-            fit: fit,
-            alignment: alignment,
-            httpHeaders: _scryfallHeaders,
-            memCacheWidth: decodeTarget.width,
-            memCacheHeight: decodeTarget.height,
-            fadeInDuration: const Duration(milliseconds: 120),
-            placeholder: (_, __) => _loadingWidget(),
-            imageBuilder: (_, provider) {
-              _notifyLoadState(CardImageLoadState.fallbackReady);
-              return Image(
-                image: provider,
-                width: width,
-                height: height,
-                fit: fit,
-                alignment: alignment,
-              );
-            },
-            errorWidget: (_, __, ___) => _errorWidget(),
-          );
-        }
-        return _errorWidget();
-      },
-    );
-
-    return image;
-  }
-
   static String _sizeScryfallImageUrl(
     String imageUrl,
     ImageDecodeTarget decodeTarget,
@@ -282,54 +158,263 @@ class CachedCardImage extends StatelessWidget {
     return uri.replace(pathSegments: segments).toString();
   }
 
+  @override
+  State<CachedCardImage> createState() => _CachedCardImageState();
+}
+
+class _CachedCardImageState extends State<CachedCardImage> {
+  int _generation = 0;
+  (String?, String?)? _source;
+  CardImageLoadState? _accepted;
+  CardImageLoadState? _emitted;
+  bool _notificationQueued = false;
+
+  void _invalidateNotifications() {
+    _generation++;
+    _source = null;
+    _accepted = null;
+    _emitted = null;
+    _notificationQueued = false;
+  }
+
+  @override
+  void didUpdateWidget(CachedCardImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.imageUrl != oldWidget.imageUrl ||
+        widget.fallbackImageUrl != oldWidget.fallbackImageUrl ||
+        widget.networkImageKey != oldWidget.networkImageKey) {
+      _invalidateNotifications();
+    }
+  }
+
+  @override
+  void dispose() {
+    _invalidateNotifications();
+    super.dispose();
+  }
+
+  int _selectSource(String? primary, String? fallback) {
+    final source = (primary, fallback);
+    if (_source != source) {
+      _invalidateNotifications();
+      _source = source;
+    }
+    return _generation;
+  }
+
+  void _notifyLoadState(CardImageLoadState state, int generation) {
+    if (!mounted || generation != _generation || state == _accepted) return;
+    // OctoImage may rebuild its faded-out placeholder after decoding. That
+    // composition callback is not a new load of this source generation.
+    if (state == CardImageLoadState.loading &&
+        _accepted != null &&
+        _accepted != CardImageLoadState.loading) {
+      return;
+    }
+    _accepted = state;
+    if (_notificationQueued) return;
+    _notificationQueued = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || generation != _generation) return;
+      _notificationQueued = false;
+      final current = _accepted;
+      if (current == null || current == _emitted) return;
+      _emitted = current;
+      widget.onLoadStateChanged?.call(current);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveImageUrl = CachedCardImage._sanitizeImageUrl(
+      widget.imageUrl,
+    );
+    final effectiveFallbackUrl = CachedCardImage._sanitizeImageUrl(
+      widget.fallbackImageUrl,
+    );
+    final primaryUrl = effectiveImageUrl ?? effectiveFallbackUrl;
+    final fallbackUrl =
+        effectiveFallbackUrl != null && effectiveFallbackUrl != primaryUrl
+        ? effectiveFallbackUrl
+        : null;
+
+    if (primaryUrl == null) {
+      return _placeholder(_selectSource(null, null));
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final decodeTarget = AppImageCachePolicy.targetFor(
+          width: widget.width,
+          height: widget.height,
+          constrainedWidth: constraints.maxWidth,
+          constrainedHeight: constraints.maxHeight,
+          devicePixelRatio: MediaQuery.maybeDevicePixelRatioOf(context) ?? 1,
+        );
+        final sizedPrimaryUrl = CachedCardImage._sizeScryfallImageUrl(
+          primaryUrl,
+          decodeTarget,
+        );
+        final sizedFallbackUrl = fallbackUrl == null
+            ? null
+            : CachedCardImage._sizeScryfallImageUrl(fallbackUrl, decodeTarget);
+        final generation = _selectSource(sizedPrimaryUrl, sizedFallbackUrl);
+        final image = _networkImage(
+          sizedPrimaryUrl,
+          fallbackUrl: sizedFallbackUrl,
+          decodeTarget: decodeTarget,
+          generation: generation,
+        );
+
+        if (widget.borderRadius != null) {
+          return ClipRRect(borderRadius: widget.borderRadius!, child: image);
+        }
+
+        return image;
+      },
+    );
+  }
+
+  Widget _networkImage(
+    String effectiveImageUrl, {
+    String? fallbackUrl,
+    required ImageDecodeTarget decodeTarget,
+    required int generation,
+  }) {
+    final needsScryfallWebResilience =
+        kIsWeb &&
+        (isScryfallArtworkImageUrl(effectiveImageUrl) ||
+            (fallbackUrl != null && isScryfallArtworkImageUrl(fallbackUrl)));
+    if (needsScryfallWebResilience) {
+      return _ScryfallWebCardImage(
+        key: widget.networkImageKey,
+        primaryUrl: effectiveImageUrl,
+        fallbackUrl: fallbackUrl,
+        width: widget.width,
+        height: widget.height,
+        fit: widget.fit,
+        alignment: widget.alignment,
+        loadingWidget: () => _loadingWidget(generation),
+        errorWidget: () => _errorWidget(generation),
+        onLoadStateChanged: (state) => _notifyLoadState(state, generation),
+      );
+    }
+
+    final image = CachedNetworkImage(
+      key: widget.networkImageKey,
+      imageUrl: effectiveImageUrl,
+      width: widget.width,
+      height: widget.height,
+      fit: widget.fit,
+      alignment: widget.alignment,
+      httpHeaders: CachedCardImage._scryfallHeaders,
+      memCacheWidth: decodeTarget.width,
+      memCacheHeight: decodeTarget.height,
+      fadeInDuration: const Duration(milliseconds: 200),
+      placeholder: (_, __) => _loadingWidget(generation),
+      imageBuilder: (_, provider) {
+        _notifyLoadState(CardImageLoadState.primaryReady, generation);
+        return Image(
+          image: provider,
+          width: widget.width,
+          height: widget.height,
+          fit: widget.fit,
+          alignment: widget.alignment,
+        );
+      },
+      errorWidget: (_, __, error) {
+        debugPrint(
+          '[🖼️ CachedCardImage] falha ao carregar $effectiveImageUrl -> $error',
+        );
+        if (fallbackUrl != null) {
+          return CachedNetworkImage(
+            imageUrl: fallbackUrl,
+            width: widget.width,
+            height: widget.height,
+            fit: widget.fit,
+            alignment: widget.alignment,
+            httpHeaders: CachedCardImage._scryfallHeaders,
+            memCacheWidth: decodeTarget.width,
+            memCacheHeight: decodeTarget.height,
+            fadeInDuration: const Duration(milliseconds: 120),
+            placeholder: (_, __) => _loadingWidget(generation),
+            imageBuilder: (_, provider) {
+              _notifyLoadState(CardImageLoadState.fallbackReady, generation);
+              return Image(
+                image: provider,
+                width: widget.width,
+                height: widget.height,
+                fit: widget.fit,
+                alignment: widget.alignment,
+              );
+            },
+            errorWidget: (_, __, ___) => _errorWidget(generation),
+          );
+        }
+        return _errorWidget(generation);
+      },
+    );
+
+    return image;
+  }
+
   /// Placeholder estático quando não há URL (sem imagem para carregar)
-  Widget _placeholder() {
-    _notifyLoadState(CardImageLoadState.missing);
-    if (errorPlaceholder != null) {
-      return SizedBox(width: width, height: height, child: errorPlaceholder);
+  Widget _placeholder(int generation) {
+    _notifyLoadState(CardImageLoadState.missing, generation);
+    if (widget.errorPlaceholder != null) {
+      return SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: widget.errorPlaceholder,
+      );
     }
     return _CardImageFallback(
       key: const Key('cached-card-image-placeholder'),
-      width: width,
-      height: height,
-      borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
+      width: widget.width,
+      height: widget.height,
+      borderRadius:
+          widget.borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
       loading: false,
     );
   }
 
   /// Placeholder enquanto a imagem está baixando (sem spinner para não parecer "loading" permanente)
-  Widget _loadingWidget() {
-    _notifyLoadState(CardImageLoadState.loading);
-    if (loadingPlaceholder != null) {
-      return SizedBox(width: width, height: height, child: loadingPlaceholder);
+  Widget _loadingWidget(int generation) {
+    _notifyLoadState(CardImageLoadState.loading, generation);
+    if (widget.loadingPlaceholder != null) {
+      return SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: widget.loadingPlaceholder,
+      );
     }
     return _CardImageFallback(
       key: const Key('cached-card-image-loading'),
-      width: width,
-      height: height,
-      borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
+      width: widget.width,
+      height: widget.height,
+      borderRadius:
+          widget.borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
       loading: true,
     );
   }
 
-  Widget _errorWidget() {
-    _notifyLoadState(CardImageLoadState.failed);
-    if (errorPlaceholder != null) {
-      return SizedBox(width: width, height: height, child: errorPlaceholder);
+  Widget _errorWidget(int generation) {
+    _notifyLoadState(CardImageLoadState.failed, generation);
+    if (widget.errorPlaceholder != null) {
+      return SizedBox(
+        width: widget.width,
+        height: widget.height,
+        child: widget.errorPlaceholder,
+      );
     }
     return _CardImageFallback(
       key: const Key('cached-card-image-error'),
-      width: width,
-      height: height,
-      borderRadius: borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
+      width: widget.width,
+      height: widget.height,
+      borderRadius:
+          widget.borderRadius ?? BorderRadius.circular(AppTheme.radiusXs),
       loading: false,
     );
-  }
-
-  void _notifyLoadState(CardImageLoadState state) {
-    final callback = onLoadStateChanged;
-    if (callback == null) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) => callback(state));
   }
 }
 
@@ -632,7 +717,10 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
     });
   }
 
-  void _queueErrorRecovery(Object error) {
+  void _queueErrorRecovery(Object error, int generation, int sequence) {
+    if (generation != _requestGeneration || sequence != _requestSequence) {
+      return;
+    }
     if (_errorRecoveryPending || _terminalError || !_requestReady) {
       return;
     }
@@ -644,7 +732,10 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || failedSequence != _requestSequence || _terminalError) {
+      if (!mounted ||
+          generation != _requestGeneration ||
+          failedSequence != _requestSequence ||
+          _terminalError) {
         return;
       }
       _recoverFromError();
@@ -700,6 +791,10 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
     // platform-view strategy is the Flutter-supported escape hatch for that
     // case. Headers must stay empty or Flutter falls back to an XHR byte fetch,
     // which is exactly what browsers reject here.
+    final generation = _requestGeneration;
+    final sequence = _requestSequence;
+    final isPrimary = _currentUrl == widget.primaryUrl;
+    final notify = widget.onLoadStateChanged;
     return Image.network(
       _currentUrl,
       key: ValueKey('$_currentUrl#$_requestSequence'),
@@ -709,9 +804,14 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
       alignment: widget.alignment,
       webHtmlElementStrategy: WebHtmlElementStrategy.prefer,
       frameBuilder: (_, child, frame, wasSynchronouslyLoaded) {
+        if (!mounted ||
+            generation != _requestGeneration ||
+            sequence != _requestSequence) {
+          return child;
+        }
         if (wasSynchronouslyLoaded || frame != null) {
-          widget.onLoadStateChanged(
-            _currentUrl == widget.primaryUrl
+          notify(
+            isPrimary
                 ? CardImageLoadState.primaryReady
                 : CardImageLoadState.fallbackReady,
           );
@@ -720,7 +820,12 @@ class _ScryfallWebCardImageState extends State<_ScryfallWebCardImage> {
         return widget.loadingWidget();
       },
       errorBuilder: (_, error, __) {
-        _queueErrorRecovery(error);
+        if (!mounted ||
+            generation != _requestGeneration ||
+            sequence != _requestSequence) {
+          return const SizedBox.shrink();
+        }
+        _queueErrorRecovery(error, generation, sequence);
         return _canRecover ? widget.loadingWidget() : widget.errorWidget();
       },
     );

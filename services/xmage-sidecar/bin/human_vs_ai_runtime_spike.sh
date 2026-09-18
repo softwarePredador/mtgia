@@ -10,6 +10,7 @@ MATCH_TIMEOUT_MS="${BL7_MATCH_TIMEOUT_MS:-180000}"
 IDLE_TIMEOUT_MS="${BL7_IDLE_TIMEOUT_MS:-20000}"
 RUN_TIMEOUT_PROBE="${BL7_RUNTIME_TIMEOUT_PROBE:-true}"
 TIMEOUT_PROBE_MS="${BL7_TIMEOUT_PROBE_MS:-1000}"
+MAVEN_REPO_LOCAL="${MAVEN_REPO_LOCAL:-${HOME:?HOME is required}/.m2/repository}"
 
 require_command() {
   command -v "$1" >/dev/null 2>&1 || {
@@ -45,8 +46,16 @@ require_positive_integer "BL7_TIMEOUT_PROBE_MS" "$TIMEOUT_PROBE_MS"
 }
 require_command java
 require_command mvn
+case "$MAVEN_REPO_LOCAL" in
+  /*) ;;
+  *)
+    echo "MAVEN_REPO_LOCAL must be an absolute path" >&2
+    exit 2
+    ;;
+esac
 
-"$SCRIPT_DIR/bootstrap_pinned_xmage_maven.sh"
+MAVEN_REPO_LOCAL="$MAVEN_REPO_LOCAL" \
+  "$SCRIPT_DIR/bootstrap_pinned_xmage_maven.sh"
 
 AUDIT_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-bl7-runtime-client.XXXXXX")"
 cleanup() {
@@ -57,6 +66,7 @@ trap cleanup EXIT INT TERM
 (
   cd "$SIDECAR_DIR"
   mvn -B -Dstyle.color=never \
+    -Dmaven.repo.local="$MAVEN_REPO_LOCAL" \
     -DincludeScope=test \
     -Dmdep.outputFile="$AUDIT_DIR/dependencies.classpath" \
     dependency:build-classpath \

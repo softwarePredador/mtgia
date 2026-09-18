@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "matrix_id": "manaloom-s3-05-web-keyboard-focus-2026-07-27",
+  "matrix_id": "manaloom-play-vs-ai-web-keyboard-focus-2026-08-25",
   "interactions": {
     "tab_forward": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"login follows forward and reverse form focus order"},
     "shift_tab": {"test":"test/ui/ui_keyboard_focus_matrix_test.dart","anchor":"login follows forward and reverse form focus order"},
@@ -26,13 +26,13 @@
     "observed_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id"],
     "passed": ["tab_forward","shift_tab","enter","space","escape_modal","modal_trap","focus_restoration","visible_focus","browser_back","reduced_motion"],
     "console_errors": 0,
-    "remaining": ["Executar teclado Web real nas rotas Battle obrigatorias.","Vincular o manifesto Battle Coach ao digest corrente e ao aggregate revisado."],
-    "remaining_routes": ["/decks/:id/battle-replays","/decks/:id/battle-coach"],
-    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id","/decks/:id/battle-replays","/decks/:id/battle-coach"]
+    "remaining": ["Executar teclado Web real nas rotas Battle obrigatorias.","Vincular o manifesto Jogar contra IA ao digest corrente e ao aggregate revisado."],
+    "remaining_routes": ["/decks/:id/battle-replays","/decks/:id/play-vs-ai","/decks/:id/play-vs-ai/:sessionId"],
+    "required_routes": ["/login","/home","/decks","/collection","/community","/profile","/decks/:id","/decks/:id/battle-replays","/decks/:id/play-vs-ai","/decks/:id/play-vs-ai/:sessionId"]
   },
   "surface_followups": {
-    "battle_coach": {
-      "route": "/decks/:id/battle-coach[/sessionId]",
+    "play_vs_ai": {
+      "route": "/decks/:id/play-vs-ai[/sessionId]",
       "widget_evidence": "test/features/battle/screens/battle_coach_screen_test.dart",
       "android_runtime_evidence": "../docs/qa/ui-live/latest.json",
       "web_keyboard_status": "pending_current_digest",

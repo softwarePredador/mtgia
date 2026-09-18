@@ -62,6 +62,18 @@ final class XmageBattleServiceTest {
     }
 
     @Test
+    void sidecarHttpBindIsExplicitAndRejectsArbitraryInterfaces() {
+        assertTrue(SidecarMain.supportedHttpHost("0.0.0.0"));
+        assertTrue(SidecarMain.supportedHttpHost("127.0.0.1"));
+        assertTrue(SidecarMain.supportedHttpHost("localhost"));
+        assertTrue(SidecarMain.supportedHttpHost("::"));
+        assertTrue(SidecarMain.supportedHttpHost("::1"));
+        assertFalse(SidecarMain.supportedHttpHost("192.0.2.10"));
+        assertFalse(SidecarMain.supportedHttpHost("sidecar.internal"));
+        assertFalse(SidecarMain.supportedHttpHost(""));
+    }
+
+    @Test
     void completedBattleRequiresAnObservedPositiveTurnAndSnapshot() {
         assertThrows(
                 IllegalStateException.class,

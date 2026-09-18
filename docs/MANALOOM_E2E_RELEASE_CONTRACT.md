@@ -36,6 +36,7 @@ eles não substituem este contrato.
 | `deterministic-read-only` | app, server, deckbuilder, battle, contratos, PG/Hermes read-only | sem mutação de produto | `./scripts/quality_gate.sh e2e` | gate estrito: `PASS` somente sem `SKIP`; `PARTIAL` retorna 3 |
 | `diagnostic-allow-partial` | mesmo inventário, para mapear pré-requisitos ainda ausentes | sem crédito de gate/release | `./scripts/manaloom_e2e_suite.sh --allow-partial` | pode retornar zero em `PARTIAL`, mas grava `execution_policy=diagnostic-allow-partial` e `gate_eligible=false` |
 | `isolated-mutating` | corpus Commander completo em ambiente aprovado | cria e remove usuários/decks de validação | `MANALOOM_RUN_MUTATING_RESOLUTION_E2E=1` + token PostgreSQL | `PASS` somente com cleanup e resumo do corpus |
+| `isolated-play-vs-ai` | partida humana real contra IA, API, replay, UI Web e XMage pinado | cria somente cluster, conta, decks e sessão descartáveis em loopback | `MANALOOM_PLAY_VS_AI_BROWSER_QA=1 ./scripts/manaloom_play_vs_ai_e2e.sh` + duas confirmações locais | `PASS` somente com casos de uso, PNGs/review, PostgreSQL/replay e cleanup coerentes |
 | `live-smoke` | Flutter runtime, API viva e smoke comercial | pode criar/apagar dados e chamar serviços externos | flags `MANALOOM_RUN_*_E2E=1` + tokens live/PG aplicáveis | `PASS` somente no alvo explicitamente aprovado |
 | `release-target` | build instalável, device/simulador, saúde e SHA implantado | depende do alvo de release | checklist desta página | conclusão de release, não apenas conclusão local |
 
@@ -97,6 +98,29 @@ deploy executam `xmage_governed_patch_audit.py --require-deployable`; o build
 reproduz a árvore a partir do patch versionado, confirma pai/commit/árvore no
 repositório governado e o runtime publica `engine_patch_commit`. Backend,
 sidecar batch e sidecar interativo precisam concordar com essa identidade.
+
+### Jogar contra IA em ambiente isolado
+
+A prova funcional canônica do fluxo interativo é:
+
+```bash
+MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_PLAY_VS_AI_BROWSER_QA=1 \
+./scripts/manaloom_play_vs_ai_e2e.sh
+```
+
+O runner cria PostgreSQL, API, conta, decks e sessão exclusivamente em
+loopback, usa processos distintos para batch e interação, fixa upstream/patch
+XMage e remove tudo ao terminar. No modo browser ele pausa em um manifesto de
+prontidão para o revisor operar a build Flutter Web release real, capturar os
+nove checkpoints declarados e entregar a atestação visual. Só depois o runner
+cruza o UUID com PostgreSQL, API, replay e logs HTTP.
+
+O resultado é focal: `release_ready=false`,
+`strategy_superiority_proven=false`, capability commitada `OFF` e
+`overall_ui_proof_claimed=false`. Ele nunca substitui o aggregate UI global,
+Android físico, teclado/TalkBack, capacidade, custo/SLO, rollout ou smoke live.
 
 A etapa focada da suíte E2E executa explicitamente os classificadores de ramp
 em Dart e Python, o piso estrutural do optimizer, os contratos de segurança da

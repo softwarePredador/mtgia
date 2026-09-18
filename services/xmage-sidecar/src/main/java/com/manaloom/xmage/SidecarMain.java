@@ -61,6 +61,12 @@ public final class SidecarMain {
         String xmageHost = env("XMAGE_SERVER_HOST", "127.0.0.1");
         int xmagePort = envInt("XMAGE_SERVER_PORT", 17171);
         int httpPort = envInt("PORT", 8080);
+        String httpHost = env("XMAGE_SIDECAR_HTTP_HOST", "0.0.0.0");
+        if (!supportedHttpHost(httpHost)) {
+            throw new IllegalArgumentException(
+                    "XMAGE_SIDECAR_HTTP_HOST must be an explicit local bind address"
+            );
+        }
         String runtimeMode = env("XMAGE_RUNTIME_MODE", "batch")
                 .toLowerCase(java.util.Locale.ROOT);
         if (!"batch".equals(runtimeMode)
@@ -82,7 +88,10 @@ public final class SidecarMain {
                 )
                         : null;
 
-        HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", httpPort), 32);
+        HttpServer server = HttpServer.create(
+                new InetSocketAddress(httpHost, httpPort),
+                32
+        );
         server.createContext("/health", exchange -> {
             if (!"GET".equals(exchange.getRequestMethod())) {
                 send(exchange, 405, singleton("error", "method_not_allowed"));
@@ -96,6 +105,7 @@ public final class SidecarMain {
             body.put("engine_patch_commit", XMAGE_PATCH_COMMIT);
             body.put("xmage_host", xmageHost);
             body.put("xmage_port", xmagePort);
+            body.put("http_bind_host", httpHost);
             body.put("catalog_ready", true);
             body.put("indexed_names", battleService.catalogSize());
             body.put(
@@ -456,6 +466,14 @@ public final class SidecarMain {
 
     static boolean batchSimulationAvailable(String runtimeMode) {
         return "batch".equals(runtimeMode);
+    }
+
+    static boolean supportedHttpHost(String host) {
+        return "0.0.0.0".equals(host)
+                || "127.0.0.1".equals(host)
+                || "localhost".equals(host)
+                || "::".equals(host)
+                || "::1".equals(host);
     }
 
     private static Exception unwrapSimulationFailure(ExecutionException error) {

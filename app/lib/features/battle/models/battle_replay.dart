@@ -113,6 +113,8 @@ class BattleReplaySummary {
         return 'Matchup';
       case 'battle':
         return 'Battle';
+      case 'interactive_coach':
+        return 'Jogar contra IA';
       default:
         return type.trim().isEmpty ? 'Simulação' : type;
     }

@@ -41,7 +41,6 @@ import 'features/cards/providers/card_provider.dart';
 import 'features/cards/screens/card_search_screen.dart';
 import 'features/cards/screens/card_detail_screen.dart';
 import 'features/battle/screens/battle_coach_screen.dart';
-import 'features/battle/screens/battle_live_spectator_screen.dart';
 import 'features/battle/screens/battle_replays_screen.dart';
 import 'features/market/providers/market_provider.dart';
 import 'features/profile/profile_screen.dart';
@@ -105,7 +104,6 @@ const bool _disableFirebasePerformanceInit = bool.fromEnvironment(
 const ReleaseRouteBuildSupport _releaseRouteBuildSupport =
     ReleaseRouteBuildSupport(
       scanner: LaunchFeatures.scannerSupported,
-      battleLive: LaunchFeatures.battleLiveSpectatorSupported,
       battleCoach: LaunchFeatures.interactiveBattleSupported,
       billingCheckout: CommercialLaunchPolicy.paidCheckoutEnabled,
     );
@@ -663,10 +661,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                         return BattleReplaysScreen(
                           deckId: state.pathParameters['id']!,
                           initialReplayId: state.uri.queryParameters['replay'],
-                          battleLiveEnabled: capabilities.isAllowed(
-                            ReleaseCapability.battleLive,
-                            buildSupported:
-                                LaunchFeatures.battleLiveSpectatorSupported,
+                          battleBatchEnabled: capabilities.isAllowed(
+                            ReleaseCapability.battleBatch,
                           ),
                           interactiveBattleEnabled: capabilities.isAllowed(
                             ReleaseCapability.battleCoach,
@@ -678,26 +674,47 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
                     ),
                     if (LaunchFeatures.interactiveBattleSupported)
                       GoRoute(
+                        path: 'play-vs-ai/:sessionId',
+                        builder: (context, state) {
+                          final capabilities = context
+                              .watch<ReleaseCapabilitiesProvider>();
+                          return BattleCoachScreen(
+                            deckId: state.pathParameters['id']!,
+                            sessionId: state.pathParameters['sessionId']!,
+                            replayHistoryEnabled: capabilities.isAllowed(
+                              ReleaseCapability.battleBatch,
+                            ),
+                          );
+                        },
+                      ),
+                    if (LaunchFeatures.interactiveBattleSupported)
+                      GoRoute(
+                        path: 'play-vs-ai',
+                        builder: (context, state) {
+                          final capabilities = context
+                              .watch<ReleaseCapabilitiesProvider>();
+                          return BattleCoachScreen(
+                            deckId: state.pathParameters['id']!,
+                            replayHistoryEnabled: capabilities.isAllowed(
+                              ReleaseCapability.battleBatch,
+                            ),
+                          );
+                        },
+                      ),
+                    if (LaunchFeatures.interactiveBattleSupported)
+                      GoRoute(
                         path: 'battle-coach/:sessionId',
-                        builder: (context, state) => BattleCoachScreen(
-                          deckId: state.pathParameters['id']!,
-                          sessionId: state.pathParameters['sessionId']!,
-                        ),
+                        redirect: (context, state) =>
+                            playVsAiSessionRouteLocation(
+                              state.pathParameters['id']!,
+                              state.pathParameters['sessionId']!,
+                            ),
                       ),
                     if (LaunchFeatures.interactiveBattleSupported)
                       GoRoute(
                         path: 'battle-coach',
-                        builder: (context, state) => BattleCoachScreen(
-                          deckId: state.pathParameters['id']!,
-                        ),
-                      ),
-                    if (LaunchFeatures.battleLiveSpectatorSupported)
-                      GoRoute(
-                        path: 'battle-live/:jobId',
-                        builder: (context, state) => BattleLiveSpectatorScreen(
-                          deckId: state.pathParameters['id']!,
-                          jobId: state.pathParameters['jobId']!,
-                        ),
+                        redirect: (context, state) =>
+                            playVsAiRouteLocation(state.pathParameters['id']!),
                       ),
                   ],
                 ),

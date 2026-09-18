@@ -116,19 +116,17 @@ void main() {
           find.textContaining('Deck aprendido disponível:'),
           findsOneWidget,
         );
-        expect(find.textContaining('curado pelo Hermes'), findsOneWidget);
+        expect(find.textContaining('referência aprendida'), findsOneWidget);
+        expect(find.textContaining('Hermes'), findsNothing);
         expect(find.textContaining('learned_deck:'), findsNothing);
         await tester.ensureVisible(learnedDeckButton);
         await captureVisualProof(binding, tester, screenshotNameFor(commander));
 
-        final helperText =
-            tester
-                .widgetList<Text>(
-                  find.textContaining('Deck aprendido disponível:'),
-                )
-                .map((widget) => widget.data ?? widget.textSpan?.toPlainText())
-                .whereType<String>()
-                .first;
+        final helperText = tester
+            .widgetList<Text>(find.textContaining('Deck aprendido disponível:'))
+            .map((widget) => widget.data ?? widget.textSpan?.toPlainText())
+            .whereType<String>()
+            .first;
         results.add({
           'commander': commander,
           'button_visible': true,

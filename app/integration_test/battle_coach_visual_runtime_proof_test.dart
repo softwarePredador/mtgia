@@ -64,7 +64,7 @@ void main() {
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
   testWidgets(
-    'Battle Coach produces current real-runtime visual and interaction proof',
+    'Play vs AI produces current real-runtime visual and interaction proof',
     (tester) async {
       expect(
         _sourceDigest,
@@ -84,7 +84,7 @@ void main() {
       // API URL, user data or private gameplay payload.
       // ignore: avoid_print
       print(
-        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'battle_coach', 'source_digest': _sourceDigest, 'profile': _profile, 'runtime': 'flutter_integration_test', 'target': _runtimeTarget, 'device_contract': _deviceContract, 'required_checkpoints': _checkpoints})}',
+        'VISUAL_PROOF_CONTEXT ${jsonEncode(<String, Object>{'schema_version': 'manaloom_ui_runtime_context_v1', 'surface': 'play_vs_ai', 'source_digest': _sourceDigest, 'profile': _profile, 'runtime': 'flutter_integration_test', 'target': _runtimeTarget, 'device_contract': _deviceContract, 'required_checkpoints': _checkpoints})}',
       );
 
       final gateway = _BattleCoachProofGateway();
@@ -99,6 +99,10 @@ void main() {
       final choice = find.byKey(
         const Key('battle-coach-option-o_cast_counterspell'),
       );
+      final legalCard = find.byKey(
+        const Key('play-vs-ai-legal-card-o_cast_counterspell'),
+      );
+      expect(legalCard, findsOneWidget);
       await tester.ensureVisible(choice);
       await tester.pump(const Duration(milliseconds: 350));
       expect(find.text('Sua prioridade'), findsWidgets);
@@ -182,15 +186,16 @@ void main() {
       await pumpUntilFound(tester, find.byKey(const Key('battle-coach-board')));
       await _waitForRenderedCardArt(tester);
 
-      await tester.ensureVisible(choice);
+      await tester.ensureVisible(legalCard);
       await tester.pump(const Duration(milliseconds: 250));
-      await tester.tap(choice);
+      await tester.tap(legalCard);
       await tester.pump();
       expect(
         find.byKey(const Key('battle-coach-action-progress')),
         findsOneWidget,
       );
       expect(actionGateway.responses, hasLength(1));
+      expect(actionGateway.responses.single.optionId, 'o_cast_counterspell');
       expect(tester.takeException(), isNull);
       await _capture(binding, tester, _checkpoints[7]);
 
@@ -218,22 +223,18 @@ void main() {
     },
   );
 
-  testWidgets(
-    'Battle Coach captures the explicit opt-in welcome independently',
-    (tester) async {
-      resetVisualCaptureSurface();
-      await _pumpSubject(tester, _BattleCoachProofGateway());
-      expect(
-        find.byKey(const Key('battle-coach-welcome-state')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(const Key('battle-coach-choose-opponent-button')),
-        findsOneWidget,
-      );
-      await _capture(binding, tester, _checkpoints[0]);
-    },
-  );
+  testWidgets('Play vs AI captures the explicit opt-in welcome independently', (
+    tester,
+  ) async {
+    resetVisualCaptureSurface();
+    await _pumpSubject(tester, _BattleCoachProofGateway());
+    expect(find.byKey(const Key('battle-coach-welcome-state')), findsOneWidget);
+    expect(
+      find.byKey(const Key('battle-coach-choose-opponent-button')),
+      findsOneWidget,
+    );
+    await _capture(binding, tester, _checkpoints[0]);
+  });
 }
 
 Future<void> _pumpSubject(
@@ -251,6 +252,7 @@ Future<void> _pumpSubject(
         deckId: '00000000-0000-4000-8000-000000000001',
         sessionId: sessionId,
         gateway: gateway,
+        replayHistoryEnabled: true,
         pollInterval: const Duration(hours: 1),
       ),
     ),
@@ -290,7 +292,7 @@ Future<void> _waitForRenderedCardArt(WidgetTester tester) async {
     }
   }
   fail(
-    'Battle Coach did not finish rendering every visible card image within '
+    'Play vs AI did not finish rendering every visible card image within '
     'the live-proof window.',
   );
 }
@@ -454,7 +456,7 @@ InteractiveBattleSession _waitingSession() => InteractiveBattleSession.fromJson(
         },
       ],
       'own_hand': [
-        _card('c_hand_1', 'Swan Song'),
+        _card('11111111-1111-4111-8111-111111111111', 'Swan Song'),
         _card('c_hand_2', 'Cyclonic Rift'),
         _card('c_hand_3', 'Island'),
         _card('c_hand_4', 'Mystic Remora'),
@@ -477,7 +479,7 @@ InteractiveBattleSession _waitingSession() => InteractiveBattleSession.fromJson(
           'id': 'o_cast_counterspell',
           'label': 'Conjurar Swan Song',
           'role': 'choice',
-          'card': _card('c_option', 'Swan Song'),
+          'card': _card('11111111-1111-4111-8111-111111111111', 'Swan Song'),
         },
         {'id': 'o_pass_priority', 'label': 'Passar prioridade', 'role': 'done'},
       ],

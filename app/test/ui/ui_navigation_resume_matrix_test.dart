@@ -80,7 +80,7 @@ void main() {
         containsAll(<String>[
           'authenticated_refresh',
           'collection_back_forward',
-          'battle_direct_url',
+          'play_vs_ai_direct_url',
           'card_detail_direct_url',
           'session_expiry_redirect',
           'draft_restore',
@@ -91,7 +91,6 @@ void main() {
         containsAll(<String>[
           'authenticated_refresh',
           'collection_back_forward',
-          'battle_direct_url',
           'card_detail_route_and_safe_reload_state',
           'draft_restore',
           'disposable_account_and_deck_cleanup',
@@ -102,6 +101,7 @@ void main() {
         containsAll(<String>[
           'card_detail_data_reload_after_backend_publish',
           'live_runtime_401_interception',
+          'play_vs_ai_direct_url_current_digest',
         ]),
       );
       expect(
@@ -111,6 +111,20 @@ void main() {
           'card_detail_exact_id_contract',
         ]),
       );
+    },
+  );
+
+  test(
+    'public Battle navigation exposes Play vs AI but no spectator route',
+    () {
+      final source = File('lib/main.dart').readAsStringSync();
+
+      expect(source, contains("path: 'play-vs-ai/:sessionId'"));
+      expect(source, contains("path: 'play-vs-ai'"));
+      expect(source, contains("path: 'battle-coach/:sessionId'"));
+      expect(source, contains('playVsAiSessionRouteLocation('));
+      expect(source, isNot(contains("path: 'battle-live/:jobId'")));
+      expect(source, isNot(contains('BattleLiveSpectatorScreen')));
     },
   );
 }

@@ -4,6 +4,8 @@ set -u -o pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
 source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
+# shellcheck source=scripts/lib/manaloom_dart_toolchain.sh
+source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 REPORT_ROOT="${MANALOOM_E2E_REPORT_ROOT:-/tmp/manaloom_e2e_suite_reports}"
 RUN_DIR="${MANALOOM_E2E_RUN_DIR:-$REPORT_ROOT/manaloom_e2e_suite_$STAMP}"
@@ -15,6 +17,24 @@ SKIPPED_STEPS=()
 BLOCKED_STEPS=()
 FINAL_STATUS=""
 E2E_EXECUTION_POLICY="strict-gate"
+
+configure_manaloom_e2e_toolchain() {
+  resolve_manaloom_node || return $?
+  resolve_manaloom_flutter_dart_pair || return $?
+
+  local node_bin flutter_bin dart_bin node_bin_dir flutter_bin_dir dart_bin_dir
+  node_bin="$MANALOOM_NODE_BIN_RESOLVED"
+  flutter_bin="$MANALOOM_FLUTTER_BIN_RESOLVED"
+  dart_bin="$MANALOOM_DART_BIN_RESOLVED"
+
+  export MANALOOM_NODE_BIN="$node_bin"
+  export MANALOOM_FLUTTER_BIN="$flutter_bin"
+  export MANALOOM_DART_BIN="$dart_bin"
+  node_bin_dir="$(dirname "$node_bin")"
+  flutter_bin_dir="$(dirname "$flutter_bin")"
+  dart_bin_dir="$(dirname "$dart_bin")"
+  export PATH="$node_bin_dir:$flutter_bin_dir:$dart_bin_dir:$PATH"
+}
 
 print_usage() {
   cat <<'EOF'
@@ -550,6 +570,8 @@ main() {
   if [[ "$parse_status" -ne 0 ]]; then
     return "$parse_status"
   fi
+
+  configure_manaloom_e2e_toolchain || return $?
 
   initialize_run_dir
   write_summary_header

@@ -35,26 +35,28 @@ Antes de aprovar uma superfície, a revisão declara:
 - **tese de interação**: como prioridade, transição, feedback e recuperação
   tornam a próxima ação inequívoca.
 
-Para o Battle Coach, a tese corrente é uma mesa tática Obsidian/slate; brass
-fica reservado para prioridade e ação, frost para informação. O conteúdo segue
-status → mesa e zonas → decisão → conclusão/replay. A interação para quando há
-uma decisão humana, bloqueia duplicidade durante o envio, preserva a mesa no
-erro recuperável e mantém concessão atrás de confirmação.
+Para **Jogar contra IA**, a tese corrente é uma mesa tática Obsidian/slate;
+brass fica reservado para prioridade e ações legais, frost para informação. O
+conteúdo segue adversário/status → campo e pilha → mão própria sempre visível →
+bandeja de ação → conclusão/rematch/replay. A carta visível é a ação primária
+quando referencia univocamente uma opção tipada; o painel textual permanece
+como alternativa acessível. A interação bloqueia duplicidade durante o envio,
+falha fechada em associação ambígua, preserva a mesa no erro recuperável e
+mantém concessão atrás de confirmação.
 
-Para o Battle Live, a tese corrente é uma mesa observável contínua em
-Obsidian/slate, sem porcentagens simuladas: brass identifica execução e ação,
-frost organiza estado público e timeline. O conteúdo segue fase e tempo
-decorrido → mesa pública → eventos incrementais → conclusão/replay. A interação
-revela o primeiro checkpoint assim que ele existe, preserva a mesa ao
-reconectar, drena páginas terminais e oferece nova tentativa explícita em
-timeout ou falha operacional.
+Battle Live não é superfície de produto. Seu stream, checkpoints e harness
+podem permanecer como evidência/runtime internos, sem rota, CTA ou crédito de
+experiência pública. Capturas históricas dessa infraestrutura nunca substituem
+a prova corrente de Jogar contra IA.
 
-Para o Battle Learning, a tese é um registro de mesa pós-partida: arte de
+Para o Battle Learning, a tese futura é um registro de mesa pós-partida: arte de
 printing exata ancora deck e cartas observadas, verde identifica o que deve ser
 preservado e brass identifica revisão e próxima ação. O conteúdo segue entrada
 de jogo → sessão/Battle → replay imutável → sinais estruturados → recibo →
 Optimize autenticado. A interação nunca inventa arte por nome nem transforma a
-evidência em autorização automática para alterar o deck.
+evidência em autorização automática para alterar o deck. O pack atual que
+atravessa a antiga visão Live fica classificado como evidência histórica
+interna até ser refeito a partir de uma partida Jogar contra IA.
 
 Para Social/Trade, a tese é uma mesa social confiável: carta e pessoa ancoram a
 decisão, Frost organiza identidade/estado e Brass indica somente a próxima
@@ -93,21 +95,46 @@ Revalidar somente a prova já revisada:
 ./scripts/manaloom_ui_live_evidence_gate.sh --check
 ```
 
-Capturar o Battle Coach em runtime Android conectado:
+Capturar Jogar contra IA em runtime Android conectado:
 
 ```bash
 MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> \
 MANALOOM_UI_ANDROID_RUNTIME_KIND=auto \
-./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach
+./scripts/manaloom_ui_live_evidence_gate.sh --capture-play-vs-ai
 ```
 
-Capturar o Battle Live em build Web release real:
+Capturar e validar a jornada focal em build Web release, API/PostgreSQL
+loopback e XMage real pinado:
+
+```bash
+MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
+MANALOOM_PLAY_VS_AI_BROWSER_QA=1 \
+./scripts/manaloom_play_vs_ai_e2e.sh
+```
+
+Esse runner exige nove PNGs `1440x900`: seletor, mão/mulligan, land drop,
+comandante, dano, reconexão, terminal, replay e revanche. Ele gera
+`docs/qa/ui-live/current/play-vs-ai-web-real/capture-manifest.json` e
+`visual-review.json`, e só passa depois de cruzar a sessão com PostgreSQL, API
+e replay. O estado e o digest correntes são resolvidos por
+`docs/qa/ui-live/latest.json`; o receipt durável de cada rodada fica em
+`docs/qa/execution/`. A primeira rodada focal preservada está em
+`docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md`, sem transformar o
+diretório mutável `current/` em evidência datada. O review focal mantém
+`overall_ui_proof_claimed=false`: o aggregate global e as provas
+Android/teclado/TalkBack continuam independentes.
+
+Capturar o stream Battle Live somente para diagnóstico interno:
 
 ```bash
 ./scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-live-web
 ```
 
-Capturar o Battle Learning em três builds Web release reais:
+Essa rotina interna não registra uma rota pública nem concede aprovação ao
+produto Jogar contra IA.
+
+Recapturar o pack histórico Battle Learning em três builds Web release reais:
 
 ```bash
 ./scripts/manaloom_battle_learning_visual_qa.sh
@@ -170,34 +197,38 @@ revisão, indisponibilidade, contraproposta, recusa, erro, conclusão, vazios e
 comentário contextual. Capturar não promove o aggregate; todas as 48 imagens
 precisam ser abertas e revisadas primeiro.
 
-Essa prova registra dez checkpoints nos perfis exclusivos
+O pack histórico registra dez checkpoints nos perfis exclusivos
 `web_battle_learning_mobile_390x844`,
 `web_battle_learning_desktop_1440x900` e
 `web_battle_learning_wide_1920x1080`. Os nomes exclusivos impedem colisão com
 os perfis da matriz P0. Capturar não promove o aggregate: todas as 30 imagens
-precisam ser abertas e revisadas primeiro.
+precisam ser abertas e revisadas primeiro. Enquanto o roteiro depender da
+antiga visão Live, ele não integra o conjunto obrigatório de superfícies
+públicas.
 
-Essa prova usa gateway fake, não autentica nem chama API, e registra cinco
+O diagnóstico interno Battle Live usa gateway fake, não autentica nem chama
+API, e registra cinco
 checkpoints: espera com progresso indeterminado, feed público com snapshot e
 evento, falha recuperável preservando a mesa, timeout com próxima ação clara e
 conclusão com replay. A captura grava
 `docs/qa/ui-live/current/battle-live-web/capture-manifest.json`; ela permanece
-fora do aggregate até todas as cinco imagens serem abertas e revisadas.
+fora do aggregate público; abrir as imagens não promove uma superfície de
+espectador.
 
-O capture do Battle Coach executa analyzer e testes focados, roda o integration
+O capture de Jogar contra IA executa analyzer e testes focados, roda o integration
 test no device e atesta por ADB se o alvo é emulador ou aparelho físico,
 extrai os PNGs emitidos pelo runtime e grava
-`docs/qa/ui-live/current/battle-coach-android/capture-manifest.json`. Capturar
+`docs/qa/ui-live/current/battle-coach-android/capture-manifest.json` (diretório
+legado de evidência). Capturar
 não aprova visualmente: depois disso o revisor abre cada PNG, corrige a UI se
 necessário, recaptura e somente então atualiza `docs/qa/ui-live/latest.json`.
 
-A política corrente exige a matriz P0 ampla em quatro perfis: Web real mobile,
-desktop e wide, mais o Samsung físico `android_physical_sm_a135m`. Battle Live,
-Binder Import, Deck Workshop, Battle Learning, Social/Trade, Onboarding Intent,
-Visual System Workspace e Critical Overlays and States completam 26 manifests
-e 456 capturas. Battle Coach Android e teclado Web continuam superfícies
-opcionais/separadas enquanto não forem declarados como perfis obrigatórios pela
-política executável.
+A política corrente exige a matriz P0 ampla nos perfis declarados pela política
+executável. Binder Import, Deck Workshop, Social/Trade, Onboarding Intent,
+Visual System Workspace e Critical Overlays and States mantêm suas matrizes
+próprias. Os packs Battle Live e Battle Learning antigos são internos e não
+entram no conjunto público obrigatório. Jogar contra IA em Android e teclado
+Web só recebe crédito quando seus perfis forem vinculados ao digest corrente.
 
 Os manifests ficam sob `docs/qa/ui-live/current`. O aggregate `latest.json`
 registra o hash de cada manifesto, todos os perfis revisados e a quantidade
@@ -233,8 +264,10 @@ resources Android, contrato de superfícies e o próprio harness de prova.
 
 ## O que a prova não autoriza
 
-- A fixture do Battle Coach não chama API, não autentica, não escreve em
-  PostgreSQL e não promove regra de carta; ela prova somente UI e interação.
+- A fixture Android de Jogar contra IA não chama API, não autentica, não
+  escreve em PostgreSQL e prova somente UI/interação. O runner Web real usa
+  apenas API e PostgreSQL novos em loopback e também não promove regra, deck,
+  capability ou dado de produto.
 - Revisão visual por agente não substitui TalkBack humano em Android físico
   nem smoke de hardware/release. Prova em emulador valida o runtime Android,
   mas não recebe crédito por sensores, desempenho, fabricante ou comportamento
@@ -245,16 +278,16 @@ resources Android, contrato de superfícies e o próprio harness de prova.
   estiver disponível.
 - A prova é por superfície declarada. Ao mudar outra tela, o manifest de
   revisão precisa nomear e capturar a superfície alterada; reutilizar apenas a
-  captura do Battle Coach ou uma matriz P0 anterior é evidência insuficiente.
+  captura de Jogar contra IA ou uma matriz P0 anterior é evidência insuficiente.
 
 ## Arquivos executáveis
 
 - política: `app/test/ui/fixtures/ui_live_evidence_policy.json`;
 - guard: `app/test/ui/ui_live_evidence_policy_test.dart`;
 - integração: `app/integration_test/battle_coach_visual_runtime_proof_test.dart`;
-- integração Battle Live:
+- integração Battle Live interna, sem rota pública:
   `app/integration_test/battle_live_visual_runtime_proof_test.dart`;
-- integração Battle Learning:
+- integração Battle Learning histórica/interna enquanto depender de Live:
   `app/integration_test/battle_learning_visual_runtime_proof_test.dart`;
 - integração Social/Trade:
   `app/integration_test/social_trade_visual_runtime_proof_test.dart`;

@@ -68,6 +68,7 @@ SOURCE_ROOTS=(
   "scripts/manaloom_critical_overlays_states_visual_qa.sh"
   "scripts/lib/manaloom_ui_runtime_contract.sh"
   "scripts/manaloom_p0_runtime_capture.sh"
+  "scripts/manaloom_play_vs_ai_e2e.sh"
   "scripts/manaloom_server_contract_e2e_isolated.sh"
   "scripts/manaloom_ui_live_evidence_gate.sh"
   "scripts/manaloom_ui_source_digest.sh"

@@ -2,12 +2,16 @@
 set -euo pipefail
 
 XMAGE_SERVER_PORT="${XMAGE_SERVER_PORT:-17171}"
+XMAGE_SERVER_SECONDARY_PORT="${XMAGE_SERVER_SECONDARY_PORT:-17179}"
 XMAGE_CONFIG="/opt/xmage/config/config.xml"
 read -r -a server_java_opts <<<"${XMAGE_SERVER_JAVA_OPTS:--Xms256m -Xmx2g}"
 read -r -a sidecar_java_opts <<<"${XMAGE_SIDECAR_JAVA_OPTS:--Xms128m -Xmx512m}"
 
 sed -i 's/serverAddress="[^"]*"/serverAddress="127.0.0.1"/' "$XMAGE_CONFIG"
 sed -i "s/port=\"[0-9]*\"/port=\"${XMAGE_SERVER_PORT}\"/" "$XMAGE_CONFIG"
+sed -i \
+  "s/secondaryBindPort=\"-\{0,1\}[0-9]*\"/secondaryBindPort=\"${XMAGE_SERVER_SECONDARY_PORT}\"/" \
+  "$XMAGE_CONFIG"
 
 cd /opt/xmage
 sidecar_pid=""
@@ -18,6 +22,7 @@ if [[ -z "$server_jar" ]]; then
 fi
 java \
   --add-opens java.base/java.io=ALL-UNNAMED \
+  -Dh2.bindAddress=127.0.0.1 \
   "${server_java_opts[@]}" \
   -Dxmage.testMode=true \
   -jar "$server_jar" \
@@ -51,6 +56,7 @@ fi
 cd /opt/manaloom
 java \
   --add-opens java.base/java.io=ALL-UNNAMED \
+  -Dh2.bindAddress=127.0.0.1 \
   "${sidecar_java_opts[@]}" \
   -jar xmage-sidecar.jar &
 sidecar_pid=$!

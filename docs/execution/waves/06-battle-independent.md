@@ -3,8 +3,9 @@
 Status operacional: `PARKED · CAPABILITIES_OFF · NOT_BETA_CORE_DEPENDENCY`
 
 Battle usa programa, capacidade, workers, receipts e release próprios. Ele não
-divide o lifecycle de IA advisory nem bloqueia a beta core enquanto batch,
-Live e Coach permanecerem comprovadamente OFF.
+divide o lifecycle de IA advisory nem bloqueia a beta core enquanto batch e
+Jogar contra IA permanecerem comprovadamente OFF. Live é infraestrutura
+interna e nunca superfície pública de espectador.
 
 ## Fechamento P0 antes de qualquer abertura
 
@@ -25,22 +26,25 @@ Live e Coach permanecerem comprovadamente OFF.
 | 13 | `BT-BAT-EVD-003` | receipt de comparação externa | job→attempt→replay→comparison→PG liga hashes, pins, subject, controls e decisão |
 | 14 | `BT-BAT-EVD-004` | lane/natural sample atestados pelo servidor | request↔echo exatos; cliente não autodeclara natural/same-lane |
 | 15 | `BT-BAT-010` | gate de promoção topology-aware | todos os P0, same-SHA first-party, pins, capacity, DR, receiver, budget, UI/smoke e rollback verdes |
+| 16 | `BT-PLAY-001` | mesa Jogar contra IA card-first | rota canônica, mão fixa, cartas legais acionáveis e nenhuma superfície pública de espectador |
+| 17 | `BT-PLAY-002` | partida real completa | XMage same-SHA/pin do mulligan ao terminal; retorno esperado por caso de uso; fixture/widget não substitui a prova |
+| 18 | `BT-PLAY-003` | fechamento e rollout | Web real, Android físico, teclado/TalkBack, resiliência, custo, kill switch, rollback e coorte allowlisted |
 
 ## Escala horizontal posterior
 
 | Ordem | ID | A task conterá | Fechamento ponta a ponta específico |
 | ---: | --- | --- | --- |
-| 16 | `BT-BAT-101` | perfis por workload | heap/CPU/headroom/slots/startup/custo medidos para API, orchestrator, XMage, Forge e Coach |
-| 17 | `BT-BAT-102` | worker registry e scheduler | heartbeat TTL/fencing; stale remove slot; sem overbooking/starvation |
-| 18 | `BT-BAT-103` | pool XMage 2+ | kill em claim/start/persist não duplica replay nem terminal |
-| 19 | `BT-BAT-104` | pool Forge separado | só gap XMage válido; serial por processo; falha operacional é terminal honesto |
-| 20 | `BT-BAT-105` | autoscaling bounded | min/max/cooldown/drain; queue age e budget; DB/capacity nunca excedidos |
-| 21 | `BT-BAT-106` | API redundante | budgets de conexão por processo; worker saturado não esgota API |
-| 22 | `BT-COACH-101` | afinidade runtime→shard+epoch | routing server-side; cliente não carrega afinidade; shard stale termina `process_lost` |
-| 23 | `BT-COACH-102` | drain/rollout Coach | coortes 1/2/4/8+, sessão conclui ou falha honestamente, pool distinto |
-| 24 | `BT-BAT-107` | capacity/retention | forecast de jobs/replays/evidence, vacuum, backup, export/delete |
-| 25 | `BT-BAT-108` | game day | perda de API/worker/node/shard/PG sem duplicação, corrupção ou fallback silencioso |
-| 26 | `BT-BAT-109` | promoção progressiva | soak/rollback 1→2→4→8+, utilização ≤75%, Coach em coorte separada |
+| 19 | `BT-BAT-101` | perfis por workload | heap/CPU/headroom/slots/startup/custo medidos para API, orchestrator, XMage, Forge e runtime interativo |
+| 20 | `BT-BAT-102` | worker registry e scheduler | heartbeat TTL/fencing; stale remove slot; sem overbooking/starvation |
+| 21 | `BT-BAT-103` | pool XMage 2+ | kill em claim/start/persist não duplica replay nem terminal |
+| 22 | `BT-BAT-104` | pool Forge separado | só gap XMage válido; serial por processo; falha operacional é terminal honesto |
+| 23 | `BT-BAT-105` | autoscaling bounded | min/max/cooldown/drain; queue age e budget; DB/capacity nunca excedidos |
+| 24 | `BT-BAT-106` | API redundante | budgets de conexão por processo; worker saturado não esgota API |
+| 25 | `BT-COACH-101` | afinidade runtime→shard+epoch | routing server-side; cliente não carrega afinidade; shard stale termina `process_lost` |
+| 26 | `BT-COACH-102` | drain/rollout runtime interativo | coortes 1/2/4/8+, sessão conclui ou falha honestamente, pool distinto |
+| 27 | `BT-BAT-107` | capacity/retention | forecast de jobs/replays/evidence, vacuum, backup, export/delete |
+| 28 | `BT-BAT-108` | game day | perda de API/worker/node/shard/PG sem duplicação, corrupção ou fallback silencioso |
+| 29 | `BT-BAT-109` | promoção progressiva | soak/rollback 1→2→4→8+, utilização ≤75%, Jogar contra IA em coorte separada |
 
 `BT-BAT-EVD-005` e `BT-BAT-EVD-006` fecham linguagem/provenance antes da
 experiência pública. Os P2 (`BT-BAT-201..204`, `BT-COACH-201`) só entram se

@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
+set +x
 set -euo pipefail
+
+# Capture inherited credentials before invoking any non-database child.
+FIXTURE_DB_PASSWORD="${DB_PASS:-}"
+export -n FIXTURE_DB_PASSWORD
+unset DB_PASS PGPASSWORD
+# libpq service/hostaddr may otherwise override explicit loopback coordinates.
+unset PGHOSTADDR PGSERVICE PGSERVICEFILE PGSYSCONFDIR PGPASSFILE
+export PGCONNECT_TIMEOUT=5
 
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 APP_DIR="$ROOT_DIR/app"
@@ -14,6 +23,8 @@ SUMMARY_FILE="$RUN_DIR/cleanup-summary.json"
 WEB_BUILD_DIR="$RUN_DIR/web-build"
 ISOLATED_CAPABILITIES_FILE="$RUN_DIR/release-capabilities.visual-fixture.json"
 ISOLATED_CAPABILITIES_DIGEST=""
+INACTIVE_BATCH_PORT=""
+INACTIVE_INTERACTIVE_PORT=""
 BACKEND_PID=""
 WEB_PID=""
 DATABASE=""
@@ -38,7 +49,12 @@ readonly SEED_PASSWORD='VisualQA!2026-Deck'
 # shellcheck source=scripts/lib/manaloom_dart_toolchain.sh
 source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 resolve_manaloom_flutter_root
+resolve_manaloom_dart
 FLUTTER_BIN="$MANALOOM_FLUTTER_ROOT_RESOLVED/bin/flutter"
+DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
+export MANALOOM_DART_BIN="$DART_BIN"
+dart_bin_dir="$(dirname "$DART_BIN")"
+export PATH="$dart_bin_dir:$MANALOOM_FLUTTER_ROOT_RESOLVED/bin:$PATH"
 
 # shellcheck source=scripts/lib/manaloom_safe_env.sh
 source "$ROOT_DIR/scripts/lib/manaloom_safe_env.sh"
@@ -51,26 +67,236 @@ require_postgres_write_approval \
 require_live_mutation_approval \
   "S3-07 visual QA in disposable loopback API"
 
-for tool in curl htpasswd jq pg_isready psql python3 shasum; do
+for tool in curl htpasswd jq lsof pg_isready psql python3 shasum; do
   command -v "$tool" >/dev/null 2>&1 || {
     echo "ferramenta obrigatória ausente: $tool" >&2
     exit 2
   }
 done
+DB_HOST="${DB_HOST:-127.0.0.1}"
+DB_PORT="${DB_PORT:-5432}"
+DB_USER="${DB_USER:-$(id -un)}"
+DB_ADMIN="${MANALOOM_S1_PG_ADMIN_DB:-postgres}"
+case "$DB_HOST" in
+  127.0.0.1) ;;
+  *) echo "fixture visual aceita somente PostgreSQL loopback" >&2; exit 2 ;;
+esac
+if [[ ! "$DB_PORT" =~ ^[0-9]{1,5}$ ]] ||
+   ((10#$DB_PORT < 1 || 10#$DB_PORT > 65535)); then
+  echo "porta PostgreSQL inválida" >&2
+  exit 2
+fi
+if [[ ! "$DB_ADMIN" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+  echo "admin database inválido" >&2
+  exit 2
+fi
+export DB_HOST DB_PORT DB_USER
+export MANALOOM_S1_PG_ADMIN_DB="$DB_ADMIN"
+run_visual_pg() (
+  export PGPASSWORD="$FIXTURE_DB_PASSWORD"
+  exec "$@"
+)
+
+verify_empty_session_list() {
+  local session_count http_status
+  # Listing nonempty rows may expire/reconcile sessions. A globally empty
+  # disposable table is mandatory BEFORE sending even this authenticated GET.
+  session_count="$(run_visual_pg psql -X -A -t \
+    -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DATABASE" \
+    -c 'SELECT COUNT(*) FROM interactive_battle_sessions' | tr -d '[:space:]')" || return 1
+  [[ "$session_count" == 0 ]] || return 1
+  [[ "$(listener_count "$INACTIVE_BATCH_PORT")" == 0 ]] || return 1
+  [[ "$(listener_count "$INACTIVE_INTERACTIVE_PORT")" == 0 ]] || return 1
+  http_status="$(curl -sS --max-time 20 \
+    -H "Authorization: Bearer $seed_token" \
+    -o "$RUN_DIR/empty-session-list.json" -w '%{http_code}' \
+    "$API_BASE_URL/ai/battle/sessions?deck_id=$SEED_DECK_ID&limit=20")" || return 1
+  [[ "$http_status" == 200 ]] || return 1
+  jq -e '.schema_version == "interactive_battle_session_list_v1" and .sessions == []' \
+    "$RUN_DIR/empty-session-list.json" >/dev/null || return 1
+}
 if [[ ! -x "$FLUTTER_BIN" ]]; then
   echo "Flutter configurado não é executável: $FLUTTER_BIN" >&2
   exit 2
 fi
-if ! pg_isready -h 127.0.0.1 -p 5432 >/dev/null 2>&1; then
-  echo "PostgreSQL loopback indisponível em 127.0.0.1:5432" >&2
+if ! run_visual_pg pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" \
+  >/dev/null 2>&1; then
+  echo "PostgreSQL loopback indisponível em $DB_HOST:$DB_PORT" >&2
   exit 2
 fi
 
-mkdir -p "$RUN_DIR"
+RUN_OWNED=0
+VISUAL_READY=0
+BACKEND_RECEIPT_DIR="$RUN_DIR/backend-receipts"
+BACKEND_COMPLETION_FILE="$RUN_DIR/backend-complete"
+COMPLETION_FILE="$RUN_DIR/complete"
+
+listener_count() {
+  local port="$1"
+  local listeners=""
+  local lookup_exit=0
+  [[ -n "$port" ]] || { printf '0'; return; }
+  listeners="$(lsof -nP -iTCP:"$port" -sTCP:LISTEN 2>"$RUN_DIR/listener-check.log")" ||
+    lookup_exit=$?
+  if [[ -s "$RUN_DIR/listener-check.log" || "$lookup_exit" -gt 1 ]]; then
+    printf 'unknown'
+    return 1
+  fi
+  printf '%s\n' "$listeners" | awk 'NR > 1 {count++} END {print count + 0}'
+}
+
+stop_visual_child() {
+  local child="$1"
+  local child_exit=0
+  local wait_ticks=100
+  [[ -n "$child" ]] || return 0
+  [[ "$child" != "$BACKEND_PID" ]] || wait_ticks=600
+  if kill -0 "$child" >/dev/null 2>&1; then
+    kill -TERM "$child" >/dev/null 2>&1 || return 1
+    for _ in $(seq 1 "$wait_ticks"); do
+      kill -0 "$child" >/dev/null 2>&1 || break
+      sleep 0.1
+    done
+    if kill -0 "$child" >/dev/null 2>&1; then
+      # The backend owns bootstrap descendants and PRE restoration. Never
+      # KILL that owner; retain its run/backup and report cleanup failure.
+      [[ "$child" != "$BACKEND_PID" ]] || return 1
+      kill -KILL "$child" >/dev/null 2>&1
+      wait "$child" >/dev/null 2>&1
+      return 1
+    fi
+  fi
+  wait "$child" >/dev/null 2>&1 || child_exit=$?
+  case "$child_exit" in 0|130|143) ;; *) return 1 ;; esac
+  ! kill -0 "$child" >/dev/null 2>&1
+}
+
+cleanup() {
+  local original_status="$?"
+  local cleanup_status=0
+  local database_remaining=0
+  local web_listeners=0
+  local api_listeners=0
+  local backend_exit=0
+  local backend_cleanup=not_started
+  trap - EXIT HUP INT TERM
+  set +e
+  [[ "$RUN_OWNED" == 1 ]] || exit "$original_status"
+
+  stop_visual_child "$WEB_PID" || cleanup_status=1
+  if [[ -n "$BACKEND_PID" ]]; then
+    if [[ "$VISUAL_READY" == 1 ]] && kill -0 "$BACKEND_PID" >/dev/null 2>&1; then
+      printf 'complete\n' >"$BACKEND_COMPLETION_FILE" || cleanup_status=1
+      for _ in $(seq 1 300); do
+        kill -0 "$BACKEND_PID" >/dev/null 2>&1 || break
+        sleep 0.1
+      done
+      if kill -0 "$BACKEND_PID" >/dev/null 2>&1; then
+        stop_visual_child "$BACKEND_PID"
+        cleanup_status=1
+      else
+        wait "$BACKEND_PID" >/dev/null 2>&1 || backend_exit=$?
+        [[ "$backend_exit" == 0 ]] || cleanup_status=1
+      fi
+    else
+      stop_visual_child "$BACKEND_PID" || cleanup_status=1
+    fi
+    # Receipt must belong to this child run and is consumed only after wait.
+    local child_receipt="$BACKEND_RECEIPT_DIR/cleanup.txt"
+    local receipt_database=""
+    local receipt_run_id=""
+    if [[ -f "$child_receipt" && ! -L "$child_receipt" ]]; then
+      receipt_database="$(sed -n 's/^database=//p' "$child_receipt")"
+      receipt_run_id="$(sed -n 's/^run_id=//p' "$child_receipt")"
+      if [[ "$receipt_run_id" =~ ^[0-9]{8}T[0-9]{6}Z_${BACKEND_PID}$ &&
+            "$receipt_database" == "manaloom_s1_api_$receipt_run_id" &&
+            ( -z "$DATABASE" || "$DATABASE" == "$receipt_database" ) ]] &&
+         awk -F= 'NF != 2 || seen[$1]++ {bad=1} END {exit bad}' "$child_receipt" &&
+         grep -qx 'result=pass' "$child_receipt" &&
+         grep -qx 'database_remaining=0' "$child_receipt" &&
+         grep -qx 'api_listeners=0' "$child_receipt" &&
+         grep -qx 'email_fixture_listeners=0' "$child_receipt" &&
+         grep -qx 'forced_kill_used=0' "$child_receipt" &&
+         grep -qx 'build_baseline_restored=true' "$child_receipt"; then
+        DATABASE="$receipt_database"
+        backend_cleanup=pass
+      else
+        backend_cleanup=fail
+        cleanup_status=1
+      fi
+    else
+      backend_cleanup=missing
+      cleanup_status=1
+    fi
+  fi
+  # A failed query is unknown, never an empty database.
+  if [[ -n "$DATABASE" ]]; then
+    if ! database_remaining="$(
+      run_visual_pg psql -X -A -t \
+        -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_ADMIN" \
+        -c "SELECT COUNT(*) FROM pg_database WHERE datname = '$DATABASE'" \
+        2>"$RUN_DIR/database-cleanup-check.log" | tr -d '[:space:]'
+    )"; then
+      database_remaining=unknown
+      cleanup_status=1
+    fi
+  fi
+  web_listeners="$(listener_count "$WEB_PORT")" || cleanup_status=1
+  if [[ -n "$API_BASE_URL" ]]; then
+    api_listeners="$(listener_count "${API_BASE_URL##*:}")" || cleanup_status=1
+  fi
+  [[ "$database_remaining" == 0 && "$web_listeners" == 0 &&
+     "$api_listeners" == 0 ]] || cleanup_status=1
+
+  rm -f -- "$CREDENTIALS_FILE" "$ISOLATED_CAPABILITIES_FILE" || cleanup_status=1
+  [[ ! -e "$CREDENTIALS_FILE" && ! -L "$CREDENTIALS_FILE" &&
+     ! -e "$ISOLATED_CAPABILITIES_FILE" && ! -L "$ISOLATED_CAPABILITIES_FILE" ]] ||
+    cleanup_status=1
+  if [[ "$web_listeners" == 0 && "$cleanup_status" == 0 ]]; then
+    rm -rf -- "$WEB_BUILD_DIR" || cleanup_status=1
+  fi
+
+  jq -n \
+    --arg result "$([[ "$cleanup_status" == 0 ]] && printf pass || printf fail)" \
+    --arg scope "disposable_loopback_postgresql_api" \
+    --arg run_id "$RUN_ID" --arg run_dir "$RUN_DIR" \
+    --arg backend_cleanup "$backend_cleanup" \
+    --arg database "$DATABASE" --arg database_remaining "$database_remaining" \
+    --arg web_listeners "$web_listeners" --arg api_listeners "$api_listeners" \
+    --argjson credentials_removed "$([[ ! -e "$CREDENTIALS_FILE" && ! -L "$CREDENTIALS_FILE" ]] && printf true || printf false)" \
+    --argjson policy_removed "$([[ ! -e "$ISOLATED_CAPABILITIES_FILE" && ! -L "$ISOLATED_CAPABILITIES_FILE" ]] && printf true || printf false)" \
+    --argjson original_exit_code "$original_status" \
+    '{
+      result: $result, scope: $scope, run_id: $run_id, run_dir: $run_dir,
+      backend_cleanup: $backend_cleanup,
+      database: $database,
+      database_remaining: ($database_remaining | tonumber? // $database_remaining),
+      web_listeners: ($web_listeners | tonumber? // $web_listeners),
+      api_listeners: ($api_listeners | tonumber? // $api_listeners),
+      original_exit_code: $original_exit_code,
+      credentials_file_removed: $credentials_removed,
+      capability_policy_file_removed: $policy_removed
+    }' >"$SUMMARY_FILE" || cleanup_status=1
+  printf 'cleanup_summary=%s\n' "$SUMMARY_FILE"
+  if [[ "$cleanup_status" != 0 ]]; then
+    echo "cleanup incompleto na fixture visual" >&2
+    [[ "$original_status" != 0 ]] || original_status=1
+  fi
+  exit "$original_status"
+}
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
+mkdir -p "$(dirname -- "$RUN_DIR")"
+mkdir -m 700 "$RUN_DIR"
+RUN_OWNED=1
+mkdir -m 700 "$BACKEND_RECEIPT_DIR"
 
 jq '
   .policy_version = (.policy_version + ".isolated_visual_fixture")
-  | .implementation_status = "isolated_visual_fixture"
+  | .implementation_status = "experimental_guarded"
   | .live_verified_as_of = null
   | .capabilities |= with_entries(
       .key as $key
@@ -100,7 +326,7 @@ jq '
           "legacy_ai_routes",
           "deck_replace_all"
         ] | index($key)) != null
-        then .value.implementation_status = "isolated_visual_fixture"
+        then .value.implementation_status = "experimental_guarded"
           | .value.release_capability = "on"
           | .value.allowed = true
           | .value.live_verified_as_of = null
@@ -115,107 +341,37 @@ ISOLATED_CAPABILITIES_DIGEST="$(
   shasum -a 256 "$ISOLATED_CAPABILITIES_FILE" | awk '{print $1}'
 )"
 
-listener_count() {
-  local port="$1"
-  if [[ -z "$port" ]]; then
-    printf '0'
-    return
-  fi
-  lsof -nP -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | awk 'NR > 1 {count++} END {print count + 0}'
-}
+# These are deliberately INACTIVE destinations, not XMage instances. The
+# welcome proof reads an empty PG list only; it must never create a session.
+read -r INACTIVE_BATCH_PORT INACTIVE_INTERACTIVE_PORT <<<"$(python3 - <<'PY'
+import socket
+with socket.socket() as batch, socket.socket() as interactive:
+    batch.bind(('127.0.0.1', 0))
+    interactive.bind(('127.0.0.1', 0))
+    print(batch.getsockname()[1], interactive.getsockname()[1])
+PY
+)"
+[[ "$INACTIVE_BATCH_PORT" =~ ^[0-9]+$ && "$INACTIVE_INTERACTIVE_PORT" =~ ^[0-9]+$ ]]
+[[ "$INACTIVE_BATCH_PORT" != "$INACTIVE_INTERACTIVE_PORT" ]]
+[[ "$(listener_count "$INACTIVE_BATCH_PORT")" == 0 ]]
+[[ "$(listener_count "$INACTIVE_INTERACTIVE_PORT")" == 0 ]]
 
-cleanup() {
-  local original_status="$?"
-  local database_remaining="unknown"
-  local web_listeners="unknown"
-  local api_listeners="unknown"
-  trap - EXIT INT TERM
-  set +e
-
-  if [[ -n "$WEB_PID" ]] && kill -0 "$WEB_PID" >/dev/null 2>&1; then
-    kill -TERM "$WEB_PID" >/dev/null 2>&1
-    wait "$WEB_PID" >/dev/null 2>&1
-  fi
-  if [[ -n "$BACKEND_PID" ]] && kill -0 "$BACKEND_PID" >/dev/null 2>&1; then
-    kill -TERM "$BACKEND_PID" >/dev/null 2>&1
-    wait "$BACKEND_PID" >/dev/null 2>&1
-  fi
-
-  for _ in $(seq 1 200); do
-    if [[ -z "$DATABASE" ]] || ! psql -X -h 127.0.0.1 -p 5432 -d postgres \
-      -Atc "SELECT 1 FROM pg_database WHERE datname = '$DATABASE'" 2>/dev/null |
-      grep -qx 1; then
-      database_remaining="0"
-      break
-    fi
-    sleep 0.1
-  done
-  if [[ "$database_remaining" != "0" && -n "$DATABASE" ]]; then
-    database_remaining="1"
-  fi
-
-  # The Dart Frog child can release its socket a few milliseconds after its
-  # owning shell has completed. Prove convergence instead of sampling once.
-  for _ in $(seq 1 200); do
-    web_listeners="$(listener_count "$WEB_PORT")"
-    if [[ -n "$API_BASE_URL" ]]; then
-      api_listeners="$(listener_count "${API_BASE_URL##*:}")"
-    else
-      api_listeners="0"
-    fi
-    if [[ "$web_listeners" == "0" && "$api_listeners" == "0" ]]; then
-      break
-    fi
-    sleep 0.1
-  done
-  web_listeners="$(listener_count "$WEB_PORT")"
-  if [[ -n "$API_BASE_URL" ]]; then
-    api_listeners="$(listener_count "${API_BASE_URL##*:}")"
-  fi
-
-  jq -n \
-    --arg scope "disposable_loopback_postgresql_api" \
-    --arg run_dir "$RUN_DIR" \
-    --arg database "$DATABASE" \
-    --arg database_remaining "$database_remaining" \
-    --arg web_listeners "$web_listeners" \
-    --arg api_listeners "$api_listeners" \
-    --argjson original_exit_code "$original_status" \
-    '{
-      scope: $scope,
-      run_dir: $run_dir,
-      database: $database,
-      database_remaining: ($database_remaining | tonumber? // $database_remaining),
-      web_listeners: ($web_listeners | tonumber? // $web_listeners),
-      api_listeners: ($api_listeners | tonumber? // $api_listeners),
-      original_exit_code: $original_exit_code,
-      credentials_file_removed: true,
-      capability_policy_file_removed: true
-    }' >"$SUMMARY_FILE"
-  rm -f "$CREDENTIALS_FILE"
-  rm -f "$ISOLATED_CAPABILITIES_FILE"
-  printf 'cleanup_summary=%s\n' "$SUMMARY_FILE"
-
-  if [[ "$database_remaining" != "0" || "$web_listeners" != "0" ||
-        "$api_listeners" != "0" ]]; then
-    echo "cleanup incompleto na fixture visual" >&2
-    exit 1
-  fi
-  exit "$original_status"
-}
-trap cleanup EXIT
-trap 'exit 130' INT
-trap 'exit 143' TERM
-
-MANALOOM_HOLD_FOR_BROWSER_QA=1 \
-MANALOOM_ALLOW_DEV_ORIGINS=true \
-MANALOOM_E2E_ISOLATED_RUNTIME=1 \
-MANALOOM_ISOLATED_RELEASE_CAPABILITIES_FILE="$ISOLATED_CAPABILITIES_FILE" \
-MANALOOM_CONFIRM_ISOLATED_RELEASE_CAPABILITIES=I_UNDERSTAND_THIS_IS_DISPOSABLE_TEST_ONLY \
-MANALOOM_CONFIRM_POSTGRES_WRITES="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
-MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
-  "$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh" \
-  >"$BACKEND_LOG" 2>&1 &
+(
+  export DB_PASS="$FIXTURE_DB_PASSWORD"
+  export INTERACTIVE_BATTLE_ENABLED=true \
+    XMAGE_SIDECAR_URL="http://127.0.0.1:$INACTIVE_BATCH_PORT" \
+    XMAGE_INTERACTIVE_SIDECAR_URL="http://127.0.0.1:$INACTIVE_INTERACTIVE_PORT"
+  export MANALOOM_HOLD_FOR_BROWSER_QA=1 \
+    MANALOOM_BROWSER_QA_COMPLETION_FILE="$BACKEND_COMPLETION_FILE" \
+    MANALOOM_ISOLATED_E2E_RECEIPT_DIR="$BACKEND_RECEIPT_DIR" \
+    MANALOOM_ALLOW_DEV_ORIGINS=true \
+    MANALOOM_E2E_ISOLATED_RUNTIME=1 \
+    MANALOOM_ISOLATED_RELEASE_CAPABILITIES_FILE="$ISOLATED_CAPABILITIES_FILE" \
+    MANALOOM_CONFIRM_ISOLATED_RELEASE_CAPABILITIES=I_UNDERSTAND_THIS_IS_DISPOSABLE_TEST_ONLY \
+    MANALOOM_CONFIRM_POSTGRES_WRITES="$MANALOOM_EXPLICIT_APPROVAL_PHRASE" \
+    MANALOOM_CONFIRM_LIVE_MUTATIONS="$MANALOOM_EXPLICIT_APPROVAL_PHRASE"
+  exec "$ROOT_DIR/scripts/manaloom_server_contract_e2e_isolated.sh"
+) >"$BACKEND_LOG" 2>&1 &
 BACKEND_PID=$!
 
 # A cold Dart Frog build can take several minutes on the governed local
@@ -252,7 +408,8 @@ visual_password_hash="$(
   htpasswd -bnBC 10 '' "$SEED_PASSWORD" | tr -d ':\n'
 )"
 seeded_users="$(
-  psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -d "$DATABASE" \
+  run_visual_pg psql -X -v ON_ERROR_STOP=1 \
+    -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DATABASE" \
     -At -F '|' \
     -v seed_username="$seed_username" \
     -v seed_email="$SEED_EMAIL" \
@@ -351,7 +508,7 @@ peer_deck_response="$(curl -fsS --max-time 20 \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer $peer_token" \
   -d "$(jq -cn --arg card_id "$SEED_CARD_ID" '{
-    name: "Battle Coach Public Rival",
+    name: "Play vs AI Opponent",
     format: "commander",
     description: "Disposable public opponent for live interaction proof",
     is_public: true,
@@ -371,7 +528,8 @@ PY
 # The visual baseline must not depend on Scryfall/CDN availability. Point the
 # disposable card at a same-origin asset that ships inside the real Web build.
 fixture_image_url="http://127.0.0.1:$WEB_PORT/app/assets/assets/branding/visual_fixture_arcane_ring.webp"
-psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -p 5432 -d "$DATABASE" \
+run_visual_pg psql -X -v ON_ERROR_STOP=1 \
+  -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DATABASE" \
   -v card_id="$SEED_CARD_ID" \
   -v basic_land_card_id="$SEED_BASIC_LAND_CARD_ID" \
   -v commander_card_id="$SEED_COMMANDER_CARD_ID" \
@@ -527,6 +685,11 @@ for _ in $(seq 1 80); do
 done
 curl -fsS --max-time 5 "$WEB_URL" >/dev/null
 
+verify_empty_session_list || {
+  echo "welcome fixture requires inactive loopback destinations and a real empty session list" >&2
+  exit 1
+}
+
 umask 077
 {
   printf 'MANALOOM_VISUAL_EMAIL=%q\n' "$SEED_EMAIL"
@@ -543,6 +706,7 @@ jq -n \
   --arg database "$DATABASE" \
   --arg run_dir "$RUN_DIR" \
   --arg credentials_file "$CREDENTIALS_FILE" \
+  --arg completion_file "$COMPLETION_FILE" \
   --arg seed_user_id "$SEED_USER_ID" \
   --arg empty_user_id "$EMPTY_USER_ID" \
   --arg seed_peer_user_id "$SEED_PEER_USER_ID" \
@@ -558,6 +722,8 @@ jq -n \
   --arg fixture_image_url "$fixture_image_url" \
   --arg bundle_sha256 "$bundle_sha256" \
   --arg capability_policy_digest_sha256 "$ISOLATED_CAPABILITIES_DIGEST" \
+  --arg inactive_batch_url "http://127.0.0.1:$INACTIVE_BATCH_PORT" \
+  --arg inactive_interactive_url "http://127.0.0.1:$INACTIVE_INTERACTIVE_PORT" \
   '{
     status: "ready",
     scope: $scope,
@@ -568,6 +734,7 @@ jq -n \
     database: $database,
     run_dir: $run_dir,
     credentials_file: $credentials_file,
+    completion_file: $completion_file,
     seed_user_id: $seed_user_id,
     empty_user_id: $empty_user_id,
     empty_user_has_decks: false,
@@ -583,6 +750,15 @@ jq -n \
     seed_trade_id: $seed_trade_id,
     fixture_image_url: $fixture_image_url,
     bundle_sha256: $bundle_sha256,
+    interactive_welcome_fixture: {
+      scope: "empty session list from disposable PostgreSQL",
+      session_count: 0,
+      engine: "NOT_STARTED",
+      readiness: "NOT_PROVEN",
+      inactive_batch_url: $inactive_batch_url,
+      inactive_interactive_url: $inactive_interactive_url,
+      sidecar_listeners: 0
+    },
     capability_policy: {
       scope: "isolated_visual_fixture",
       digest_sha256: $capability_policy_digest_sha256,
@@ -593,6 +769,7 @@ jq -n \
     cleanup: "trap_registered"
   }' >"$READY_MANIFEST"
 
+VISUAL_READY=1
 printf 'READY: S3-07 authenticated visual QA\n'
 printf 'ready_manifest=%s\n' "$READY_MANIFEST"
 printf 'web_url=%s\n' "$WEB_URL"
@@ -610,6 +787,10 @@ printf 'Press Ctrl+C to stop and prove cleanup.\n'
 
 while kill -0 "$WEB_PID" >/dev/null 2>&1 &&
       kill -0 "$BACKEND_PID" >/dev/null 2>&1; do
+  if [[ -f "$COMPLETION_FILE" && ! -L "$COMPLETION_FILE" ]]; then
+    [[ "$(tr -d '\r\n' <"$COMPLETION_FILE")" == complete ]] || exit 1
+    exit 0
+  fi
   sleep 1
 done
 

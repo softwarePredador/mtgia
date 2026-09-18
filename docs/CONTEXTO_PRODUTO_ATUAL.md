@@ -7,7 +7,7 @@
 > `docs/execution/CURRENT_QUEUE.md` e `docs/execution/README.md`. O restante
 > deste arquivo preserva contexto por data.
 
-## Decisão vigente — 2026-08-13
+## Decisão vigente — 2026-08-25
 
 - estado: `NO_GO_PUBLIC_RELEASE`;
 - candidato pretendido: beta gratuita, coorte controlada, Web + Android;
@@ -18,6 +18,15 @@
   não apresenta CTA ou link para `/app`;
 - Generate/Rebuild, learning, Battle, Scanner, social, marketplace e trades
   permanecem `OFF` por padrão;
+- a única direção pública planejada para Battle interativo é Jogar contra IA,
+  com o humano controlando mão, campo, alvos, prioridade e combate contra um
+  adversário da IA; não haverá rota, CTA ou modo público de espectador, nem
+  fallback para simulação/replay quando o XMage interativo estiver bloqueado;
+- a prova focal Web/XMage de 2026-08-25 passou do mulligan ao replay/rematch e
+  está registrada em
+  `docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md`; ela valida a
+  implementação contida, mas não libera Battle nem substitui clean-SHA,
+  aggregate UI, Android físico, acessibilidade, capacidade ou rollout;
 - baseline estrutural deste checkout: migration `058`, com `58` migrations; o
   estado do PostgreSQL live continua desconhecido até receipt read-only fresco;
 - nenhum status local altera `live_verified_as_of` sem prova same-SHA fresca.
@@ -66,6 +75,10 @@ as dependências ou os critérios de aceite do backlog mestre.
   não deve ser considerado corrigido antes de uma nova otimização após deploy.
 
 ## Execução Battle Lab — 2026-07-26
+
+Registro histórico de implementação. O ADR 0013 substitui sua direção pública:
+Live/stream permanece apenas infraestrutura interna e o produto interativo
+passa a ser Jogar contra IA, sem espectador.
 
 - a ampliação local de escopo foi autorizada e implementou BL0–BL6: Battle Lab
   com entrada pela Análise, preflight/setup, replay visual, relatório,

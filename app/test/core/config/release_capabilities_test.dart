@@ -75,6 +75,12 @@ void main() {
         (payload) => payload['schema_version'] = 'release_capabilities_v2',
         (payload) => payload['configuration_status'] = 'invalid_fail_closed',
         (payload) => payload['product'] = 'another_product',
+        (payload) => payload['implementation_status'] = 'future_unknown',
+        (payload) =>
+            (payload['capabilities'] as Map<String, dynamic>)[ReleaseCapability
+                    .battleBatch
+                    .wireName]['implementation_status'] =
+                'future_unknown',
         (payload) => payload['policy_digest_sha256'] = 'not-a-sha256',
         (payload) => payload.remove('capabilities'),
         (payload) => payload['unexpected'] = true,
@@ -245,6 +251,102 @@ void main() {
         );
       },
     );
+
+    for (final failureCase
+        in <({String label, Future<ApiResponse> Function() fetch})>[
+          (
+            label: '503',
+            fetch: () async => ApiResponse(503, const {'error': 'unavailable'}),
+          ),
+          (
+            label: 'malformed 200',
+            fetch: () async =>
+                ApiResponse(200, const {'configuration_status': 'valid'}),
+          ),
+          (
+            label: 'fetch exception',
+            fetch: () async => throw StateError('offline'),
+          ),
+        ]) {
+      test(
+        'a ${failureCase.label} refresh never preserves an older permission',
+        () async {
+          var requestCount = 0;
+          final provider = ReleaseCapabilitiesProvider(
+            fetcher: (_) async {
+              requestCount++;
+              if (requestCount == 1) {
+                return ApiResponse(
+                  200,
+                  _validPayload(
+                    allowed: const {ReleaseCapability.aiGenerateRebuild},
+                  ),
+                );
+              }
+              return failureCase.fetch();
+            },
+          );
+          addTearDown(provider.dispose);
+
+          expect(await provider.refresh(), isTrue);
+          expect(
+            provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
+            isTrue,
+          );
+
+          expect(await provider.refresh(), isFalse);
+          expect(provider.loadState, ReleaseCapabilitiesLoadState.unavailable);
+          expect(
+            provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
+            isFalse,
+          );
+        },
+      );
+    }
+
+    test(
+      'an older concurrent response cannot replace the latest matrix',
+      () async {
+        final firstResponse = Completer<ApiResponse>();
+        final secondResponse = Completer<ApiResponse>();
+        var requestCount = 0;
+        final provider = ReleaseCapabilitiesProvider(
+          fetcher: (_) {
+            requestCount++;
+            return requestCount == 1
+                ? firstResponse.future
+                : secondResponse.future;
+          },
+        );
+        addTearDown(provider.dispose);
+
+        final firstRefresh = provider.refresh();
+        final secondRefresh = provider.refresh();
+        secondResponse.complete(
+          ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.catalogPrivate}),
+          ),
+        );
+
+        expect(await secondRefresh, isTrue);
+        expect(provider.isAllowed(ReleaseCapability.catalogPrivate), isTrue);
+
+        firstResponse.complete(
+          ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.aiGenerateRebuild}),
+          ),
+        );
+
+        expect(await firstRefresh, isFalse);
+        expect(provider.isAllowed(ReleaseCapability.catalogPrivate), isTrue);
+        expect(
+          provider.isAllowed(ReleaseCapability.aiGenerateRebuild),
+          isFalse,
+        );
+      },
+    );
   });
 
   group('ReleaseCapabilityRouteGuard', () {
@@ -265,7 +367,7 @@ void main() {
         '/decks/deck-1/scan?mode=add': '/decks/deck-1/search?mode=add',
         '/decks/deck-1/search?mode=add': '/decks/deck-1',
         '/decks/deck-1/battle-replays': '/decks/deck-1',
-        '/decks/deck-1/battle-live/job-1': '/decks/deck-1',
+        '/decks/deck-1/play-vs-ai/session-1': '/decks/deck-1',
         '/decks/deck-1/battle-coach/session-1': '/decks/deck-1',
         '/life-counter?deckId=deck-1': '/home',
         '/community': '/home',
@@ -323,7 +425,7 @@ void main() {
         '/decks/deck-1?optimize=rebuild',
         '/decks/deck-1/scan',
         '/decks/deck-1/battle-replays',
-        '/decks/deck-1/battle-live/job-1',
+        '/decks/deck-1/play-vs-ai',
         '/decks/deck-1/battle-coach',
         '/decks/deck-1?optimize=post_game',
         '/life-counter',
@@ -416,6 +518,59 @@ void main() {
           buildSupport: supported,
         ),
         isNull,
+      );
+    });
+
+    test('keeps Play vs AI and replay capabilities independent', () {
+      final coachOnly = ReleaseCapabilitiesSnapshot.forTesting(const {
+        ReleaseCapability.decksPrivate,
+        ReleaseCapability.battleCoach,
+      });
+      final batchOnly = ReleaseCapabilitiesSnapshot.forTesting(const {
+        ReleaseCapability.decksPrivate,
+        ReleaseCapability.battleBatch,
+      });
+
+      expect(
+        ReleaseCapabilityRouteGuard.redirectFor(
+          uri: Uri.parse('/decks/deck-1/play-vs-ai/session-1'),
+          capabilities: coachOnly,
+          buildSupport: supported,
+        ),
+        isNull,
+      );
+      expect(
+        ReleaseCapabilityRouteGuard.redirectFor(
+          uri: Uri.parse('/decks/deck-1/battle-coach/session-1'),
+          capabilities: coachOnly,
+          buildSupport: supported,
+        ),
+        isNull,
+      );
+      expect(
+        ReleaseCapabilityRouteGuard.redirectFor(
+          uri: Uri.parse('/decks/deck-1/battle-replays'),
+          capabilities: coachOnly,
+          buildSupport: supported,
+        ),
+        '/decks/deck-1',
+      );
+
+      expect(
+        ReleaseCapabilityRouteGuard.redirectFor(
+          uri: Uri.parse('/decks/deck-1/battle-replays'),
+          capabilities: batchOnly,
+          buildSupport: supported,
+        ),
+        isNull,
+      );
+      expect(
+        ReleaseCapabilityRouteGuard.redirectFor(
+          uri: Uri.parse('/decks/deck-1/play-vs-ai'),
+          capabilities: batchOnly,
+          buildSupport: supported,
+        ),
+        '/decks/deck-1',
       );
     });
   });

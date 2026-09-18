@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "matrix_id": "manaloom-s3-07-authenticated-p0-live-matrix-2026-07-27",
+  "matrix_id": "manaloom-play-vs-ai-authenticated-p0-live-matrix-2026-08-25",
   "status": "governed_by_live_evidence",
   "harness": "../scripts/manaloom_authenticated_visual_qa_isolated.sh",
   "fixture": {
@@ -17,7 +17,7 @@
     ],
     "fixture_users": {
       "seeded_user": "owns the canonical seeded deck",
-      "empty_deck_user": "owns no deck and exists only for decks_empty"
+      "empty_deck_user": "owns no deck or binder item; used for decks_empty and collection_empty"
     },
     "cleanup": "kill listeners and drop disposable database"
   },
@@ -153,7 +153,7 @@
     {
       "id": "collection_empty",
       "route": "/collection?tab=0",
-      "auth": "seeded_user",
+      "auth": "empty_deck_user",
       "states": ["empty", "above_fold"],
       "anchor": "collection-hub-tabs",
       "source": "lib/features/collection/screens/collection_screen.dart"
@@ -440,19 +440,21 @@
     },
     {
       "id": "battle_coach_welcome",
-      "route": "/decks/{seed_deck_id}/battle-coach",
+      "route": "/decks/{seed_deck_id}/play-vs-ai",
       "auth": "seeded_user",
       "states": ["success", "above_fold"],
       "anchor": "battle-coach-welcome-state",
-      "source": "lib/features/battle/screens/battle_coach_screen.dart"
+      "source": "lib/features/battle/screens/battle_coach_screen.dart",
+      "classification": "legacy_evidence_filename_for_play_vs_ai"
     },
     {
       "id": "battle_live_disabled",
-      "route": "/decks/{seed_deck_id}/battle-live/{job_id}",
+      "route": "/decks/{seed_deck_id}/battle-replays",
       "auth": "seeded_user",
       "states": ["disabled", "above_fold"],
-      "anchor": "battle-live-disabled-state",
-      "source": "lib/features/battle/screens/battle_live_spectator_screen.dart"
+      "anchor": "battle-replays-empty-state",
+      "source": "lib/features/battle/screens/battle_replays_screen.dart",
+      "classification": "legacy_evidence_filename_proving_no_public_spectator"
     },
     {
       "id": "messages_inbox",

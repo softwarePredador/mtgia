@@ -23,6 +23,7 @@ class _FakeInteractiveGateway implements InteractiveBattleGateway {
   final List<InteractiveBattleSession> activeSessions;
   int getCount = 0;
   int listCount = 0;
+  int createCount = 0;
   int concedeCalls = 0;
   final List<InteractiveBattleResponse> responses = [];
 
@@ -41,7 +42,10 @@ class _FakeInteractiveGateway implements InteractiveBattleGateway {
     required String opponentDeckId,
     int ttlSeconds = 1800,
     int promptTimeoutSeconds = 90,
-  }) async => _waitingSession();
+  }) async {
+    createCount += 1;
+    return _waitingSession();
+  }
 
   @override
   Future<InteractiveBattleSession> get(String sessionId) async {
@@ -99,7 +103,9 @@ class _FakeOpponentGateway extends BattleReplayService {
   );
 }
 
-class _FallbackOpponentGateway extends _FakeOpponentGateway {
+class _BlockedInteractiveOpponentGateway extends _FakeOpponentGateway {
+  int interactivePreflightCalls = 0;
+  int automaticPreflightCalls = 0;
   int automaticRuns = 0;
 
   @override
@@ -109,6 +115,7 @@ class _FallbackOpponentGateway extends _FakeOpponentGateway {
     bool interactive = false,
   }) async {
     if (interactive) {
+      interactivePreflightCalls += 1;
       return const BattlePreflight(
         status: 'blocked',
         cardCount: 100,
@@ -121,6 +128,7 @@ class _FallbackOpponentGateway extends _FakeOpponentGateway {
         mode: 'interactive',
       );
     }
+    automaticPreflightCalls += 1;
     return const BattlePreflight(
       status: 'ready',
       cardCount: 100,
@@ -140,23 +148,22 @@ class _FallbackOpponentGateway extends _FakeOpponentGateway {
     int maxTurns = 30,
   }) async {
     automaticRuns += 1;
-    return BattleReplayDetail.fromJson(
-      {
-        'replay_id': 'fallback-replay',
-        'type': 'battle',
-        'deck_a_id': deckId,
-        'deck_b_id': setup.opponentDeckId,
-        'turns': 7,
-        'events': const <dynamic>[],
-      },
-      fallbackDeckId: deckId,
-      fallbackId: 'fallback-replay',
-      source: 'battle_simulations',
-    );
+    throw StateError('Play vs AI must never start an automatic simulation.');
   }
 }
 
 void main() {
+  test('uses the deck-scoped Play vs AI route as the public identity', () {
+    expect(
+      playVsAiRouteLocation('deck / one'),
+      '/decks/deck%20%2F%20one/play-vs-ai',
+    );
+    expect(
+      playVsAiSessionRouteLocation('deck-1', 'session / one'),
+      '/decks/deck-1/play-vs-ai/session%20%2F%20one',
+    );
+  });
+
   testWidgets('shows a clear opt-in welcome before creating a session', (
     tester,
   ) async {
@@ -171,17 +178,15 @@ void main() {
     await tester.pump();
 
     expect(find.byKey(const Key('battle-coach-welcome-state')), findsOneWidget);
-    expect(find.text('Participe das decisões compatíveis'), findsOneWidget);
+    expect(find.text('Jogue seu deck contra a IA'), findsOneWidget);
+    expect(find.text('MÃO · CAMPO · PILHA · AÇÕES LEGAIS'), findsOneWidget);
+    expect(find.text('Você controla suas jogadas'), findsOneWidget);
+    expect(find.text('Regras aplicadas e replay ao concluir'), findsOneWidget);
     expect(
-      find.text('MÃO · PILHA · CAMPO · DECISÕES COMPATÍVEIS'),
+      find.textContaining('mana, alvos, prioridade e combate'),
       findsOneWidget,
     );
-    expect(find.text('Deck validado para execução'), findsOneWidget);
-    expect(
-      find.text('Decisões registradas; replay ao concluir'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('toda prioridade'), findsNothing);
+    expect(find.textContaining('Coach'), findsNothing);
     expect(
       tester
           .widget<ManaLoomThemeMotif>(find.byType(ManaLoomThemeMotif))
@@ -193,9 +198,11 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const Key('battle-coach-alpha-banner')), findsOneWidget);
-    expect(find.text('ALPHA'), findsOneWidget);
+    expect(find.text('TESTE'), findsOneWidget);
     expect(
-      find.text('Experimental · decisões assistidas e suporte limitado'),
+      find.text(
+        'Experimental · você joga contra um adversário controlado pela IA',
+      ),
       findsOneWidget,
     );
     final layoutException = tester.takeException();
@@ -211,10 +218,10 @@ void main() {
     final active = _waitingSession();
     final gateway = _FakeInteractiveGateway(activeSessions: [active]);
     final router = GoRouter(
-      initialLocation: '/decks/$deckId/battle-coach',
+      initialLocation: '/decks/$deckId/play-vs-ai',
       routes: [
         GoRoute(
-          path: '/decks/:id/battle-coach',
+          path: '/decks/:id/play-vs-ai',
           builder: (context, state) => BattleCoachScreen(
             deckId: state.pathParameters['id']!,
             gateway: gateway,
@@ -272,7 +279,7 @@ void main() {
     expect(find.textContaining('XMage'), findsNothing);
   });
 
-  testWidgets('uses interactive copy and CTA in the Coach opponent picker', (
+  testWidgets('uses player-vs-AI copy and CTA in the opponent picker', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -292,15 +299,20 @@ void main() {
       find.byKey(const Key('battle-opponent-coach-description')),
       findsOneWidget,
     );
-    expect(find.text('Jogar com Coach'), findsOneWidget);
+    expect(find.text('Jogar contra IA'), findsWidgets);
+    expect(
+      find.textContaining('mesa privada para você controlar seu lado'),
+      findsOneWidget,
+    );
     expect(find.text('Simular Battle'), findsNothing);
+    expect(find.textContaining('Coach'), findsNothing);
     expect(find.byKey(const Key('battle-test-objective-field')), findsNothing);
     expect(find.byKey(const Key('battle-focus-cards-field')), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
-  testWidgets('shows a strong keyboard focus halo on the Coach start action', (
+  testWidgets('shows a strong keyboard focus halo on the Play vs AI action', (
     tester,
   ) async {
     final previousHighlightStrategy = FocusManager.instance.highlightStrategy;
@@ -377,25 +389,26 @@ void main() {
             builder: (context) => Scaffold(
               body: Center(
                 child: FilledButton(
-                  key: const Key('open-battle-coach'),
+                  key: const Key('open-play-vs-ai'),
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => BattleCoachScreen(
                         deckId: '00000000-0000-4000-8000-000000000001',
                         gateway: _FakeInteractiveGateway(),
                         opponentGateway: _FakeOpponentGateway(),
+                        replayHistoryEnabled: true,
                         pollInterval: const Duration(hours: 1),
                       ),
                     ),
                   ),
-                  child: const Text('Abrir Coach'),
+                  child: const Text('Jogar contra IA'),
                 ),
               ),
             ),
           ),
         ),
       );
-      await tester.tap(find.byKey(const Key('open-battle-coach')));
+      await tester.tap(find.byKey(const Key('open-play-vs-ai')));
       await tester.pumpAndSettle();
       FocusManager.instance.primaryFocus?.unfocus();
       await tester.pump();
@@ -488,67 +501,50 @@ void main() {
     },
   );
 
-  testWidgets(
-    'runs an explicitly selected automatic fallback and opens its replay',
-    (tester) async {
-      const deckId = '00000000-0000-4000-8000-000000000001';
-      final interactiveGateway = _FakeInteractiveGateway();
-      final opponentGateway = _FallbackOpponentGateway();
-      final router = GoRouter(
-        initialLocation: '/decks/$deckId/battle-coach',
-        routes: [
-          GoRoute(
-            path: '/decks/:id/battle-coach',
-            builder: (context, state) => BattleCoachScreen(
-              deckId: state.pathParameters['id']!,
-              gateway: interactiveGateway,
-              opponentGateway: opponentGateway,
-              pollInterval: const Duration(hours: 1),
-            ),
-          ),
-          GoRoute(
-            path: '/decks/:id/battle-replays',
-            builder: (context, state) => Scaffold(
-              body: Text(
-                'Replay aberto: ${state.uri.queryParameters['replay']}',
-              ),
-            ),
-          ),
-        ],
-      );
-      addTearDown(router.dispose);
-      await tester.pumpWidget(
-        MaterialApp.router(
-          theme: AppTheme.darkTheme.copyWith(
-            splashFactory: InkRipple.splashFactory,
-          ),
-          routerConfig: router,
-        ),
-      );
-      await tester.pumpAndSettle();
+  testWidgets('blocks Play vs AI instead of replacing it with a simulation', (
+    tester,
+  ) async {
+    final interactiveGateway = _FakeInteractiveGateway();
+    final opponentGateway = _BlockedInteractiveOpponentGateway();
+    await tester.pumpWidget(
+      _subject(interactiveGateway, opponentGateway: opponentGateway),
+    );
+    await tester.pumpAndSettle();
 
-      await tester.tap(
-        find.byKey(const Key('battle-coach-choose-opponent-button')),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(
-          const Key(
-            'battle-opponent-deck-11111111-1111-4111-8111-111111111111',
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.byKey(const Key('battle-opponent-automatic-fallback-button')),
-      );
-      await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const Key('battle-coach-choose-opponent-button')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(
+        const Key('battle-opponent-deck-11111111-1111-4111-8111-111111111111'),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-      expect(opponentGateway.automaticRuns, 1);
-      expect(find.text('Replay aberto: fallback-replay'), findsOneWidget);
-      expect(find.textContaining('XMage'), findsNothing);
-    },
-  );
+    expect(opponentGateway.interactivePreflightCalls, 1);
+    expect(opponentGateway.automaticPreflightCalls, 0);
+    expect(
+      find.byKey(const Key('battle-opponent-automatic-fallback-button')),
+      findsNothing,
+    );
+    expect(
+      find.textContaining(
+        'Cobertura de regras em preparação para Lorehold, the Historian',
+      ),
+      findsOneWidget,
+    );
+    final playVsAiButton = tester.widget<FilledButton>(
+      find.byKey(const Key('battle-opponent-submit-button')),
+    );
+    expect(playVsAiButton.onPressed, isNull);
+
+    await tester.tap(find.byKey(const Key('battle-opponent-submit-button')));
+    await tester.pump();
+
+    expect(interactiveGateway.createCount, 0);
+    expect(opponentGateway.automaticRuns, 0);
+  });
 
   testWidgets('resumes, renders private state, and submits a prompt choice', (
     tester,
@@ -589,6 +585,235 @@ void main() {
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'keeps Play vs AI usable without exposing replay history when batch is off',
+    (tester) async {
+      final gateway = _FakeInteractiveGateway(session: _terminalSession());
+      await tester.pumpWidget(
+        _subject(gateway, sessionId: 'session-1', replayHistoryEnabled: false),
+      );
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('battle-coach-terminal-panel')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('play-vs-ai-rematch-button')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-history-button')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-open-replay-button')),
+        findsNothing,
+      );
+    },
+  );
+
+  testWidgets('submits the exact typed option by tapping a legal hand card', (
+    tester,
+  ) async {
+    final gateway = _FakeInteractiveGateway(
+      session: _waitingSession(cardAction: _CardAction.hand),
+    );
+    await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+    await tester.pump();
+    await tester.pump();
+
+    const optionId = 'o_cast_swords_abcdefghijkl';
+    final legalCard = find.byKey(const Key('play-vs-ai-legal-card-$optionId'));
+    expect(legalCard, findsOneWidget);
+    expect(
+      find.byKey(const Key('play-vs-ai-legal-card-badge-$optionId')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('battle-coach-option-$optionId')),
+      findsOneWidget,
+      reason: 'the typed action tray remains the accessible fallback',
+    );
+    expect(
+      find.byKey(const Key('play-vs-ai-card-action-hint')),
+      findsOneWidget,
+    );
+
+    await tester.tap(legalCard);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(gateway.responses, hasLength(1));
+    expect(gateway.responses.single.optionId, optionId);
+    expect(
+      find.byKey(const Key('battle-coach-terminal-panel')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets(
+    'submits the exact typed option by tapping a legal board target',
+    (tester) async {
+      final gateway = _FakeInteractiveGateway(
+        session: _waitingSession(cardAction: _CardAction.boardTarget),
+      );
+      await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+      await tester.pump();
+      await tester.pump();
+
+      const optionId = 'o_target_atraxa_abcdefghijkl';
+      final legalTarget = find.byKey(
+        const Key('play-vs-ai-legal-card-$optionId'),
+      );
+      expect(legalTarget, findsOneWidget);
+
+      await tester.tap(legalTarget);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      expect(gateway.responses, hasLength(1));
+      expect(gateway.responses.single.optionId, optionId);
+    },
+  );
+
+  testWidgets(
+    'fails closed when a visible card matches multiple prompt cards',
+    (tester) async {
+      final gateway = _FakeInteractiveGateway(
+        session: _waitingSession(cardAction: _CardAction.ambiguousOptions),
+      );
+      await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+      await tester.pump();
+      await tester.pump();
+
+      expect(
+        find.byKey(const Key('play-vs-ai-legal-card-o_choice_a_abcdefghijkl')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('play-vs-ai-legal-card-o_choice_b_abcdefghijkl')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-option-o_choice_a_abcdefghijkl')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-option-o_choice_b_abcdefghijkl')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('play-vs-ai-card-action-hint')),
+        findsNothing,
+      );
+
+      final card = find.byKey(
+        const Key('battle-coach-card-preview-$_handObjectId'),
+      );
+      expect(card, findsWidgets);
+      await tester.tap(card.first);
+      await tester.pumpAndSettle();
+
+      expect(gateway.responses, isEmpty);
+      expect(
+        find.byKey(const Key('battle-coach-card-preview-dialog')),
+        findsOneWidget,
+        reason: 'ambiguous direct actions degrade to preview plus typed tray',
+      );
+    },
+  );
+
+  testWidgets(
+    'fails closed when a prompt card descriptor has no opaque object id',
+    (tester) async {
+      final gateway = _FakeInteractiveGateway(
+        session: _waitingSession(cardAction: _CardAction.ambiguousVisibleCards),
+      );
+      await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+      await tester.pump();
+      await tester.pump();
+
+      const optionId = 'o_duplicate_abcdefghijkl';
+      expect(
+        find.byKey(const Key('play-vs-ai-legal-card-$optionId')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-option-$optionId')),
+        findsOneWidget,
+        reason: 'the typed option remains available when card-first is unsafe',
+      );
+      expect(
+        find.byKey(const Key('play-vs-ai-card-action-hint')),
+        findsNothing,
+      );
+
+      for (final cardId in const [_handObjectId, _secondHandObjectId]) {
+        final card = find.byKey(Key('battle-coach-card-preview-$cardId'));
+        expect(card, findsOneWidget);
+        await tester.tap(card);
+        await tester.pumpAndSettle();
+        expect(gateway.responses, isEmpty);
+        expect(
+          find.byKey(const Key('battle-coach-card-preview-dialog')),
+          findsOneWidget,
+        );
+        await tester.tap(
+          find.byKey(const Key('battle-coach-card-preview-close-button')),
+        );
+        await tester.pumpAndSettle();
+      }
+    },
+  );
+
+  testWidgets(
+    'does not highlight homonymous hand or battlefield copies for a graveyard id',
+    (tester) async {
+      final gateway = _FakeInteractiveGateway(
+        session: _waitingSession(cardAction: _CardAction.graveyardCopy),
+      );
+      await tester.pumpWidget(_subject(gateway, sessionId: 'session-1'));
+      await tester.pump();
+      await tester.pump();
+
+      const optionId = 'o_graveyard_abcdefghijkl';
+      expect(
+        find.byKey(const Key('battle-coach-option-$optionId')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('play-vs-ai-legal-card-$optionId')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('play-vs-ai-card-action-hint')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('battle-coach-card-preview-$_handObjectId')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(
+          const Key('battle-coach-card-preview-$_battlefieldCopyObjectId'),
+        ),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('battle-coach-card-preview-$_handObjectId')),
+      );
+      await tester.pumpAndSettle();
+      expect(gateway.responses, isEmpty);
+      expect(
+        find.byKey(const Key('battle-coach-card-preview-dialog')),
+        findsOneWidget,
+      );
+    },
+  );
 
   testWidgets(
     'concede confirmation cancels safely and confirms a causal terminal state',
@@ -676,8 +901,8 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    const previewKey = Key('battle-coach-card-preview-card-preview-1');
-    const focusKey = Key('battle-coach-card-preview-card-preview-1-focus');
+    const previewKey = Key('battle-coach-card-preview-$_handObjectId');
+    const focusKey = Key('battle-coach-card-preview-$_handObjectId-focus');
     final preview = find.byKey(previewKey);
     await tester.ensureVisible(preview);
     await tester.pump();
@@ -688,8 +913,11 @@ void main() {
 
     final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await mouse.addPointer(location: Offset.zero);
-    await mouse.moveTo(tester.getCenter(preview));
-    await tester.pump();
+    final hoverTarget = find
+        .descendant(of: preview, matching: find.byType(MouseRegion))
+        .first;
+    await mouse.moveTo(tester.getCenter(hoverTarget));
+    await tester.pumpAndSettle();
     expect(
       find.byKey(const Key('battle-coach-card-hover-preview')),
       findsOneWidget,
@@ -703,7 +931,8 @@ void main() {
 
     final focus = tester.widget<Focus>(find.byKey(focusKey));
     focus.focusNode!.requestFocus();
-    await tester.pump();
+    await tester.pumpAndSettle();
+    expect(focus.focusNode!.hasFocus, isTrue);
     expect(
       find.byKey(const Key('battle-coach-card-hover-preview')),
       findsOneWidget,
@@ -784,7 +1013,7 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
-  testWidgets('keeps the interactive table overflow-free across web widths', (
+  testWidgets('keeps hand, board, and actions reachable across target widths', (
     tester,
   ) async {
     addTearDown(() {
@@ -800,7 +1029,12 @@ void main() {
     ]) {
       tester.view.physicalSize = size;
       await tester.pumpWidget(
-        _subject(_FakeInteractiveGateway(), sessionId: 'session-1'),
+        _subject(
+          _FakeInteractiveGateway(
+            session: _waitingSession(cardAction: _CardAction.hand),
+          ),
+          sessionId: 'session-1',
+        ),
       );
       await tester.pump();
       await tester.pump();
@@ -808,28 +1042,33 @@ void main() {
       expect(
         tester.takeException(),
         isNull,
-        reason: 'Battle Coach must fit ${size.width} px.',
+        reason: 'Play vs AI must fit ${size.width}x${size.height}.',
       );
       expect(find.byKey(const Key('battle-coach-board')), findsOneWidget);
-      if (size == const Size(844, 390)) {
+      expect(find.byKey(const Key('play-vs-ai-hand-dock')), findsOneWidget);
+      expect(find.byKey(const Key('play-vs-ai-action-tray')), findsOneWidget);
+      expect(
+        find.byKey(
+          const Key('play-vs-ai-legal-card-o_cast_swords_abcdefghijkl'),
+        ),
+        findsOneWidget,
+      );
+      final handDock = tester.getRect(
+        find.byKey(const Key('play-vs-ai-hand-dock')),
+      );
+      expect(handDock.top, greaterThanOrEqualTo(0));
+      expect(handDock.bottom, lessThanOrEqualTo(size.height));
+
+      if (size.width < 760) {
         expect(
-          find.byKey(const Key('battle-coach-compact-scroll')),
+          find.byKey(const Key('play-vs-ai-stacked-workspace')),
           findsOneWidget,
         );
-        final decisionRegion = tester.getRect(
-          find.byKey(const Key('battle-coach-compact-decision-region')),
+      } else {
+        expect(
+          find.byKey(const Key('play-vs-ai-side-by-side-workspace')),
+          findsOneWidget,
         );
-        final boardViewport = tester.getRect(
-          find.byKey(const Key('battle-coach-compact-board-scroll')),
-        );
-        expect(decisionRegion.top, lessThan(boardViewport.top));
-        expect(decisionRegion.bottom, lessThanOrEqualTo(boardViewport.top));
-        expect(decisionRegion.bottom, lessThanOrEqualTo(size.height));
-        final delegate = find.byKey(const Key('battle-coach-delegate-button'));
-        expect(delegate, findsOneWidget);
-        await tester.ensureVisible(delegate);
-        await tester.pump();
-        expect(tester.takeException(), isNull);
       }
       await tester.pumpWidget(const SizedBox.shrink());
     }
@@ -929,6 +1168,63 @@ void main() {
     });
   }
 
+  testWidgets('Jogar novamente returns to the canonical Play vs AI entry', (
+    tester,
+  ) async {
+    const deckId = '00000000-0000-4000-8000-000000000001';
+    final gateway = _FakeInteractiveGateway(session: _terminalSession());
+    final router = GoRouter(
+      initialLocation: '/decks/$deckId/play-vs-ai/session-1',
+      routes: [
+        GoRoute(
+          path: '/decks/:id/play-vs-ai',
+          builder: (context, state) => BattleCoachScreen(
+            deckId: state.pathParameters['id']!,
+            gateway: gateway,
+            opponentGateway: _FakeOpponentGateway(),
+            pollInterval: const Duration(hours: 1),
+          ),
+          routes: [
+            GoRoute(
+              path: ':sessionId',
+              builder: (context, state) => BattleCoachScreen(
+                deckId: state.pathParameters['id']!,
+                sessionId: state.pathParameters['sessionId']!,
+                gateway: gateway,
+                opponentGateway: _FakeOpponentGateway(),
+                pollInterval: const Duration(hours: 1),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+    await tester.pumpWidget(
+      MaterialApp.router(
+        theme: AppTheme.darkTheme.copyWith(
+          splashFactory: InkRipple.splashFactory,
+        ),
+        routerConfig: router,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('battle-coach-terminal-panel')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const Key('play-vs-ai-rematch-button')));
+    await tester.pumpAndSettle();
+
+    expect(
+      router.routeInformationProvider.value.uri.path,
+      '/decks/$deckId/play-vs-ai',
+    );
+    expect(find.byKey(const Key('battle-coach-welcome-state')), findsOneWidget);
+    expect(find.text('Jogue seu deck contra a IA'), findsOneWidget);
+  });
+
   testWidgets('disables decorative motion when accessibility requests it', (
     tester,
   ) async {
@@ -969,6 +1265,7 @@ Widget _subject(
   InteractiveBattleGateway gateway, {
   String? sessionId,
   bool disableAnimations = false,
+  bool replayHistoryEnabled = true,
   BattleReplayGateway? opponentGateway,
 }) => MaterialApp(
   theme: AppTheme.darkTheme.copyWith(splashFactory: InkRipple.splashFactory),
@@ -981,79 +1278,223 @@ Widget _subject(
     sessionId: sessionId,
     gateway: gateway,
     opponentGateway: opponentGateway,
+    replayHistoryEnabled: replayHistoryEnabled,
     pollInterval: const Duration(hours: 1),
   ),
 );
 
-InteractiveBattleSession _waitingSession({bool withCard = false}) =>
-    InteractiveBattleSession.fromJson({
-      'schema_version': 'interactive_battle_session_v1',
-      'id': 'session-1',
-      'status': 'waiting_for_action',
+enum _CardAction {
+  none,
+  hand,
+  boardTarget,
+  ambiguousOptions,
+  ambiguousVisibleCards,
+  graveyardCopy,
+}
+
+const _handObjectId = '11111111-1111-4111-8111-111111111111';
+const _secondHandObjectId = '22222222-2222-4222-8222-222222222222';
+const _boardTargetObjectId = '33333333-3333-4333-8333-333333333333';
+const _graveyardObjectId = '44444444-4444-4444-8444-444444444444';
+const _battlefieldCopyObjectId = '55555555-5555-4555-8555-555555555555';
+
+InteractiveBattleSession _waitingSession({
+  bool withCard = false,
+  _CardAction cardAction = _CardAction.none,
+}) {
+  final showHandCard =
+      withCard ||
+      cardAction == _CardAction.hand ||
+      cardAction == _CardAction.ambiguousOptions ||
+      cardAction == _CardAction.ambiguousVisibleCards ||
+      cardAction == _CardAction.graveyardCopy;
+  const handCardId = _handObjectId;
+  final promptOptions = switch (cardAction) {
+    _CardAction.hand => [
+      {
+        'id': 'o_cast_swords_abcdefghijkl',
+        'label': 'Conjurar Swords to Plowshares',
+        'role': 'card',
+        'card': {
+          'id': _handObjectId,
+          'name': 'Swords to Plowshares',
+          'set_code': '2xm',
+          'collector_number': '35',
+        },
+      },
+    ],
+    _CardAction.boardTarget => [
+      {
+        'id': 'o_target_atraxa_abcdefghijkl',
+        'label': 'Escolher Atraxa como alvo',
+        'role': 'target',
+        'card': {
+          'id': _boardTargetObjectId,
+          'name': "Atraxa, Praetors' Voice",
+          'set_code': '2x2',
+          'collector_number': '188',
+        },
+      },
+    ],
+    _CardAction.ambiguousOptions => [
+      {
+        'id': 'o_choice_a_abcdefghijkl',
+        'label': 'Escolha A',
+        'role': 'card',
+        'card': {
+          'id': _handObjectId,
+          'name': 'Swords to Plowshares',
+          'set_code': '2xm',
+          'collector_number': '35',
+        },
+      },
+      {
+        'id': 'o_choice_b_abcdefghijkl',
+        'label': 'Escolha B',
+        'role': 'card',
+        'card': {
+          'id': _handObjectId,
+          'name': 'Swords to Plowshares',
+          'set_code': '2xm',
+          'collector_number': '35',
+        },
+      },
+    ],
+    _CardAction.ambiguousVisibleCards => [
+      {
+        'id': 'o_duplicate_abcdefghijkl',
+        'label': 'Conjurar Swords to Plowshares',
+        'role': 'card',
+        'card': {
+          'name': 'Swords to Plowshares',
+          'set_code': '2xm',
+          'collector_number': '35',
+        },
+      },
+    ],
+    _CardAction.graveyardCopy => [
+      {
+        'id': 'o_graveyard_abcdefghijkl',
+        'label': 'Escolher Swords to Plowshares no cemitério',
+        'role': 'target',
+        'card': {
+          'id': _graveyardObjectId,
+          'name': 'Swords to Plowshares',
+          'set_code': '2xm',
+          'collector_number': '35',
+        },
+      },
+    ],
+    _CardAction.none => [
+      {'id': 'o_abcdefghijklmnop', 'label': 'Manter esta mão', 'role': 'keep'},
+    ],
+  };
+
+  return InteractiveBattleSession.fromJson({
+    'schema_version': 'interactive_battle_session_v1',
+    'id': 'session-1',
+    'status': 'waiting_for_action',
+    'state_version': 7,
+    'deck_id': '00000000-0000-4000-8000-000000000001',
+    'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
+    'expires_at': '2099-07-27T15:30:00Z',
+    'updated_at': '2026-07-27T15:00:00Z',
+    'private_state': {
+      'turn': 1,
+      'phase': 'BEGINNING',
+      'step': 'UPKEEP',
+      'priority_player': 'ManaLoom',
+      'own_player': 'ManaLoom',
+      'players': [
+        {
+          'name': 'ManaLoom',
+          'life': 40,
+          'library_count': 92,
+          'hand_count': 7,
+          'battlefield': cardAction == _CardAction.graveyardCopy
+              ? [
+                  {
+                    'id': _battlefieldCopyObjectId,
+                    'name': 'Swords to Plowshares',
+                    'set_code': '2xm',
+                    'card_number': '35',
+                  },
+                ]
+              : const <dynamic>[],
+          'graveyard': cardAction == _CardAction.graveyardCopy
+              ? [
+                  {
+                    'id': _graveyardObjectId,
+                    'name': 'Swords to Plowshares',
+                    'set_code': '2xm',
+                    'card_number': '35',
+                  },
+                ]
+              : const <dynamic>[],
+          'exile': const <dynamic>[],
+          'command': const <dynamic>[],
+        },
+        {
+          'name': 'Opponent',
+          'life': 40,
+          'library_count': 91,
+          'hand_count': 8,
+          'battlefield': cardAction == _CardAction.boardTarget
+              ? [
+                  {
+                    'id': _boardTargetObjectId,
+                    'name': "Atraxa, Praetors' Voice",
+                    'set_code': '2x2',
+                    'card_number': '188',
+                  },
+                ]
+              : const <dynamic>[],
+          'graveyard': const <dynamic>[],
+          'exile': const <dynamic>[],
+          'command': const <dynamic>[],
+        },
+      ],
+      'stack': const <dynamic>[],
+      'combat': const <dynamic>[],
+      'own_hand': showHandCard
+          ? cardAction == _CardAction.ambiguousVisibleCards
+                ? [
+                    {
+                      'id': _handObjectId,
+                      'name': 'Swords to Plowshares',
+                      'set_code': '2xm',
+                      'card_number': '35',
+                    },
+                    {
+                      'id': _secondHandObjectId,
+                      'name': 'Swords to Plowshares',
+                      'set_code': '2xm',
+                      'card_number': '35',
+                    },
+                  ]
+                : [
+                    {
+                      'id': handCardId,
+                      'name': 'Swords to Plowshares',
+                      'set_code': '2xm',
+                      'card_number': '35',
+                    },
+                  ]
+          : const <dynamic>[],
+    },
+    'prompt': {
+      'schema_version': 'interactive_battle_prompt_v1',
+      'id': 'p_abcdefghijklmnop',
       'state_version': 7,
-      'deck_id': '00000000-0000-4000-8000-000000000001',
-      'opponent_deck_id': '00000000-0000-4000-8000-000000000002',
-      'expires_at': '2099-07-27T15:30:00Z',
-      'updated_at': '2026-07-27T15:00:00Z',
-      'private_state': {
-        'turn': 1,
-        'phase': 'BEGINNING',
-        'step': 'UPKEEP',
-        'priority_player': 'ManaLoom',
-        'own_player': 'ManaLoom',
-        'players': [
-          {
-            'name': 'ManaLoom',
-            'life': 40,
-            'library_count': 92,
-            'hand_count': 7,
-            'battlefield': const <dynamic>[],
-            'graveyard': const <dynamic>[],
-            'exile': const <dynamic>[],
-            'command': const <dynamic>[],
-          },
-          {
-            'name': 'Opponent',
-            'life': 40,
-            'library_count': 91,
-            'hand_count': 8,
-            'battlefield': const <dynamic>[],
-            'graveyard': const <dynamic>[],
-            'exile': const <dynamic>[],
-            'command': const <dynamic>[],
-          },
-        ],
-        'stack': const <dynamic>[],
-        'combat': const <dynamic>[],
-        'own_hand': withCard
-            ? [
-                {
-                  'id': 'card-preview-1',
-                  'name': 'Swords to Plowshares',
-                  'set_code': '2xm',
-                  'collector_number': '35',
-                },
-              ]
-            : const <dynamic>[],
-      },
-      'prompt': {
-        'schema_version': 'interactive_battle_prompt_v1',
-        'id': 'p_abcdefghijklmnop',
-        'state_version': 7,
-        'kind': 'mulligan',
-        'input_mode': 'options',
-        'title': 'Sua prioridade',
-        'message': 'Manter esta mão?',
-        'deadline_at': '2099-07-27T15:01:00Z',
-        'options': [
-          {
-            'id': 'o_abcdefghijklmnop',
-            'label': 'Manter esta mão',
-            'role': 'keep',
-          },
-        ],
-      },
-    });
+      'kind': cardAction == _CardAction.none ? 'mulligan' : 'main_action',
+      'input_mode': 'options',
+      'title': 'Sua prioridade',
+      'message': 'Manter esta mão?',
+      'deadline_at': '2099-07-27T15:01:00Z',
+      'options': promptOptions,
+    },
+  });
+}
 
 InteractiveBattleSession _unknownMetricsSession() =>
     InteractiveBattleSession.fromJson({

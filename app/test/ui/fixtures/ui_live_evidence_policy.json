@@ -14,8 +14,9 @@
   },
   "gate": {
     "command": "../scripts/manaloom_ui_live_evidence_gate.sh --check",
-    "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> MANALOOM_UI_ANDROID_RUNTIME_KIND=auto ../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-coach",
+    "capture_command": "MANALOOM_UI_PROOF_DEVICE=<ANDROID_RUNTIME_ID> MANALOOM_UI_ANDROID_RUNTIME_KIND=auto ../scripts/manaloom_ui_live_evidence_gate.sh --capture-play-vs-ai",
     "battle_live_capture_command": "../scripts/manaloom_ui_live_evidence_gate.sh --capture-battle-live-web",
+    "battle_live_capture_scope": "internal_runtime_evidence_only_no_public_route",
     "binder_import_capture_command": "../scripts/manaloom_binder_import_visual_qa.sh",
     "deck_workshop_capture_command": "../scripts/manaloom_deck_workshop_visual_qa.sh",
     "battle_learning_capture_command": "../scripts/manaloom_battle_learning_visual_qa.sh",
@@ -49,20 +50,41 @@
   ],
   "surfaces": [
     {
-      "id": "battle_coach",
-      "route": "/decks/:id/battle-coach[/sessionId]",
+      "id": "play_vs_ai",
+      "route": "/decks/:id/play-vs-ai[/sessionId]",
+      "visibility": "product",
+      "runtime_surface_id": "play_vs_ai",
       "source": "lib/features/battle/screens/battle_coach_screen.dart",
       "automated_test": "test/features/battle/screens/battle_coach_screen_test.dart",
       "runtime_test": "integration_test/battle_coach_visual_runtime_proof_test.dart",
+      "required_profiles": {
+        "web_play_vs_ai_1440x900": 9
+      },
+      "real_runtime_capture_manifest": "docs/qa/ui-live/current/play-vs-ai-web-real/capture-manifest.json",
+      "real_runtime_required_checkpoints": [
+        "01-opponent-picker",
+        "02-private-hand-mulligan",
+        "03-land-played",
+        "04-commander-cast",
+        "05-combat-damage",
+        "06-reconnected-session",
+        "07-terminal-replay-rematch",
+        "08-replay",
+        "09-rematch-picker"
+      ],
       "stable_keys": [
         "battle-coach-welcome-state",
         "battle-coach-board",
         "battle-coach-own-hand",
+        "play-vs-ai-hand-dock",
+        "play-vs-ai-action-tray",
+        "play-vs-ai-legal-card-",
         "battle-coach-error-banner",
         "battle-coach-concede-dialog",
         "battle-coach-cancel-concede-button",
         "battle-coach-action-progress",
-        "battle-coach-terminal-panel"
+        "battle-coach-terminal-panel",
+        "play-vs-ai-rematch-button"
       ],
       "required_checkpoints": [
         "battle_coach_00_welcome",
@@ -78,7 +100,8 @@
     },
     {
       "id": "battle_live",
-      "route": "/decks/:id/battle-live/:jobId",
+      "route": "internal://battle-live-evidence/no-go-router-route",
+      "visibility": "internal_runtime_evidence",
       "source": "lib/features/battle/screens/battle_live_spectator_screen.dart",
       "automated_test": "test/features/battle/screens/battle_live_spectator_screen_test.dart",
       "runtime_test": "integration_test/battle_live_visual_runtime_proof_test.dart",
@@ -93,9 +116,6 @@
         "battle-live-new-attempt-button",
         "battle-live-open-replay-button"
       ],
-      "required_profiles": {
-        "web_battle_live_1440x900": 5
-      },
       "required_checkpoints": [
         "battle_live_00_waiting",
         "battle_live_01_active_feed",
@@ -141,12 +161,17 @@
       "source": "lib/features/decks/widgets/deck_workshop_tab.dart",
       "sources": [
         "lib/features/decks/widgets/deck_workshop_tab.dart",
-        "lib/features/decks/widgets/sample_hand_widget.dart"
+        "lib/features/decks/widgets/sample_hand_widget.dart",
+        "lib/features/decks/screens/deck_details_screen.dart",
+        "lib/features/decks/screens/deck_generate_screen.dart",
+        "lib/features/decks/widgets/deck_details_overview_tab.dart"
       ],
       "automated_test": "test/features/decks/widgets/deck_workshop_tab_test.dart",
       "automated_tests": [
         "test/features/decks/widgets/deck_workshop_tab_test.dart",
-        "test/features/decks/widgets/sample_hand_widget_test.dart"
+        "test/features/decks/widgets/sample_hand_widget_test.dart",
+        "test/features/decks/screens/deck_details_screen_smoke_test.dart",
+        "test/features/decks/screens/deck_flow_entry_screens_test.dart"
       ],
       "runtime_test": "integration_test/deck_workshop_visual_runtime_proof_test.dart",
       "stable_keys": [
@@ -160,12 +185,17 @@
         "deck-workshop-rollback-reason-",
         "deck-workshop-test-next-step",
         "deck-workshop-inline-error",
-        "sample-hand-carousel-hint"
+        "sample-hand-carousel-hint",
+        "deck-details-menu",
+        "deck-details-empty-search-cards",
+        "deck-generate-commander-field",
+        "deck-generate-submit-cta-frame",
+        "deck-generate-learned-deck-button"
       ],
       "required_profiles": {
-        "web_deck_workshop_mobile_390x844": 9,
-        "web_deck_workshop_desktop_1440x900": 9,
-        "web_deck_workshop_wide_1920x1080": 9
+        "web_deck_workshop_mobile_390x844": 12,
+        "web_deck_workshop_desktop_1440x900": 12,
+        "web_deck_workshop_wide_1920x1080": 12
       },
       "required_checkpoints": [
         "deck_workshop_00_commander",
@@ -176,12 +206,16 @@
         "deck_workshop_05_card_reader",
         "deck_workshop_06_history_undo",
         "deck_workshop_07_conflict",
-        "deck_workshop_08_sample_hand_continuity"
+        "deck_workshop_08_sample_hand_continuity",
+        "deck_workshop_09_replace_all_off_empty",
+        "deck_workshop_10_replace_all_off_menu",
+        "deck_workshop_11_learning_reads_off"
       ]
     },
     {
       "id": "battle_learning",
-      "route": "/home → /decks/:id/battle-live/:jobId → /decks/:id/battle-lab → /decks/:id/post-game → Optimize",
+      "route": "internal://historical-battle-learning-evidence",
+      "visibility": "internal_historical_evidence",
       "source": "lib/features/retention/screens/post_game_notes_screen.dart",
       "automated_test": "test/features/retention/post_game_card_evidence_test.dart",
       "runtime_test": "integration_test/battle_learning_visual_runtime_proof_test.dart",
@@ -192,11 +226,6 @@
         "post-game-evidence-receipt",
         "post-game-optimize-evidence-button"
       ],
-      "required_profiles": {
-        "web_battle_learning_mobile_390x844": 10,
-        "web_battle_learning_desktop_1440x900": 10,
-        "web_battle_learning_wide_1920x1080": 10
-      },
       "required_checkpoints": [
         "battle_learning_00_play_entry",
         "battle_learning_01_active_session",
@@ -651,7 +680,7 @@
         "web_mobile_390x844": 54,
         "web_desktop_1440x900": 53,
         "web_wide_1920x1080": 53,
-        "android_physical_sm_a135m": 54
+        "android_emulator_manaloom_api34": 54
       },
       "android_runtime_contract": {
         "accepted_targets": [
@@ -660,7 +689,7 @@
         ],
         "must_be_attested_from_adb": true,
         "emulator_must_not_be_reported_as_physical": true,
-        "current_profile": "android_physical_sm_a135m"
+        "current_profile": "android_emulator_manaloom_api34"
       },
       "required_checkpoints": [
         "splash_boot",

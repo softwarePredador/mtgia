@@ -274,6 +274,7 @@ void main() {
 
         expect(detail.nativeDecisionTraceAvailable, isFalse);
         expect(detail.interactiveUserDecisionTraceAvailable, isTrue);
+        expect(detail.summary.typeLabel, 'Jogar contra IA');
         expect(detail.decisions, hasLength(1));
         final decision = detail.decisions.single;
         expect(decision.isNativeHeuristic, isFalse);

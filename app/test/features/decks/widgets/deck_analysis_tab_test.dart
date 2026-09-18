@@ -154,7 +154,7 @@ Widget _subject(
   Map<String, dynamic>? analysisPayload,
   _FakeApiClient? apiClient,
   VoidCallback? onOpenBattleLab,
-  VoidCallback? onOpenBattleCoach,
+  VoidCallback? onOpenPlayVsAi,
 }) {
   return MaterialApp(
     theme: AppTheme.darkTheme.copyWith(splashFactory: InkRipple.splashFactory),
@@ -183,7 +183,7 @@ Widget _subject(
           child: DeckAnalysisTab(
             deck: deck,
             onOpenBattleLab: onOpenBattleLab,
-            onOpenBattleCoach: onOpenBattleCoach,
+            onOpenPlayVsAi: onOpenPlayVsAi,
           ),
         ),
       ),
@@ -225,13 +225,13 @@ void main() {
     expect(opened, isTrue);
   });
 
-  testWidgets('prioritizes interactive Battle Coach when explicitly enabled', (
+  testWidgets('prioritizes Jogar contra IA when explicitly enabled', (
     tester,
   ) async {
-    var coachOpened = false;
+    var playVsAiOpened = false;
     var labOpened = false;
     final deck = _makeDeck(
-      id: 'deck-battle-coach',
+      id: 'deck-play-vs-ai',
       name: 'Talrand Tempo',
       synergyScore: 82,
     );
@@ -240,14 +240,14 @@ void main() {
       _subject(
         deck,
         onOpenBattleLab: () => labOpened = true,
-        onOpenBattleCoach: () => coachOpened = true,
+        onOpenPlayVsAi: () => playVsAiOpened = true,
       ),
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Battle Lab e Coach'), findsOneWidget);
+    expect(find.text('Jogar contra IA'), findsWidgets);
     expect(
-      find.byKey(const Key('deck-analysis-open-battle-coach-button')),
+      find.byKey(const Key('deck-analysis-open-play-vs-ai-button')),
       findsOneWidget,
     );
     expect(
@@ -256,15 +256,52 @@ void main() {
     );
 
     await tester.ensureVisible(
-      find.byKey(const Key('deck-analysis-open-battle-coach-button')),
+      find.byKey(const Key('deck-analysis-open-play-vs-ai-button')),
     );
     await tester.tap(
-      find.byKey(const Key('deck-analysis-open-battle-coach-button')),
+      find.byKey(const Key('deck-analysis-open-play-vs-ai-button')),
     );
     await tester.pump();
 
-    expect(coachOpened, isTrue);
+    expect(playVsAiOpened, isTrue);
     expect(labOpened, isFalse);
+  });
+
+  testWidgets('shows Play vs AI independently when Battle Lab is disabled', (
+    tester,
+  ) async {
+    var playVsAiOpened = false;
+    final deck = _makeDeck(
+      id: 'deck-play-vs-ai-only',
+      name: 'Talrand Tempo',
+      synergyScore: 82,
+    );
+
+    await tester.pumpWidget(
+      _subject(deck, onOpenPlayVsAi: () => playVsAiOpened = true),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('deck-analysis-battle-lab-entry')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('deck-analysis-open-play-vs-ai-button')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('deck-analysis-open-battle-lab-button')),
+      findsNothing,
+    );
+    expect(find.textContaining('revise simulações'), findsNothing);
+
+    await tester.tap(
+      find.byKey(const Key('deck-analysis-open-play-vs-ai-button')),
+    );
+    await tester.pump();
+
+    expect(playVsAiOpened, isTrue);
   });
 
   testWidgets(

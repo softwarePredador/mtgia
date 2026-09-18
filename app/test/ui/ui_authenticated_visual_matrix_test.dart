@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/core/api/api_client.dart';
+
+import '../../integration_test/app_existing_user_visual_audit_test.dart'
+    as visual_audit;
 
 void main() {
   final file = File('test/ui/fixtures/ui_authenticated_visual_matrix.json');
@@ -103,7 +107,7 @@ void main() {
       (fixture['fixture_users'] as Map).cast<String, String>(),
       containsPair(
         'empty_deck_user',
-        'owns no deck and exists only for decks_empty',
+        'owns no deck or binder item; used for decks_empty and collection_empty',
       ),
     );
     expect(fixture['cleanup'], contains('drop disposable database'));
@@ -130,9 +134,16 @@ void main() {
     ).readAsStringSync();
     expect(
       backendHarness,
-      contains('exec "\${EGRESS_GUARD[@]}" env'),
+      contains(r'''export \
+    DB_HOST="$DB_HOST" DB_PORT="$DB_PORT" DB_USER="$DB_USER" \
+    DB_PASS="$FIXTURE_DB_PASSWORD" DB_NAME="$DATABASE"'''),
     );
-    expect(backendHarness, contains('dart build/bin/server.dart'));
+    expect(
+      backendHarness,
+      contains(r'exec "${EGRESS_GUARD[@]}" "$DART_BIN" build/bin/server.dart'),
+    );
+    expect(backendHarness, isNot(contains(r'exec "${EGRESS_GUARD[@]}" env')));
+    expect(backendHarness, isNot(contains('dart build/bin/server.dart')));
     expect(backendHarness, contains('EGRESS_POLICY="deny_non_loopback"'));
     expect(backendHarness, contains('OPENAI_API_KEY='));
   });
@@ -147,11 +158,28 @@ void main() {
           .toList();
       expect(ids.toSet(), hasLength(ids.length));
       expect(checkpoints, hasLength(54));
+      final publicRoutes = checkpoints
+          .map((checkpoint) => checkpoint['route'] as String)
+          .toList(growable: false);
+      expect(publicRoutes, contains('/decks/{seed_deck_id}/play-vs-ai'));
+      expect(
+        publicRoutes.where((route) => route.contains('/battle-live/')),
+        isEmpty,
+      );
+      expect(
+        publicRoutes.where((route) => route.contains('/battle-coach')),
+        isEmpty,
+      );
       final emptyDeckCheckpoint = checkpoints.singleWhere(
         (checkpoint) => checkpoint['id'] == 'decks_empty',
       );
       expect(emptyDeckCheckpoint['auth'], 'empty_deck_user');
       expect(emptyDeckCheckpoint['anchor'], 'deck-list-empty-state');
+      final emptyCollectionCheckpoint = checkpoints.singleWhere(
+        (checkpoint) => checkpoint['id'] == 'collection_empty',
+      );
+      expect(emptyCollectionCheckpoint['auth'], 'empty_deck_user');
+      expect(emptyCollectionCheckpoint['states'], ['empty', 'above_fold']);
 
       final findings = <String>[];
       for (final checkpoint in checkpoints) {
@@ -179,6 +207,96 @@ void main() {
       );
     },
   );
+
+  test('empty collection requires a real successful empty binder response', () {
+    expect(
+      () => visual_audit.expectEmptyCollectionFixtureResponse(
+        ApiResponse(200, {'data': <Object>[], 'total': 0}),
+      ),
+      returnsNormally,
+    );
+    for (final response in <ApiResponse>[
+      ApiResponse(401, {'data': <Object>[], 'total': 0}),
+      ApiResponse(500, {'data': <Object>[], 'total': 0}),
+      ApiResponse(200, null),
+      ApiResponse(200, {'total': 0}),
+      ApiResponse(200, {'data': '', 'total': 0}),
+      ApiResponse(200, {'data': <Object>[], 'total': 1}),
+      ApiResponse(200, {'data': <Object>[], 'total': '0'}),
+      ApiResponse(200, {
+        'data': [
+          {'quantity': 3},
+        ],
+        'total': 0,
+      }),
+    ]) {
+      expect(
+        () => visual_audit.expectEmptyCollectionFixtureResponse(response),
+        throwsA(isA<TestFailure>()),
+      );
+    }
+  });
+
+  test(
+    'empty collection isolates and restores the authenticated providers',
+    () {
+      final integration = File(
+        'integration_test/app_existing_user_visual_audit_test.dart',
+      ).readAsStringSync();
+      final helper = integration.substring(
+        integration.indexOf('Future<void> _captureEmptyCollection('),
+        integration.indexOf('Future<void> _authenticateExistingUser()'),
+      );
+      final ordered = <String>[
+        'email: _auditEmptyEmail',
+        'tester.pumpWidget(const SizedBox.shrink())',
+        'tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()))',
+        "ApiClient().get('/binder?page=1&limit=1')",
+        'expectEmptyCollectionFixtureResponse(response)',
+        "Key('binder-list-empty-have')",
+        "_capture(binding, tester, 'collection_empty')",
+        '} finally {',
+        'await _authenticateExistingUser()',
+        'tester.pumpWidget(const SizedBox.shrink())',
+        'tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()))',
+      ];
+      var after = 0;
+      for (final step in ordered) {
+        final position = helper.indexOf(step, after);
+        expect(position, greaterThanOrEqualTo(after), reason: step);
+        after = position + step.length;
+      }
+      expect(
+        integration,
+        contains('await _captureEmptyCollection(binding, tester)'),
+      );
+    },
+  );
+
+  test('welcome waits for its own list and rejects error before capture', () {
+    final integration = File(
+      'integration_test/app_existing_user_visual_audit_test.dart',
+    ).readAsStringSync();
+    final start = integration.indexOf('final chooseOpponent =');
+    final capture = integration.indexOf(
+      "_capture(binding, tester, 'battle_coach_welcome')",
+      start,
+    );
+    expect(start, greaterThan(0));
+    expect(capture, greaterThan(start));
+    final guard = integration.substring(start, capture);
+    expect(guard, contains('await pumpUntil('));
+    expect(
+      guard,
+      contains('tester.widget<FilledButton>(chooseOpponent).onPressed != null'),
+    );
+    expect(
+      guard,
+      contains("expect(find.text('Verificando mesa ativa…'), findsNothing)"),
+    );
+    expect(guard, contains("Key('battle-coach-active-session-error')"));
+    expect(guard, contains('findsNothing'));
+  });
 
   test('visual gate binds the complete baseline to live evidence approval', () {
     final gate = matrix['visual_gate'] as Map<String, dynamic>;

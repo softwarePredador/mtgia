@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "matrix_id": "manaloom-s3-04-mobile-accessibility-2026-07-21",
+  "matrix_id": "manaloom-play-vs-ai-mobile-accessibility-2026-08-25",
   "canonical_checks": [
     "labels",
     "roles_and_states",
@@ -44,10 +44,10 @@
       "status": "pending_physical",
       "reader": "TalkBack",
       "evidence": null,
-      "required_routes": ["/login","/home","/decks","/decks/generate","/decks/import","/decks/:id","/collection","/community","/profile","/decks/:id/battle-replays","/decks/:id/battle-live/:jobId","/decks/:id/battle-coach","/decks/:id/battle-coach/:sessionId"],
+      "required_routes": ["/login","/home","/decks","/decks/generate","/decks/import","/decks/:id","/collection","/community","/profile","/decks/:id/battle-replays","/decks/:id/play-vs-ai","/decks/:id/play-vs-ai/:sessionId"],
       "required_human_checks": ["reading_order","accessible_name_role_state","live_region_announcement","focus_continuity","touch_exploration","text_200_percent"],
       "completed_surface_ids": [],
-      "pending_surface_ids": ["deck_list_create","deck_generate","deck_import","deck_details","deck_workshop","deck_optimize_preview","deck_sample_hand","battle_replays","battle_live","battle_coach"],
+      "pending_surface_ids": ["deck_list_create","deck_generate","deck_import","deck_details","deck_workshop","deck_optimize_preview","deck_sample_hand","battle_replays","play_vs_ai"],
       "critical_surfaces": [
         {
           "id": "deck_list_create",
@@ -114,20 +114,12 @@
           "required_states": ["empty","setup","replay","timeout","recoverable_error"]
         },
         {
-          "id": "battle_live",
+          "id": "play_vs_ai",
           "domain": "battle",
-          "routes": ["/decks/:id/battle-live/:jobId"],
-          "sources": ["lib/features/battle/screens/battle_live_spectator_screen.dart"],
-          "automated_tests": ["test/features/battle/screens/battle_live_spectator_screen_test.dart"],
-          "required_states": ["waiting","active","reconnect","timeout","completed"]
-        },
-        {
-          "id": "battle_coach",
-          "domain": "battle",
-          "routes": ["/decks/:id/battle-coach","/decks/:id/battle-coach/:sessionId"],
+          "routes": ["/decks/:id/play-vs-ai","/decks/:id/play-vs-ai/:sessionId"],
           "sources": ["lib/features/battle/screens/battle_coach_screen.dart"],
           "automated_tests": ["test/features/battle/screens/battle_coach_screen_test.dart"],
-          "required_states": ["welcome","decision_prompt","recoverable_error","action_progress","terminal_replay"]
+          "required_states": ["welcome","own_hand","legal_card_action","decision_prompt","recoverable_error","action_progress","terminal_replay","rematch"]
         }
       ]
     },

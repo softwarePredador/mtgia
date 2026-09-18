@@ -196,7 +196,7 @@ PY
   curl -fsS --max-time 3 \
     "http://127.0.0.1:$image_port/visual_fixture_arcane_ring.webp" >/dev/null
 
-  print_header "Battle Coach automated UI evidence"
+  print_header "Play vs AI automated UI evidence"
   (
     cd "$ROOT_DIR/app"
     "$FLUTTER_BIN" analyze \
@@ -212,7 +212,7 @@ PY
       --no-pub --no-version-check --reporter compact
   )
 
-  print_header "Battle Coach $MANALOOM_ATTESTED_ANDROID_KIND Android runtime capture"
+  print_header "Play vs AI $MANALOOM_ATTESTED_ANDROID_KIND Android runtime capture"
   set +e
   (
     cd "$ROOT_DIR/app"
@@ -234,7 +234,7 @@ PY
   status="${PIPESTATUS[0]}"
   set -e
   if [[ "$status" -ne 0 ]]; then
-    echo "Battle Coach runtime proof failed; no evidence was approved" >&2
+    echo "Play vs AI runtime proof failed; no evidence was approved" >&2
     exit "$status"
   fi
 
@@ -698,6 +698,9 @@ case "$MODE" in
   --check)
     verify_current_evidence
     ;;
+  --capture-play-vs-ai)
+    capture_battle_coach
+    ;;
   --capture-battle-coach)
     capture_battle_coach
     ;;
@@ -713,8 +716,9 @@ case "$MODE" in
   -h|--help|help)
     printf '%s\n' \
       "usage: $0 --check" \
-      "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-battle-coach" \
-      "       [MANALOOM_CHROMEDRIVER_BIN=<path>] $0 --capture-battle-live-web" \
+      "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-play-vs-ai" \
+      "       $0 --capture-battle-coach  # legacy alias" \
+      "       [MANALOOM_CHROMEDRIVER_BIN=<path>] $0 --capture-battle-live-web  # internal evidence only" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-core-product" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
     ;;

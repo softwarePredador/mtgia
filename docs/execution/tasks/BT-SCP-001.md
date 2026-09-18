@@ -34,10 +34,82 @@
 - Classe(s) de fechamento: `LOCAL_CODE`, `DISPOSABLE_PG` e
   `RELEASE_READ_ONLY` somente quando os respectivos gates forem executados
 - Autorização máxima: código e documentação local, PostgreSQL loopback descartável, commits e push desta branch; nenhum PR/merge, deploy, migration ou DML live, capability ON, pin, regra ou deck
-- Estado desta ficha: `OPENED_NOT_IMPLEMENTED`; nenhuma cláusula de aceite foi
-  reivindicada por esta abertura
+- Estado desta ficha: `IN_PROGRESS_CONTAINED`; implementação e prova focal de
+  runtime existem, mas gate amplo, clean-SHA, auditoria e fechamento canônico
+  continuam pendentes
 
 ## Resultado desta execução
+
+### Consolidação herdada autorizada em 2026-09-09
+
+- Owner único: `/root`; WIP `1`, sem subagentes de Desenvolvimento. Auditorias
+  coordenadas pela gerência são somente leitura. Nenhum novo ID funcional foi
+  aberto, e o aceite canônico de `BT-SCP-001` continua pendente.
+- Base atual do principal: `354983a1e8a37f8fe1139b6282ca9e909a4f886d`, tree
+  `bcaf98d1c839ad7ba867ad3d7846097bcf7f9fe2`. Home/UX e recovery isolados não
+  foram importados. O pacote é de consolidação do trabalho já existente,
+  não um fechamento de Battle, MVP ou release.
+- Destino enumerado: `271` paths herdados (`94` fontes/testes/contratos,
+  `5` gerados modificados e `172` evidências históricas). A única fonte extra
+  da revisão inicial foi `server/test/authenticated_visual_fixture_contract_test.dart`,
+  teste existente necessário à segurança dos dois harnesses. O ajuste P0
+  descrito abaixo acrescentou somente seu runner; total `273`, índice vazio.
+- Preservação durável fora de `/tmp`: checkpoint privado
+  `main-consolidation/20260909.SkxWdq9c`; backup verificado
+  `backup-receipt.json` SHA-256
+  `1960af763fbcf2f886a3b1476ca23d79cd69c7598b16ffe63cb23c8896f40083`.
+  O índice `historical-evidence-172.json`, SHA-256
+  `4b9b11d78ac8d6d93c2ebb81ecc131165a8cc1e4b80e7af1234a62669f65f537`,
+  mantém origem/hashes de todos os artefatos antigos. Nada recebe reetiquetagem
+  como prova nova; `current` só será substituído por captura runtime fresca.
+- Revisão mínima dos scripts `manaloom_authenticated_visual_qa_isolated.sh`
+  e `manaloom_server_contract_e2e_isolated.sh`: coordenadas PG literais
+  loopback, neutralização de serviços/endereço herdados do libpq, segredo
+  somente no ambiente dos consumers, bootstrap do CLI pinado antes de iniciar
+  runtime, ownership/cancelamento do grupo de build e restauração dos outputs
+  PRE ignorados. Cleanup falho ou receipt ausente/divergente não vira PASS.
+- Prova focal `fixture-safety-r3`: `27/27`, zero SKIP; analyze, bash-n,
+  diff-check e scan focal de segredos verdes. Receipt externo SHA-256
+  `41c6b0994d128a4b32bc80461499eb52ac992f46d81b92f1066fb0898fd45015`;
+  log dos testes SHA-256
+  `6eafb453e77ac50afd29a150a67be86c10862dad22b354a6d267c6ef60dfec16`.
+  R1 (escaping no teste) e R2 (`ps` bloqueado pela sandbox macOS) permanecem
+  NON_PASS históricos. O focal usa stubs/processos locais, não prova PG/UI.
+- Reauditoria do focal identificou que uma asserção Bash podia ser mascarada
+  pelo `printf` seguinte. Corrigido somente `]]; printf` para `]] && printf`,
+  sem alterar novamente os harnesses. R4 repetiu `27/27`, análise e cleanup
+  com exit `0`; teste SHA-256
+  `e972f207dda62ee9af8663d9d7887ccde03cba462495ed9d9277ca9c1dbbedfd`,
+  log SHA-256
+  `48cabafbdc7bda7deefadc6b4e42faf152b06516d62a0a6fe3bcdd872009e91d`.
+  R3 permanece histórico com essa limitação; R4 aguarda o parecer dirigido.
+- Gerência ratificou `GO_HARNESS_SAFETY_DELTA_AUDITED` para R4. Os receipts
+  originais permanecem imutáveis; o parecer cobre só o delta de segurança,
+  não PG/UI/release. Os dois harnesses e o focal R4 não mudaram depois do GO.
+- `GO_FIX_P0_CAPTURE_TOOLCHAIN_BINDING_MINIMAL`: o runner
+  `scripts/manaloom_p0_runtime_capture.sh` passou a consumir o resolver/par
+  versionado de Flutter/Dart, eliminando a fixação ao SDK compartilhado e ao
+  wrapper `bin/dart`. O processo de captura usará explicitamente o SDK lateral
+  aprovado. Contrato em `server/test/flutter_release_sdk_contract_test.dart`
+  (já herdado): overrides, Dart real do mesmo SDK e negação de root inválido;
+  `8/8`, análise, bash-n e diff-check com exit `0`. Sem mudança de pin, helper,
+  policy, roteiros ou outputs visuais.
+- A geração R4 terminou `NON_PASS`, exit `2`, antes de produzir gerados:
+  fonte global do cache divergiu em `24` arquivos intermediários JNI `.cxx`.
+  Os cinco locks e o seed do cache privado previamente aprovado permaneceram
+  idênticos. Preparação proporcional: usar esse seed privado como fonte
+  somente leitura e criar outro cache independente pelo launcher canônico;
+  não reetiquetar marcador nem alterar cache global/SDK compartilhados.
+- Próximo marco: auditoria dirigida, freeze, geração oficial e campanha local
+  de `23/23` manifests e `439/439` PNGs novos no mesmo UI digest, todos abertos
+  pelos revisores designados. A policy inclui emulador Android (`54`) e Web
+  real (`385`); físico, TalkBack e teclado humano não recebem PASS implícito.
+- Veredito corrente: `INHERITED_CONSOLIDATION_NOT_READY`. Os PASS focais de
+  agosto registrados abaixo continuam vinculados somente aos seus snapshots;
+  não comprovam o checkout atual. Commit/push normais dependem dos gates e da
+  auditoria exata do índice. Fechamento canônico SCP exigirá aceite separado.
+- Capabilities de produto continuam `29/29 OFF`; nenhum deploy, DML/migration
+  live, sincronização, pin ou runtime publicado foi alterado nesta retomada.
 
 ### Dentro do escopo pretendido
 
@@ -47,6 +119,9 @@
   PostgreSQL, fila, worker ou provider externo.
 - Provar que o app apresenta e roteia somente superfícies permitidas pelo
   snapshot válido recebido do backend.
+- Aplicar a decisão do ADR 0013 sem abrir Battle: remover a rota pública de
+  espectador, tornar Jogar contra IA a única direção interativa guardada e
+  impedir fallback para Forge/simulação/replay quando o XMage estiver bloqueado.
 - Manter `account_registration` separada e `OFF`, sem transformar login,
   recuperação ou privacidade de contas existentes em capability de produto.
 - Ligar a matriz à release identity da mesma revisão e manter
@@ -56,6 +131,10 @@
 ### Fora do escopo
 
 - Ligar qualquer capability ou alterar a oferta gratuita sem comércio.
+- Fechar canonicamente partida real completa, capacidade Battle ou prontidão
+  de coorte; a execução focal autorizada pelo usuário serve como evidência
+  suplementar da superfície app-facing, sem mover `BT-PLAY-002`, `BT-BAT-010`
+  ou sucessores.
 - Declarar produção same-SHA sem observação read-only da revisão publicada.
 - Fazer deploy, migration/DML live, criar conta, promover deck/regra, atualizar
   XMage/Forge ou seus pins, ou iniciar outra task funcional.
@@ -69,6 +148,23 @@
   promoção funcional.
 - Evidência baseline: `server/config/release_capabilities.json`, SHA-256
   `ace782b3969a9ba5a2691f5ca3d97360927919739cd16c796d7b36e8124d754d`.
+
+### Delta implementado nesta execução
+
+- A policy e os consumers preservam 29/29 capabilities `OFF`, com cadastro
+  novo separado de login/recuperação de conta existente.
+- A superfície Battle pública foi reduzida a **Jogar contra IA** atrás da
+  capability técnica legada `battle_coach`; Battle Live ficou sem rota/CTA de
+  produto.
+- A rota canônica é `/decks/:id/play-vs-ai[/sessionId]`; rotas Coach antigas
+  são redirects de compatibilidade.
+- A mesa apresenta mão própria, campo, pilha e ações tipadas card-first; opção
+  ambígua não dispara ação e indisponibilidade XMage falha fechada sem Forge,
+  simulação ou replay substituto.
+- Um runner isolado passou a provar API, PostgreSQL, XMage pinado, replay,
+  Flutter Web release, reconexão, terminal, rematch e cleanup no mesmo fluxo.
+- Nenhum pin, migration, DML live, capability, deck/regra de produto, deploy ou
+  runtime publicado foi alterado.
 
 ## Critérios de entrada
 
@@ -170,40 +266,53 @@
 
 ## Gates executados
 
+Tabela histórica de agosto; não atribuir crédito ao pacote de setembro sem
+reexecução aplicável e prova vinculada ao digest congelado.
+
 | Gate | Comando | Esperado | Real | Exit | SHA | Artefato/hash |
 | --- | --- | --- | --- | ---: | --- | --- |
 | Baseline herdado | `./scripts/manaloom_local_ci.sh full` | baseline saudável antes da task | `PASS`; nenhuma implementação de `BT-SCP-001` atribuída | `0` | `d9f7a59cd87d032df3d076c35ffbdb17e41525a6` | receipt de `BT-DOC-004` |
-| Focais `BT-SCP-001` | a definir após reproduzir o gap | `PASS` | não executado | — | — | — |
+| Contrato Play/XMage | `cd server && dart test test/xmage_interactive_release_contract_test.dart` | `PASS` | rodada anterior `14/14`; refresh após regressão SQL pendente | — | worktree | teste focal |
+| UI policy | `cd app && flutter test test/ui/ui_live_evidence_policy_test.dart` | `PASS` | `4/4` | `0` | worktree | policy executável |
+| Mesa Jogar contra IA | `cd app && flutter test test/features/battle/screens/battle_coach_screen_test.dart` | `PASS` | `27/27` | `0` | worktree | widget/semântica/ações |
+| Analyzer focal | Flutter analyzer nos sources Battle alterados | `PASS` | sem issues | `0` | worktree | saída local |
+| E2E XMage + browser | `MANALOOM_PLAY_VS_AI_BROWSER_QA=1 ./scripts/manaloom_play_vs_ai_e2e.sh` com confirmações descartáveis | `PASS` | `PASS`; 3 níveis UI, replay/PG e cleanup | `0` | UI digest `a81e8c2a…` | relatório `20260825T193821Z_67071_13837` |
+| Project logic / full / schema | comandos de fechamento | `PASS` | pendente desta consolidação | — | — | — |
 
 ## Receipts
 
 | Contrato | Producer | Status | Path/hash | Durável | Bindings revisados |
 | --- | --- | --- | --- | --- | --- |
 | Baseline policy | repository | observado | `server/config/release_capabilities.json` · `ace782b3969a…` | yes | revisão baseline |
-| `BT-SCP-001` | `/root` | não emitido | será definido no fechamento | yes | SHA/digest/target obrigatórios |
+| Play vs AI focal | `/root` | `PASS_FOCAL_NOT_TASK_CLOSURE` | `docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md` | yes | worktree/UI digest/bundle/pins/target |
+| `BT-SCP-001` | `/root` | fechamento pendente | será emitido depois de full, clean-SHA e auditoria | yes | SHA/digest/target obrigatórios |
 
 ## Aceite canônico
 
 | Cláusula resolvida do registry | Evidência nesta abertura |
 | --- | --- |
-| Flag ausente/inválida fica OFF | pendente de testes focais e integrados |
-| API nega antes de PG | pendente de prova de ordem e failure injection |
-| App só apresenta o permitido | pendente de provider/guard/runtime aplicável |
-| Cadastro novo separado e OFF | baseline observado; aceite integrado pendente |
+| Flag ausente/inválida fica OFF | implementado em parsers/providers e negativos; gate amplo ainda pendente |
+| API nega antes de PG | testes de policy/rotas e fixture isolada exercitam default-deny; full ainda pendente |
+| App só apresenta o permitido | guards/rotas atualizados e Web real comprovou a superfície permitida no snapshot isolado |
+| Cadastro novo separado e OFF | policy/app mantêm chave própria; conta descartável só foi criada com policy isolada explícita |
 | Same-SHA registra a matriz | pendente de receipt de release identity |
-| Três eixos permanecem distintos | baseline observado; negativos pendentes |
+| Três eixos permanecem distintos | report mantém implementação funcional, capability `OFF`, live desconhecido e `release_ready=false` |
 
 ## Fechamento
 
-- Resultado E2E estrito: `n/a` nesta abertura sem implementação
+- Resultado E2E estrito: `PASS` focal em ambiente loopback descartável; não é
+  fechamento da task nem release
 - Gate-eligible: `false`
 - Release identity: produção não reobservada; último estado conhecido
   `SERVER_BEHIND`
-- Bloqueios: nenhum para iniciar após publicar o fechamento de `BT-DOC-004`
-- Riscos residuais: todos os riscos desta task permanecem abertos
-- Rollback verificado: `no`; implementação ainda não iniciada
+- Bloqueios: project logic, gates amplo/schema, secret scan, clean-SHA,
+  auditoria independente e receipt final
+- Riscos residuais: aggregate UI global stale, Android físico,
+  teclado/TalkBack e todos os P0/rollout Battle continuam abertos
+- Rollback verificado: cleanup do runtime descartável passou sem kill forçado;
+  rollback Git será registrado após o commit focal
 - Auditor independente: `pending`
-- Veredito da execução: `DEFERRED_BY_SCOPE` somente para esta etapa de abertura;
-  o estado canônico continua no backlog
+- Veredito da execução: `IN_PROGRESS_CONTAINED`; o estado canônico continua no
+  backlog até todos os gates de `BT-SCP-001` fecharem
 - Commit que atualiza o estado canônico: `pending`
 - Próximo ID elegível depois do fechamento: `BT-OFFER-001`

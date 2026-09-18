@@ -533,6 +533,10 @@ class BattleReplayReadService {
         'engine_version': gameLogMap['engine_version'],
       if (gameLogMap['engine_commit'] != null)
         'engine_commit': gameLogMap['engine_commit'],
+      if (gameLogMap['engine_patch_commit'] != null)
+        'engine_patch_commit': gameLogMap['engine_patch_commit'],
+      if (gameLogMap['ai_profile'] != null)
+        'ai_profile': gameLogMap['ai_profile'],
       if (learningContract.isNotEmpty) 'learning_contract': learningContract,
       'replay_security': battleReplaySecurityContract,
       'simulation_contract': _simulationContract(

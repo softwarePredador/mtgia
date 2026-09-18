@@ -22,7 +22,6 @@ import '../services/battle_job_series_runner.dart';
 import '../services/battle_post_report_service.dart';
 import '../services/battle_replay_service.dart';
 import '../utils/battle_runtime_presentation.dart';
-import 'battle_live_spectator_screen.dart';
 
 String battleReplaysRouteLocation(String deckId, {String? replayId}) {
   final base = '/decks/${Uri.encodeComponent(deckId)}/battle-replays';
@@ -31,7 +30,7 @@ String battleReplaysRouteLocation(String deckId, {String? replayId}) {
   return '$base?replay=${Uri.encodeQueryComponent(normalizedReplayId)}';
 }
 
-enum BattleOpponentPickerMode { simulation, coach }
+enum BattleOpponentPickerMode { simulation, playVsAi }
 
 Future<BattleTestSetup?> showBattleOpponentPicker({
   required BuildContext context,
@@ -53,7 +52,7 @@ Future<BattleTestSetup?> showBattleOpponentPicker({
 
 enum _ReplayDetailView { timeline, decisions }
 
-enum _BattleExecutionKind { consistency, synchronousBattle, liveBattle }
+enum _BattleExecutionKind { consistency, matchupSimulation, batchSeries }
 
 class _BattleExecutionContext {
   const _BattleExecutionContext({required this.kind, this.opponentLabel});
@@ -74,7 +73,7 @@ class BattleReplaysScreen extends StatefulWidget {
     this.gateway,
     this.jobGateway,
     this.initialReplayId,
-    this.battleLiveEnabled = false,
+    this.battleBatchEnabled = false,
     this.interactiveBattleEnabled = false,
   });
 
@@ -82,7 +81,7 @@ class BattleReplaysScreen extends StatefulWidget {
   final BattleReplayGateway? gateway;
   final BattleJobGateway? jobGateway;
   final String? initialReplayId;
-  final bool battleLiveEnabled;
+  final bool battleBatchEnabled;
   final bool interactiveBattleEnabled;
 
   @override
@@ -95,15 +94,12 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   bool _isLoading = true;
   bool _isRunning = false;
-  bool _isStartingLive = false;
-  bool _jobsLoading = false;
+  bool _isRunningSeries = false;
   int _deckLoadEpoch = 0;
   int _replayLoadEpoch = 0;
   String? _handledRouteReplayId;
   String? _error;
-  String? _jobsError;
   List<BattleReplaySummary> _replays = const <BattleReplaySummary>[];
-  List<BattleJob> _jobs = const <BattleJob>[];
   BattleReplayDetail? _selectedReplay;
   _ReplayDetailView _detailView = _ReplayDetailView.timeline;
   BattlePostReport? _comparisonBaseline;
@@ -119,8 +115,6 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   String? _historyNextCursor;
   bool _historyHasMore = false;
   bool _historyLoadingMore = false;
-  String? _pendingLiveRequestFingerprint;
-  String? _pendingLiveIdempotencyKey;
   BattleJobSeriesProgress? _seriesProgress;
   BattleJobSeriesCancellation? _seriesCancellation;
   String? _seriesError;
@@ -132,9 +126,6 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     _gateway = widget.gateway ?? BattleReplayService();
     _jobGateway = widget.jobGateway ?? BattleJobGateway();
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadReplays());
-    if (widget.battleLiveEnabled) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _loadJobs());
-    }
   }
 
   @override
@@ -145,20 +136,11 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         unawaited(_loadReplays());
-        if (widget.battleLiveEnabled) unawaited(_loadJobs());
       });
       return;
     }
-    if (oldWidget.battleLiveEnabled != widget.battleLiveEnabled) {
-      if (widget.battleLiveEnabled) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) unawaited(_loadJobs());
-        });
-      } else {
-        _jobsLoading = false;
-        _jobsError = null;
-        _jobs = const <BattleJob>[];
-      }
+    if (oldWidget.battleBatchEnabled && !widget.battleBatchEnabled) {
+      _seriesCancellation?.requestCancellation();
     }
     final previousReplayId = _normalizedReplayId(oldWidget.initialReplayId);
     final nextReplayId = _normalizedReplayId(widget.initialReplayId);
@@ -175,17 +157,15 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   }
 
   void _resetForDeckChange() {
+    _seriesCancellation?.requestCancellation();
     _deckLoadEpoch += 1;
     _replayLoadEpoch += 1;
     _isLoading = true;
     _isRunning = false;
-    _isStartingLive = false;
-    _jobsLoading = widget.battleLiveEnabled;
+    _isRunningSeries = false;
     _handledRouteReplayId = null;
     _error = null;
-    _jobsError = null;
     _replays = const <BattleReplaySummary>[];
-    _jobs = const <BattleJob>[];
     _selectedReplay = null;
     _detailView = _ReplayDetailView.timeline;
     _comparisonBaseline = null;
@@ -201,8 +181,6 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     _historyNextCursor = null;
     _historyHasMore = false;
     _historyLoadingMore = false;
-    _pendingLiveRequestFingerprint = null;
-    _pendingLiveIdempotencyKey = null;
     _seriesProgress = null;
     _seriesCancellation = null;
     _seriesError = null;
@@ -326,46 +304,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
-  Future<void> _loadJobs({bool quiet = false}) async {
-    if (!widget.battleLiveEnabled) return;
-    final deckId = widget.deckId;
-    final deckLoadEpoch = _deckLoadEpoch;
-    if (!quiet) {
-      setState(() {
-        _jobsLoading = true;
-        _jobsError = null;
-      });
-    }
-    try {
-      final jobs = await _jobGateway.list(limit: 8, deckId: deckId);
-      if (!mounted ||
-          deckLoadEpoch != _deckLoadEpoch ||
-          widget.deckId != deckId) {
-        return;
-      }
-      setState(() {
-        _jobs = jobs;
-        _jobsLoading = false;
-        _jobsError = null;
-      });
-    } catch (error) {
-      if (!mounted ||
-          deckLoadEpoch != _deckLoadEpoch ||
-          widget.deckId != deckId) {
-        return;
-      }
-      setState(() {
-        _jobsLoading = false;
-        _jobsError = _friendlyJobError(error);
-      });
-    }
-  }
-
-  Future<void> _refreshAll() async {
-    final refreshes = <Future<void>>[_loadReplays()];
-    if (widget.battleLiveEnabled) refreshes.add(_loadJobs());
-    await Future.wait(refreshes);
-  }
+  Future<void> _refreshAll() => _loadReplays();
 
   Future<void> _openReplay(BattleReplaySummary summary) async {
     await _openReplayId(summary.id);
@@ -450,23 +389,20 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
   Future<void> _runBattle() async {
     BattleOpponentDeck? opponent;
     final setup = await _askBattleTestSetup(
-      allowSeries: widget.battleLiveEnabled,
+      allowSeries: widget.battleBatchEnabled,
       onOpponentResolved: (value) => opponent = value,
     );
     if (setup == null || setup.opponentDeckId.trim().isEmpty) return;
 
     final execution = _BattleExecutionContext(
-      kind: widget.battleLiveEnabled
-          ? _BattleExecutionKind.liveBattle
-          : _BattleExecutionKind.synchronousBattle,
+      kind: setup.seriesSize.isSeries
+          ? _BattleExecutionKind.batchSeries
+          : _BattleExecutionKind.matchupSimulation,
       opponentLabel: opponent?.name ?? 'Deck selecionado',
     );
-    if (widget.battleLiveEnabled) {
-      if (setup.seriesSize.isSeries) {
-        await _runLiveSeries(setup, execution);
-      } else {
-        await _runLiveBattle(setup, execution);
-      }
+    if (setup.seriesSize.isSeries) {
+      if (!widget.battleBatchEnabled) return;
+      await _runBatchSeries(setup, execution);
       return;
     }
     await _runSimulation(
@@ -475,122 +411,68 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     );
   }
 
-  void _openBattleCoach() {
-    if (!widget.interactiveBattleEnabled) return;
-    context.push('/decks/${Uri.encodeComponent(widget.deckId)}/battle-coach');
-  }
-
-  Future<void> _runLiveBattle(
+  Future<void> _runBatchSeries(
     BattleTestSetup setup,
     _BattleExecutionContext execution,
   ) async {
-    if (!widget.battleLiveEnabled) return;
-    final requestFingerprint = jsonEncode({
-      'deck_id': widget.deckId,
-      ...setup.toRequestJson(),
-    });
-    final idempotencyKey =
-        _pendingLiveRequestFingerprint == requestFingerprint &&
-            _pendingLiveIdempotencyKey != null
-        ? _pendingLiveIdempotencyKey!
-        : ApiClient.generateRequestId();
-    _pendingLiveRequestFingerprint = requestFingerprint;
-    _pendingLiveIdempotencyKey = idempotencyKey;
-    _beginExecution(execution);
-    setState(() {
-      _isStartingLive = true;
-      _jobsError = null;
-    });
-    try {
-      final creation = await _jobGateway.create(
-        BattleJobCreateRequest(
-          deckId: widget.deckId,
-          setup: setup,
-          idempotencyKey: idempotencyKey,
-        ),
-      );
-      if (!mounted) return;
-      _pendingLiveRequestFingerprint = null;
-      _pendingLiveIdempotencyKey = null;
-      setState(() {
-        _isStartingLive = false;
-        _activeExecution = null;
-        _jobs = [
-          creation.job,
-          ..._jobs.where((job) => job.jobId != creation.job.jobId),
-        ];
-      });
-      await context.push<void>(
-        battleLiveRouteLocation(widget.deckId, creation.job.jobId),
-      );
-      if (mounted) unawaited(_loadJobs(quiet: true));
-    } catch (error) {
-      if (!mounted) return;
-      setState(() {
-        _isStartingLive = false;
-        _activeExecution = null;
-        _jobsError = _friendlyJobError(error);
-      });
-    }
-  }
-
-  Future<void> _runLiveSeries(
-    BattleTestSetup setup,
-    _BattleExecutionContext execution,
-  ) async {
-    if (!widget.battleLiveEnabled) return;
+    if (!widget.battleBatchEnabled || !setup.seriesSize.isSeries) return;
     final cancellation = BattleJobSeriesCancellation();
     final runner = BattleJobSeriesRunner(gateway: _jobGateway);
     final seriesId = ApiClient.generateRequestId();
+    final deckId = widget.deckId;
+    final deckLoadEpoch = _deckLoadEpoch;
     _beginExecution(execution);
     setState(() {
-      _isStartingLive = true;
+      _isRunningSeries = true;
       _seriesCancellation = cancellation;
       _seriesProgress = null;
       _seriesError = null;
-      _jobsError = null;
     });
 
     void updateSeries(BattleJobSeriesProgress progress) {
-      if (!mounted) return;
-      final seriesJobs = progress.attempts.map((attempt) => attempt.job);
-      final seriesJobIds = seriesJobs.map((job) => job.jobId).toSet();
-      setState(() {
-        _seriesProgress = progress;
-        _jobs = [
-          ...seriesJobs.toList().reversed,
-          ..._jobs.where((job) => !seriesJobIds.contains(job.jobId)),
-        ];
-      });
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
+      setState(() => _seriesProgress = progress);
     }
 
     try {
       final result = await runner.run(
         seriesId: seriesId,
-        deckId: widget.deckId,
+        deckId: deckId,
         setup: setup,
         cancellation: cancellation,
         onProgress: updateSeries,
       );
-      if (!mounted) return;
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
-        _isStartingLive = false;
+        _isRunningSeries = false;
         _activeExecution = null;
         _seriesProgress = result;
         _seriesCancellation = null;
       });
       final message = result.cancellationRequested
-          ? 'Série interrompida. Jobs já criados continuam no histórico.'
+          ? 'Série interrompida. As tentativas já criadas permanecem no histórico.'
           : 'Série encerrada: ${result.terminalCount}/${result.total} '
-                'tentativas finalizadas. Confira cada status.';
+                'tentativas finalizadas. Confira cada resultado.';
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
-      unawaited(_loadJobs(quiet: true));
+      unawaited(_loadReplays(quiet: true));
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted ||
+          deckLoadEpoch != _deckLoadEpoch ||
+          widget.deckId != deckId) {
+        return;
+      }
       setState(() {
-        _isStartingLive = false;
+        _isRunningSeries = false;
         _activeExecution = null;
         _seriesCancellation = null;
         _seriesError = _friendlyJobError(error);
@@ -598,25 +480,24 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
     }
   }
 
-  void _cancelLiveSeries() {
+  void _cancelBatchSeries() {
     final cancellation = _seriesCancellation;
     if (cancellation == null || cancellation.isCancellationRequested) return;
     cancellation.requestCancellation();
     setState(() {});
   }
 
-  void _dismissLiveSeries() {
-    if (_isStartingLive) return;
+  void _dismissBatchSeries() {
+    if (_isRunningSeries) return;
     setState(() {
       _seriesProgress = null;
       _seriesError = null;
     });
   }
 
-  Future<void> _openLiveJob(BattleJob job) async {
-    if (!widget.battleLiveEnabled) return;
-    await context.push<void>(battleLiveRouteLocation(widget.deckId, job.jobId));
-    if (mounted) unawaited(_loadJobs(quiet: true));
+  void _openPlayVsAi() {
+    if (!widget.interactiveBattleEnabled) return;
+    context.push('/decks/${Uri.encodeComponent(widget.deckId)}/play-vs-ai');
   }
 
   Future<void> _runSimulation(
@@ -843,11 +724,12 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   String _friendlyJobError(Object error) {
     if (error is BattleJobGatewayException) return error.message;
-    return 'Não foi possível atualizar os Battles ao vivo.';
+    return 'Não foi possível executar a série de simulações.';
   }
 
   @override
   Widget build(BuildContext context) {
+    final isBusy = _isRunning || _isRunningSeries;
     return Scaffold(
       key: const Key('battle-replays-screen'),
       appBar: AppBar(
@@ -857,7 +739,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
             key: const Key('battle-replays-refresh-button'),
             tooltip: 'Atualizar',
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: _isRunning || _isStartingLive ? null : _refreshAll,
+            onPressed: isBusy ? null : _refreshAll,
           ),
         ],
       ),
@@ -871,32 +753,22 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
             child: Column(
               children: [
                 _BattleReplayActions(
-                  isRunning: _isRunning || _isStartingLive,
+                  isRunning: isBusy,
                   onRunGoldfish: _runGoldfish,
                   onRunBattle: _runBattle,
                   onOpenCoach: widget.interactiveBattleEnabled
-                      ? _openBattleCoach
+                      ? _openPlayVsAi
                       : null,
                 ),
                 if (_seriesProgress != null || _seriesError != null)
-                  _BattleSeriesProgressPanel(
+                  _BattleBatchSeriesProgressPanel(
                     progress: _seriesProgress,
                     error: _seriesError,
-                    running: _isStartingLive,
+                    running: _isRunningSeries,
                     cancellationRequested:
                         _seriesCancellation?.isCancellationRequested ?? false,
-                    onCancel: _cancelLiveSeries,
-                    onDismiss: _dismissLiveSeries,
-                  ),
-                if (widget.battleLiveEnabled &&
-                    _seriesProgress == null &&
-                    _seriesError == null)
-                  _BattleLiveJobStrip(
-                    jobs: _jobs,
-                    loading: _jobsLoading,
-                    error: _jobsError,
-                    onRetry: _loadJobs,
-                    onOpen: _openLiveJob,
+                    onCancel: _cancelBatchSeries,
+                    onDismiss: _dismissBatchSeries,
                   ),
                 Expanded(child: _buildBody()),
               ],
@@ -909,7 +781,7 @@ class _BattleReplaysScreenState extends State<BattleReplaysScreen> {
 
   Widget _buildBody() {
     final activeExecution = _activeExecution;
-    if (activeExecution != null && (_isRunning || _isStartingLive)) {
+    if (activeExecution != null && (_isRunning || _isRunningSeries)) {
       return _BattleExecutionPanel(
         execution: activeExecution,
         seriesProgress: _seriesProgress,
@@ -1476,12 +1348,12 @@ class _BattleOpponentPickerDialogState
   bool _isLoading = true;
   bool _showTechnicalId = false;
   bool _isCheckingPreflight = false;
+  int _preflightRequestGeneration = 0;
   String? _error;
   String? _manualError;
   String? _selectedDeckId;
   String? _preflightOpponentId;
   BattlePreflight? _preflight;
-  BattlePreflight? _automaticFallbackPreflight;
   BattleTestObjective _objective = BattleTestObjective.general;
   BattleSeriesSize _seriesSize = BattleSeriesSize.single;
   List<BattleOpponentDeck> _decks = const <BattleOpponentDeck>[];
@@ -1494,6 +1366,7 @@ class _BattleOpponentPickerDialogState
 
   @override
   void dispose() {
+    _preflightRequestGeneration += 1;
     _searchController.dispose();
     _technicalIdController.dispose();
     _focusCardsController.dispose();
@@ -1552,10 +1425,10 @@ class _BattleOpponentPickerDialogState
   }
 
   Future<BattlePreflight?> _loadPreflight(String opponentDeckId) async {
+    final requestGeneration = ++_preflightRequestGeneration;
     setState(() {
       _isCheckingPreflight = true;
       _preflight = null;
-      _automaticFallbackPreflight = null;
       _preflightOpponentId = opponentDeckId;
       _manualError = null;
     });
@@ -1563,30 +1436,24 @@ class _BattleOpponentPickerDialogState
       final result = await widget.gateway.loadBattlePreflight(
         deckId: widget.currentDeckId,
         opponentDeckId: opponentDeckId,
-        interactive: widget.mode == BattleOpponentPickerMode.coach,
+        interactive: widget.mode == BattleOpponentPickerMode.playVsAi,
       );
-      BattlePreflight? automaticFallback;
-      if (widget.mode == BattleOpponentPickerMode.coach &&
-          !result.canStartInteractive &&
-          result.blockers.contains('engine_coverage_incomplete')) {
-        try {
-          automaticFallback = await widget.gateway.loadBattlePreflight(
-            deckId: widget.currentDeckId,
-            opponentDeckId: opponentDeckId,
-          );
-        } on Object {
-          automaticFallback = null;
-        }
+      if (!mounted ||
+          requestGeneration != _preflightRequestGeneration ||
+          _preflightOpponentId != opponentDeckId) {
+        return null;
       }
-      if (!mounted || _preflightOpponentId != opponentDeckId) return null;
       setState(() {
         _preflight = result;
-        _automaticFallbackPreflight = automaticFallback;
         _isCheckingPreflight = false;
       });
       return result;
     } catch (error) {
-      if (!mounted || _preflightOpponentId != opponentDeckId) return null;
+      if (!mounted ||
+          requestGeneration != _preflightRequestGeneration ||
+          _preflightOpponentId != opponentDeckId) {
+        return null;
+      }
       setState(() {
         _isCheckingPreflight = false;
         _manualError = error is BattleReplayException
@@ -1597,9 +1464,14 @@ class _BattleOpponentPickerDialogState
     }
   }
 
-  Future<void> _submit({
-    BattleTestLaunchMode launchMode = BattleTestLaunchMode.automatic,
-  }) async {
+  void _cancelPreflightCheck() {
+    _preflightRequestGeneration += 1;
+    _isCheckingPreflight = false;
+    _preflight = null;
+    _preflightOpponentId = null;
+  }
+
+  Future<void> _submit() async {
     final opponentDeckId = _showTechnicalId
         ? _technicalIdController.text.trim()
         : _selectedDeckId?.trim() ?? '';
@@ -1610,20 +1482,9 @@ class _BattleOpponentPickerDialogState
       return;
     }
 
-    final automaticFallback =
-        launchMode == BattleTestLaunchMode.automatic &&
-        widget.mode == BattleOpponentPickerMode.coach;
-    var preflight = _preflightOpponentId == opponentDeckId
-        ? automaticFallback
-              ? _automaticFallbackPreflight
-              : _preflight
-        : null;
-    if (preflight == null && !automaticFallback) {
-      preflight = await _loadPreflight(opponentDeckId);
-    }
-    final canStart = automaticFallback
-        ? preflight?.canStart == true
-        : preflight != null && _preflightCanStart(preflight);
+    var preflight = _preflightOpponentId == opponentDeckId ? _preflight : null;
+    preflight ??= await _loadPreflight(opponentDeckId);
+    final canStart = preflight != null && _preflightCanStart(preflight);
     if (!mounted || !canStart) return;
 
     final focusCards = _focusCardsController.text
@@ -1641,7 +1502,9 @@ class _BattleOpponentPickerDialogState
         opponentDeckId: opponentDeckId,
         objective: _objective,
         seriesSize: _seriesSize,
-        launchMode: launchMode,
+        launchMode: widget.mode == BattleOpponentPickerMode.playVsAi
+            ? BattleTestLaunchMode.interactive
+            : BattleTestLaunchMode.automatic,
         focusCards: focusCards,
       ),
     );
@@ -1650,7 +1513,7 @@ class _BattleOpponentPickerDialogState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isCoach = widget.mode == BattleOpponentPickerMode.coach;
+    final isCoach = widget.mode == BattleOpponentPickerMode.playVsAi;
     final query = _searchController.text;
     final visibleDecks = _decks
         .where((deck) => deck.matches(query))
@@ -1678,14 +1541,11 @@ class _BattleOpponentPickerDialogState
         !_isCheckingPreflight &&
         (_preflightOpponentId != selectedId ||
             (_preflight != null && _preflightCanStart(_preflight!)));
-    final canSimulateAutomatically =
-        isCoach && _automaticFallbackPreflight?.canStart == true;
-
     return AlertDialog(
       key: const Key('battle-opponent-picker-dialog'),
       title: Text(
         isCoach
-            ? 'Escolha o adversário do Battle Coach'
+            ? 'Escolha o adversário controlado pela IA'
             : 'Escolha o deck adversário',
       ),
       content: SizedBox(
@@ -1697,8 +1557,8 @@ class _BattleOpponentPickerDialogState
             children: [
               Text(
                 isCoach
-                    ? 'Selecione o deck adversário. O Coach abrirá '
-                          'uma sessão interativa e pausará nas decisões disponíveis.'
+                    ? 'Selecione o deck adversário. A partida abrirá uma mesa '
+                          'privada para você controlar seu lado do jogo.'
                     : widget.allowSeries
                     ? 'Selecione um deck e quantas tentativas independentes deseja acompanhar.'
                     : 'Selecione um deck seu ou público. O replay será salvo no histórico ao concluir.',
@@ -1752,8 +1612,7 @@ class _BattleOpponentPickerDialogState
                   setState(() {
                     _showTechnicalId = !_showTechnicalId;
                     _manualError = null;
-                    _preflight = null;
-                    _preflightOpponentId = null;
+                    _cancelPreflightCheck();
                   });
                 },
                 icon: Icon(
@@ -1779,13 +1638,10 @@ class _BattleOpponentPickerDialogState
                   enableSuggestions: false,
                   textInputAction: TextInputAction.done,
                   onChanged: (_) {
-                    _preflight = null;
-                    _preflightOpponentId = null;
-                    if (_manualError != null) {
-                      setState(() => _manualError = null);
-                    } else {
-                      setState(() {});
-                    }
+                    setState(() {
+                      _cancelPreflightCheck();
+                      _manualError = null;
+                    });
                   },
                   onSubmitted: (_) => _submit(),
                 ),
@@ -1877,10 +1733,6 @@ class _BattleOpponentPickerDialogState
                 error: _preflightOpponentId == null ? null : _manualError,
                 interactive: isCoach,
               ),
-              if (canSimulateAutomatically) ...[
-                const SizedBox(height: AppTheme.space8),
-                const _BattleAutomaticFallbackMessage(),
-              ],
               const SizedBox(height: AppTheme.space8),
             ],
           ),
@@ -1891,14 +1743,6 @@ class _BattleOpponentPickerDialogState
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancelar'),
         ),
-        if (canSimulateAutomatically)
-          OutlinedButton.icon(
-            key: const Key('battle-opponent-automatic-fallback-button'),
-            onPressed: () =>
-                _submit(launchMode: BattleTestLaunchMode.automatic),
-            icon: const Icon(Icons.smart_display_outlined),
-            label: const Text('Simular automaticamente'),
-          ),
         _BattleOpponentKeyboardFocusHalo(
           haloKey: const Key('battle-opponent-submit-focus-halo'),
           borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -1906,17 +1750,11 @@ class _BattleOpponentPickerDialogState
           builder: (focusNode) => FilledButton.icon(
             key: const Key('battle-opponent-submit-button'),
             focusNode: focusNode,
-            onPressed: canSubmit
-                ? () => _submit(
-                    launchMode: isCoach
-                        ? BattleTestLaunchMode.interactive
-                        : BattleTestLaunchMode.automatic,
-                  )
-                : null,
+            onPressed: canSubmit ? _submit : null,
             icon: const Icon(Icons.play_arrow_rounded),
             label: Text(
               isCoach
-                  ? 'Jogar com Coach'
+                  ? 'Jogar contra IA'
                   : _seriesSize.isSeries
                   ? 'Simular série de ${_seriesSize.count}'
                   : 'Iniciar simulação',
@@ -1928,7 +1766,7 @@ class _BattleOpponentPickerDialogState
   }
 
   bool _preflightCanStart(BattlePreflight value) =>
-      widget.mode == BattleOpponentPickerMode.coach
+      widget.mode == BattleOpponentPickerMode.playVsAi
       ? value.canStartInteractive
       : value.canStart;
 
@@ -2140,42 +1978,6 @@ class _BattleOpponentKeyboardFocusHaloState
   );
 }
 
-class _BattleAutomaticFallbackMessage extends StatelessWidget {
-  const _BattleAutomaticFallbackMessage();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: const Key('battle-automatic-fallback-ready'),
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppTheme.space10),
-      decoration: BoxDecoration(
-        color: AppTheme.frost400.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-        border: Border.all(color: AppTheme.frost400.withValues(alpha: 0.32)),
-      ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            Icons.smart_display_outlined,
-            color: AppTheme.frost400,
-            size: 19,
-          ),
-          SizedBox(width: AppTheme.space8),
-          Expanded(
-            child: Text(
-              'A partida automática está disponível. Você não escolherá as '
-              'jogadas, mas poderá acompanhar e revisar o replay completo.',
-              style: TextStyle(color: AppTheme.textSecondary, height: 1.3),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _BattlePreflightPanel extends StatelessWidget {
   const _BattlePreflightPanel({
     required this.loading,
@@ -2329,7 +2131,7 @@ String _battlePreflightBlockerMessage(
     'opponent_format_invalid':
         'O deck adversário precisa usar o formato Commander',
     'no_available_opponents': 'Nenhum adversário está disponível',
-    'interactive_battle_disabled': 'Battle Coach interativo está desativado',
+    'interactive_battle_disabled': 'Jogar contra IA está desativado',
     'engine_not_configured': 'Motor Battle não está configurado',
     'engine_coverage_incomplete': 'Cartas sem cobertura de regras',
     'engine_coverage_unavailable': 'Motor Battle indisponível',
@@ -2344,10 +2146,7 @@ bool _isUuid(String value) => RegExp(
 ).hasMatch(value);
 
 class _BattleExecutionPanel extends StatelessWidget {
-  const _BattleExecutionPanel({
-    required this.execution,
-    required this.seriesProgress,
-  });
+  const _BattleExecutionPanel({required this.execution, this.seriesProgress});
 
   final _BattleExecutionContext execution;
   final BattleJobSeriesProgress? seriesProgress;
@@ -2358,22 +2157,20 @@ class _BattleExecutionPanel extends StatelessWidget {
     final opponent = execution.opponentLabel?.trim();
     final title = switch (execution.kind) {
       _BattleExecutionKind.consistency => 'Testando consistência',
-      _BattleExecutionKind.synchronousBattle => 'Simulando confronto',
-      _BattleExecutionKind.liveBattle => 'Preparando acompanhamento ao vivo',
+      _BattleExecutionKind.matchupSimulation => 'Simulando confronto',
+      _BattleExecutionKind.batchSeries => 'Executando série independente',
     };
     final activeStage = switch (execution.kind) {
       _BattleExecutionKind.consistency => 'Gerando a amostra do deck',
-      _BattleExecutionKind.synchronousBattle => 'Executando a partida',
-      _BattleExecutionKind.liveBattle when seriesProgress != null =>
-        'Enfileirando ${seriesProgress!.submittedCount} de '
-            '${seriesProgress!.total} partidas',
-      _BattleExecutionKind.liveBattle => 'Criando a partida',
+      _BattleExecutionKind.matchupSimulation => 'Executando a partida',
+      _BattleExecutionKind.batchSeries when seriesProgress != null =>
+        'Processando ${seriesProgress!.submittedCount} de '
+            '${seriesProgress!.total} tentativas',
+      _BattleExecutionKind.batchSeries => 'Preparando a primeira tentativa',
     };
     final finalStage = switch (execution.kind) {
-      _BattleExecutionKind.liveBattle when seriesProgress != null =>
-        'As partidas aparecerão em Acompanhar ao vivo',
-      _BattleExecutionKind.liveBattle =>
-        'A mesa de acompanhamento abrirá automaticamente',
+      _BattleExecutionKind.batchSeries =>
+        'Os resultados serão reunidos no histórico após a persistência',
       _ => 'O replay será aberto assim que estiver salvo',
     };
 
@@ -2432,9 +2229,10 @@ class _BattleExecutionPanel extends StatelessWidget {
                 _BattleExecutionStage(label: finalStage),
                 const SizedBox(height: AppTheme.space12),
                 Text(
-                  execution.kind == _BattleExecutionKind.liveBattle
-                      ? 'Você pode sair desta tela; o processamento continuará '
-                            'e ficará no histórico.'
+                  execution.kind == _BattleExecutionKind.batchSeries
+                      ? 'Cada tentativa é um job batch fechado. Interromper '
+                            'evita novas tentativas e solicita o cancelamento '
+                            'cooperativo do job atual.'
                       : 'Mantenha esta tela aberta até o replay ser salvo.',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppTheme.textHint,
@@ -2555,7 +2353,7 @@ class _BattleReplayActions extends StatelessWidget {
           Text(
             'Teste consistência sem adversário ou simule contra outro deck '
             'para acompanhar a partida e revisar o replay. '
-            '${onOpenCoach == null ? '' : 'O Coach pausa nas decisões disponíveis para você jogar. '}'
+            '${onOpenCoach == null ? '' : 'Na partida contra IA, você controla as decisões legais oferecidas pelo jogo. '}'
             'Nenhum modo prova superioridade ou substitui regra oficial.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppTheme.textSecondary,
@@ -2598,7 +2396,7 @@ class _BattleReplayActions extends StatelessWidget {
                     ManaLoomGlyphKind.commander,
                     size: 20,
                   ),
-                  label: const Text('Jogar com Coach'),
+                  label: const Text('Jogar contra IA'),
                 ),
             ],
           ),
@@ -2608,8 +2406,8 @@ class _BattleReplayActions extends StatelessWidget {
   }
 }
 
-class _BattleSeriesProgressPanel extends StatelessWidget {
-  const _BattleSeriesProgressPanel({
+class _BattleBatchSeriesProgressPanel extends StatelessWidget {
+  const _BattleBatchSeriesProgressPanel({
     required this.progress,
     required this.error,
     required this.running,
@@ -2700,7 +2498,7 @@ class _BattleSeriesProgressPanel extends StatelessWidget {
               ),
               const SizedBox(height: AppTheme.space8),
               Text(
-                '$submitted/$total enfileiradas · $active em andamento. '
+                '$submitted/$total criadas · $active em andamento. '
                 'Cada tentativa usa job, seed e idempotência próprios.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
@@ -2759,152 +2557,13 @@ class _BattleSeriesProgressPanel extends StatelessWidget {
             ],
             const SizedBox(height: AppTheme.space8),
             Text(
-              'Cada partida criada permanece no histórico. Se o app fechar '
-              'antes de preparar toda a série, as partidas já iniciadas '
-              'continuam disponíveis, mas a série não é retomada automaticamente.',
+              'Não há modo espectador nem acompanhamento ao vivo. Cada job '
+              'persistido aparece no histórico quando o backend concluir.',
               style: theme.textTheme.labelSmall?.copyWith(
                 color: AppTheme.textHint,
                 height: 1.3,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BattleLiveJobStrip extends StatelessWidget {
-  const _BattleLiveJobStrip({
-    required this.jobs,
-    required this.loading,
-    required this.error,
-    required this.onRetry,
-    required this.onOpen,
-  });
-
-  final List<BattleJob> jobs;
-  final bool loading;
-  final String? error;
-  final VoidCallback onRetry;
-  final ValueChanged<BattleJob> onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final visibleJobs = jobs.take(4).toList(growable: false);
-    return Container(
-      key: const Key('battle-live-jobs-strip'),
-      width: double.infinity,
-      constraints: const BoxConstraints(maxHeight: 184),
-      decoration: BoxDecoration(
-        color: AppTheme.backgroundAbyss.withValues(alpha: 0.55),
-        border: Border(
-          bottom: BorderSide(
-            color: AppTheme.outlineMuted.withValues(alpha: 0.58),
-          ),
-        ),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(
-          AppTheme.space16,
-          AppTheme.space8,
-          AppTheme.space16,
-          AppTheme.space10,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const ManaLoomGlyph(
-                  ManaLoomGlyphKind.battleReplay,
-                  size: 18,
-                  color: AppTheme.frost400,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                Expanded(
-                  child: Text(
-                    'Acompanhar ao vivo',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  key: const Key('battle-live-jobs-refresh-button'),
-                  tooltip: 'Atualizar jobs',
-                  onPressed: loading ? null : onRetry,
-                  icon: const Icon(Icons.sync_rounded, size: 20),
-                ),
-              ],
-            ),
-            if (loading)
-              const LinearProgressIndicator(
-                key: Key('battle-live-jobs-loading'),
-                minHeight: 2,
-              )
-            else if (error != null)
-              Wrap(
-                spacing: AppTheme.space8,
-                runSpacing: AppTheme.space6,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Text(
-                    error!,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.error,
-                    ),
-                  ),
-                  TextButton(
-                    key: const Key('battle-live-jobs-retry-button'),
-                    onPressed: onRetry,
-                    child: const Text('Tentar novamente'),
-                  ),
-                ],
-              )
-            else if (visibleJobs.isEmpty)
-              Text(
-                'Nenhuma partida em acompanhamento para este deck.',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
-              )
-            else
-              for (final job in visibleJobs)
-                InkWell(
-                  key: Key('battle-live-job-${job.jobId}'),
-                  onTap: () => onOpen(job),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppTheme.space8,
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${_battleJobListStatusLabel(job.status)} · '
-                            '${job.progress.current}/${job.progress.total} '
-                            'etapas · ${_battleJobActionLabel(job)}',
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: AppTheme.space8),
-                        const Icon(
-                          Icons.chevron_right_rounded,
-                          size: 20,
-                          color: AppTheme.frost400,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
           ],
         ),
       ),
@@ -2925,13 +2584,6 @@ String _battleJobListStatusLabel(BattleJobStatus status) => switch (status) {
   BattleJobStatus.cancelled => 'Cancelado',
   BattleJobStatus.persistenceError => 'Falha ao salvar',
 };
-
-String _battleJobActionLabel(BattleJob job) {
-  if (job.status == BattleJobStatus.completed && job.replayId != null) {
-    return 'replay disponível';
-  }
-  return job.isTerminal ? 'abrir resultado' : 'abrir acompanhamento';
-}
 
 class _BattleReplaySummaryTile extends StatelessWidget {
   const _BattleReplaySummaryTile({
@@ -4540,7 +4192,7 @@ class _ReplayDecisions extends StatelessWidget {
         icon: Icons.account_tree_outlined,
         title: 'Sem decisões registradas',
         message:
-            'Suas escolhas do Battle Coach e decisões explicadas por uma simulação aparecem aqui.',
+            'Suas escolhas em partidas contra IA e decisões explicadas por uma simulação aparecem aqui.',
       );
     }
 
@@ -6291,7 +5943,7 @@ class _ReplayDecisionTile extends StatelessWidget {
                       ),
                       const SizedBox(width: AppTheme.space5),
                       Text(
-                        'Sua escolha no Battle Coach',
+                        'Sua escolha na partida contra IA',
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: AppTheme.mythicGold,
                           fontWeight: FontWeight.w800,

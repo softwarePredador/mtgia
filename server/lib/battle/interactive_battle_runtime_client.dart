@@ -5,9 +5,17 @@ import 'package:http/http.dart' as http;
 
 import '../ai/battle_engine_config.dart';
 import 'battle_replay_payload_sanitizer.dart';
+import 'battle_request_correlation.dart';
 import 'interactive_battle_contract.dart';
 
-const interactiveBattleMaximumRuntimePayloadBytes = 1024 * 1024;
+// A terminal interactive snapshot carries the same bounded public replay used
+// by Battle Live. Natural XMage games routinely contain hundreds of visible
+// snapshots, so the transport uses the same audited 8 MiB ceiling while the
+// per-user/global session limits bound aggregate memory.
+const interactiveBattleMaximumRuntimePayloadBytes = 8 * 1024 * 1024;
+const interactiveBattleActionReceiptSchema =
+    'interactive_battle_action_receipt_v1';
+const interactiveBattleMaximumActionReceipts = 256;
 
 class InteractiveBattleConfiguration {
   const InteractiveBattleConfiguration({
@@ -112,6 +120,62 @@ class InteractiveBattleRuntimeException implements Exception {
   String toString() => 'InteractiveBattleRuntimeException($code)';
 }
 
+String? interactiveBattlePublicReplayContractValidationError(
+  Map<String, dynamic> replay, {
+  required ExternalBattleEngineIdentity expected,
+  required String expectedRequestId,
+  required String expectedRequestHash,
+}) {
+  if (replay['engine'] != expected.engine) return 'engine mismatch';
+  if (replay['engine_version'] != expected.version) {
+    return 'engine version mismatch';
+  }
+  if (replay['engine_commit'] != expected.commit) {
+    return 'engine commit mismatch';
+  }
+  if (!replay.containsKey('engine_patch_commit') ||
+      replay['engine_patch_commit'] != expected.patchCommit) {
+    return 'engine patch commit mismatch';
+  }
+  if (replay['ai_profile'] != expected.aiProfile) {
+    return 'AI profile mismatch';
+  }
+  if (replay['request_schema_version'] != interactiveBattleRequestSchema) {
+    return 'request schema mismatch';
+  }
+  if (replay['request_id'] != expectedRequestId) {
+    return 'request ID mismatch';
+  }
+  if (replay['request_hash'] != expectedRequestHash) {
+    return 'request hash mismatch';
+  }
+  final rawLearning = replay['learning_contract'];
+  if (rawLearning is! Map || rawLearning.keys.any((key) => key is! String)) {
+    return 'learning contract missing';
+  }
+  final learning = Map<String, dynamic>.from(rawLearning);
+  final expectedLearning = <String, dynamic>{
+    'schema_version': 'external_battle_learning_v1',
+    'named_draw_identity_available': false,
+    'visible_stack_activity_available': true,
+    'visible_battlefield_entries_available': true,
+    'combat_activity_available': true,
+    'ai_decision_rationale_available': false,
+    'seed_semantics': expected.seedSemantics,
+    'deterministic': expected.deterministic,
+    'event_stream_completeness': 'best_effort_visible_state_lower_bound',
+    'absence_proves_nonuse': false,
+    'strategy_or_swap_proof': false,
+  };
+  if (learning.length != expectedLearning.length ||
+      expectedLearning.entries.any(
+        (entry) => learning[entry.key] != entry.value,
+      )) {
+    return 'learning contract mismatch';
+  }
+  return null;
+}
+
 class InteractiveBattleRuntimeSnapshot {
   const InteractiveBattleRuntimeSnapshot({
     required this.runtimeSessionId,
@@ -130,6 +194,7 @@ class InteractiveBattleRuntimeSnapshot {
     this.terminalReason,
     this.errorCode,
     this.publicReplay,
+    this.acceptedActionReceipts,
   });
 
   final String runtimeSessionId;
@@ -148,6 +213,23 @@ class InteractiveBattleRuntimeSnapshot {
   final String? terminalReason;
   final String? errorCode;
   final Map<String, dynamic>? publicReplay;
+  // Null means a legacy sidecar omitted the additive receipt protocol. An
+  // empty list means the protocol is present and no action was accepted.
+  final List<InteractiveBattleAcceptedActionReceipt>? acceptedActionReceipts;
+}
+
+class InteractiveBattleAcceptedActionReceipt {
+  const InteractiveBattleAcceptedActionReceipt({
+    required this.actionId,
+    required this.requestFingerprint,
+    required this.kind,
+    required this.acceptedStateVersion,
+  });
+
+  final String actionId;
+  final String requestFingerprint;
+  final String kind;
+  final int acceptedStateVersion;
 }
 
 abstract interface class InteractiveBattleRuntime {
@@ -228,6 +310,9 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
       '/interactive/sessions/${Uri.encodeComponent(runtimeSessionId)}/actions',
       body: action.responsePayload,
       expectedRuntimeSessionId: runtimeSessionId,
+      expectedAcceptedActionId: action.idempotencyKey,
+      expectedAcceptedRequestFingerprint: action.requestFingerprint,
+      expectedAcceptedActionKind: 'response',
     );
   }
 
@@ -240,14 +325,18 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
     if (!interactiveBattleIdempotencyPattern.hasMatch(actionId)) {
       throw const InteractiveBattleRuntimeException('action_id_invalid');
     }
+    final body = <String, dynamic>{
+      'schema_version': interactiveBattleActionSchema,
+      'action_id': actionId,
+    };
     return _send(
       'POST',
       '/interactive/sessions/${Uri.encodeComponent(runtimeSessionId)}/concede',
-      body: {
-        'schema_version': interactiveBattleActionSchema,
-        'action_id': actionId,
-      },
+      body: body,
       expectedRuntimeSessionId: runtimeSessionId,
+      expectedAcceptedActionId: actionId,
+      expectedAcceptedRequestFingerprint: canonicalBattlePayloadHash(body),
+      expectedAcceptedActionKind: 'concede',
     );
   }
 
@@ -258,6 +347,9 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
     String? expectedRuntimeSessionId,
     String? expectedRequestId,
     String? expectedRequestHash,
+    String? expectedAcceptedActionId,
+    String? expectedAcceptedRequestFingerprint,
+    String? expectedAcceptedActionKind,
   }) async {
     final request = http.Request(method, _baseUri.resolve(path));
     request.headers['Accept'] = 'application/json';
@@ -335,12 +427,28 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
         statusCode: 502,
       );
     }
-    return _parseSnapshot(
+    final snapshot = _parseSnapshot(
       decoded,
       expectedRuntimeSessionId: expectedRuntimeSessionId,
       expectedRequestId: expectedRequestId,
       expectedRequestHash: expectedRequestHash,
     );
+    final receipts = snapshot.acceptedActionReceipts;
+    if (expectedAcceptedActionId != null && receipts != null) {
+      final accepted = receipts.any(
+        (receipt) =>
+            receipt.actionId == expectedAcceptedActionId &&
+            receipt.requestFingerprint == expectedAcceptedRequestFingerprint &&
+            receipt.kind == expectedAcceptedActionKind,
+      );
+      if (!accepted) {
+        throw const InteractiveBattleRuntimeException(
+          'runtime_action_receipt_rejected',
+          statusCode: 502,
+        );
+      }
+    }
+    return snapshot;
   }
 
   Future<List<int>> _boundedBody(http.StreamedResponse response) async {
@@ -440,6 +548,18 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
           statusCode: 502,
         );
       }
+      if (interactiveBattlePublicReplayContractValidationError(
+            rawReplay,
+            expected: _expectedIdentity,
+            expectedRequestId: requestId,
+            expectedRequestHash: requestHash,
+          ) !=
+          null) {
+        throw const InteractiveBattleRuntimeException(
+          'runtime_replay_identity_rejected',
+          statusCode: 502,
+        );
+      }
       publicReplay = sanitizeBattleReplayForStorage(rawReplay);
     }
     final terminalReason = _boundedOptionalString(
@@ -452,6 +572,10 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
         statusCode: 502,
       );
     }
+    final acceptedActionReceipts = _acceptedActionReceipts(
+      body,
+      maximumStateVersion: stateVersion,
+    );
     return InteractiveBattleRuntimeSnapshot(
       runtimeSessionId: runtimeSessionId,
       requestId: requestId,
@@ -469,6 +593,7 @@ class XmageInteractiveBattleRuntime implements InteractiveBattleRuntime {
       terminalReason: terminalReason,
       errorCode: _boundedOptionalString(body['error_code'], maximum: 120),
       publicReplay: publicReplay,
+      acceptedActionReceipts: acceptedActionReceipts,
     );
   }
 
@@ -498,6 +623,70 @@ InteractiveBattleStatus _runtimeStatus(Object? raw) {
     );
   }
   return status;
+}
+
+List<InteractiveBattleAcceptedActionReceipt>? _acceptedActionReceipts(
+  Map<String, dynamic> body, {
+  required int maximumStateVersion,
+}) {
+  if (!body.containsKey('accepted_action_receipts')) return null;
+  final raw = body['accepted_action_receipts'];
+  if (raw is! List || raw.length > interactiveBattleMaximumActionReceipts) {
+    throw const InteractiveBattleRuntimeException(
+      'runtime_action_receipts_invalid',
+      statusCode: 502,
+    );
+  }
+  final seen = <String>{};
+  final receipts = <InteractiveBattleAcceptedActionReceipt>[];
+  for (final entry in raw) {
+    final value = _stringMap(entry);
+    if (value == null ||
+        value.keys.any(
+          (key) =>
+              !const {
+                'schema_version',
+                'action_id',
+                'request_fingerprint',
+                'kind',
+                'accepted_state_version',
+              }.contains(key),
+        ) ||
+        value['schema_version'] != interactiveBattleActionReceiptSchema) {
+      throw const InteractiveBattleRuntimeException(
+        'runtime_action_receipts_invalid',
+        statusCode: 502,
+      );
+    }
+    final actionId = value['action_id'];
+    final requestFingerprint = value['request_fingerprint'];
+    final kind = value['kind'];
+    final acceptedStateVersion = value['accepted_state_version'];
+    if (actionId is! String ||
+        !interactiveBattleIdempotencyPattern.hasMatch(actionId) ||
+        !seen.add(actionId) ||
+        requestFingerprint is! String ||
+        !RegExp(r'^[0-9a-f]{64}$').hasMatch(requestFingerprint) ||
+        kind is! String ||
+        !const {'response', 'concede'}.contains(kind) ||
+        acceptedStateVersion is! int ||
+        acceptedStateVersion < 0 ||
+        acceptedStateVersion > maximumStateVersion) {
+      throw const InteractiveBattleRuntimeException(
+        'runtime_action_receipts_invalid',
+        statusCode: 502,
+      );
+    }
+    receipts.add(
+      InteractiveBattleAcceptedActionReceipt(
+        actionId: actionId,
+        requestFingerprint: requestFingerprint,
+        kind: kind,
+        acceptedStateVersion: acceptedStateVersion,
+      ),
+    );
+  }
+  return List<InteractiveBattleAcceptedActionReceipt>.unmodifiable(receipts);
 }
 
 Map<String, dynamic> _privateState(Object? raw) {

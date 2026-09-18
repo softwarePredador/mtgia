@@ -8,6 +8,10 @@ import 'package:server/battle/interactive_battle_runtime_client.dart';
 import 'package:test/test.dart';
 
 void main() {
+  test('uses the bounded full-replay transport ceiling', () {
+    expect(interactiveBattleMaximumRuntimePayloadBytes, 8 * 1024 * 1024);
+  });
+
   test('accepts one correlated private participant snapshot', () async {
     late http.Request captured;
     final runtime = _runtime((request) async {
@@ -29,6 +33,136 @@ void main() {
     expect(snapshot.prompt?.options.single.id, _optionId);
     expect(snapshot.privateState['own_hand'], hasLength(1));
   });
+
+  test(
+    'parses bounded accepted-action receipts without public payloads',
+    () async {
+      final response = _snapshot();
+      response['accepted_action_receipts'] = [
+        {
+          'schema_version': interactiveBattleActionReceiptSchema,
+          'action_id': 'accepted-action-1',
+          'request_fingerprint': 'b' * 64,
+          'kind': 'response',
+          'accepted_state_version': 4,
+        },
+      ];
+      final runtime = _runtime((_) async => _jsonResponse(response, 200));
+
+      final snapshot = await runtime.read(_runtimeId);
+      runtime.close();
+
+      expect(snapshot.acceptedActionReceipts, hasLength(1));
+      final receipt = snapshot.acceptedActionReceipts!.single;
+      expect(receipt.actionId, 'accepted-action-1');
+      expect(receipt.requestFingerprint, 'b' * 64);
+      expect(receipt.kind, 'response');
+      expect(receipt.acceptedStateVersion, 4);
+    },
+  );
+
+  test(
+    'new receipt protocol must acknowledge the current POST action',
+    () async {
+      final action = InteractiveBattleActionInput(
+        stateVersion: 4,
+        promptId: _promptId,
+        responseKind: InteractiveBattleResponseKind.option,
+        optionId: _optionId,
+        idempotencyKey: 'expected-action-1',
+      );
+      final response =
+          _snapshot()..['accepted_action_receipts'] = <Map<String, dynamic>>[];
+      final runtime = _runtime((_) async => _jsonResponse(response, 200));
+
+      await expectLater(
+        runtime.respond(_runtimeId, action),
+        throwsA(
+          isA<InteractiveBattleRuntimeException>().having(
+            (error) => error.code,
+            'code',
+            'runtime_action_receipt_rejected',
+          ),
+        ),
+      );
+      runtime.close();
+    },
+  );
+
+  test(
+    'accepts the current POST receipt with the exact canonical hash',
+    () async {
+      final action = InteractiveBattleActionInput(
+        stateVersion: 4,
+        promptId: _promptId,
+        responseKind: InteractiveBattleResponseKind.option,
+        optionId: _optionId,
+        idempotencyKey: 'accepted-action-current',
+      );
+      late Map<String, dynamic> posted;
+      final runtime = _runtime((request) async {
+        posted = jsonDecode(request.body) as Map<String, dynamic>;
+        final response = _snapshot();
+        response['accepted_action_receipts'] = [
+          {
+            'schema_version': interactiveBattleActionReceiptSchema,
+            'action_id': action.idempotencyKey,
+            'request_fingerprint': action.requestFingerprint,
+            'kind': 'response',
+            'accepted_state_version': action.stateVersion,
+          },
+        ];
+        return _jsonResponse(response, 200);
+      });
+
+      final snapshot = await runtime.respond(_runtimeId, action);
+      runtime.close();
+
+      expect(posted, action.responsePayload);
+      expect(
+        snapshot.acceptedActionReceipts!.single.actionId,
+        action.idempotencyKey,
+      );
+    },
+  );
+
+  test(
+    'rejects duplicate, malformed, or future receipts fail closed',
+    () async {
+      final valid = {
+        'schema_version': interactiveBattleActionReceiptSchema,
+        'action_id': 'accepted-action-1',
+        'request_fingerprint': 'b' * 64,
+        'kind': 'response',
+        'accepted_state_version': 4,
+      };
+      final fixtures = <List<Map<String, dynamic>>>[
+        [valid, Map<String, dynamic>.from(valid)],
+        [Map<String, dynamic>.from(valid)..['request_fingerprint'] = 'nope'],
+        [Map<String, dynamic>.from(valid)..['kind'] = 'private_payload'],
+        [Map<String, dynamic>.from(valid)..['accepted_state_version'] = 5],
+        [
+          Map<String, dynamic>.from(valid)..['private_state'] = {'hand': []},
+        ],
+      ];
+
+      for (final receipts in fixtures) {
+        final response = _snapshot()..['accepted_action_receipts'] = receipts;
+        final runtime = _runtime((_) async => _jsonResponse(response, 200));
+        await expectLater(
+          runtime.read(_runtimeId),
+          throwsA(
+            isA<InteractiveBattleRuntimeException>().having(
+              (error) => error.code,
+              'code',
+              'runtime_action_receipts_invalid',
+            ),
+          ),
+        );
+        runtime.close();
+      }
+    },
+  );
 
   test(
     'rejects request hash mismatch and malformed process identity',
@@ -77,6 +211,137 @@ void main() {
       ),
     );
     runtime.close();
+  });
+
+  test('accepts a terminal replay with exact nested identity', () async {
+    final runtime = _runtime(
+      (_) async => _jsonResponse(_terminalSnapshot(), 200),
+    );
+
+    final snapshot = await runtime.read(_runtimeId);
+
+    expect(snapshot.status, InteractiveBattleStatus.conceded);
+    expect(snapshot.publicReplay?['engine'], 'xmage');
+    expect(
+      snapshot.publicReplay?['engine_patch_commit'],
+      pinnedXmagePatchCommit,
+    );
+    runtime.close();
+  });
+
+  test('rejects divergent or missing nested replay identity', () async {
+    final mutations = <(String, Object?, bool)>[
+      ('engine', 'forge', false),
+      ('engine_version', '0.0.0', false),
+      ('engine_commit', 'f' * 40, false),
+      ('engine_patch_commit', 'e' * 40, false),
+      ('engine_patch_commit', null, true),
+      ('ai_profile', 'computer_easy', false),
+      ('ai_profile', null, true),
+    ];
+
+    for (final mutation in mutations) {
+      final response = _terminalSnapshot();
+      final replay = response['public_replay'] as Map<String, dynamic>;
+      if (mutation.$3) {
+        replay.remove(mutation.$1);
+      } else {
+        replay[mutation.$1] = mutation.$2;
+      }
+      final runtime = _runtime((_) async => _jsonResponse(response, 200));
+
+      await expectLater(
+        runtime.read(_runtimeId),
+        throwsA(
+          isA<InteractiveBattleRuntimeException>().having(
+            (error) => error.code,
+            'code',
+            'runtime_replay_identity_rejected',
+          ),
+        ),
+        reason: 'mutation of ${mutation.$1} must fail closed',
+      );
+      runtime.close();
+    }
+  });
+
+  test('rejects divergent or missing nested replay correlation', () async {
+    final mutations = <(String, Object?, bool)>[
+      ('request_schema_version', 'interactive_battle_request_v0', false),
+      ('request_schema_version', null, true),
+      ('request_id', 'interactive-request-other', false),
+      ('request_id', null, true),
+      ('request_hash', 'f' * 64, false),
+      ('request_hash', null, true),
+    ];
+
+    for (final mutation in mutations) {
+      final response = _terminalSnapshot();
+      final replay = response['public_replay'] as Map<String, dynamic>;
+      if (mutation.$3) {
+        replay.remove(mutation.$1);
+      } else {
+        replay[mutation.$1] = mutation.$2;
+      }
+
+      await _expectReplayRejected(
+        response,
+        reason: 'mutation of ${mutation.$1} must fail closed',
+      );
+    }
+  });
+
+  test('rejects arbitrary learning flags, seeds, and schema', () async {
+    final mutations = <(String, void Function(Map<String, dynamic> replay))>[
+      ('missing contract', (replay) => replay.remove('learning_contract')),
+      (
+        'wrong schema',
+        (replay) =>
+            (replay['learning_contract'] as Map)['schema_version'] =
+                'external_battle_learning_v0',
+      ),
+      (
+        'named draw claim',
+        (replay) =>
+            (replay['learning_contract']
+                    as Map)['named_draw_identity_available'] =
+                true,
+      ),
+      (
+        'arbitrary seed semantics',
+        (replay) =>
+            (replay['learning_contract'] as Map)['seed_semantics'] =
+                'caller_controls_engine_rng',
+      ),
+      (
+        'determinism claim',
+        (replay) =>
+            (replay['learning_contract'] as Map)['deterministic'] = true,
+      ),
+      (
+        'absence claim',
+        (replay) =>
+            (replay['learning_contract'] as Map)['absence_proves_nonuse'] =
+                true,
+      ),
+      (
+        'strategy claim',
+        (replay) =>
+            (replay['learning_contract'] as Map)['strategy_or_swap_proof'] =
+                true,
+      ),
+      (
+        'unexpected seed',
+        (replay) => (replay['learning_contract'] as Map)['seed'] = 424242,
+      ),
+    ];
+
+    for (final mutation in mutations) {
+      final response = _terminalSnapshot();
+      mutation.$2(response['public_replay'] as Map<String, dynamic>);
+
+      await _expectReplayRejected(response, reason: mutation.$1);
+    }
   });
 
   test('maps stale and missing runtime responses fail closed', () async {
@@ -169,6 +434,7 @@ XmageInteractiveBattleRuntime _runtime(
     engine: 'xmage',
     version: pinnedXmageVersion,
     commit: pinnedXmageCommit,
+    patchCommit: pinnedXmagePatchCommit,
     aiProfile: 'computer_mad',
     telemetryField: 'normalizer_version',
     telemetryVersion: 'xmage_replay_normalizer_v2',
@@ -184,8 +450,10 @@ Map<String, dynamic> _snapshot() => {
   'engine': 'xmage',
   'engine_version': pinnedXmageVersion,
   'engine_commit': pinnedXmageCommit,
+  'engine_patch_commit': pinnedXmagePatchCommit,
   'sidecar_protocol_version': externalBattleSidecarProtocol,
-  'sidecar_build_identity': 'xmage-sidecar-v2@$pinnedXmageCommit',
+  'sidecar_build_identity':
+      'xmage-sidecar-v2@$pinnedXmageCommit+patch.$pinnedXmagePatchCommit',
   'sidecar_process_id': 'process-interactive-1',
   'sidecar_started_at': '2026-07-27T12:00:00Z',
   'ai_profile': 'computer_mad',
@@ -226,6 +494,65 @@ Map<String, dynamic> _snapshot() => {
     ],
   },
 };
+
+Map<String, dynamic> _terminalSnapshot() {
+  final snapshot = _snapshot();
+  snapshot['status'] = 'conceded';
+  snapshot['terminal'] = true;
+  snapshot['prompt'] = null;
+  snapshot['terminal_reason'] = 'user_conceded';
+  snapshot['public_replay'] = <String, dynamic>{
+    'status': 'conceded',
+    'engine': 'xmage',
+    'engine_version': pinnedXmageVersion,
+    'engine_commit': pinnedXmageCommit,
+    'engine_patch_commit': pinnedXmagePatchCommit,
+    'ai_profile': 'computer_mad',
+    'request_schema_version': interactiveBattleRequestSchema,
+    'request_id': _requestId,
+    'request_hash': _requestHash,
+    'learning_contract': _learningContract(),
+    'events': <Map<String, dynamic>>[],
+    'visual_snapshots': <Map<String, dynamic>>[],
+  };
+  return snapshot;
+}
+
+Map<String, dynamic> _learningContract() => {
+  'schema_version': 'external_battle_learning_v1',
+  'named_draw_identity_available': false,
+  'visible_stack_activity_available': true,
+  'visible_battlefield_entries_available': true,
+  'combat_activity_available': true,
+  'ai_decision_rationale_available': false,
+  'seed_semantics': 'request_correlation_only_server_rng_uncontrolled',
+  'deterministic': false,
+  'event_stream_completeness': 'best_effort_visible_state_lower_bound',
+  'absence_proves_nonuse': false,
+  'strategy_or_swap_proof': false,
+};
+
+Future<void> _expectReplayRejected(
+  Map<String, dynamic> response, {
+  required String reason,
+}) async {
+  final runtime = _runtime((_) async => _jsonResponse(response, 200));
+  try {
+    await expectLater(
+      runtime.read(_runtimeId),
+      throwsA(
+        isA<InteractiveBattleRuntimeException>().having(
+          (error) => error.code,
+          'code',
+          'runtime_replay_identity_rejected',
+        ),
+      ),
+      reason: reason,
+    );
+  } finally {
+    runtime.close();
+  }
+}
 
 const _requestId = 'interactive-request-1';
 const _requestHash =

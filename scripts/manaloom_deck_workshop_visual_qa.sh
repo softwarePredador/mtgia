@@ -210,7 +210,10 @@ capture_profile() {
           "deck_workshop_05_card_reader",
           "deck_workshop_06_history_undo",
           "deck_workshop_07_conflict",
-          "deck_workshop_08_sample_hand_continuity"
+          "deck_workshop_08_sample_hand_continuity",
+          "deck_workshop_09_replace_all_off_empty",
+          "deck_workshop_10_replace_all_off_menu",
+          "deck_workshop_11_learning_reads_off"
         ]
       }'
   )"
@@ -221,8 +224,8 @@ capture_profile() {
   fi
 
   actual_count="$(find "$screenshots" -maxdepth 1 -type f -name '*.png' | wc -l | tr -d '[:space:]')"
-  if [[ "$actual_count" != "9" ]]; then
-    echo "Expected 9 Deck Workshop screenshots for $profile, got $actual_count" >&2
+  if [[ "$actual_count" != "12" ]]; then
+    echo "Expected 12 Deck Workshop screenshots for $profile, got $actual_count" >&2
     return 1
   fi
   (
@@ -266,4 +269,4 @@ capture_profile web_deck_workshop_desktop_1440x900 1440 900 ux-pack-03-deck-work
 capture_profile web_deck_workshop_wide_1920x1080 1920 1080 ux-pack-03-deck-workshop-web-wide
 
 printf 'Deck Workshop PASS_RUNTIME captured for three real Web release profiles.\n'
-printf 'Open all 27 PNGs before recording PASS_VISUAL_REVIEWED.\n'
+printf 'Open all 36 PNGs before recording PASS_VISUAL_REVIEWED.\n'

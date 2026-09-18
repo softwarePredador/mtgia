@@ -26,20 +26,20 @@ A fonte estruturada do inventário é
 as keys e os contratos de interação; o JSON classifica toda a superfície
 descoberta no código e o teste impede dívida silenciosa.
 
-Baseline ampliada da beta Web + Android em 2026-07-27:
+Inventário corrente da beta Web + Android em 2026-08-25:
 
 | Tipo | Quantidade classificada |
 |---|---:|
-| `GoRoute` | 41 |
+| `GoRoute` | 46 |
 | `ShellRoute` | 1 |
-| `MaterialPageRoute` | 6 |
-| Dialogs | 47 |
-| Bottom sheets | 22 |
+| `MaterialPageRoute` | 7 |
+| Dialogs | 51 |
+| Bottom sheets | 24 |
 | Menus | 9 |
 | Tabs | 10 |
 | Navegação responsiva | 2 |
-| Transientes (`SnackBar`) | 108 |
-| **Total** | **246** |
+| Transientes (`SnackBar`) | 115 |
+| **Total** | **265** |
 
 Cada ocorrência pertence a um contrato de domínio que declara:
 
@@ -51,7 +51,7 @@ Cada ocorrência pertence a um contrato de domínio que declara:
 - ação, sucesso e recuperação;
 - política de deep link.
 
-As 41 rotas também declaram path canônico, tela/destino e escopo
+As 46 rotas também declaram path canônico, tela/destino e escopo
 `active`, `deferred_by_scope` ou `compatibility_redirect`. O Scanner permanece
 explicitamente deferido e `/market` é apenas compatibilidade para
 `/community?tab=3`; nenhum deles é contabilizado como tela ativa própria.
@@ -71,24 +71,34 @@ classificada para S3-02/S3-05. `not_applicable:` só é permitido quando a
 superfície não possui UI própria ativa, como redirect de compatibilidade ou
 feature removida do escopo do artefato.
 
-## Battle Lab e Live Spectator — BL1–BL6
+## Jogar contra IA e Battle Lab interno
 
 As entradas canônicas são:
 
 - Análise do deck → `Testar este deck`;
-- Análise do deck → Battle gate → `Jogar no Battle Coach`;
-- rota privada → `/decks/:id/battle-coach[/sessionId]`;
+- Análise do deck → Battle gate → `Jogar contra IA`;
+- rota privada canônica → `/decks/:id/play-vs-ai[/sessionId]`;
+- `/decks/:id/battle-coach[/sessionId]` existe somente como redirect legado e
+  nunca como CTA;
 - menu do deck ou Visão Geral → `/decks/:id/battle-replays`;
-- job Live opt-in → `/decks/:id/battle-live/:jobId`;
 - detalhe direto → `/decks/:id/battle-replays?replay=:replayId`.
+
+Não existe rota, CTA ou modo público de espectador. O usuário vê a própria mão,
+controla cartas, mana, alvos, prioridade e combate contra exatamente um
+adversário da IA. Stream e checkpoints Live são infraestrutura interna de
+execução, recuperação, observabilidade e evidência; não são superfície do app.
+Se o preflight interativo XMage bloquear a partida, a UI permanece fail-closed:
+não consulta uma cobertura automática, não oferece Forge/simulação e não abre
+um replay como substituto de jogar.
 
 O setup exige oponente, preflight e objetivo; cartas de foco são observação,
 não compra forçada. O histórico aceita paginação e filtros por status, engine,
 oponente e revisão. O detalhe oferece mesa responsiva, playback, timeline
 limitada, relatório, comparação e anotações privadas.
 
-Anotações são salvas por API em `battle_replay_annotations`; jobs e Live usam
-`battle_jobs` e `battle_job_live_records`. Nenhuma dessas leituras usa
+Anotações são salvas por API em `battle_replay_annotations`; a infraestrutura
+interna de jobs/stream usa `battle_jobs` e `battle_job_live_records`. Nenhuma
+dessas leituras usa
 `shared_preferences` como fonte durável. O replay é imutável e a anotação não
 altera nem retoma o estado do engine.
 
@@ -98,15 +108,13 @@ Keys principais:
   `battle-preflight-ready|blocked` e `battle-test-objective-field`;
 - `battle-post-report`, `battle-annotations-panel`,
   `battle-replay-keyboard-focus` e `battle-replay-event-action-filter`;
-- `battle-live-screen`, `battle-live-status-header`, `battle-live-progress`,
-  `battle-live-table`, `battle-live-timeline` e
-  `battle-live-reconnect-banner`.
+- `play-vs-ai-hand-dock`, `play-vs-ai-action-tray`,
+  `play-vs-ai-legal-card-<optionId>` e `play-vs-ai-rematch-button`.
 
-Com Live desabilitado, app e backend falham fechados e não fazem polling. Com
-Live habilitado, `Space` pausa apenas o playback local, `R` tenta reconectar e
-`End` salta para o estado mais recente; o engine continua executando. Cursor,
-registros recebidos e estado visual são preservados durante erro recuperável.
-Cancelamento exige confirmação e continua cooperativo no backend.
+Capabilities Battle permanecem `OFF` e falham fechadas. A mesa envia somente a
+opção tipada exata fornecida pelo backend; correspondência ambígua entre carta
+visível e opção não dispara ação. O painel textual continua disponível para
+acessibilidade e para respostas sem carta, valores inteiros ou distribuições.
 
 Os testes widget cobrem 390 px, fronteira 1199/1200, texto 200%, reduced
 motion, teclado, offline/retry, cursor sem duplicação, ID do replay final e
@@ -126,13 +134,22 @@ inventário passaram. O aggregate exige:
   coerência, funcionamento e atratividade.
 
 O digest de `scripts/manaloom_ui_source_digest.sh` invalida a evidência quando
-os sources app-facing mudam. O primeiro fluxo fechado por este contrato é o
-Battle Coach: welcome, mesa ativa, prompt, erro recuperável, confirmação de
-concessão, envio em progresso e terminal/replay. Rode:
+os sources app-facing mudam. O fluxo Battle coberto por este contrato é Jogar
+contra IA: entrada explícita, mesa ativa com mão fixa, ação legal pela própria
+carta, prompt acessível, erro recuperável, confirmação de concessão, envio em
+progresso, terminal, replay e rematch. Rode:
 
 ```bash
 ./scripts/quality_gate.sh ui-proof
 ```
+
+A prova Web/XMage focal corrente é resolvida por
+`docs/qa/ui-live/latest.json`, que referencia e hasheia o manifest sob
+`docs/qa/ui-live/current/play-vs-ai-web-real`. Receipts datados em
+`docs/qa/execution/` preservam cada rodada; a primeira rodada focal está em
+`docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md`. O review focal
+declara `overall_ui_proof_claimed=false`; o aggregate global continua um gate
+distinto.
 
 TalkBack físico e teclado Web real não são inferidos da revisão de imagem e
 continuam itens de release separados.
@@ -171,10 +188,11 @@ captura é `scripts/manaloom_critical_overlays_states_visual_qa.sh`.
 | `ux_pack08_21_permission_denied` | contrato de permissão negada | `critical-contract-state-panel` | `app_state_panel_test.dart` | estado sintético |
 
 Os três perfis Web reais exigem `22/22` checkpoints cada, totalizando 66 PNGs.
-O Battle Coach mantém uma prova Android separada de nove checkpoints, incluindo
-confirmação, progresso e terminal de concessão; ela não recebe crédito visual
-focal do Pack 08 sem recaptura no runtime Android elegível. TalkBack humano e
-teclado Web de hardware continuam gates de release distintos.
+A evidência histórica no diretório legado `battle-coach-android` não recebe
+crédito para Jogar contra IA no digest corrente. Confirmação, ação direta na
+carta, progresso, terminal e rematch precisam de nova captura em runtime
+elegível. TalkBack humano e teclado Web de hardware continuam gates de release
+distintos.
 
 ## Matriz executável de estados — S3-02
 
@@ -266,14 +284,12 @@ manual seja confundida com `PASS` enquanto houver itens em `remaining`.
 
 O roteiro no build Web real validou `/login` e as rotas autenticadas críticas
 com Tab/Shift+Tab, Enter/Space, foco visível, Escape, trap/restauração de foco,
-browser back e reduced motion, sem erro de console. O Battle Coach recebeu
-prova física adicional em nove checkpoints: avanço e retorno entre ações,
-abertura por Enter e Space, Escape com restauração no launcher, foco no campo
-de busca, digitação que filtra o rival e Enter que seleciona o resultado e
-executa o preflight real. O fixture e
-`docs/qa/ui-live/current/battle-coach-web-keyboard/capture-manifest.json`
-registram `pass`; essa prova continua separada da validação manual em leitores
-de tela físicos.
+browser back e reduced motion, sem erro de console. O diretório legado
+`docs/qa/ui-live/current/battle-coach-web-keyboard` registra uma execução
+histórica do protótipo anterior; ela não aprova a rota, a mesa ou o digest
+corrente de Jogar contra IA. A prova nova deve cobrir Tab/Shift+Tab,
+Enter/Space na carta legal e no painel alternativo, Escape/restauração de foco,
+busca/seleção do rival e rematch. Leitores de tela físicos continuam separados.
 
 ## Matriz executável de navegação e retomada — S3-06
 
@@ -284,7 +300,8 @@ rascunhos de Generate e Import. O guard
 `app/test/ui/ui_navigation_resume_matrix_test.dart` exige fonte e teste atuais
 para cada cenário.
 
-Battle/Replays agora usa `/decks/:id/battle-replays`. Card Detail usa
+Jogar contra IA usa `/decks/:id/play-vs-ai[/sessionId]` e Battle/Replays usa
+`/decks/:id/battle-replays`; não há deep link público Live. Card Detail usa
 `/cards/:cardId`: o objeto em memória é apenas um fast path e o refresh resolve
 o mesmo `card_id` pela API/backend PostgreSQL. Collection e Community mantêm a
 tab normalizada na URL. Generate e Import persistem somente o formulário não
@@ -343,11 +360,11 @@ pelo compositor do aparelho com `adb screencap`, depois de um marcador de
 prontidão; screenshot da surface Flutter, que não compõe a view nativa, não é
 aceita.
 
-A recaptura dos quatro manifestos da matriz, somada aos sete estados Android do
-Battle Coach e aos nove checkpoints Web de teclado, totaliza 230 imagens
-abertas e revisadas no aggregate `docs/qa/ui-live/latest.json`. Todas estão
-vinculadas ao digest
-`c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9`.
+A execução vinculada ao digest
+`c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9` é
+histórica. Alterações app-facing e a decisão Jogar contra IA invalidam seu
+crédito corrente; `docs/qa/ui-live/latest.json` só volta a aprovar após nova
+captura e revisão visual de todos os PNGs no mesmo digest.
 
 ## Onboarding e primeiro uso — S3-08
 

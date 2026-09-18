@@ -369,6 +369,10 @@ OPTIMIZER_BASENAMES = {
     "test_global_commander_larger_battle_gate_audit.py",
 }
 
+HISTORICAL_BASENAMES = {
+    "optimizer_loop_tombstone_contract_test.py",
+}
+
 FOCUSED_EVIDENCE_BASENAMES = {
     "battle_card_adjustment_throughput_benchmark.py",
     "test_battle_card_adjustment_throughput_benchmark.py",
@@ -476,6 +480,8 @@ def category_for(rel_path: Path) -> str | None:
         return "focused evidence/promotion"
     if name in LEARNED_DECK_BASENAMES:
         return "learned-deck source"
+    if name in HISTORICAL_BASENAMES:
+        return "historical/deprecated"
     if name in OPTIMIZER_BASENAMES:
         return "optimizer/scorecard"
     if name in RULE_REGISTRY_BASENAMES:

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-24T15:23:40.664687Z",
-  "source_digest": "d517adb65beaa0a759a6ce5304779d21698850bd9212c6e5536b1615d5a11cee",
+  "generated_at": "2026-09-10T13:35:31.117312Z",
+  "source_digest": "e9accd9433541ee73368393f3311930d3da878da7fb4f6c85a45eeed4ca5122c",
   "surface": "deck_workshop",
   "profile": "web_deck_workshop_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,8 +12,8 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "2cae32ed05b4c6ba924d266f6ffef4b320432963293913f9487792c2dd645cc9",
-  "checkpoint_count": 9,
+  "log_sha256": "c250f34ed6a8c2235653b0ffc9e9963e707f0a6c794d70e8a5298b4d80d54669",
+  "checkpoint_count": 12,
   "required_checkpoints": [
     "deck_workshop_00_commander",
     "deck_workshop_01_import_preflight",
@@ -23,14 +23,17 @@
     "deck_workshop_05_card_reader",
     "deck_workshop_06_history_undo",
     "deck_workshop_07_conflict",
-    "deck_workshop_08_sample_hand_continuity"
+    "deck_workshop_08_sample_hand_continuity",
+    "deck_workshop_09_replace_all_off_empty",
+    "deck_workshop_10_replace_all_off_menu",
+    "deck_workshop_11_learning_reads_off"
   ],
   "screenshots": [
     {
       "checkpoint": "deck_workshop_00_commander",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_00_commander.png",
-      "sha256": "2be8f57ff47379b2df5c788285a90fe1a6bb565e4d304715561c66ee59a8fbb5",
-      "bytes": 59506,
+      "sha256": "127cf00acfecbca288189853ebbfd8d90f6c30eb606d1694fae2acef449f9ac5",
+      "bytes": 75884,
       "width": 390,
       "height": 844
     },
@@ -95,6 +98,30 @@
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_08_sample_hand_continuity.png",
       "sha256": "4a3cb66db91174042e59a014c56ab4f3b4967fd0d5467782e869656bd6314a02",
       "bytes": 60859,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_09_replace_all_off_empty",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_09_replace_all_off_empty.png",
+      "sha256": "036cac6666dde5fc3394d059b20db3bc3e02467b6154f05d3c6add662f1583f1",
+      "bytes": 43006,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_10_replace_all_off_menu",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_10_replace_all_off_menu.png",
+      "sha256": "8930ad06a0d5951aa72500d3d48e182dbac1147b5c0920642a88e6dbef4810a6",
+      "bytes": 47025,
+      "width": 390,
+      "height": 844
+    },
+    {
+      "checkpoint": "deck_workshop_11_learning_reads_off",
+      "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_11_learning_reads_off.png",
+      "sha256": "98abdfa7a32e49c2d69ef2cb5e742429e081b062586c57b3e8743245dcd71c5e",
+      "bytes": 60096,
       "width": 390,
       "height": 844
     }

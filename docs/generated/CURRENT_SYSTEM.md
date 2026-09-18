@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `5a0dbbc8b56a4131a9bda1eba3772104c95870aed294d28502fc03cfdc63b8b7`
+**Digest das fontes:** `5ee22ba2cf09adb751478e261ad82c4ad9863a2f6a661a440716ec2d2f1a2ab3`
 
 ## Fontes de verdade
 
@@ -15,31 +15,31 @@
 
 | Superfície | Quantidade |
 |---|---:|
-| `dart_source_files` | 684 |
+| `dart_source_files` | 687 |
 | `non_dart_product_files` | 50 |
-| `battle_sidecar_source_files` | 33 |
-| `dart_symbols` | 5166 |
-| `semantic_resolved_files` | 684 |
+| `battle_sidecar_source_files` | 34 |
+| `dart_symbols` | 5196 |
+| `semantic_resolved_files` | 687 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 42596 |
-| `semantic_resolved_call_sites` | 67848 |
-| `semantic_resolved_type_references` | 16034 |
+| `semantic_resolved_call_edges` | 42730 |
+| `semantic_resolved_call_sites` | 68115 |
+| `semantic_resolved_type_references` | 16075 |
 | `modules` | 153 |
-| `app_routes` | 45 |
+| `app_routes` | 46 |
 | `web_routes` | 11 |
 | `api_routes` | 121 |
 | `database_tables` | 79 |
 | `database_views` | 6 |
 | `migrations` | 58 |
-| `scripts_and_jobs` | 680 |
-| `environment_variables` | 695 |
-| `tests` | 1216 |
+| `scripts_and_jobs` | 685 |
+| `environment_variables` | 715 |
+| `tests` | 1220 |
 | `flows` | 8 |
 | `traceability_rules` | 12 |
-| `tasks` | 217 |
-| `task_dependency_edges` | 393 |
-| `route_consumer_bindings` | 36 |
-| `receipt_contracts` | 5 |
+| `tasks` | 220 |
+| `task_dependency_edges` | 402 |
+| `route_consumer_bindings` | 42 |
+| `receipt_contracts` | 6 |
 
 ## Fluxos canônicos
 
@@ -49,7 +49,7 @@
 | Descoberta de cartas e coleção | `active_release_scope` | cards, sets, card_legalities and collection availability in PostgreSQL |
 | Criar, importar, editar e validar deck | `active_release_scope` | decks and deck_cards under DeckRulesService validation |
 | Gerar, analisar e otimizar deck com IA | `experimental_guarded` | Commander deckbuilding contract plus backend deterministic and quality gates |
-| Battle, evidência de carta e replay | `active_guarded` | persisted battle attempts, jobs and replays plus pinned execution identity; external pins do not promote native rules |
+| Battle, Jogar contra IA, evidência de carta e replay | `active_guarded` | persisted battle attempts, jobs and replays plus pinned execution identity; external pins do not promote native rules |
 | Life Counter, sessão e pós-jogo | `active_release_scope` | local game session stores plus PostgreSQL post_game_notes after sync |
 | Comunidade, mensagens, binder e trades | `active_requires_release_e2e` | PostgreSQL ownership and transition services |
 | Build, migração, deploy, observabilidade e rollback | `guarded_no_implicit_live_write` | same-SHA release contract, artifact digests, migration ledger and health/readiness |

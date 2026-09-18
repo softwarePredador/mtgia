@@ -291,14 +291,14 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     context.push(battleReplaysRouteLocation(widget.deckId));
   }
 
-  void _openBattleCoach() {
+  void _openPlayVsAi() {
     if (!_isReleaseCapabilityAllowed(
       ReleaseCapability.battleCoach,
       buildSupported: LaunchFeatures.interactiveBattleSupported,
     )) {
       return;
     }
-    context.push(battleCoachRouteLocation(widget.deckId));
+    context.push(playVsAiRouteLocation(widget.deckId));
   }
 
   Future<void> _openLifeCounterForDeck(DeckDetails deck) async {
@@ -405,7 +405,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         false;
     final canUseBattleBatch =
         releaseCapabilities?.isAllowed(ReleaseCapability.battleBatch) ?? false;
-    final canUseBattleCoach =
+    final canPlayVsAi =
         releaseCapabilities?.isAllowed(
           ReleaseCapability.battleCoach,
           buildSupported: LaunchFeatures.interactiveBattleSupported,
@@ -416,6 +416,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
         false;
     final canUseLifeCounter =
         releaseCapabilities?.isAllowed(ReleaseCapability.lifeCounterLocal) ??
+        false;
+    final canUseDeckReplaceAll =
+        releaseCapabilities?.isAllowed(ReleaseCapability.deckReplaceAll) ??
         false;
 
     return Scaffold(
@@ -442,8 +445,8 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                 case 'battle_replays':
                   _openBattleReplays();
                   break;
-                case 'battle_coach':
-                  _openBattleCoach();
+                case 'play_vs_ai':
+                  _openPlayVsAi();
                   break;
                 case 'toggle_public':
                   _togglePublic();
@@ -460,16 +463,17 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
               final deck = context.read<DeckProvider>().selectedDeck;
               final isPublic = deck?.isPublic ?? false;
               return [
-                const PopupMenuItem(
-                  key: Key('deck-details-menu-import-list'),
-                  value: 'paste',
-                  child: ListTile(
-                    leading: Icon(Icons.content_paste_go),
-                    title: Text('Colar lista de cartas'),
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
+                if (canUseDeckReplaceAll)
+                  const PopupMenuItem(
+                    key: Key('deck-details-menu-import-list'),
+                    value: 'paste',
+                    child: ListTile(
+                      leading: Icon(Icons.content_paste_go),
+                      title: Text('Colar lista de cartas'),
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
                   ),
-                ),
                 const PopupMenuItem(
                   value: 'validate',
                   child: ListTile(
@@ -498,12 +502,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                       dense: true,
                     ),
                   ),
-                if (canUseBattleCoach)
+                if (canPlayVsAi)
                   const PopupMenuItem(
-                    value: 'battle_coach',
+                    value: 'play_vs_ai',
                     child: ListTile(
                       leading: ManaLoomGlyph(ManaLoomGlyphKind.commander),
-                      title: Text('Jogar Battle Coach'),
+                      title: Text('Jogar contra IA'),
                       contentPadding: EdgeInsets.zero,
                       dense: true,
                     ),
@@ -773,7 +777,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                     : null,
                 onSelectCommander: () =>
                     context.go('/decks/${widget.deckId}/search?mode=commander'),
-                onImportList: () => _showImportListDialog(context),
+                onImportList: canUseDeckReplaceAll
+                    ? () => _showImportListDialog(context)
+                    : null,
                 onEditDescription: _showEditDescriptionDialog,
                 onShowCardDetails: (card) => _showCardDetails(context, card),
               ),
@@ -925,9 +931,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                             onOpenBattleLab: canUseBattleBatch
                                 ? _openBattleReplays
                                 : null,
-                            onOpenBattleCoach: canUseBattleCoach
-                                ? _openBattleCoach
-                                : null,
+                            onOpenPlayVsAi: canPlayVsAi ? _openPlayVsAi : null,
                           ),
                         ],
                       ),
@@ -1647,16 +1651,26 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
   }
 
   void _showImportListDialog(BuildContext context) {
+    if (!_isReleaseCapabilityAllowed(ReleaseCapability.deckReplaceAll)) return;
     showDeckImportListDialog(
       context: context,
       deckId: widget.deckId,
       importListToDeck:
-          ({required deckId, required list, required replaceAll}) =>
-              context.read<DeckProvider>().importListToDeck(
-                deckId: deckId,
-                list: list,
-                replaceAll: replaceAll,
-              ),
+          ({required deckId, required list, required replaceAll}) {
+            if (!_isReleaseCapabilityAllowed(
+              ReleaseCapability.deckReplaceAll,
+            )) {
+              return Future.value(const {
+                'success': false,
+                'error': 'Ação indisponível nesta versão.',
+              });
+            }
+            return context.read<DeckProvider>().importListToDeck(
+              deckId: deckId,
+              list: list,
+              replaceAll: replaceAll,
+            );
+          },
       refreshDeckDetails: (deckId) => context
           .read<DeckProvider>()
           .fetchDeckDetails(deckId, forceRefresh: true),

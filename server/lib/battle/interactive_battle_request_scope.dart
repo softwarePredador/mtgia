@@ -36,7 +36,6 @@ class InteractiveBattleRequestScope {
         store: InteractiveBattleStore(pool),
         deckStore: BattleJobStore(pool),
         runtime: runtime,
-        persistence: PostgresInteractiveBattlePersistence(pool),
       ),
     );
   }

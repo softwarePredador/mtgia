@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd"
+    "sha256": "333b6c0ba8262783ee2f457e65b0dfbc4a86696cf76eeee18d0b6557bc6458d1"
   },
   "required_task_fields": [
     "id",
@@ -12,7 +12,7 @@
     "depends_on",
     "acceptance"
   ],
-  "task_count": 217,
+  "task_count": 220,
   "tasks": [
     {
       "id": "BT-GOV-001",
@@ -32,7 +32,7 @@
       "depends_on": [
         "BT-GOV-001"
       ],
-      "acceptance": "Flag ausente/inválida fica OFF; API nega antes de PG; app só apresenta o permitido; cadastro novo tem capability própria e fica OFF, enquanto login/recuperação/privacidade de contas existentes permanecem control-plane; same-SHA registra a matriz; `implementation_status`, `release_capability` e `live_verified_as_of` são eixos distintos.",
+      "acceptance": "Flag ausente/inválida fica OFF; API nega antes de PG; app só apresenta o permitido; nenhuma rota espectador fica pública e a implementação interativa guardada usa a direção Jogar contra IA; cadastro novo tem capability própria e fica OFF, enquanto login/recuperação/privacidade de contas existentes permanecem control-plane; same-SHA registra a matriz; `implementation_status`, `release_capability` e `live_verified_as_of` são eixos distintos.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 222
     },
@@ -1662,6 +1662,48 @@
       "source_line": 471
     },
     {
+      "id": "BT-PLAY-001",
+      "priority": "P0 BATTLE",
+      "status": "BLOCKED_BY_P0",
+      "delivery": "Entregar a mesa card-first de Jogar contra IA e eliminar espectador da superfície pública.",
+      "depends_on": [
+        "BT-SCP-001",
+        "BT-BAT-004",
+        "BT-BAT-005",
+        "BT-BAT-007"
+      ],
+      "acceptance": "Rota canônica `/play-vs-ai`; redirects legados sem CTA; zero rota pública `/battle-live`; mão própria sempre visível; carta legal acionável; painel acessível cobre opções sem carta, inteiro e distribuição; preflight XMage bloqueado nunca consulta Forge, simula nem abre replay substituto; capabilities continuam OFF até promoção.",
+      "section": "P0 antes de qualquer abertura Battle",
+      "source_line": 472
+    },
+    {
+      "id": "BT-PLAY-002",
+      "priority": "P0 BATTLE",
+      "status": "BLOCKED_BY_P0",
+      "delivery": "Provar os casos de uso em partida XMage real completa, não apenas fixture/widget.",
+      "depends_on": [
+        "BT-PLAY-001",
+        "BT-BAT-010"
+      ],
+      "acceptance": "Mesma SHA/pin cobre escolha de oponente, mulligan, mana, cast, alvo, prioridade/passe, combate, reconexão, concessão e resultado terminal esperado; erro não fabrica resultado; replay/rematch validados.",
+      "section": "P0 antes de qualquer abertura Battle",
+      "source_line": 473
+    },
+    {
+      "id": "BT-PLAY-003",
+      "priority": "P0 BATTLE",
+      "status": "BLOCKED_BY_P0",
+      "delivery": "Fechar resiliência, acessibilidade, capacidade e rollout de Jogar contra IA.",
+      "depends_on": [
+        "BT-PLAY-002",
+        "BT-BAT-008",
+        "BT-BAT-009"
+      ],
+      "acceptance": "Web real e Android físico; teclado/TalkBack; timeout/retry/idempotência; SLO/custo/kill switch/rollback e coorte allowlisted com receipts same-SHA.",
+      "section": "P0 antes de qualquer abertura Battle",
+      "source_line": 474
+    },
+    {
       "id": "BT-BAT-101",
       "priority": "P1",
       "status": "BLOCKED_BY_P0",
@@ -1671,7 +1713,7 @@
       ],
       "acceptance": "Heap/reservation/limit/CPU/headroom/slots/startup/custo por perfil.",
       "section": "P1 horizontal",
-      "source_line": 477
+      "source_line": 495
     },
     {
       "id": "BT-BAT-102",
@@ -1683,7 +1725,7 @@
       ],
       "acceptance": "Heartbeat TTL/fencing; stale remove slots; sem overbooking/starvation.",
       "section": "P1 horizontal",
-      "source_line": 478
+      "source_line": 496
     },
     {
       "id": "BT-BAT-103",
@@ -1695,7 +1737,7 @@
       ],
       "acceptance": "2+ workers; kill em claim/start/persist não duplica replay/terminal.",
       "section": "P1 horizontal",
-      "source_line": 479
+      "source_line": 497
     },
     {
       "id": "BT-BAT-104",
@@ -1707,7 +1749,7 @@
       ],
       "acceptance": "Só gap XMage válido; serial por processo; falha operacional termina.",
       "section": "P1 horizontal",
-      "source_line": 480
+      "source_line": 498
     },
     {
       "id": "BT-BAT-105",
@@ -1720,7 +1762,7 @@
       ],
       "acceptance": "Min/max/cooldown; scale-in drena; nunca excede DB/custo/capacity.",
       "section": "P1 horizontal",
-      "source_line": 481
+      "source_line": 499
     },
     {
       "id": "BT-BAT-106",
@@ -1732,7 +1774,7 @@
       ],
       "acceptance": "API/worker/ops separados; worker saturado não esgota API.",
       "section": "P1 horizontal",
-      "source_line": 482
+      "source_line": 500
     },
     {
       "id": "BT-COACH-101",
@@ -1744,7 +1786,7 @@
       ],
       "acceptance": "Cliente não carrega afinidade; shard stale termina `process_lost`.",
       "section": "P1 horizontal",
-      "source_line": 483
+      "source_line": 501
     },
     {
       "id": "BT-COACH-102",
@@ -1756,7 +1798,7 @@
       ],
       "acceptance": "1/2/4/8+ medidos; sessão existente conclui ou termina honestamente.",
       "section": "P1 horizontal",
-      "source_line": 484
+      "source_line": 502
     },
     {
       "id": "BT-BAT-107",
@@ -1769,7 +1811,7 @@
       ],
       "acceptance": "Forecast storage/backup/vacuum; export/delete íntegros.",
       "section": "P1 horizontal",
-      "source_line": 485
+      "source_line": 503
     },
     {
       "id": "BT-BAT-108",
@@ -1786,7 +1828,7 @@
       ],
       "acceptance": "Perda de API/worker/node/shard/PG sem duplicação ou fallback silencioso.",
       "section": "P1 horizontal",
-      "source_line": 486
+      "source_line": 504
     },
     {
       "id": "BT-BAT-109",
@@ -1807,7 +1849,7 @@
       ],
       "acceptance": "Soak/rollback; utilização aprovada ≤75%; Coach é coorte separada.",
       "section": "P1 horizontal",
-      "source_line": 487
+      "source_line": 505
     },
     {
       "id": "BT-BAT-201",
@@ -1819,7 +1861,7 @@
       ],
       "acceptance": "Decisão compara throughput, operação, custo e rollback; sem broker quando PG atende SLO.",
       "section": "P2 Battle",
-      "source_line": 493
+      "source_line": 511
     },
     {
       "id": "BT-BAT-202",
@@ -1832,7 +1874,7 @@
       ],
       "acceptance": "Cold start, memória, concorrência e custo por sessão medidos contra o pool.",
       "section": "P2 Battle",
-      "source_line": 494
+      "source_line": 512
     },
     {
       "id": "BT-BAT-203",
@@ -1845,7 +1887,7 @@
       ],
       "acceptance": "Interrupção reencaminha por lease/fencing sem duplicar cobrança, resultado ou replay.",
       "section": "P2 Battle",
-      "source_line": 495
+      "source_line": 513
     },
     {
       "id": "BT-COACH-201",
@@ -1858,7 +1900,7 @@
       ],
       "acceptance": "Estado restaurado é completo e privado; ausência de caso real mantém a task sem implementação.",
       "section": "P2 Battle",
-      "source_line": 496
+      "source_line": 514
     },
     {
       "id": "BT-BAT-204",
@@ -1871,7 +1913,7 @@
       ],
       "acceptance": "Trigger, consistência, egress, failover e custo medidos; rollout separado por região.",
       "section": "P2 Battle",
-      "source_line": 497
+      "source_line": 515
     },
     {
       "id": "LC-P0-01",
@@ -1881,7 +1923,7 @@
       "depends_on": [],
       "acceptance": "Conta B nunca herda nick/deck/sessão/nota de A; legado migra ou é limpo com receipt.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 503
+      "source_line": 521
     },
     {
       "id": "LC-P0-02",
@@ -1893,7 +1935,7 @@
       ],
       "acceptance": "Logout, forced logout, delete, token expiry e restart cobertos.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 504
+      "source_line": 522
     },
     {
       "id": "LC-P0-03",
@@ -1905,7 +1947,7 @@
       ],
       "acceptance": "UI não afirma “salvo/pausado” com `storageFlushed=false`; retry/continuar/sair sem salvar claros.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 505
+      "source_line": 523
     },
     {
       "id": "LC-P0-04",
@@ -1919,7 +1961,7 @@
       ],
       "acceptance": "Docs não chamam persistência local de durável/server-side.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 506
+      "source_line": 524
     },
     {
       "id": "PG-P1-01",
@@ -1935,7 +1977,7 @@
       ],
       "acceptance": "Um match ID, participantes, deck revision e outcome; retry idempotente.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 507
+      "source_line": 525
     },
     {
       "id": "PG-P1-02",
@@ -1947,7 +1989,7 @@
       ],
       "acceptance": "Winners/losers, cartas destaque e nota curta; skip permitido; sem parede de texto.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 508
+      "source_line": 526
     },
     {
       "id": "PGSYNC-P1-01",
@@ -1959,7 +2001,7 @@
       ],
       "acceptance": "Dois devices não sobrescrevem; typed 409/merge/retry.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 509
+      "source_line": 527
     },
     {
       "id": "PG-P1-03",
@@ -1971,7 +2013,7 @@
       ],
       "acceptance": "queued/syncing/conflict/synced; logout não envia conta errada.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 510
+      "source_line": 528
     },
     {
       "id": "LC-P1-01",
@@ -1983,7 +2025,7 @@
       ],
       "acceptance": "Limite em bytes/entradas, cleanup e métricas honestas.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 511
+      "source_line": 529
     },
     {
       "id": "PG-KPI-01",
@@ -1995,7 +2037,7 @@
       ],
       "acceptance": "Coortes por usuário/deck, sem conteúdo sensível; baseline antes de target.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
-      "source_line": 512
+      "source_line": 530
     },
     {
       "id": "SCOPE-P0-SOC-00",
@@ -2007,7 +2049,7 @@
       ],
       "acceptance": "UI/deep links ausentes e API direta nega antes de PG; flags no release identity.",
       "section": "Contenção que bloqueia a beta core",
-      "source_line": 528
+      "source_line": 546
     },
     {
       "id": "SCOPE-P0-TRD-00",
@@ -2019,7 +2061,7 @@
       ],
       "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca.",
       "section": "Contenção que bloqueia a beta core",
-      "source_line": 529
+      "source_line": 547
     },
     {
       "id": "SOC-P0-01",
@@ -2031,7 +2073,7 @@
       ],
       "acceptance": "Perfil/Binder private; message/trade none; busca por opt-in.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 535
+      "source_line": 553
     },
     {
       "id": "SOC-P0-02",
@@ -2043,7 +2085,7 @@
       ],
       "acceptance": "UUID conhecido não revela nem permite report de alvo inacessível.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 536
+      "source_line": 554
     },
     {
       "id": "SOC-P0-03",
@@ -2056,7 +2098,7 @@
       ],
       "acceptance": "Owner não republica durante hold; somente moderador libera.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 537
+      "source_line": 555
     },
     {
       "id": "SOC-P0-04",
@@ -2068,7 +2110,7 @@
       ],
       "acceptance": "Restore não reexpõe com outro enforcement ativo.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 538
+      "source_line": 556
     },
     {
       "id": "SOC-P0-05",
@@ -2081,7 +2123,7 @@
       ],
       "acceptance": "Oversize/burst/concurrency/limiter-down cobertos.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 539
+      "source_line": 557
     },
     {
       "id": "SOC-P0-06",
@@ -2094,7 +2136,7 @@
       ],
       "acceptance": "Report ID preservado; afetado recorre; reporter não recebe detalhe sensível.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 540
+      "source_line": 558
     },
     {
       "id": "SOC-P0-07",
@@ -2107,7 +2149,7 @@
       ],
       "acceptance": "100% ações com principal, justificativa e audit.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 541
+      "source_line": 559
     },
     {
       "id": "LEGAL-P0-SOC-01",
@@ -2119,7 +2161,7 @@
       ],
       "acceptance": "Memorando externo assinado; Codex/checklist não é signoff.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 542
+      "source_line": 560
     },
     {
       "id": "OPS-P0-SOC-01",
@@ -2132,7 +2174,7 @@
       ],
       "acceptance": "SLA, owner, escalation, tabletop, queue e on-call.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 543
+      "source_line": 561
     },
     {
       "id": "SOC-P0-08",
@@ -2152,7 +2194,7 @@
       ],
       "acceptance": "Zero IDOR/reexposição; UI/runtime/same-SHA.",
       "section": "Tasks que bloqueiam apenas uma futura liberação social",
-      "source_line": 544
+      "source_line": 562
     },
     {
       "id": "SOC-P1-01",
@@ -2167,7 +2209,7 @@
       ],
       "acceptance": "Copy cria draft privado com attribution e revalidação; galeria respeita hold/visibilidade.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 550
+      "source_line": 568
     },
     {
       "id": "SOC-P1-02",
@@ -2180,7 +2222,7 @@
       ],
       "acceptance": "Navegação e copy não misturam comunidade, preço e troca; deep links fechados permanecem negados.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 551
+      "source_line": 569
     },
     {
       "id": "SOC-P1-03",
@@ -2194,7 +2236,7 @@
       ],
       "acceptance": "Sem opt-in, identificador conhecido ou busca parcial não revela perfil; rate limit distribuído.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 552
+      "source_line": 570
     },
     {
       "id": "SOC-P1-04",
@@ -2208,7 +2250,7 @@
       ],
       "acceptance": "Outbox idempotente, preferências por categoria e token revogado não recebe evento.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 553
+      "source_line": 571
     },
     {
       "id": "SOC-P1-05",
@@ -2221,7 +2263,7 @@
       ],
       "acceptance": "Eventos pseudonimizados medem jornada sem conteúdo, decklist, mensagem ou identificador bruto.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 554
+      "source_line": 572
     },
     {
       "id": "SOC-P2-01",
@@ -2235,7 +2277,7 @@
       ],
       "acceptance": "Cada capability abre isoladamente; block/hold/report continuam prevalecendo.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 555
+      "source_line": 573
     },
     {
       "id": "SOC-P2-02",
@@ -2249,7 +2291,7 @@
       ],
       "acceptance": "Consentimento bilateral revogável, anti-spam, report/block e retenção comprovados.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 556
+      "source_line": 574
     },
     {
       "id": "SOC-P2-03",
@@ -2263,7 +2305,7 @@
       ],
       "acceptance": "Android físico prova opt-in/out, redaction, deep link autorizado e revogação.",
       "section": "Primeiras expansões possíveis",
-      "source_line": 557
+      "source_line": 575
     },
     {
       "id": "TRD-P0-01",
@@ -2276,7 +2318,7 @@
       ],
       "acceptance": "Matching usa somente itens consentidos; enumeração e UUID conhecido não revelam inventário privado.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 563
+      "source_line": 581
     },
     {
       "id": "TRD-P0-02",
@@ -2288,7 +2330,7 @@
       ],
       "acceptance": "Novos dados nascem privados e respostas removem endereço, localização precisa e PII.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 564
+      "source_line": 582
     },
     {
       "id": "TRD-P0-03",
@@ -2301,7 +2343,7 @@
       ],
       "acceptance": "API e copy proíbem pagamento/garantia; estados e responsabilidades ficam tipados.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 565
+      "source_line": 583
     },
     {
       "id": "TRD-P0-04",
@@ -2313,7 +2355,7 @@
       ],
       "acceptance": "Uma transição concorrente vence; retry é idempotente; expiry libera reservas corretamente.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 566
+      "source_line": 584
     },
     {
       "id": "TRD-P0-05",
@@ -2326,7 +2368,7 @@
       ],
       "acceptance": "Impressão/finish/quantidade são exatos; mudança do Binder invalida proposta e reserva stale.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 567
+      "source_line": 585
     },
     {
       "id": "TRD-P0-06",
@@ -2341,7 +2383,7 @@
       ],
       "acceptance": "Hold, disputa, evidência e decisão têm owner/SLA/audit; restore não ignora enforcement.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 568
+      "source_line": 586
     },
     {
       "id": "TRD-P0-07",
@@ -2358,7 +2400,7 @@
       ],
       "acceptance": "Duas contas provam isolamento, concorrência, cancel/expiry, fulfilment e cleanup na mesma SHA.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 569
+      "source_line": 587
     },
     {
       "id": "TRD-P1-01",
@@ -2372,7 +2414,7 @@
       ],
       "acceptance": "Limites distribuídos, alertas, runbook e histórico explicam bloqueio sem expor dados da contraparte.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 570
+      "source_line": 588
     },
     {
       "id": "TRD-P2-01",
@@ -2386,7 +2428,7 @@
       ],
       "acceptance": "Parecer, licença, pagamento, fraude, retenção e rollback recebem programa/release separados.",
       "section": "Trade/marketplace — alpha futuro separado",
-      "source_line": 571
+      "source_line": 589
     },
     {
       "id": "BT-DB-001",
@@ -2396,7 +2438,7 @@
       "depends_on": [],
       "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 577
+      "source_line": 595
     },
     {
       "id": "BT-DB-002",
@@ -2408,7 +2450,7 @@
       ],
       "acceptance": "Perfis de origem fechados, preflight antes de DDL, payload preservado, postcheck exato.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 578
+      "source_line": 596
     },
     {
       "id": "BT-DB-003",
@@ -2420,7 +2462,7 @@
       ],
       "acceptance": "Canonical e live-drift suportados explicitamente; perfil misto falha antes de DDL.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 579
+      "source_line": 597
     },
     {
       "id": "BT-DB-004",
@@ -2432,7 +2474,7 @@
       ],
       "acceptance": "`update_schema.dart` já falha fechado; sync/backfill/Commander CLIs não executam CREATE/ALTER/DROP; `sync_state` tem um único DDL; schema só muda por migration+gate; auditor cobre todos os entrypoints.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 580
+      "source_line": 598
     },
     {
       "id": "BT-DB-005",
@@ -2444,7 +2486,7 @@
       ],
       "acceptance": "Para `optimization_analysis_logs`, `theme_contextual_rules`, `synergy_packages`, `archetype_patterns`, `ml_learning_state` e demais extras: migrar com contrato ou remover consumer; fresh baseline não degrada silenciosamente.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 581
+      "source_line": 599
     },
     {
       "id": "BT-CAP-001",
@@ -2456,7 +2498,7 @@
       ],
       "acceptance": "Memória/CPU/swap/DB/resources por serviço; sem reutilizar números de worktree temporário.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 582
+      "source_line": 600
     },
     {
       "id": "BT-CAP-002",
@@ -2468,7 +2510,7 @@
       ],
       "acceptance": "Preflight antes de mutação; rollback restaura image/env/resources/deploy.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 583
+      "source_line": 601
     },
     {
       "id": "BT-OBS-001",
@@ -2480,7 +2522,7 @@
       ],
       "acceptance": "Receiver humano, thresholds, alert test e runbook; PII excluída.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 584
+      "source_line": 602
     },
     {
       "id": "BT-OBS-002",
@@ -2492,7 +2534,7 @@
       ],
       "acceptance": "Duas execuções agendadas verdes; receiver idempotente e acknowledged.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 585
+      "source_line": 603
     },
     {
       "id": "BT-DR-001",
@@ -2504,7 +2546,7 @@
       ],
       "acceptance": "Manifest/checksum/object version; RPO/RTO medidos; dados e schema validados.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 586
+      "source_line": 604
     },
     {
       "id": "BT-REL-001",
@@ -2519,7 +2561,7 @@
       ],
       "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 587
+      "source_line": 605
     },
     {
       "id": "BT-REL-002",
@@ -2531,7 +2573,7 @@
       ],
       "acceptance": "SHA completo, product/surface e flags; app compara o digest recebido com a matriz embutida no próprio artefato; backend novo não habilita código antigo; mixed SHA/digest falha fechado.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 588
+      "source_line": 606
     },
     {
       "id": "BT-REL-003",
@@ -2546,7 +2588,7 @@
       ],
       "acceptance": "quick/full/schema/e2e/release e segurança verdes no commit candidato; o gate resolve e exige todos os P0 core aplicáveis.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 589
+      "source_line": 607
     },
     {
       "id": "BT-QA-001",
@@ -2559,7 +2601,7 @@
       ],
       "acceptance": "Capturas abertas, TalkBack, teclado, permissões, offline, erros e flows negativos.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 590
+      "source_line": 608
     },
     {
       "id": "BT-DEC-001",
@@ -2571,7 +2613,7 @@
       ],
       "acceptance": "Escopo, bloqueios, riscos aceitos, rollout, monitor e rollback explícitos.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 591
+      "source_line": 609
     },
     {
       "id": "BT-GATE-001",
@@ -2581,7 +2623,7 @@
       "depends_on": [],
       "acceptance": "E2E/quality/local CI propagam `BLOCKED` não-zero; testes cobrem runtime/PG/Flutter omitidos.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 592
+      "source_line": 610
     },
     {
       "id": "BT-GATE-002",
@@ -2593,7 +2635,7 @@
       ],
       "acceptance": "Receipt fresco não pode ser forjado com um check; digest no fim igual ao início; logs/artifacts hasheados; `/tmp` não é prova durável.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 593
+      "source_line": 611
     },
     {
       "id": "BT-GATE-003",
@@ -2606,7 +2648,7 @@
       ],
       "acceptance": "Pre-push cobre containment Python/Dart; release exige receipt PG/runtime aplicável; cada slice roda uma vez.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 594
+      "source_line": 612
     },
     {
       "id": "BT-GATE-004",
@@ -2618,7 +2660,7 @@
       ],
       "acceptance": "CI roda o analisador real, não só teste do classificador; zero órfão desconhecido; validation-only tem owner/substituto/expiry.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 595
+      "source_line": 613
     },
     {
       "id": "BT-GATE-005",
@@ -2630,7 +2672,7 @@
       ],
       "acceptance": "Generate/save, Analyze, Optimize/Complete/apply, Rebuild, learning, privacy, jobs e Battle evidence têm positivos/negativos/concorrência; warnings estruturados bloqueiam conforme policy.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 596
+      "source_line": 614
     },
     {
       "id": "BT-GATE-006",
@@ -2642,7 +2684,7 @@
       ],
       "acceptance": "Disco/RAM/SDK pinados antes do build; insuficiência retorna BLOCKED, não corrompe cache nem vira falha de produto.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 597
+      "source_line": 615
     },
     {
       "id": "BT-WEB-001",
@@ -2656,7 +2698,7 @@
       ],
       "acceptance": "Sem Pro/market/social/Battle prometidos quando OFF; screenshots e release metadata corretos.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 603
+      "source_line": 621
     },
     {
       "id": "BT-WEB-002",
@@ -2669,7 +2711,7 @@
       ],
       "acceptance": "Deep link/reload/back preservam intenção; sem bypass de auth/capability.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 604
+      "source_line": 622
     },
     {
       "id": "BT-ACT-001",
@@ -2683,7 +2725,7 @@
       ],
       "acceptance": "Funnel por usuário/coorte; erro tem recuperação; abandono mensurado.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 605
+      "source_line": 623
     },
     {
       "id": "BT-ACT-002",
@@ -2698,7 +2740,7 @@
       ],
       "acceptance": "Cada etapa tem CTA único e receipt; eventos não contam preview como apply.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 606
+      "source_line": 624
     },
     {
       "id": "BT-ACT-003",
@@ -2713,7 +2755,7 @@
       ],
       "acceptance": "Decisão GO/ITERATE/STOP pré-registrada; metas só depois da baseline.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 607
+      "source_line": 625
     },
     {
       "id": "BT-LEGAL-001",
@@ -2727,7 +2769,7 @@
       ],
       "acceptance": "Inventário fechado e reproduzível; perguntas e decisões do owner explícitas.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 625
+      "source_line": 643
     },
     {
       "id": "BT-LEGAL-002",
@@ -2739,7 +2781,7 @@
       ],
       "acceptance": "Profissional/jurisdição/data/escopo/ressalvas/próxima revisão; receipt/hash seguro.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 626
+      "source_line": 644
     },
     {
       "id": "BT-COM-001",
@@ -2752,7 +2794,7 @@
       ],
       "acceptance": "Backend é autoridade; checkout/webhook/refund/reconciliação e kill switch.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 627
+      "source_line": 645
     },
     {
       "id": "BT-COM-002",
@@ -2766,7 +2808,7 @@
       ],
       "acceptance": "Margem observada; custo p50/p95; Battle/Coach com budget; nenhum subsídio oculto.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 628
+      "source_line": 646
     },
     {
       "id": "BT-COM-003",
@@ -2778,7 +2820,7 @@
       ],
       "acceptance": "Plano vencido não conserva quota Pro; webhook/reconciler/retry concorrente e clock boundaries comprovados.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 629
+      "source_line": 647
     }
   ],
   "dependency_edges": [
@@ -2967,6 +3009,10 @@
       "to": "BT-BAT-010"
     },
     {
+      "from": "BT-BAT-004",
+      "to": "BT-PLAY-001"
+    },
+    {
       "from": "BT-BAT-005",
       "to": "BT-BAT-008"
     },
@@ -2977,6 +3023,10 @@
     {
       "from": "BT-BAT-005",
       "to": "BT-BAT-106"
+    },
+    {
+      "from": "BT-BAT-005",
+      "to": "BT-PLAY-001"
     },
     {
       "from": "BT-BAT-006",
@@ -2991,6 +3041,10 @@
       "to": "BT-BAT-EVD-004"
     },
     {
+      "from": "BT-BAT-007",
+      "to": "BT-PLAY-001"
+    },
+    {
       "from": "BT-BAT-008",
       "to": "BT-BAT-009"
     },
@@ -3003,6 +3057,10 @@
       "to": "BT-BAT-107"
     },
     {
+      "from": "BT-BAT-008",
+      "to": "BT-PLAY-003"
+    },
+    {
       "from": "BT-BAT-009",
       "to": "BT-BAT-010"
     },
@@ -3011,8 +3069,16 @@
       "to": "BT-COM-002"
     },
     {
+      "from": "BT-BAT-009",
+      "to": "BT-PLAY-003"
+    },
+    {
       "from": "BT-BAT-010",
       "to": "BT-BAT-101"
+    },
+    {
+      "from": "BT-BAT-010",
+      "to": "BT-PLAY-002"
     },
     {
       "from": "BT-BAT-101",
@@ -3523,6 +3589,14 @@
       "to": "BT-WEB-001"
     },
     {
+      "from": "BT-PLAY-001",
+      "to": "BT-PLAY-002"
+    },
+    {
+      "from": "BT-PLAY-002",
+      "to": "BT-PLAY-003"
+    },
+    {
       "from": "BT-PRICE-01",
       "to": "BT-AI-006"
     },
@@ -3617,6 +3691,10 @@
     {
       "from": "BT-SCP-001",
       "to": "BT-BAT-004"
+    },
+    {
+      "from": "BT-SCP-001",
+      "to": "BT-PLAY-001"
     },
     {
       "from": "BT-SCP-001",
@@ -4447,6 +4525,7 @@
     "BT-COM-001",
     "BT-COM-003",
     "BT-GATE-004",
+    "BT-PLAY-001",
     "BT-REL-001",
     "BT-REL-002",
     "BT-SCN-00",
@@ -4495,6 +4574,8 @@
     "BT-BAT-203",
     "BT-BAT-204",
     "BT-COACH-201",
+    "BT-PLAY-002",
+    "BT-PLAY-003",
     "DCK-P0-06",
     "DCK-P0-07",
     "DCK-P1-01",
@@ -4578,7 +4659,7 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/execution/CURRENT_QUEUE.md",
-      "sha256": "01a7b56ab0cbbf82cfd1b2538b14da3fc5aa1dc5c948bd2d1e3b08e3c7b05d7d"
+      "sha256": "fb4870a6ad3447ef352d6a3d73ef3451138a9e15eea58bbe42e3be9e8bc2018d"
     },
     "wip_limit": 1,
     "active_slot_count": 1,
@@ -4764,6 +4845,13 @@
       },
       {
         "path": "docs/adr/0012-xmage-human-spike-go.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "path": "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
         "priority_authority": false,
@@ -5208,6 +5296,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5220,17 +5309,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5238,6 +5339,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5245,9 +5348,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5273,6 +5379,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5285,17 +5392,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5303,6 +5422,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5310,9 +5431,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5336,6 +5460,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5348,17 +5473,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5366,6 +5503,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5373,9 +5512,338 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
+    },
+    {
+      "flow_id": "battle_replay",
+      "entrypoint": "/ai/battle/sessions",
+      "normalized_pattern": "/ai/battle/sessions",
+      "surfaces": [
+        "api"
+      ],
+      "methods": [
+        "GET",
+        "POST"
+      ],
+      "sources": [
+        {
+          "surface": "api",
+          "path": "/ai/battle/sessions",
+          "source": "server/routes/ai/battle/sessions/index.dart",
+          "methods": [
+            "GET",
+            "POST"
+          ]
+        }
+      ],
+      "flow_producers": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
+        "server/lib/battle/battle_job_metrics_service.dart",
+        "server/lib/battle/battle_job_runner.dart",
+        "server/lib/battle/battle_job_service.dart",
+        "server/lib/battle/battle_live_cursor_contract.dart",
+        "server/lib/battle/battle_live_service.dart",
+        "server/lib/battle/battle_live_store.dart",
+        "server/lib/battle/battle_replay_annotation_service.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
+        "server/routes/ai/simulate/index.dart",
+        "services/forge-sidecar/sidecar.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
+      ],
+      "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
+        "app/lib/features/battle/screens/battle_replays_screen.dart",
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "storage": [
+        "battle_simulations",
+        "battle_simulation_attempts",
+        "battle_replay_annotations",
+        "battle_jobs",
+        "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "card_battle_rules",
+        "deck_matchups"
+      ],
+      "gates": [
+        "scripts/quality_gate.sh",
+        "scripts/manaloom_battle_product_gate.sh",
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
+    },
+    {
+      "flow_id": "battle_replay",
+      "entrypoint": "/ai/battle/sessions/{id}",
+      "normalized_pattern": "/ai/battle/sessions/{}",
+      "surfaces": [
+        "api"
+      ],
+      "methods": [
+        "GET"
+      ],
+      "sources": [
+        {
+          "surface": "api",
+          "path": "/ai/battle/sessions/{id}",
+          "source": "server/routes/ai/battle/sessions/[id]/index.dart",
+          "methods": [
+            "GET"
+          ]
+        }
+      ],
+      "flow_producers": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
+        "server/lib/battle/battle_job_metrics_service.dart",
+        "server/lib/battle/battle_job_runner.dart",
+        "server/lib/battle/battle_job_service.dart",
+        "server/lib/battle/battle_live_cursor_contract.dart",
+        "server/lib/battle/battle_live_service.dart",
+        "server/lib/battle/battle_live_store.dart",
+        "server/lib/battle/battle_replay_annotation_service.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
+        "server/routes/ai/simulate/index.dart",
+        "services/forge-sidecar/sidecar.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
+      ],
+      "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
+        "app/lib/features/battle/screens/battle_replays_screen.dart",
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "storage": [
+        "battle_simulations",
+        "battle_simulation_attempts",
+        "battle_replay_annotations",
+        "battle_jobs",
+        "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "card_battle_rules",
+        "deck_matchups"
+      ],
+      "gates": [
+        "scripts/quality_gate.sh",
+        "scripts/manaloom_battle_product_gate.sh",
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
+    },
+    {
+      "flow_id": "battle_replay",
+      "entrypoint": "/ai/battle/sessions/{id}/actions",
+      "normalized_pattern": "/ai/battle/sessions/{}/actions",
+      "surfaces": [
+        "api"
+      ],
+      "methods": [
+        "POST"
+      ],
+      "sources": [
+        {
+          "surface": "api",
+          "path": "/ai/battle/sessions/{id}/actions",
+          "source": "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+          "methods": [
+            "POST"
+          ]
+        }
+      ],
+      "flow_producers": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
+        "server/lib/battle/battle_job_metrics_service.dart",
+        "server/lib/battle/battle_job_runner.dart",
+        "server/lib/battle/battle_job_service.dart",
+        "server/lib/battle/battle_live_cursor_contract.dart",
+        "server/lib/battle/battle_live_service.dart",
+        "server/lib/battle/battle_live_store.dart",
+        "server/lib/battle/battle_replay_annotation_service.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
+        "server/routes/ai/simulate/index.dart",
+        "services/forge-sidecar/sidecar.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
+      ],
+      "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
+        "app/lib/features/battle/screens/battle_replays_screen.dart",
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "storage": [
+        "battle_simulations",
+        "battle_simulation_attempts",
+        "battle_replay_annotations",
+        "battle_jobs",
+        "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "card_battle_rules",
+        "deck_matchups"
+      ],
+      "gates": [
+        "scripts/quality_gate.sh",
+        "scripts/manaloom_battle_product_gate.sh",
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
+    },
+    {
+      "flow_id": "battle_replay",
+      "entrypoint": "/ai/battle/sessions/{id}/concede",
+      "normalized_pattern": "/ai/battle/sessions/{}/concede",
+      "surfaces": [
+        "api"
+      ],
+      "methods": [
+        "POST"
+      ],
+      "sources": [
+        {
+          "surface": "api",
+          "path": "/ai/battle/sessions/{id}/concede",
+          "source": "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+          "methods": [
+            "POST"
+          ]
+        }
+      ],
+      "flow_producers": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
+        "server/lib/battle/battle_job_metrics_service.dart",
+        "server/lib/battle/battle_job_runner.dart",
+        "server/lib/battle/battle_job_service.dart",
+        "server/lib/battle/battle_live_cursor_contract.dart",
+        "server/lib/battle/battle_live_service.dart",
+        "server/lib/battle/battle_live_store.dart",
+        "server/lib/battle/battle_replay_annotation_service.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
+        "server/routes/ai/simulate/index.dart",
+        "services/forge-sidecar/sidecar.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
+      ],
+      "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
+        "app/lib/features/battle/screens/battle_replays_screen.dart",
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "storage": [
+        "battle_simulations",
+        "battle_simulation_attempts",
+        "battle_replay_annotations",
+        "battle_jobs",
+        "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "card_battle_rules",
+        "deck_matchups"
+      ],
+      "gates": [
+        "scripts/quality_gate.sh",
+        "scripts/manaloom_battle_product_gate.sh",
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5399,6 +5867,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5411,17 +5880,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5429,6 +5910,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5436,9 +5919,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5453,11 +5939,12 @@
           "surface": "app",
           "path": "/decks/:id/battle-coach",
           "source": "app/lib/main.dart",
-          "screen": "BattleCoachScreen"
+          "screen": "redirect:/decks/:id/play-vs-ai"
         }
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5470,17 +5957,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5488,6 +5987,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5495,9 +5996,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5512,11 +6016,12 @@
           "surface": "app",
           "path": "/decks/:id/battle-coach/:sessionId",
           "source": "app/lib/main.dart",
-          "screen": "BattleCoachScreen"
+          "screen": "redirect:/decks/:id/play-vs-ai/:sessionId"
         }
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5529,17 +6034,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5547,6 +6064,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5554,9 +6073,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5580,6 +6102,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5592,17 +6115,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5610,6 +6145,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5617,9 +6154,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5650,6 +6190,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5662,17 +6203,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5680,6 +6233,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5687,9 +6242,12 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "battle_replay",
@@ -5715,6 +6273,7 @@
       ],
       "flow_producers": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
         "server/lib/battle/battle_job_metrics_service.dart",
@@ -5727,17 +6286,29 @@
         "server/lib/battle/battle_replay_payload_sanitizer.dart",
         "server/lib/battle/battle_replay_read_service.dart",
         "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
         "server/routes/ai/simulate/index.dart",
         "services/forge-sidecar/sidecar.py",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
         "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
       ],
       "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
         "app/lib/features/battle/screens/battle_coach_screen.dart",
         "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
         "app/lib/features/battle/screens/battle_replays_screen.dart",
-        "app/lib/features/battle/services/battle_job_gateway.dart"
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
       ],
       "storage": [
         "battle_simulations",
@@ -5745,6 +6316,8 @@
         "battle_replay_annotations",
         "battle_jobs",
         "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
         "card_battle_rules",
         "deck_matchups"
       ],
@@ -5752,9 +6325,166 @@
         "scripts/quality_gate.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_external_engine_delta_audit.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh"
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
-      "receipt_contract_ids": []
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
+    },
+    {
+      "flow_id": "battle_replay",
+      "entrypoint": "/decks/{id}/play-vs-ai",
+      "normalized_pattern": "/decks/{}/play-vs-ai",
+      "surfaces": [
+        "app"
+      ],
+      "methods": [],
+      "sources": [
+        {
+          "surface": "app",
+          "path": "/decks/:id/play-vs-ai",
+          "source": "app/lib/main.dart",
+          "screen": "BattleCoachScreen"
+        }
+      ],
+      "flow_producers": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
+        "server/lib/battle/battle_job_metrics_service.dart",
+        "server/lib/battle/battle_job_runner.dart",
+        "server/lib/battle/battle_job_service.dart",
+        "server/lib/battle/battle_live_cursor_contract.dart",
+        "server/lib/battle/battle_live_service.dart",
+        "server/lib/battle/battle_live_store.dart",
+        "server/lib/battle/battle_replay_annotation_service.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
+        "server/routes/ai/simulate/index.dart",
+        "services/forge-sidecar/sidecar.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
+      ],
+      "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
+        "app/lib/features/battle/screens/battle_replays_screen.dart",
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "storage": [
+        "battle_simulations",
+        "battle_simulation_attempts",
+        "battle_replay_annotations",
+        "battle_jobs",
+        "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "card_battle_rules",
+        "deck_matchups"
+      ],
+      "gates": [
+        "scripts/quality_gate.sh",
+        "scripts/manaloom_battle_product_gate.sh",
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
+    },
+    {
+      "flow_id": "battle_replay",
+      "entrypoint": "/decks/{id}/play-vs-ai/{sessionId}",
+      "normalized_pattern": "/decks/{}/play-vs-ai/{}",
+      "surfaces": [
+        "app"
+      ],
+      "methods": [],
+      "sources": [
+        {
+          "surface": "app",
+          "path": "/decks/:id/play-vs-ai/:sessionId",
+          "source": "app/lib/main.dart",
+          "screen": "BattleCoachScreen"
+        }
+      ],
+      "flow_producers": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/external_battle_async_runner.py",
+        "scripts/manaloom_play_vs_ai_e2e.sh",
+        "server/lib/ai/battle_engine_config.dart",
+        "server/lib/battle/battle_execution_runtime.dart",
+        "server/lib/battle/battle_job_metrics_service.dart",
+        "server/lib/battle/battle_job_runner.dart",
+        "server/lib/battle/battle_job_service.dart",
+        "server/lib/battle/battle_live_cursor_contract.dart",
+        "server/lib/battle/battle_live_service.dart",
+        "server/lib/battle/battle_live_store.dart",
+        "server/lib/battle/battle_replay_annotation_service.dart",
+        "server/lib/battle/battle_replay_payload_sanitizer.dart",
+        "server/lib/battle/battle_replay_read_service.dart",
+        "server/lib/battle/battle_simulation_attempt_service.dart",
+        "server/lib/battle/interactive_battle_contract.dart",
+        "server/lib/battle/interactive_battle_runtime_client.dart",
+        "server/lib/battle/interactive_battle_service.dart",
+        "server/lib/battle/interactive_battle_store.dart",
+        "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+        "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+        "server/routes/ai/battle/sessions/[id]/index.dart",
+        "server/routes/ai/battle/sessions/index.dart",
+        "server/routes/ai/simulate/index.dart",
+        "services/forge-sidecar/sidecar.py",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/BattleLiveRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/InteractiveBattleRegistry.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/SidecarMain.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageBattleService.java",
+        "services/xmage-sidecar/src/main/java/com/manaloom/xmage/XmageCardQualificationPolicy.java"
+      ],
+      "flow_consumers": [
+        "app/lib/features/battle/models/interactive_battle_session.dart",
+        "app/lib/features/battle/screens/battle_coach_screen.dart",
+        "app/lib/features/battle/screens/battle_live_spectator_screen.dart",
+        "app/lib/features/battle/screens/battle_replays_screen.dart",
+        "app/lib/features/battle/services/battle_job_gateway.dart",
+        "app/lib/features/battle/services/interactive_battle_service.dart"
+      ],
+      "storage": [
+        "battle_simulations",
+        "battle_simulation_attempts",
+        "battle_replay_annotations",
+        "battle_jobs",
+        "battle_job_live_records",
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "card_battle_rules",
+        "deck_matchups"
+      ],
+      "gates": [
+        "scripts/quality_gate.sh",
+        "scripts/manaloom_battle_product_gate.sh",
+        "scripts/manaloom_external_engine_delta_audit.sh",
+        "scripts/manaloom_ui_live_evidence_gate.sh",
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "receipt_contract_ids": [
+        "play_vs_ai_e2e_report_v1"
+      ]
     },
     {
       "flow_id": "card_collection",
@@ -7016,6 +7746,52 @@
       ]
     },
     {
+      "id": "play_vs_ai_e2e_report_v1",
+      "flows": [
+        "battle_replay"
+      ],
+      "producers": [
+        "scripts/manaloom_play_vs_ai_e2e.sh"
+      ],
+      "consumers": [
+        "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
+        "docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md"
+      ],
+      "schemas": [
+        "play_vs_ai_e2e_report_v1"
+      ],
+      "durability": "ephemeral_until_reviewed_and_tracked",
+      "allowed_statuses": [
+        "pass",
+        "fail"
+      ],
+      "required_bindings": [
+        "result",
+        "exit_code",
+        "failure_stage",
+        "source.git_head",
+        "source.worktree_status_sha256",
+        "engine.upstream_commit",
+        "engine.governed_patch_commit",
+        "engine.build_identity",
+        "topology.postgresql",
+        "topology.batch_and_interactive_processes_distinct",
+        "isolated_capabilities.policy_sha256",
+        "isolated_capabilities.enabled_only",
+        "isolated_capabilities.committed_policy_modified",
+        "evidence.play_vs_ai.session_id",
+        "evidence.play_vs_ai.replay_id",
+        "evidence.browser_qa.ui_source_digest",
+        "evidence.browser_qa.runtime.capture_manifest.sha256",
+        "evidence.browser_qa.runtime.visual_review.sha256",
+        "cleanup.success",
+        "cleanup.forced_kill_used",
+        "strategy_superiority_proven",
+        "release_ready",
+        "committed_capability_state"
+      ]
+    },
+    {
       "id": "release_identity_v1",
       "flows": [
         "release_operations"
@@ -7061,5 +7837,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "5a0dbbc8b56a4131a9bda1eba3772104c95870aed294d28502fc03cfdc63b8b7"
+  "project_logic_source_digest_sha256": "5ee22ba2cf09adb751478e261ad82c4ad9863a2f6a661a440716ec2d2f1a2ab3"
 }

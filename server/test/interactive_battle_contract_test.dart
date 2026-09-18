@@ -65,6 +65,54 @@ void main() {
         ),
       );
     });
+
+    test('create fingerprint binds the stable request body and deck ids', () {
+      const input = InteractiveBattleCreateInput(
+        deckId: _deckA,
+        opponentDeckId: _deckB,
+        ttlSeconds: 600,
+        promptTimeoutSeconds: 45,
+        idempotencyKey: 'fingerprint-one',
+      );
+      final fingerprint = interactiveBattleCreateFingerprint(input: input);
+
+      expect(
+        interactiveBattleCreateFingerprint(
+          input: const InteractiveBattleCreateInput(
+            deckId: _deckA,
+            opponentDeckId: _deckB,
+            ttlSeconds: 600,
+            promptTimeoutSeconds: 45,
+            idempotencyKey: 'fingerprint-retry-key-is-not-hash-material',
+          ),
+        ),
+        fingerprint,
+      );
+      expect(
+        interactiveBattleCreateFingerprint(
+          input: const InteractiveBattleCreateInput(
+            deckId: _deckC,
+            opponentDeckId: _deckB,
+            ttlSeconds: 600,
+            promptTimeoutSeconds: 45,
+            idempotencyKey: 'fingerprint-one',
+          ),
+        ),
+        isNot(fingerprint),
+      );
+      expect(
+        interactiveBattleCreateFingerprint(
+          input: const InteractiveBattleCreateInput(
+            deckId: _deckA,
+            opponentDeckId: _deckB,
+            ttlSeconds: 601,
+            promptTimeoutSeconds: 45,
+            idempotencyKey: 'fingerprint-one',
+          ),
+        ),
+        isNot(fingerprint),
+      );
+    });
   });
 
   group('interactive prompt actions', () {
@@ -171,6 +219,94 @@ void main() {
         ),
       );
     });
+
+    test('prompt card object id is optional but UUID-strict when present', () {
+      final withObjectId = InteractiveBattlePrompt.parse({
+        'schema_version': interactiveBattlePromptSchema,
+        'id': _promptId,
+        'state_version': 7,
+        'kind': 'main_action',
+        'input_mode': 'options',
+        'title': 'Sua prioridade',
+        'message': 'Escolha uma ação.',
+        'deadline_at': '2026-07-27T15:00:00Z',
+        'options': [
+          {
+            'id': _optionId,
+            'label': 'Conjurar Swords to Plowshares',
+            'role': 'card',
+            'card': {
+              'id': '11111111-1111-4111-8111-111111111111',
+              'name': 'Swords to Plowshares',
+              'set_code': '2XM',
+              'collector_number': '35',
+            },
+          },
+        ],
+      });
+      final withoutObjectId = InteractiveBattlePrompt.parse({
+        'schema_version': interactiveBattlePromptSchema,
+        'id': _promptId,
+        'state_version': 7,
+        'kind': 'main_action',
+        'input_mode': 'options',
+        'title': 'Sua prioridade',
+        'message': 'Escolha uma ação.',
+        'deadline_at': '2026-07-27T15:00:00Z',
+        'options': [
+          {
+            'id': _optionId,
+            'label': 'Conjurar Swords to Plowshares',
+            'role': 'card',
+            'card': {'name': 'Swords to Plowshares'},
+          },
+        ],
+      });
+
+      expect(
+        withObjectId.options.single.card?['id'],
+        '11111111-1111-4111-8111-111111111111',
+      );
+      expect(withoutObjectId.options.single.card?['id'], isNull);
+
+      for (final invalidCard in <Map<String, Object?>>[
+        {'id': 'not-a-uuid', 'name': 'Swords to Plowshares'},
+        {'id': 42, 'name': 'Swords to Plowshares'},
+        {
+          'id': '11111111-1111-4111-8111-111111111111',
+          'name': 'Swords to Plowshares',
+          'hidden_owner_id': 'opponent-private-id',
+        },
+      ]) {
+        expect(
+          () => InteractiveBattlePrompt.parse({
+            'schema_version': interactiveBattlePromptSchema,
+            'id': _promptId,
+            'state_version': 7,
+            'kind': 'main_action',
+            'input_mode': 'options',
+            'title': 'Sua prioridade',
+            'message': 'Escolha uma ação.',
+            'deadline_at': '2026-07-27T15:00:00Z',
+            'options': [
+              {
+                'id': _optionId,
+                'label': 'Conjurar Swords to Plowshares',
+                'role': 'card',
+                'card': invalidCard,
+              },
+            ],
+          }),
+          throwsA(
+            isA<InteractiveBattlePersistenceException>().having(
+              (error) => error.code,
+              'code',
+              'interactive_battle_prompt_invalid',
+            ),
+          ),
+        );
+      }
+    });
   });
 
   test('completed, censored, and conceded sessions require a replay', () {
@@ -187,5 +323,6 @@ void main() {
 
 const _deckA = '11111111-1111-4111-8111-111111111111';
 const _deckB = '22222222-2222-4222-8222-222222222222';
+const _deckC = '33333333-3333-4333-8333-333333333333';
 const _promptId = 'p_abcdefghijklmnop';
 const _optionId = 'o_abcdefghijklmnop';

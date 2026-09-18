@@ -1,0 +1,102 @@
+{
+  "schema_version": "manaloom_ui_runtime_capture_v1",
+  "status": "PASS_RUNTIME",
+  "generated_at": "2026-08-26T11:37:14.575691Z",
+  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
+  "surface": "play_vs_ai",
+  "profile": "web_play_vs_ai_1440x900",
+  "runtime": "flutter_web_release_loopback_api_pinned_xmage",
+  "target": "web_real_build",
+  "device_contract": "Codex in-app Chromium browser real Web build 1440x900",
+  "runtime_console": {
+    "status": "pass",
+    "forbidden_entries": 0
+  },
+  "log_sha256": "85eb1f0243731f9dbb6e9b23353dc0540a068f9ee39ecc805d78648fd94d20a3",
+  "checkpoint_count": 9,
+  "required_checkpoints": [
+    "01-opponent-picker",
+    "02-private-hand-mulligan",
+    "03-land-played",
+    "04-commander-cast",
+    "05-combat-damage",
+    "06-reconnected-session",
+    "07-terminal-replay-rematch",
+    "08-replay",
+    "09-rematch-picker"
+  ],
+  "screenshots": [
+    {
+      "checkpoint": "01-opponent-picker",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/01-opponent-picker.png",
+      "sha256": "18f8f293bba4fdcf4b9926e0d65bbd5501fa7b745f37e6b2f4cb6c9b828f16db",
+      "bytes": 197800,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "02-private-hand-mulligan",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/02-private-hand-mulligan.png",
+      "sha256": "bc3f0074509aa19fae6ce5b9d491489c37987e003200fffafd142f20ad0455b3",
+      "bytes": 363707,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "03-land-played",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/03-land-played.png",
+      "sha256": "6b0a20d98bc1efdd952196c2cf2989aa321486dc974af85f0665d6c03254b45d",
+      "bytes": 359327,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "04-commander-cast",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/04-commander-cast.png",
+      "sha256": "2b798e1a052f0b0e2b0050ede6c4995f2da00a3e83cb0378dfb7f743db8612a7",
+      "bytes": 289637,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "05-combat-damage",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/05-combat-damage.png",
+      "sha256": "c932a1f5300fbb2303957c012def0e8d27aa9bf3093b16800d36ad77e0589aab",
+      "bytes": 394118,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "06-reconnected-session",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/06-reconnected-session.png",
+      "sha256": "6590a5ee3c701eb4706c1070d01f9f0bd38f274c72445a8731e5cc411dec16f6",
+      "bytes": 394491,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "07-terminal-replay-rematch",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/07-terminal-replay-rematch.png",
+      "sha256": "f8993443fef321bd487f155d1c947320db1bc96a8175a15ff413d26f1b2dc42e",
+      "bytes": 253312,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "08-replay",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/08-replay.png",
+      "sha256": "3b20c151a9b47ba8488c84693860cbedd22173d9109380b1225eb1ded892bc06",
+      "bytes": 456420,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "checkpoint": "09-rematch-picker",
+      "path": "docs/qa/ui-live/current/play-vs-ai-web-real/09-rematch-picker.png",
+      "sha256": "6479a5b2cea509aa02e8699921769c4f0aebac0bc24cc6cb5fac9247f11fe889",
+      "bytes": 198087,
+      "width": 1440,
+      "height": 900
+    }
+  ]
+}

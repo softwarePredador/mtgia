@@ -446,19 +446,27 @@ class InteractiveBattlePromptOption {
       );
     }
     final card = _stringMap(value['card']);
-    if (card != null &&
-        card.keys.any(
-          (key) =>
-              !const {
-                'name',
-                'image_url',
-                'set_code',
-                'collector_number',
-              }.contains(key),
-        )) {
-      throw const InteractiveBattlePersistenceException(
-        'interactive_battle_prompt_invalid',
+    if (card != null) {
+      final hasUnexpectedKey = card.keys.any(
+        (key) =>
+            !const {
+              'id',
+              'name',
+              'image_url',
+              'set_code',
+              'collector_number',
+            }.contains(key),
       );
+      final rawCardId = card['id'];
+      final hasInvalidCardId =
+          card.containsKey('id') &&
+          (rawCardId is! String ||
+              !interactiveBattleUuidPattern.hasMatch(rawCardId.trim()));
+      if (hasUnexpectedKey || hasInvalidCardId) {
+        throw const InteractiveBattlePersistenceException(
+          'interactive_battle_prompt_invalid',
+        );
+      }
     }
     return InteractiveBattlePromptOption(
       id: id,
@@ -732,12 +740,10 @@ class InteractiveBattleSession {
 
 String interactiveBattleCreateFingerprint({
   required InteractiveBattleCreateInput input,
-  required String deckAHash,
-  required String deckBHash,
 }) => canonicalBattlePayloadHash({
   'schema_version': interactiveBattleRequestSchema,
-  'deck_a_hash': deckAHash,
-  'deck_b_hash': deckBHash,
+  'deck_id': input.deckId,
+  'opponent_deck_id': input.opponentDeckId,
   'ttl_seconds': input.ttlSeconds,
   'prompt_timeout_seconds': input.promptTimeoutSeconds,
   'engine': 'xmage',

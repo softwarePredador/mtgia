@@ -1,0 +1,89 @@
+{
+  "schema_version": "manaloom_ui_surface_visual_review_v1",
+  "status": "PASS_VISUAL_REVIEWED",
+  "scope": "focal_play_vs_ai_real_xmage",
+  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
+  "surface": "play_vs_ai",
+  "profile": "web_play_vs_ai_1440x900",
+  "reviewed_at": "2026-08-26T11:36:32Z",
+  "reviewer": {
+    "kind": "agent",
+    "name": "Codex primary agent"
+  },
+  "visual_thesis": "A mesa mantém cartas, zonas, vida e ações legais como foco principal, deixando claro que o usuário joga diretamente contra a IA.",
+  "content_plan": "Os nove checkpoints cobrem escolha do adversário, mão privada, progressão de turno, dano, reconexão, terminal, replay e rematch.",
+  "interaction_thesis": "A bandeja contextual apresenta somente decisões legais do XMage e mantém a continuidade da mesma sessão após recarregar a página.",
+  "criteria": {
+    "visual_hierarchy": {
+      "status": "pass",
+      "note": "Mesa e bandeja de decisões dominam a composição, enquanto navegação e status permanecem claramente secundários."
+    },
+    "brand_and_mtg_identity": {
+      "status": "pass",
+      "note": "A paleta escura, cartas reais, zonas e acentos dourados preservam a identidade BrewTact e a linguagem visual de MTG."
+    },
+    "color_and_contrast": {
+      "status": "pass",
+      "note": "Textos, estados de prioridade, vida e botões mantêm contraste suficiente em todos os nove estados revisados."
+    },
+    "typography": {
+      "status": "pass",
+      "note": "Títulos serifados e textos funcionais sans-serif formam uma hierarquia consistente e legível no perfil 1440 por 900."
+    },
+    "spacing_and_density": {
+      "status": "pass",
+      "note": "A densidade elevada da mesa permanece organizada por zonas, com espaçamento previsível entre cartas, painéis e ações."
+    },
+    "responsive_fit": {
+      "status": "pass",
+      "note": "Nenhum controle necessário ficou cortado no viewport governado de 1440 por 900 durante a jornada completa."
+    },
+    "interaction_clarity": {
+      "status": "pass",
+      "note": "Mulligan, terreno, mana, conjuração, combate, concessão, replay e rematch têm ações explícitas e estados reconhecíveis."
+    },
+    "state_coverage": {
+      "status": "pass",
+      "note": "Os checkpoints mostram entrada, mão privada, ações de jogo, dano real, reconexão, terminal, replay e reinício da jornada."
+    },
+    "accessibility_visual": {
+      "status": "pass",
+      "note": "Ícones são acompanhados por texto, foco visual e estados não dependem apenas de cor; crédito humano de teclado e TalkBack não é reivindicado."
+    },
+    "attractiveness": {
+      "status": "pass",
+      "note": "A apresentação é coesa e temática, com cartas reconhecíveis, mesa limpa e feedback visual suficiente para sustentar a partida."
+    }
+  },
+  "reviewed_capture_manifest_sha256": "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d",
+  "reviewed_screenshot_count": 9,
+  "reviewed_checkpoints": [
+    "01-opponent-picker",
+    "02-private-hand-mulligan",
+    "03-land-played",
+    "04-commander-cast",
+    "05-combat-damage",
+    "06-reconnected-session",
+    "07-terminal-replay-rematch",
+    "08-replay",
+    "09-rematch-picker"
+  ],
+  "reviewed_screenshot_sha256": [
+    "18f8f293bba4fdcf4b9926e0d65bbd5501fa7b745f37e6b2f4cb6c9b828f16db",
+    "bc3f0074509aa19fae6ce5b9d491489c37987e003200fffafd142f20ad0455b3",
+    "6b0a20d98bc1efdd952196c2cf2989aa321486dc974af85f0665d6c03254b45d",
+    "2b798e1a052f0b0e2b0050ede6c4995f2da00a3e83cb0378dfb7f743db8612a7",
+    "c932a1f5300fbb2303957c012def0e8d27aa9bf3093b16800d36ad77e0589aab",
+    "6590a5ee3c701eb4706c1070d01f9f0bd38f274c72445a8731e5cc411dec16f6",
+    "f8993443fef321bd487f155d1c947320db1bc96a8175a15ff413d26f1b2dc42e",
+    "3b20c151a9b47ba8488c84693860cbedd22173d9109380b1225eb1ded892bc06",
+    "6479a5b2cea509aa02e8699921769c4f0aebac0bc24cc6cb5fac9247f11fe889"
+  ],
+  "blocking_findings": [],
+  "release_scope": {
+    "overall_ui_proof_claimed": false,
+    "committed_capability_promoted": false,
+    "talkback_human_credit": false,
+    "hardware_keyboard_credit": false
+  }
+}

@@ -60,6 +60,7 @@ RUN chmod 0755 /opt/manaloom/entrypoint.sh
 ENV PORT=8080 \
     XMAGE_SERVER_HOST=127.0.0.1 \
     XMAGE_SERVER_PORT=17171 \
+    XMAGE_SERVER_SECONDARY_PORT=17179 \
     XMAGE_SERVER_JAVA_OPTS="-Xms256m -Xmx2g" \
     XMAGE_SIDECAR_JAVA_OPTS="-Xms128m -Xmx512m" \
     JAVA_TOOL_OPTIONS="-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true"

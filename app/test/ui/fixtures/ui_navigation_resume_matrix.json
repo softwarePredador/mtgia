@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "matrix_id": "manaloom-s3-06-navigation-resume-2026-07-21",
+  "matrix_id": "manaloom-play-vs-ai-navigation-resume-2026-08-25",
   "required_scenarios": [
     "protected_redirect",
     "runtime_session_expiry",
@@ -51,15 +51,14 @@
     },
     {
       "id": "battle_deep_link",
-      "expectation": "Battle Coach, Battle/Replays e o espectador ao vivo possuem URLs canônicas deck-scoped e recarregam sem objeto transitório; sessão e replay final usam identificadores estáveis.",
+      "expectation": "Jogar contra IA e Battle/Replays possuem URLs canônicas deck-scoped e recarregam sem objeto transitório; as URLs Battle Coach apenas redirecionam e não existe rota pública de espectador.",
       "sources": {
-        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "path: 'battle-coach/:sessionId'", "path: 'battle-coach'", "path: 'battle-live/:jobId'", "BattleLiveSpectatorScreen"],
-        "lib/features/battle/screens/battle_coach_screen.dart": ["battleCoachRouteLocation", "battleCoachSessionRouteLocation", "final String? sessionId"],
+        "lib/main.dart": ["GoRouter.optionURLReflectsImperativeAPIs = true", "path: 'battle-replays'", "path: 'play-vs-ai/:sessionId'", "path: 'play-vs-ai'", "path: 'battle-coach/:sessionId'", "path: 'battle-coach'"],
+        "lib/features/battle/screens/battle_coach_screen.dart": ["playVsAiRouteLocation", "playVsAiSessionRouteLocation", "final String? sessionId"],
         "lib/features/battle/screens/battle_replays_screen.dart": ["battleReplaysRouteLocation", "initialReplayId"],
-        "lib/features/battle/screens/battle_live_spectator_screen.dart": ["battleLiveRouteLocation", "battleReplayDetailRouteLocation"],
-        "lib/features/decks/screens/deck_details_screen.dart": ["battleCoachRouteLocation", "battleReplaysRouteLocation"]
+        "lib/features/decks/screens/deck_details_screen.dart": ["playVsAiRouteLocation", "battleReplaysRouteLocation"]
       },
-      "tests": ["test/features/battle/screens/battle_coach_screen_test.dart","test/features/battle/screens/battle_replays_screen_test.dart","test/features/battle/screens/battle_live_spectator_screen_test.dart"]
+      "tests": ["test/features/battle/screens/battle_coach_screen_test.dart","test/features/battle/screens/battle_replays_screen_test.dart"]
     },
     {
       "id": "card_detail_deep_link",
@@ -107,7 +106,7 @@
     "required": [
       "authenticated_refresh",
       "collection_back_forward",
-      "battle_direct_url",
+      "play_vs_ai_direct_url",
       "card_detail_direct_url",
       "session_expiry_redirect",
       "draft_restore"
@@ -115,14 +114,14 @@
     "passed": [
       "authenticated_refresh",
       "collection_back_forward",
-      "battle_direct_url",
       "card_detail_route_and_safe_reload_state",
       "draft_restore",
       "disposable_account_and_deck_cleanup"
     ],
     "remaining": [
       "card_detail_data_reload_after_backend_publish",
-      "live_runtime_401_interception"
+      "live_runtime_401_interception",
+      "play_vs_ai_direct_url_current_digest"
     ],
     "automated_evidence": [
       "session_expiry_redirect",

@@ -150,6 +150,7 @@ class CardArtwork extends StatefulWidget {
 class _CardArtworkState extends State<CardArtwork> {
   late CardArtworkDisplayState _displayState;
   late CardArtworkResolution _resolution;
+  CardImageLoadState? _lastLoadState;
 
   @override
   void initState() {
@@ -162,9 +163,15 @@ class _CardArtworkState extends State<CardArtwork> {
     super.didUpdateWidget(oldWidget);
     if (widget.imageUrl != oldWidget.imageUrl ||
         widget.fallbackImageUrl != oldWidget.fallbackImageUrl ||
-        widget.imageIsReference != oldWidget.imageIsReference ||
         widget.offline != oldWidget.offline) {
+      _lastLoadState = null;
       _resetDisplayState();
+    } else if (widget.imageIsReference != oldWidget.imageIsReference) {
+      // A semantic reclassification is not a new image request. Readiness may
+      // already have been emitted once by the child's stable lifecycle.
+      _resetDisplayState();
+      final loaded = _lastLoadState;
+      if (loaded != null) _handleLoadState(loaded);
     }
   }
 
@@ -199,6 +206,7 @@ class _CardArtworkState extends State<CardArtwork> {
 
   void _handleLoadState(CardImageLoadState state) {
     if (!mounted || widget.offline) return;
+    _lastLoadState = state;
 
     final nextState = switch (state) {
       CardImageLoadState.missing => CardArtworkDisplayState.missing,

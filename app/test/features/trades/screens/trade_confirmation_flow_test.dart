@@ -640,6 +640,96 @@ void main() {
     );
   });
 
+  for (final viewerIsSender in [false, true]) {
+    for (final status in ['pending', 'declined', 'completed']) {
+      testWidgets(
+        'TradeDetailScreen value perspective sender=$viewerIsSender status=$status',
+        (tester) async {
+          tester.view.physicalSize = const Size(1440, 900);
+          tester.view.devicePixelRatio = 1;
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.view.resetDevicePixelRatio);
+          // GET keeps these directions/totals sender-centric for both viewers.
+          final senderItem = <String, dynamic>{
+            'id': 'offered-arcane',
+            'binder_item_id': 'sender-binder',
+            'direction': 'offering',
+            'quantity': 1,
+            'agreed_price': 18.5,
+            'card': {'id': 'arcane', 'name': 'Arcane Signet'},
+          };
+          final receiverItem = <String, dynamic>{
+            'id': 'requested-counterspell',
+            'binder_item_id': 'receiver-binder',
+            'direction': 'requesting',
+            'quantity': 1,
+            'agreed_price': 12.0,
+            'card': {'id': 'counterspell', 'name': 'Counterspell'},
+          };
+          final trade = TradeOffer.fromDetailJson({
+            'id': 'trade-1',
+            'status': status,
+            'type': 'trade',
+            'sender': {'id': 'sender-1', 'username': 'sender'},
+            'receiver': {'id': 'receiver-1', 'username': 'receiver'},
+            'created_at': '2026-08-06T10:00:00Z',
+            'updated_at': '2026-08-06T11:20:00Z',
+            'my_items': [viewerIsSender ? senderItem : receiverItem],
+            'their_items': [viewerIsSender ? receiverItem : senderItem],
+            'value_summary': {
+              'offered_value': senderItem['agreed_price'],
+              'requested_value': receiverItem['agreed_price'],
+              'payment_amount': 0,
+              'total_offered_value': senderItem['agreed_price'],
+              'difference_abs': 6.5,
+              'difference_pct': 35.14,
+              'direction': 'offer_higher',
+              'threshold_pct': 20,
+              'threshold_abs': 25,
+              'has_warning': false,
+            },
+          });
+          await _pumpTradeDetail(
+            tester,
+            _DetailTradeProvider(trade),
+            currentUserId: viewerIsSender ? 'sender-1' : 'receiver-1',
+          );
+          final outgoing = trade.myItems.single.agreedPrice!.toStringAsFixed(2);
+          final incoming = trade.theirItems.single.agreedPrice!.toStringAsFixed(
+            2,
+          );
+          expect(
+            find.text(
+              'Você entrega: R\$ $outgoing • Você recebe: R\$ $incoming',
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.text(
+              'Você entrega: R\$ $incoming • Você recebe: R\$ $outgoing',
+            ),
+            findsNothing,
+          );
+          expect(
+            find.textContaining(
+              viewerIsSender
+                  ? 'você entrega mais valor'
+                  : 'você recebe mais valor',
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.byKey(const Key('trade-action-accept')),
+            !viewerIsSender && status == 'pending'
+                ? findsOneWidget
+                : findsNothing,
+          );
+          expect(tester.takeException(), isNull);
+        },
+      );
+    }
+  }
+
   testWidgets('TradeDetailScreen confirms accept before provider action', (
     tester,
   ) async {

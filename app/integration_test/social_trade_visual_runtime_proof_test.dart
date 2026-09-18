@@ -180,7 +180,8 @@ Map<String, dynamic> _tradeItem({required bool viewerCopy}) {
         ? '20000000-0000-4000-8000-000000000001'
         : '20000000-0000-4000-8000-000000000002',
     'binder_item_id': viewerCopy ? _spellBinderId : _ringBinderId,
-    'direction': viewerCopy ? 'offering' : 'requesting',
+    // Directions belong to the offer's sender, not the authenticated viewer.
+    'direction': viewerCopy ? 'requesting' : 'offering',
     'quantity': 1,
     'agreed_price': viewerCopy ? 12.0 : 18.5,
     'condition': viewerCopy ? 'LP' : 'NM',
@@ -224,17 +225,18 @@ Map<String, dynamic> _tradePayload(String status) => <String, dynamic>{
   'created_at': '2026-08-06T10:00:00.000Z',
   'updated_at': '2026-08-06T11:20:00.000Z',
   'value_summary': const <String, dynamic>{
-    'offered_value': 12.0,
-    'requested_value': 18.5,
+    'offered_value': 18.5,
+    'requested_value': 12.0,
     'payment_amount': 0.0,
-    'total_offered_value': 12.0,
+    'total_offered_value': 18.5,
     'difference_abs': 6.5,
-    'difference_pct': 35.1,
-    'direction': 'requested_higher',
+    'difference_pct': 35.14,
+    'direction': 'offer_higher',
     'threshold_pct': 20.0,
-    'threshold_abs': 5.0,
-    'has_warning': true,
-    'message': 'O pedido está acima da oferta; combine a diferença.',
+    'threshold_abs': 25.0,
+    'has_warning': false,
+    'message':
+        'Resumo calculado com preços acordados dos itens e pagamento informado.',
   },
   'my_items': <Map<String, dynamic>>[_tradeItem(viewerCopy: true)],
   'their_items': <Map<String, dynamic>>[_tradeItem(viewerCopy: false)],
@@ -270,6 +272,78 @@ Map<String, dynamic> _tradePayload(String status) => <String, dynamic>{
       },
   ],
 };
+
+void _expectTradeFixtureContract(Map<String, dynamic> payload) {
+  // POST /trades fixes direction by owner; GET /trades/:id groups by viewer.
+  final trade = TradeOffer.fromDetailJson(payload);
+  expect(trade.sender.id, _partnerId);
+  expect(trade.receiver.id, _viewerId);
+  expect(trade.myItems, hasLength(1));
+  expect(trade.theirItems, hasLength(1));
+  final owners = {_spellBinderId: _viewerId, _ringBinderId: _partnerId};
+  var offered = 0.0;
+  var requested = 0.0;
+  for (final (items, owner) in [
+    (trade.myItems, _viewerId),
+    (trade.theirItems, _partnerId),
+  ]) {
+    for (final item in items) {
+      expect(owners[item.binderItemId], owner);
+      final partnerCopy = owner == _partnerId;
+      expect(item.card.id, partnerCopy ? _ringCardId : _spellCardId);
+      expect(item.quantity, 1);
+      expect(item.agreedPrice, _binderItem(partnerCopy: partnerCopy)['price']);
+      final direction = owner == trade.sender.id ? 'offering' : 'requesting';
+      expect(item.direction, direction);
+      final value = item.agreedPrice! * item.quantity;
+      if (direction == 'offering') {
+        offered += value;
+      } else {
+        requested += value;
+      }
+    }
+  }
+  expect(trade.paymentAmount ?? 0, 0);
+  final summary = payload['value_summary'] as Map<String, dynamic>;
+  final diff = offered - requested;
+  final biggest = offered > requested ? offered : requested;
+  double round2(double value) => double.parse(value.toStringAsFixed(2));
+  expect(summary['offered_value'], round2(offered));
+  expect(summary['requested_value'], round2(requested));
+  expect(summary['payment_amount'], 0);
+  expect(summary['total_offered_value'], round2(offered));
+  expect(summary['difference_abs'], round2(diff.abs()));
+  expect(summary['difference_pct'], round2(diff.abs() / biggest * 100));
+  expect(summary['direction'], diff > 0 ? 'offer_higher' : 'request_higher');
+  expect(summary['threshold_pct'], 20);
+  expect(summary['threshold_abs'], 25);
+  expect(
+    summary['has_warning'],
+    diff.abs() >= 25 && diff.abs() / biggest >= .2,
+  );
+  expect(
+    summary['message'],
+    'Resumo calculado com preços acordados dos itens e pagamento informado.',
+  );
+}
+
+void _expectRenderedTradePerspective(String status) {
+  final payload = _tradePayload(status);
+  _expectTradeFixtureContract(payload);
+  final trade = TradeOffer.fromDetailJson(payload);
+  double total(List<TradeItem> items) =>
+      items.fold(0.0, (sum, item) => sum + item.agreedPrice! * item.quantity);
+  final outgoing = total(trade.myItems);
+  final incoming = total(trade.theirItems);
+  expect(
+    find.text(
+      'Você entrega: R\$ ${outgoing.toStringAsFixed(2)}'
+      ' • Você recebe: R\$ ${incoming.toStringAsFixed(2)}',
+    ),
+    findsOneWidget,
+  );
+  expect(find.textContaining('você recebe mais valor'), findsOneWidget);
+}
 
 class _RuntimeApi extends ApiClient {
   _RuntimeApi(this.mode);
@@ -547,6 +621,55 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
+  for (final status in ['pending', 'declined', 'completed']) {
+    test(
+      'Social fixture preserves sender/receiver value contract: $status',
+      () {
+        _expectTradeFixtureContract(_tradePayload(status));
+      },
+    );
+  }
+  for (final mutation in [
+    'viewer_direction',
+    'participants',
+    'values',
+    'direction_enum',
+    'rounding',
+    'threshold',
+  ]) {
+    test('Social fixture rejects R1 contract regression: $mutation', () {
+      final payload =
+          jsonDecode(jsonEncode(_tradePayload('pending')))
+              as Map<String, dynamic>;
+      final summary = payload['value_summary'] as Map<String, dynamic>;
+      switch (mutation) {
+        case 'viewer_direction':
+          (payload['my_items'] as List<dynamic>)
+                  .cast<Map<String, dynamic>>()
+                  .single['direction'] =
+              'offering';
+        case 'participants':
+          (payload['sender'] as Map<String, dynamic>)['id'] = _viewerId;
+        case 'values':
+          summary.addAll({
+            'offered_value': 12.0,
+            'requested_value': 18.5,
+            'total_offered_value': 12.0,
+          });
+        case 'direction_enum':
+          summary['direction'] = 'requested_higher';
+        case 'rounding':
+          summary['difference_pct'] = 35.1;
+        case 'threshold':
+          summary.addAll({'threshold_abs': 5.0, 'has_warning': true});
+      }
+      expect(
+        () => _expectTradeFixtureContract(payload),
+        throwsA(isA<TestFailure>()),
+      );
+    });
+  }
+
   testWidgets(
     'real Web surfaces prove the complete social discovery and trade journey',
     (tester) async {
@@ -692,6 +815,7 @@ void main() {
         ready: find.byKey(const Key('trade-status-header-pending')),
       );
       expect(find.byKey(const Key('trade-action-counter')), findsOneWidget);
+      _expectRenderedTradePerspective('pending');
       await _capture(
         binding,
         tester,
@@ -731,6 +855,7 @@ void main() {
         home: const TradeDetailScreen(tradeId: _tradeId),
         ready: find.byKey(const Key('trade-status-header-declined')),
       );
+      _expectRenderedTradePerspective('declined');
       await _capture(
         binding,
         tester,
@@ -757,6 +882,7 @@ void main() {
         home: const TradeDetailScreen(tradeId: _tradeId),
         ready: find.byKey(const Key('trade-status-header-completed')),
       );
+      _expectRenderedTradePerspective('completed');
       await _capture(
         binding,
         tester,

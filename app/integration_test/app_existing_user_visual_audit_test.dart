@@ -278,7 +278,7 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   binding.framePolicy = LiveTestWidgetsFlutterBindingFramePolicy.fullyLive;
 
-  testWidgets('live visual audit covers every active P0 route and Battle Coach', (
+  testWidgets('live visual audit covers every active P0 route and Play vs AI', (
     tester,
   ) async {
     expect(
@@ -313,7 +313,7 @@ void main() {
       _interactiveBattleEnabled,
       isTrue,
       reason:
-          'The P0 live matrix must compile the gated Battle Coach route so '
+          'The P0 live matrix must compile the gated Play vs AI route so '
           'its welcome state and real Web focus can be audited.',
     );
     final proofCheckpoints = _auditSegment == 'all'
@@ -818,14 +818,7 @@ void main() {
       await _prepareDeckImportDetectedState(tester);
       await _capture(binding, tester, 'deck_import_detected');
 
-      await _goRoute(tester, '/collection?tab=0');
-      await pumpUntilFound(
-        tester,
-        find.byKey(const Key('collection-hub-tabs')),
-        attempts: 100,
-      );
-      await tester.pump(const Duration(seconds: 1));
-      await _capture(binding, tester, 'collection_empty');
+      await _captureEmptyCollection(binding, tester);
 
       await _goRoute(tester, '/collection?tab=3');
       await pumpUntilAnyFound(tester, <Finder>[
@@ -961,12 +954,29 @@ void main() {
       );
       await _capture(binding, tester, 'battle_replays_empty');
 
-      await _goRoute(tester, '/decks/$_auditDeckId/battle-coach');
+      await _goRoute(tester, '/decks/$_auditDeckId/play-vs-ai');
       await pumpUntilFound(
         tester,
         find.byKey(const Key('battle-coach-welcome-state')),
         attempts: 100,
       );
+      final chooseOpponent = find.byKey(
+        const Key('battle-coach-choose-opponent-button'),
+      );
+      await pumpUntil(
+        tester,
+        () =>
+            finderExists(chooseOpponent) &&
+            tester.widget<FilledButton>(chooseOpponent).onPressed != null,
+        description: 'the welcome screen finishes its own empty session list',
+        attempts: 100,
+      );
+      expect(find.text('Verificando mesa ativa…'), findsNothing);
+      expect(
+        find.byKey(const Key('battle-coach-active-session-error')),
+        findsNothing,
+      );
+      expect(find.byKey(const Key('battle-coach-start-error')), findsNothing);
       await _capture(binding, tester, 'battle_coach_welcome');
 
       // A build without Live support must not register/navigate to the
@@ -1065,6 +1075,67 @@ class _HoldingAuthProvider extends AuthProvider {
 
   @override
   Future<void> initialize() => _initialization.future;
+}
+
+/// Shared with the focal contract: a visible shell cannot prove an empty binder.
+@visibleForTesting
+void expectEmptyCollectionFixtureResponse(ApiResponse response) {
+  expect(
+    response.statusCode,
+    200,
+    reason: 'collection_empty requires a successful authenticated binder read.',
+  );
+  expect(response.data, isA<Map>());
+  final payload = response.data as Map;
+  expect(payload['data'], isA<List>());
+  expect(payload['data'], isEmpty);
+  expect(payload['total'], 0);
+}
+
+Future<void> _captureEmptyCollection(
+  IntegrationTestWidgetsFlutterBinding binding,
+  WidgetTester tester,
+) async {
+  // The seeded account owns Binder/Trade fixtures. Use the existing empty
+  // account and remount providers; never delete another journey's fixture data.
+  await _authenticateVisualUser(
+    email: _auditEmptyEmail,
+    password: _auditEmptyPassword,
+  );
+  try {
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()));
+    await tester.pump();
+    await pumpUntilFound(
+      tester,
+      find.byKey(const Key('home-hero-frame')),
+      attempts: 120,
+    );
+    // No search/list filter: total=0 must describe the account, not a filtered
+    // page that happens to contain no results.
+    final response = await ApiClient().get('/binder?page=1&limit=1');
+    expectEmptyCollectionFixtureResponse(response);
+    await _goRoute(tester, '/collection?tab=0');
+    await pumpUntilFound(
+      tester,
+      find.byKey(const Key('binder-list-empty-have')),
+      attempts: 100,
+    );
+    expect(find.byKey(const Key('collection-hub-tabs')), findsOneWidget);
+    await _capture(binding, tester, 'collection_empty');
+  } finally {
+    await _authenticateExistingUser();
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+    await tester.pumpWidget(app.ManaLoomApp(key: UniqueKey()));
+    await tester.pump();
+    await pumpUntilFound(
+      tester,
+      find.byKey(const Key('home-hero-frame')),
+      attempts: 120,
+    );
+  }
 }
 
 Future<void> _authenticateExistingUser() =>

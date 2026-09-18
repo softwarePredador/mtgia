@@ -77,7 +77,10 @@ void main() {
     final remainingRoutes = _stringSet(manualWeb['remaining_routes']);
 
     expect(requiredRoutes, contains('/decks/:id/battle-replays'));
-    expect(requiredRoutes, contains('/decks/:id/battle-coach'));
+    expect(requiredRoutes, contains('/decks/:id/play-vs-ai'));
+    expect(requiredRoutes, contains('/decks/:id/play-vs-ai/:sessionId'));
+    expect(requiredRoutes, isNot(contains('/decks/:id/battle-coach')));
+    expect(requiredRoutes, isNot(contains('/decks/:id/battle-live/:jobId')));
     expect(requiredRoutes, isNot(contains('/battle/replays')));
     expect(remainingRoutes, missingRoutes);
 
@@ -98,15 +101,15 @@ void main() {
       );
     }
 
-    final battleCoach =
-        (matrix['surface_followups'] as Map<String, dynamic>)['battle_coach']
+    final playVsAi =
+        (matrix['surface_followups'] as Map<String, dynamic>)['play_vs_ai']
             as Map<String, dynamic>;
-    final runtimeManifest = File(battleCoach['web_runtime_evidence'] as String);
-    final aggregateReview = File(battleCoach['aggregate_review'] as String);
+    final runtimeManifest = File(playVsAi['web_runtime_evidence'] as String);
+    final aggregateReview = File(playVsAi['aggregate_review'] as String);
     expect(runtimeManifest.existsSync(), isTrue);
     expect(aggregateReview.existsSync(), isTrue);
     expect(
-      (battleCoach['required_interactions'] as List).cast<String>(),
+      (playVsAi['required_interactions'] as List).cast<String>(),
       containsAll(<String>[
         'tab_forward',
         'shift_tab',
@@ -127,19 +130,19 @@ void main() {
           .toString(),
       aggregate: _loadJson(aggregateReview.path),
       currentSourceDigest: _currentUiSourceDigest(),
-      aggregateManifestPath: battleCoach['aggregate_manifest_path'] as String,
-      aggregateReleaseCheck: battleCoach['aggregate_release_check'] as String,
+      aggregateManifestPath: playVsAi['aggregate_manifest_path'] as String,
+      aggregateReleaseCheck: playVsAi['aggregate_release_check'] as String,
     );
 
     if (manualStatus == 'pass') {
-      expect(battleCoach['web_keyboard_status'], 'pass_current_digest');
+      expect(playVsAi['web_keyboard_status'], 'pass_current_digest');
       expect(
         qualificationIssues,
         isEmpty,
         reason: qualificationIssues.join('\n'),
       );
     } else {
-      expect(battleCoach['web_keyboard_status'], 'pending_current_digest');
+      expect(playVsAi['web_keyboard_status'], 'pending_current_digest');
       expect(
         qualificationIssues,
         isNotEmpty,

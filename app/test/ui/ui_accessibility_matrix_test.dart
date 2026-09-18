@@ -152,9 +152,10 @@ void main() {
     final requiredRoutes = _stringSet(android['required_routes']);
     expect(requiredRoutes, isNot(contains('/battle/replays')));
     expect(requiredRoutes, contains('/decks/:id/battle-replays'));
-    expect(requiredRoutes, contains('/decks/:id/battle-live/:jobId'));
-    expect(requiredRoutes, contains('/decks/:id/battle-coach'));
-    expect(requiredRoutes, contains('/decks/:id/battle-coach/:sessionId'));
+    expect(requiredRoutes, isNot(contains('/decks/:id/battle-live/:jobId')));
+    expect(requiredRoutes, isNot(contains('/decks/:id/battle-coach')));
+    expect(requiredRoutes, contains('/decks/:id/play-vs-ai'));
+    expect(requiredRoutes, contains('/decks/:id/play-vs-ai/:sessionId'));
     expect(
       requiredRoutes,
       containsAll(<String>{
@@ -203,10 +204,9 @@ void main() {
       'deck_optimize_preview': {'/decks/:id'},
       'deck_sample_hand': {'/decks/:id'},
       'battle_replays': {'/decks/:id/battle-replays'},
-      'battle_live': {'/decks/:id/battle-live/:jobId'},
-      'battle_coach': {
-        '/decks/:id/battle-coach',
-        '/decks/:id/battle-coach/:sessionId',
+      'play_vs_ai': {
+        '/decks/:id/play-vs-ai',
+        '/decks/:id/play-vs-ai/:sessionId',
       },
     };
 

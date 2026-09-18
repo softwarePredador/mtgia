@@ -8,11 +8,10 @@ FLUTTER_TEST_TIMEOUT_SECONDS="${FLUTTER_TEST_TIMEOUT_SECONDS:-1200}"
 TEST_CONCURRENCY="${QUALITY_GATE_TEST_CONCURRENCY:-2}"
 BACKEND_TEST_BATCH_SIZE="${QUALITY_GATE_BACKEND_TEST_BATCH_SIZE:-8}"
 BACKEND_TEST_JWT_SECRET="${JWT_SECRET:-local_quality_gate_jwt_secret_not_for_production_20260706}"
-PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
 
 source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
-resolve_manaloom_dart
-DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
+resolve_manaloom_node
+NODE_BIN="$MANALOOM_NODE_BIN_RESOLVED"
 
 # deck-ai-learning is deliberately server-only. It must remain runnable on a
 # host without Flutter and cannot invoke pub implicitly. Every other historical
@@ -24,31 +23,28 @@ fi
 
 FLUTTER_BIN=""
 if [[ "$QUALITY_GATE_NEEDS_FLUTTER" == "1" ]]; then
-  if [[ -n "${MANALOOM_FLUTTER_BIN:-}" ]]; then
-    FLUTTER_BIN="$MANALOOM_FLUTTER_BIN"
-  elif [[ -x "$PINNED_FLUTTER" ]]; then
-    FLUTTER_BIN="$PINNED_FLUTTER"
-  else
-    FLUTTER_BIN="$(command -v flutter 2>/dev/null || true)"
-  fi
-
-  if [[ -z "$FLUTTER_BIN" || ! -x "$FLUTTER_BIN" ]]; then
-    echo "❌ Flutter configurado não é executável: $FLUTTER_BIN" >&2
-    exit 2
-  fi
-  if [[ "$FLUTTER_BIN" == */* ]]; then
-    FLUTTER_BIN="$(cd "$(dirname "$FLUTTER_BIN")" && pwd)/$(basename "$FLUTTER_BIN")"
-  fi
+  resolve_manaloom_flutter_dart_pair
+  FLUTTER_BIN="$MANALOOM_FLUTTER_BIN_RESOLVED"
+  DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
   readonly FLUTTER_BIN
 
-  # Nested gates inherit the same Dart and Flutter SDKs selected above.
+  # Nested gates inherit the same Node and paired Flutter/Dart SDK selected
+  # above, even when the caller's PATH points to an older global toolchain.
+  node_bin_dir="$(dirname "$NODE_BIN")"
   flutter_bin_dir="$(dirname "$FLUTTER_BIN")"
-  export PATH="$(dirname "$DART_BIN"):$flutter_bin_dir:$PATH"
+  dart_bin_dir="$(dirname "$DART_BIN")"
+  export PATH="$node_bin_dir:$flutter_bin_dir:$dart_bin_dir:$PATH"
+  export MANALOOM_FLUTTER_BIN="$FLUTTER_BIN"
 else
+  resolve_manaloom_dart
+  DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
   readonly FLUTTER_BIN
-  export PATH="$(dirname "$DART_BIN"):$PATH"
+  node_bin_dir="$(dirname "$NODE_BIN")"
+  dart_bin_dir="$(dirname "$DART_BIN")"
+  export PATH="$node_bin_dir:$dart_bin_dir:$PATH"
 fi
 export MANALOOM_DART_BIN="$DART_BIN"
+export MANALOOM_NODE_BIN="$NODE_BIN"
 
 trap 'echo "❌ Quality gate interrompido." >&2; exit 130' INT
 trap 'echo "❌ Quality gate encerrado." >&2; exit 143' TERM

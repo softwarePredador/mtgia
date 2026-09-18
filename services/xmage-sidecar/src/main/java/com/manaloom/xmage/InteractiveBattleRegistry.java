@@ -1,6 +1,5 @@
 package com.manaloom.xmage;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,6 +24,7 @@ import mage.utils.MageVersion;
 import mage.view.AbilityPickerView;
 import mage.view.CardView;
 import mage.view.CardsView;
+import mage.view.CommandObjectView;
 import mage.view.GameClientMessage;
 import mage.view.GameEndView;
 import mage.view.GameTypeView;
@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -65,6 +66,8 @@ final class InteractiveBattleRegistry {
     static final String PRIVATE_STATE_SCHEMA =
             "interactive_battle_private_state_v1";
     static final String ACTION_SCHEMA = "interactive_battle_action_v1";
+    static final String ACTION_RECEIPT_SCHEMA =
+            "interactive_battle_action_receipt_v1";
 
     private static final String GAME_TYPE =
             "Freeform Commander Free For All";
@@ -77,7 +80,6 @@ final class InteractiveBattleRegistry {
     static final long CONNECT_READY_TIMEOUT_MS =
             TimeUnit.SECONDS.toMillis(15);
     private static final int MAX_ACTION_HISTORY = 256;
-    private static final Gson GSON = new Gson();
 
     private final String host;
     private final int port;
@@ -458,7 +460,7 @@ final class InteractiveBattleRegistry {
         Map<String, Object> respond(JsonObject input) {
             requireActionSchema(input);
             String actionId = requiredString(input, "action_id", 128);
-            String fingerprint = sha256(GSON.toJson(input));
+            String fingerprint = canonicalInteractiveActionHash(input);
             synchronized (lock) {
                 ActionReceipt receipt = actions.get(actionId);
                 if (receipt != null) {
@@ -502,7 +504,12 @@ final class InteractiveBattleRegistry {
                     );
                     throw new ConflictException("action_rejected");
                 }
-                putReceipt(actionId, fingerprint);
+                putReceipt(
+                        actionId,
+                        fingerprint,
+                        "response",
+                        stateVersion
+                );
                 lock.notifyAll();
                 return snapshot();
             }
@@ -511,7 +518,7 @@ final class InteractiveBattleRegistry {
         Map<String, Object> concede(JsonObject input) {
             requireActionSchema(input);
             String actionId = requiredString(input, "action_id", 128);
-            String fingerprint = sha256(GSON.toJson(input));
+            String fingerprint = canonicalInteractiveActionHash(input);
             synchronized (lock) {
                 ActionReceipt receipt = actions.get(actionId);
                 if (receipt != null) {
@@ -523,7 +530,12 @@ final class InteractiveBattleRegistry {
                     return snapshot();
                 }
                 if (isTerminal()) {
-                    putReceipt(actionId, fingerprint);
+                    putReceipt(
+                            actionId,
+                            fingerprint,
+                            "concede",
+                            stateVersion()
+                    );
                     return snapshot();
                 }
                 requestConcede(
@@ -531,7 +543,12 @@ final class InteractiveBattleRegistry {
                         "conceded",
                         "user_conceded"
                 );
-                putReceipt(actionId, fingerprint);
+                putReceipt(
+                        actionId,
+                        fingerprint,
+                        "concede",
+                        stateVersion()
+                );
                 long deadline =
                         System.currentTimeMillis() + CONCEDE_GRACE_MS;
                 while (!isTerminal()
@@ -573,6 +590,12 @@ final class InteractiveBattleRegistry {
                 );
                 result.put("terminal_reason", terminalReason);
                 result.put("error_code", errorCode);
+                List<Map<String, Object>> receipts = new ArrayList<>();
+                for (Map.Entry<String, ActionReceipt> entry
+                        : actions.entrySet()) {
+                    receipts.add(entry.getValue().payload(entry.getKey()));
+                }
+                result.put("accepted_action_receipts", receipts);
                 if (publicReplay != null) {
                     result.put("public_replay", publicReplay);
                 }
@@ -813,12 +836,14 @@ final class InteractiveBattleRegistry {
             replay.put("type", "interactive_coach");
             replay.put("status", status);
             replay.put("engine", "xmage");
+            replay.put("engine_contract", "canonical_rules_execution");
             replay.put("engine_version", SidecarMain.XMAGE_VERSION);
             replay.put("engine_commit", SidecarMain.XMAGE_COMMIT);
             replay.put(
                     "engine_patch_commit",
                     SidecarMain.XMAGE_PATCH_COMMIT
             );
+            replay.put("ai_profile", SidecarMain.AI_PROFILE);
             replay.put("request_schema_version", REQUEST_SCHEMA);
             replay.put("request_hash", request.requestHash);
             replay.put("request_id", request.requestId);
@@ -855,6 +880,8 @@ final class InteractiveBattleRegistry {
             learning.put("visible_battlefield_entries_available", true);
             learning.put("combat_activity_available", true);
             learning.put("ai_decision_rationale_available", false);
+            learning.put("seed_semantics", SidecarMain.SEED_SEMANTICS);
+            learning.put("deterministic", false);
             learning.put(
                     "event_stream_completeness",
                     "best_effort_visible_state_lower_bound"
@@ -1077,21 +1104,38 @@ final class InteractiveBattleRegistry {
             GameView view = message.getGameView();
             PlayableObjectsList playable =
                     view == null ? null : view.getCanPlayObjects();
-            if (playable != null && playable.getObjects() != null) {
-                List<UUID> ids = new ArrayList<>(
-                        playable.getObjects().keySet()
+            Set<UUID> selectableIds = new LinkedHashSet<>();
+            HumanVsAiSpikeHarness.PromptKind kind =
+                    HumanVsAiSpikeHarness.classify(
+                            callback.getMethod(),
+                            message.getMessage(),
+                            message.getOptions()
+                    );
+            if (kind == HumanVsAiSpikeHarness.PromptKind.COMBAT) {
+                selectableIds.addAll(
+                        combatSelectableIds(message.getOptions())
                 );
-                ids.sort(Comparator.comparing(UUID::toString));
-                for (UUID id : ids) {
-                    PlayableObjectStats stats =
-                            playable.getObjects().get(id);
-                    raw.add(id);
-                    options.add(new OptionDescriptor(
-                            playableLabel(view, id, stats),
-                            "card",
-                            cardDescriptor(view, id)
-                    ));
+            }
+            if (playable != null && playable.getObjects() != null) {
+                selectableIds.addAll(playable.getObjects().keySet());
+            }
+            List<UUID> ids = new ArrayList<>(selectableIds);
+            ids.sort(Comparator.comparing(UUID::toString));
+            for (UUID id : ids) {
+                PlayableObjectStats stats = playable == null
+                        || playable.getObjects() == null
+                        ? null
+                        : playable.getObjects().get(id);
+                Map<String, Object> card = cardDescriptor(view, id);
+                if (card == null) {
+                    card = cardDescriptor(lastView, id);
                 }
+                raw.add(id);
+                options.add(new OptionDescriptor(
+                        playableLabel(card, stats),
+                        "card",
+                        card
+                ));
             }
             if (!message.isFlag() || raw.isEmpty()) {
                 raw.add(Boolean.FALSE);
@@ -1607,12 +1651,24 @@ final class InteractiveBattleRegistry {
             return view == null ? 0 : view.getTurn();
         }
 
-        private void putReceipt(String actionId, String fingerprint) {
+        private void putReceipt(
+                String actionId,
+                String fingerprint,
+                String kind,
+                long acceptedStateVersion
+        ) {
             if (actions.size() >= MAX_ACTION_HISTORY) {
                 String first = actions.keySet().iterator().next();
                 actions.remove(first);
             }
-            actions.put(actionId, new ActionReceipt(fingerprint));
+            actions.put(
+                    actionId,
+                    new ActionReceipt(
+                            fingerprint,
+                            kind,
+                            acceptedStateVersion
+                    )
+            );
         }
 
         private static PlayerView winner(GameView view) {
@@ -1710,15 +1766,33 @@ final class InteractiveBattleRegistry {
         }
     }
 
-    private static final class ActionReceipt {
+    static final class ActionReceipt {
         final String fingerprint;
+        final String kind;
+        final long acceptedStateVersion;
 
-        ActionReceipt(String fingerprint) {
+        ActionReceipt(
+                String fingerprint,
+                String kind,
+                long acceptedStateVersion
+        ) {
             this.fingerprint = fingerprint;
+            this.kind = kind;
+            this.acceptedStateVersion = acceptedStateVersion;
+        }
+
+        Map<String, Object> payload(String actionId) {
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("schema_version", ACTION_RECEIPT_SCHEMA);
+            result.put("action_id", actionId);
+            result.put("request_fingerprint", fingerprint);
+            result.put("kind", kind);
+            result.put("accepted_state_version", acceptedStateVersion);
+            return result;
         }
     }
 
-    private static final class SessionRequest {
+    static final class SessionRequest {
         final String requestId;
         final String requestHash;
         final int ttlSeconds;
@@ -1767,7 +1841,7 @@ final class InteractiveBattleRegistry {
                     input,
                     "request_hash",
                     64
-            ).toLowerCase();
+            );
             if (!requestHash.matches("^[0-9a-f]{64}$")) {
                 throw new IllegalArgumentException(
                         "interactive request_hash is invalid"
@@ -1789,6 +1863,16 @@ final class InteractiveBattleRegistry {
                             "expected_engine_commit",
                             64
                     )
+            )
+                    || !SidecarMain.XMAGE_PATCH_COMMIT.equals(
+                    requiredString(
+                            input,
+                            "expected_engine_patch_commit",
+                            64
+                    )
+            )
+                    || !SidecarMain.AI_PROFILE.equals(
+                    requiredString(input, "ai_profile", 64)
             )) {
                 throw new IllegalArgumentException(
                         "interactive engine identity is invalid"
@@ -1865,6 +1949,13 @@ final class InteractiveBattleRegistry {
                         "interactive deck hash does not match deck payload"
                 );
             }
+            String canonicalRequestHash =
+                    canonicalInteractiveRequestHash(input);
+            if (!requestHash.equals(canonicalRequestHash)) {
+                throw new IllegalArgumentException(
+                        "interactive request_hash does not match request payload"
+                );
+            }
             return new SessionRequest(
                     requestId,
                     requestHash,
@@ -1875,6 +1966,140 @@ final class InteractiveBattleRegistry {
                     deckB
             );
         }
+    }
+
+    static String canonicalInteractiveRequestHash(JsonObject input) {
+        if (input == null) {
+            throw new IllegalArgumentException(
+                    "interactive request payload is required"
+            );
+        }
+        StringBuilder canonical = new StringBuilder();
+        appendCanonicalJson(input, canonical, true);
+        canonical.append('\n');
+        return sha256(canonical.toString());
+    }
+
+    static String canonicalInteractiveActionHash(JsonObject input) {
+        if (input == null) {
+            throw new IllegalArgumentException(
+                    "interactive action payload is required"
+            );
+        }
+        StringBuilder canonical = new StringBuilder();
+        appendCanonicalJson(input, canonical, false);
+        canonical.append('\n');
+        return sha256(canonical.toString());
+    }
+
+    private static void appendCanonicalJson(
+            JsonElement value,
+            StringBuilder output,
+            boolean requestRoot
+    ) {
+        if (value == null || value.isJsonNull()) {
+            output.append("null");
+            return;
+        }
+        if (value.isJsonObject()) {
+            JsonObject object = value.getAsJsonObject();
+            List<String> keys = new ArrayList<>();
+            for (Map.Entry<String, JsonElement> entry
+                    : object.entrySet()) {
+                if (!requestRoot || !"request_hash".equals(entry.getKey())) {
+                    keys.add(entry.getKey());
+                }
+            }
+            Collections.sort(keys);
+            output.append('{');
+            for (int index = 0; index < keys.size(); index++) {
+                if (index > 0) {
+                    output.append(',');
+                }
+                String key = keys.get(index);
+                appendCanonicalJsonString(key, output);
+                output.append(':');
+                appendCanonicalJson(object.get(key), output, false);
+            }
+            output.append('}');
+            return;
+        }
+        if (value.isJsonArray()) {
+            output.append('[');
+            JsonArray array = value.getAsJsonArray();
+            for (int index = 0; index < array.size(); index++) {
+                if (index > 0) {
+                    output.append(',');
+                }
+                appendCanonicalJson(array.get(index), output, false);
+            }
+            output.append(']');
+            return;
+        }
+        if (value.getAsJsonPrimitive().isString()) {
+            appendCanonicalJsonString(value.getAsString(), output);
+            return;
+        }
+        output.append(value.getAsString());
+    }
+
+    private static void appendCanonicalJsonString(
+            String value,
+            StringBuilder output
+    ) {
+        output.append('"');
+        for (int index = 0; index < value.length(); index++) {
+            char character = value.charAt(index);
+            switch (character) {
+                case '"':
+                    output.append("\\\"");
+                    continue;
+                case '\\':
+                    output.append("\\\\");
+                    continue;
+                case '\b':
+                    output.append("\\b");
+                    continue;
+                case '\t':
+                    output.append("\\t");
+                    continue;
+                case '\n':
+                    output.append("\\n");
+                    continue;
+                case '\f':
+                    output.append("\\f");
+                    continue;
+                case '\r':
+                    output.append("\\r");
+                    continue;
+                default:
+                    break;
+            }
+            if (character < 0x20
+                    || Character.isHighSurrogate(character)
+                    && (index + 1 >= value.length()
+                    || !Character.isLowSurrogate(value.charAt(index + 1)))
+                    || Character.isLowSurrogate(character)
+                    && (index == 0
+                    || !Character.isHighSurrogate(value.charAt(index - 1)))) {
+                appendCanonicalUnicodeEscape(character, output);
+            } else {
+                output.append(character);
+            }
+        }
+        output.append('"');
+    }
+
+    private static void appendCanonicalUnicodeEscape(
+            char character,
+            StringBuilder output
+    ) {
+        final String digits = "0123456789abcdef";
+        output.append("\\u");
+        output.append(digits.charAt((character >> 12) & 0xf));
+        output.append(digits.charAt((character >> 8) & 0xf));
+        output.append(digits.charAt((character >> 4) & 0xf));
+        output.append(digits.charAt(character & 0xf));
     }
 
     private static List<OptionDescriptor> genericDescriptors(int count) {
@@ -1901,11 +2126,9 @@ final class InteractiveBattleRegistry {
     }
 
     private static String playableLabel(
-            GameView view,
-            UUID id,
+            Map<String, Object> card,
             PlayableObjectStats stats
     ) {
-        Map<String, Object> card = cardDescriptor(view, id);
         String name =
                 card == null
                         ? "Ação legal"
@@ -1928,26 +2151,80 @@ final class InteractiveBattleRegistry {
             UUID id
     ) {
         CardView card = findCard(view, id);
-        if (card == null) {
-            return null;
-        }
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("name", bounded(card.getName(), 160));
-        if (card.getExpansionSetCode() != null
-                && !card.getExpansionSetCode().trim().isEmpty()) {
-            result.put(
-                    "set_code",
-                    bounded(card.getExpansionSetCode(), 16)
+        if (card != null) {
+            return promptCardDescriptor(
+                    id,
+                    card.getName(),
+                    card.getExpansionSetCode(),
+                    card.getCardNumber()
             );
         }
-        if (card.getCardNumber() != null
-                && !card.getCardNumber().trim().isEmpty()) {
+
+        CommandObjectView commandObject = findCommandObject(view, id);
+        return commandObject == null
+                ? null
+                : commandObjectDescriptor(commandObject);
+    }
+
+    static Map<String, Object> commandObjectDescriptor(
+            CommandObjectView card
+    ) {
+        return promptCardDescriptor(
+                card.getId(),
+                card.getName(),
+                card.getExpansionSetCode(),
+                null
+        );
+    }
+
+    static Map<String, Object> promptCardDescriptor(
+            UUID id,
+            String name,
+            String setCode,
+            String collectorNumber
+    ) {
+        if (id == null) {
+            throw new IllegalArgumentException(
+                    "prompt card object id is required"
+            );
+        }
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("id", id.toString());
+        result.put("name", bounded(name, 160));
+        if (setCode != null && !setCode.trim().isEmpty()) {
+            result.put(
+                    "set_code",
+                    bounded(setCode, 16)
+            );
+        }
+        if (collectorNumber != null
+                && !collectorNumber.trim().isEmpty()) {
             result.put(
                     "collector_number",
-                    bounded(card.getCardNumber(), 32)
+                    bounded(collectorNumber, 32)
             );
         }
         return result;
+    }
+
+    private static CommandObjectView findCommandObject(
+            GameView view,
+            UUID id
+    ) {
+        if (view == null || id == null || view.getPlayers() == null) {
+            return null;
+        }
+        for (PlayerView player : view.getPlayers()) {
+            if (player == null || player.getCommandObjectList() == null) {
+                continue;
+            }
+            for (CommandObjectView card : player.getCommandObjectList()) {
+                if (card != null && id.equals(card.getId())) {
+                    return card;
+                }
+            }
+        }
+        return null;
     }
 
     private static PlayerView findPlayer(GameView view, UUID id) {
@@ -2065,7 +2342,51 @@ final class InteractiveBattleRegistry {
                 return zone.get(id);
             }
         }
+        if (view.getPlayers() != null) {
+            for (PlayerView player : view.getPlayers()) {
+                if (player == null || player.getBattlefield() == null) {
+                    continue;
+                }
+                CardView permanent = player.getBattlefield().get(id);
+                if (permanent != null) {
+                    return permanent;
+                }
+            }
+        }
         return null;
+    }
+
+    static List<UUID> combatSelectableIds(Map<String, ?> metadata) {
+        Set<UUID> ids = new LinkedHashSet<>();
+        addCombatSelectableIds(ids, metadata, "possibleAttackers");
+        addCombatSelectableIds(ids, metadata, "possibleBlockers");
+        List<UUID> result = new ArrayList<>(ids);
+        result.sort(Comparator.comparing(UUID::toString));
+        return result;
+    }
+
+    private static void addCombatSelectableIds(
+            Set<UUID> target,
+            Map<String, ?> metadata,
+            String key
+    ) {
+        if (metadata == null || metadata.get(key) == null) {
+            return;
+        }
+        Object rawIds = metadata.get(key);
+        if (!(rawIds instanceof Iterable)) {
+            throw new IllegalArgumentException(
+                    key + " must be an iterable of UUID values"
+            );
+        }
+        for (Object rawId : (Iterable<?>) rawIds) {
+            if (!(rawId instanceof UUID)) {
+                throw new IllegalArgumentException(
+                        key + " contains a non-UUID value"
+                );
+            }
+            target.add((UUID) rawId);
+        }
     }
 
     private static String promptTitle(

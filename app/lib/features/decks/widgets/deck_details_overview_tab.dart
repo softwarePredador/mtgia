@@ -38,7 +38,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
   final VoidCallback? onShowOptimizationOptions;
   final VoidCallback? onOpenBattleReplays;
   final VoidCallback onSelectCommander;
-  final VoidCallback onImportList;
+  final VoidCallback? onImportList;
   final ValueChanged<String?> onEditDescription;
   final ValueChanged<DeckCardItem> onShowCardDetails;
 
@@ -66,7 +66,7 @@ class DeckDetailsOverviewTab extends StatelessWidget {
     this.onShowOptimizationOptions,
     this.onOpenBattleReplays,
     required this.onSelectCommander,
-    required this.onImportList,
+    this.onImportList,
     required this.onEditDescription,
     required this.onShowCardDetails,
   });
@@ -1696,13 +1696,13 @@ class _DeckEmptyState extends StatelessWidget {
   final bool isCommanderFormat;
   final VoidCallback onSelectCommander;
   final VoidCallback onOpenCards;
-  final VoidCallback onImportList;
+  final VoidCallback? onImportList;
 
   const _DeckEmptyState({
     required this.isCommanderFormat,
     required this.onSelectCommander,
     required this.onOpenCards,
-    required this.onImportList,
+    this.onImportList,
   });
 
   @override
@@ -1778,15 +1778,18 @@ class _DeckEmptyState extends StatelessWidget {
             runSpacing: 10,
             children: [
               OutlinedButton.icon(
+                key: const Key('deck-details-empty-search-cards'),
                 onPressed: onOpenCards,
                 icon: const Icon(Icons.search),
                 label: const Text('Buscar cartas'),
               ),
-              OutlinedButton.icon(
-                onPressed: onImportList,
-                icon: const Icon(Icons.paste_outlined),
-                label: const Text('Colar lista'),
-              ),
+              if (onImportList != null)
+                OutlinedButton.icon(
+                  key: const Key('deck-details-empty-import-list'),
+                  onPressed: onImportList,
+                  icon: const Icon(Icons.paste_outlined),
+                  label: const Text('Colar lista'),
+                ),
             ],
           ),
         ],

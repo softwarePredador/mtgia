@@ -1,7 +1,7 @@
 # BrewTact — decisão corrente de produto
 
 - Lifecycle: `CURRENT_PRODUCT_DECISION`
-- Data da decisão: `2026-08-13`
+- Data da decisão: `2026-08-25`
 - Estado de release: `NO_GO_PUBLIC_RELEASE`
 - Candidato pretendido: `CONTROLLED_FREE_BETA`
 - Público inicial: coorte pequena e controlada
@@ -61,7 +61,7 @@ consultar PostgreSQL ou chamar um provedor.
 | Analyze/Optimize consultivo, sempre revisável | Experimental guardado, com P0 de IA ainda abertos | `OFF_UNTIL_P0_RECEIPT` | `null` |
 | Generate/Rebuild | Experimental guardado | `OFF`; futura allowlist exige decisão e receipt próprios | `null` |
 | Life Counter local | Implementado; isolamento/saída confiável ainda precisam fechar | `OFF_UNTIL_P0_RECEIPT` | `null` |
-| Battle batch, Live e Coach | Implementação/laboratório existente | `OFF` até o programa Battle horizontal | `null` |
+| Battle batch e Jogar contra IA | Implementação/laboratório existente; Live é infraestrutura interna, não produto espectador | `OFF` até o programa Battle horizontal e a prova de partida real completa | `null` |
 | Scanner/OCR | Implementação/provas históricas existentes | `OFF` | `null` |
 | Galeria, perfis públicos, busca social, comments, follows, DMs e push social | Implementação parcial existente | `OFF` | `null` |
 | Binder público, marketplace e trades | Implementação parcial existente | `OFF` | `null` |
@@ -80,6 +80,31 @@ consultar PostgreSQL ou chamar um provedor.
 5. Legalidade/estrutura não significam desempenho comprovado.
 6. Migration, deploy, escrita live e promoção exigem autorização própria.
 7. Um gate local verde não altera `live_verified_as_of`.
+
+## Direção de produto para Battle
+
+- A experiência interativa será **Jogar contra IA**: o usuário controla o
+  próprio lado da mesa e a IA controla um adversário.
+- Não haverá rota, CTA ou modo público de espectador. Stream, checkpoints e
+  replay podem existir somente como infraestrutura interna e evidência.
+- Cobertura XMage interativa incompleta bloqueia o início de forma explícita;
+  não existe fallback para Forge, simulação automática ou replay assistido no
+  fluxo Jogar contra IA.
+- A rota planejada é `/decks/:id/play-vs-ai[/sessionId]`; o nome histórico
+  Battle Coach é apenas compatibilidade técnica temporária.
+- O aceite exige partida XMage real completa e retorno esperado por caso de
+  uso. Fixture, mock, golden e widget test continuam úteis, mas não provam esse
+  resultado.
+- Essa direção não altera a matriz corrente: todas as capabilities Battle
+  permanecem `OFF` até seus P0, receipts e decisão de coorte.
+
+Em 2026-08-25, uma execução focal isolada comprovou a jornada Web real contra
+XMage do mulligan ao dano, reconexão, concessão, replay e rematch, com
+PostgreSQL descartável e nove capturas revisadas. O receipt é
+`docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md`. Esse `PASS`
+funcional não altera o veredito: a evidência global, clean-SHA, Android físico,
+acessibilidade, capacidade, segurança horizontal, custo/SLO e rollout ainda
+estão abertos; `release_ready=false` e Battle continua `OFF`.
 
 ## Próxima decisão permitida
 

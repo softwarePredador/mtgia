@@ -5,20 +5,27 @@ import 'package:test/test.dart';
 void main() {
   test('quality gate honors the explicitly selected Flutter SDK', () {
     final source = File('../scripts/quality_gate.sh').readAsStringSync();
+    final helper =
+        File('../scripts/lib/manaloom_dart_toolchain.sh').readAsStringSync();
 
-    expect(source, contains(r'FLUTTER_BIN="$MANALOOM_FLUTTER_BIN"'));
+    expect(source, contains('resolve_manaloom_node'));
+    expect(source, contains('resolve_manaloom_flutter_dart_pair'));
+    expect(source, contains('resolve_manaloom_dart'));
+    expect(source, contains(r'flutter_bin_dir="$(dirname "$FLUTTER_BIN")"'));
+    expect(source, contains(r'node_bin_dir="$(dirname "$NODE_BIN")"'));
+    expect(source, contains(r'dart_bin_dir="$(dirname "$DART_BIN")"'));
     expect(
       source,
       contains(
-        r'PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"',
+        r'export PATH="$node_bin_dir:$flutter_bin_dir:$dart_bin_dir:$PATH"',
       ),
     );
-    expect(source, contains('resolve_manaloom_dart'));
-    expect(source, contains(r'flutter_bin_dir="$(dirname "$FLUTTER_BIN")"'));
-    expect(
-      source,
-      contains(r'export PATH="$(dirname "$DART_BIN"):$flutter_bin_dir:$PATH"'),
-    );
+    expect(source, contains(r'export MANALOOM_NODE_BIN="$NODE_BIN"'));
+    expect(source, contains(r'export MANALOOM_FLUTTER_BIN="$FLUTTER_BIN"'));
+    expect(source, contains(r'export MANALOOM_DART_BIN="$DART_BIN"'));
+    expect(helper, contains('MANALOOM_FLUTTER_TOOLCHAIN_VERSION="3.44.6"'));
+    expect(helper, contains('MANALOOM_DART_TOOLCHAIN_VERSION="3.12.2"'));
+    expect(helper, contains('MANALOOM_NODE_TOOLCHAIN_REQUIREMENT='));
     expect(
       source,
       contains(r'"$FLUTTER_BIN" analyze --no-pub --no-fatal-infos'),
@@ -30,6 +37,180 @@ void main() {
       ),
     );
   });
+
+  test(
+    'E2E child shells inherit the approved Node and paired Flutter/Dart',
+    () async {
+      final e2eSuite = File(
+        File(
+          '../scripts/manaloom_e2e_suite.sh',
+        ).absolute.resolveSymbolicLinksSync(),
+      );
+      final qualityGate = File('../scripts/quality_gate.sh').readAsStringSync();
+      final e2eSource = e2eSuite.readAsStringSync();
+      final fixture = Directory.systemTemp.createTempSync(
+        'manaloom-e2e-toolchain-contract.',
+      );
+
+      File executable(String path, String source) {
+        final file =
+            File(path)
+              ..createSync(recursive: true)
+              ..writeAsStringSync(source);
+        final chmod = Process.runSync('/bin/chmod', ['+x', file.path]);
+        expect(chmod.exitCode, 0, reason: file.path);
+        return file;
+      }
+
+      try {
+        final inheritedBin = Directory('${fixture.path}/inherited-bin')
+          ..createSync();
+        final approvedBin = Directory('${fixture.path}/approved-bin')
+          ..createSync();
+        final flutterRoot = Directory(
+          '${fixture.path}/toolchains/flutter-3.44.6',
+        )..createSync(recursive: true);
+        File('${flutterRoot.path}/packages/flutter/pubspec.yaml')
+          ..createSync(recursive: true)
+          ..writeAsStringSync('name: flutter\n');
+
+        executable('${inheritedBin.path}/node', r'''#!/bin/sh
+if [ "${1:-}" = "-e" ]; then
+  exit 1
+fi
+printf 'inherited-node\n'
+''');
+        for (final command in ['flutter', 'dart']) {
+          executable(
+            '${inheritedBin.path}/$command',
+            '#!/bin/sh\nprintf "inherited-$command\\n"\n',
+          );
+        }
+        final approvedNode = executable(
+          '${approvedBin.path}/node',
+          r'''#!/bin/sh
+if [ "${1:-}" = "-e" ]; then
+  exit 0
+fi
+printf 'approved-node\n'
+''',
+        );
+        executable('${flutterRoot.path}/bin/flutter', r'''#!/bin/sh
+if [ "${1:-}" = "--version" ] && [ "${2:-}" = "--machine" ]; then
+  printf '%s\n' '{"frameworkVersion":"3.44.6","dartSdkVersion":"3.12.2"}'
+  exit 0
+fi
+printf 'pinned-flutter\n'
+''');
+        final fakeDartSource = r'''#!/bin/sh
+if [ "${1:-}" = "--version" ]; then
+  printf 'Dart SDK version: 3.12.2 (stable) on "fixture"\n'
+  exit 0
+fi
+printf 'pinned-dart\n'
+''';
+        executable(
+          '${flutterRoot.path}/bin/cache/dart-sdk/bin/dart',
+          fakeDartSource,
+        );
+        executable('${flutterRoot.path}/bin/dart', fakeDartSource);
+
+        final runDir = Directory('${fixture.path}/run');
+        final result = await Process.run(
+          '/bin/bash',
+          [
+            '-c',
+            r'''
+set -euo pipefail
+. "$E2E_SUITE"
+configure_manaloom_e2e_toolchain
+initialize_run_dir
+write_summary_header
+run_step "Toolchain inheritance contract" 'test "$(node --probe)" = approved-node && test "$(flutter --probe)" = pinned-flutter && test "$(dart --probe)" = pinned-dart && printf "%s|%s|%s\n" "$(node --probe)" "$(flutter --probe)" "$(dart --probe)"'
+''',
+            'toolchain-contract',
+          ],
+          workingDirectory: Directory.current.path,
+          environment: {
+            'HOME': Platform.environment['HOME']!,
+            'PATH': '${inheritedBin.path}:/usr/bin:/bin',
+            'E2E_SUITE': e2eSuite.path,
+            'MANALOOM_E2E_RUN_DIR': runDir.path,
+            'MANALOOM_FLUTTER_ROOT': flutterRoot.path,
+            'MANALOOM_NODE_BIN': approvedNode.path,
+          },
+        );
+        expect(
+          result.exitCode,
+          0,
+          reason: '${result.stdout}\n${result.stderr}',
+        );
+        final log =
+            File(
+              '${runDir.path}/toolchain_inheritance_contract.log',
+            ).readAsStringSync();
+        expect(log, contains('approved-node|pinned-flutter|pinned-dart'));
+        expect(log, isNot(contains('inherited-')));
+
+        final mainSource = e2eSource.substring(e2eSource.indexOf('main() {'));
+        expect(
+          mainSource.indexOf('configure_manaloom_e2e_toolchain || return'),
+          lessThan(mainSource.indexOf('initialize_run_dir')),
+        );
+        expect(qualityGate, contains('resolve_manaloom_flutter_dart_pair'));
+        expect(qualityGate, contains('resolve_manaloom_node'));
+
+        // P0 must consume the same explicit SDK pair, including the real Dart
+        // binary, before touching the fixture or invoking any capture command.
+        final p0Source =
+            File(
+              '../scripts/manaloom_p0_runtime_capture.sh',
+            ).readAsStringSync();
+        expect(
+          p0Source,
+          isNot(contains(r'$HOME/.manaloom/toolchains/flutter-3.44.6')),
+        );
+        expect(p0Source, isNot(contains(r'${PINNED_FLUTTER%/flutter}/dart')));
+        final p0Binding = p0Source.substring(
+          p0Source.indexOf(
+            'source "\$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"',
+          ),
+          p0Source.indexOf(
+            'source "\$ROOT_DIR/scripts/lib/manaloom_ui_runtime_contract.sh"',
+          ),
+        );
+        expect(p0Binding, contains('resolve_manaloom_flutter_dart_pair'));
+        final projectRoot = Directory('..').absolute.resolveSymbolicLinksSync();
+        Future<ProcessResult> resolveP0(String selectedRoot) => Process.run(
+          '/bin/bash',
+          [
+            '-c',
+            'set -euo pipefail\n$p0Binding\n'
+                r'printf "%s\n%s\n" "$PINNED_FLUTTER" "$PINNED_DART"',
+          ],
+          environment: {
+            'ROOT_DIR': projectRoot,
+            'PATH': '${inheritedBin.path}:/usr/bin:/bin',
+            'MANALOOM_FLUTTER_ROOT': selectedRoot,
+            'MANALOOM_FLUTTER_BIN': '${flutterRoot.path}/bin/flutter',
+            'MANALOOM_DART_BIN': '${inheritedBin.path}/dart',
+          },
+        );
+        final p0Resolved = await resolveP0(flutterRoot.path);
+        expect(p0Resolved.exitCode, 0, reason: '${p0Resolved.stderr}');
+        final p0Paths = (p0Resolved.stdout as String).trim().split('\n');
+        expect(p0Paths, [
+          '${flutterRoot.path}/bin/flutter',
+          '${flutterRoot.path}/bin/cache/dart-sdk/bin/dart',
+        ]);
+        final p0Missing = await resolveP0('${fixture.path}/missing-sdk');
+        expect(p0Missing.exitCode, 2);
+        expect(p0Missing.stdout, isEmpty);
+      } finally {
+        fixture.deleteSync(recursive: true);
+      }
+    },
+  );
 
   test('full backend gate batches the complete deterministic file list', () {
     final source = File('../scripts/quality_gate.sh').readAsStringSync();
