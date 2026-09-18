@@ -1,5 +1,28 @@
 # ManaLoom Product Readiness Runbook - 2026-07-06
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> **NÃO USE COMO PLANO ATUAL NEM EXECUTE OS SCRIPTS CITADOS.**
+>
+> Fotografia de `2026-07-06`, anterior à decisão de `2026-08-25`
+> (`docs/status/CURRENT_PRODUCT_DECISION.md`) e aos ADRs 0010/0011. O que
+> este documento descreve e que hoje é falso:
+>
+> - **Billing, checkout e plano Pro não existem mais no código.**
+>   `server/lib/billing/payment_provider.dart` retorna 403/410 estáticos e
+>   declara não ter escape hatch de ambiente; as env vars citadas
+>   (`MANALOOM_INTERNAL_CHECKOUT_ENABLED`, `ALLOW_INTERNAL_PRO_ACTIVATION`,
+>   `MANALOOM_PRO_CHECKOUT_URL`) sobrevivem apenas como asserções **negativas**
+>   em `server/test/plan_checkout_contract_test.dart`. A oferta corrente é
+>   beta gratuita, "sem preço, plano Pro, assinatura, checkout, renovação,
+>   anúncio ou paywall".
+> - **`manaloom.com` não é o domínio do produto.** A origem pública canônica é
+>   `https://brewtact.com` (ADR 0011); o ADR 0010 registra que
+>   `manaloom.com` não pertence ao projeto e que nenhum fallback pode apontar
+>   para ele.
+>
+> A seção "Rotina operacional em andamento" descreve scripts que apontam por
+> padrão para o host live e executam DML destrutivo via SSH. Ela é histórica.
+
 ## Pronto sem dependencias externas
 
 - Backlog ativo:
@@ -112,7 +135,7 @@ Esperado:
 - pricing responde 200.
 - report inexistente responde 404; report criado pelo app responde 200.
 
-## Rotina operacional em andamento
+## Rotina operacional de 2026-07-06 (histórica, não executar)
 
 ```bash
 scripts/manaloom_product_smoke.sh

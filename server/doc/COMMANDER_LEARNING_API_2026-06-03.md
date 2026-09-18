@@ -1,5 +1,13 @@
 # Commander Learning API - 2026-06-03
 
+> Lifecycle: `HISTORICAL_EVIDENCE · ROUTE_DISABLED`.
+> A rota descrita aqui **não responde** hoje: `learning_reads` está
+> `allowed=false` em `server/config/release_capabilities.json`, e
+> `server/routes/ai/commander-learning/index.dart` retorna `503` antes de
+> tocar o banco. O contrato de shape abaixo permanece válido como referência
+> de formato; os exemplos de resposta `200` e as "garantias esperadas" não
+> descrevem comportamento observável no estado atual.
+
 Nota reconciliada em 2026-06-19: este documento descreve o contrato atual da
 rota. O modo lista e apenas um resumo seguro de disponibilidade; payloads de
 deck, `win_conditions` e `role_summary` pertencem somente ao modo detalhe com

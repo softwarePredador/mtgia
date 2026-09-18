@@ -1,5 +1,17 @@
 # ManaLoom — Crons do Aprendizado & Pendências de Lógica
 
+> Lifecycle: `HISTORICAL_EVIDENCE · NO_MUTATION_AUTHORITY`.
+> **O crontab abaixo não descreve o runtime atual — não o instale.**
+>
+> Fotografia de `2026-06-02`. Nenhuma das entradas roda hoje: os oito scripts
+> de sync externo (`cron_sync_cards`, `cron_sync_combos`, `cron_sync_prices`,
+> `cron_sync_prices_mtgjson`, `cron_sync_rulings`, `cron_sync_staples`,
+> `cron_snapshot_edhrec`, `cron_snapshot_price_history`) **não estão
+> registrados** em `server/bin/manaloom_ops_daemon.py` `JOBS`, e os jobs que
+> estão registrados dependem de capabilities que estão todas `allowed=false`.
+> Para o estado real de quem escreve cada tabela e com que frescor, ver
+> `docs/DECK_QUALITY_MODEL.md` seções 5 e 6.
+
 Documento único com (1) a validação/esquema das crons que alimentam o
 aprendizado (recommendations/optimize/análises) e (2) o backlog de lacunas de
 lógica ainda **não** implementadas. Gerado durante a auditoria de coerência

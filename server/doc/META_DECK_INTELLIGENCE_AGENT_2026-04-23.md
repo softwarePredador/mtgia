@@ -31,10 +31,10 @@ Ele precisa provar:
 ## Arquivos obrigatorios de leitura
 
 - `.github/instructions/guia.instructions.md`
-- `ROADMAP.md`
+- `docs/status/CURRENT_PRODUCT_DECISION.md`
+- `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`
 - `docs/CONTEXTO_PRODUTO_ATUAL.md`
 - `server/bin/fetch_meta.dart`
-- `server/bin/populate_meta_v2.py`
 - `server/bin/extract_meta_insights.dart`
 - `server/bin/meta_profile_report.dart`
 - `server/bin/meta_report.dart`

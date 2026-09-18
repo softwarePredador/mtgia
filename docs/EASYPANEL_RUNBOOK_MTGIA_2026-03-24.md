@@ -1,5 +1,18 @@
 # EasyPanel Runbook - MTGIA
 
+> Lifecycle: `HISTORICAL_EVIDENCE · NO_DEPLOY_AUTHORITY`.
+> **NÃO EXECUTE OS COMANDOS DESTE DOCUMENTO.**
+>
+> Fotografia operacional de `2026-03-24`. A decisão corrente é
+> `NO_GO_PUBLIC_RELEASE` (`docs/status/CURRENT_PRODUCT_DECISION.md`) e as 29
+> capabilities de `server/config/release_capabilities.json` estão
+> `allowed=false`. Os blocos `docker build` / `docker push` /
+> `docker service update` abaixo contornam
+> `scripts/manaloom_deploy_backend_image.sh`, que é o único caminho de deploy
+> governado — ele valida o contrato de capabilities, o digest da política e o
+> drain de jobs. A ordem de deploy, a tabela de envs e o "critério de pronto"
+> preservam o estado anterior e não autorizam mutação.
+
 > Runbook operacional inicial formalizado em `2026-03-24`.
 > Baseado no padrão validado do `carMatch`, mas adaptado ao backend Dart Frog do `mtgia`.
 
