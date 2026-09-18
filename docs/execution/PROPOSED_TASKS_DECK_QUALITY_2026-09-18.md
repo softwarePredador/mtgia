@@ -1,0 +1,156 @@
+# Proposta de fichas — cadeia de qualidade de deck — 2026-09-18
+
+Status: `PROPOSAL · NOT_MERGED · NO_AUTHORITY`
+
+Este documento **não** é autoridade. Ele existe porque
+`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` e
+`docs/execution/CURRENT_QUEUE.md` estão sob edição em andamento (renomeação de
+"Coach" para "Jogar contra IA", inclusão de `BT-PLAY-001/002`), e escrever
+neles agora colidiria com esse trabalho.
+
+As linhas abaixo estão prontas para colar no backlog mestre quando a edição
+em curso fechar. Até lá, nenhuma delas tem ID reservado nem posição na fila.
+
+Origem factual: `docs/DECK_QUALITY_MODEL.md`, verificado contra código em
+`a2d044618`. Números de banco vêm do backup local de 2026-08-03.
+
+---
+
+## Parte 1 — Não criar ID novo: enriquecer IDs existentes
+
+A investigação de 2026-09-18 produziu **detalhe de mecanismo**, não tarefas
+novas. Três IDs já existentes cobrem o escopo e devem receber o detalhe em vez
+de competir com um ID paralelo.
+
+### `BT-AI-011` — vincular comandante à execução Generate
+
+Estado atual no backlog: `P0 GENERATE · IN_PROGRESS_CONTAINED`.
+
+O aceite hoje fala em fingerprint, cache e resultado. Falta o mecanismo que
+torna o vínculo real:
+
+> O pool determinístico de candidatos
+> (`server/lib/ai/optimize_filler_loader_support.dart:1263-1320`) recebe
+> apenas `identity` e `legality_format`. **O comandante não é parâmetro.**
+> Dois comandantes de mesma identidade de cor recebem a mesma lista de 600
+> cartas. `compareCandidates` (`:516-533`) desempata por penalidade de slot,
+> nome preferido, ordem do SQL e alfabético — **sem termo de sinergia**.
+> Aceite adicional sugerido: a query aceita o comandante e o ranking muda de
+> forma observável entre dois comandantes da mesma identidade.
+
+### `BT-CAT-01` — refresh de catálogo em job/CLI interno
+
+Estado atual: `P0 CORE · TODO`. Já é o guarda-chuva correto.
+
+Detalhe verificado a anexar:
+
+> Os oito scripts de sync externo (`cron_sync_cards`, `cron_sync_combos`,
+> `cron_sync_prices`, `cron_sync_prices_mtgjson`, `cron_sync_rulings`,
+> `cron_sync_staples`, `cron_snapshot_edhrec`, `cron_snapshot_price_history`)
+> existem e são determinísticos, mas **nunca foram registrados** em
+> `server/bin/manaloom_ops_daemon.py` `JOBS`. São receitas de crontab em
+> comentário. Frescor medido em 2026-09-18: catálogo 104 dias, EDHREC 108
+> dias. Esta lane depende de `catalog_private`
+> (`implemented_p0_open`, sem PII e sem superfície de consentimento) e **não**
+> de `learning_writes`, que está bloqueada por schema — as duas devem ser
+> tratadas separadamente.
+
+### `BT-AI-017` — snapshot/provenance/freshness das referências Commander
+
+Estado atual: `P1 · IN_PROGRESS_CONTAINED`.
+
+> Não existe caminho automatizado de escrita em
+> `commander_reference_profiles`: `upsertCommanderReferenceProfile` só é
+> chamado por dois CLIs manuais. Enquanto isso, a cobertura não cresce e
+> praticamente toda geração cai no caminho sem perfil. A cobertura real é
+> **desconhecida** — o README do lote Strixhaven registra "no database apply
+> was run" e os payloads de lote 2 / Anchor 30 foram removidos em
+> `8cab6400b`. Fechar com leitura read-only antes de estimar esforço.
+
+---
+
+## Parte 2 — Linhas novas propostas
+
+Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependências | aceite`.
+
+```
+| `BT-CI-001` | P0 CORE | TODO | Propagar o PUB_CACHE task-scoped do project logic para o `dart test` do CI local. | `BT-SCP-001` | `manaloom_local_ci.sh quick` e `full` passam sem bypass; `git commit` e `git push` deixam de exigir `--no-verify`. |
+| `BT-META-001` | P0 AI | TODO | Filtrar o corpus de meta insights por formato Commander. | — | `extract_meta_insights` ignora decks não-Commander; o ranking do pool deixa de ser liderado por staples de Legacy/Vintage. |
+| `BT-META-002` | P0 AI | TODO | Tornar `card_meta_insights.usage_count` idempotente e com decaimento. | `BT-META-001` | Rodar o extractor duas vezes não altera o resultado; carta ausente do corpus corrente perde posição; divergência corpus↔tabela vai a zero. |
+| `BT-FRESH-001` | P1 | TODO | Comparar a lista oficial de Game Changers com a fonte upstream, não só JSON↔Dart. | `BT-CAT-01` | O gate falha quando `source_checked_at` excede o limite de idade ou quando a lista upstream diverge; segue read-only, com provenance. |
+| `BT-HERMES-RET-001` | P2 | TODO | Decidir formalmente o destino do serviço `hermes-lab` e emitir receipt. | — | Serviço parado ou mantido por decisão registrada; `OPENAI_API_KEY` e `HERMES_GITHUB_TOKEN` revogados se parado; nenhum documento restante o descreve como frota ativa. |
+```
+
+### Justificativa de cada uma
+
+**`BT-CI-001`** — bloqueia tudo. `run_project_logic()`
+(`scripts/manaloom_local_ci.sh:105-112`) chama
+`manaloom_project_logic.sh --check`, que exporta
+`MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE` **no próprio processo**, e em seguida
+roda `"$DART_BIN" test` num subshell que não herda nem a variável nem as
+dependências resolvidas nela. Consequência: todo commit desta branch exigiu
+`--no-verify` em 2026-09-18. Exportar a variável não basta — o teste valida o
+`.dart_tool` da raiz do workspace, então o conserto pertence à campanha de
+cold bootstrap de `BT-SCP-001`.
+
+**`BT-META-001`** — maior retorno por esforço de toda a cadeia, e é um `WHERE`.
+`server/bin/extract_meta_insights.dart:134-149` lê `SELECT ... FROM meta_decks
+ORDER BY created_at DESC`, sem cláusula `WHERE`. Composição medida do corpus
+(653 decks): cEDH 34,2%, EDH 24,8%, e **39% Standard, Pioneer, Vintage,
+Modern, Pauper e Legacy**. O topo do ranking que ordena o pool inteiro é
+`Force of Will`, `Thoughtseize`, `Wasteland`, `Steam Vents`.
+
+**`BT-META-002`** — `extract_meta_insights.dart:838` faz
+`usage_count = card_meta_insights.usage_count + @usage`. Sem idempotência e
+sem decaimento: o valor mede quantas vezes o script rodou, não o meta. No
+backup, 29.593 nomes gravados não existem no corpus atual.
+
+**`BT-FRESH-001`** — `commander_game_changers.json` tem
+`source_checked_at=2026-07-14` apontando para um anúncio de 2026-02-09. O
+drift gate valida atribuição de fonte, 53 nomes e igualdade JSON↔Dart, mas
+**nunca consulta a WotC**. Isso alimenta `edh_bracket_policy.dart`. O molde de
+auditoria upstream já existe e roda no gate:
+`docs/hermes-analysis/manaloom-knowledge/scripts/external_engine_upstream_delta_audit.py`.
+
+**`BT-HERMES-RET-001`** — o serviço está dormente desde 2026-06-23, nenhum
+documento o governa, e dois segredos seguem válidos. Ver a análise em
+`docs/qa/execution/2026-09-18/deck-quality-harness.md`.
+
+---
+
+## Parte 3 — Ordem recomendada
+
+1. `BT-SCP-001` (já é o slot `NOW`) → destrava commit/push sem bypass, e
+   `BT-CI-001` sai junto ou logo depois.
+2. `BT-FRESH-001` → bug de produto vivo, barato, independente do resto.
+3. `BT-META-001` e `BT-META-002` → limpam o sinal.
+4. `BT-AI-011` → só depois de 3, porque sinergia sobre sinal contaminado é
+   otimizar ruído.
+5. `BT-CAT-01` → lane de ingestão, separada da de learning.
+6. `BT-AI-017` e `BT-HERMES-RET-001` → sem urgência.
+
+`DCK-P0-05`, `BT-AI-001`, `BT-AI-014` e `BT-AI-030` (lane de learning de
+usuário) continuam onde estão. O schema não permite cumprir revogação por
+sujeito — `deck_learning_events` não tem `user_id` nem coluna de
+consentimento, e `commander_card_usage` é agregado irreversível. Ligar
+learning antes disso cria obrigação que o banco não cumpre.
+
+---
+
+## Medição
+
+`scripts/quality_gate.sh deck-quality` pontua consistência de mana de forma
+determinística sobre 17 decks reais, com baseline de tolerância zero. Serve
+para provar que `BT-META-001/002` e `BT-AI-011` não pioraram a base de mana.
+**Não** mede potência de deck — ver
+`server/test/ai/deck_quality_report_limits_test.dart`.
+
+## Verificações pendentes que mudam estimativa
+
+```bash
+# cobertura real de perfis: muda a escala de BT-AI-017 e BT-AI-011
+psql "$DATABASE_URL" -c "select commander_name, source, updated_at from commander_reference_profiles order by updated_at desc;"
+
+# estado do container hermes-lab: entrada de BT-HERMES-RET-001
+python3 server/bin/audit_easypanel_cron_runtime.py --require-hermes-lab
+```

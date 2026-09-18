@@ -1,6 +1,6 @@
 # Receipt de trabalho — harness determinístico de consistência de mana
 
-Status: `PASS_LOCAL · COMMITTED_WITH_AUTHORIZED_HOOK_BYPASS · PUSH_PENDING · FORA_DA_FILA`
+Status: `PASS_LOCAL · COMMITTED_AND_PUSHED_WITH_AUTHORIZED_HOOK_BYPASS · FORA_DA_FILA`
 
 Este receipt registra trabalho **exploratório fora da fila**. Ele **não** fecha
 nenhuma ficha `BT-*`, não reordena a fila e não ocupa o slot `NOW`, que
@@ -214,6 +214,22 @@ Causa estrutural, para quem for fechar `BT-SCP-001`:
 `manaloom_project_logic.sh --check`, que exporta o cache task-scoped **no
 próprio processo**, e depois roda `"$DART_BIN" test` num subshell que não
 herda nem o cache nem as dependências resolvidas nele.
+
+### Push
+
+Enviado em 2026-09-18 sob autorização explícita do dono, com
+`git push --no-verify`, levando também o commit `354983a1e` (BT-SCP-001), que
+estava sem enviar — o dono foi consultado sobre isso e optou por incluí-lo.
+Remoto ficou em `d93867b68`.
+
+O hook `pre-push` (`manaloom_local_ci.sh full`) passou por project logic,
+secret scan, XMage pin transition e report retention, e falhou em
+`scripts/lib/manaloom_public_web_surface_contract.sh:81` —
+"landing/pricing nao identificam uma unica Beta gratuita e sem cobranca".
+Esse check inspeciona HTML renderizado do web público. Nenhum arquivo de
+`web-public/` foi tocado nesta entrega, e os fontes
+(`web-public/src/app/page.tsx`, `web-public/src/app/pricing/page.tsx`) contêm
+os três termos exigidos. A falha é de build local, não do conteúdo.
 
 ### Detalhe original do bloqueio
 `tools/project_logic/test/project_logic_generator_test.dart` aborta em
