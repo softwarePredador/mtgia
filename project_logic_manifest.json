@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "5ee22ba2cf09adb751478e261ad82c4ad9863a2f6a661a440716ec2d2f1a2ab3",
+  "source_digest_sha256": "9b2a11a22b098dd3aaf221ebb9934d9d5939d8bfb6f400485b495b8b802178cb",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -30,6 +30,8 @@
     "docs/CONTEXTO_PRODUTO_ATUAL.md",
     "docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md",
     "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
+    "docs/MAPA_OPERACIONAL_DO_PROJETO.md",
+    "docs/DECK_QUALITY_MODEL.md",
     "docs/execution/README.md",
     "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
     "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
@@ -276905,6 +276907,13 @@
           "mutation_authority": false
         },
         {
+          "path": "docs/DECK_QUALITY_MODEL.md",
+          "state": "current_contract",
+          "declaration_source": "canonical_documents",
+          "priority_authority": false,
+          "mutation_authority": false
+        },
+        {
           "path": "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
           "state": "current_contract",
           "declaration_source": "canonical_documents",
@@ -276934,6 +276943,13 @@
         },
         {
           "path": "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
+          "state": "current_contract",
+          "declaration_source": "canonical_documents",
+          "priority_authority": false,
+          "mutation_authority": false
+        },
+        {
+          "path": "docs/MAPA_OPERACIONAL_DO_PROJETO.md",
           "state": "current_contract",
           "declaration_source": "canonical_documents",
           "priority_authority": false,
@@ -280010,7 +280026,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "5ee22ba2cf09adb751478e261ad82c4ad9863a2f6a661a440716ec2d2f1a2ab3"
+    "project_logic_source_digest_sha256": "9b2a11a22b098dd3aaf221ebb9934d9d5939d8bfb6f400485b495b8b802178cb"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -281124,11 +281140,13 @@
       "docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md",
       "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
       "docs/CONTEXTO_PRODUTO_ATUAL.md",
+      "docs/DECK_QUALITY_MODEL.md",
       "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
       "docs/MANALOOM_COLLECTION_INGESTION_CONTRACT.md",
       "docs/MANALOOM_E2E_RELEASE_CONTRACT.md",
       "docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md",
       "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
+      "docs/MAPA_OPERACIONAL_DO_PROJETO.md",
       "docs/README.md",
       "docs/adr/0001-generated-project-logic.md",
       "docs/adr/0002-battle-lab-execution-boundaries.md",

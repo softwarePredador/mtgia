@@ -74,7 +74,7 @@ Estado atual: `P1 · IN_PROGRESS_CONTAINED`.
 Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependências | aceite`.
 
 ```
-| `BT-CI-001` | P0 CORE | TODO | Propagar o PUB_CACHE task-scoped do project logic para o `dart test` do CI local. | `BT-SCP-001` | `manaloom_local_ci.sh quick` e `full` passam sem bypass; `git commit` e `git push` deixam de exigir `--no-verify`. |
+| `BT-CI-001` | P0 CORE | TODO | Fazer a suíte do project logic rodar dentro do cold bootstrap, resolvendo o conflito entre o binding de PUB_CACHE e o próprio `dart test`. | `BT-SCP-001` | `manaloom_local_ci.sh quick` e `full` passam sem bypass; `git commit` e `git push` deixam de exigir `--no-verify`. |
 | `BT-META-001` | P0 AI | TODO | Filtrar o corpus de meta insights por formato Commander. | — | `extract_meta_insights` ignora decks não-Commander; o ranking do pool deixa de ser liderado por staples de Legacy/Vintage. |
 | `BT-META-002` | P0 AI | TODO | Tornar `card_meta_insights.usage_count` idempotente e com decaimento. | `BT-META-001` | Rodar o extractor duas vezes não altera o resultado; carta ausente do corpus corrente perde posição; divergência corpus↔tabela vai a zero. |
 | `BT-FRESH-001` | P1 | TODO | Comparar a lista oficial de Game Changers com a fonte upstream, não só JSON↔Dart. | `BT-CAT-01` | O gate falha quando `source_checked_at` excede o limite de idade ou quando a lista upstream diverge; segue read-only, com provenance. |
@@ -83,15 +83,43 @@ Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependência
 
 ### Justificativa de cada uma
 
-**`BT-CI-001`** — bloqueia tudo. `run_project_logic()`
-(`scripts/manaloom_local_ci.sh:105-112`) chama
-`manaloom_project_logic.sh --check`, que exporta
-`MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE` **no próprio processo**, e em seguida
-roda `"$DART_BIN" test` num subshell que não herda nem a variável nem as
-dependências resolvidas nela. Consequência: todo commit desta branch exigiu
-`--no-verify` em 2026-09-18. Exportar a variável não basta — o teste valida o
-`.dart_tool` da raiz do workspace, então o conserto pertence à campanha de
-cold bootstrap de `BT-SCP-001`.
+**`BT-CI-001`** — bloqueia tudo, e a causa é mais funda do que parecia.
+Investigado em 2026-09-18, com três camadas isoladas:
+
+1. **O bug do CI é real e independente.** `run_project_logic()`
+   (`scripts/manaloom_local_ci.sh:105-112`) chama
+   `manaloom_project_logic.sh --check`, que materializa um `PUB_CACHE`
+   task-scoped, reescreve o `.dart_tool` dos quatro pacotes
+   (`tools/project_logic`, raiz, `app`, `server`), roda o gerador e **limpa**.
+   Só então o CI roda `"$DART_BIN" test` num subshell — que nunca vê o
+   ambiente preparado.
+
+2. **Mover o teste para dentro não basta.** Foi implementado e testado um modo
+   `--test` que roda a suíte dentro do ambiente materializado. O `setUpAll`
+   continua abortando com
+   `.dart_tool/package_config.json points outside the task PUB_CACHE`,
+   e o caminho relativo é o da **raiz** do workspace. A mudança foi revertida
+   por não corrigir.
+
+3. **O próprio `dart test` desfaz o binding.** Na mesma execução, o check de
+   integridade do script acusou
+   `Bootstrap criou/alterou conteúdo inesperado em tools/project_logic/.dart_tool`.
+
+Ou seja: existe um ovo-e-galinha. A suíte valida que o workspace está amarrado
+a um cache isolado, e **o ato de rodá-la desfaz essa amarração**. Descartada a
+hipótese de Dart workspace: o repositório é Melos, sem `workspace:` nem
+`resolution: workspace`, então resolver um membro não deveria reescrever a
+raiz — e reescreve.
+
+Correção exige decisão de desenho, não flag: ou o `dart test` passa a
+participar explicitamente do cold bootstrap (com o script revalidando o
+binding depois dele), ou o `setUpAll` do gerador ganha um ponto de injeção
+para o caso "rodando sob teste". Ambas pertencem a `BT-SCP-001`.
+
+Evidência do custo de não ter esse gate: ao registrar dois documentos em
+`canonical_documents` nesta sessão, o digest de fonte do project logic mudou e
+os artefatos ficaram defasados. Com o gate funcionando isso teria sido barrado
+no commit; com `--no-verify`, passou e precisou de correção posterior.
 
 **`BT-META-001`** — maior retorno por esforço de toda a cadeia, e é um `WHERE`.
 `server/bin/extract_meta_insights.dart:134-149` lê `SELECT ... FROM meta_decks

@@ -4732,6 +4732,13 @@
         "mutation_authority": false
       },
       {
+        "path": "docs/DECK_QUALITY_MODEL.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "docs/MANALOOM_CARD_ART_SOURCE_CACHE_AND_RIGHTS_CONTRACT.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
@@ -4761,6 +4768,13 @@
       },
       {
         "path": "docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
+        "path": "docs/MAPA_OPERACIONAL_DO_PROJETO.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
         "priority_authority": false,
@@ -7837,5 +7851,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "5ee22ba2cf09adb751478e261ad82c4ad9863a2f6a661a440716ec2d2f1a2ab3"
+  "project_logic_source_digest_sha256": "9b2a11a22b098dd3aaf221ebb9934d9d5939d8bfb6f400485b495b8b802178cb"
 }
