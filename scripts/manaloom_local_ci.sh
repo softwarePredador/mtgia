@@ -105,10 +105,10 @@ run_mcp_preflight() {
 run_project_logic() {
   print_header "Manifesto, análise semântica e drift"
   "$ROOT_DIR/scripts/manaloom_project_logic.sh" --check
-  (
-    cd "$ROOT_DIR/tools/project_logic"
-    "$DART_BIN" test
-  )
+  # A suíte roda pelo próprio script, não num subshell ao lado: ela valida o
+  # binding de PUB_CACHE task-scoped que só existe dentro do ambiente que o
+  # script materializa.
+  "$ROOT_DIR/scripts/manaloom_project_logic.sh" --test
 }
 
 run_commander_game_changer_source() {

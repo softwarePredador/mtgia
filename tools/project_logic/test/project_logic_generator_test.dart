@@ -11,6 +11,12 @@ void main() {
 
   setUpAll(() async {
     root = _findWorkspaceRoot();
+    // generate() validates that every workspace package is bound to the
+    // task-scoped PUB_CACHE, and bootstrapWorkspacePackages is what
+    // establishes that binding. The binary has always called it first; this
+    // test called generate() directly and therefore aborted here with
+    // ".dart_tool/package_config.json points outside the task PUB_CACHE".
+    await bootstrapWorkspacePackages(root);
     result = await ProjectLogicGenerator(root).generate();
   });
 

@@ -23,7 +23,7 @@ Future<void> main(List<String> arguments) async {
     final rootArgument = _valueAfter(arguments, '--root') ?? '../..';
     final root = _canonicalRoot(rootArgument);
     _validateTaskCacheEnvironment();
-    await _bootstrapWorkspacePackages(root);
+    await bootstrapWorkspacePackages(root);
 
     final generator = ProjectLogicGenerator(root);
     final result = await generator.generate();
@@ -118,40 +118,6 @@ void _validateTaskCacheEnvironment() {
   }
 }
 
-Future<void> _bootstrapWorkspacePackages(Directory root) async {
-  for (final relative in const ['', 'app', 'server']) {
-    final directory = Directory(
-      relative.isEmpty
-          ? root.path
-          : Directory.fromUri(root.uri.resolve('$relative/')).path,
-    );
-    final label = relative.isEmpty ? '.' : relative;
-    for (final name in const ['pubspec.yaml', 'pubspec.lock']) {
-      if (!File.fromUri(directory.uri.resolve(name)).existsSync()) {
-        throw ProjectLogicException(
-          'Required package input is missing: $label/$name.',
-        );
-      }
-    }
-    final result = await Process.run(
-      Platform.resolvedExecutable,
-      const [
-        'pub',
-        'get',
-        '--offline',
-        '--enforce-lockfile',
-        '--no-precompile',
-      ],
-      workingDirectory: directory.path,
-      includeParentEnvironment: true,
-    );
-    if (result.exitCode != 0) {
-      throw ProjectLogicException(
-        'Offline package bootstrap failed for $label: ${result.stderr}',
-      );
-    }
-  }
-}
 
 String? _valueAfter(List<String> arguments, String flag) {
   final index = arguments.indexOf(flag);

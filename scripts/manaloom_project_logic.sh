@@ -25,10 +25,10 @@ export CI=true
 export FLUTTER_SUPPRESS_ANALYTICS=true
 
 case "$MODE" in
-  --check|--write)
+  --check|--write|--test)
     ;;
   *)
-    echo "Uso: ./scripts/manaloom_project_logic.sh [--check|--write]" >&2
+    echo "Uso: ./scripts/manaloom_project_logic.sh [--check|--write|--test]" >&2
     exit 2
     ;;
 esac
@@ -472,8 +472,16 @@ restore_package_metadata() {
     done
     after="$(dot_tool_other_fingerprint "$package_dir")"
     if [[ "$after" != "$(cat "$state_dir/other-before")" ]]; then
-      echo "Bootstrap criou/alterou conteúdo inesperado em $package_dir/.dart_tool." >&2
-      restore_status=1
+      # Em --test, `dart test` grava seu próprio cache de build dentro do
+      # .dart_tool do pacote sob teste. Isso é esperado e não é resíduo de
+      # bootstrap, então só o pacote de teste é tolerado; raiz, app e server
+      # continuam estritos.
+      if [[ "$MODE" == "--test" && "$package_dir" == "$ROOT_DIR/tools/project_logic" ]]; then
+        :
+      else
+        echo "Bootstrap criou/alterou conteúdo inesperado em $package_dir/.dart_tool." >&2
+        restore_status=1
+      fi
     fi
     if [[ "$(cat "$state_dir/directory-state")" == "absent" && -d "$package_dir/.dart_tool" ]]; then
       rmdir "$package_dir/.dart_tool" 2>/dev/null || {
@@ -544,7 +552,17 @@ PACKAGE_DIR="$ROOT_DIR/tools/project_logic"
   "$DART_BIN" pub get --offline --enforce-lockfile --no-precompile
 )
 
-(
-  cd "$PACKAGE_DIR"
-  "$DART_BIN" bin/manaloom_project_logic.dart "$MODE" --root "$ROOT_DIR"
-)
+if [[ "$MODE" == "--test" ]]; then
+  # A suíte precisa do mesmo PUB_CACHE task-scoped que o gerador: ela valida
+  # o binding que `bootstrapWorkspacePackages` estabelece. Rodá-la fora deste
+  # ambiente aborta em setUpAll.
+  (
+    cd "$PACKAGE_DIR"
+    "$DART_BIN" test
+  )
+else
+  (
+    cd "$PACKAGE_DIR"
+    "$DART_BIN" bin/manaloom_project_logic.dart "$MODE" --root "$ROOT_DIR"
+  )
+fi

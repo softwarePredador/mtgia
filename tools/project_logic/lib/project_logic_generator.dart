@@ -45,6 +45,11 @@ const _canonicalResolvedPubspecPaths = <String>[
   'server/pubspec.yaml',
 ];
 
+/// Workspace packages whose `.dart_tool` binding the generator both
+/// bootstraps and validates. The two must never drift apart, so they read the
+/// same constant.
+const workspacePackageRelativePaths = <String>['', 'app', 'server'];
+
 class ProjectLogicException implements Exception {
   ProjectLogicException(this.message);
 
@@ -52,6 +57,48 @@ class ProjectLogicException implements Exception {
 
   @override
   String toString() => message;
+}
+
+/// Binds every workspace package to the task-scoped `PUB_CACHE` by running an
+/// offline, lockfile-enforced `pub get` in each one.
+///
+/// [ProjectLogicGenerator.generate] validates that each package's
+/// `.dart_tool/package_config.json` points inside the task cache, but nothing
+/// establishes that binding on its own — the surrounding shell script only
+/// seeds the cache with copied packages and restores metadata afterwards.
+/// This is the step that makes the validation satisfiable, and every entry
+/// point must call it before `generate()`.
+///
+/// It used to live privately inside `bin/manaloom_project_logic.dart`, which
+/// is why `project_logic_generator_test.dart` failed in `setUpAll`: the test
+/// calls `generate()` directly and had no way to reach it.
+Future<void> bootstrapWorkspacePackages(Directory root) async {
+  for (final relative in workspacePackageRelativePaths) {
+    final directory = Directory(
+      relative.isEmpty
+          ? root.path
+          : Directory.fromUri(root.uri.resolve('$relative/')).path,
+    );
+    final label = relative.isEmpty ? '.' : relative;
+    for (final name in const ['pubspec.yaml', 'pubspec.lock']) {
+      if (!File.fromUri(directory.uri.resolve(name)).existsSync()) {
+        throw ProjectLogicException(
+          'Required package input is missing: $label/$name.',
+        );
+      }
+    }
+    final result = await Process.run(
+      Platform.resolvedExecutable,
+      const ['pub', 'get', '--offline', '--enforce-lockfile', '--no-precompile'],
+      workingDirectory: directory.path,
+      includeParentEnvironment: true,
+    );
+    if (result.exitCode != 0) {
+      throw ProjectLogicException(
+        'Offline package bootstrap failed for $label: ${result.stderr}',
+      );
+    }
+  }
 }
 
 Directory _canonicalWorkspaceRoot(Directory candidate) {
@@ -544,7 +591,7 @@ class ProjectLogicGenerator {
       }
     }
 
-    for (final relativePackage in const ['', 'app', 'server']) {
+    for (final relativePackage in workspacePackageRelativePaths) {
       _validateWorkspacePackage(
         relativePackage: relativePackage,
         taskCache: taskCache,
