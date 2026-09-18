@@ -108,6 +108,9 @@ estabelecido, o que foi descartado, e a pergunta que resta:
 2. *"É um Dart workspace, então resolver um membro reescreve a raiz."*
    Não é. O repositório é Melos: não há `workspace:` no `pubspec.yaml` da raiz
    nem `resolution: workspace` nos membros.
+3. *"O script separa raiz lógica de física (`cd -P` + `MANALOOM_PROJECT_LOGIC_LOGICAL_ROOT`),
+   então script e teste olham `.dart_tool` diferentes."* Não. Medido:
+   `pwd -L` e `pwd -P` são idênticos e nenhum componente do caminho é symlink.
 
 **A contradição em aberto**
 
@@ -117,8 +120,20 @@ config da raiz, e a validação exige a raiz no task cache sem guarda, então
 
 Uma sonda temporária leu, no momento imediatamente anterior à chamada do
 gerador, `raiz pubCache = file:///Users/<user>/.pub-cache` — o cache global.
-Ou a sonda estava mal posicionada de forma não identificada, ou o seeding faz
-algo não rastreado nas partes do script que não foram lidas.
+
+Busca exaustiva feita depois disso, e o resultado **fecha** a contradição em
+vez de abri-la: o script tem exatamente duas invocações de Dart
+(`pub get` em `tools/project_logic` e o binário do gerador), nenhum script do
+repositório escreve a chave `pubCache` em lugar nenhum, e `seed_task_cache`
+apenas copia pacotes do cache global para o task cache — não toca em
+`package_config.json`. O binário chama `generate()` nos dois modos
+(`bin/manaloom_project_logic.dart:29`), e `generate()` chama a validação como
+primeira instrução.
+
+Logo: pelo código lido, `--check` deveria falhar sempre — e passa. A
+explicação **não está** em nenhuma das três hipóteses testadas, e resolvê-la
+exige instrumentar o próprio gerador, o que altera o digest e mexe no núcleo
+do `BT-SCP-001`. É onde esta investigação para.
 
 **Escopo medido em 2026-09-18.** Com o drift resolvido, foi feita uma
 tentativa de commit com o hook **ativo**. O `manaloom_local_ci.sh quick`
