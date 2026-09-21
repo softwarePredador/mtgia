@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-10T14:19:25.662318Z",
-  "source_digest": "e9accd9433541ee73368393f3311930d3da878da7fb4f6c85a45eeed4ca5122c",
+  "generated_at": "2026-09-21T22:39:02.364364Z",
+  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
   "surface": "social_trade",
   "profile": "web_social_trade_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "9aeb75df2809ff5f7a1f35cc10bc3dd92fd01e28c25fbe504e9f08c8892dbb6f",
+  "log_sha256": "9a486c81a4ef0838b97adc57a45691111d7afd4ab47b47ec8468c767aa2f9ec2",
   "checkpoint_count": 16,
   "required_checkpoints": [
     "social_trade_00_matches_populated",
@@ -84,8 +84,8 @@
     {
       "checkpoint": "social_trade_06_trade_pending_actions",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/social_trade_06_trade_pending_actions.png",
-      "sha256": "f0d27d094331e4bf5c96fc42c0d83565ffa162e4446539ddff16830ca85f56eb",
-      "bytes": 98704,
+      "sha256": "29d2af6367e40b3af18ce821cdcb752e090d3f0be45bc4c3f112c538caa7a969",
+      "bytes": 99497,
       "width": 1440,
       "height": 900
     },
@@ -100,8 +100,8 @@
     {
       "checkpoint": "social_trade_08_trade_declined",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/social_trade_08_trade_declined.png",
-      "sha256": "9b48ae543c5dcd925e9db816d7eef32f07c32c2c789994cf7c7e3c3e4ad0afaf",
-      "bytes": 99712,
+      "sha256": "ebc760940e7d9fdd2f7c611278a1b320e774803c087a7eb3da6e3fcfa2932f8b",
+      "bytes": 100505,
       "width": 1440,
       "height": 900
     },
@@ -116,8 +116,8 @@
     {
       "checkpoint": "social_trade_10_trade_completed",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/social_trade_10_trade_completed.png",
-      "sha256": "2a3d8680aaec7ee4066c617bba359a218d68dd72c76e64621c751c90503b3261",
-      "bytes": 101634,
+      "sha256": "1119ebda2d4dd250098c6045a79e28bd5bce99b03d46368296130f35d8d1ae03",
+      "bytes": 102429,
       "width": 1440,
       "height": 900
     },

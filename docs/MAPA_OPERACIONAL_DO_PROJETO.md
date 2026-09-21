@@ -372,6 +372,7 @@ Esta é a seção mais acionável.
 | C14 | `deck_replace_all` e `legacy_ai_routes` são portões reais sem motivo documentado | o schema não tem campo `reason` |
 | C15 | O web público é o único deploy **sem nenhuma** referência a capability — zero ocorrências, verificado | `manaloom_deploy_public_web.sh` |
 | C16 | O contrato de egress do harness isolado cobrava quatro trechos que `f6f791098` já havia refatorado — 23 das 27 asserções continuavam válidas, então a deriva passou despercebida | `mutating_e2e_entrypoint_guard_test.dart:371-380` vs `manaloom_server_contract_e2e_isolated.sh:440,674,817` |
+| C17 | O conjunto de evidência viva de UI contém um pack que apresenta marketplace, preços em `R$` e CTAs de compra/venda como superfície ativa, enquanto `marketplace` e `trades` estão `allowed=false` e o contrato de web público proíbe esse vocabulário | `ux-pack-05-social-trade-web-*` vs `server/config/release_capabilities.json` |
 
 C16 foi corrigido em duas etapas. A primeira trocou as âncoras literais por
 outras âncoras literais, e uma revisão adversarial mostrou que ela deixava
@@ -386,6 +387,27 @@ qualquer refactor legítimo, e quando 18 de 22 continuam passando a deriva não
 grita. Contratos de shell deveriam cobrar a **propriedade** — "todo passo
 privilegiado executa sob `EGRESS_GUARD`, e depois do self-test" — e não o
 recorte exato da linha.
+
+C17 **não é falha de gating**, e vale dizer com precisão porque a leitura
+ingênua das capturas sugere o contrário. Três revisores independentes abriram
+os 48 screenshots do pack 05 e classificaram como bloqueio de escopo: chip
+`Venda`, `R$ 18,50`, tipo de negociação `Compra` com ícone de carrinho,
+`Resumo de valor`, `Explorar Marketplace`. Olhando o código, o pack monta as
+telas **diretamente** — `home: const Scaffold(body: MarketplaceTabContent())`,
+`home: const CreateTradeScreen(...)` em
+`app/integration_test/social_trade_visual_runtime_proof_test.dart:713,747` — e
+nunca passa pelo router, onde `/marketplace` tem `redirect`
+(`app/lib/main.dart:804-805`). As telas existem no código e são inalcançáveis
+no app entregue.
+
+O que sobra é contradição de **higiene de evidência**, não de produto: o
+conjunto que se chama "evidência viva de UI" guarda 48 capturas que apresentam
+comércio como superfície viva, sem nenhum marcador dizendo que aquilo está
+desligado. Quem auditar o conjunto sem ler o teste conclui que o Beta vende
+cartas — foi exatamente o que três revisores concluíram. A correção barata é
+marcar o pack (no manifest e/ou na captura) como superfície `allowed=false`
+construída diretamente; a cara é aposentar o pack enquanto a capability
+estiver desligada. Decisão do dono.
 
 C1, C2 e C3 recomendam a mesma correção: separar **implementado** de
 **alcançável** na matriz de prontidão. O repositório já rastreia as duas

@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-09T15:05:02.890815Z",
-  "source_digest": "e173d5a6088320bda92f77eac486c8ff5e39e99d4693758a1facb88b68b55c2c",
+  "generated_at": "2026-09-21T23:15:40.440043Z",
+  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
   "surface": "authenticated_p0_matrix",
   "profile": "web_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "ce420ca0084483b5584835caf97f7a397832227d753421197242e6c8106f2363",
+  "log_sha256": "ec153fa6cfb4f7f07fa393302d48f47b20e46bdadcd97643b507e31c85cf63ed",
   "checkpoint_count": 54,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -154,16 +154,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/community_deck_success.png",
-      "sha256": "6e2bbb5feb28e1ec8a8e9ede074b231834f603ae703bed786246721ee73a69af",
-      "bytes": 65758,
+      "sha256": "c79c01e3f714c7addb5376d929a659725ceffc1d2071184c6e317d1528ee9e4c",
+      "bytes": 64851,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "community_public_decks",
       "path": "app/test/ui/goldens/runtime/web_mobile/community_public_decks.png",
-      "sha256": "ec2791fb646d80ecfc3e87effef5f95ec235aa62b6ce3ea6a7ecd6bf4445665f",
-      "bytes": 111980,
+      "sha256": "736989a0cf648803414bfa1336c0ca04fc1a508244480ea649db49031b4f3c0e",
+      "bytes": 111717,
       "width": 390,
       "height": 844
     },
@@ -306,8 +306,8 @@
     {
       "checkpoint": "life_counter_initial",
       "path": "app/test/ui/goldens/runtime/web_mobile/life_counter_initial.png",
-      "sha256": "8e4c104d69fba1f594b8fb900d30db191d48c358787246f3e5dde9a8eb4d451e",
-      "bytes": 136096,
+      "sha256": "5b6253d3a60653bb68d0a801ba39c2a0bf17d0a0178d4343a4d0b6329544b91a",
+      "bytes": 135864,
       "width": 390,
       "height": 844
     },
@@ -354,16 +354,16 @@
     {
       "checkpoint": "post_game_empty",
       "path": "app/test/ui/goldens/runtime/web_mobile/post_game_empty.png",
-      "sha256": "799bcd2a17e688a52098368647b609699f753415d858b073627b90f39d741be2",
-      "bytes": 110678,
+      "sha256": "0e8bd11c91b7f6f706916375d77e59114ef96e5e9845ba78ebf3f3ad73955dc4",
+      "bytes": 110723,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/profile_success.png",
-      "sha256": "6c516d121b08355b8732c43fec69bd576010c6f09e1d1f0b88e872ce1d261f6f",
-      "bytes": 81611,
+      "sha256": "46b6db069e5c7a0024ef2b70efc134763ebe6cf9eac75c4c3d532a84d0b8a17c",
+      "bytes": 79377,
       "width": 390,
       "height": 844
     },
@@ -434,8 +434,8 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/web_mobile/splash_boot.png",
-      "sha256": "e3f80c7b6d4c5edcca19e487208dc818b26d1fe9f058396559149e25bf21f6bd",
-      "bytes": 33135,
+      "sha256": "3eb76a9cf0df24a14e58013392ed43b58eb0a5030e176e6910ab259551bbcf07",
+      "bytes": 33139,
       "width": 390,
       "height": 844
     },
@@ -474,8 +474,8 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/web_mobile/user_profile_success.png",
-      "sha256": "63d20a7c6031ef959c85a0221c5fbae6aed2c15ee3cffc5ee963c979529d04f1",
-      "bytes": 64991,
+      "sha256": "5720ab0d2bf5e482a237a30760e8a3cc4d82d55d2db1429f0c62fb6538edf989",
+      "bytes": 63789,
       "width": 390,
       "height": 844
     },
@@ -490,8 +490,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/web_mobile/user_search_results.png",
-      "sha256": "2461c3b3a04271a35f0cfe0a2b0145372c97816039fc5b585fcc3840a6e7e52e",
-      "bytes": 21152,
+      "sha256": "44ceccb3581e90d00b2068a1391d2f99529307ed4fd9807ec689bdf4ba053ed8",
+      "bytes": 19222,
       "width": 390,
       "height": 844
     },

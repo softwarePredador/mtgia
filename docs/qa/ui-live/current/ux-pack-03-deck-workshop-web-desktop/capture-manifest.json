@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-10T13:36:52.905573Z",
-  "source_digest": "e9accd9433541ee73368393f3311930d3da878da7fb4f6c85a45eeed4ca5122c",
+  "generated_at": "2026-09-21T22:29:11.395987Z",
+  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
   "surface": "deck_workshop",
   "profile": "web_deck_workshop_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "44ea8994066cfbbd321c4b8c0e8c4cb45bf4f4b17c738f7aafa8b4f3ca9101d2",
+  "log_sha256": "8b196c510e36e7b55787e46681f58d4d17fa89b309e577a60c1e967e4926d644",
   "checkpoint_count": 12,
   "required_checkpoints": [
     "deck_workshop_00_commander",

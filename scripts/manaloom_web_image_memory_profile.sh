@@ -4,7 +4,9 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 PINNED_FLUTTER="${MANALOOM_PINNED_FLUTTER:-$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter}"
 FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-$PINNED_FLUTTER}"
-CHROMEDRIVER_BIN="${MANALOOM_CHROMEDRIVER_BIN:-$(command -v chromedriver 2>/dev/null || true)}"
+source "$ROOT_DIR/scripts/lib/manaloom_chromedriver.sh"
+resolve_manaloom_chromedriver || exit 2
+CHROMEDRIVER_BIN="$MANALOOM_CHROMEDRIVER_BIN_RESOLVED"
 CHROME_BIN="${MANALOOM_CHROME_BIN:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
 CHROMEDRIVER_PORT="${MANALOOM_CHROMEDRIVER_PORT:-9515}"
 FIXTURE_PORT="${MANALOOM_IMAGE_FIXTURE_PORT:-8091}"

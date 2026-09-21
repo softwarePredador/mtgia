@@ -67,6 +67,12 @@ SOURCE_ROOTS=(
   "scripts/manaloom_visual_system_workspace_qa.sh"
   "scripts/manaloom_critical_overlays_states_visual_qa.sh"
   "scripts/lib/manaloom_ui_runtime_contract.sh"
+  # O pin do ChromeDriver decide qual navegador produz as capturas, entao ele
+  # PRECISA mover o digest. Ate 2026-09-21 a versao vivia inline nos seis
+  # scripts de visual QA, que ja estao nesta lista; ao extrair a resolucao para
+  # a biblioteca compartilhada eu tirei o pin da cobertura sem perceber, e
+  # trocar o driver deixaria de invalidar evidencia nenhuma.
+  "scripts/lib/manaloom_chromedriver.sh"
   "scripts/manaloom_p0_runtime_capture.sh"
   "scripts/manaloom_play_vs_ai_e2e.sh"
   "scripts/manaloom_server_contract_e2e_isolated.sh"

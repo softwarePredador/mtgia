@@ -466,6 +466,82 @@ printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
     expect(source, contains('MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE'));
   });
 
+  // ChromeDriver tem um pin, num lugar. Antes, seis scripts carregavam o mesmo
+  // caminho literal e quatro pegavam o que houvesse no PATH; o cache tinha um
+  // driver que nenhum script usava e o do PATH era tres majors atras do
+  // Chrome. Este contrato cobra a PROPRIEDADE: todo script que fala em
+  // chromedriver resolve pela biblioteca compartilhada, e nenhum consulta o
+  // PATH.
+  test('every ChromeDriver consumer resolves through the shared pin', () {
+    final lib = File(
+      '../scripts/lib/manaloom_chromedriver.sh',
+    ).readAsStringSync();
+    expect(
+      RegExp(
+        r'^readonly MANALOOM_CHROMEDRIVER_VERSION="\d+\.\d+\.\d+\.\d+"$',
+        multiLine: true,
+      ).hasMatch(lib),
+      isTrue,
+      reason: 'a versao pinada precisa ser um build completo do CfT',
+    );
+    expect(
+      RegExp(
+        r'^readonly MANALOOM_CHROMEDRIVER_SHA256="[0-9a-f]{64}"$',
+        multiLine: true,
+      ).hasMatch(lib),
+      isTrue,
+      reason: 'o arquivo baixado precisa de SHA-256 pinado',
+    );
+    expect(lib, contains('resolve_manaloom_chromedriver()'));
+    expect(lib, isNot(contains('command -v chromedriver')));
+
+    // O pin precisa estar no escopo do digest de UI. Enquanto a versao vivia
+    // inline nos scripts de visual QA ela era coberta de graca; extrair para a
+    // biblioteca tirou o pin da cobertura, e trocar o driver deixaria de
+    // invalidar as evidencias — capturas velhas passariam por frescas.
+    expect(
+      File('../scripts/manaloom_ui_source_digest.sh').readAsStringSync(),
+      contains('"scripts/lib/manaloom_chromedriver.sh"'),
+      reason: 'o pin do ChromeDriver precisa mover o digest de UI',
+    );
+
+    final consumers = Directory('../scripts')
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.sh'))
+        .where((file) => !file.path.endsWith('/manaloom_chromedriver.sh'))
+        .where(
+          (file) => RegExp(
+            r'chromedriver',
+            caseSensitive: false,
+          ).hasMatch(file.readAsStringSync()),
+        )
+        .toList(growable: false);
+    expect(
+      consumers.length,
+      greaterThanOrEqualTo(10),
+      reason: 'os dez consumidores conhecidos mais o bootstrap',
+    );
+    for (final consumer in consumers) {
+      final source = consumer.readAsStringSync();
+      expect(
+        source,
+        contains('scripts/lib/manaloom_chromedriver.sh'),
+        reason: '${consumer.path} precisa sourcear a biblioteca compartilhada',
+      );
+      expect(
+        source,
+        isNot(contains('command -v chromedriver')),
+        reason: '${consumer.path} nao pode consultar o PATH',
+      );
+      expect(
+        RegExp(r'chromedriver/\d+\.\d+\.\d+\.\d+').hasMatch(source),
+        isFalse,
+        reason: '${consumer.path} nao pode carregar um pin de versao proprio',
+      );
+    }
+  });
+
   test('release Flutter helper accepts only the pinned SDK', () async {
     final helper =
         File(

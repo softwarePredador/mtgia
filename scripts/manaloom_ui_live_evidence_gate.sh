@@ -12,6 +12,7 @@ P0_CAPTURE_OUTPUT="docs/qa/ui-live/current/p0-matrix"
 
 source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 source "$ROOT_DIR/scripts/lib/manaloom_ui_runtime_contract.sh"
+source "$ROOT_DIR/scripts/lib/manaloom_chromedriver.sh"
 resolve_manaloom_dart
 DART_BIN="$MANALOOM_DART_BIN_RESOLVED"
 
@@ -280,7 +281,8 @@ capture_battle_live_web() {
   local promoted="false"
   device_contract="$(manaloom_web_runtime_device_contract "$profile")"
   chrome_executable="${CHROME_EXECUTABLE:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
-  chromedriver_bin="${MANALOOM_CHROMEDRIVER_BIN:-$(command -v chromedriver 2>/dev/null || true)}"
+  resolve_manaloom_chromedriver || exit 2
+  chromedriver_bin="$MANALOOM_CHROMEDRIVER_BIN_RESOLVED"
   if [[ ! -x "$chrome_executable" ]]; then
     echo "Battle Live Web capture requires Chrome: $chrome_executable" >&2
     exit 2

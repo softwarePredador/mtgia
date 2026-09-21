@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-08-25T21:13:39.255480Z",
-  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
+  "generated_at": "2026-09-21T22:51:52.243898Z",
+  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
   "surface": "critical_overlays_states",
   "profile": "web_critical_overlays_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "d0fed403406d1c99e161df6b26280ee0e5c006eeeb60996ad1f01021a6133263",
+  "log_sha256": "1912ea6d96c1cd348345ec5bd22da230984af33e7179a88e4c722770e55b5a26",
   "checkpoint_count": 22,
   "required_checkpoints": [
     "ux_pack08_00_profile_security_below_fold",
@@ -58,8 +58,8 @@
     {
       "checkpoint": "ux_pack08_02_profile_blocked_loading",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/ux_pack08_02_profile_blocked_loading.png",
-      "sha256": "223525e30d83de9358d19d62713c1631b17dfeedd60db36daa9c04a6cf97ddcc",
-      "bytes": 43021,
+      "sha256": "a58f0473bc8f967b15f295a24031bd4c278e720976851c21594565771eea9843",
+      "bytes": 43056,
       "width": 390,
       "height": 844
     },
@@ -106,16 +106,16 @@
     {
       "checkpoint": "ux_pack08_08_deck_seeded_action_context",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/ux_pack08_08_deck_seeded_action_context.png",
-      "sha256": "61433c27ae1b07a5e7de263f779a2e5920c0aef46b16c5c599b61f572a4e6830",
-      "bytes": 91132,
+      "sha256": "2400cc2828267b9f7bc1feb34e68f954a7dd8fd15f4ed166e34eac5faa049ed2",
+      "bytes": 90932,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "ux_pack08_09_deck_delete_action_menu",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/ux_pack08_09_deck_delete_action_menu.png",
-      "sha256": "32daa23fe87a87398ba3ccc2df840af2b7b1d0f1d0a293219dd4fe4df257f983",
-      "bytes": 87907,
+      "sha256": "7cb112c11a24196172572423325fc7a7925f5055f9c62a51e762031ef3635717",
+      "bytes": 87711,
       "width": 390,
       "height": 844
     },
@@ -130,8 +130,8 @@
     {
       "checkpoint": "ux_pack08_11_deck_delete_cancelled",
       "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/ux_pack08_11_deck_delete_cancelled.png",
-      "sha256": "61433c27ae1b07a5e7de263f779a2e5920c0aef46b16c5c599b61f572a4e6830",
-      "bytes": 91132,
+      "sha256": "2400cc2828267b9f7bc1feb34e68f954a7dd8fd15f4ed166e34eac5faa049ed2",
+      "bytes": 90932,
       "width": 390,
       "height": 844
     },

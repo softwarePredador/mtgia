@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-10T13:24:25.137784Z",
-  "source_digest": "e9accd9433541ee73368393f3311930d3da878da7fb4f6c85a45eeed4ca5122c",
+  "generated_at": "2026-09-21T22:34:00.745584Z",
+  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
   "surface": "binder_import",
   "profile": "web_binder_import_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "bf9e19a6595b910cf836c9a738e052d6572f827ae1fbeaab7e1b7448a640f434",
+  "log_sha256": "3723896d92754498afd60aecf4321ffd5412546845bbe59ebd518a3458612044",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "binder_import_00_source",
@@ -35,48 +35,48 @@
     {
       "checkpoint": "binder_import_01_review_duplicates",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_01_review_duplicates.png",
-      "sha256": "ef7a015f4b1abf59e2508a4dc24ab6af65eee602042fa4c658bcda3165513f48",
-      "bytes": 140012,
+      "sha256": "6c09e76576695ef9d3e5b695678908edb30dd6c32f81c60ca68c107ace6a1022",
+      "bytes": 132247,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "binder_import_02_plan",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_02_plan.png",
-      "sha256": "7cf8b9b60643beb77423e4977b8ba7e151bed69f3752f9b0b614cd2cba871a7b",
-      "bytes": 166840,
+      "sha256": "219d59068d22313e8b678de5836c70373ec881193a1bd851f5dfd52cd74e86da",
+      "bytes": 148714,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "binder_import_03_confirmation",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_03_confirmation.png",
-      "sha256": "30b7d3e7d28695e99839869161e992bd2773460b819731cf68fed324589ce87f",
-      "bytes": 132896,
+      "sha256": "64170a1ee71ed5050588d608d19a8c3beeb105d3ce8b303ce5371687ae770884",
+      "bytes": 125313,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "binder_import_04_partial_failure",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_04_partial_failure.png",
-      "sha256": "12327a3cc36a2129361462ba5b1f449c245fca36ad3ce72ea00a81b8565b5813",
-      "bytes": 178550,
+      "sha256": "9495e427c5db41f808537131541aa59d036d94cb4c29a3fb459a5e216c6c3aff",
+      "bytes": 160193,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "binder_import_05_retry_success",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_05_retry_success.png",
-      "sha256": "2e274dee678a5cfb217848a94533e667843033c203e4710ffabc897be7b67494",
-      "bytes": 173856,
+      "sha256": "cb799e0f42e28c541cba2f36334cfda05943cde02f2cdab669f5c99306e58ea1",
+      "bytes": 156186,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "binder_import_06_history",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_06_history.png",
-      "sha256": "cb03ef512bfd49733acbd503c431cdb98f2e524b33605223f23f24a084f8e6a1",
-      "bytes": 184569,
+      "sha256": "8da68800f103f5c4bb431ead4961ff9bb8f01323e0b60c22f0b18b97498abeb7",
+      "bytes": 167519,
       "width": 1440,
       "height": 900
     }

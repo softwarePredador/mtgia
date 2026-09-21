@@ -8,6 +8,7 @@ resolve_manaloom_flutter_dart_pair
 PINNED_FLUTTER="$MANALOOM_FLUTTER_BIN_RESOLVED"
 PINNED_DART="$MANALOOM_DART_BIN_RESOLVED"
 source "$ROOT_DIR/scripts/lib/manaloom_ui_runtime_contract.sh"
+source "$ROOT_DIR/scripts/lib/manaloom_chromedriver.sh"
 
 PROFILE=""
 READY_MANIFEST=""
@@ -304,7 +305,8 @@ drive_command=(
 )
 
 if [[ "$platform" == "web" ]]; then
-  chromedriver_bin="${MANALOOM_CHROMEDRIVER_BIN:-$(command -v chromedriver || true)}"
+  resolve_manaloom_chromedriver || exit 2
+  chromedriver_bin="$MANALOOM_CHROMEDRIVER_BIN_RESOLVED"
   chrome_executable="${CHROME_EXECUTABLE:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
   if [[ -z "$chromedriver_bin" || ! -x "$chromedriver_bin" ]]; then
     echo "Web capture requires an executable ChromeDriver" >&2

@@ -4,16 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
 PINNED_DART="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/cache/dart-sdk/bin/dart"
-PINNED_CHROMEDRIVER="$HOME/Library/Caches/manaloom/chromedriver/150.0.7871.124-mac-arm64/unpacked/chromedriver-mac-arm64/chromedriver"
 FLUTTER_BIN="${MANALOOM_FLUTTER_BIN:-$PINNED_FLUTTER}"
 DART_BIN="${MANALOOM_DART_BIN:-$PINNED_DART}"
 CHROME_EXECUTABLE="${CHROME_EXECUTABLE:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
-if [[ -x "$PINNED_CHROMEDRIVER" ]]; then
-  DEFAULT_CHROMEDRIVER="$PINNED_CHROMEDRIVER"
-else
-  DEFAULT_CHROMEDRIVER="$(command -v chromedriver 2>/dev/null || true)"
-fi
-CHROMEDRIVER_BIN="${MANALOOM_CHROMEDRIVER_BIN:-$DEFAULT_CHROMEDRIVER}"
+source "$ROOT_DIR/scripts/lib/manaloom_chromedriver.sh"
+resolve_manaloom_chromedriver || exit 2
+CHROMEDRIVER_BIN="$MANALOOM_CHROMEDRIVER_BIN_RESOLVED"
 RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_social_trade_visual.XXXXXX")"
 CHROMEDRIVER_PID=""
 ASSET_SERVER_PID=""

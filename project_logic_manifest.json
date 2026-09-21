@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "49639fd791059d79bcf49c0a82bccd77f7b2f7e44633d33da2a7424575a0f2e5",
+  "source_digest_sha256": "556ba631fd046cdf47e9a07e93cbf12421326dd018155af22b6be0b53e9d0d0c",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,8 +79,8 @@
     "database_tables": 79,
     "database_views": 6,
     "migrations": 58,
-    "scripts_and_jobs": 685,
-    "environment_variables": 715,
+    "scripts_and_jobs": 687,
+    "environment_variables": 717,
     "tests": 1220,
     "flows": 8,
     "traceability_rules": 12,
@@ -260756,6 +260756,16 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/lib/manaloom_chromedriver.sh",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_CHROMEDRIVER_BIN",
+        "MANALOOM_CHROMEDRIVER_PLATFORM",
+        "MANALOOM_CHROMEDRIVER_VERSION"
+      ]
+    },
+    {
       "path": "scripts/lib/manaloom_dart_toolchain.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -260904,7 +260914,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -260932,7 +260941,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -260981,6 +260989,12 @@
       ]
     },
     {
+      "path": "scripts/manaloom_chromedriver_bootstrap.sh",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_commercial_quality_gate.sh",
       "role": "test_or_gate",
       "mutation_class": "read_only_or_unknown",
@@ -261007,7 +261021,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -261083,7 +261096,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -261514,7 +261526,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -261532,7 +261543,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_VISUAL_EMAIL",
         "MANALOOM_VISUAL_EMPTY_EMAIL",
         "MANALOOM_VISUAL_EMPTY_PASSWORD",
@@ -261773,7 +261783,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -261804,7 +261813,6 @@
       "environment_variables": [
         "CHROME_EXECUTABLE",
         "MANALOOM_ATTESTED_ANDROID_KIND",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_FLUTTER_BIN",
         "MANALOOM_P0_ANDROID_DIR",
         "MANALOOM_P0_ANDROID_LOG",
@@ -261866,7 +261874,6 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "CHROME_EXECUTABLE",
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_DART_BIN",
         "MANALOOM_FLUTTER_BIN",
         "TMPDIR"
@@ -261886,7 +261893,6 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
-        "MANALOOM_CHROMEDRIVER_BIN",
         "MANALOOM_CHROMEDRIVER_PORT",
         "MANALOOM_CHROME_BIN",
         "MANALOOM_FLUTTER_BIN",
@@ -266074,16 +266080,15 @@
       "name": "MANALOOM_CHROMEDRIVER_BIN",
       "classification": "configuration",
       "sources": [
-        "scripts/manaloom_battle_learning_visual_qa.sh",
-        "scripts/manaloom_binder_import_visual_qa.sh",
-        "scripts/manaloom_critical_overlays_states_visual_qa.sh",
-        "scripts/manaloom_deck_workshop_visual_qa.sh",
-        "scripts/manaloom_onboarding_intent_visual_qa.sh",
-        "scripts/manaloom_p0_runtime_capture.sh",
-        "scripts/manaloom_social_trade_visual_qa.sh",
-        "scripts/manaloom_ui_live_evidence_gate.sh",
-        "scripts/manaloom_visual_system_workspace_qa.sh",
-        "scripts/manaloom_web_image_memory_profile.sh"
+        "scripts/lib/manaloom_chromedriver.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_CHROMEDRIVER_PLATFORM",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_chromedriver.sh"
       ],
       "value_captured": false
     },
@@ -266092,6 +266097,14 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_web_image_memory_profile.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_CHROMEDRIVER_VERSION",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_chromedriver.sh"
       ],
       "value_captured": false
     },
@@ -280026,7 +280039,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "49639fd791059d79bcf49c0a82bccd77f7b2f7e44633d33da2a7424575a0f2e5"
+    "project_logic_source_digest_sha256": "556ba631fd046cdf47e9a07e93cbf12421326dd018155af22b6be0b53e9d0d0c"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -282032,6 +282045,7 @@
       "scripts/dev_full_with_integration.sh",
       "scripts/flutter_run_with_local_sentry.sh",
       "scripts/generate_brewtact_brand_assets.py",
+      "scripts/lib/manaloom_chromedriver.sh",
       "scripts/lib/manaloom_dart_toolchain.sh",
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
@@ -282051,6 +282065,7 @@
       "scripts/manaloom_build_android_release.sh",
       "scripts/manaloom_build_beta_release.sh",
       "scripts/manaloom_capture_android_platform_view.sh",
+      "scripts/manaloom_chromedriver_bootstrap.sh",
       "scripts/manaloom_commercial_quality_gate.sh",
       "scripts/manaloom_critical_overlays_states_visual_qa.sh",
       "scripts/manaloom_custom_lint.sh",
