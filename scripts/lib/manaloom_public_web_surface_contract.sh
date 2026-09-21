@@ -75,9 +75,16 @@ manaloom_public_web_assert_free_beta_files() {
   local home_html="$1"
   local pricing_html="$2"
 
+  # As alternâncias abaixo são propositais no lugar de classes como `[aá]` e
+  # `[cç]`. Um caractere acentuado ocupa dois bytes em UTF-8, e o grep do BSD
+  # trata uma classe como conjunto de bytes isolados fora de um locale UTF-8:
+  # o padrão passa a esperar um byte onde o texto tem dois, e nunca casa. Isso
+  # fazia este contrato falhar em qualquer máquina com `LANG` vazio, mesmo com
+  # a landing correta. Alternância casa a sequência inteira e funciona tanto
+  # em `LC_ALL=C` quanto em UTF-8.
   if ! grep -Eqi 'beta' "$home_html" "$pricing_html" ||
-     ! grep -Eqi 'gratuit|gr[aá]tis' "$home_html" "$pricing_html" ||
-     ! grep -Eqi 'sem cobran[cç]a' "$pricing_html"; then
+     ! grep -Eqi 'gratuit|gr(a|á)tis' "$home_html" "$pricing_html" ||
+     ! grep -Eqi 'sem cobran(c|ç)a' "$pricing_html"; then
     echo "landing/pricing nao identificam uma unica Beta gratuita e sem cobranca" >&2
     return 1
   fi

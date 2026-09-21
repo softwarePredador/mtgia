@@ -277,12 +277,43 @@ Para a proposta da cadeia de qualidade de deck, ver
 | secret scan | quick | passa |
 | **project logic** | quick | **passa** — corrigido em `d83e9b1e1` |
 | **`ui_live_evidence`** | quick | **falha** — 23 de 35 packs com digest defasado |
-| `manaloom_public_web_surface_contract` | full | falha — HTML renderizado |
+| **`manaloom_public_web_surface_contract`** | full | **passa** — corrigido em 2026-09-21 |
+| **`npm audit` do web público** | full | **falha** — advisory upstream, `next` critical + `sharp` high |
 
 O gate de project logic era o bloqueio principal e foi resolvido: o teste
 chamava `generate()` sem antes rodar `bootstrapWorkspacePackages`, que é o que
 amarra cada `package_config.json` ao `PUB_CACHE` isolado que a validação
 exige. Ver `docs/execution/PROPOSED_TASKS_DECK_QUALITY_2026-09-18.md`.
+
+O contrato de web público também caiu, e o diagnóstico inicial registrado aqui
+— "HTML renderizado / falta build local" — **estava errado**. A causa real era
+portabilidade de regex: `manaloom_public_web_assert_free_beta_files` usava as
+classes `[aá]` e `[cç]`. Um caractere acentuado ocupa dois bytes em UTF-8, e o
+`grep` do BSD trata uma classe como conjunto de **bytes** isolados fora de um
+locale UTF-8 — o padrão passa a esperar um byte onde o texto tem dois e nunca
+casa. O contrato falhava em qualquer máquina com `LANG` vazio, mesmo com a
+landing correta. As classes viraram alternâncias (`gr(a|á)tis`,
+`cobran(c|ç)a`), que casam a sequência inteira sob `LC_ALL=C` e sob UTF-8.
+
+O erro de diagnóstico tem uma lição própria: a verificação manual passava
+porque o `grep` do meu shell é **ugrep 7.8.4**, enquanto os scripts resolvem
+`/usr/bin/grep` (BSD). Comprovar um contrato de shell exige rodá-lo pelo mesmo
+caminho que o CI usa, não pelo `grep` do PATH interativo.
+
+Com aquele contrato corrigido, o `full` passou a chegar ao **último** estágio e
+revelou o bloqueio que estava escondido atrás de todos os outros:
+`manaloom_public_web_smoke.sh:199` roda
+`npm audit --omit=dev --audit-level=moderate`, e `web-public` tem duas
+vulnerabilidades — `next` (**critical**, RCE não autenticado) e `sharp`
+(**high**). Ambas caem com `next@15.5.25`, que não é semver-major.
+`package.json` fixa `"next": "15.5.21"` exato e força
+`"overrides": {"sharp": "0.35.3"}`, abaixo do `0.35.4` corrigido.
+
+Medido isoladamente, fora do gate: `npm audit` falha por conta própria. Não é
+regressão de nenhum trabalho em curso — é advisory upstream que só ficou
+visível quando o gate passou a chegar lá. **É hoje o único ponto do `full` sem
+nenhuma falha de teste associada**, e envolve bumpar dependência do artefato
+público deployável: decisão do dono, não da fila.
 
 **O bloqueio restante é `ui_live_evidence`, e tem duas camadas.** O digest de
 UI é **global por desenho** (`scripts/manaloom_ui_source_digest.sh` cobre
@@ -292,7 +323,7 @@ visual, drivers e fixtures), então qualquer mudança em `app/lib` invalida os
 travada por versão: o ChromeDriver pinado em 6 scripts é o 150, o Chrome
 instalado é o 153, e nenhum script do repositório baixa driver.
 
-**Consequência séria:****Consequência séria:** hoje nenhum commit nem push passa sem `--no-verify`.
+**Consequência séria:** hoje nenhum commit nem push passa sem `--no-verify`.
 Três bypasses foram usados em 2026-09-18 sob autorização explícita, e estão
 registrados em `docs/qa/execution/2026-09-18/deck-quality-harness.md`. Um gate
 que sempre é contornado deixa de proteger.
@@ -329,6 +360,16 @@ Esta é a seção mais acionável.
 | C13 | `/decks/:id/reports` exige `gallery_public` enquanto `/reports` é plano de controle | `policy:474-476` |
 | C14 | `deck_replace_all` e `legacy_ai_routes` são portões reais sem motivo documentado | o schema não tem campo `reason` |
 | C15 | O web público é o único deploy **sem nenhuma** referência a capability — zero ocorrências, verificado | `manaloom_deploy_public_web.sh` |
+| C16 | O contrato de egress do harness isolado cobrava quatro trechos que `f6f791098` já havia refatorado — 18 das 22 asserções continuavam válidas, então a deriva passou despercebida | `mutating_e2e_entrypoint_guard_test.dart:371-380` vs `manaloom_server_contract_e2e_isolated.sh:440,674,817` |
+
+C16 já foi corrigido nesta rodada: só o teste mudou, o script do dono ficou
+intacto, e o guard de egress nunca se perdeu (`run_pg` é `run_no_egress` com
+`PGPASSWORD`, ainda sob `sandbox-exec` loopback-only). A lição é sobre a forma
+do contrato: asserções que fixam **texto literal** de um script quebram em
+qualquer refactor legítimo, e quando 18 de 22 continuam passando a deriva não
+grita. Contratos de shell deveriam cobrar a **propriedade** — "todo passo
+privilegiado executa sob `EGRESS_GUARD`, e depois do self-test" — e não o
+recorte exato da linha.
 
 C1, C2 e C3 recomendam a mesma correção: separar **implementado** de
 **alcançável** na matriz de prontidão. O repositório já rastreia as duas

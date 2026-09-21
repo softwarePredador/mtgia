@@ -369,17 +369,32 @@ void main() {
           'scripts/manaloom_server_contract_e2e_isolated.sh',
         );
         final guard = source.indexOf('EGRESS_POLICY="deny_non_loopback"');
-        final databaseCreation = source.indexOf(
-          'run_no_egress createdb',
+        final guardSelfTest = source.indexOf(
+          'EGRESS_GUARD_SELF_TEST="pass"',
           guard,
         );
+        final databaseCreation = source.indexOf('run_pg createdb', guard);
         final serverStart = source.indexOf(
-          'exec "\${EGRESS_GUARD[@]}" env',
+          'exec "\${EGRESS_GUARD[@]}" "\$DART_BIN" build/bin/server.dart',
           guard,
         );
-        final testRunner = source.indexOf('run_no_egress env', serverStart + 1);
+        final testRunner = source.indexOf(
+          'exec "\${EGRESS_GUARD[@]}" "\$DART_BIN" test -j 1 "\${tests[@]}"',
+          serverStart + 1,
+        );
 
         expect(guard, greaterThanOrEqualTo(0));
+        // `run_pg` e o `run_no_egress` que tambem carrega PGPASSWORD. Sem esta
+        // assercao, trocar `run_no_egress createdb` por um wrapper qualquer
+        // chamado `run_pg` satisfaria o contrato sem passar pelo guard.
+        expect(
+          RegExp(
+            r'run_pg\(\) \((?:(?!\n\))[^])*?'
+            r'exec "\$\{EGRESS_GUARD\[@\]\}" "\$@"',
+          ).hasMatch(source),
+          isTrue,
+          reason: 'run_pg precisa executar sob o guard de egress',
+        );
         expect(source, contains('(deny network*)'));
         expect(
           source,
@@ -395,10 +410,11 @@ void main() {
           source,
           contains('o guard de egress permitiu conexão não-loopback'),
         );
-        expect(databaseCreation, greaterThan(guard));
+        // Nada privilegiado pode rodar antes de o guard se provar funcional.
+        expect(guardSelfTest, greaterThan(guard));
+        expect(databaseCreation, greaterThan(guardSelfTest));
         expect(serverStart, greaterThan(databaseCreation));
         expect(testRunner, greaterThan(serverStart));
-        expect(source, contains('dart test -j 1 "\${tests[@]}"'));
         expect(source, contains('OPENAI_API_KEY='));
         expect(source, contains('OPTIMIZE_COMPLETE_DISABLE_OPENAI=1'));
         expect(

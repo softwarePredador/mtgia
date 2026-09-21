@@ -394,7 +394,30 @@ printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
           '../tools/project_logic/bin/manaloom_project_logic.dart',
         ).readAsStringSync();
 
-    expect(source, contains("const ['', 'app', 'server']"));
+    expect(source, contains('await bootstrapWorkspacePackages(root);'));
+    expect(source, contains('resolveSymbolicLinksSync'));
+    expect(source, contains('MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE'));
+    expect(source, contains('ProjectLogicGenerator(root)'));
+    expect(source, contains("final write = arguments.contains('--write');"));
+    expect(source, isNot(contains('|| !check')));
+  });
+
+  // O bootstrap saiu do binario para a biblioteca em BT-CI-001: o binario e a
+  // suite de testes precisam entrar no mesmo estado, e a lista de pacotes
+  // precisa ser a mesma que a validacao cobra. Por isso o contrato exige a
+  // constante compartilhada, e nao um literal inline em cada chamador.
+  test('project logic bootstrap and validation share one package list', () {
+    final source =
+        File(
+          '../tools/project_logic/lib/project_logic_generator.dart',
+        ).readAsStringSync();
+
+    expect(
+      source,
+      contains(
+        "const workspacePackageRelativePaths = <String>['', 'app', 'server'];",
+      ),
+    );
     expect(
       RegExp(
         r"const \[\s*'pub',\s*'get',\s*'--offline',\s*"
@@ -402,11 +425,33 @@ printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
       ).hasMatch(source),
       isTrue,
     );
-    expect(source, contains('resolveSymbolicLinksSync'));
+    // `(?:(?!for \()[^])*?` e um curinga que para no proximo `for (`. Sem esse
+    // limite o curinga atravessa o arquivo e casa o loop do bootstrap com um
+    // `_validateWorkspacePackage(` muito mais abaixo, e o contrato passa mesmo
+    // com as duas listas divergentes -- exatamente o defeito que ele cobra.
+    expect(
+      RegExp(
+        r'Future<void> bootstrapWorkspacePackages\(Directory root\) async \{'
+        r'(?:(?!for \()[^])*?for \(final \w+ in workspacePackageRelativePaths\)',
+      ).hasMatch(source),
+      isTrue,
+      reason: 'o bootstrap precisa iterar a lista compartilhada',
+    );
+    expect(
+      RegExp(
+        r'for \(final \w+ in workspacePackageRelativePaths\)'
+        r'(?:(?!for \()[^])*?_validateWorkspacePackage\(',
+      ).hasMatch(source),
+      isTrue,
+      reason: 'a validacao precisa iterar a mesma lista compartilhada',
+    );
+    // Nenhuma copia inline da lista pode sobreviver fora da constante.
+    expect(
+      RegExp(r"'',\s*'app',\s*'server'").allMatches(source).length,
+      1,
+      reason: 'a lista de pacotes so pode existir na constante compartilhada',
+    );
     expect(source, contains('MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE'));
-    expect(source, contains('ProjectLogicGenerator(root)'));
-    expect(source, contains("final write = arguments.contains('--write');"));
-    expect(source, isNot(contains('|| !check')));
   });
 
   test('release Flutter helper accepts only the pinned SDK', () async {

@@ -324,8 +324,12 @@ run_xmage_pin_transition_audit() {
 run_project_logic_docs() {
   print_header "ManaLoom generated project logic and documentation drift"
   "$ROOT_DIR/scripts/manaloom_project_logic.sh" --check
+  # A suíte roda pelo próprio script: ela valida o binding de PUB_CACHE
+  # task-scoped que `bootstrapWorkspacePackages` estabelece, e esse binding só
+  # existe dentro do ambiente que o script materializa. Rodar `dart test` aqui
+  # ao lado aborta em setUpAll.
+  "$ROOT_DIR/scripts/manaloom_project_logic.sh" --test
   cd "$ROOT_DIR/tools/project_logic"
-  "$DART_BIN" test
   "$ROOT_DIR/scripts/manaloom_dart_doc.sh" --check
 }
 
