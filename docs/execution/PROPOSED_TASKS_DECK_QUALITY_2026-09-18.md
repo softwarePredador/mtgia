@@ -74,7 +74,7 @@ Estado atual: `P1 · IN_PROGRESS_CONTAINED`.
 Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependências | aceite`.
 
 ```
-| `BT-CI-001` | P0 CORE | TODO | Fazer a suíte do project logic rodar dentro do cold bootstrap, resolvendo o conflito entre o binding de PUB_CACHE e o próprio `dart test`. | `BT-SCP-001` | `manaloom_local_ci.sh quick` e `full` passam sem bypass; `git commit` e `git push` deixam de exigir `--no-verify`. |
+| `BT-UIEV-001` | P0 CORE | TODO | Restabelecer a prova de UI viva após mudança de fonte, incluindo o pin de ChromeDriver. | `BT-PLAY-001` | `manaloom_local_ci.sh quick` passa sem bypass; os 35 packs com digest corrente e manifesto conferido. |
 | `BT-META-001` | P0 AI | TODO | Filtrar o corpus de meta insights por formato Commander. | — | `extract_meta_insights` ignora decks não-Commander; o ranking do pool deixa de ser liderado por staples de Legacy/Vintage. |
 | `BT-META-002` | P0 AI | TODO | Tornar `card_meta_insights.usage_count` idempotente e com decaimento. | `BT-META-001` | Rodar o extractor duas vezes não altera o resultado; carta ausente do corpus corrente perde posição; divergência corpus↔tabela vai a zero. |
 | `BT-FRESH-001` | P1 | TODO | Comparar a lista oficial de Game Changers com a fonte upstream, não só JSON↔Dart. | `BT-CAT-01` | O gate falha quando `source_checked_at` excede o limite de idade ou quando a lista upstream diverge; segue read-only, com provenance. |
@@ -83,77 +83,77 @@ Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependência
 
 ### Justificativa de cada uma
 
-**`BT-CI-001`** — bloqueia tudo. Investigado em 2026-09-18 até o ponto em que
-a continuação exige contexto de desenho do `BT-SCP-001`. O que está
-estabelecido, o que foi descartado, e a pergunta que resta:
+**`BT-CI-001` — RESOLVIDO em 2026-09-18, commit `d83e9b1e1`.** Mantido aqui
+como registro; não precisa entrar no backlog.
 
-**Fatos verificados**
+Causa raiz: `bin/manaloom_project_logic.dart` chamava um
+`_bootstrapWorkspacePackages(root)` **privado** antes de `generate()`. Essa
+função roda `pub get --offline --enforce-lockfile` em `''`, `app` e `server`
+com `includeParentEnvironment: true`, amarrando cada `package_config.json` ao
+`PUB_CACHE` task-scoped. `generate()` valida exatamente essa amarração.
 
-| Fato | Onde |
+`project_logic_generator_test.dart` chamava `generate()` direto. Nunca fazia o
+bootstrap, então validava uma amarração que ninguém havia estabelecido. Era
+**assimetria entre dois pontos de entrada** — não ovo-e-galinha, não o
+`dart test` reescrevendo nada.
+
+Três hipóteses foram testadas e descartadas antes da certa: propagar a env var
+(implementada como modo `--test`, continuou falhando), cascata de Dart
+workspace (é Melos, sem `workspace:`), e divergência entre raiz lógica e
+física (`pwd -L` = `pwd -P`, sem symlink). A resposta veio de instrumentar o
+gerador, não de raciocinar sobre o script.
+
+Correção aplicada: `bootstrapWorkspacePackages` movida para a biblioteca e
+tornada pública; `workspacePackageRelativePaths` virou constante compartilhada
+entre o bootstrap e a validação, que antes duplicavam o literal; o teste passa
+a fazer o bootstrap; o script ganhou modo `--test`; o CI usa esse modo.
+
+Verificado com hook ativo: `Project logic is synchronized (9 artifacts)` e
+`All tests passed!` (40 testes, incluindo o de drift).
+
+---
+
+**`BT-UIEV-001`** — o bloqueio que sobrou no caminho de commit, e é de outra
+natureza. Levantado em 2026-09-21.
+
+Com o project logic verde, o `quick` passa a parar em `run_ui_live_evidence`
+(`manaloom_local_ci.sh:222`) com `review source digest is stale`,
+`capture source digest is stale` e `runtime capture manifest hash does not
+match`. **23 dos 35 packs** de captura estão defasados.
+
+**O digest é global, por desenho.** `scripts/manaloom_ui_source_digest.sh`
+computa um único SHA-256 sobre `app/lib`, `app/assets`, `app/web`, recursos e
+build files do Android, os dois pubspecs, os 11 testes de prova visual, os
+drivers e as fixtures de matriz. Não existe granularidade por superfície:
+**qualquer** mudança em `app/lib` invalida todos os packs de uma vez. A
+entrega do Jogar contra IA tocou 13 arquivos ali, e foi o suficiente.
+
+Isso é deliberado e defensável — nenhuma evidência visual sobrevive a uma
+mudança de fonte não revisada. Mas elimina a opção de recapturar só a parte
+afetada.
+
+**Bloqueio de ambiente adicional.** A captura usa `flutter drive` contra build
+real de Chrome, com ChromeDriver pinado. Medido:
+
+| | Versão |
 | --- | --- |
-| O CI roda `dart test` fora do ambiente preparado | `scripts/manaloom_local_ci.sh:105-112` |
-| O script **não reescreve** `package_config.json` — faz snapshot e restaura byte a byte | `manaloom_project_logic.sh:439-470` |
-| Existe **um único** `pub get`, e só em `tools/project_logic` | `:544` |
-| `generate()` chama `_validateWorkspacePackageMetadata()` como primeira instrução, sem guarda | `project_logic_generator.dart:285-286` |
-| A validação exige que raiz, `app` e `server` apontem para o task cache | `:547` |
-| Modificar o próprio script muda o digest de fonte do project logic | observado: uma sonda temporária causou drift sozinha |
+| ChromeDriver pinado (em **6 scripts**) | 150.0.7871.124 |
+| Também em cache | 151.0.7922.77 |
+| Homebrew | 147.0.7727.50 |
+| Chrome instalado | **153.0.8010.50** |
 
-**Hipóteses descartadas com evidência**
+A tentativa de captura falha rápido, com guarda própria:
+`ChromeDriver major 150 does not match Chrome major 153`. Nenhum script do
+repositório baixa ChromeDriver — o cache foi populado à mão. Destravar exige
+baixar o 153 e **subir o pin nos 6 scripts**, o que altera o contrato de
+captura de todo o projeto, não só destes packs.
 
-1. *"Basta propagar `MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE` para o subshell."*
-   Não basta. Foi implementado um modo `--test` que roda a suíte dentro do
-   ambiente materializado; o `setUpAll` continua abortando com
-   `.dart_tool/package_config.json points outside the task PUB_CACHE`, e o
-   caminho relativo é o da raiz. A mudança foi revertida.
-2. *"É um Dart workspace, então resolver um membro reescreve a raiz."*
-   Não é. O repositório é Melos: não há `workspace:` no `pubspec.yaml` da raiz
-   nem `resolution: workspace` nos membros.
-3. *"O script separa raiz lógica de física (`cd -P` + `MANALOOM_PROJECT_LOGIC_LOGICAL_ROOT`),
-   então script e teste olham `.dart_tool` diferentes."* Não. Medido:
-   `pwd -L` e `pwd -P` são idênticos e nenhum componente do caminho é symlink.
-
-**A contradição em aberto**
-
-Os fatos acima são mutuamente inconsistentes. Se o script nunca reescreve o
-config da raiz, e a validação exige a raiz no task cache sem guarda, então
-`--check` deveria falhar sempre. **E `--check` passa.**
-
-Uma sonda temporária leu, no momento imediatamente anterior à chamada do
-gerador, `raiz pubCache = file:///Users/<user>/.pub-cache` — o cache global.
-
-Busca exaustiva feita depois disso, e o resultado **fecha** a contradição em
-vez de abri-la: o script tem exatamente duas invocações de Dart
-(`pub get` em `tools/project_logic` e o binário do gerador), nenhum script do
-repositório escreve a chave `pubCache` em lugar nenhum, e `seed_task_cache`
-apenas copia pacotes do cache global para o task cache — não toca em
-`package_config.json`. O binário chama `generate()` nos dois modos
-(`bin/manaloom_project_logic.dart:29`), e `generate()` chama a validação como
-primeira instrução.
-
-Logo: pelo código lido, `--check` deveria falhar sempre — e passa. A
-explicação **não está** em nenhuma das três hipóteses testadas, e resolvê-la
-exige instrumentar o próprio gerador, o que altera o digest e mexe no núcleo
-do `BT-SCP-001`. É onde esta investigação para.
-
-**Escopo medido em 2026-09-18.** Com o drift resolvido, foi feita uma
-tentativa de commit com o hook **ativo**. O `manaloom_local_ci.sh quick`
-passou em tudo — contratos de shell, fonte de Game Changers, MCP local,
-secret scan, e `Project logic is synchronized (9 artifacts)` — e parou em
-`8 passed, 1 failed`, com a única falha sendo
-`test/project_logic_generator_test.dart: (setUpAll)`.
-
-Ou seja: **o escopo desta ficha é um único `setUpAll`.** Destravado ele,
-`git commit` e `git push` voltam a passar sem bypass.
-
-**Pergunta que fecha a ficha:** por que `--check` passa se a raiz não aponta
-para o task cache? Respondida isso, a correção do CI decorre — e só então faz
-sentido escolher entre fazer o `dart test` participar do cold bootstrap ou dar
-ao `setUpAll` um ponto de injeção para o caso "sob teste".
-
-**Custo de não ter o gate**, observado nesta sessão: registrar dois documentos
-em `canonical_documents` mudou o digest de fonte e deixou os artefatos
-defasados. O gate de drift existe para barrar isso no commit; com
-`--no-verify` passou e exigiu correção posterior.
+**Recomendação: não recapturar agora.** `BT-PLAY-001/002` seguem abertos, então
+a superfície vai mudar de novo antes de fechar; congelar 23 packs agora produz
+evidência que será descartada. E subir o pin para gerar evidência descartável
+é pagar o custo de contrato sem retorno. O caminho de commit segue exigindo
+`--no-verify` por **este** motivo, isolado e com dono conhecido — o que é
+melhor do que o estado anterior, em que o bloqueio era difuso.
 
 **`BT-META-001`** — maior retorno por esforço de toda a cadeia, e é um `WHERE`.
 `server/bin/extract_meta_insights.dart:134-149` lê `SELECT ... FROM meta_decks

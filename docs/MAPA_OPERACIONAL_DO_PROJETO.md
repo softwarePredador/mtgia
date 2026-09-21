@@ -267,24 +267,32 @@ Para a proposta da cadeia de qualidade de deck, ver
 `manaloom_local_ci.sh quick`; `pre-push` roda `full`.
 
 **O bloqueio difere por arm.** `pre-commit` roda `quick`; `pre-push` roda
-`full`. Medido em 2026-09-18, com o drift já resolvido:
+`full`. Medido em 2026-09-21:
 
-- **`quick` falha em um único ponto** — `project_logic_generator_test`
-  aborta em `setUpAll` (`8 passed, 1 failed`). Todo o resto passa: contratos
-  de shell, fonte de Game Changers, MCP local, secret scan e
-  `Project logic is synchronized`.
-- **`full` acrescenta dois** — `ui_live_evidence` e
-  `manaloom_public_web_surface_contract.sh:81`.
-
-**Os três gates que falham por motivo de ambiente, não de conteúdo:**
-
-| Gate | Falha | Causa |
+| Gate | Arm | Estado |
 | --- | --- | --- |
-| `project_logic_generator_test` | `.dart_tool` da raiz aponta fora do PUB_CACHE task-scoped | contrato de cold bootstrap do `BT-SCP-001`. Propagar a variável **não** resolve — ver a contradição documentada em `docs/execution/PROPOSED_TASKS_DECK_QUALITY_2026-09-18.md` |
-| `ui_live_evidence` | digest de captura stale | captura de UI desatualizada |
-| `manaloom_public_web_surface_contract.sh:81` | landing/pricing renderizado sem os termos | build local; os fontes contêm os termos |
+| contratos de shell | quick | passa |
+| fonte de Game Changers | quick | passa |
+| MCP local | quick | passa |
+| secret scan | quick | passa |
+| **project logic** | quick | **passa** — corrigido em `d83e9b1e1` |
+| **`ui_live_evidence`** | quick | **falha** — 23 de 35 packs com digest defasado |
+| `manaloom_public_web_surface_contract` | full | falha — HTML renderizado |
 
-**Consequência séria:** hoje nenhum commit nem push passa sem `--no-verify`.
+O gate de project logic era o bloqueio principal e foi resolvido: o teste
+chamava `generate()` sem antes rodar `bootstrapWorkspacePackages`, que é o que
+amarra cada `package_config.json` ao `PUB_CACHE` isolado que a validação
+exige. Ver `docs/execution/PROPOSED_TASKS_DECK_QUALITY_2026-09-18.md`.
+
+**O bloqueio restante é `ui_live_evidence`, e tem duas camadas.** O digest de
+UI é **global por desenho** (`scripts/manaloom_ui_source_digest.sh` cobre
+`app/lib`, `app/assets`, `app/web`, Android, pubspecs, 11 testes de prova
+visual, drivers e fixtures), então qualquer mudança em `app/lib` invalida os
+35 packs de uma vez — não há granularidade por superfície. E a recaptura está
+travada por versão: o ChromeDriver pinado em 6 scripts é o 150, o Chrome
+instalado é o 153, e nenhum script do repositório baixa driver.
+
+**Consequência séria:****Consequência séria:** hoje nenhum commit nem push passa sem `--no-verify`.
 Três bypasses foram usados em 2026-09-18 sob autorização explícita, e estão
 registrados em `docs/qa/execution/2026-09-18/deck-quality-harness.md`. Um gate
 que sempre é contornado deixa de proteger.
