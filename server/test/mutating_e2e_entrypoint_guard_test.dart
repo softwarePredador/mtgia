@@ -365,8 +365,13 @@ void main() {
     test(
       'isolated server contract harness is fail-closed for external egress',
       () {
-        final source = scriptSource(
-          'scripts/manaloom_server_contract_e2e_isolated.sh',
+        // Linhas de comentario saem antes de qualquer casamento. A versao
+        // anterior deste contrato podia ser satisfeita por um `exec` guardado
+        // que so existia dentro de um comentario no corpo de `run_pg` —
+        // provava nada — e um comentario documental inocente podia quebrar as
+        // assercoes de ordem sem mudanca alguma de comportamento.
+        final source = _stripShellCommentLines(
+          scriptSource('scripts/manaloom_server_contract_e2e_isolated.sh'),
         );
         final guard = source.indexOf('EGRESS_POLICY="deny_non_loopback"');
         final guardSelfTest = source.indexOf(
@@ -384,9 +389,44 @@ void main() {
         );
 
         expect(guard, greaterThanOrEqualTo(0));
-        // `run_pg` e o `run_no_egress` que tambem carrega PGPASSWORD. Sem esta
-        // assercao, trocar `run_no_egress createdb` por um wrapper qualquer
-        // chamado `run_pg` satisfaria o contrato sem passar pelo guard.
+
+        // A PROPRIEDADE, no lugar de ancoras literais: toda invocacao `exec`
+        // do harness roda sob o guard, salvo uma allowlist nomeada.
+        //
+        // Ancorar em tres comandos literais deixava `bin/migrate.dart` e o
+        // listener de e-mail descobertos: removendo `"\${EGRESS_GUARD[@]}"` de
+        // qualquer um deles o contrato continuava verde. Medido por mutacao,
+        // nao deduzido.
+        // O lookbehind descarta `sandbox-exec`, que aparece como nome de
+        // binario, de kind e em mensagem de erro; o `)` final cai porque o
+        // unico exec sem guard vive dentro de um subshell.
+        final execTargets = RegExp(r'(?<![-\w])exec\s+(\S+)')
+            .allMatches(source)
+            .map((match) => match.group(1)!.replaceAll(RegExp(r'\)+$'), ''))
+            .toList(growable: false);
+        final guarded = execTargets
+            .where((target) => target == r'"${EGRESS_GUARD[@]}"')
+            .length;
+        final unguarded = execTargets
+            .where((target) => target != r'"${EGRESS_GUARD[@]}"')
+            .toList(growable: false);
+
+        expect(
+          guarded,
+          greaterThanOrEqualTo(5),
+          reason:
+              'run_pg, o fixture de e-mail, migrate, o server e o runner de '
+              'testes executam sob o guard',
+        );
+        // `run_bootstrap_phase` roda `pub get --offline` e `dart_frog build`
+        // fora do sandbox. E lacuna real do script, registrada e NAO
+        // introduzida por este contrato; fica fixada aqui para que qualquer
+        // `exec` novo sem guard falhe em vez de passar despercebido.
+        expect(
+          unguarded,
+          equals(const [r'"$@"']),
+          reason: 'apareceu um exec fora do guard e fora da allowlist',
+        );
         expect(
           RegExp(
             r'run_pg\(\) \((?:(?!\n\))[^])*?'
@@ -394,6 +434,17 @@ void main() {
           ).hasMatch(source),
           isTrue,
           reason: 'run_pg precisa executar sob o guard de egress',
+        );
+        // `run_no_egress` e o wrapper que o self-test usa para provar o guard.
+        // Se ele perder o guard, o self-test passa a medir "esta maquina tem
+        // rota?" em vez de "o sandbox bloqueia?", e registra pass de graca.
+        expect(
+          RegExp(
+            r'run_no_egress\(\) \{(?:(?!\n\})[^])*?'
+            r'"\$\{EGRESS_GUARD\[@\]\}" "\$@"',
+          ).hasMatch(source),
+          isTrue,
+          reason: 'run_no_egress precisa aplicar o guard de egress',
         );
         expect(source, contains('(deny network*)'));
         expect(
@@ -727,3 +778,14 @@ void main() {
     );
   });
 }
+
+/// Remove linhas que sao apenas comentario de shell.
+///
+/// Contratos que casam texto cru de script aceitam por engano codigo que
+/// existe so dentro de um comentario, e quebram por engano quando alguem
+/// documenta o script sem mudar comportamento. As duas falhas foram medidas
+/// neste arquivo antes desta funcao existir.
+String _stripShellCommentLines(String source) => source
+    .split('\n')
+    .map((line) => line.trimLeft().startsWith('#') ? '' : line)
+    .join('\n');

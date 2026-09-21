@@ -71,26 +71,75 @@ manaloom_public_web_assert_removed_response() {
   esac
 }
 
+# Casa um padrão fixando o locale, e trata erro como erro.
+#
+# `grep -q` devolve 2 quando o padrão é inválido ou o arquivo não pode ser
+# lido, e um `if ! grep -q` não distingue isso de "não casou" — um padrão
+# quebrado faria o contrato passar silenciosamente. Aqui 0 é casou, 1 é não
+# casou, e qualquer outro status vira 2 e é tratado como falha pelos dois
+# chamadores.
+#
+# `LC_ALL=C` não é detalhe: os padrões abaixo são escritos em BYTES, e sem
+# fixar o locale eles se comportam de três maneiras diferentes conforme o
+# `LANG` da máquina. Medido, com /usr/bin/grep:
+#
+#   LANG vazio  — `[cç]` nunca casa; `-i` não dobra `á`/`Á`; `[^[:alnum:]_]`
+#                 casa o byte de continuação de `í`, e `proíbe` dispara o
+#                 check de "Pro".
+#   LANG UTF-8  — a faixa `\x80-\xff` é sequência multibyte inválida:
+#                 `grep: illegal byte sequence`, status 2, e o check negativo
+#                 falharia ABERTO.
+#
+# Fixando C, o comportamento é o mesmo em qualquer máquina e os padrões em
+# bytes valem sempre.
+manaloom_public_web_grep() {
+  local pattern="$1"
+  shift
+  local status=0
+  LC_ALL=C grep -Eqi -- "$pattern" "$@" || status=$?
+  if ((status > 1)); then
+    echo "grep falhou (status $status) ao avaliar o contrato de web publico" >&2
+    return 2
+  fi
+  return "$status"
+}
+
 manaloom_public_web_assert_free_beta_files() {
   local home_html="$1"
   local pricing_html="$2"
 
-  # As alternâncias abaixo são propositais no lugar de classes como `[aá]` e
-  # `[cç]`. Um caractere acentuado ocupa dois bytes em UTF-8, e o grep do BSD
-  # trata uma classe como conjunto de bytes isolados fora de um locale UTF-8:
-  # o padrão passa a esperar um byte onde o texto tem dois, e nunca casa. Isso
-  # fazia este contrato falhar em qualquer máquina com `LANG` vazio, mesmo com
-  # a landing correta. Alternância casa a sequência inteira e funciona tanto
-  # em `LC_ALL=C` quanto em UTF-8.
-  if ! grep -Eqi 'beta' "$home_html" "$pricing_html" ||
-     ! grep -Eqi 'gratuit|gr(a|á)tis' "$home_html" "$pricing_html" ||
-     ! grep -Eqi 'sem cobran(c|ç)a' "$pricing_html"; then
+  # Um caractere acentuado ocupa DOIS bytes em UTF-8 e `-i` não os dobra em
+  # locale C, então cada caso do acentuado é escrito. Alternância no lugar de
+  # classe (`(c|ç)`, não `[cç]`) casa a sequência inteira.
+  if ! manaloom_public_web_grep 'beta' "$home_html" "$pricing_html" ||
+     ! manaloom_public_web_grep 'gratuit|gr(a|á|Á)tis' \
+         "$home_html" "$pricing_html" ||
+     ! manaloom_public_web_grep 'sem cobran(c|ç|Ç)a' "$pricing_html"; then
     echo "landing/pricing nao identificam uma unica Beta gratuita e sem cobranca" >&2
     return 1
   fi
 
-  if grep -Eqi '(^|[^[:alnum:]_])pro([^[:alnum:]_]|$)|checkout|(^|[^[:alnum:]_])trades?([^[:alnum:]_]|$)|marketplace|upgrade|[Rr]\$[[:space:]]*[0-9]' \
-      "$home_html" "$pricing_html"; then
+  # Byte alto conta como caractere de palavra: sem isso `proíbe` e `promoção`
+  # satisfazem `(^|[^[:alnum:]_])pro([^[:alnum:]_]|$)` e acusam um tier pago
+  # que não existe.
+  local nonword=$'[^[:alnum:]_\x80-\xff]'
+  # U+00A0 (\xc2\xa0) é o separador que `Intl.NumberFormat('pt-BR')` emite
+  # entre `R$` e o valor. `[[:space:]]` não o cobre, e sem esta alternativa um
+  # preço em BRL corretamente formatado passaria despercebido — o contrato
+  # falharia aberto no caso exato que existe para barrar.
+  local money_gap=$'([[:space:]]|\xc2\xa0)*'
+
+  local paid_pattern
+  paid_pattern="(^|${nonword})pro(${nonword}|\$)"
+  paid_pattern="${paid_pattern}|checkout"
+  paid_pattern="${paid_pattern}|(^|${nonword})trades?(${nonword}|\$)"
+  paid_pattern="${paid_pattern}|marketplace|upgrade"
+  paid_pattern="${paid_pattern}|[Rr]\\\$${money_gap}[0-9]"
+
+  local status=0
+  manaloom_public_web_grep "$paid_pattern" "$home_html" "$pricing_html" ||
+    status=$?
+  if ((status != 1)); then
     echo "landing/pricing voltaram a anunciar Pro, checkout, trade, marketplace, upgrade ou preco pago" >&2
     return 1
   fi

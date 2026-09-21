@@ -445,11 +445,23 @@ printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
       isTrue,
       reason: 'a validacao precisa iterar a mesma lista compartilhada',
     );
-    // Nenhuma copia inline da lista pode sobreviver fora da constante.
+    // Nenhuma copia inline da lista pode sobreviver fora da constante — nem
+    // na biblioteca, nem no binario. A versao anterior olhava so a
+    // biblioteca, entao um segundo caminho de bootstrap com a lista escrita a
+    // mao dentro de `bin/` passava sem que nada falhasse.
+    final inlineList = RegExp(r"'',\s*'app',\s*'server'");
     expect(
-      RegExp(r"'',\s*'app',\s*'server'").allMatches(source).length,
+      inlineList.allMatches(source).length,
       1,
       reason: 'a lista de pacotes so pode existir na constante compartilhada',
+    );
+    final binarySource = File(
+      '../tools/project_logic/bin/manaloom_project_logic.dart',
+    ).readAsStringSync();
+    expect(
+      inlineList.allMatches(binarySource).length,
+      0,
+      reason: 'o binario precisa usar a constante, nunca uma copia da lista',
     );
     expect(source, contains('MANALOOM_PROJECT_LOGIC_TASK_PUB_CACHE'));
   });

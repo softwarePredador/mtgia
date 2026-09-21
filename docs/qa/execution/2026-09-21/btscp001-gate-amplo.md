@@ -1,10 +1,17 @@
 # Receipt de trabalho — gate amplo de BT-SCP-001
 
-Status: `GATE_SEM_FALHA_DE_TESTE · BLOQUEADO_POR_ADVISORY_UPSTREAM · COMMITTED_AND_PUSHED_WITH_AUTHORIZED_HOOK_BYPASS`
+Status: `PARCIAL · GATE_AMPLO_NAO_ALCANCADO · COMMITTED_AND_PUSHED_WITH_AUTHORIZED_HOOK_BYPASS · CORRIGIDO_APOS_REVISAO`
+
+> **Este receipt foi corrigido depois de commitado.** A revisão adversarial
+> registrada na seção final derrubou três afirmações centrais da versão
+> original, entre elas a "descoberta" que eu dizia ter destravado o aceite.
+> As afirmações erradas foram corrigidas no lugar onde estavam, e a seção
+> final lista cada uma — um receipt que se reescreve em silêncio esconde
+> justamente o que precisa ficar registrado.
 
 Este receipt registra a execução do **gate amplo** que as duas cláusulas de
-aceite pendentes de `BT-SCP-001` exigem, e os três defeitos corrigidos para que
-ele pudesse rodar até o fim. Não autoriza PR, merge, deploy, migration, DML
+aceite pendentes de `BT-SCP-001` exigem, os cinco defeitos corrigidos para que
+ele chegasse mais longe, e os sete que a revisão posterior encontrou. Não autoriza PR, merge, deploy, migration, DML
 live, capability `ON`, atualização de pin nem promoção de deck/regra.
 
 ## Identidade
@@ -13,16 +20,43 @@ live, capability `ON`, atualização de pin nem promoção de deck/regra.
 - SHA base: `b4473a98a`
 - Slot `NOW`: `BT-SCP-001` (este trabalho serve ao próprio slot)
 - Comando de prova: `./scripts/manaloom_local_ci.sh full`
-- Dart SDK: `3.11.4 (stable)`
+- Dart SDK: `3.12.2 (stable)` — a versão que `manaloom_dart_toolchain.sh`
+  resolve nesta máquina, medida com `--version`. A versão original deste
+  receipt (`3.11.4`) foi escrita de memória e estava errada.
 - `MANALOOM_NODE_BIN=/opt/homebrew/opt/node@22/bin/node`
 
-## Descoberta que destravou o aceite
+## A "descoberta que destravou o aceite" estava errada
 
-`quick` e `full` **não rodam o mesmo conjunto de gates**. `ui_live_evidence`
-está apenas no `quick`. Como o bloqueio de recaptura de UI (ChromeDriver 150
-pinado contra Chrome 153 instalado) é de prazo indefinido e virou ficha
-própria, o "gate amplo" que `BT-SCP-001` cobra é alcançável hoje pelo `full`,
-sem depender daquela ficha.
+A versão original deste receipt afirmava que `ui_live_evidence` está apenas no
+`quick`, e concluía que o gate amplo era alcançável hoje sem depender de
+`BT-UIEV-001`. **Falso, e é o erro mais caro desta sessão.**
+
+`melos.yaml:98` encadeia seis estágios:
+
+```
+quality_gate.sh project-logic && quality_gate.sh full && quality_gate.sh ui-audit
+  && quality_gate.sh custom-lint && quality_gate.sh patrol-smoke
+  && manaloom_dependency_audit.sh
+```
+
+E `quality_gate.sh:190-204`:
+
+```bash
+run_ui_audit() {
+  ...
+  run_ui_live_evidence      # <- linha 198
+}
+run_ui_live_evidence() {
+  "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" --check
+}
+```
+
+`full` **roda** `ui_live_evidence`, via `ui-audit`. Ele só não chegou lá porque
+o estágio anterior falhou antes. Consequência direta: **o gate amplo não é
+alcançável hoje**, nem se o advisory de `npm audit` for resolvido — logo depois
+vem `ui-audit` e o bloqueio de `BT-UIEV-001`. As duas cláusulas de aceite de
+`BT-SCP-001` continuam dependendo daquela ficha, exatamente o contrário do que
+este documento afirmava.
 
 ## Defeitos corrigidos nesta rodada
 
@@ -207,8 +241,12 @@ palpite.
 
 `./scripts/manaloom_local_ci.sh full`, árvore limpa de drift, `EXIT=1`.
 
-**Zero falhas de teste.** Todas as 46 batches de backend, a suíte do app
-Flutter (911+ testes) e os contratos de shell passaram. Os cinco defeitos
+**Zero falhas de teste nos estágios que rodaram.** Todas as 46 batches de
+backend, a suíte do app Flutter (911+ testes) e os contratos de shell passaram.
+A qualificação importa: `full` é o **segundo** de seis estágios do
+`melos run quality`, e quatro nunca rodaram — `ui-audit`, `custom-lint`,
+`patrol-smoke` e `manaloom_dependency_audit.sh`. Confirmado no log: o cabeçalho
+`ManaLoom Flutter UI audit` não aparece nenhuma vez. Os cinco defeitos
 acima foram encontrados e corrigidos em sequência, cada um destravando o
 seguinte:
 
@@ -222,8 +260,9 @@ seguinte:
 
 ### O que sobrou, e não é meu nem de `BT-SCP-001`
 
-O `full` morre no **último** estágio, `Public web full checks` →
-`manaloom_public_web_smoke.sh:199`:
+O `quality_gate.sh full` morre no seu último passo, `Public web full checks` →
+`manaloom_public_web_smoke.sh:199` — **não** no último estágio do gate amplo,
+como a versão original dizia:
 
 ```
 npm audit --omit=dev --audit-level=moderate
@@ -247,11 +286,19 @@ Registrado aqui e no mapa operacional em vez de resolvido por conta própria.
 
 ### Situação de `BT-SCP-001`
 
-As duas cláusulas de aceite pendentes pediam gate amplo verde. O gate amplo
-hoje **não tem nenhuma falha de teste** — o que restou é um advisory de
-dependência de terceiro, fora do contrato de bootstrap frio que a ficha define.
-Se a ficha exige literalmente `EXIT=0`, ela fica bloqueada por algo que não
-controla; se exige que o contrato dela esteja provado, está provado.
+As duas cláusulas de aceite pendentes pedem gate amplo verde, e **o gate amplo
+não foi alcançado**. Ordem real dos bloqueios, do primeiro ao último:
+
+1. `quality_gate.sh full` → `npm audit` do web público (advisory upstream);
+2. `quality_gate.sh ui-audit` → `ui_live_evidence` (`BT-UIEV-001`);
+3. `custom-lint`, `patrol-smoke` e `dependency_audit`, ainda não exercitados.
+
+O que **está** provado é o contrato que a ficha define: o bootstrap frio roda,
+a suíte de project-logic passa dentro dele, e a deriva entre a lista do
+bootstrap e a da validação agora falha por mutação nas duas direções. O que
+**não** está provado é a cláusula de gate amplo, e ela depende de
+`BT-UIEV-001` — dependência que este receipt, na versão original, dizia não
+existir.
 
 ## Bypass de hook, autorizado
 
@@ -260,18 +307,114 @@ com **23 packs** de captura com digest defasado — o bloqueio de `BT-UIEV-001`
 (ChromeDriver pinado em 150 contra Chrome 153 instalado, em 6 scripts; nenhum
 script do repositório baixa driver).
 
-O bloqueio é comprovadamente alheio a este trabalho. `manaloom_ui_source_digest.sh`
-cobre `app/lib`, `app/assets`, `app/web`, o Android, os pubspecs e
-`app/integration_test/` — **não cobre `app/test/`**, que é o único diretório do
-`app` tocado aqui. E são os mesmos 23 packs que o mapa operacional já
-registrava antes desta sessão, não 23 recém-invalidados.
+A justificativa original — *"o digest não cobre `app/test/`"* — **era falsa**.
+`manaloom_ui_source_digest.sh` declara 49 caminhos, e o de número 59 é
+`app/test/ui/fixtures/ui_surface_inventory.json`: exatamente o arquivo que o
+defeito #5 alterou. Eu li o script até a linha 51 e parei antes da lista
+acabar.
+
+Medido depois, com o commit já no `origin`:
+
+| estado | digest global de UI |
+| --- | --- |
+| `HEAD~1` | `52c3113d56dc49d9…` |
+| `HEAD` (este commit) | `a7e7b36c207f2218…` |
+
+O commit **moveu** o digest. O que continua verdadeiro é a contagem: 23 packs
+com `capture source digest is stale` nos dois estados, medido revertendo só o
+fixture. Os 23 já estavam defasados contra o digest anterior também, então este
+commit não aumentou o bloqueio — mas a razão que dei para isso estava errada, e
+foi dada com confiança depois de ler metade de um arquivo.
 
 Reportei a recusa e parei, conforme `.hermes.md` ("If git commit fails, stop
 and report the exact failure. Do not invent a workaround."). O dono então
 autorizou explicitamente, em 2026-09-21: *"autorizado, pode usar --no-verify e
 fazer push"*.
 
-Um quarto bypass no mesmo bloqueio, depois dos três de 2026-09-18. O mapa
-operacional já registra a consequência, e ela só piora com a repetição: um gate
-que é sempre contornado deixa de proteger. O defeito #5 deste receipt é a prova
-concreta — entrou na história exatamente por um bypass anterior.
+Contagem correta: `git log --grep=no-verify -i` devolve **11 commits** nesta
+branch, 9 deles em 2026-09-18. O "três bypasses" que o mapa operacional
+registrava, e que a versão original deste receipt repetiu, subestima o hábito
+por um fator de quase quatro — e é justamente esse número que se usa para
+julgar se o hábito está escalando.
+
+O mapa já registra a consequência, e ela só piora com a repetição: um gate que
+é sempre contornado deixa de proteger. Os defeitos #4 e #5 deste receipt são a
+prova concreta — os dois entraram na história por um bypass anterior.
+
+---
+
+## Revisão adversarial pós-commit, e o que ela derrubou
+
+Como o hook foi contornado, nada independente checou o diff. Rodei uma revisão
+adversarial de `07014b431` em cinco frentes (contrato de bootstrap, contrato de
+egress, portabilidade de shell, inventário de UI, exatidão documental), com
+refutadores independentes por achado. 18 achados; meu próprio limite de
+verificação descartou 10 **sem verificar** — recuperei-os do journal e verifiquei
+à mão. O limite foi um erro de desenho meu: os dois achados mais graves estavam
+entre os descartados.
+
+### Corrigido no código
+
+| # | Achado | Prova |
+| --- | --- | --- |
+| A | O check **negativo** do contrato web continuava byte-based: `R$` seguido de U+00A0 — o separador que `Intl.NumberFormat('pt-BR')` emite para BRL — **não era detectado** sob `LC_ALL=C`. Um tier pago reintroduzido com preço corretamente formatado passaria. O contrato falhava **aberto**, no caso exato que existe para barrar. | 7 fixtures × 3 locales |
+| B | `-i` não dobra `á`/`Á` em locale C: `BETA GRÁTIS` em caixa alta não casava `gr(a|á)tis`, e o contrato acusava um site correto. | idem |
+| C | `[^[:alnum:]_]` casava o byte de continuação de `í`: `proíbe` disparava o check de "Pro". | idem |
+| D | `grep -q` devolve **2** em padrão inválido, e `if ! grep -q` não distingue de "não casou". Um padrão quebrado fazia o contrato passar em silêncio. | `grep: illegal byte sequence`, rc=2 |
+| E | O contrato de egress ancorava em três comandos literais e deixava **`bin/migrate.dart`** e o listener de e-mail descobertos: removendo o sandbox de qualquer um o teste continuava verde. | mutação |
+| F | O regex de `run_pg` era **vacuoso**: um `exec` guardado que só existia dentro de um comentário no corpo da função o satisfazia. | mutação |
+| G | Nada exigia que `run_no_egress` aplicasse o guard — e é ele que o self-test usa para provar o sandbox. Sem guard, o self-test mede "esta máquina tem rota?" e registra `pass` de graça. | mutação |
+| H | A checagem anti-cópia da lista de pacotes olhava só a biblioteca; uma cópia inline em `bin/` passava. | mutação |
+| I | O inventário de UI tinha uma **quarta** fonte do mesmo número, não três: `app/doc/UI_TEST_SURFACE_MAP.md` ainda dizia 115/265. | leitura |
+
+A correção de A–D fixa `LC_ALL=C` nos greps do contrato e escreve os padrões em
+bytes explícitos, em vez de tentar ser agnóstico a locale: o comportamento
+passa a ser idêntico em qualquer máquina. 7 casos × 3 locales (`C`, `pt_BR.UTF-8`,
+`LANG` vazio) = 21/21 corretos.
+
+A correção de E–G troca as âncoras literais pela **propriedade** que o próprio
+mapa operacional prescreve — *todo `exec` roda sob o guard, salvo allowlist
+nomeada* — e tira linhas de comentário antes de qualquer casamento. Oito
+mutações, oito capturas:
+
+| mutação | resultado |
+| --- | --- |
+| pristino | passa |
+| migrate sem guard | falha |
+| fixture de e-mail sem guard | falha |
+| server sem guard | falha |
+| runner de testes sem guard | falha |
+| `run_pg` sem guard | falha |
+| `run_no_egress` sem guard | falha |
+| `run_pg` guardado só em comentário | falha |
+| `exec` novo sem guard | falha |
+
+### Registrado, não corrigido
+
+`run_bootstrap_phase` (`manaloom_server_contract_e2e_isolated.sh:194`) roda
+`pub get --offline` e `dart_frog build` com `exec "$@"` **fora do sandbox**.
+É lacuna real do script do dono, anterior a este trabalho. Não a fechei porque
+o sandbox pode quebrar o build e a decisão é dele; em vez disso ela está
+**fixada** na allowlist do contrato, nomeada e comentada, de modo que qualquer
+`exec` novo sem guard passa a falhar.
+
+### Corrigido nos documentos
+
+Três afirmações centrais da versão original deste receipt eram falsas, e todas
+as três foram ditas com confiança:
+
+1. **"`ui_live_evidence` está apenas no `quick`"** — `full` roda via
+   `ui-audit`. Era a "descoberta que destravou o aceite"; destravava nada.
+2. **"o digest não cobre `app/test/`"** — cobre, na linha 59, e este commit
+   moveu o digest.
+3. **"o `full` morre no último estágio"** — morre no segundo de seis.
+
+Mais quatro números errados: Dart `3.11.4` (é `3.12.2`), três bypasses (são
+11), 22 asserções no bloco de egress (são 27), e "três defeitos" na abertura
+contra cinco na própria tabela.
+
+O padrão é um só, e é o mesmo dos defeitos #3 e #6: **afirmei depois de ler
+parte do arquivo, e tratei a leitura parcial como verificação.** Os guards que
+sobreviveram nesta sessão foram todos provados por mutação; as afirmações que
+caíram foram todas escritas por leitura.
+

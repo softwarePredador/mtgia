@@ -276,9 +276,10 @@ Para a proposta da cadeia de qualidade de deck, ver
 | MCP local | quick | passa |
 | secret scan | quick | passa |
 | **project logic** | quick | **passa** — corrigido em `d83e9b1e1` |
-| **`ui_live_evidence`** | quick | **falha** — 23 de 35 packs com digest defasado |
+| **`ui_live_evidence`** | quick **e full** | **falha** — 23 de 35 packs com digest defasado |
 | **`manaloom_public_web_surface_contract`** | full | **passa** — corrigido em 2026-09-21 |
 | **`npm audit` do web público** | full | **falha** — advisory upstream, `next` critical + `sharp` high |
+| `custom-lint`, `patrol-smoke`, `dependency-audit` | full | **não exercitados** — nunca alcançados |
 
 O gate de project logic era o bloqueio principal e foi resolvido: o teste
 chamava `generate()` sem antes rodar `bootstrapWorkspacePackages`, que é o que
@@ -311,9 +312,17 @@ vulnerabilidades — `next` (**critical**, RCE não autenticado) e `sharp`
 
 Medido isoladamente, fora do gate: `npm audit` falha por conta própria. Não é
 regressão de nenhum trabalho em curso — é advisory upstream que só ficou
-visível quando o gate passou a chegar lá. **É hoje o único ponto do `full` sem
-nenhuma falha de teste associada**, e envolve bumpar dependência do artefato
-público deployável: decisão do dono, não da fila.
+visível quando o gate passou a chegar lá. Envolve bumpar dependência do
+artefato público deployável: decisão do dono, não da fila.
+
+**Corrigindo uma afirmação anterior deste documento e do receipt de
+2026-09-21:** `full` e `quick` *não* diferem quanto a `ui_live_evidence`.
+`melos.yaml:98` encadeia seis estágios, e `quality_gate.sh:190-204` mostra
+`run_ui_audit()` chamando `run_ui_live_evidence`. Logo `full` roda o gate de
+evidência de UI — só não chegou lá porque o estágio anterior falhou. Resolver
+o `npm audit` **não** deixa o `full` verde: logo em seguida vem
+`BT-UIEV-001`. A ordem real dos bloqueios é `npm audit` → `ui_live_evidence` →
+três estágios ainda não exercitados.
 
 **O bloqueio restante é `ui_live_evidence`, e tem duas camadas.** O digest de
 UI é **global por desenho** (`scripts/manaloom_ui_source_digest.sh` cobre
@@ -324,8 +333,10 @@ travada por versão: o ChromeDriver pinado em 6 scripts é o 150, o Chrome
 instalado é o 153, e nenhum script do repositório baixa driver.
 
 **Consequência séria:** hoje nenhum commit nem push passa sem `--no-verify`.
-Três bypasses foram usados em 2026-09-18 sob autorização explícita, e estão
-registrados em `docs/qa/execution/2026-09-18/deck-quality-harness.md`. Um gate
+`git log --grep=no-verify -i` devolve **11 commits** nesta branch, 9 deles em
+2026-09-18, todos sob autorização explícita. Este documento registrava três, e
+o número subestimado é o que se usava para julgar se o hábito estava
+escalando. Um gate
 que sempre é contornado deixa de proteger.
 
 Some-se o Node: o do PATH é `v20.11.1`, abaixo do mínimo, e o fallback do
@@ -360,9 +371,14 @@ Esta é a seção mais acionável.
 | C13 | `/decks/:id/reports` exige `gallery_public` enquanto `/reports` é plano de controle | `policy:474-476` |
 | C14 | `deck_replace_all` e `legacy_ai_routes` são portões reais sem motivo documentado | o schema não tem campo `reason` |
 | C15 | O web público é o único deploy **sem nenhuma** referência a capability — zero ocorrências, verificado | `manaloom_deploy_public_web.sh` |
-| C16 | O contrato de egress do harness isolado cobrava quatro trechos que `f6f791098` já havia refatorado — 18 das 22 asserções continuavam válidas, então a deriva passou despercebida | `mutating_e2e_entrypoint_guard_test.dart:371-380` vs `manaloom_server_contract_e2e_isolated.sh:440,674,817` |
+| C16 | O contrato de egress do harness isolado cobrava quatro trechos que `f6f791098` já havia refatorado — 23 das 27 asserções continuavam válidas, então a deriva passou despercebida | `mutating_e2e_entrypoint_guard_test.dart:371-380` vs `manaloom_server_contract_e2e_isolated.sh:440,674,817` |
 
-C16 já foi corrigido nesta rodada: só o teste mudou, o script do dono ficou
+C16 foi corrigido em duas etapas. A primeira trocou as âncoras literais por
+outras âncoras literais, e uma revisão adversarial mostrou que ela deixava
+`bin/migrate.dart` e o listener de e-mail **descobertos**: removendo o sandbox
+de qualquer um dos dois, o contrato continuava verde. A segunda cobra a
+propriedade — todo `exec` sob o guard, salvo allowlist nomeada — e resiste a
+oito mutações. Nas duas etapas só o teste mudou, o script do dono ficou
 intacto, e o guard de egress nunca se perdeu (`run_pg` é `run_no_egress` com
 `PGPASSWORD`, ainda sob `sandbox-exec` loopback-only). A lição é sobre a forma
 do contrato: asserções que fixam **texto literal** de um script quebram em

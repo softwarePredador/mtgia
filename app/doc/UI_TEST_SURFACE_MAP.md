@@ -38,8 +38,8 @@ Inventário corrente da beta Web + Android em 2026-08-25:
 | Menus | 9 |
 | Tabs | 10 |
 | Navegação responsiva | 2 |
-| Transientes (`SnackBar`) | 115 |
-| **Total** | **265** |
+| Transientes (`SnackBar`) | 116 |
+| **Total** | **266** |
 
 Cada ocorrência pertence a um contrato de domínio que declara:
 
