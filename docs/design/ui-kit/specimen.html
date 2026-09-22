@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>BrewTact · folha de espécimes do kit</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="kit.css">
+<style>
+/* Só a moldura da folha de espécimes mora aqui. Tudo que é peça vem do kit.css. */
+*{box-sizing:border-box}
+html{background:var(--bt-obsidiana-950)}
+body{margin:0;position:relative;min-height:100%;overflow-x:hidden}
+
+/* a mesa viva embaixo: cards reais de jogador, desfocados */
+.esp-mesa{position:absolute;inset:0;z-index:0;display:grid;grid-template-columns:repeat(4,1fr);
+  grid-auto-rows:300px;gap:8px;padding:8px;filter:blur(7px) saturate(1.05) brightness(1);overflow:hidden}
+.esp-mesa .bt-panel{display:grid;place-items:center}
+.esp-mesa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42;mix-blend-mode:luminosity}
+.esp-mesa .bt-numeral{position:relative;color:var(--bt-marfim)}
+.esp-veu{position:absolute;inset:0;z-index:1;background:var(--bt-veu-folha);
+  -webkit-backdrop-filter:var(--bt-blur-folha);backdrop-filter:var(--bt-blur-folha)}
+
+.esp-doc{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:22px 16px 40px;display:grid;gap:26px}
+.esp-cabeca h1{margin:0;font:600 26px/1.1 var(--bt-display)}
+.esp-cabeca p{margin:6px 0 0;font:500 12.5px/1.5 var(--bt-ui);color:var(--bt-nevoa);max-width:62ch}
+.esp-sec{display:grid;gap:10px}
+.esp-sec > h2{margin:0;font:800 11px/1 var(--bt-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--bt-nevoa)}
+.esp-sec > h2 em{font-style:normal;color:var(--bt-latao-400)}
+.esp-linha{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
+.esp-linha > .bt-tile{width:150px;min-height:122px;flex:none}
+.esp-linha > .bt-piece{width:150px;min-height:158px;flex:none}
+.esp-marca{font:700 10px/1 var(--bt-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--bt-nevoa-fraca);margin:2px 0 0}
+.esp-marca b{color:var(--bt-latao-400);font-weight:800}
+.esp-cel{display:grid;gap:5px}
+
+/* o quadro-mesa: a grade de azulejos vive deitada, como na mesa */
+.esp-palco{position:relative;height:420px;border-radius:22px;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.10)}
+.esp-palco .esp-mesa{filter:blur(3px) saturate(1.05) brightness(1);grid-auto-rows:210px}
+.esp-quadro{position:absolute;inset:0;display:grid;place-items:center;z-index:2}
+.esp-escala{width:780px;height:412px}
+.esp-board{width:780px;height:412px;padding:0}
+.esp-hubgap{display:grid;place-items:center}
+
+.esp-tela{position:relative;height:430px;border-radius:22px;overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.10)}
+.esp-tela .esp-mesa{filter:blur(5px) saturate(1.05) brightness(1);grid-auto-rows:220px}
+
+.esp-dx{display:grid;grid-template-columns:200px minmax(0,1fr);gap:10px;align-items:start}
+.esp-pf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:12px 14px;align-items:start}
+.esp-numbox{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.esp-numdemo{width:170px;height:128px;--bt-bg:var(--bt-assento-musgo);position:relative;overflow:hidden}
+.esp-numdemo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.38;mix-blend-mode:luminosity}
+.esp-numdemo .bt-numeral--mesa{color:var(--bt-marfim)}
+
+@media (max-width:860px){
+  .esp-mesa{grid-template-columns:repeat(2,1fr)}
+  .esp-escala{zoom:.45}
+  .esp-palco{height:204px}
+  .esp-palco .esp-mesa{grid-auto-rows:120px}
+  .esp-linha > .bt-tile,.esp-linha > .bt-piece{width:calc(50% - 5px)}
+  .esp-tela{height:430px}
+  .esp-dx,.esp-pf{grid-template-columns:minmax(0,1fr)}
+  .esp-sec .bt-scorerow{flex-wrap:wrap}
+  .esp-sec .bt-score{flex:1 1 40%}
+  .bt-shapegrid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+</style>
+</head>
+<body class="bt-base">
+
+<!-- ───── mesa viva de exemplo, desfocada ───── -->
+<div class="esp-mesa" aria-hidden="true">
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-brasa)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">34</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-mare)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-musgo)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">27</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-ameixa)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">18</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-ambar)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">21</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-indigo)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">12</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-pinho)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-vinho)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">9</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-cobre)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">31</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-ferro)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">16</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-mare)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">25</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-musgo)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">38</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-brasa)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">7</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-indigo)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-ameixa)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">22</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-ambar)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">29</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-pinho)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">13</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-vinho)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-ferro)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">19</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-cobre)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">33</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-mare)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">26</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-musgo)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">11</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-brasa)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+  <div class="bt-panel" style="--bt-bg:var(--bt-assento-indigo)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">30</span></div>
+</div>
+<div class="esp-veu" aria-hidden="true"></div>
+
+<main class="esp-doc">
+
+  <header class="esp-cabeca">
+    <h1>Kit BrewTact · vitral com a disciplina dos azulejos vivos</h1>
+    <p>Cinco primitivas e quatro peças derivadas, nos valores do protótipo do contador de vida. Vidro escuro = ação neutra · cor cheia = está valendo · latão = jogada principal e selecionado · tracejado = vazio, sem dono · brasa = encerra ou destrói.</p>
+  </header>
+
+  <!-- ═════ 1 · bt-board + bt-tile + bt-hero + bt-x ═════ -->
+  <section class="esp-sec">
+    <h2>1 · bt-board <em>·</em> bt-tile <em>·</em> bt-hero <em>·</em> bt-overlay (véu + ✕)</h2>
+    <div class="esp-palco">
+      <div class="esp-mesa" aria-hidden="true">
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-brasa)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">34</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-mare)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-musgo)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">27</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-ambar)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">21</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-ameixa)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">18</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-indigo)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">12</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-pinho)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-vinho)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">9</span></div>
+      </div>
+      <div class="esp-veu" aria-hidden="true" style="background:var(--bt-veu-menu);-webkit-backdrop-filter:var(--bt-blur-menu);backdrop-filter:var(--bt-blur-menu)"></div>
+      <div class="esp-quadro">
+        <div class="esp-escala">
+        <div class="bt-board esp-board">
+
+          <div class="bt-board__row bt-board__row--alta">
+            <button class="bt-tile bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5 3.5 10l5 5"/><path d="M3.5 10H14a5.5 5.5 0 0 1 0 11h-3.5"/></svg>
+              <span class="bt-tile__lb">Desfazer</span>
+            </button>
+            <button class="bt-tile bt-f2" type="button">
+              <span style="display:flex;align-items:center;gap:10px">
+                <svg class="bt-tile__ic" style="width:38px;height:38px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2 20.5 7.1v9.8L12 21.8 3.5 16.9V7.1z"/><path d="M12 7.2 16.6 15.2H7.4z"/><path d="M12 2.2v5M3.5 7.1l3.9 8.1M20.5 7.1l-3.9 8.1M12 21.8l-4.6-6.6M12 21.8l4.6-6.6M3.5 7.1 12 7.2l8.5-.1"/></svg>
+                <svg class="bt-tile__ic" style="width:38px;height:38px" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4.5"/><circle class="bt-f" cx="8" cy="8" r="1.5"/><circle class="bt-f" cx="16" cy="8" r="1.5"/><circle class="bt-f" cx="12" cy="12" r="1.5"/><circle class="bt-f" cx="8" cy="16" r="1.5"/><circle class="bt-f" cx="16" cy="16" r="1.5"/></svg>
+                <svg class="bt-tile__ic" style="width:38px;height:38px" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 21.3 19.6H2.7z"/></svg>
+                <svg class="bt-tile__ic" style="width:38px;height:38px" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><circle cx="12" cy="12" r="6" stroke-dasharray="1.2 2.4"/><path d="M12 9.2v5.6M9.8 10.6 12 9.2"/></svg>
+              </span>
+              <span class="bt-tile__lb">Dados</span>
+            </button>
+            <button class="bt-tile bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2" stroke-dasharray="3.2 3.1"/><g transform="rotate(38 12 12)"><path class="bt-f" d="M12 4.8 14.7 12H9.3z"/><path d="M9.3 12 12 19.2 14.7 12z"/></g></svg>
+              <span class="bt-tile__lb">Quem<br>começa</span>
+            </button>
+            <button class="bt-tile bt-tile--lit bt-tile--coroa bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path class="bt-f" d="M3.2 8.2 7.6 12.3 12 5.2l4.4 7.1 4.4-4.1-1.7 9.3H4.9z"/><path d="M5.4 20.6h13.2"/></svg>
+              <span class="bt-tile__estado" style="--bt-c2:var(--bt-assento-ambar)"><i class="bt-dotp"></i>Bia</span>
+              <span class="bt-tile__lb">Coroa</span>
+            </button>
+            <button class="bt-tile bt-tile--livre bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18.2"/><path d="M6 4.4h13l-3.3 4.3L19 13H6"/></svg>
+              <span class="bt-tile__estado">Sem dono</span>
+              <span class="bt-tile__lb">Iniciativa</span>
+            </button>
+          </div>
+
+          <div class="bt-board__row bt-board__row--heroi">
+            <div class="bt-board__pair">
+              <button class="bt-hero bt-f1" type="button">
+                <span class="bt-hero__turno">
+                  <span class="bt-hero__sub">Turno</span>
+                  <span class="bt-numeral bt-numeral--hero">3</span>
+                </span>
+                <span class="bt-hero__mid">
+                  <span class="bt-hero__lb">Passar a vez</span>
+                  <span class="bt-hero__quem">Léo</span>
+                  <span class="bt-hero__pips">
+                    <i style="--bt-c2:var(--bt-assento-brasa)"></i>
+                    <i style="--bt-c2:var(--bt-assento-ambar)"></i>
+                    <i class="bt-on" style="--bt-c2:var(--bt-assento-musgo)"></i>
+                    <i style="--bt-c2:var(--bt-assento-mare)"></i>
+                  </span>
+                </span>
+                <span class="bt-hero__go"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5"/></svg></span>
+              </button>
+            </div>
+            <div class="esp-hubgap">
+              <button class="bt-x" type="button" aria-label="Fechar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            </div>
+            <div class="bt-board__pair">
+              <button class="bt-tile bt-tile--lit bt-tile--noite bt-f1" type="button">
+                <svg class="bt-tile__ic" style="width:44px;height:44px" viewBox="0 0 24 24" aria-hidden="true"><path class="bt-f" d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.6 8.6 0 1 0 20 14.2z"/></svg>
+                <span class="bt-tile__estado">noite</span>
+                <span class="bt-tile__lb">Dia / Noite</span>
+              </button>
+              <button class="bt-tile bt-f1" type="button">
+                <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 21 8l-9 5-9-5z"/><path d="M3 12.5 12 17.5l9-5"/><path d="M3 16.8 12 21.8l9-5"/></svg>
+                <span class="bt-tile__estado bt-tile__estado--off">Desligado</span>
+                <span class="bt-tile__lb">Plano</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="bt-board__row bt-board__row--alta">
+            <button class="bt-tile bt-f2" type="button">
+              <span class="bt-seats" style="margin-bottom:2px">
+                <span class="bt-ln bt-up"><b style="background:var(--bt-assento-mare)"></b><b style="background:var(--bt-assento-musgo)"></b></span>
+                <span class="bt-ln bt-dn"><b style="background:var(--bt-assento-brasa)"></b><b style="background:var(--bt-assento-ambar)"></b></span>
+              </span>
+              <span class="bt-tile__lb">Mesa</span>
+              <span style="position:absolute;right:14px;top:10px;bottom:10px;display:flex;align-items:center;gap:12px">
+                <span class="bt-numeral bt-numeral--tile">4</span>
+                <span style="display:grid;justify-items:center;gap:2px">
+                  <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#D9695A" aria-hidden="true"><path d="M12 20.4 4.6 13a4.6 4.6 0 1 1 7.4-5.3A4.6 4.6 0 1 1 19.4 13z"/></svg>
+                  <span class="bt-numeral" style="font-size:26px;line-height:1;color:var(--bt-nevoa);text-shadow:none">40</span>
+                </span>
+              </span>
+            </button>
+            <button class="bt-tile bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h9M18.5 8h1.5M4 16h5.5M15 16h5"/><circle class="bt-f" cx="15.6" cy="8" r="2.4"/><circle class="bt-f" cx="12.1" cy="16" r="2.4"/></svg>
+              <span class="bt-tile__lb">Regras</span>
+            </button>
+            <button class="bt-tile bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="6.4" width="12.4" height="13.4" rx="3"/><path d="M8 4.2h9a3 3 0 0 1 3 3v9"/></svg>
+              <span class="bt-numeral bt-numeral--tile-pequeno bt-tile__estado" style="top:10px">3</span>
+              <span class="bt-tile__lb">Partidas</span>
+            </button>
+            <button class="bt-tile bt-tile--brasa bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/></svg>
+              <span class="bt-tile__lb">Nova<br>partida</span>
+            </button>
+            <button class="bt-tile bt-f1" type="button">
+              <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 5h12v8H6"/><path class="bt-f" d="M6 5h4v4H6zM14 5h4v4h-4zM10 9h4v4h-4z" stroke="none"/></svg>
+              <span class="bt-tile__lb">Encerrar<br>partida</span>
+            </button>
+          </div>
+
+        </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════ 2 · estados do azulejo ═════ -->
+  <section class="esp-sec">
+    <h2>2 · bt-tile — todos os estados</h2>
+    <div class="esp-linha">
+      <div class="esp-cel"><button class="bt-tile" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 21 8l-9 5-9-5z"/><path d="M3 12.5 12 17.5l9-5"/></svg>
+        <span class="bt-tile__lb">Neutro</span></button>
+        <p class="esp-marca">vidro · ação sem estado</p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-tile--lit bt-tile--plano" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 21 8l-9 5-9-5z"/><path d="M3 12.5 12 17.5l9-5"/></svg>
+        <span class="bt-tile__estado">caos</span>
+        <span class="bt-tile__lb">Valendo</span></button>
+        <p class="esp-marca">vitral · <b>está valendo</b></p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-tile--sel" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path class="bt-f" d="M3.2 8.2 7.6 12.3 12 5.2l4.4 7.1 4.4-4.1-1.7 9.3H4.9z"/><path d="M5.4 20.6h13.2"/></svg>
+        <span class="bt-tile__lb">Selecionado</span></button>
+        <p class="esp-marca">latão · <b>jogada principal</b></p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-tile--livre" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18.2"/><path d="M6 4.4h13l-3.3 4.3L19 13H6"/></svg>
+        <span class="bt-tile__estado">Sem dono</span>
+        <span class="bt-tile__lb">Livre</span></button>
+        <p class="esp-marca">tracejado · vazio</p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-tile--brasa" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 5h12v8H6"/><path class="bt-f" d="M6 5h4v4H6zM14 5h4v4h-4zM10 9h4v4h-4z" stroke="none"/></svg>
+        <span class="bt-tile__lb">Brasa</span></button>
+        <p class="esp-marca">brasa na tinta · destrói</p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-tile--brasa bt-tile--armado" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 5h12v8H6"/><path class="bt-f" d="M6 5h4v4H6zM14 5h4v4h-4zM10 9h4v4h-4z" stroke="none"/></svg>
+        <span class="bt-tile__estado bt-tile__estado--off" style="color:var(--bt-brasa)">de novo</span>
+        <span class="bt-tile__lb">Armado</span></button>
+        <p class="esp-marca">aro de brasa · dois toques</p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-tile--brasa-cheia bt-tile--lit" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 5h12v8H6"/><path class="bt-f" d="M6 5h4v4H6zM14 5h4v4h-4zM10 9h4v4h-4z" stroke="none"/></svg>
+        <span class="bt-tile__lb">Brasa cheia</span></button>
+        <p class="esp-marca">destruir como herói</p></div>
+
+      <div class="esp-cel"><button class="bt-tile" type="button" disabled style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5 3.5 10l5 5"/><path d="M3.5 10H14a5.5 5.5 0 0 1 0 11h-3.5"/></svg>
+        <span class="bt-tile__lb">Desabilitado</span></button>
+        <p class="esp-marca">derivado · opacidade .38</p></div>
+
+      <div class="esp-cel"><div class="bt-tile bt-is-carregando" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="6.4" width="12.4" height="13.4" rx="3"/><path d="M8 4.2h9a3 3 0 0 1 3 3v9"/></svg>
+        <span class="bt-tile__estado"><i class="bt-carga bt-carga--num"></i></span>
+        <span class="bt-tile__lb">Carregando</span></div>
+        <p class="esp-marca">derivado · brilho que atravessa</p></div>
+
+      <div class="esp-cel"><button class="bt-tile bt-is-erro" type="button" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v4.5h4.5"/></svg>
+        <span class="bt-tile__estado">de novo</span>
+        <span class="bt-tile__lb">Erro</span></button>
+        <p class="esp-marca">derivado · brasa na tinta, sem brasa cheia</p></div>
+
+      <div class="esp-cel"><div class="bt-tile bt-is-vazio" style="width:150px;min-height:122px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="6.4" width="12.4" height="13.4" rx="3"/><path d="M8 4.2h9a3 3 0 0 1 3 3v9"/></svg>
+        <span class="bt-tile__estado">nenhuma</span>
+        <span class="bt-tile__lb">Vazio</span></div>
+        <p class="esp-marca">derivado · tracejado em latão</p></div>
+    </div>
+  </section>
+
+  <!-- ═════ 3 · bt-numeral ═════ -->
+  <section class="esp-sec">
+    <h2>3 · bt-numeral — Fraunces, lining-nums tabular-nums</h2>
+    <div class="esp-numbox">
+      <div class="esp-cel"><span class="bt-numeral bt-numeral--tile">40</span><p class="esp-marca">tile · 56 px / .8</p></div>
+      <div class="esp-cel"><span class="bt-numeral bt-numeral--hero">3</span><p class="esp-marca">herói · 70 px / .8</p></div>
+      <div class="esp-cel"><span class="bt-numeral bt-numeral--tile-pequeno">12</span><p class="esp-marca">canto · 32 px</p></div>
+      <div class="esp-cel">
+        <div class="bt-panel esp-numdemo"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-panel__core"><span class="bt-numeral bt-numeral--mesa">27</span></span></div>
+        <p class="esp-marca">mesa · medido pelo card</p>
+      </div>
+      <div class="esp-cel">
+        <div class="bt-panel esp-numdemo" style="--bt-bg:var(--bt-assento-vinho)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-panel__core"><span class="bt-numeral bt-numeral--mesa bt-is-wide">120</span></span></div>
+        <p class="esp-marca">mesa · três dígitos</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════ 4 · bt-piece ═════ -->
+  <section class="esp-sec">
+    <h2>4 · bt-piece — peça de escolha com miniatura</h2>
+    <div class="esp-linha">
+      <button class="bt-piece" type="button">
+        <span class="bt-seats"><span class="bt-ln bt-up"><b style="background:var(--bt-assento-musgo)"></b><b style="background:var(--bt-assento-mare)"></b></span><span class="bt-ln bt-dn"><b style="background:var(--bt-assento-brasa)"></b></span></span>
+        <span class="bt-piece__num">3</span>
+      </button>
+      <button class="bt-piece bt-piece--on" type="button">
+        <span class="bt-seats"><span class="bt-ln bt-up"><b style="background:var(--bt-assento-musgo)"></b><b style="background:var(--bt-assento-mare)"></b></span><span class="bt-ln bt-dn"><b style="background:var(--bt-assento-brasa)"></b><b style="background:var(--bt-assento-ambar)"></b></span></span>
+        <span class="bt-piece__foot"><span class="bt-piece__num">4</span><span class="bt-piece__cap">Atual</span></span>
+      </button>
+      <button class="bt-piece bt-piece--armado" type="button">
+        <span class="bt-seats"><span class="bt-ln bt-up"><b style="background:var(--bt-assento-mare)"></b><b style="background:var(--bt-assento-indigo)"></b><b style="background:var(--bt-assento-ameixa)"></b></span><span class="bt-ln bt-dn"><b style="background:var(--bt-assento-brasa)"></b><b style="background:var(--bt-assento-ambar)"></b></span></span>
+        <span class="bt-piece__foot"><span class="bt-piece__num">5</span><span class="bt-piece__cap">confirmar</span></span>
+      </button>
+      <button class="bt-piece" type="button" disabled>
+        <span class="bt-seats"><span class="bt-ln bt-up"><b style="background:var(--bt-assento-mare)"></b><b style="background:var(--bt-assento-indigo)"></b><b style="background:var(--bt-assento-ameixa)"></b></span><span class="bt-ln bt-dn"><b style="background:var(--bt-assento-brasa)"></b><b style="background:var(--bt-assento-ambar)"></b><b style="background:var(--bt-assento-musgo)"></b></span></span>
+        <span class="bt-piece__num">6</span>
+      </button>
+      <div class="bt-piece bt-is-carregando">
+        <span class="bt-seats"><span class="bt-ln bt-up"><b style="background:rgba(243,239,227,.10)"></b><b style="background:rgba(243,239,227,.10)"></b></span><span class="bt-ln bt-dn"><b style="background:rgba(243,239,227,.10)"></b><b style="background:rgba(243,239,227,.10)"></b></span></span>
+        <span class="bt-piece__foot"><i class="bt-carga bt-carga--num"></i></span>
+      </div>
+      <div class="bt-piece bt-is-erro">
+        <span class="bt-seats"><span class="bt-ln bt-up"><b style="background:rgba(255,138,128,.22)"></b><b style="background:rgba(255,138,128,.22)"></b></span><span class="bt-ln bt-dn"><b style="background:rgba(255,138,128,.22)"></b></span></span>
+        <span class="bt-piece__foot"><span class="bt-piece__num">—</span><span class="bt-piece__cap" style="color:var(--bt-brasa)">tentar de novo</span></span>
+      </div>
+      <div class="bt-piece bt-is-vazio">
+        <span class="bt-seats" style="background:rgba(11,13,18,.5)"><span class="bt-ln bt-up"><b style="background:rgba(224,169,59,.22)"></b><b style="background:rgba(224,169,59,.22)"></b></span><span class="bt-ln bt-dn"><b style="background:rgba(224,169,59,.22)"></b><b style="background:rgba(224,169,59,.22)"></b></span></span>
+        <span class="bt-piece__foot"><span class="bt-piece__num" style="color:rgba(224,169,59,.55)">0</span><span class="bt-piece__cap">sem mesa</span></span>
+      </div>
+    </div>
+    <p class="esp-marca">neutro · <b>selecionado</b> · armado · desabilitado (derivado) · carregando (derivado) · erro (derivado) · vazio (derivado)</p>
+  </section>
+
+  <!-- ═════ 5 · bt-vpiece ═════ -->
+  <section class="esp-sec">
+    <h2>5 · bt-vpiece — peça-numeral</h2>
+    <div class="esp-linha" style="align-items:center">
+      <span class="bt-vcap"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13a4.6 4.6 0 1 1 7.4-5.3A4.6 4.6 0 1 1 19.4 13z"/></svg><span>Vida<br>inicial</span></span>
+      <button class="bt-vpiece" type="button"><span class="bt-vpiece__num">20</span></button>
+      <button class="bt-vpiece" type="button"><span class="bt-vpiece__num">30</span></button>
+      <button class="bt-vpiece bt-vpiece--on" type="button"><span class="bt-vpiece__num">40</span></button>
+      <button class="bt-vpiece bt-vpiece--armado" type="button"><span class="bt-vpiece__num">50</span></button>
+      <button class="bt-vpiece" type="button" disabled><span class="bt-vpiece__num">60</span></button>
+      <div class="bt-vpiece bt-is-carregando"><i class="bt-carga" style="width:34px"></i></div>
+      <div class="bt-vpiece bt-is-erro"><span class="bt-vpiece__num">—</span></div>
+      <div class="bt-vpiece bt-is-vazio"><span class="bt-vpiece__num" style="color:rgba(224,169,59,.55)">0</span></div>
+    </div>
+    <p class="esp-marca">neutro · neutro · <b>selecionado</b> · armado · desabilitado · carregando · erro · vazio</p>
+  </section>
+
+  <!-- ═════ 6 · bt-rule ═════ -->
+  <section class="esp-sec">
+    <h2>6 · bt-rule — peça-regra que acende e diz VALE</h2>
+    <div class="bt-rgrid">
+      <button class="bt-rule bt-rule--on" type="button">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8 20 6v6.2c0 4.6-3.3 7.8-8 9-4.7-1.2-8-4.4-8-9V6z"/></svg></span>
+        <b>Dano de comandante tira vida</b>
+        <span class="bt-rule__st">Vale</span>
+      </button>
+      <button class="bt-rule bt-rule--on" type="button">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13a4.6 4.6 0 1 1 7.4-5.3A4.6 4.6 0 1 1 19.4 13z"/></svg></span>
+        <b>Tocar no número abre o teclado</b>
+        <span class="bt-rule__st">Vale</span>
+      </button>
+      <button class="bt-rule" type="button">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2c3.4 4 5.6 6.8 5.6 9.4A5.6 5.6 0 0 1 6.4 12.6c0-2.6 2.2-5.4 5.6-9.4z"/></svg></span>
+        <b>Marcadores no próprio card</b>
+        <span class="bt-rule__st">Não vale</span>
+      </button>
+      <div class="bt-rule bt-is-carregando">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8 20 6v6.2c0 4.6-3.3 7.8-8 9-4.7-1.2-8-4.4-8-9V6z"/></svg></span>
+        <b><i class="bt-carga bt-carga--lb" style="width:140px"></i></b>
+        <span class="bt-rule__st"><i class="bt-carga" style="width:48px"></i></span>
+      </div>
+      <div class="bt-rule bt-is-erro">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8 20 6v6.2c0 4.6-3.3 7.8-8 9-4.7-1.2-8-4.4-8-9V6z"/></svg></span>
+        <b>Não deu para salvar a regra</b>
+        <span class="bt-rule__st">Tocar de novo</span>
+      </div>
+      <button class="bt-rule" type="button" disabled>
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13a4.6 4.6 0 1 1 7.4-5.3A4.6 4.6 0 1 1 19.4 13z"/></svg></span>
+        <b>Só na mesa de duas faixas</b>
+        <span class="bt-rule__st">Desabilitado</span>
+      </button>
+    </div>
+    <div class="bt-rband" style="margin-top:6px">
+      <span class="bt-rband__cap">Dia e noite</span>
+      <div class="bt-vrow">
+        <button class="bt-rule bt-rule--sm" type="button"><span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></span><b>Sem</b></button>
+        <button class="bt-rule bt-rule--sm" type="button"><span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.6M12 19v2.6M4.2 12H1.6M22.4 12h-2.6M6.1 6.1 4.3 4.3M19.7 19.7l-1.8-1.8M17.9 6.1l1.8-1.8M4.3 19.7l1.8-1.8"/></svg></span><b>Dia</b></button>
+        <button class="bt-rule bt-rule--sm bt-rule--on" type="button"><span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20 14.2A8.4 8.4 0 0 1 9.8 4 8.6 8.6 0 1 0 20 14.2z"/></svg></span><b>Noite</b></button>
+      </div>
+    </div>
+    <div class="bt-rband" style="margin-top:6px">
+      <span class="bt-rband__cap">Segurar muda de</span>
+      <div class="bt-vrow">
+        <button class="bt-vpiece" type="button"><span class="bt-vpiece__num">5</span></button>
+        <button class="bt-vpiece bt-vpiece--on" type="button"><span class="bt-vpiece__num">10</span></button>
+        <button class="bt-vpiece" type="button"><span class="bt-vpiece__num">20</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════ 7 · bt-overlay + bt-footer ═════ -->
+  <section class="esp-sec">
+    <h2>7 · bt-overlay — véu sobre a mesa viva, seta de volta, ✕ único, rodapé fora da rolagem</h2>
+    <div class="esp-tela">
+      <div class="esp-mesa" aria-hidden="true">
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-brasa)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">34</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-mare)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-musgo)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">27</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-ameixa)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">18</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-ambar)"><img src="../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><span class="bt-numeral bt-numeral--tile">21</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-indigo)"><img src="../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><span class="bt-numeral bt-numeral--tile">12</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-pinho)"><img src="../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><span class="bt-numeral bt-numeral--tile">40</span></div>
+        <div class="bt-panel" style="--bt-bg:var(--bt-assento-vinho)"><img src="../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><span class="bt-numeral bt-numeral--tile">9</span></div>
+      </div>
+      <div class="bt-overlay">
+        <div class="bt-overlay__head">
+          <button class="bt-back" type="button" aria-label="Voltar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 7.5 12l7 7"/></svg></button>
+          <h2 class="bt-overlay__title">Regras da mesa</h2>
+          <button class="bt-x bt-x--head" type="button" aria-label="Fechar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+        <div class="bt-overlay__body">
+          <div class="bt-rgrid">
+            <button class="bt-rule bt-rule--on" type="button">
+              <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8 20 6v6.2c0 4.6-3.3 7.8-8 9-4.7-1.2-8-4.4-8-9V6z"/></svg></span>
+              <b>Dano de comandante tira vida</b><span class="bt-rule__st">Vale</span>
+            </button>
+            <button class="bt-rule bt-rule--on" type="button">
+              <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.4 4.6 13a4.6 4.6 0 1 1 7.4-5.3A4.6 4.6 0 1 1 19.4 13z"/></svg></span>
+              <b>Tocar no número abre o teclado</b><span class="bt-rule__st">Vale</span>
+            </button>
+          </div>
+          <div class="bt-hint">
+            <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5.5v13M5.5 12h13"/></svg></span>
+            <p><b>Toque</b> na direita soma 1, na esquerda tira 1. Segure para mudar de 10 em 10.</p>
+          </div>
+        </div>
+        <div class="bt-footer">
+          <button class="bt-action bt-action--principal" type="button"><span>Salvar regras</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════ 8 · tela vazia ═════ -->
+  <section class="esp-sec">
+    <h2>8 · vazio como peça, não como parede de texto <em>(derivado)</em></h2>
+    <div class="bt-empty bt-is-vazio" style="max-width:560px">
+      <svg class="bt-empty__ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="6.4" width="12.4" height="13.4" rx="3"/><path d="M8 4.2h9a3 3 0 0 1 3 3v9"/></svg>
+      <span class="bt-empty__num">0</span>
+      <span class="bt-empty__lb">Nenhuma partida guardada</span>
+    </div>
+  </section>
+
+  <!-- ═════ 9 · dados (vt-06) ═════ -->
+  <section class="esp-sec">
+    <h2>9 · bt-result + bt-shape + bt-lane — <em>prova vt-06-dados</em></h2>
+    <div class="esp-dx">
+      <div class="bt-result bt-result--tem">
+        <span class="bt-result__num">5</span><span class="bt-result__cap">D8</span>
+      </div>
+      <div class="bt-shapegrid">
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5 34 32H6z"/><path d="M20 5v27"/></svg><span class="bt-shape__cap">D4</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="7" y="7" width="26" height="26" rx="6"/><circle class="bt-f" cx="15" cy="15" r="2"/><circle class="bt-f" cx="25" cy="15" r="2"/><circle class="bt-f" cx="15" cy="25" r="2"/><circle class="bt-f" cx="25" cy="25" r="2"/><circle class="bt-f" cx="20" cy="20" r="2"/></svg><span class="bt-shape__cap">D6</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5 34 20 20 35 6 20z"/><path d="M6 20h28M20 5v30"/></svg><span class="bt-shape__cap">D8</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4 35 19 20 36 5 19z"/><path d="M20 4v20M9 15l11 9 11-9"/></svg><span class="bt-shape__cap">D10</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5 34 15.6 28.7 32H11.3L6 15.6z"/></svg><span class="bt-shape__cap">D12</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 4 34 12v16l-14 8-14-8V12z"/><path d="M20 12 32 18l-5 12H13l-5-12z"/></svg><span class="bt-shape__cap">D20</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="9" stroke-dasharray="3 3"/></svg><span class="bt-shape__cap">Moeda</span></button>
+        <button class="bt-shape" type="button"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 5 34 20 20 35 6 20z"/><path d="M6 20h28"/></svg><span class="bt-shape__cap">D100</span></button>
+      </div>
+    </div>
+    <button class="bt-lane" type="button" style="width:100%;margin-top:10px">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h9l-1.2 3H19v7h-7.2l-1-3H5z"/></svg>
+      <span><b>Quem começa</b><i>Um d20 para cada jogador</i></span>
+    </button>
+    <p class="esp-marca"><b>Novo</b> · resultado herói · peça-forma · faixa de ação</p>
+  </section>
+
+  <!-- ═════ 10 · quem começa (vt-07) ═════ -->
+  <section class="esp-sec">
+    <h2>10 · bt-score — fileira de jogadores com valor <em>(prova vt-07-quem-comeca)</em></h2>
+    <div class="bt-scorerow">
+      <div class="bt-score bt-score--vence" style="--bt-c:var(--bt-assento-mare)">
+        <span class="bt-score__tag">Começa</span><span class="bt-score__num">20</span><b>Duda</b>
+      </div>
+      <div class="bt-score" style="--bt-c:var(--bt-assento-brasa)"><span class="bt-score__num">10</span><b>Rafa</b></div>
+      <div class="bt-score" style="--bt-c:var(--bt-assento-ambar)"><span class="bt-score__num">9</span><b>Bia</b></div>
+      <div class="bt-score" style="--bt-c:var(--bt-assento-musgo)"><span class="bt-score__num">4</span><b>Léo</b></div>
+      <button class="bt-again" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 1-2.4-5.6"/><path d="M20 4v5h-5"/></svg></button>
+    </div>
+    <ul class="bt-log" style="margin-top:10px"><li>d20 · 20 Duda</li><li>d20 · 10 Rafa</li><li>d20 · 9 Bia</li><li>d20 · 4 Léo</li></ul>
+    <p class="esp-marca"><b>Novo</b> · cor cheia do dono · etiqueta e aro de latão no vencedor · histórico em pílulas</p>
+  </section>
+
+  <!-- ═════ 11 · folha do jogador (vt-05) ═════ -->
+  <section class="esp-sec">
+    <h2>11 · bt-live + bt-rule--estado + bt-plaque + bt-swatches <em>(prova vt-05-jogador)</em></h2>
+    <div class="esp-pf">
+      <div class="bt-live" style="--bt-c:var(--bt-assento-ambar)">
+        <span class="bt-live__cap">Vida · começou com 40</span>
+        <div class="bt-live__row">
+          <button class="bt-live__st" type="button">−</button>
+          <span class="bt-live__num">27</span>
+          <button class="bt-live__st" type="button">+</button>
+        </div>
+        <div class="bt-live__row">
+          <button class="bt-live__st bt-live__st--sm" type="button">−5</button>
+          <button class="bt-live__pad" type="button" style="flex:1"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="7" cy="7" r="1.6"/><circle cx="12" cy="7" r="1.6"/><circle cx="17" cy="7" r="1.6"/><circle cx="7" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="17" cy="12" r="1.6"/><circle cx="7" cy="17" r="1.6"/><circle cx="12" cy="17" r="1.6"/><circle cx="17" cy="17" r="1.6"/></svg>Digitar</button>
+          <button class="bt-live__st bt-live__st--sm" type="button">+5</button>
+        </div>
+      </div>
+      <div>
+        <span class="bt-rband__cap">Na partida</span>
+        <div class="bt-rulegrid3">
+          <button class="bt-rule bt-rule--estado bt-rule--on" type="button">
+            <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 8l4.5 3L12 5l4.5 6L21 8l-1.8 9H4.8z"/></svg></span>
+            <b>Coroa</b><span class="bt-rule__st">Com ela</span>
+          </button>
+          <button class="bt-rule bt-rule--estado" type="button">
+            <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 4h8l-1 3h7v6h-7l-1-3H5z"/></svg></span>
+            <b>Iniciativa</b><span class="bt-rule__st">Não tem</span>
+          </button>
+          <button class="bt-rule bt-rule--estado bt-rule--ruim bt-rule--on" type="button">
+            <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3c3 4 6 6 6 9.5A6 6 0 0 1 6 12.5C6 9 9 7 12 3z"/></svg></span>
+            <b>Envenenado</b><span class="bt-rule__st">8 marcas</span>
+          </button>
+        </div>
+        <span class="bt-rband__cap" style="margin-top:12px">Cor na mesa</span>
+        <div class="bt-swatches">
+          <button type="button" style="--bt-c:var(--bt-assento-brasa)" aria-pressed="false"></button>
+          <button type="button" style="--bt-c:var(--bt-assento-ambar)" aria-pressed="true"></button>
+          <button type="button" style="--bt-c:var(--bt-assento-musgo)" aria-pressed="false"></button>
+          <button type="button" style="--bt-c:var(--bt-assento-mare)" aria-pressed="false"></button>
+          <button type="button" style="--bt-c:var(--bt-assento-indigo)" aria-pressed="false"></button>
+          <button type="button" style="--bt-c:var(--bt-assento-ameixa)" aria-pressed="false"></button>
+        </div>
+        <span class="bt-rband__cap" style="margin-top:12px">Nome na mesa</span>
+        <label class="bt-plaque"><input type="text" value="Bia" aria-label="Nome na mesa"></label>
+      </div>
+    </div>
+    <p class="esp-marca"><b>Novo</b> · vitral do dono com os controles escavados · brasa cheia = estado ruim valendo · placa sem caixa · aro marfim no swatch</p>
+  </section>
+
+</main>
+</body>
+</html>

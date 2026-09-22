@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BrewTact · Onboarding · direção B "Três batidas"</title>
+<link rel="stylesheet" href="../../../ui-kit/kit.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Direção B — "Três batidas".
+   Uma decisão por tela cheia · objetos gigantes · um título Fraunces enorme ·
+   progresso em três pontos de latão · a escolha vale no toque e avança sozinha.
+   Só layout da tela e ilustrações aqui: nenhuma cor, raio, sombra ou tipo do
+   kit é redefinido.
+   ═══════════════════════════════════════════════════════════════════════════ */
+*{ -webkit-tap-highlight-color: transparent; }
+html, body { margin:0; height:100%; }
+body.bt-base { overflow:hidden; }
+
+/* ── a mesa viva embaixo: escurecida e desfocada ──────────────────────────── */
+.ob-mesa{ position:fixed; inset:0; scale:1.08; display:grid; grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr 1fr; gap:6px; padding:8px; filter:blur(10px) saturate(.8);
+  opacity:.9; pointer-events:none; }
+.ob-mesa i{ display:grid; place-items:center; border-radius:var(--bt-raio-painel); overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 82% 0%, rgba(255,255,255,.10), transparent 55%),
+    radial-gradient(110% 100% at 0% 100%, rgba(0,0,0,.34), transparent 62%),
+    var(--bt-bg); }
+.ob-mesa i b{ font:600 78px/1 var(--bt-display); font-variant-numeric:lining-nums tabular-nums;
+  color:var(--bt-marfim); opacity:.92; }
+.ob-veu{ position:fixed; inset:0; background:var(--bt-veu-folha); pointer-events:none; }
+
+/* ── a tela ───────────────────────────────────────────────────────────────── */
+.ob{ position:relative; display:none; flex-direction:column; width:390px; height:844px;
+  box-sizing:border-box; padding:10px 16px 14px; }
+body[data-estado="vazio"]      .ob--vazio,
+body[data-estado="preenchido"] .ob--preenchido,
+body[data-estado="carregando"] .ob--carregando,
+body[data-estado="erro"]       .ob--erro,
+body[data-estado="retomado"]   .ob--retomado,
+body[data-estado="negado"]     .ob--negado { display:flex; }
+
+/* cabeçalho: seta de volta · nome da rota · atalhos do shell · o único ✕ */
+.ob-top{ display:flex; align-items:center; gap:7px; flex:none; }
+.ob-rota{ flex:1; min-width:0; font:800 11px/1 var(--bt-ui); letter-spacing:.115em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); overflow:hidden;
+  text-overflow:ellipsis; white-space:nowrap; }
+.ob-glyph{ position:relative; width:34px; height:34px; display:grid; place-items:center;
+  color:var(--bt-nevoa); flex:none; }
+.ob-glyph svg{ width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.8;
+  stroke-linecap:round; stroke-linejoin:round; }
+.ob-badge{ position:absolute; top:-1px; right:-2px; min-width:16px; height:16px; padding:0 3px;
+  box-sizing:border-box; border-radius:999px; background:var(--bt-latao-400);
+  color:var(--bt-obsidiana-950); font:800 10px/16px var(--bt-ui); font-style:normal;
+  text-align:center; box-shadow:0 0 0 2px var(--bt-obsidiana-950); }
+.ob-sair{ display:grid; justify-items:center; gap:4px; flex:none; margin-left:2px; }
+.ob-sair span{ font:800 9px/1 var(--bt-ui); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--bt-nevoa-fraca); }
+
+/* as três batidas */
+.ob-dots{ margin:15px 0 0; flex:none; }
+
+/* o título enorme */
+.ob-cab{ flex:none; margin:15px 0 0; }
+.ob-eyebrow{ margin:0 0 7px; font:800 11px/1 var(--bt-ui); letter-spacing:.15em;
+  text-transform:uppercase; color:var(--bt-latao-400); }
+.ob-h1{ margin:0; font:600 37px/1.04 var(--bt-display); letter-spacing:-.02em;
+  color:var(--bt-marfim); text-wrap:balance; }
+
+/* o palco: tudo cabe de uma vez, nada rola */
+.ob-palco{ flex:1; min-height:0; display:flex; flex-direction:column; gap:10px; margin-top:15px; }
+.ob-sub{ font-size:9.5px; line-height:1.32; letter-spacing:.05em; }
+.ob-t{ font:700 17px/1.03 var(--bt-display); letter-spacing:-.01em; color:var(--bt-marfim); }
+.ob-t--g{ font-size:26px; line-height:1; }
+.ob-band{ display:flex; flex-direction:column; min-height:0; }
+
+/* ── ilustrações: cartas de verdade dos fixtures do repo ──────────────────── */
+.ob-cartas{ position:relative; display:block; }
+.ob-cartas img{ position:absolute; top:50%; left:50%; height:64%; width:auto; aspect-ratio:5/7;
+  object-fit:cover; border-radius:8px;
+  box-shadow:0 8px 16px rgba(0,0,0,.55), inset 0 0 0 1px rgba(243,239,227,.18); }
+.ob-cartas--1 img{ translate:-50% -50%; }
+.ob-cartas--leque img{ height:54%; }
+.ob-cartas--leque img:nth-child(1){ translate:-92% -50%; rotate:-13deg; }
+.ob-cartas--leque img:nth-child(2){ translate:-50% -54%; rotate:0deg; }
+.ob-cartas--leque img:nth-child(3){ translate:-8% -50%; rotate:13deg; }
+.ob-volta{ position:absolute; inset:0; width:100%; height:100%; fill:none;
+  stroke:var(--bt-marfim); stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.bt-piece--on .ob-volta, .bt-tile--lit .ob-volta{ stroke:var(--bt-marfim); }
+
+/* ── batida 1: o tabuleiro de objetivos ───────────────────────────────────── */
+.ob-grade{ display:flex; flex-direction:column; gap:var(--bt-gap-azulejo); flex:1; min-height:0; }
+.ob-linha{ display:flex; gap:var(--bt-gap-azulejo); min-height:0; }
+.ob-linha--herói{ flex:16 1 0; }
+.ob-linha--par{ flex:17 1 0; }
+.ob-alvo{ flex:1 1 0; min-width:0; align-items:stretch; gap:8px; }
+.ob-alvo--herói{ flex-direction:row; align-items:stretch; gap:10px; padding-right:0; }
+.ob-corpo{ display:flex; flex-direction:column; justify-content:flex-end; gap:5px; min-width:0; }
+.ob-alvo--herói .ob-corpo{ flex:1; justify-content:center; padding-bottom:2px; }
+.ob-alvo--herói .ob-leque{ flex:none; width:146px; align-self:stretch; margin-right:-6px; }
+.ob-alvo--herói .ob-cartas img{ height:72%; }
+
+.ob-ilu{ flex:none; height:58px; width:100%; overflow:hidden; box-sizing:border-box;
+  border-radius:var(--bt-raio-mini); background:rgba(11,13,18,.74);
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.08); }
+.ob-lista{ display:grid; align-content:start; gap:3px; padding:7px 9px;
+  -webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 72%,transparent 100%); }
+.ob-lista span{ font:600 9.5px/1 var(--bt-ui); color:var(--bt-nevoa); white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis; display:block; }
+.ob-lista em{ font:800 9.5px/1 var(--bt-ui); font-style:normal; font-variant-numeric:tabular-nums;
+  color:var(--bt-latao-400); margin-right:6px; }
+.ob-fich{ display:grid; grid-template-columns:repeat(4,1fr); gap:4px; padding:5px; }
+.ob-fich img{ width:100%; height:100%; object-fit:cover; border-radius:5px;
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.14); }
+.ob-fich i{ border-radius:5px; border:1.5px dashed rgba(224,169,59,.5); }
+.ob-of{ position:relative; }
+.ob-of img{ width:100%; height:100%; object-fit:cover; opacity:.8; }
+.ob-of svg{ position:absolute; right:9px; top:50%; translate:0 -50%; width:30px; height:30px;
+  fill:none; stroke:var(--bt-latao-400); stroke-width:2.2; stroke-linecap:round;
+  stroke-linejoin:round; filter:drop-shadow(0 2px 5px rgba(0,0,0,.8)); }
+.ob-mesa-mini{ padding:5px; gap:4px; display:grid; }
+.ob-mesa-mini .bt-ln{ display:flex; gap:4px; flex:1; }
+.ob-mesa-mini b{ flex:1; border-radius:4px; }
+
+/* ── batida 2: momentos e formatos ────────────────────────────────────────── */
+.ob-momentos{ display:flex; gap:var(--bt-gap-azulejo); flex:none; height:222px; }
+.ob-cena{ flex:1 1 0; min-height:0; position:relative; }
+.bt-piece .ob-cena{ max-height:none; width:auto; height:auto; overflow:hidden; }
+.bt-piece .ob-cartas--leque img{ height:40%; }
+.ob-fmts{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--bt-gap-azulejo); }
+.ob-fmt{ width:auto; min-height:86px; height:auto; }
+.ob-fmt--w{ grid-column:span 2; }
+.ob-fmt b{ font:600 16px/1 var(--bt-display); letter-spacing:-.01em; }
+.ob-fmt--w b{ font-size:22px; }
+
+/* ── batida 3: resumo aceso, modo de construção e o herói ─────────────────── */
+.ob-resumo{ display:flex; gap:var(--bt-gap-azulejo); flex:none; height:200px; }
+.ob-sum{ flex:1 1 0; align-items:stretch; gap:7px; }
+.ob-sum .bt-tile__lb{ line-height:1.2; }
+.ob-sum .ob-cena{ border-radius:var(--bt-raio-mini); background:rgba(11,13,18,.5); overflow:hidden; }
+.ob-sum .bt-numeral{ align-self:flex-start; margin-top:auto; }
+.ob-modo{ flex:none; }
+.ob-modo .bt-rgrid{ flex:none; height:166px; }
+.ob-modo .bt-rule__st{ line-height:1.3; }
+.ob-heroi{ flex:none; margin-top:auto; gap:12px; padding:13px 14px 13px 18px; }
+.ob-heroi .bt-hero__mid{ gap:3px; }
+.ob--erro .ob-resumo{ height:112px; }
+.ob--erro .ob-modo .bt-rgrid{ height:136px; }
+.ob--erro .bt-lane{ min-height:56px; }
+.ob--erro .ob-heroi{ padding:11px 14px 11px 18px; }
+.ob--negado .ob-palco{ justify-content:center; gap:12px; }
+.ob--negado .ob-nada{ flex:none; height:252px; }
+.ob--negado .ob-nada__slots{ max-height:104px; }
+.ob-aviso .bt-rule{ min-height:0; }
+.ob-aviso .bt-rule__st{ line-height:1.3; }
+.ob-lane-2 i{ line-height:1.3; }
+
+/* ── negado: a peça grande e tracejada ────────────────────────────────────── */
+.ob-nada{ flex:1 1 0; min-height:200px; }
+.ob-nada__slots{ display:flex; gap:7px; width:100%; flex:1 1 0; min-height:0; margin:12px 0 14px; }
+.ob-nada__slots i{ flex:1 1 0; border-radius:12px; border:var(--bt-tracejado); opacity:.55; }
+.ob-nada__pe{ display:flex; align-items:flex-end; gap:12px; }
+
+/* rosca de carregamento dentro do botão redondo do herói */
+.ob-rosca{ animation:ob-gira 1.1s linear infinite; transform-origin:50% 50%; }
+@keyframes ob-gira{ to{ rotate:360deg; } }
+@media (prefers-reduced-motion: reduce){ .ob-rosca{ animation:none; } }
+#ob-anuncio{ top:0; left:0; }
+</style>
+</head>
+<body class="bt-base" data-estado="vazio">
+
+<!-- a superfície principal continua viva embaixo: a mesa, escurecida e desfocada -->
+<div class="ob-mesa" aria-hidden="true">
+  <i style="--bt-bg:var(--bt-assento-mare)"><b>40</b></i>
+  <i style="--bt-bg:var(--bt-assento-brasa)"><b>33</b></i>
+  <i style="--bt-bg:var(--bt-assento-musgo)"><b>27</b></i>
+  <i style="--bt-bg:var(--bt-assento-ambar)"><b>40</b></i>
+  <i style="--bt-bg:var(--bt-assento-indigo)"><b>18</b></i>
+  <i style="--bt-bg:var(--bt-assento-ameixa)"><b>31</b></i>
+</div>
+<div class="ob-veu" aria-hidden="true"></div>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #vazio — batida 1, primeira execução, nada escolhido
+     ═════════════════════════════════════════════════════════════════════════ -->
+<article class="ob ob--vazio" data-key="onboarding-intent-screen">
+  <header class="ob-top">
+    <span class="ob-rota">Seu primeiro passo</span>
+    <button class="ob-glyph" aria-label="Mensagens"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5v-3.6A2.5 2.5 0 0 1 4 13.5z"/></svg></button>
+    <button class="ob-glyph" aria-label="Notificações"><svg viewBox="0 0 24 24"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.8 4.8 1.6 5.8.4.5 0 1.2-.6 1.2H5.5c-.6 0-1-.7-.6-1.2.8-1 1.6-2.6 1.6-5.8Z"/><path d="M10 20.2a2.4 2.4 0 0 0 4 0"/></svg></button>
+    <span class="ob-sair">
+      <button class="bt-x bt-x--head" data-key="onboarding-skip-action" aria-label="Pular por enquanto — seu objetivo continua salvo"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span>Pular</span>
+    </span>
+  </header>
+
+  <div class="ob-dots bt-hero__pips" data-key="onboarding-journey-progress" role="group"
+       aria-label="Progresso do onboarding: objetivo pendente, contexto pendente, ação pendente">
+    <i class="bt-on" style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-out" style="--bt-c2:var(--bt-nevoa-fraca)"></i>
+    <i class="bt-out" style="--bt-c2:var(--bt-nevoa-fraca)"></i>
+  </div>
+
+  <div class="ob-cab" data-key="onboarding-intent-hero">
+    <p class="ob-eyebrow">Comece pelo seu jogo</p>
+    <h1 class="ob-h1">O que você quer fazer primeiro?</h1>
+  </div>
+
+  <div class="ob-palco">
+    <div class="ob-grade" data-key="onboarding-goal-rail">
+
+      <div class="ob-linha ob-linha--herói">
+        <button class="bt-tile ob-alvo ob-alvo--herói" data-key="onboarding-goal-buildDeck">
+          <span class="ob-corpo">
+            <span class="ob-t ob-t--g">Montar<br>um deck</span>
+            <span class="bt-tile__sub ob-sub">Comece do zero ou gere uma base para revisar</span>
+          </span>
+          <span class="ob-cartas ob-cartas--leque ob-leque" aria-hidden="true">
+            <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+          </span>
+        </button>
+      </div>
+
+      <div class="ob-linha ob-linha--par">
+        <button class="bt-tile ob-alvo" data-key="onboarding-goal-importDeck">
+          <span class="ob-ilu ob-lista" aria-hidden="true">
+            <span><em>1</em>Anel Solar</span>
+            <span><em>1</em>Contramágica</span>
+            <span><em>2</em>Saqueadores de Brasa</span>
+            <span><em>1</em>Atraxa, Voz Praetoriana</span>
+          </span>
+          <span class="ob-corpo">
+            <span class="ob-t">Importar uma lista</span>
+            <span class="bt-tile__sub ob-sub">Traga um deck de texto ou de outro site</span>
+          </span>
+        </button>
+        <button class="bt-tile ob-alvo" data-key="onboarding-goal-catalogCollection">
+          <span class="ob-ilu ob-fich" aria-hidden="true">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+            <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+            <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            <i></i>
+          </span>
+          <span class="ob-corpo">
+            <span class="ob-t">Catalogar minha coleção</span>
+            <span class="bt-tile__sub ob-sub">Registre cópias, impressão e estado físico</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="ob-linha ob-linha--par">
+        <button class="bt-tile ob-alvo" data-key="onboarding-goal-play">
+          <span class="ob-ilu ob-mesa-mini" aria-hidden="true">
+            <span class="bt-ln bt-up"><b style="background:var(--bt-assento-musgo)"></b><b style="background:var(--bt-assento-mare)"></b></span>
+            <span class="bt-ln bt-dn"><b style="background:var(--bt-assento-brasa)"></b><b style="background:var(--bt-assento-ambar)"></b></span>
+          </span>
+          <span class="ob-corpo">
+            <span class="ob-t">Jogar uma partida</span>
+            <span class="bt-tile__sub ob-sub">Abra uma mesa com ou sem deck vinculado</span>
+          </span>
+        </button>
+        <button class="bt-tile ob-alvo" data-key="onboarding-goal-improveDeck">
+          <span class="ob-ilu ob-of" aria-hidden="true">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+            <svg viewBox="0 0 24 24"><path d="M5 19V9M12 19V5M19 19v-6"/><path d="M2.5 12 5 9.5 7.5 12M9.5 8 12 5.5 14.5 8M16.5 13 19 10.5 21.5 13"/></svg>
+          </span>
+          <span class="ob-corpo">
+            <span class="ob-t">Melhorar um deck</span>
+            <span class="bt-tile__sub ob-sub">Escolha uma lista e revise mudanças com contexto</span>
+          </span>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="bt-hint">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h9"/><path d="m10 8 4 4-4 4"/><circle cx="19" cy="12" r="1.7"/></svg></span>
+      <p>Você pode mudar depois: o BrewTact prepara <b>somente o caminho necessário</b> e pular não apaga o que já está salvo.</p>
+    </div>
+  </div>
+</article>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #retomado — batida 2 com os controles já preenchidos
+     ═════════════════════════════════════════════════════════════════════════ -->
+<article class="ob ob--retomado" data-key="onboarding-intent-screen">
+  <header class="ob-top">
+    <button class="bt-back" aria-label="Voltar para o objetivo"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+    <span class="ob-rota">Seu primeiro passo</span>
+    <button class="ob-glyph" aria-label="Mensagens, 3 não lidas"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5v-3.6A2.5 2.5 0 0 1 4 13.5z"/></svg><i class="ob-badge">3</i></button>
+    <button class="ob-glyph" aria-label="Notificações"><svg viewBox="0 0 24 24"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.8 4.8 1.6 5.8.4.5 0 1.2-.6 1.2H5.5c-.6 0-1-.7-.6-1.2.8-1 1.6-2.6 1.6-5.8Z"/><path d="M10 20.2a2.4 2.4 0 0 0 4 0"/></svg></button>
+    <span class="ob-sair">
+      <button class="bt-x bt-x--head" data-key="onboarding-skip-action" aria-label="Pular por enquanto — seu objetivo continua salvo"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span>Pular</span>
+    </span>
+  </header>
+
+  <div class="ob-dots bt-hero__pips" data-key="onboarding-journey-progress" role="group"
+       aria-label="Progresso do onboarding: objetivo escolhido, contexto escolhido, ação pendente">
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-on" style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-out" style="--bt-c2:var(--bt-nevoa-fraca)"></i>
+  </div>
+
+  <div class="ob-cab" data-key="onboarding-intent-hero">
+    <p class="ob-eyebrow">Plano retomado</p>
+    <h1 class="ob-h1">Continue de onde você parou.</h1>
+  </div>
+
+  <div class="ob-palco" data-key="onboarding-context-panel">
+    <div class="bt-rband ob-band">
+      <span class="bt-rband__cap">Conte sobre seu momento</span>
+      <div class="ob-momentos" data-key="onboarding-experience-options">
+        <button class="bt-piece" data-key="onboarding-experience-firstSteps" aria-pressed="false">
+          <span class="bt-seats ob-cena" aria-hidden="true">
+            <span class="ob-cartas ob-cartas--1" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            </span>
+          </span>
+          <span class="bt-piece__foot"><span class="bt-piece__cap">Começando agora</span></span>
+        </button>
+        <button class="bt-piece bt-piece--on" data-key="onboarding-experience-returning" aria-pressed="true">
+          <span class="bt-seats ob-cena" aria-hidden="true">
+            <span class="ob-cartas ob-cartas--1" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="" style="rotate:-7deg">
+            </span>
+            <svg class="ob-volta" viewBox="0 0 90 110"><path d="M22 40a24 24 0 0 1 44 6"/><path d="M14 30.5 22.5 41l11-6.5"/></svg>
+          </span>
+          <span class="bt-piece__foot"><span class="bt-piece__cap">Voltando ao Magic</span></span>
+        </button>
+        <button class="bt-piece" data-key="onboarding-experience-experienced" aria-pressed="false">
+          <span class="bt-seats ob-cena" aria-hidden="true">
+            <span class="ob-cartas ob-cartas--leque" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            </span>
+          </span>
+          <span class="bt-piece__foot"><span class="bt-piece__cap">Jogo com frequência</span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bt-rband" data-key="onboarding-format-dropdown">
+      <span class="bt-rband__cap">Formato principal</span>
+      <div class="ob-fmts">
+        <button class="bt-rule bt-rule--sm bt-rule--on ob-fmt ob-fmt--w" aria-pressed="true"><b>Commander</b></button>
+        <button class="bt-rule bt-rule--sm ob-fmt" aria-pressed="false"><b>Standard</b></button>
+        <button class="bt-rule bt-rule--sm ob-fmt" aria-pressed="false"><b>Modern</b></button>
+        <button class="bt-rule bt-rule--sm ob-fmt" aria-pressed="false"><b>Pioneer</b></button>
+        <button class="bt-rule bt-rule--sm ob-fmt" aria-pressed="false"><b>Legacy</b></button>
+        <button class="bt-rule bt-rule--sm ob-fmt" aria-pressed="false"><b>Vintage</b></button>
+        <button class="bt-rule bt-rule--sm ob-fmt" aria-pressed="false"><b>Pauper</b></button>
+      </div>
+    </div>
+
+    <div class="bt-hint">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11.2v5.4M12 7.7v.1"/></svg></span>
+      <p>Isso muda a orientação, <b>não as regras do formato</b> — é o contexto do caminho escolhido.</p>
+    </div>
+
+    <button class="bt-hero bt-hero--ocioso ob-heroi" data-key="onboarding-primary-action">
+      <span class="bt-hero__mid">
+        <span class="bt-hero__lb">Retomar</span>
+        <span class="bt-hero__quem">Montar um deck</span>
+        <span class="bt-hero__sub">Commander · plano salvo</span>
+      </span>
+      <span class="bt-hero__go"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+    </button>
+  </div>
+</article>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #preenchido — batida 3: o resumo aceso e o herói de latão
+     ═════════════════════════════════════════════════════════════════════════ -->
+<article class="ob ob--preenchido" data-key="onboarding-intent-screen">
+  <header class="ob-top">
+    <button class="bt-back" aria-label="Voltar para o contexto"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+    <span class="ob-rota">Seu primeiro passo</span>
+    <button class="ob-glyph" aria-label="Mensagens, 3 não lidas"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5v-3.6A2.5 2.5 0 0 1 4 13.5z"/></svg><i class="ob-badge">3</i></button>
+    <button class="ob-glyph" aria-label="Notificações"><svg viewBox="0 0 24 24"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.8 4.8 1.6 5.8.4.5 0 1.2-.6 1.2H5.5c-.6 0-1-.7-.6-1.2.8-1 1.6-2.6 1.6-5.8Z"/><path d="M10 20.2a2.4 2.4 0 0 0 4 0"/></svg></button>
+    <span class="ob-sair">
+      <button class="bt-x bt-x--head" data-key="onboarding-skip-action" aria-label="Pular por enquanto — seu objetivo continua salvo"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span>Pular</span>
+    </span>
+  </header>
+
+  <div class="ob-dots bt-hero__pips" data-key="onboarding-journey-progress" role="group"
+       aria-label="Progresso do onboarding: objetivo escolhido, contexto escolhido, ação pronta">
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-on" style="--bt-c2:var(--bt-latao-400)"></i>
+  </div>
+
+  <div class="ob-cab" data-key="onboarding-intent-hero">
+    <p class="ob-eyebrow">Comece pelo seu jogo</p>
+    <h1 class="ob-h1">Vamos transformar uma ideia em uma lista jogável.</h1>
+  </div>
+
+  <div class="ob-palco">
+    <div class="bt-rband ob-band">
+      <span class="bt-rband__cap">Seu plano</span>
+      <div class="ob-resumo">
+        <button class="bt-tile bt-tile--lit bt-tile--plano ob-sum" aria-label="Objetivo: Montar um deck. Tocar para trocar.">
+          <span class="ob-cena" style="flex:1 1 0;min-height:0">
+            <span class="ob-cartas ob-cartas--leque" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+            </span>
+          </span>
+          <span class="bt-tile__lb">Montar um deck</span>
+        </button>
+        <button class="bt-tile bt-tile--lit bt-tile--noite ob-sum" aria-label="Momento: Voltando ao Magic. Tocar para trocar.">
+          <span class="ob-cena" style="flex:1 1 0;min-height:0">
+            <span class="ob-cartas ob-cartas--1" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="" style="rotate:-7deg">
+            </span>
+            <svg class="ob-volta" viewBox="0 0 90 96"><path d="M24 34a22 22 0 0 1 42 5"/><path d="M16 25 24.5 35l11-6.5"/></svg>
+          </span>
+          <span class="bt-tile__lb">Voltando ao Magic</span>
+        </button>
+        <button class="bt-tile bt-tile--lit bt-tile--iniciativa ob-sum" aria-label="Formato principal: Commander, 100 cartas. Tocar para trocar.">
+          <span class="bt-numeral bt-numeral--tile">100</span>
+          <span class="bt-tile__lb">Commander</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bt-rband ob-band ob-modo">
+      <span class="bt-rband__cap">Escolha como começar</span>
+      <div class="bt-rgrid">
+        <button class="bt-rule bt-rule--on" data-key="onboarding-build-guided" aria-pressed="true">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5 12.8 8.2 17.5 10 12.8 11.8 11 16.5 9.2 11.8 4.5 10l4.7-1.8z"/><path d="M18 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg></span>
+          <b>Gerar uma base</b>
+          <span class="bt-rule__st">Mais rápido · revisão antes de salvar</span>
+        </button>
+        <button class="bt-rule" data-key="onboarding-build-manual" aria-pressed="false">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5 4.7 16 15 5.7a1.8 1.8 0 0 1 2.6 0l.7.7a1.8 1.8 0 0 1 0 2.6L8 19.3z"/><path d="M13.6 7.2 16.8 10.4"/></svg></span>
+          <b>Criar do zero</b>
+          <span class="bt-rule__st">Controle carta por carta</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bt-hint">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 20 6.8v5.4c0 4.5-3.2 7.4-8 8.6-4.8-1.2-8-4.1-8-8.6V6.8z"/><path d="m8.8 12.2 2.2 2.2 4.2-4.6"/></svg></span>
+      <p>A IA prepara uma base para você revisar. <b>Nada é aplicado sem sua confirmação.</b></p>
+    </div>
+
+    <button class="bt-hero bt-hero--ocioso ob-heroi" data-key="onboarding-primary-action onboarding-generate-action">
+      <span class="bt-hero__mid">
+        <span class="bt-hero__lb">Próximo passo</span>
+        <span class="bt-hero__quem">Gerar uma base</span>
+        <span class="bt-hero__sub">Para revisar antes de salvar</span>
+      </span>
+      <span class="bt-hero__go"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+    </button>
+  </div>
+</article>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #carregando — o plano está sendo salvo; tudo mais fica inerte
+     ═════════════════════════════════════════════════════════════════════════ -->
+<article class="ob ob--carregando" data-key="onboarding-intent-screen">
+  <header class="ob-top">
+    <button class="bt-back" aria-label="Voltar para o contexto" disabled style="opacity:.38"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+    <span class="ob-rota">Seu primeiro passo</span>
+    <button class="ob-glyph" aria-label="Mensagens, 3 não lidas"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5v-3.6A2.5 2.5 0 0 1 4 13.5z"/></svg><i class="ob-badge">3</i></button>
+    <button class="ob-glyph" aria-label="Notificações"><svg viewBox="0 0 24 24"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.8 4.8 1.6 5.8.4.5 0 1.2-.6 1.2H5.5c-.6 0-1-.7-.6-1.2.8-1 1.6-2.6 1.6-5.8Z"/><path d="M10 20.2a2.4 2.4 0 0 0 4 0"/></svg></button>
+    <span class="ob-sair" style="opacity:.38">
+      <button class="bt-x bt-x--head" data-key="onboarding-skip-action" aria-label="Pular por enquanto" disabled><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span>Pular</span>
+    </span>
+  </header>
+
+  <div class="ob-dots bt-hero__pips" data-key="onboarding-journey-progress" role="group" aria-label="Salvando seu plano">
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-on" style="--bt-c2:var(--bt-latao-400)"></i>
+  </div>
+
+  <div class="ob-cab" data-key="onboarding-intent-hero">
+    <p class="ob-eyebrow">Comece pelo seu jogo</p>
+    <h1 class="ob-h1">Vamos transformar uma ideia em uma lista jogável.</h1>
+  </div>
+
+  <div class="ob-palco">
+    <div class="bt-rband ob-band" style="opacity:.4">
+      <span class="bt-rband__cap">Seu plano</span>
+      <div class="ob-resumo">
+        <span class="bt-tile bt-tile--lit bt-tile--plano ob-sum">
+          <span class="ob-cena" style="flex:1 1 0;min-height:0">
+            <span class="ob-cartas ob-cartas--leque" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+            </span>
+          </span>
+          <span class="bt-tile__lb">Montar um deck</span>
+        </span>
+        <span class="bt-tile bt-tile--lit bt-tile--noite ob-sum">
+          <span class="ob-cena" style="flex:1 1 0;min-height:0">
+            <span class="ob-cartas ob-cartas--1" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="" style="rotate:-7deg">
+            </span>
+            <svg class="ob-volta" viewBox="0 0 90 96"><path d="M24 34a22 22 0 0 1 42 5"/><path d="M16 25 24.5 35l11-6.5"/></svg>
+          </span>
+          <span class="bt-tile__lb">Voltando ao Magic</span>
+        </span>
+        <span class="bt-tile bt-tile--lit bt-tile--iniciativa ob-sum">
+          <span class="bt-numeral bt-numeral--tile">100</span>
+          <span class="bt-tile__lb">Commander</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="bt-rband ob-band ob-modo" style="opacity:.4">
+      <span class="bt-rband__cap">Escolha como começar</span>
+      <div class="bt-rgrid">
+        <span class="bt-rule bt-rule--on">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5 12.8 8.2 17.5 10 12.8 11.8 11 16.5 9.2 11.8 4.5 10l4.7-1.8z"/><path d="M18 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg></span>
+          <b>Gerar uma base</b>
+          <span class="bt-rule__st">Mais rápido · revisão antes de salvar</span>
+        </span>
+        <span class="bt-rule">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5 4.7 16 15 5.7a1.8 1.8 0 0 1 2.6 0l.7.7a1.8 1.8 0 0 1 0 2.6L8 19.3z"/><path d="M13.6 7.2 16.8 10.4"/></svg></span>
+          <b>Criar do zero</b>
+          <span class="bt-rule__st">Controle carta por carta</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="bt-hint" style="opacity:.4">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 20 6.8v5.4c0 4.5-3.2 7.4-8 8.6-4.8-1.2-8-4.1-8-8.6V6.8z"/><path d="m8.8 12.2 2.2 2.2 4.2-4.6"/></svg></span>
+      <p>A IA prepara uma base para você revisar. <b>Nada é aplicado sem sua confirmação.</b></p>
+    </div>
+
+    <span class="bt-hero bt-hero--ocioso ob-heroi" data-key="onboarding-primary-action"
+          role="status" aria-label="Salvando seu plano">
+      <span class="bt-hero__mid">
+        <span class="bt-hero__lb">Salvando seu plano…</span>
+        <span class="bt-hero__quem">Gerar uma base</span>
+        <span class="bt-hero__sub">Guardando no aparelho</span>
+      </span>
+      <span class="bt-hero__go"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4" style="opacity:.24"/><path class="ob-rosca" d="M12 3.6a8.4 8.4 0 1 1-8.4 8.4"/></svg></span>
+    </span>
+  </div>
+</article>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #erro — falha recuperável; as escolhas continuam aqui
+     ═════════════════════════════════════════════════════════════════════════ -->
+<article class="ob ob--erro" data-key="onboarding-intent-screen">
+  <header class="ob-top">
+    <button class="bt-back" aria-label="Voltar para o contexto"><svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7"/></svg></button>
+    <span class="ob-rota">Seu primeiro passo</span>
+    <button class="ob-glyph" aria-label="Mensagens, 3 não lidas"><svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5v-3.6A2.5 2.5 0 0 1 4 13.5z"/></svg><i class="ob-badge">3</i></button>
+    <button class="ob-glyph" aria-label="Notificações"><svg viewBox="0 0 24 24"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.8 4.8 1.6 5.8.4.5 0 1.2-.6 1.2H5.5c-.6 0-1-.7-.6-1.2.8-1 1.6-2.6 1.6-5.8Z"/><path d="M10 20.2a2.4 2.4 0 0 0 4 0"/></svg></button>
+    <span class="ob-sair">
+      <button class="bt-x bt-x--head" data-key="onboarding-skip-action" aria-label="Pular por enquanto — seu objetivo continua salvo"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span>Pular</span>
+    </span>
+  </header>
+
+  <div class="ob-dots bt-hero__pips" data-key="onboarding-journey-progress" role="group"
+       aria-label="Progresso do onboarding: objetivo escolhido, contexto escolhido, ação pronta">
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-on" style="--bt-c2:var(--bt-latao-400)"></i>
+  </div>
+
+  <div class="ob-cab" data-key="onboarding-intent-hero">
+    <p class="ob-eyebrow">Comece pelo seu jogo</p>
+    <h1 class="ob-h1">Vamos transformar uma ideia em uma lista jogável.</h1>
+  </div>
+
+  <div class="ob-palco">
+    <div class="ob-aviso" data-key="onboarding-persistence-error" role="alert">
+      <div class="bt-rule bt-is-erro">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.8 10.5a8.4 8.4 0 0 1 13.4-5"/><path d="M17.8 2.2v4.2h-4.2"/><path d="M20.2 13.5a8.4 8.4 0 0 1-13.4 5"/><path d="M6.2 21.8v-4.2h4.2"/><path d="M12 8.6v3.6M12 15.4v.1"/></svg></span>
+        <b>Não foi possível salvar seu plano.</b>
+        <span class="bt-rule__st">A navegação foi pausada para evitar perder a escolha</span>
+      </div>
+    </div>
+
+    <button class="bt-lane" data-key="onboarding-persistence-retry">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.7 3.8v5h-5"/></svg>
+      <span><b>Tentar novamente</b><i>Suas escolhas continuam aqui</i></span>
+    </button>
+
+    <div class="bt-rband ob-band">
+      <span class="bt-rband__cap">Seu plano</span>
+      <div class="ob-resumo">
+        <button class="bt-tile bt-tile--lit bt-tile--plano ob-sum" aria-label="Objetivo: Montar um deck. Tocar para trocar.">
+          <span class="ob-cena" style="flex:1 1 0;min-height:0">
+            <span class="ob-cartas ob-cartas--leque" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+            </span>
+          </span>
+          <span class="bt-tile__lb">Montar um deck</span>
+        </button>
+        <button class="bt-tile bt-tile--lit bt-tile--noite ob-sum" aria-label="Momento: Voltando ao Magic. Tocar para trocar.">
+          <span class="ob-cena" style="flex:1 1 0;min-height:0">
+            <span class="ob-cartas ob-cartas--1" style="position:absolute;inset:0">
+              <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="" style="rotate:-7deg">
+            </span>
+            <svg class="ob-volta" viewBox="0 0 90 96"><path d="M24 34a22 22 0 0 1 42 5"/><path d="M16 25 24.5 35l11-6.5"/></svg>
+          </span>
+          <span class="bt-tile__lb">Voltando ao Magic</span>
+        </button>
+        <button class="bt-tile bt-tile--lit bt-tile--iniciativa ob-sum" aria-label="Formato principal: Commander, 100 cartas. Tocar para trocar.">
+          <span class="bt-numeral bt-numeral--tile">100</span>
+          <span class="bt-tile__lb">Commander</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bt-rband ob-band ob-modo">
+      <span class="bt-rband__cap">Escolha como começar</span>
+      <div class="bt-rgrid">
+        <button class="bt-rule bt-rule--on" data-key="onboarding-build-guided" aria-pressed="true">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5 12.8 8.2 17.5 10 12.8 11.8 11 16.5 9.2 11.8 4.5 10l4.7-1.8z"/><path d="M18 14.5l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9z"/></svg></span>
+          <b>Gerar uma base</b>
+          <span class="bt-rule__st">Mais rápido · revisão antes de salvar</span>
+        </button>
+        <button class="bt-rule" data-key="onboarding-build-manual" aria-pressed="false">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5 4.7 16 15 5.7a1.8 1.8 0 0 1 2.6 0l.7.7a1.8 1.8 0 0 1 0 2.6L8 19.3z"/><path d="M13.6 7.2 16.8 10.4"/></svg></span>
+          <b>Criar do zero</b>
+          <span class="bt-rule__st">Controle carta por carta</span>
+        </button>
+      </div>
+    </div>
+
+    <button class="bt-hero bt-hero--ocioso ob-heroi" data-key="onboarding-primary-action onboarding-generate-action">
+      <span class="bt-hero__mid">
+        <span class="bt-hero__lb">Próximo passo</span>
+        <span class="bt-hero__quem">Gerar uma base</span>
+        <span class="bt-hero__sub">Para revisar antes de salvar</span>
+      </span>
+      <span class="bt-hero__go"><svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span>
+    </button>
+  </div>
+</article>
+
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #negado — armazenamento indisponível e nenhum caminho liberado
+     ═════════════════════════════════════════════════════════════════════════ -->
+<article class="ob ob--negado" data-key="onboarding-intent-screen">
+  <header class="ob-top">
+    <span class="ob-rota">Seu primeiro passo</span>
+    <span class="ob-sair">
+      <button class="bt-x bt-x--head" data-key="onboarding-skip-action" aria-label="Pular por enquanto — nada foi marcado como concluído"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span>Pular</span>
+    </span>
+  </header>
+
+  <div class="ob-dots bt-hero__pips" data-key="onboarding-journey-progress" role="group"
+       aria-label="Progresso do onboarding: objetivo pendente, contexto pendente, ação pendente">
+    <i class="bt-on" style="--bt-c2:var(--bt-latao-400)"></i>
+    <i class="bt-out" style="--bt-c2:var(--bt-nevoa-fraca)"></i>
+    <i class="bt-out" style="--bt-c2:var(--bt-nevoa-fraca)"></i>
+  </div>
+
+  <div class="ob-cab" data-key="onboarding-intent-hero">
+    <p class="ob-eyebrow">Comece pelo seu jogo</p>
+    <h1 class="ob-h1">Nada pode ser preparado agora.</h1>
+  </div>
+
+  <div class="ob-palco">
+    <div class="bt-empty bt-is-vazio ob-nada" data-key="onboarding-goal-rail">
+      <span class="bt-empty__ic"><svg viewBox="0 0 24 24"><path d="M3.5 17.5h4a4 4 0 0 0 4-4v-3a4 4 0 0 1 4-4h4"/><path d="M17.5 3.5 21 6.5l-3.5 3"/><path d="M15.5 17.5H21"/></svg></span>
+      <span class="bt-tile__estado" style="top:17px;right:18px">Sem resposta do serviço</span>
+      <span class="ob-nada__slots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="ob-nada__pe">
+        <span class="bt-empty__num">0</span>
+        <span class="bt-empty__lb">Caminhos<br>disponíveis agora</span>
+      </span>
+    </div>
+
+    <div class="ob-aviso" data-key="onboarding-persistence-error" role="alert">
+      <div class="bt-rule bt-is-erro">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="4"/><path d="M8 8.4h8M8 12h8M8 15.6h4.5"/><path d="M3.8 20.2 20.2 3.8"/></svg></span>
+        <b>Não foi possível confirmar seu progresso salvo.</b>
+        <span class="bt-rule__st">Armazenamento indisponível neste aparelho</span>
+      </div>
+    </div>
+
+    <button class="bt-lane ob-lane-2" data-key="onboarding-persistence-retry">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"/><path d="M20.7 3.8v5h-5"/></svg>
+      <span><b>Tentar novamente</b><i>Relê o progresso salvo</i></span>
+    </button>
+
+    <div class="bt-hint">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2 20 6.8v5.4c0 4.5-3.2 7.4-8 8.6-4.8-1.2-8-4.1-8-8.6V6.8z"/><path d="M12 8.6v4.2M12 16v.1"/></svg></span>
+      <p>Sem os caminhos, só dá para <b>pular por enquanto</b>. Nada foi marcado como concluído e tentar de novo não recarrega a lista.</p>
+    </div>
+  </div>
+</article>
+
+<p class="bt-sr" id="ob-anuncio" role="status"></p>
+
+<script>
+(function () {
+  var validos = ['vazio', 'preenchido', 'carregando', 'erro', 'retomado', 'negado'];
+  function aplicar() {
+    var h = (location.hash || '').replace('#', '');
+    document.body.dataset.estado = validos.indexOf(h) >= 0 ? h : 'vazio';
+  }
+  window.addEventListener('hashchange', aplicar);
+  aplicar();
+})();
+</script>
+</body>
+</html>

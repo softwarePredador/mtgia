@@ -1,0 +1,733 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   BrewTact · kit visual "Vitral com a disciplina dos Azulejos vivos"
+   ───────────────────────────────────────────────────────────────────────────────
+   A régua é o protótipo do contador de vida:
+     docs/design/life-counter-prototype/mesa-brewtact.html        (manda quando diverge)
+     docs/design/life-counter-prototype/design/vitral/menu.html   (direção de vitral)
+     docs/design/life-counter-prototype/design/azulejos-vivos/menu.html (disciplina)
+
+   Mapa de significado — vale em TODA tela do app:
+     vidro escuro com filete marfim ....... ação neutra, sem estado
+     cor cheia (vitral, brilho diagonal) .. algo está VALENDO agora
+     latão cheio .......................... a jogada principal da tela e o SELECIONADO
+     contorno tracejado em latão .......... vazio, sem dono
+     brasa ................................ encerra ou destrói; pede dois toques
+   Um herói por tela. Um único ✕. Objeto, não campo.
+
+   Tudo aqui é prefixado bt- de propósito: o README do protótipo registra que classes
+   genéricas (.half, .picker) já colidiram e quebraram telas em silêncio.
+   Valores copiados do protótipo sem arredondar. O que o protótipo não tem está
+   marcado com /* DERIVADO: não existe no protótipo *​/ e foi deduzido do mapa acima.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── fontes locais ──────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: "Fraunces";
+  src: url(../../../app/assets/lotus/fonts/Fraunces.ttf) format("truetype");
+  font-weight: 100 900; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: "Inter";
+  src: url(../../../app/assets/lotus/fonts/Inter.ttf) format("truetype");
+  font-weight: 100 900; font-style: normal; font-display: block;
+}
+
+/* ── tokens ─────────────────────────────────────────────────────────────────── */
+:root {
+  /* superfície */
+  --bt-obsidiana-950: #0B0D12;
+  --bt-obsidiana-900: #151821;
+  --bt-ardosia-850: #1D222C;
+  --bt-ardosia-750: #293041;
+
+  /* tinta */
+  --bt-marfim: #F3EFE3;
+  --bt-nevoa: #B8C0CC;
+  --bt-nevoa-fraca: #8A93A3;
+
+  /* latão — único destaque da marca */
+  --bt-latao-400: #E0A93B;
+  --bt-latao-500: #C58B2A;
+  --bt-latao-700: #8E641B;
+  --bt-latao-claro: #F4CB6C;   /* topo do gradiente de latão */
+  --bt-latao-rotulo: #EBCB8B;  /* rótulo dentro da peça tracejada */
+
+  /* brasa e gelo */
+  --bt-brasa: #FF8A80;         /* brasa como TINTA (ícone, rótulo, aro armado) */
+  --bt-brasa-cheia: #B5402B;   /* brasa como VITRAL cheio (destruir em destaque) */
+  --bt-gelo-400: #6FA8DC;      /* é noite no hub */
+
+  /* vitral: a cor de cada peça acesa */
+  --bt-vitral-noite: #2B3274;      --bt-vitral-noite-2: #12163F;
+  --bt-vitral-dia: #3E8FC9;        --bt-vitral-dia-2: #E0A24A;
+  --bt-vitral-plano: #5B3A8C;      --bt-vitral-plano-2: #23163F;
+  --bt-vitral-coroa: #9A6A1E;      --bt-vitral-coroa-2: #4E2C10;
+  --bt-vitral-coroa-ic: #FFD98A;
+  --bt-vitral-iniciativa: #2F6C8C; --bt-vitral-iniciativa-2: #12303F;
+
+  /* assentos: a cor pertence ao jogador, nunca a um botão */
+  --bt-assento-brasa: #A83A27;
+  --bt-assento-ambar: #855614;
+  --bt-assento-musgo: #356B45;
+  --bt-assento-mare: #1D6985;
+  --bt-assento-indigo: #3B4699;
+  --bt-assento-ameixa: #7A3B86;
+  --bt-assento-ferro: #4A5260;
+  --bt-assento-vinho: #7A2340;
+  --bt-assento-cobre: #8A4A20;
+  --bt-assento-pinho: #245C58;
+
+  /* tipos */
+  --bt-ui: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --bt-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+
+  /* raios */
+  --bt-raio-azulejo: 22px;   /* azulejo, peça de escolha */
+  --bt-raio-regra: 20px;     /* peça-regra, peça-numeral */
+  --bt-raio-painel: 18px;    /* card de jogador na mesa */
+  --bt-raio-dica: 16px;      /* cartão de texto curto */
+  --bt-raio-mini: 12px;      /* miniatura dentro da peça */
+  --bt-raio-mini-tile: 10px; /* miniatura dentro do azulejo */
+  --bt-raio-pilula: 999px;
+
+  /* espaçamentos */
+  --bt-gap-mesa: 6px;
+  --bt-gap-azulejo: 8px;
+  --bt-gap-peca: 10px;
+  --bt-gap-regra: 10px;
+  --bt-pad-azulejo: 12px 14px 11px;
+  --bt-pad-peca: 11px 12px 9px;
+  --bt-pad-regra: 12px 14px;
+  --bt-col-conteudo: 560px;  /* coluna de leitura do véu */
+  --bt-col-mesa: 780px;      /* largura máxima da grade de azulejos */
+
+  /* sombras */
+  --bt-sombra-azulejo:
+    inset 0 0 0 1.5px rgba(243,239,227,.10),
+    inset 0 1.5px 0 rgba(255,255,255,.10),
+    0 8px 18px rgba(0,0,0,.45);
+  --bt-sombra-lit:
+    inset 0 0 0 1.5px rgba(243,239,227,.17),
+    inset 0 1.5px 0 rgba(255,255,255,.30),
+    inset 0 -10px 22px rgba(0,0,0,.16),
+    0 10px 22px rgba(0,0,0,.5),
+    0 0 0 3px rgba(11,13,18,.85);
+  --bt-sombra-latao:
+    inset 0 1.5px 0 rgba(255,255,255,.45),
+    0 10px 22px rgba(0,0,0,.5),
+    0 0 0 3px rgba(11,13,18,.85);
+  --bt-sombra-peca:
+    inset 0 0 0 1.5px rgba(243,239,227,.09),
+    inset 0 1.5px 0 rgba(255,255,255,.10),
+    0 8px 18px rgba(0,0,0,.45);
+  --bt-sombra-selecionado:
+    inset 0 1.5px 0 rgba(255,255,255,.45),
+    0 0 0 3px var(--bt-obsidiana-950),
+    0 0 0 5px rgba(224,169,59,.55),
+    0 12px 30px rgba(224,169,59,.28);
+  --bt-sombra-armado:
+    inset 0 0 0 2px var(--bt-latao-400),
+    0 0 0 3px var(--bt-obsidiana-950),
+    0 0 0 5px rgba(224,169,59,.35);
+  --bt-sombra-x:
+    inset 0 0 0 2px var(--bt-latao-400),
+    0 0 0 7px var(--bt-obsidiana-950),
+    0 0 0 8.5px rgba(224,169,59,.28),
+    0 10px 26px rgba(0,0,0,.7);
+  --bt-sombra-livre: 0 8px 18px rgba(0,0,0,.45);
+
+  /* gradientes */
+  --bt-grad-azulejo: linear-gradient(160deg, rgba(41,48,65,.88), rgba(21,24,33,.95));
+  --bt-grad-peca: linear-gradient(160deg, rgba(41,48,65,.84), rgba(21,24,33,.94));
+  --bt-grad-latao: linear-gradient(158deg, #F4CB6C 0%, var(--bt-latao-400) 40%, var(--bt-latao-500) 100%);
+  --bt-grad-latao-peca: linear-gradient(158deg, #F4CB6C 0%, var(--bt-latao-400) 42%, var(--bt-latao-500) 100%);
+  --bt-grad-livre: linear-gradient(158deg, #2b2114, #1a1610);
+  --bt-brilho-diagonal:
+    linear-gradient(115deg, rgba(255,255,255,.13) 0 34%, transparent 34.2%),
+    linear-gradient(200deg, transparent 0 72%, rgba(0,0,0,.10) 72.2%);
+
+  /* véu da tela secundária */
+  --bt-veu-menu: radial-gradient(ellipse at 50% 50%, rgba(11,13,18,.42), rgba(11,13,18,.78));
+  --bt-veu-folha: radial-gradient(ellipse at 50% 40%, rgba(11,13,18,.80), rgba(11,13,18,.93));
+  --bt-blur-menu: blur(3px) saturate(.8);
+  --bt-blur-folha: blur(8px) saturate(.8);
+
+  --bt-tracejado: 2px dashed rgba(224,169,59,.5);
+  --bt-filete: 1px solid rgba(243,239,227,.10);
+
+  color-scheme: dark;
+}
+
+/* ── base ───────────────────────────────────────────────────────────────────── */
+.bt-base {
+  background: var(--bt-obsidiana-950);
+  color: var(--bt-marfim);
+  font: 500 14px/1.4 var(--bt-ui);
+  -webkit-font-smoothing: antialiased;
+}
+/* :where() zera a especificidade: o reset de botão NUNCA pode ganhar de uma peça do kit.
+   Sem isso `background: none` apaga o latão de todo azulejo que é <button>. */
+:where(.bt-base) button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; touch-action: manipulation; }
+:where(.bt-base) :focus-visible { outline: 2px solid var(--bt-latao-400); outline-offset: 2px; }
+.bt-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ═══ 1 · bt-tile — o azulejo ═════════════════════════════════════════════════
+   Ícone no alto à esquerda · rótulo em caixa alta embaixo · estado no alto à direita.
+   Fonte: mesa-brewtact.html `.menu .t` e derivadas.                              */
+.bt-tile {
+  --bt-c: #2A3142;
+  position: relative; overflow: hidden; min-width: 0;
+  border-radius: var(--bt-raio-azulejo);
+  padding: var(--bt-pad-azulejo);
+  text-align: left;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
+  color: var(--bt-marfim);
+  background: var(--bt-grad-azulejo);
+  box-shadow: var(--bt-sombra-azulejo);
+  box-sizing: border-box;
+  transition: scale .12s;
+}
+.bt-tile:active { scale: .97; }
+.bt-tile > * { position: relative; }
+
+.bt-tile__ic { width: 34px; height: 34px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.bt-tile__ic .bt-f { fill: currentColor; stroke: none; }
+.bt-tile__lb { font: 800 11.5px/1.18 var(--bt-ui); letter-spacing: .085em; text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.bt-tile__sub { font: 700 11px/1 var(--bt-ui); letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(243,239,227,.72); }
+.bt-tile__estado { position: absolute; top: 12px; right: 13px; font: 700 17px/1 var(--bt-display);
+  text-align: right; max-width: 62%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bt-tile__estado--off { font: 700 10.5px/1 var(--bt-ui); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--bt-nevoa-fraca); top: 15px; }
+.bt-tile__estado .bt-dotp { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+  margin-right: 5px; box-shadow: 0 0 0 1.5px rgba(243,239,227,.85);
+  /* DERIVADO: no protótipo a cor do ponto vem inline (é a cor do jogador). Aqui só o padrão. */
+  background: var(--bt-c2, var(--bt-latao-500)); }
+
+/* cor cheia: só para o que está VALENDO agora */
+.bt-tile--lit {
+  background: linear-gradient(158deg,
+    color-mix(in srgb, var(--bt-c) 78%, #fff) 0%,
+    var(--bt-c) 42%,
+    var(--bt-c2, color-mix(in srgb, var(--bt-c) 66%, #000)) 100%);
+  box-shadow: var(--bt-sombra-lit);
+}
+.bt-tile--lit::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--bt-brilho-diagonal);
+}
+
+/* latão cheio: a jogada principal e tudo que está SELECIONADO */
+.bt-tile--sel {
+  background: var(--bt-grad-latao);
+  color: var(--bt-obsidiana-950);
+  box-shadow: var(--bt-sombra-latao);
+}
+/* o brilho vem de `.menu .hero::before`: no protótipo o único azulejo de latão cheio é o herói. */
+.bt-tile--sel::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--bt-brilho-diagonal); }
+.bt-tile--sel .bt-tile__lb { text-shadow: none; }
+.bt-tile--sel .bt-tile__sub { color: rgba(11,13,18,.7); }
+
+/* tracejado em latão: vazio, sem dono */
+.bt-tile--livre { background: var(--bt-grad-livre); box-shadow: var(--bt-sombra-livre); }
+.bt-tile--livre::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: var(--bt-tracejado); border-radius: var(--bt-raio-azulejo); }
+.bt-tile--livre .bt-tile__ic { color: var(--bt-latao-400); }
+.bt-tile--livre .bt-tile__lb { color: var(--bt-latao-rotulo); }
+.bt-tile--livre .bt-tile__estado { font: 700 11px/1 var(--bt-ui); letter-spacing: .06em;
+  text-transform: uppercase; color: var(--bt-nevoa); }
+
+/* brasa: encerra ou destrói. Tinta primeiro; vitral cheio só quando a destruição é o herói. */
+.bt-tile--brasa .bt-tile__ic, .bt-tile--brasa .bt-tile__lb { color: var(--bt-brasa); }
+.bt-tile--brasa-cheia { --bt-c: var(--bt-brasa-cheia); }
+.bt-tile--armado { box-shadow: inset 0 0 0 2px var(--bt-brasa), 0 8px 18px rgba(0,0,0,.45); }
+
+/* paleta de vitral já batizada pelo protótipo */
+.bt-tile--noite { --bt-c: var(--bt-vitral-noite); --bt-c2: var(--bt-vitral-noite-2); }
+.bt-tile--dia { --bt-c: var(--bt-vitral-dia); --bt-c2: var(--bt-vitral-dia-2); }
+.bt-tile--plano { --bt-c: var(--bt-vitral-plano); --bt-c2: var(--bt-vitral-plano-2); }
+.bt-tile--coroa { --bt-c: var(--bt-vitral-coroa); --bt-c2: var(--bt-vitral-coroa-2); }
+.bt-tile--coroa .bt-tile__ic { color: var(--bt-vitral-coroa-ic); }
+.bt-tile--iniciativa { --bt-c: var(--bt-vitral-iniciativa); --bt-c2: var(--bt-vitral-iniciativa-2); }
+
+/* ═══ 2 · bt-numeral — o numeral serifado ═════════════════════════════════════
+   Fraunces, lining-nums tabular-nums, entrelinha .72–.8, dimensionado pelo espaço real.
+   Fonte: mesa-brewtact.html `.life`, `.menu .num`, `.menu .hero .num`, `.p .num`, `.v .num`. */
+.bt-numeral {
+  display: block; font-family: var(--bt-display); font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
+  /* opsz fica em `auto`: mesa-brewtact.html (a régua) não fixa o eixo óptico, então o
+     numeral engorda junto com o tamanho. Fixar "opsz" 144 — como faz o mock vitral —
+     deixa o 20 de 36px com hairline fina e um desenho diferente do de vt-04-regras.png. */
+  font-optical-sizing: auto;
+  letter-spacing: -.02em; line-height: .8;
+  text-shadow: 0 3px 8px rgba(0,0,0,.35);
+}
+.bt-numeral--tile { font-size: 56px; }
+.bt-numeral--tile-pequeno { font-size: 32px; line-height: 1; color: var(--bt-nevoa); text-shadow: none; }
+.bt-numeral--hero { font-size: 70px; text-shadow: 0 1px 0 rgba(255,255,255,.35); }
+/* na mesa o numeral é medido pelo CARD, não pela tela: ~60% da altura do card */
+.bt-numeral--mesa {
+  font-weight: 600; line-height: .72; letter-spacing: -.03em;
+  font-size: min(calc((100cqh - 2 * 38px) * 1.38), 38cqw);
+  text-shadow: 0 2px 0 rgba(0,0,0,.18);
+}
+.bt-numeral--mesa.bt-is-wide { font-size: min(calc((100cqh - 2 * 38px) * 1.38), 26cqw); }
+
+/* ═══ 3 · bt-board — a grade por linhas ═══════════════════════════════════════
+   Linhas de flex, tudo visível de uma vez, nada rola. Fonte: `.menu`, `.mrow`, `.f1`, `.f2`. */
+.bt-board {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: var(--bt-gap-azulejo); box-sizing: border-box;
+}
+.bt-board__row { display: flex; gap: var(--bt-gap-azulejo); width: min(100%, var(--bt-col-mesa)); min-height: 0; }
+.bt-board__row--alta { flex: 112 1 0; max-height: 128px; }
+.bt-board__row--heroi { flex: 120 1 0; max-height: 136px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 80px minmax(0, 1fr); gap: 0; }
+.bt-board__pair { display: flex; gap: var(--bt-gap-azulejo); min-width: 0; }
+.bt-f1 { flex: 1 1 0; min-width: 0; }
+.bt-f2 { flex: 2 1 0; min-width: 0; }
+
+/* a mesa viva embaixo: card de jogador. Fonte: `.panel`, `.core`. */
+.bt-panel {
+  position: relative; min-width: 0; min-height: 0; border-radius: var(--bt-raio-painel); overflow: hidden;
+  container-type: size;
+  background:
+    radial-gradient(120% 90% at 82% 0%, rgba(255,255,255,.10), transparent 55%),
+    radial-gradient(110% 100% at 0% 100%, rgba(0,0,0,.34), transparent 62%),
+    var(--bt-bg, var(--bt-assento-indigo));
+  box-shadow: inset 0 0 0 1px rgba(243,239,227,.10);
+}
+.bt-panel__core { position: absolute; inset: 38px 0; display: grid; place-items: center; pointer-events: none; }
+
+/* ═══ 4 · bt-overlay — a tela secundária ══════════════════════════════════════
+   A mesa continua embaixo, escurecida e desfocada. Um único ✕; a seta volta ao menu.
+   Fonte: `.sheet`, `.sheet-head`, `.sheet-body`, `.menu` (véu), `.back`, `.x`, `.band .x`. */
+.bt-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  display: flex; flex-direction: column; box-sizing: border-box;
+  background: var(--bt-veu-folha);
+  -webkit-backdrop-filter: var(--bt-blur-folha); backdrop-filter: var(--bt-blur-folha);
+  animation: bt-fade .16s ease;
+}
+.bt-overlay--menu {
+  background: var(--bt-veu-menu);
+  -webkit-backdrop-filter: var(--bt-blur-menu); backdrop-filter: var(--bt-blur-menu);
+  align-items: center; justify-content: center;
+}
+.bt-overlay__head {
+  display: flex; align-items: center; gap: 10px; padding: 12px 10px 6px 18px; flex: none;
+  width: min(100%, var(--bt-col-conteudo)); margin-inline: auto; box-sizing: border-box;
+}
+.bt-overlay__title { margin: 0; font: 600 22px/1.15 var(--bt-display); text-wrap: balance; flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; }
+.bt-overlay__body { overflow-y: auto; padding: 4px 18px 18px; display: grid; gap: 16px;
+  overscroll-behavior: contain; align-content: start;
+  width: min(100%, var(--bt-col-conteudo)); margin-inline: auto; box-sizing: border-box; }
+
+/* a seta de volta no cabeçalho */
+.bt-back { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  color: var(--bt-nevoa); flex: none; }
+.bt-back svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; }
+
+/* o ✕ único: círculo escuro com aro de latão, no mesmo ponto da mesa */
+.bt-x { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  color: var(--bt-marfim); background: var(--bt-obsidiana-950); box-shadow: var(--bt-sombra-x); }
+.bt-x svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+/* o mesmo ✕ quando mora no cabeçalho de uma folha que rola */
+.bt-x--head { width: 44px; height: 44px; background: var(--bt-ardosia-850);
+  box-shadow: inset 0 0 0 1px var(--bt-ardosia-750); }
+.bt-x--head svg { width: 18px; height: 18px; }
+.bt-x--armado { box-shadow: inset 0 0 0 2px var(--bt-latao-400); color: var(--bt-latao-400); }
+
+/* ═══ 5 · bt-hero — o herói de latão ══════════════════════════════════════════
+   Numeral + divisor + rótulo + nome Fraunces + pips + botão redondo escuro com seta.
+   Um por tela. Fonte: `.menu .hero`, `.menu .ordem`, `.menu .go`.                */
+.bt-hero {
+  position: relative; overflow: hidden; border-radius: var(--bt-raio-azulejo);
+  display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px;
+  padding: 10px 14px 10px 16px; text-align: left; box-sizing: border-box;
+  color: var(--bt-obsidiana-950);
+  background: var(--bt-grad-latao);
+  box-shadow: var(--bt-sombra-latao);
+}
+.bt-hero::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--bt-brilho-diagonal); }
+.bt-hero > * { position: relative; }
+.bt-hero__turno { display: flex; flex-direction: column; align-items: center; gap: 6px;
+  min-width: 56px; min-height: 64px; color: inherit; }
+.bt-hero__sub { font: 700 11px/1 var(--bt-ui); letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(11,13,18,.7); }
+.bt-hero__mid { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;
+  padding-left: 12px; border-left: 2px solid rgba(11,13,18,.18); }
+.bt-hero__lb { font: 800 11.5px/1.18 var(--bt-ui); letter-spacing: .085em; text-transform: uppercase; text-shadow: none; }
+.bt-hero__quem { font: 700 30px/1 var(--bt-display); letter-spacing: -.01em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bt-hero--ocioso .bt-hero__turno { display: none; }
+.bt-hero--ocioso .bt-hero__mid { border-left: 0; padding-left: 2px; }
+.bt-hero__pips { display: flex; align-items: center; gap: 5px; margin-top: 2px; }
+.bt-hero__pips i { width: 13px; height: 13px; border-radius: 5px; box-shadow: 0 0 0 2px rgba(11,13,18,.85);
+  /* DERIVADO: no protótipo cada pip recebe a cor do jogador inline. Aqui só o padrão. */
+  background: var(--bt-c2, var(--bt-assento-ferro)); }
+.bt-hero__pips i.bt-on { width: 28px; }
+.bt-hero__pips i.bt-out { opacity: .3; }
+.bt-hero__go { width: 56px; height: 56px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  background: var(--bt-obsidiana-950);
+  box-shadow: 0 6px 14px rgba(0,0,0,.4), inset 0 0 0 2px rgba(224,169,59,.55); }
+.bt-hero__go svg { width: 27px; height: 27px; fill: none; stroke: var(--bt-latao-400); stroke-width: 2.4;
+  stroke-linecap: round; stroke-linejoin: round; }
+
+/* ═══ bt-piece — peça de escolha com miniatura ════════════════════════════════
+   A escolha vale no toque e mostra o próprio valor dentro dela. Fonte: `.p`, `.seats`. */
+.bt-piece {
+  flex: 1 1 0; min-width: 0; border-radius: var(--bt-raio-azulejo); padding: var(--bt-pad-peca);
+  display: flex; flex-direction: column; justify-content: space-between; align-items: stretch;
+  text-align: left; box-sizing: border-box; position: relative;
+  background: var(--bt-grad-peca);
+  box-shadow: var(--bt-sombra-peca);
+  transition: scale .12s;
+}
+.bt-piece:active { scale: .97; }
+.bt-piece__num { font: 700 38px/.85 var(--bt-display); font-variant-numeric: lining-nums;
+  font-optical-sizing: auto; color: var(--bt-nevoa); margin-top: 6px; }
+.bt-piece__foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; }
+.bt-piece__cap { font: 700 11px/1 var(--bt-ui); letter-spacing: .08em; text-transform: uppercase;
+  color: var(--bt-nevoa-fraca); padding-bottom: 3px; }
+.bt-piece--on { background: var(--bt-grad-latao-peca); box-shadow: var(--bt-sombra-selecionado); }
+.bt-piece--on .bt-seats { background: var(--bt-obsidiana-950); }
+.bt-piece--on .bt-piece__num { color: var(--bt-obsidiana-950); font-size: 44px; }
+.bt-piece--on .bt-piece__cap { color: rgba(11,13,18,.75); }
+.bt-piece--armado { box-shadow: var(--bt-sombra-armado); }
+.bt-piece--armado .bt-piece__num { color: var(--bt-latao-400); }
+
+/* a miniatura da mesa real, nas cores dos assentos */
+.bt-seats { display: grid; gap: 3px; width: 104px; height: 50px; padding: 3px;
+  border-radius: var(--bt-raio-mini-tile); background: rgba(11,13,18,.7); box-sizing: border-box; }
+.bt-seats .bt-ln { display: flex; gap: 3px; min-height: 0; }
+.bt-seats b { flex: 1; border-radius: 4px; background: var(--bt-marfim); }
+.bt-seats .bt-ln.bt-up b { border-radius: 6px 6px 3px 3px; }
+.bt-seats .bt-ln.bt-dn b { border-radius: 3px 3px 6px 6px; }
+.bt-piece .bt-seats { width: 100%; height: auto; flex: 1 1 0; max-height: 66px; min-height: 30px;
+  background: rgba(11,13,18,.8); border-radius: var(--bt-raio-mini); padding: 4px; gap: 4px; }
+.bt-piece .bt-seats .bt-ln { gap: 4px; flex: 1; }
+
+/* ═══ bt-vpiece — peça-numeral ════════════════════════════════════════════════
+   Escolher um número entre poucos (20/30/40, 5/10/20). Fonte: `.v`, `.vcap`.     */
+.bt-vpiece { width: 70px; height: 58px; flex: none; border-radius: var(--bt-raio-regra);
+  display: grid; place-items: center; box-sizing: border-box;
+  background: rgba(29,34,44,.8); box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.13);
+  transition: scale .12s; }
+.bt-vpiece:active { scale: .97; }
+.bt-vpiece__num { font: 700 36px/1 var(--bt-display); font-variant-numeric: lining-nums;
+  font-optical-sizing: auto; color: var(--bt-nevoa); translate: 0 -2px; }
+.bt-vpiece--outro .bt-vpiece__num { font-size: 30px; }
+.bt-vpiece--on { background: var(--bt-grad-latao-peca);
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,.45), 0 0 0 3px var(--bt-obsidiana-950), 0 0 0 5px rgba(224,169,59,.55); }
+.bt-vpiece--on .bt-vpiece__num { color: var(--bt-obsidiana-950); font-size: 40px; }
+.bt-vpiece--armado { box-shadow: var(--bt-sombra-armado); }
+.bt-vpiece--armado .bt-vpiece__num { color: var(--bt-latao-400); }
+.bt-vcap { display: grid; justify-items: center; gap: 3px; margin-right: 2px;
+  font: 800 10.5px/1.15 var(--bt-ui); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--bt-nevoa); text-align: center; }
+.bt-vcap svg { width: 22px; height: 22px; color: #D9695A; }
+.bt-vrow { display: flex; gap: var(--bt-gap-azulejo); flex-wrap: wrap; }
+
+/* ═══ bt-rule — peça-regra que acende e diz VALE ══════════════════════════════
+   Substitui o interruptor. Fonte: `.rt`, `.rgrid`.                               */
+.bt-rule { position: relative; min-height: 96px; border-radius: var(--bt-raio-regra); padding: var(--bt-pad-regra);
+  display: grid; grid-template-rows: auto 1fr auto; justify-items: start; gap: 6px; text-align: left;
+  box-sizing: border-box; color: var(--bt-nevoa);
+  background: var(--bt-grad-peca);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.09), 0 8px 18px rgba(0,0,0,.4);
+  transition: scale .12s; }
+.bt-rule:active { scale: .97; }
+.bt-rule__ico { width: 26px; height: 26px; }
+.bt-rule__ico svg { width: 26px; height: 26px; }
+.bt-rule b { font: 700 14px/1.2 var(--bt-ui); color: var(--bt-marfim); }
+.bt-rule__st { font: 800 11px/1 var(--bt-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--bt-nevoa-fraca); }
+.bt-rule--on { background: var(--bt-grad-latao-peca); color: var(--bt-obsidiana-950);
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,.45), 0 0 0 3px var(--bt-obsidiana-950), 0 0 0 5px rgba(224,169,59,.45); }
+.bt-rule--on b { color: var(--bt-obsidiana-950); }
+.bt-rule--on .bt-rule__st { color: rgba(11,13,18,.72); }
+.bt-rule--sm { min-height: 58px; width: 84px; flex: none; grid-template-rows: auto auto;
+  align-content: center; justify-items: center; text-align: center; gap: 4px; padding: 8px; }
+.bt-rgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--bt-gap-regra); }
+.bt-rband { display: grid; gap: 0; }
+.bt-rband__cap { display: block; font: 800 11px/1 var(--bt-ui); letter-spacing: .12em; text-transform: uppercase;
+  color: var(--bt-nevoa); margin-bottom: 7px; }
+
+/* cartão de dica: texto curto que acompanha as regras. Fonte: `.gt`. */
+.bt-hint { display: flex; gap: 10px; align-items: flex-start; border-radius: var(--bt-raio-dica);
+  padding: 10px 12px; background: rgba(29,34,44,.6); }
+.bt-hint__ico { width: 20px; height: 20px; flex: none; color: var(--bt-latao-400); margin-top: 1px; }
+.bt-hint p { margin: 0; font: 500 12px/1.4 var(--bt-ui); color: var(--bt-nevoa); }
+.bt-hint p b { color: var(--bt-marfim); }
+
+/* ═══ bt-footer — rodapé de ação fora da área que rola ════════════════════════
+   Nunca cobre conteúdo. Fonte: `.sheet > .btns`.                                 */
+.bt-footer { flex: none; align-self: center; width: 100%; max-width: var(--bt-col-conteudo);
+  padding: 10px 18px 14px; box-sizing: border-box; border-top: var(--bt-filete); background: transparent;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--bt-gap-azulejo); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   PEÇAS DAS PROVAS NOVAS (vt-05-jogador · vt-06-dados · vt-07-quem-comeca)
+   Publicadas depois da primeira extração. Valores copiados de mesa-brewtact.html.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ bt-result — resultado herói ═════════════════════════════════════════════
+   O numeral gigante é o próprio resultado: apagado com "?" enquanto não há valor,
+   latão cheio quando há. Um por tela. Fonte: `.dx-hero`, `.dx-hero.has`.          */
+.bt-result { border-radius: var(--bt-raio-azulejo); min-height: 172px; box-sizing: border-box;
+  display: grid; place-items: center; align-content: center; gap: 4px;
+  color: var(--bt-nevoa); background: var(--bt-grad-peca);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.09), 0 8px 18px rgba(0,0,0,.45); }
+.bt-result__num { font: 700 92px/.85 var(--bt-display); font-variant-numeric: lining-nums;
+  font-optical-sizing: auto; letter-spacing: -.03em; }
+.bt-result__num.bt-is-longo { font-size: 46px; line-height: 1; }
+.bt-result__cap { font: 800 11px/1 var(--bt-ui); letter-spacing: .12em; text-transform: uppercase; }
+.bt-result--tem { color: var(--bt-obsidiana-950); background: var(--bt-grad-latao-peca);
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,.45), 0 0 0 3px var(--bt-obsidiana-950),
+    0 0 0 5px rgba(224,169,59,.45), 0 12px 30px rgba(224,169,59,.22); }
+
+/* ═══ bt-shape — peça-forma ═══════════════════════════════════════════════════
+   A forma do objeto desenhada em SVG, com o nome embaixo: substitui botão com texto.
+   Fonte: `.dx-die`, `.dx-grid`.                                                   */
+.bt-shapegrid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--bt-gap-azulejo); }
+.bt-shape { min-height: 82px; border-radius: var(--bt-raio-regra); box-sizing: border-box;
+  display: grid; justify-items: center; align-content: center; gap: 5px; color: var(--bt-marfim);
+  background: var(--bt-grad-peca);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.09), inset 0 1.5px 0 rgba(255,255,255,.10),
+    0 6px 14px rgba(0,0,0,.4);
+  transition: scale .12s; }
+.bt-shape:active { scale: .95; }
+.bt-shape svg { width: 40px; height: 40px; fill: rgba(243,239,227,.07); stroke: currentColor;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); }
+.bt-shape svg .bt-f { fill: currentColor; stroke: none; }
+.bt-shape__cap { font: 800 11px/1 var(--bt-ui); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--bt-nevoa); }
+
+/* ═══ bt-lane — faixa de ação ═════════════════════════════════════════════════
+   Uma linha inteira que é um objeto: ícone de latão + título em serifa + linha em
+   caixa alta. Nunca um item de lista com chevron. Fonte: `.dx-start`.             */
+.bt-lane { min-height: 64px; border-radius: var(--bt-raio-regra); box-sizing: border-box;
+  display: flex; align-items: center; gap: 14px; padding: 0 18px; text-align: left;
+  color: var(--bt-marfim); background: var(--bt-grad-peca);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.09), 0 6px 14px rgba(0,0,0,.4);
+  transition: scale .12s; }
+.bt-lane:active { scale: .97; }
+.bt-lane svg { width: 28px; height: 28px; color: var(--bt-latao-400); flex: none; }
+.bt-lane span { display: grid; gap: 3px; min-width: 0; }
+.bt-lane b { font: 700 17px/1 var(--bt-display); }
+.bt-lane i { font: 600 11px/1 var(--bt-ui); font-style: normal; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--bt-nevoa); }
+
+/* ═══ bt-score — fileira de jogadores com valor ═══════════════════════════════
+   Cada jogador é um card na cor DELE (cor cheia: o valor está valendo), com o
+   numeral dentro. O vencedor ganha aro de latão e etiqueta de latão — nunca uma
+   linha de tabela. Fonte: `.dx-hr`, `.dx-p`, `.dx-p.win`, `.dx-again`.            */
+.bt-scorerow { display: flex; gap: var(--bt-gap-azulejo); min-width: 0; }
+.bt-score { --bt-c: var(--bt-assento-indigo); flex: 1 1 0; min-width: 0; min-height: 64px;
+  border-radius: var(--bt-raio-painel); padding: 8px 10px; position: relative; box-sizing: border-box;
+  display: grid; align-content: center; gap: 2px; text-align: left; color: var(--bt-marfim);
+  background: linear-gradient(158deg,
+    color-mix(in srgb, var(--bt-c) 80%, #fff) 0%,
+    var(--bt-c) 45%,
+    color-mix(in srgb, var(--bt-c) 68%, #000) 100%);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.16), 0 6px 14px rgba(0,0,0,.4); }
+.bt-score__num { font: 700 30px/.9 var(--bt-display); font-variant-numeric: lining-nums;
+  font-optical-sizing: auto; }
+.bt-score b { font: 700 11px/1.1 var(--bt-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bt-score__tag { position: absolute; top: 7px; right: 8px; font: 800 9px/1 var(--bt-ui);
+  letter-spacing: .08em; text-transform: uppercase; background: var(--bt-latao-400);
+  color: var(--bt-obsidiana-950); border-radius: var(--bt-raio-pilula); padding: 3px 6px; }
+.bt-score--vence { box-shadow: 0 0 0 3px var(--bt-obsidiana-950), 0 0 0 5px var(--bt-latao-400),
+  0 8px 20px rgba(224,169,59,.3); }
+.bt-again { width: 56px; flex: none; border-radius: var(--bt-raio-painel); display: grid; place-items: center;
+  color: var(--bt-nevoa); background: rgba(29,34,44,.8);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.10); }
+.bt-again svg { width: 22px; height: 22px; }
+
+/* ═══ bt-live — o bloco que está valendo, na cor do dono ══════════════════════
+   Vitral na cor do jogador porque aquela vida está valendo agora; os controles
+   moram DENTRO da peça, escavados no próprio vidro (nunca botões flutuando).
+   Fonte: `.pf-life`, `.pf-row`, `.pf-st`, `.pf-pad`.                              */
+.bt-live { --bt-c: var(--bt-assento-indigo); border-radius: var(--bt-raio-azulejo); padding: 12px 14px;
+  display: grid; gap: 8px; align-content: start; box-sizing: border-box; color: var(--bt-marfim);
+  background: linear-gradient(158deg,
+    color-mix(in srgb, var(--bt-c) 80%, #fff) 0%,
+    var(--bt-c) 45%,
+    color-mix(in srgb, var(--bt-c) 66%, #000) 100%);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.17), inset 0 1.5px 0 rgba(255,255,255,.28),
+    0 10px 22px rgba(0,0,0,.45); }
+.bt-live__cap { display: block; font: 800 11px/1 var(--bt-ui); letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(243,239,227,.8); }
+.bt-live__row { display: flex; align-items: center; justify-content: space-between; gap: var(--bt-gap-azulejo); }
+.bt-live__num { font: 700 64px/.9 var(--bt-display); font-variant-numeric: lining-nums tabular-nums;
+  font-optical-sizing: auto; letter-spacing: -.03em; text-shadow: 0 3px 8px rgba(0,0,0,.3); min-width: 0; }
+.bt-live__st { width: 48px; height: 48px; flex: none; border-radius: 50%; color: inherit;
+  font: 600 22px/1 var(--bt-ui); background: rgba(11,13,18,.34); }
+.bt-live__st--sm { font: 800 13px/1 var(--bt-ui); }
+.bt-live__pad { min-height: 44px; border-radius: 14px; display: flex; align-items: center;
+  justify-content: center; gap: var(--bt-gap-azulejo); background: rgba(11,13,18,.34); color: inherit;
+  font: 700 12px/1 var(--bt-ui); letter-spacing: .06em; text-transform: uppercase; }
+.bt-live__pad svg { width: 16px; height: 16px; }
+
+/* peça-regra no tamanho de estado do jogador (três por linha). Fonte: `.pf-states .rt`. */
+.bt-rulegrid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--bt-gap-azulejo); }
+.bt-rule--estado { min-height: 74px; padding: 9px 10px; gap: 3px; border-radius: var(--bt-raio-painel); }
+.bt-rule--estado b { font-size: 13px; }
+.bt-rule--estado .bt-rule__st { white-space: nowrap; }
+.bt-rule--estado .bt-rule__ico, .bt-rule--estado .bt-rule__ico svg { width: 20px; height: 20px; }
+/* brasa cheia com um sentido a mais que o mapa antigo dizia: um estado RUIM que está
+   valendo agora (envenenado, concedeu). Não é "toque para destruir" — é "está pegando
+   fogo". Continua sendo brasa porque continua sendo dano. Fonte: `.rt.bad.on`. */
+.bt-rule--ruim.bt-rule--on {
+  background: linear-gradient(158deg,
+    color-mix(in srgb, var(--bt-brasa-cheia) 78%, #fff),
+    var(--bt-brasa-cheia) 45%,
+    color-mix(in srgb, var(--bt-brasa-cheia) 66%, #000));
+  color: var(--bt-marfim);
+  box-shadow: inset 0 1.5px 0 rgba(255,255,255,.3), 0 0 0 3px var(--bt-obsidiana-950),
+    0 0 0 5px rgba(255,138,128,.45); }
+.bt-rule--ruim.bt-rule--on b { color: var(--bt-marfim); }
+.bt-rule--ruim.bt-rule--on .bt-rule__st { color: rgba(243,239,227,.8); }
+
+/* ═══ bt-plaque — placa de texto ══════════════════════════════════════════════
+   Campo sem caixa: serifa grande sobre um fio, que acende em latão no foco.
+   É o que substitui o input de formulário. Fonte: `.plaque`.                      */
+.bt-plaque { display: block; min-width: 0; }
+.bt-plaque input { width: 100%; box-sizing: border-box; background: none; border: 0;
+  border-bottom: 2px solid rgba(243,239,227,.22); border-radius: 0; color: var(--bt-marfim);
+  font: 600 22px/1.2 var(--bt-display); font-optical-sizing: auto; padding: 2px 0 7px; }
+.bt-plaque input::placeholder { color: var(--bt-nevoa-fraca); font-style: italic; }
+.bt-plaque input:focus { outline: none; border-bottom-color: var(--bt-latao-400); }
+
+/* ═══ bt-swatches — escolher a cor do jogador ═════════════════════════════════
+   Exceção consciente ao "latão = selecionado": numa fileira de cores o latão seria
+   só mais uma cor, então o escolhido ganha aro de MARFIM. Fonte: `.swatches`.      */
+.bt-swatches { display: flex; gap: 6px; flex-wrap: wrap; }
+.bt-swatches button { width: 44px; height: 44px; border-radius: 50%; position: relative; }
+.bt-swatches button::before { content: ""; position: absolute; inset: 4px; border-radius: 50%;
+  background: var(--bt-c, var(--bt-assento-indigo)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.2); }
+.bt-swatches button[aria-pressed="true"]::before {
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.2), 0 0 0 2px var(--bt-obsidiana-900),
+    0 0 0 4px var(--bt-marfim); }
+
+/* ═══ bt-log — o que já aconteceu ═════════════════════════════════════════════
+   Pílulas de ardósia, tabular-nums. Fonte: `.log`, `.log li`.                     */
+.bt-log { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--bt-gap-mesa); }
+.bt-log li { font: 600 12px/1 var(--bt-ui); font-variant-numeric: tabular-nums;
+  background: var(--bt-ardosia-850); border-radius: var(--bt-raio-pilula); padding: 6px 10px;
+  color: var(--bt-nevoa); }
+
+/* ═══ bt-action — a ação do rodapé ════════════════════════════════════════════
+   DERIVADO: o `.btn` do protótipo ainda é da linguagem antiga (caixa com borda).
+   Na linguagem nova a ação principal do rodapé é a mesma superfície de latão do
+   herói, com a altura de toque do `.btn` (46px). A neutra fica em vidro escuro.
+   Só uma por rodapé: um herói por tela.                                           */
+.bt-action { min-height: 46px; border-radius: 14px; padding: 0 16px; box-sizing: border-box;
+  position: relative; overflow: hidden; display: grid; place-items: center; color: var(--bt-marfim);
+  font: 800 11.5px/1.18 var(--bt-ui); letter-spacing: .085em; text-transform: uppercase;
+  background: var(--bt-grad-peca);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.10), 0 8px 18px rgba(0,0,0,.45);
+  transition: scale .12s; }
+.bt-action:active { scale: .97; }
+.bt-action--principal { color: var(--bt-obsidiana-950); background: var(--bt-grad-latao);
+  box-shadow: var(--bt-sombra-latao); }
+.bt-action--principal::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: var(--bt-brilho-diagonal); }
+.bt-action--principal > * { position: relative; }
+.bt-action--brasa { color: var(--bt-brasa); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ESTADOS QUE O PROTÓTIPO NÃO TEM E O APP PRECISA
+   Todos deduzidos do mapa de significado, nenhum inventado fora dele.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── desabilitado ────────────────────────────────────────────────────────────
+   O protótipo já apaga o azulejo: `.menu .t:disabled { opacity: .38 }`.
+   A peça some de vista sem mudar de cor — a cor continua querendo dizer estado. */
+.bt-tile:disabled, .bt-tile.bt-is-desativado { opacity: .38; }
+.bt-tile:disabled:active, .bt-tile.bt-is-desativado:active { scale: 1; }
+/* DERIVADO: não existe no protótipo — o mesmo apagar estendido às outras peças. */
+.bt-piece:disabled, .bt-piece.bt-is-desativado,
+.bt-vpiece:disabled, .bt-vpiece.bt-is-desativado,
+.bt-rule:disabled, .bt-rule.bt-is-desativado,
+.bt-hero:disabled, .bt-hero.bt-is-desativado,
+.bt-shape:disabled, .bt-shape.bt-is-desativado,
+.bt-lane:disabled, .bt-lane.bt-is-desativado,
+.bt-action:disabled, .bt-action.bt-is-desativado { opacity: .38; }
+.bt-piece:disabled:active, .bt-vpiece:disabled:active, .bt-rule:disabled:active,
+.bt-piece.bt-is-desativado:active, .bt-vpiece.bt-is-desativado:active, .bt-rule.bt-is-desativado:active { scale: 1; }
+
+/* ── carregando ──────────────────────────────────────────────────────────────
+   DERIVADO: não existe no protótipo.
+   Ainda não está VALENDO nada, então a peça fica em vidro escuro: nada de cor cheia.
+   O que se move é o brilho diagonal do vitral, atravessando devagar — a mesma peça,
+   só que respirando. O rótulo continua; o valor ainda não existe, então o lugar dele
+   fica com um fio de latão, não com um texto cinza explicativo. */
+.bt-is-carregando { position: relative; overflow: hidden; pointer-events: none; }
+.bt-is-carregando::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(115deg,
+    transparent 0 38%,
+    rgba(224,169,59,.20) 44%,
+    rgba(244,203,108,.34) 50%,
+    rgba(224,169,59,.20) 56%,
+    transparent 62% 100%);
+  /* largura fixa: o fio de luz tem o mesmo tamanho num azulejo e numa peça-regra larga.
+     A faixa acesa é ~24% de 210px (≈50px): um fio que atravessa, não um banho de latão.
+     Se ela engorda, a peça passa a ler como "latão cheio" e mente: carregar não é valer. */
+  background-size: 210px 100%; background-repeat: no-repeat; background-position: -210px 0;
+  animation: bt-varredura 1.35s linear infinite;
+}
+.bt-carga { display: block; height: 3px; border-radius: 999px; background: rgba(224,169,59,.30); }
+.bt-carga--num { width: 64px; }
+.bt-carga--lb { width: 84px; height: 9px; background: rgba(243,239,227,.10); border-radius: 3px; }
+
+/* ── erro recuperável ────────────────────────────────────────────────────────
+   DERIVADO: não existe no protótipo.
+   Brasa é só para destruir. Um erro que dá para tentar de novo não destrói nada,
+   então ele usa a brasa como TINTA (o `.quiet-danger` do protótipo: ícone e rótulo
+   em #FF8A80 sobre vidro escuro) e ganha um filete de brasa no lugar do filete marfim.
+   A palavra de estado ocupa o canto de estado, em caixa alta — nunca um subtítulo cinza. */
+.bt-is-erro {
+  background: linear-gradient(160deg, rgba(61,38,42,.88), rgba(26,20,24,.95));
+  box-shadow: inset 0 0 0 1.5px rgba(255,138,128,.34), inset 0 1.5px 0 rgba(255,255,255,.08),
+    0 8px 18px rgba(0,0,0,.45);
+}
+.bt-is-erro .bt-tile__ic, .bt-is-erro .bt-rule__ico { color: var(--bt-brasa); }
+.bt-is-erro .bt-tile__lb, .bt-is-erro b { color: var(--bt-brasa); }
+.bt-is-erro .bt-tile__estado, .bt-is-erro .bt-rule__st {
+  font: 800 10.5px/1 var(--bt-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--bt-brasa); }
+.bt-is-erro .bt-piece__num, .bt-is-erro .bt-vpiece__num { color: var(--bt-brasa); }
+
+/* ── vazio ───────────────────────────────────────────────────────────────────
+   DERIVADO: não existe no protótipo como estado de tela.
+   Vazio já tem aparência no mapa: contorno tracejado em latão, o mesmo "sem dono"
+   da peça `.livre`. Uma tela sem nada é uma peça grande e tracejada com o convite
+   dentro dela — nunca uma parede de texto centralizada. */
+.bt-is-vazio { background: var(--bt-grad-livre); box-shadow: var(--bt-sombra-livre); position: relative; }
+.bt-is-vazio::before { content: ""; position: absolute; inset: 0; pointer-events: none;
+  border: var(--bt-tracejado); border-radius: inherit; }
+.bt-is-vazio .bt-tile__ic, .bt-is-vazio .bt-rule__ico, .bt-is-vazio .bt-empty__ic { color: var(--bt-latao-400); }
+.bt-is-vazio .bt-tile__lb, .bt-is-vazio b { color: var(--bt-latao-rotulo); }
+.bt-is-vazio .bt-tile__estado, .bt-is-vazio .bt-rule__st {
+  font: 700 11px/1 var(--bt-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--bt-nevoa); }
+.bt-empty { min-height: 136px; border-radius: var(--bt-raio-azulejo); padding: 16px 18px;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: flex-start;
+  box-sizing: border-box; text-align: left; }
+.bt-empty__ic { width: 38px; height: 38px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round; }
+.bt-empty__lb { font: 800 11.5px/1.18 var(--bt-ui); letter-spacing: .085em; text-transform: uppercase;
+  color: var(--bt-latao-rotulo); }
+.bt-empty__num { font: 700 44px/.8 var(--bt-display); font-optical-sizing: auto;
+  font-variant-numeric: lining-nums tabular-nums; color: rgba(224,169,59,.55); letter-spacing: -.02em; }
+
+@keyframes bt-fade { from { opacity: 0; } }
+@keyframes bt-varredura { to { background-position: calc(100% + 210px) 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .bt-base *, .bt-base *::before, .bt-base *::after { animation: none !important; transition: none !important; }
+}

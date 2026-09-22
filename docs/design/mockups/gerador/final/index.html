@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BrewTact · Gerador de Decks com IA · versão final</title>
+<link rel="stylesheet" href="../../../ui-kit/kit.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   GERADOR DE DECKS COM IA — versão FINAL
+   Base: direção A "Bancada do comandante" (vencedora nas três lentes).
+   Enxertos: fileira de bracket 1–5 e miniaturas em proporção de carta (C),
+   peça tracejada "+N linhas" e trio de coleção (C), mosaico de arquétipos com
+   arte e pips de identidade (B), cabeçalho que dá NOME ao estado (B), escala do
+   numeral no painel de estado ruim (B), pip de cor como selo permanente (B).
+
+   Régua: docs/design/life-counter-prototype
+     menu.png · jogadores.png · vt-04-regras · vt-05-jogador · vt-06-dados · vt-07-quem-comeca
+   Kit congelado: ../../../ui-kit/kit.css — usado como está. Nada de cor, raio,
+   sombra ou tipo do kit é redefinido aqui; só largura, posição e composição.
+
+   MAPA DE SIGNIFICADO (vale em toda peça desta tela)
+     vidro escuro + filete marfim ... ação neutra, sem estado
+     cor cheia (vitral) ............ algo está VALENDO agora
+     latão cheio .................. a jogada principal e tudo que está SELECIONADO
+     tracejado em latão ........... vazio, sem dono
+     brasa ........................ encerra ou destrói; pede DOIS TOQUES
+
+   REGRAS DURAS APLICADAS
+     · um único ✕ por tela (soltar o comandante e cancelar são dois toques em
+       brasa dentro da própria peça, nunca um segundo ✕);
+     · um herói claramente maior por tela;
+     · nenhum alvo tocável abaixo de 44pt;
+     · zero código de engenharia na cara do usuário (sem id de job, sem chave,
+       sem "capability", sem score, sem UTC);
+     · etapa já concluída nunca fica em cor cheia (cor cheia = está valendo AGORA);
+     · o nome do comandante pousa sobre FAIXA SÓLIDA, nunca sobre a ilustração
+       (regra de luminância: com arte clara o nome quebraria o contraste).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+*{ -webkit-tap-highlight-color: transparent; }
+[hidden]{ display:none !important; }
+html, body{ margin:0; height:100%; }
+body.bt-base{ overflow:hidden; }
+
+:root{
+  --gd-topo: 38px;      /* a área segura de cima */
+  --gd-pe: 42px;        /* o indicador de gesto */
+  --gd-lado: 16px;
+  --gd-gap: 9px;
+}
+
+/* ── a lista de decks continua viva embaixo: só FORMA, nenhum texto ───────── */
+.gd-fundo{ position:fixed; inset:0; display:flex; flex-direction:column; gap:10px;
+  padding:46px 13px 0; box-sizing:border-box; pointer-events:none;
+  filter:blur(7px) saturate(1.05); }
+.gd-fundo__bar{ display:flex; align-items:center; gap:9px; flex:none; height:30px; }
+.gd-fundo__mark{ width:24px; height:24px; border-radius:9px; background:var(--bt-latao-500); }
+.gd-fundo__bar u{ flex:1; }
+.gd-fundo__bar i{ width:24px; height:24px; border-radius:50%; background:rgba(243,239,227,.2); }
+.gd-fundo__decks{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; flex:1 1 0; min-height:0; }
+.gd-fundo__c{ border-radius:16px; padding:8px; box-sizing:border-box; display:grid;
+  grid-template-rows:1fr auto auto; gap:5px; background:rgba(41,48,65,.9);
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.08); min-height:0; overflow:hidden; }
+.gd-fundo__c img{ width:100%; height:100%; object-fit:cover; border-radius:10px; }
+.gd-fundo__c s{ display:block; height:7px; border-radius:4px; background:rgba(243,239,227,.3); }
+.gd-fundo__c s.gd-curto{ width:54%; background:rgba(243,239,227,.16); }
+.gd-fundo__nav{ flex:none; height:56px; display:flex; align-items:center; justify-content:space-around;
+  margin-inline:-13px; padding:0 18px 8px;
+  background:linear-gradient(180deg, rgba(58,68,90,0), rgba(58,68,90,.98) 32%);
+  box-shadow:inset 0 1px 0 rgba(243,239,227,.12); }
+.gd-fundo__nav i{ width:26px; height:26px; border-radius:9px; background:rgba(243,239,227,.6); }
+.gd-fundo__nav i:nth-child(2){ background:var(--bt-latao-400); }
+.gd-veu{ position:fixed; inset:0; pointer-events:none;
+  background:
+    radial-gradient(125% 62% at 50% 6%, rgba(11,13,18,.95), rgba(11,13,18,.78) 54%, rgba(11,13,18,.44) 100%),
+    linear-gradient(180deg, rgba(11,13,18,.88) 0%, rgba(11,13,18,.72) 44%,
+                            rgba(11,13,18,.5) 76%, rgba(11,13,18,.18) 100%); }
+.gd-gesto{ position:fixed; left:50%; bottom:9px; translate:-50% 0; width:134px; height:5px;
+  border-radius:999px; background:rgba(243,239,227,.34); pointer-events:none; }
+
+/* ── a tela ──────────────────────────────────────────────────────────────── */
+.gd{ position:relative; display:none; height:100%; box-sizing:border-box;
+  flex-direction:column; gap:var(--gd-gap);
+  padding:var(--gd-topo) var(--gd-lado) var(--gd-pe); }
+body[data-estado="vazio"]      .gd--vazio,
+body[data-estado="preenchido"] .gd--preenchido,
+body[data-estado="buscar"]     .gd--preenchido,
+body[data-estado="formato"]    .gd--preenchido,
+body[data-estado="gerando"]    .gd--gerando,
+body[data-estado="direto"]     .gd--gerando,
+body[data-estado="salvando"]   .gd--gerando,
+body[data-estado="resultado"]  .gd--resultado,
+body[data-estado="lista"]      .gd--resultado,
+body[data-estado="bloqueado"]  .gd--bloqueado,
+body[data-estado="erro"]       .gd--erro,
+body[data-estado="cota"]       .gd--cota,
+body[data-estado="negado"]     .gd--negado{ display:flex; }
+
+/* os três segundos níveis moram numa folha por cima; o ✕ de baixo se esconde
+   para que continue existindo UM único ✕ na tela. */
+.gd-sobre{ display:none; }
+body[data-estado="buscar"]  .gd-sobre--buscar,
+body[data-estado="lista"]   .gd-sobre--lista,
+body[data-estado="formato"] .gd-sobre--formato{ display:flex; }
+body[data-estado="buscar"]  .gd--preenchido .bt-x,
+body[data-estado="formato"] .gd--preenchido .bt-x,
+body[data-estado="lista"]   .gd--resultado .bt-x{ visibility:hidden; }
+
+/* ── cabeçalho: o estado em palavra grande · cota · o único ✕ ─────────────── */
+.gd-top{ flex:none; display:flex; align-items:center; gap:10px; }
+.gd-top__t{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.gd-kicker{ font:800 10px/1.15 var(--bt-ui); letter-spacing:.125em; text-transform:uppercase;
+  color:var(--bt-nevoa-fraca); }
+.gd-estado{ margin:0; font:700 clamp(23px, 6.6vw, 28px)/1 var(--bt-display); letter-spacing:-.02em;
+  color:var(--bt-marfim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.gd-cota{ flex:none; min-width:64px; min-height:46px; padding:5px 11px 6px;
+  border-radius:var(--bt-raio-regra); display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:2px; box-sizing:border-box;
+  background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca); }
+.gd-cota b{ font:700 23px/1 var(--bt-display); font-variant-numeric:lining-nums tabular-nums;
+  color:var(--bt-marfim); letter-spacing:-.02em; }
+.gd-cota i{ font:800 8px/1.1 var(--bt-ui); font-style:normal; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); white-space:nowrap; text-align:center; }
+/* cota esgotada NÃO é erro: é um estado que está valendo → cor cheia (vitral noite) */
+.gd-cota--fim{ box-shadow:var(--bt-sombra-lit);
+  background:linear-gradient(158deg, color-mix(in srgb, var(--bt-vitral-noite) 78%, #fff) 0%,
+    var(--bt-vitral-noite) 42%, var(--bt-vitral-noite-2) 100%); }
+.gd-cota--fim i{ color:rgba(243,239,227,.86); }
+/* sem dono → tracejado */
+.gd-cota--livre{ background:var(--bt-grad-livre); box-shadow:var(--bt-sombra-livre); position:relative; }
+.gd-cota--livre::before{ content:""; position:absolute; inset:0; border:var(--bt-tracejado);
+  border-radius:inherit; pointer-events:none; }
+.gd-cota--livre b{ color:var(--bt-latao-400); }
+.gd-cota--livre i{ color:var(--bt-latao-rotulo); }
+
+/* ── corpo e rodapé ──────────────────────────────────────────────────────── */
+.gd-corpo{ flex:1 1 auto; min-height:0; overflow:hidden;
+  display:flex; flex-direction:column; gap:var(--gd-gap); }
+.gd-esq, .gd-dir{ display:flex; flex-direction:column; gap:var(--gd-gap); min-height:0; }
+.gd-esq{ flex:1 1 auto; }
+.gd-pe{ flex:none; }
+
+/* ═══ a bancada: a arte do comandante ═════════════════════════════════════
+   O nome mora numa FAIXA SÓLIDA no pé da peça (regra de luminância: com carta
+   de borda branca o marfim sobre a ilustração reprovaria no contraste). */
+.gd-cmd{ position:relative; overflow:hidden; box-sizing:border-box; display:flex;
+  flex-direction:column; justify-content:flex-end; min-height:180px; flex:1 1 auto;
+  border-radius:var(--bt-raio-azulejo); box-shadow:var(--bt-sombra-azulejo);
+  background:var(--bt-obsidiana-900); padding:0; text-align:left; }
+.gd-cmd img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  object-position:50% 18%; }
+.gd-cmd::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(11,13,18,.78) 0, rgba(11,13,18,.02) 74px),
+    linear-gradient(to top, var(--bt-obsidiana-950) 0 62px, rgba(11,13,18,.62) 104px, rgba(11,13,18,0) 160px); }
+.gd-cmd > *{ position:relative; z-index:1; }
+.gd-cmd__cap{ position:absolute; top:14px; left:15px; z-index:2;
+  font:800 10px/1 var(--bt-ui); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--bt-latao-400); text-shadow:0 2px 7px rgba(0,0,0,.9); }
+.gd-cmd__pe{ position:relative; z-index:2; padding:0 15px 13px; display:flex; align-items:flex-end;
+  justify-content:space-between; gap:12px; }
+.gd-cmd__nome{ font:700 clamp(18px, 5.2vw, 23px)/1.06 var(--bt-display); letter-spacing:-.015em;
+  color:var(--bt-marfim); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.gd-cmd__tipo{ display:block; font:800 9.5px/1 var(--bt-ui); letter-spacing:.1em;
+  text-transform:uppercase; color:var(--bt-nevoa); margin-top:6px; }
+/* os dois objetos de comando, à direita da arte: ambos com 52px (>=44pt) */
+.gd-cmd__acoes{ position:absolute; z-index:3; right:12px; top:12px; display:flex; flex-direction:column; gap:9px; }
+.gd-rd{ width:52px; height:52px; border-radius:50%; display:grid; place-items:center; flex:none;
+  color:var(--bt-marfim); background:rgba(11,13,18,.72);
+  box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.22), 0 6px 14px rgba(0,0,0,.5); }
+.gd-rd svg{ width:23px; height:23px; }
+/* soltar o comandante: brasa, DOIS TOQUES, dentro da própria peça — nunca um 2º ✕ */
+.gd-rd--brasa{ color:var(--bt-brasa); box-shadow:inset 0 0 0 1.5px rgba(255,138,128,.45), 0 6px 14px rgba(0,0,0,.5); }
+.gd-rd--armado{ box-shadow:inset 0 0 0 2px var(--bt-brasa), 0 0 0 3px var(--bt-obsidiana-950),
+  0 0 0 5px rgba(255,138,128,.35); }
+.gd-rd__cap{ display:block; margin-top:5px; padding:3px 0 4px; border-radius:var(--bt-raio-pilula);
+  background:rgba(11,13,18,.72); font:800 8px/1 var(--bt-ui); letter-spacing:.07em;
+  text-transform:uppercase; color:var(--bt-nevoa); text-align:center; }
+.gd-acao{ display:block; width:52px; }
+.gd-acao--brasa .gd-rd__cap{ color:var(--bt-brasa); }
+
+/* a bancada sem dono: tracejado em latão + silhuetas de carta */
+.gd-cmd--livre{ background:var(--bt-grad-livre); box-shadow:var(--bt-sombra-livre);
+  min-height:98px; flex:none; justify-content:center; }
+.gd-cmd--livre::after{ background:none; border:var(--bt-tracejado); border-radius:inherit; }
+.gd-cmd--livre .gd-cmd__cap{ position:static; margin:0 0 6px; }
+.gd-cmd--livre .gd-cmd__pe{ padding:13px 15px; align-items:center; }
+.gd-cmd--livre .gd-cmd__nome{ color:var(--bt-latao-rotulo); }
+.gd-silhueta{ display:flex; gap:8px; flex:none; }
+.gd-silhueta i{ width:27px; height:38px; border-radius:7px; border:var(--bt-tracejado); }
+
+/* a fita: a mesma bancada, comprimida, quando o herói da tela é outro */
+.gd-cmd--fita{ min-height:96px; max-height:112px; flex:none; }
+.gd-cmd--fita img{ object-position:50% 16%; }
+.gd-cmd--fita .gd-cmd__nome{ font-size:19px; }
+
+/* ═══ mosaico de pontos de partida: arte real, tamanhos diferentes ═════════ */
+.gd-mosaico{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+  grid-template-rows:1fr 1fr 64px; gap:8px; flex:1 1 auto; min-height:206px; }
+.gd-arq{ position:relative; overflow:hidden; border-radius:var(--bt-raio-azulejo);
+  box-sizing:border-box; display:flex; flex-direction:column; justify-content:flex-end;
+  text-align:left; padding:10px 11px; color:var(--bt-marfim);
+  background:var(--bt-grad-azulejo); box-shadow:var(--bt-sombra-azulejo); transition:scale .12s; }
+.gd-arq:active{ scale:.97; }
+.gd-arq img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  object-position:50% 26%; }
+.gd-arq::after{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(to top, rgba(11,13,18,.96) 0 34%, rgba(11,13,18,.4) 62%, rgba(11,13,18,.05) 100%); }
+.gd-arq > *{ position:relative; z-index:1; }
+.gd-arq b{ font:700 15px/1.1 var(--bt-display); letter-spacing:-.01em; }
+.gd-arq--g{ grid-column:span 2; grid-row:span 2; min-height:0; }
+.gd-arq--g b{ font-size:21px; }
+.gd-arq--m{ min-height:0; padding:8px 10px 9px; }
+.gd-arq--m b{ font-size:13.5px; }
+.gd-arq--p{ min-height:0; padding:8px 10px 9px; }
+.gd-arq--p b{ font-size:13px; }
+.gd-arq--p .gd-arq__ic{ width:23px; height:23px; color:var(--bt-latao-400); margin-bottom:auto; }
+.gd-arq--sel{ background:var(--bt-grad-latao); color:var(--bt-obsidiana-950);
+  box-shadow:var(--bt-sombra-selecionado); }
+.gd-arq--sel::after{ background:linear-gradient(to top, rgba(11,13,18,.62) 0 30%, rgba(11,13,18,.12) 70%, transparent 100%); }
+
+/* o pip de identidade de cor é SELO PERMANENTE no canto de toda peça com cor */
+.gd-pips{ display:flex; gap:4px; align-items:center; }
+.gd-pips i{ width:15px; height:15px; border-radius:50%; flex:none;
+  box-shadow:0 0 0 1.5px rgba(11,13,18,.92), inset 0 0 0 1px rgba(255,255,255,.28); }
+.gd-pips--selo{ position:absolute; z-index:2; top:9px; right:9px; padding:4px 5px;
+  border-radius:var(--bt-raio-pilula); background:rgba(11,13,18,.62); }
+.gd-pips--mini i{ width:11px; height:11px; }
+.gd-w{ background:var(--bt-marfim); }
+.gd-u{ background:var(--bt-assento-mare); }
+.gd-b{ background:var(--bt-obsidiana-900); box-shadow:0 0 0 1.5px rgba(243,239,227,.6), inset 0 0 0 1px rgba(255,255,255,.1); }
+.gd-r{ background:var(--bt-assento-brasa); }
+.gd-g{ background:var(--bt-assento-musgo); }
+
+/* ═══ a placa: entrada de texto livre, o padrão do kit no lugar do campo ═══ */
+.gd-placa{ flex:none; display:flex; align-items:flex-end; gap:12px; padding:2px 2px 8px;
+  border-bottom:2px solid rgba(243,239,227,.22); text-align:left; width:100%; box-sizing:border-box;
+  min-height:52px; }
+.gd-placa p{ margin:0; flex:1; min-width:0; color:var(--bt-marfim);
+  font:600 clamp(16px, 4.6vw, 19px)/1.26 var(--bt-display); }
+.gd-placa__cap{ flex:none; font:800 10px/1 var(--bt-ui); letter-spacing:.12em;
+  text-transform:uppercase; color:var(--bt-latao-400); padding-bottom:3px; }
+.gd-placa--vazia{ border-bottom-color:var(--bt-latao-400); }
+.gd-placa--vazia p{ color:var(--bt-nevoa-fraca); font-style:italic; }
+
+/* ═══ fileira de bracket: as CINCO opções à vista (vt-04 ao pé da letra) ═══ */
+.gd-fila{ display:flex; align-items:stretch; gap:8px; flex:none; }
+.gd-fila .bt-vcap{ align-content:center; flex:none; width:52px; margin:0; }
+.gd-fila .bt-vcap svg{ color:var(--bt-latao-400); }
+.gd-fila .bt-vpiece{ width:auto; flex:1 1 0; height:58px; }
+.gd-fila .bt-vpiece--on{ flex:1.5 1 0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:2px; }
+.gd-vnome{ font:800 9px/1 var(--bt-ui); letter-spacing:.09em; text-transform:uppercase;
+  color:rgba(11,13,18,.72); }
+
+/* ═══ fileira da receita: cada peça mostra o PRÓPRIO valor ════════════════ */
+.gd-rec{ display:flex; gap:8px; flex:none; }
+.gd-t{ position:relative; flex:1 1 0; min-width:0; min-height:66px; box-sizing:border-box;
+  border-radius:var(--bt-raio-regra); padding:9px 11px 10px; overflow:hidden; text-align:left;
+  display:flex; flex-direction:column; justify-content:space-between; gap:5px;
+  color:var(--bt-marfim); background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca);
+  transition:scale .12s; }
+.gd-t:active{ scale:.97; }
+.gd-t > *{ position:relative; z-index:1; }
+.gd-t__top{ display:flex; align-items:center; gap:6px; }
+.gd-t__top svg{ width:17px; height:17px; flex:none; color:var(--bt-nevoa); }
+.gd-t__cap{ font:800 8.5px/1.15 var(--bt-ui); letter-spacing:.09em; text-transform:uppercase;
+  color:var(--bt-nevoa-fraca); min-width:0; }
+.gd-t__val{ font:700 clamp(15px, 4.1vw, 17px)/1.08 var(--bt-display); letter-spacing:-.015em;
+  color:var(--bt-marfim); }
+.gd-t__val em{ font-style:normal; font-variant-numeric:lining-nums tabular-nums; }
+/* um teto de gasto que está valendo = cor cheia (vitral iniciativa) */
+.gd-t--lit{ box-shadow:var(--bt-sombra-lit);
+  background:linear-gradient(158deg, color-mix(in srgb, var(--bt-c) 78%, #fff) 0%,
+    var(--bt-c) 42%, var(--bt-c2) 100%); }
+.gd-t--lit::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:var(--bt-brilho-diagonal); }
+.gd-t--lit .gd-t__top svg, .gd-t--lit .gd-t__cap{ color:rgba(243,239,227,.86); }
+.gd-t--teto{ --bt-c:var(--bt-vitral-iniciativa); --bt-c2:var(--bt-vitral-iniciativa-2); }
+.gd-t--ref{ --bt-c:var(--bt-vitral-plano); --bt-c2:var(--bt-vitral-plano-2); }
+/* sem teto / sem referência = vazio sem dono = tracejado */
+.gd-t--livre{ background:var(--bt-grad-livre); box-shadow:var(--bt-sombra-livre); }
+.gd-t--livre::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  border:var(--bt-tracejado); border-radius:inherit; }
+.gd-t--livre .gd-t__top svg{ color:var(--bt-latao-400); }
+.gd-t--livre .gd-t__cap{ color:var(--bt-latao-rotulo); }
+.gd-t--livre .gd-t__val{ color:var(--bt-latao-400); }
+
+/* ═══ trio de coleção: as três semânticas à vista, a escolhida maior ══════ */
+.gd-trio{ display:flex; gap:8px; flex:none; }
+.gd-op{ flex:1 1 0; min-width:0; min-height:62px; box-sizing:border-box; border-radius:var(--bt-raio-regra);
+  padding:9px 8px; display:grid; justify-items:center; align-content:center; gap:5px; text-align:center;
+  color:var(--bt-nevoa); background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca);
+  transition:scale .12s; position:relative; overflow:hidden; }
+.gd-op:active{ scale:.97; }
+.gd-op svg{ width:21px; height:21px; }
+.gd-op b{ font:700 11.5px/1.15 var(--bt-ui); color:var(--bt-marfim); }
+.gd-op--on{ flex:1.55 1 0; background:var(--bt-grad-latao-peca); color:var(--bt-obsidiana-950);
+  box-shadow:var(--bt-sombra-selecionado); }
+.gd-op--on::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:var(--bt-brilho-diagonal); }
+.gd-op--on > *{ position:relative; }
+.gd-op--on b{ font:700 15px/1 var(--bt-display); color:var(--bt-obsidiana-950); }
+.gd-op--on i{ font:800 8.5px/1 var(--bt-ui); font-style:normal; letter-spacing:.1em;
+  text-transform:uppercase; color:rgba(11,13,18,.7); }
+
+/* ═══ o painel de estado: numeral grande + fala de gente ═════════════════ */
+.gd-painel{ position:relative; overflow:hidden; box-sizing:border-box; flex:1 1 auto; min-height:0;
+  border-radius:var(--bt-raio-azulejo); padding:15px 16px 14px;
+  display:flex; flex-direction:column; gap:12px;
+  background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca); }
+.gd-painel > *{ position:relative; z-index:1; }
+.gd-painel__cab{ display:flex; align-items:center; gap:9px; }
+.gd-painel__cab svg{ width:20px; height:20px; flex:none; color:var(--bt-latao-400); }
+.gd-painel__cab span{ font:800 10.5px/1.15 var(--bt-ui); letter-spacing:.115em; text-transform:uppercase;
+  color:var(--bt-nevoa); }
+.gd-painel__linha{ display:flex; align-items:center; gap:14px; }
+.gd-num{ font:700 clamp(62px, 17vw, 78px)/.82 var(--bt-display); letter-spacing:-.035em;
+  font-variant-numeric:lining-nums tabular-nums; color:var(--bt-marfim); flex:none;
+  text-shadow:0 3px 8px rgba(0,0,0,.35); }
+.gd-num small{ display:block; font:800 9.5px/1.2 var(--bt-ui); letter-spacing:.1em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); margin-top:8px; letter-spacing:.09em; }
+.gd-fala{ margin:0; font:600 clamp(17px, 4.7vw, 20px)/1.24 var(--bt-display); color:var(--bt-marfim);
+  flex:1; min-width:0; }
+.gd-divisa{ width:2px; align-self:stretch; border-radius:2px; background:rgba(243,239,227,.16); flex:none; }
+
+/* o painel varre em latão enquanto a IA trabalha (nada de barrinha de progresso) */
+.gd-painel--vivo::after{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+  background:linear-gradient(115deg, transparent 0 38%, rgba(224,169,59,.16) 44%,
+    rgba(244,203,108,.28) 50%, rgba(224,169,59,.16) 56%, transparent 62% 100%);
+  background-size:230px 100%; background-repeat:no-repeat; background-position:-230px 0;
+  animation:bt-varredura 1.6s linear infinite; }
+
+/* estado ruim recuperável: brasa como TINTA, nunca brasa cheia */
+.gd-painel--erro{ background:linear-gradient(160deg, rgba(61,38,42,.9), rgba(26,20,24,.95));
+  box-shadow:inset 0 0 0 1.5px rgba(255,138,128,.34), inset 0 1.5px 0 rgba(255,255,255,.08),
+    0 8px 18px rgba(0,0,0,.45); }
+.gd-painel--erro .gd-painel__cab svg, .gd-painel--erro .gd-painel__cab span{ color:var(--bt-brasa); }
+.gd-painel--erro .gd-num{ color:var(--bt-brasa); }
+.gd-painel--erro .gd-num small{ color:rgba(255,138,128,.8); }
+
+/* estado que está VALENDO agora: cor cheia. Cota esgotada mora aqui. */
+.gd-painel--lit{ box-shadow:var(--bt-sombra-lit);
+  background:linear-gradient(158deg, color-mix(in srgb, var(--bt-vitral-noite) 78%, #fff) 0%,
+    var(--bt-vitral-noite) 42%, var(--bt-vitral-noite-2) 100%); }
+.gd-painel--lit::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  background:var(--bt-brilho-diagonal); }
+.gd-painel--lit .gd-painel__cab svg, .gd-painel--lit .gd-painel__cab span{ color:rgba(243,239,227,.86); }
+.gd-painel--lit .gd-num small{ color:rgba(243,239,227,.8); }
+
+/* vazio sem dono: tracejado em latão */
+.gd-painel--livre{ background:var(--bt-grad-livre); box-shadow:var(--bt-sombra-livre); }
+.gd-painel--livre::before{ content:""; position:absolute; inset:0; pointer-events:none;
+  border:var(--bt-tracejado); border-radius:inherit; }
+.gd-painel--livre .gd-painel__cab svg{ color:var(--bt-latao-400); }
+.gd-painel--livre .gd-painel__cab span{ color:var(--bt-latao-rotulo); }
+.gd-painel--livre .gd-fala{ color:var(--bt-latao-rotulo); }
+.gd-painel--livre .gd-num{ color:var(--bt-latao-400); }
+.gd-painel--livre .gd-num small{ color:var(--bt-latao-rotulo); }
+.gd-coroa{ width:52px; height:52px; color:var(--bt-latao-400); align-self:center; }
+
+/* ── as cinco etapas: a que está valendo tem ARO de latão; as passadas não
+      ficam em cor cheia (cor cheia querer dizer "está valendo agora") ────── */
+.gd-etapas{ display:flex; gap:7px; flex:none; }
+.gd-et{ flex:1 1 0; min-width:0; min-height:52px; box-sizing:border-box; border-radius:var(--bt-raio-regra);
+  display:grid; place-items:center; align-content:center; gap:2px; padding:6px 4px;
+  background:rgba(29,34,44,.82); box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.11); }
+.gd-et span{ font:700 21px/1 var(--bt-display); font-variant-numeric:lining-nums;
+  color:var(--bt-nevoa-fraca); }
+.gd-et svg{ width:19px; height:19px; color:var(--bt-latao-400); }
+.gd-et--feito span{ color:var(--bt-latao-500); }
+.gd-et--agora{ flex:3.1 1 0; box-shadow:var(--bt-sombra-armado); display:flex; align-items:center;
+  justify-content:center; gap:8px; }
+.gd-et--agora span{ color:var(--bt-latao-400); font-size:26px; }
+.gd-et--agora b{ font:800 9.5px/1.15 var(--bt-ui); letter-spacing:.09em; text-transform:uppercase;
+  color:var(--bt-marfim); text-align:left; }
+
+/* ── faixa de ação dentro do painel (cancelar em dois toques) ───────────── */
+.gd-faixa{ flex:none; min-height:62px; box-sizing:border-box; border-radius:var(--bt-raio-regra);
+  display:flex; align-items:center; gap:14px; padding:0 16px; text-align:left; color:var(--bt-marfim);
+  background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca); transition:scale .12s; }
+.gd-faixa:active{ scale:.97; }
+.gd-faixa svg{ width:25px; height:25px; flex:none; color:var(--bt-latao-400); }
+.gd-faixa span{ display:grid; gap:3px; min-width:0; }
+.gd-faixa b{ font:700 17px/1.1 var(--bt-display); }
+.gd-faixa i{ font:800 9.5px/1.1 var(--bt-ui); font-style:normal; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--bt-nevoa); }
+.gd-faixa--brasa svg, .gd-faixa--brasa b{ color:var(--bt-brasa); }
+.gd-faixa--brasa{ box-shadow:inset 0 0 0 1.5px rgba(255,138,128,.3), 0 8px 18px rgba(0,0,0,.45); }
+.gd-faixa--brasa i{ color:rgba(255,138,128,.82); }
+.gd-faixa--livre{ background:var(--bt-grad-livre); box-shadow:var(--bt-sombra-livre); position:relative; }
+.gd-faixa--livre::before{ content:""; position:absolute; inset:0; border:var(--bt-tracejado);
+  border-radius:inherit; pointer-events:none; }
+.gd-faixa--livre b{ color:var(--bt-latao-rotulo); }
+.gd-faixa--livre i{ color:var(--bt-nevoa); }
+
+/* ── o que já aconteceu: pílulas do kit, palavra de gente, nenhum código ── */
+.bt-log{ flex:none; }
+
+/* ═══ miniaturas em PROPORÇÃO DE CARTA (3:4) com o "1x" em latão ══════════ */
+.gd-cartas{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:9px; flex:none; }
+.gd-carta{ margin:0; display:flex; flex-direction:column; gap:7px; text-align:left; min-width:0; }
+.gd-carta__art{ position:relative; aspect-ratio:3/4; border-radius:var(--bt-raio-mini); overflow:hidden;
+  background:var(--bt-obsidiana-900); box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.13), 0 6px 14px rgba(0,0,0,.45); }
+.gd-carta__art img{ width:100%; height:100%; object-fit:cover; display:block; }
+.gd-carta__qtd{ position:absolute; top:7px; left:7px; z-index:2; min-width:26px; text-align:center;
+  padding:3px 6px 4px; border-radius:var(--bt-raio-pilula); background:var(--bt-grad-latao);
+  color:var(--bt-obsidiana-950); font:700 12px/1 var(--bt-ui); font-variant-numeric:lining-nums;
+  box-shadow:0 2px 6px rgba(0,0,0,.5); }
+.gd-carta .gd-pips--selo{ top:auto; bottom:7px; right:7px; }
+.gd-carta figcaption{ font:700 12px/1.18 var(--bt-display); color:var(--bt-marfim); }
+.gd-carta--vazia .gd-carta__art{ background:var(--bt-grad-livre); display:grid; place-items:center; }
+.gd-carta--vazia .gd-carta__art::before{ content:""; position:absolute; inset:0; border:var(--bt-tracejado);
+  border-radius:inherit; }
+.gd-carta--vazia svg{ width:34px; height:34px; color:var(--bt-latao-400); }
+
+/* ═══ a peça tracejada que diz "tem mais": objeto, nunca linha de texto ═══ */
+.gd-mais{ flex:none; min-height:64px; box-sizing:border-box; border-radius:var(--bt-raio-azulejo);
+  display:flex; align-items:center; gap:14px; padding:0 16px; text-align:left; position:relative;
+  background:var(--bt-grad-livre); box-shadow:var(--bt-sombra-livre); transition:scale .12s; }
+.gd-mais:active{ scale:.97; }
+.gd-mais::before{ content:""; position:absolute; inset:0; border:var(--bt-tracejado);
+  border-radius:inherit; pointer-events:none; }
+.gd-mais em{ font:700 38px/.8 var(--bt-display); font-style:normal; letter-spacing:-.02em;
+  font-variant-numeric:lining-nums tabular-nums; color:var(--bt-latao-400); flex:none; }
+.gd-mais b{ font:800 10.5px/1.25 var(--bt-ui); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--bt-latao-rotulo); }
+.gd-mais svg{ width:24px; height:24px; color:var(--bt-latao-400); flex:none; margin-left:auto; }
+
+/* ═══ os números da proposta: numeral em peça, nunca pílula de texto ══════ */
+.gd-nums{ display:flex; gap:8px; flex:none; }
+.gd-n{ flex:1 1 0; min-width:0; min-height:64px; box-sizing:border-box; border-radius:var(--bt-raio-regra);
+  padding:9px 11px 10px; display:flex; flex-direction:column; justify-content:space-between;
+  text-align:left; background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca); }
+.gd-n em{ font:700 27px/.9 var(--bt-display); font-style:normal; letter-spacing:-.02em;
+  font-variant-numeric:lining-nums tabular-nums; color:var(--bt-marfim); }
+.gd-n i{ font:800 8.5px/1.2 var(--bt-ui); font-style:normal; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); }
+
+/* ═══ par de regras: legalidade e avisos ═════════════════════════════════ */
+.gd-par{ display:flex; gap:8px; flex:none; }
+.gd-par .bt-rule{ flex:1 1 0; min-height:70px; }
+
+/* ═══ herói: um por tela. Só acende quando há o que fazer. ═══════════════ */
+.bt-hero{ min-height:80px; }
+/* o glifo do kit herda `color`; o símbolo desenha em currentColor */
+.bt-hero__go svg{ color:var(--bt-latao-400); }
+.gd-hero--frio .bt-hero__go svg{ color:var(--bt-nevoa); }
+.gd-hero--frio{ background:var(--bt-grad-peca); color:var(--bt-marfim); box-shadow:var(--bt-sombra-peca); }
+.gd-hero--frio::before{ background:none; }
+.gd-hero--frio .bt-hero__sub{ color:var(--bt-nevoa-fraca); }
+.gd-hero--frio .bt-hero__mid{ border-left-color:rgba(243,239,227,.16); }
+.gd-hero--frio .bt-numeral--hero{ color:var(--bt-nevoa-fraca); text-shadow:none; }
+.gd-hero--frio .bt-hero__go{ box-shadow:0 6px 14px rgba(0,0,0,.4), inset 0 0 0 2px rgba(243,239,227,.22); }
+.bt-hero__turno .bt-numeral--hero{ font-size:clamp(46px, 13vw, 60px); }
+.bt-hero__quem{ font-size:clamp(23px, 6.2vw, 28px); }
+
+/* ═══ segundo nível: a folha do kit sobre a mesa viva ════════════════════ */
+.gd-sobre{ position:fixed; inset:0; z-index:9; flex-direction:column; box-sizing:border-box;
+  background:var(--bt-veu-folha); -webkit-backdrop-filter:var(--bt-blur-folha);
+  backdrop-filter:var(--bt-blur-folha); animation:bt-fade .16s ease;
+  padding:var(--gd-topo) var(--gd-lado) var(--gd-pe); gap:var(--gd-gap); }
+.gd-sobre__head{ flex:none; display:flex; align-items:center; gap:8px; }
+.gd-sobre__head h2{ margin:0; flex:1; min-width:0; font:700 22px/1.12 var(--bt-display);
+  color:var(--bt-marfim); overflow:hidden; text-overflow:ellipsis; }
+.gd-sobre__corpo{ flex:1 1 auto; min-height:0; display:flex; flex-direction:column; gap:var(--gd-gap);
+  overflow:hidden; }
+.gd-grade{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:9px; }
+.gd-cand{ position:relative; border-radius:var(--bt-raio-azulejo); padding:8px 8px 10px; text-align:left;
+  display:flex; flex-direction:column; gap:8px; box-sizing:border-box; color:var(--bt-marfim);
+  background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca); transition:scale .12s; }
+.gd-cand:active{ scale:.97; }
+.gd-cand__art{ position:relative; aspect-ratio:3/4; border-radius:var(--bt-raio-mini); overflow:hidden;
+  background:var(--bt-obsidiana-900); display:grid; place-items:center; }
+.gd-cand__art img{ width:100%; height:100%; object-fit:cover; }
+.gd-cand__art svg{ width:40px; height:40px; color:var(--bt-latao-400); }
+.gd-cand__art--livre{ background:var(--bt-grad-livre); }
+.gd-cand__art--livre::before{ content:""; position:absolute; inset:0; border:var(--bt-tracejado);
+  border-radius:inherit; }
+.gd-cand b{ font:700 14px/1.14 var(--bt-display); }
+.gd-cand__pe{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.gd-cand__st{ font:800 9px/1 var(--bt-ui); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--bt-latao-400); }
+.gd-cand--on{ background:var(--bt-grad-latao-peca); color:var(--bt-obsidiana-950);
+  box-shadow:var(--bt-sombra-selecionado); }
+.gd-cand--on .gd-cand__st{ color:rgba(11,13,18,.75); }
+.gd-cand--fora{ opacity:.46; }
+.gd-cand--fora .gd-cand__st{ color:var(--bt-nevoa-fraca); }
+
+.gd-bloco{ border-radius:var(--bt-raio-azulejo); padding:12px 14px 13px; box-sizing:border-box;
+  background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca);
+  display:flex; flex-direction:column; gap:10px; }
+.gd-bloco__cap{ font:800 10px/1 var(--bt-ui); letter-spacing:.12em; text-transform:uppercase;
+  color:var(--bt-nevoa); }
+.gd-grupos{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:9px; }
+.gd-grupo{ position:relative; overflow:hidden; border-radius:var(--bt-raio-regra); padding:10px 12px 11px;
+  min-height:78px; box-sizing:border-box; text-align:left; display:flex; align-items:flex-end;
+  justify-content:space-between; gap:8px; background:var(--bt-grad-peca); box-shadow:var(--bt-sombra-peca); }
+.gd-grupo em{ font:700 34px/.84 var(--bt-display); font-style:normal; letter-spacing:-.025em;
+  font-variant-numeric:lining-nums tabular-nums; color:var(--bt-marfim); }
+.gd-grupo b{ font:800 9.5px/1.2 var(--bt-ui); letter-spacing:.09em; text-transform:uppercase;
+  color:var(--bt-nevoa); display:block; margin-top:6px; }
+.gd-grupo__tira{ display:flex; gap:4px; flex:none; }
+.gd-grupo__tira i{ width:22px; height:30px; border-radius:5px; overflow:hidden; display:block;
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.16); }
+.gd-grupo__tira img{ width:100%; height:100%; object-fit:cover; }
+.gd-fmt{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; }
+.gd-fmt .gd-t{ min-height:66px; }
+.gd-fmt__g{ grid-column:span 3; min-height:110px; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PISO 320x568 — tudo encolhe junto, nada sai da tela e nada rola
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (max-height: 700px), (max-width: 340px){
+  :root{ --gd-topo:26px; --gd-pe:26px; --gd-lado:12px; --gd-gap:7px; }
+  .gd-cota{ min-width:56px; min-height:44px; padding:4px 8px 5px; }
+  .gd-cota b{ font-size:19px; }
+  .gd-arq--g{ min-height:116px; }
+  .gd-arq--m{ min-height:54.5px; }
+  .gd-arq--p{ min-height:56px; }
+  .gd-arq--g b{ font-size:17px; }
+  .gd-arq--m b{ font-size:12px; }
+  .gd-arq--p b{ font-size:11.5px; }
+  .gd-pips i{ width:12px; height:12px; }
+  .gd-cmd--livre{ min-height:88px; }
+  .gd-silhueta i{ width:22px; height:31px; }
+  .gd-placa{ min-height:44px; padding-bottom:6px; }
+  .gd-fila .bt-vpiece{ height:50px; }
+  .gd-fila .bt-vcap{ width:44px; font-size:9px; }
+  .gd-fila .bt-vpiece__num{ font-size:28px; }
+  .gd-fila .bt-vpiece--on .bt-vpiece__num{ font-size:30px; }
+  .gd-t{ min-height:54px; padding:7px 9px 8px; }
+  .gd-t__val{ font-size:15px; }
+  .gd-op{ min-height:54px; }
+  .bt-hero{ min-height:68px; padding:8px 12px 8px 13px; }
+  .bt-hero__go{ width:46px; height:46px; }
+  .bt-hero__go svg{ width:22px; height:22px; }
+  .gd-cmd--fita{ min-height:80px; max-height:88px; }
+  .gd-cartas{ gap:7px; }
+  .gd-mais{ min-height:56px; }
+  .gd-nums .gd-n{ min-height:56px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   WEB / DESKTOP — a largura vira DUAS COLUNAS: a arte grande de um lado,
+   a receita e o herói do outro. Não é o mobile esticado.
+   ═══════════════════════════════════════════════════════════════════════ */
+@media (min-width: 1100px){
+  :root{ --gd-topo:34px; --gd-pe:34px; --gd-lado:40px; --gd-gap:16px; }
+  .gd{ display:none; max-width:1280px; margin-inline:auto; }
+  body[data-estado="vazio"]      .gd--vazio,
+  body[data-estado="preenchido"] .gd--preenchido,
+  body[data-estado="buscar"]     .gd--preenchido,
+  body[data-estado="formato"]    .gd--preenchido,
+  body[data-estado="gerando"]    .gd--gerando,
+  body[data-estado="direto"]     .gd--gerando,
+  body[data-estado="salvando"]   .gd--gerando,
+  body[data-estado="resultado"]  .gd--resultado,
+  body[data-estado="lista"]      .gd--resultado,
+  body[data-estado="bloqueado"]  .gd--bloqueado,
+  body[data-estado="erro"]       .gd--erro,
+  body[data-estado="cota"]       .gd--cota,
+  body[data-estado="negado"]     .gd--negado{
+    display:grid;
+    grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);
+    grid-template-rows:auto minmax(0,1fr) auto;
+    grid-template-areas:"topo topo" "esq dir" "esq pe";
+    column-gap:26px; row-gap:16px;
+  }
+  .gd-top{ grid-area:topo; }
+  .gd-corpo{ display:contents; }
+  .gd-esq{ grid-area:esq; }
+  .gd-dir{ grid-area:dir; }
+  .gd-pe{ grid-area:pe; }
+
+  .gd-estado{ font-size:38px; }
+  .gd-kicker{ font-size:11px; }
+  .gd-cota{ min-width:84px; min-height:58px; }
+  .gd-cota b{ font-size:30px; }
+  .gd-cota i{ font-size:9px; }
+
+  .gd-cmd{ min-height:360px; }
+  .gd-cmd img{ object-position:50% 16%; }
+  .gd-cmd__nome{ font-size:34px; }
+  .gd-cmd__cap{ font-size:11px; top:20px; left:22px; }
+  .gd-cmd__pe{ padding:0 22px 20px; }
+  .gd-cmd::after{ background:
+    linear-gradient(180deg, rgba(11,13,18,.72) 0, rgba(11,13,18,.02) 110px),
+    linear-gradient(to top, var(--bt-obsidiana-950) 0 84px, rgba(11,13,18,.6) 140px, rgba(11,13,18,0) 220px); }
+  .gd-cmd__acoes{ right:18px; top:18px; gap:12px; }
+  .gd-rd{ width:58px; height:58px; }
+  .gd-cmd__gesto{ right:18px; top:142px; width:58px; }
+  .gd-cmd--fita{ min-height:200px; max-height:none; flex:1 1 auto; }
+  .gd-cmd--livre{ min-height:150px; }
+  .gd-silhueta i{ width:38px; height:53px; }
+
+  .gd-mosaico{ flex:1 1 auto; grid-template-rows:1fr 1fr minmax(96px, .78fr); }
+  .gd-arq--g{ min-height:0; }
+  .gd-arq--m, .gd-arq--p{ min-height:0; }
+  .gd-arq--g b{ font-size:26px; }
+  .gd-arq--m b{ font-size:16px; }
+  .gd-arq--p b{ font-size:15px; }
+
+  .gd-placa p{ font-size:22px; }
+  .gd-fila .bt-vpiece{ height:70px; }
+  .gd-fila .bt-vcap{ width:64px; font-size:11px; }
+  .gd-t{ min-height:74px; }
+  .gd-t__val{ font-size:21px; }
+  .gd-op{ min-height:74px; }
+  .gd-op b{ font-size:13px; }
+  .gd-op--on b{ font-size:17px; }
+
+  .bt-hero{ min-height:104px; padding:12px 18px 12px 20px; }
+  .bt-hero__go{ width:64px; height:64px; }
+  .bt-hero__go svg{ width:30px; height:30px; }
+
+  .gd-painel{ padding:22px 24px 20px; gap:18px; }
+  .gd-num{ font-size:104px; }
+  .gd-fala{ font-size:25px; }
+  .gd-et{ min-height:64px; }
+  .gd-et--agora b{ font-size:11px; }
+  .gd-faixa{ min-height:74px; }
+  .gd-faixa b{ font-size:20px; }
+
+  .gd-cartas{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px; }
+  .gd-carta figcaption{ font-size:15px; }
+  .gd-mais{ min-height:82px; }
+  .gd-mais em{ font-size:46px; }
+  .gd-mais b{ font-size:12px; }
+  .gd-n{ min-height:80px; }
+  .gd-n em{ font-size:34px; }
+  .gd-n i{ font-size:9.5px; }
+  .gd-par .bt-rule{ min-height:86px; }
+
+  .gd-fundo{ padding:56px 26px 0; }
+  .gd-fundo__decks{ grid-template-columns:repeat(4,1fr); }
+  .gd-sobre{ padding:34px 40px; }
+  .gd-sobre__corpo{ max-width:1280px; width:100%; margin-inline:auto; }
+  .gd-sobre__head{ max-width:1280px; width:100%; margin-inline:auto; }
+  .gd-grade{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+  .gd-grupos{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+  .gd-fmt{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+  .gd-fmt__g{ grid-column:span 2; min-height:170px; }
+}
+
+@media (min-width: 1700px){
+  .gd{ max-width:1480px; }
+  .gd-sobre__corpo, .gd-sobre__head{ max-width:1480px; }
+  .gd-cmd__nome{ font-size:40px; }
+  .gd-estado{ font-size:44px; }
+  .gd-num{ font-size:124px; }
+}
+</style>
+</head>
+
+<body class="bt-base" data-estado="vazio">
+
+<!-- ═══ os glifos: SVG próprio, traço simples, nenhum emoji ═══════════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <g id="s" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></g>
+  </defs>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-volta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4l-7 8 7 8"/></symbol>
+  <symbol id="i-coroa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l-1.2-10L7.6 12 12 4l4.4 8 5.8-4-1.2 10z"/><path d="M3.4 20.4h17.2"/></symbol>
+  <symbol id="i-busca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.6"/><path d="M15.6 15.6L21 21"/></symbol>
+  <symbol id="i-soltar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 17.2L3.2 8.6l5.4 3.6L12 5.2l3.4 7 5.4-3.6-1.2 8.6z"/><path d="M4.8 19.6h14.4"/><path d="M20.4 3.6L3.6 20.4"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3.1v5.2c0 5-3.3 8.6-7.5 10.3-4.2-1.7-7.5-5.3-7.5-10.3V6.1z"/></symbol>
+  <symbol id="i-camadas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8.6 4.6L12 12.2 3.4 7.6z"/><path d="M3.4 12.4L12 17l8.6-4.6"/><path d="M3.4 16.6L12 21.2l8.6-4.6"/></symbol>
+  <symbol id="i-moeda" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6.4" rx="7.8" ry="3.2"/><path d="M4.2 6.4v5.3c0 1.8 3.5 3.2 7.8 3.2s7.8-1.4 7.8-3.2V6.4"/><path d="M4.2 11.7v5.3c0 1.8 3.5 3.2 7.8 3.2s7.8-1.4 7.8-3.2v-5.3"/></symbol>
+  <symbol id="i-birrete" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l9.4 4.2L12 12 2.6 7.8z"/><path d="M6.4 10.2v4.6c0 1.7 2.5 3 5.6 3s5.6-1.3 5.6-3v-4.6"/><path d="M21.4 7.8v5.4"/></symbol>
+  <symbol id="i-globo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2"/><path d="M12 3.4c2.4 2.5 3.6 5.4 3.6 8.6s-1.2 6.1-3.6 8.6c-2.4-2.5-3.6-5.4-3.6-8.6S9.6 5.9 12 3.4z"/></symbol>
+  <symbol id="i-caixa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l8.4 3.9v9.8L12 20.8 3.6 16.9V7.1z"/><path d="M3.6 7.1L12 11l8.4-3.9"/><path d="M12 11v9.8"/></symbol>
+  <symbol id="i-cadeado" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.2" y="10.4" width="15.6" height="10.2" rx="3"/><path d="M8 10.4V7.6a4 4 0 0 1 8 0v2.8"/></symbol>
+  <symbol id="i-faisca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2.6l2 5.6 5.6 2-5.6 2-2 5.6-2-5.6-5.6-2 5.6-2z"/><path d="M6 16.4l.9 2.3 2.3.9-2.3.9-.9 2.3-.9-2.3-2.3-.9 2.3-.9z"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.6"/><path d="M12 6.8V12l3.6 2.2"/></symbol>
+  <symbol id="i-lua" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 14.8A8.8 8.8 0 0 1 9.2 3.6a8.8 8.8 0 1 0 11.2 11.2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 12.6l5.2 5.2L19.8 6.6"/></symbol>
+  <symbol id="i-aviso" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.6l9.2 16.2H2.8z"/><path d="M12 9.6v4.2"/><path d="M12 17.1v.1"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-refaz" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 12a8.6 8.6 0 1 1-2.8-6.4"/><path d="M20.6 3.6v4.8h-4.8"/></symbol>
+  <symbol id="i-cartas" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8.2" y="3.4" width="12.4" height="16.2" rx="2.6"/><path d="M15.4 20.6H6a2.6 2.6 0 0 1-2.6-2.6V7.4"/></symbol>
+  <symbol id="i-folha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 3.4c.6 8-3.4 14.4-10.6 15.4-3.8.5-5.6-1.4-5.6-4.4 0-6 5.6-9.6 16.2-11z"/><path d="M4.4 20.6c2-6.4 6.2-10.4 11.4-12.6"/></symbol>
+  <symbol id="i-calice" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 3.6h11.2l-1 5.6a4.7 4.7 0 0 1-9.2 0z"/><path d="M12 14.2v5.2"/><path d="M7.6 20.4h8.8"/></symbol>
+  <symbol id="i-pena" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 20.4l3.8-1 10.2-10.2-2.8-2.8L4.6 16.6z"/><path d="M14.8 6.4l2.8 2.8"/><path d="M15.4 4.2l4.4 4.4"/></symbol>
+  <symbol id="i-lista" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5.4 3.6h8.2l5 5v11.8a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1V4.6a1 1 0 0 1 1-1z"/><path d="M13.6 3.6v5h5"/><path d="M8 13h8M8 16.8h5"/></symbol>
+  <symbol id="i-mais" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-guardar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 5.6a2 2 0 0 1 2-2h8.8l4.4 4.4v10.4a2 2 0 0 1-2 2H6.4a2 2 0 0 1-2-2z"/><path d="M8 3.6v5.2h6.4V3.6"/><path d="M8 20.4v-5.6h8v5.6"/></symbol>
+</svg>
+
+<!-- ═══ a lista de decks continua viva embaixo ════════════════════════════ -->
+<div class="gd-fundo" aria-hidden="true">
+  <div class="gd-fundo__bar"><i class="gd-fundo__mark"></i><u></u><i></i><i></i></div>
+  <div class="gd-fundo__decks">
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><s></s><s class="gd-curto"></s></div>
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><s></s><s class="gd-curto"></s></div>
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><s></s><s class="gd-curto"></s></div>
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><s></s><s class="gd-curto"></s></div>
+  </div>
+  <div class="gd-fundo__nav"><i></i><i></i><i></i><i></i></div>
+</div>
+<div class="gd-veu" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #vazio — nada preenchido. O convite é o mosaico de pontos de partida.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--vazio">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">A IA propõe · você revisa</span>
+      <h1 class="gd-estado">Gerar deck</h1>
+    </div>
+    <button class="gd-cota" aria-label="108 de 120 ações de IA"><b>108</b><i>de 120 · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <!-- seis pontos de partida: tamanhos diferentes, arte real, pips de cor -->
+      <div class="gd-mosaico">
+        <button class="gd-arq gd-arq--g">
+          <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+          <span class="gd-pips gd-pips--selo"><i class="gd-r"></i></span>
+          <b>Goblins na brasa</b>
+        </button>
+        <button class="gd-arq gd-arq--m">
+          <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+          <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-w"></i><i class="gd-u"></i></span>
+          <b>Controle azul</b>
+        </button>
+        <button class="gd-arq gd-arq--m">
+          <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+          <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-r"></i><i class="gd-g"></i></span>
+          <b>Dragões e tesouros</b>
+        </button>
+        <button class="gd-arq gd-arq--p">
+          <svg class="gd-arq__ic"><use href="#i-folha"/></svg>
+          <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-g"></i></span>
+          <b>Elfos que crescem</b>
+        </button>
+        <button class="gd-arq gd-arq--p">
+          <svg class="gd-arq__ic"><use href="#i-calice"/></svg>
+          <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-w"></i><i class="gd-b"></i></span>
+          <b>Aristocratas</b>
+        </button>
+        <button class="gd-arq gd-arq--p">
+          <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+          <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-u"></i></span>
+          <b>Contramágicas</b>
+        </button>
+      </div>
+
+      <!-- a bancada sem dono: tracejado em latão -->
+      <button class="gd-cmd gd-cmd--livre">
+        <span class="gd-cmd__pe">
+          <span>
+            <span class="gd-cmd__cap">Sem comandante</span>
+            <span class="gd-cmd__nome">Buscar a carta</span>
+          </span>
+          <span class="gd-silhueta" aria-hidden="true"><i></i><i></i><i></i></span>
+        </span>
+      </button>
+    </div>
+
+    <div class="gd-dir">
+      <button class="gd-placa gd-placa--vazia">
+        <p>Diga o deck que você quer — tema, cores, jeito de ganhar.</p>
+        <span class="gd-placa__cap">Seu pedido</span>
+      </button>
+
+      <!-- bracket: as CINCO opções à vista (vt-04). Nada de valor escondido. -->
+      <div class="gd-fila">
+        <span class="bt-vcap"><svg><use href="#i-escudo"/></svg>Bracket</span>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">1</span></button>
+        <button class="bt-vpiece bt-vpiece--on"><span class="bt-vpiece__num">2</span><span class="gd-vnome">Core</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">3</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">4</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">5</span></button>
+      </div>
+
+      <div class="gd-rec">
+        <button class="gd-t">
+          <span class="gd-t__top"><svg><use href="#i-camadas"/></svg><span class="gd-t__cap">Formato</span></span>
+          <span class="gd-t__val">Commander</span>
+        </button>
+        <button class="gd-t gd-t--livre">
+          <span class="gd-t__top"><svg><use href="#i-moeda"/></svg><span class="gd-t__cap">Orçamento</span></span>
+          <span class="gd-t__val">Sem limite</span>
+        </button>
+        <button class="gd-t gd-t--livre">
+          <span class="gd-t__top"><svg><use href="#i-birrete"/></svg><span class="gd-t__cap">Aprendido</span></span>
+          <span class="gd-t__val">Sem dono</span>
+        </button>
+      </div>
+
+      <div class="gd-trio">
+        <button class="gd-op gd-op--on"><svg><use href="#i-globo"/></svg><b>Ignorar</b><i>minha coleção</i></button>
+        <button class="gd-op"><svg><use href="#i-caixa"/></svg><b>Preferir</b></button>
+        <button class="gd-op"><svg><use href="#i-cadeado"/></svg><b>Só o que tenho</b></button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <button class="bt-hero gd-hero--frio">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">100</span><span class="bt-hero__sub">cartas</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">Diga o pedido</span><span class="bt-hero__quem">Gerar deck</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-seta"/></svg></span>
+    </button>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #preenchido — a receita montada, pronta para gerar.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--preenchido">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">A receita está pronta</span>
+      <h1 class="gd-estado">Gerar deck</h1>
+    </div>
+    <button class="gd-cota" aria-label="108 de 120 ações de IA"><b>108</b><i>de 120 · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <!-- a arte do comandante é o herói visual; o nome pousa em faixa sólida -->
+      <div class="gd-cmd">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="Arte de Teferi, Herói de Dominária">
+        <span class="gd-cmd__cap">Comandante</span>
+        <span class="gd-cmd__acoes">
+          <button class="gd-acao" aria-label="Trocar o comandante">
+            <span class="gd-rd"><svg><use href="#i-busca"/></svg></span>
+            <span class="gd-rd__cap">Trocar</span>
+          </button>
+          <button class="gd-acao gd-acao--brasa" aria-label="Soltar o comandante (dois toques)">
+            <span class="gd-rd gd-rd--brasa"><svg><use href="#i-soltar"/></svg></span>
+            <span class="gd-rd__cap">2 toques</span>
+          </button>
+        </span>
+        <span class="gd-cmd__pe">
+          <span style="min-width:0">
+            <span class="gd-cmd__nome">Teferi, Herói de Dominária</span>
+          </span>
+          <span class="gd-pips"><i class="gd-w"></i><i class="gd-u"></i></span>
+        </span>
+      </div>
+    </div>
+
+    <div class="gd-dir">
+      <button class="gd-placa">
+        <p>Controle azul e branco: segurar a mesa com contramágicas e fechar com o comandante.</p>
+        <span class="gd-placa__cap">Seu pedido</span>
+      </button>
+
+      <div class="gd-fila">
+        <span class="bt-vcap"><svg><use href="#i-escudo"/></svg>Bracket</span>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">1</span></button>
+        <button class="bt-vpiece bt-vpiece--on"><span class="bt-vpiece__num">2</span><span class="gd-vnome">Core</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">3</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">4</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">5</span></button>
+      </div>
+
+      <div class="gd-rec">
+        <button class="gd-t">
+          <span class="gd-t__top"><svg><use href="#i-camadas"/></svg><span class="gd-t__cap">Formato</span></span>
+          <span class="gd-t__val">Commander</span>
+        </button>
+        <button class="gd-t gd-t--lit gd-t--teto">
+          <span class="gd-t__top"><svg><use href="#i-moeda"/></svg><span class="gd-t__cap">Teto</span></span>
+          <span class="gd-t__val"><em>R$ 300</em></span>
+        </button>
+        <button class="gd-t gd-t--lit gd-t--ref">
+          <span class="gd-t__top"><svg><use href="#i-birrete"/></svg><span class="gd-t__cap">Aprendido</span></span>
+          <span class="gd-t__val">Vai junto</span>
+        </button>
+      </div>
+
+      <div class="gd-trio">
+        <button class="gd-op"><svg><use href="#i-globo"/></svg><b>Ignorar</b></button>
+        <button class="gd-op gd-op--on"><svg><use href="#i-caixa"/></svg><b>Preferir</b><i>minha coleção</i></button>
+        <button class="gd-op"><svg><use href="#i-cadeado"/></svg><b>Só o que tenho</b></button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <button class="bt-hero">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">100</span><span class="bt-hero__sub">cartas</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">Você revisa antes</span><span class="bt-hero__quem">Gerar deck</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-seta"/></svg></span>
+    </button>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #gerando — o trabalho assíncrono. Cinco etapas nomeadas, contagem de
+     cartas, fala do servidor e cancelar em dois toques (só porque há job).
+     #direto  — a variante sem contagem e sem cancelar.
+     #salvando— a tarefa bloqueante de guardar.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--gerando">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker gd-so-gerando">A IA está montando</span>
+      <span class="gd-kicker gd-so-direto" hidden>Sem contagem nesta versão</span>
+      <span class="gd-kicker gd-so-salvando" hidden>Guardando na sua coleção</span>
+      <h1 class="gd-estado"><span class="gd-so-gerando">Tecendo</span><span class="gd-so-direto" hidden>Tecendo</span><span class="gd-so-salvando" hidden>Salvando</span></h1>
+    </div>
+    <button class="gd-cota" aria-label="107 de 120 ações de IA"><b>107</b><i>de 120 · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <div class="gd-cmd gd-cmd--fita">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+        <span class="gd-cmd__cap">Comandante</span>
+        <span class="gd-cmd__pe">
+          <span style="min-width:0"><span class="gd-cmd__nome">Teferi, Herói de Dominária</span></span>
+          <span class="gd-pips"><i class="gd-w"></i><i class="gd-u"></i></span>
+        </span>
+      </div>
+      <button class="gd-placa">
+        <p>Controle azul e branco: segurar a mesa com contramágicas e fechar com o comandante.</p>
+        <span class="gd-placa__cap">Retomado</span>
+      </button>
+    </div>
+
+    <div class="gd-dir">
+      <div class="gd-painel gd-painel--vivo">
+        <div class="gd-painel__cab"><svg><use href="#i-faisca"/></svg><span class="gd-so-gerando">O servidor está respondendo</span><span class="gd-so-direto" hidden>Esta versão não devolve a contagem</span><span class="gd-so-salvando" hidden>Guardando as 100 cartas</span></div>
+        <div class="gd-painel__linha">
+          <span class="gd-num gd-so-gerando">62<small>de 100 cartas</small></span>
+          <span class="gd-num gd-so-direto" hidden>?<small>sem contagem</small></span>
+          <span class="gd-num gd-so-salvando" hidden>100<small>cartas indo</small></span>
+          <span class="gd-divisa"></span>
+          <p class="gd-fala gd-so-gerando">Ajustando mana e quantidades antes da prévia.</p>
+          <p class="gd-fala gd-so-direto" hidden>A lista está sendo montada de uma vez só. Não dá para interromper aqui.</p>
+          <p class="gd-fala gd-so-salvando" hidden>Nada muda na sua coleção até esta etapa terminar.</p>
+        </div>
+
+        <div class="gd-etapas">
+          <div class="gd-et gd-et--feito"><svg><use href="#i-check"/></svg><span>1</span></div>
+          <div class="gd-et gd-et--feito"><svg><use href="#i-check"/></svg><span>2</span></div>
+          <div class="gd-et gd-et--agora"><span>3</span><b>Ajustando mana</b></div>
+          <div class="gd-et"><span>4</span></div>
+          <div class="gd-et"><span>5</span></div>
+        </div>
+
+        <ul class="bt-log">
+          <li>Pedido aceito · 0:12</li>
+          <li>Lista tecida · 98 cartas</li>
+          <li>Esperou a vez no servidor · 8s</li>
+        </ul>
+      </div>
+
+      <button class="gd-faixa gd-faixa--brasa gd-so-gerando">
+        <svg><use href="#i-x"/></svg>
+        <span><b>Cancelar</b><i>Dois toques · nada é cobrado</i></span>
+      </button>
+      <div class="gd-faixa gd-faixa--livre gd-so-direto" hidden>
+        <svg><use href="#i-relogio"/></svg>
+        <span><b>Sem cancelar aqui</b><i>Espere ou feche a tela</i></span>
+      </div>
+      <div class="gd-faixa gd-faixa--livre gd-so-salvando" hidden>
+        <svg><use href="#i-guardar"/></svg>
+        <span><b>Espere um instante</b><i>Não dá para voltar agora</i></span>
+      </div>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <div class="bt-hero gd-hero--frio bt-is-desativado">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">3</span><span class="bt-hero__sub">de 5</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">Termina e a prévia abre</span><span class="bt-hero__quem">Salvar deck</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-seta"/></svg></span>
+    </div>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #resultado — a proposta pronta. A prévia é uma GRADE DE CARTINHAS, não
+     uma lista de texto; o resto do deck é uma peça tracejada que abre o
+     segundo nível.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--resultado">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">Nada entra na coleção até salvar</span>
+      <h1 class="gd-estado">Proposta pronta</h1>
+    </div>
+    <button class="gd-cota" aria-label="107 de 120 ações de IA"><b>107</b><i>de 120 · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <div class="gd-cmd gd-cmd--fita">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+        <span class="gd-cmd__cap">Comandante</span>
+        <span class="gd-cmd__pe">
+          <span style="min-width:0"><span class="gd-cmd__nome">Teferi, Herói de Dominária</span></span>
+          <span class="gd-pips"><i class="gd-w"></i><i class="gd-u"></i></span>
+        </span>
+      </div>
+
+      <button class="gd-placa">
+        <p>Relógio de Teferi</p>
+        <span class="gd-placa__cap">Nome do deck</span>
+      </button>
+
+      <div class="gd-cartas">
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+            <b class="gd-carta__qtd">1x</b>
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-w"></i><i class="gd-u"></i></span>
+          </span>
+          <figcaption>Teferi, Herói de Dominária</figcaption>
+        </figure>
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+            <b class="gd-carta__qtd">1x</b>
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-b"></i></span>
+          </span>
+          <figcaption>Anel Solar</figcaption>
+        </figure>
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            <b class="gd-carta__qtd">1x</b>
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-u"></i></span>
+          </span>
+          <figcaption>Contramágica</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="gd-dir">
+      <button class="gd-mais">
+        <em>97</em>
+        <b>Linhas no deck<br>principal</b>
+        <svg><use href="#i-seta"/></svg>
+      </button>
+
+      <div class="gd-nums">
+        <div class="gd-n"><em>63</em><i>na coleção</i></div>
+        <div class="gd-n"><em>36</em><i>a comprar</i></div>
+        <div class="gd-n"><em>248</em><i>R$ estimado</i></div>
+      </div>
+
+      <div class="gd-par">
+        <div class="bt-rule bt-rule--on">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" width="26" height="26"><use href="#i-escudo"/></svg></span>
+          <b>Legalidade conferida</b>
+          <span class="bt-rule__st">Vale</span>
+        </div>
+        <button class="bt-rule">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" width="26" height="26"><use href="#i-aviso"/></svg></span>
+          <b>2 avisos para ler</b>
+          <span class="bt-rule__st">Ver</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <button class="bt-hero">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">100</span><span class="bt-hero__sub">cartas</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">Entra na coleção agora</span><span class="bt-hero__quem">Salvar deck</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-seta"/></svg></span>
+    </button>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #bloqueado — a proposta nasce travada. Brasa como TINTA (nada é
+     destruído aqui); o herói apaga porque não há o que salvar.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--bloqueado">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">A proposta chegou travada</span>
+      <h1 class="gd-estado">Não dá para salvar</h1>
+    </div>
+    <button class="gd-cota" aria-label="107 de 120 ações de IA"><b>107</b><i>de 120 · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <div class="gd-painel gd-painel--erro">
+        <div class="gd-painel__cab"><svg><use href="#i-aviso"/></svg><span>O que travou</span></div>
+        <div class="gd-painel__linha">
+          <span class="gd-num">3<small>cartas fora<br>do bracket 2</small></span>
+          <span class="gd-divisa"></span>
+          <p class="gd-fala">Três cartas da proposta não cabem no bracket que você pediu. Troque o bracket ou tire as três.</p>
+        </div>
+      </div>
+
+      <div class="gd-cartas">
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+            <b class="gd-carta__qtd">1x</b>
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-b"></i></span>
+          </span>
+          <figcaption>Anel Solar</figcaption>
+        </figure>
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            <b class="gd-carta__qtd">1x</b>
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-u"></i></span>
+          </span>
+          <figcaption>Tempo Fraturado</figcaption>
+        </figure>
+        <figure class="gd-carta gd-carta--vazia">
+          <span class="gd-carta__art"><svg><use href="#i-coroa"/></svg></span>
+          <figcaption>Sem arte aqui</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="gd-dir">
+      <div class="gd-nums">
+        <div class="gd-n"><em>3</em><i>a tirar</i></div>
+        <div class="gd-n"><em>97</em><i>já valem</i></div>
+        <div class="gd-n"><em>2</em><i>avisos</i></div>
+      </div>
+      <button class="gd-faixa">
+        <svg><use href="#i-escudo"/></svg>
+        <span><b>Subir para o bracket 4</b><i>As três passam a valer</i></span>
+      </button>
+      <button class="gd-faixa">
+        <svg><use href="#i-cartas"/></svg>
+        <span><b>Ver as três cartas</b><i>Tirar uma a uma</i></span>
+      </button>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <div class="bt-hero gd-hero--frio bt-is-desativado">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">3</span><span class="bt-hero__sub">travam</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">Resolva as três primeiro</span><span class="bt-hero__quem">Salvar deck</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-seta"/></svg></span>
+    </div>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #erro — falha recuperável. Brasa como TINTA, numeral grande de âncora,
+     o que aconteceu em palavra de gente e a saída: tentar de novo.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--erro">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">Nada foi cobrado · nada ficou pela metade</span>
+      <h1 class="gd-estado">Deu erro</h1>
+    </div>
+    <button class="gd-cota" aria-label="108 de 120 ações de IA"><b>108</b><i>de 120 · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <div class="gd-cmd gd-cmd--fita">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+        <span class="gd-cmd__cap">Comandante</span>
+        <span class="gd-cmd__pe">
+          <span style="min-width:0"><span class="gd-cmd__nome">Teferi, Herói de Dominária</span></span>
+          <span class="gd-pips"><i class="gd-w"></i><i class="gd-u"></i></span>
+        </span>
+      </div>
+      <button class="gd-placa">
+        <p>Controle azul e branco: segurar a mesa com contramágicas e fechar com o comandante.</p>
+        <span class="gd-placa__cap">Guardado</span>
+      </button>
+    </div>
+
+    <div class="gd-dir">
+      <div class="gd-painel gd-painel--erro">
+        <div class="gd-painel__cab"><svg><use href="#i-relogio"/></svg><span>A IA parou de responder</span></div>
+        <div class="gd-painel__linha">
+          <span class="gd-num">108<small>ações de IA<br>intactas</small></span>
+          <span class="gd-divisa"></span>
+          <p class="gd-fala">Ela aceitou o pedido e não devolveu a lista a tempo.</p>
+        </div>
+        <ul class="bt-log">
+          <li>Pedido aceito · 0:12</li>
+          <li>Sem resposta · 3:15</li>
+        </ul>
+      </div>
+      <button class="gd-faixa">
+        <svg><use href="#i-guardar"/></svg>
+        <span><b>Seu pedido continua aqui</b><i>Volta pronto na próxima</i></span>
+      </button>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <button class="bt-hero">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">100</span><span class="bt-hero__sub">cartas</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">A mesma receita</span><span class="bt-hero__quem">Tentar de novo</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-refaz"/></svg></span>
+    </button>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #cota — a cota de IA esgotou. Não é erro: é um estado que está VALENDO,
+     então é COR CHEIA (vitral noite), nunca brasa. Duas saídas reais.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--cota">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">A beta zera todo mês</span>
+      <h1 class="gd-estado">Cota cheia</h1>
+    </div>
+    <button class="gd-cota gd-cota--fim" aria-label="0 ações de IA hoje"><b>0</b><i>hoje · IA</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <div class="gd-painel gd-painel--lit">
+        <div class="gd-painel__cab"><svg><use href="#i-lua"/></svg><span>Cota de IA da beta</span></div>
+        <div class="gd-painel__linha">
+          <span class="gd-num">120<small>de 120<br>usadas</small></span>
+          <span class="gd-divisa"></span>
+          <p class="gd-fala">O saldo volta em 1º de outubro. Sem compra e sem upgrade nesta fase.</p>
+        </div>
+        <div class="gd-nums">
+          <div class="gd-n" style="background:rgba(11,13,18,.34); box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.18)"><em>9</em><i>dias até voltar</i></div>
+          <div class="gd-n" style="background:rgba(11,13,18,.34); box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.18)"><em>1</em><i>receita guardada</i></div>
+          <div class="gd-n" style="background:rgba(11,13,18,.34); box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.18)"><em>12</em><i>decks seus</i></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gd-dir">
+      <button class="gd-placa">
+        <p>Controle azul e branco: segurar a mesa com contramágicas e fechar com o comandante.</p>
+        <span class="gd-placa__cap">Receita guardada</span>
+      </button>
+      <button class="gd-faixa">
+        <svg><use href="#i-guardar"/></svg>
+        <span><b>A receita fica pronta</b><i>Volta inteira quando a cota voltar</i></span>
+      </button>
+      <button class="gd-faixa">
+        <svg><use href="#i-faisca"/></svg>
+        <span><b>Ver o que a beta libera</b><i>Sem paywall nesta fase</i></span>
+      </button>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <button class="bt-hero">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">100</span><span class="bt-hero__sub">cartas</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">Sem gastar ação de IA</span><span class="bt-hero__quem">Montar à mão</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-pena"/></svg></span>
+    </button>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     #negado — o recurso não está liberado para esta conta. É VAZIO SEM DONO:
+     tracejado em latão. Nenhum código, nenhum nome técnico: duas portas reais
+     e o herói que leva de volta ao que já é seu.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<main class="gd gd--negado">
+  <header class="gd-top">
+    <div class="gd-top__t">
+      <span class="gd-kicker">Nada quebrou aqui</span>
+      <h1 class="gd-estado">Não liberado</h1>
+    </div>
+    <button class="gd-cota gd-cota--livre" aria-label="Sem cota nesta conta"><b>0</b><i>sem dono</i></button>
+    <button class="bt-x" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </header>
+
+  <div class="gd-corpo">
+    <div class="gd-esq">
+      <div class="gd-painel gd-painel--livre">
+        <div class="gd-painel__cab"><svg><use href="#i-faisca"/></svg><span>Sem dono nesta versão</span></div>
+        <svg class="gd-coroa"><use href="#i-coroa"/></svg>
+        <div class="gd-painel__linha">
+          <span class="gd-num">0<small>decks que a IA<br>pode montar aqui</small></span>
+          <span class="gd-divisa"></span>
+          <p class="gd-fala">O gerador com IA não está liberado para a sua conta agora.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="gd-dir">
+      <div class="gd-cartas" style="grid-template-columns:repeat(2, minmax(0,1fr))">
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-b"></i></span>
+          </span>
+          <figcaption>Montar à mão</figcaption>
+        </figure>
+        <figure class="gd-carta">
+          <span class="gd-carta__art">
+            <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+            <span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-u"></i></span>
+          </span>
+          <figcaption>Importar uma lista</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+
+  <footer class="gd-pe">
+    <button class="bt-hero">
+      <span class="bt-hero__turno"><span class="bt-numeral bt-numeral--hero">12</span><span class="bt-hero__sub">decks</span></span>
+      <span class="bt-hero__mid"><span class="bt-hero__lb">O que já é seu continua aqui</span><span class="bt-hero__quem">Meus decks</span></span>
+      <span class="bt-hero__go"><svg><use href="#i-seta"/></svg></span>
+    </button>
+  </footer>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SEGUNDO NÍVEL 1 — escolher o comandante (#buscar)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="gd-sobre gd-sobre--buscar">
+  <div class="gd-sobre__head">
+    <button class="bt-back" aria-label="Voltar"><svg><use href="#i-volta"/></svg></button>
+    <h2>Escolher comandante</h2>
+    <button class="bt-x bt-x--head" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </div>
+  <div class="gd-sobre__corpo">
+    <div style="display:flex; align-items:flex-end; gap:12px">
+      <div class="gd-placa" style="flex:1"><p style="font-style:normal">teferi</p></div>
+      <button class="gd-rd" aria-label="Limpar a busca" style="width:46px;height:46px"><svg><use href="#i-x"/></svg></button>
+      <div style="text-align:right; padding-bottom:4px">
+        <span style="font:700 26px/1 var(--bt-display); color:var(--bt-latao-400)">6</span>
+        <span style="display:block; font:800 9px/1 var(--bt-ui); letter-spacing:.1em; text-transform:uppercase; color:var(--bt-nevoa-fraca); margin-top:5px">candidatos</span>
+      </div>
+    </div>
+    <div class="gd-grade">
+      <button class="gd-cand gd-cand--on">
+        <span class="gd-cand__art"><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""></span>
+        <b>Teferi, Herói de Dominária</b>
+        <span class="gd-cand__pe"><span class="gd-pips gd-pips--mini"><i class="gd-w"></i><i class="gd-u"></i></span><span class="gd-cand__st">Escolhido</span></span>
+      </button>
+      <button class="gd-cand">
+        <span class="gd-cand__art"><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""></span>
+        <b>Teferi, Mago do Tempo</b>
+        <span class="gd-cand__pe"><span class="gd-pips gd-pips--mini"><i class="gd-u"></i></span><span class="gd-cand__st">Elegível</span></span>
+      </button>
+      <button class="gd-cand">
+        <span class="gd-cand__art gd-cand__art--livre"><svg><use href="#i-coroa"/></svg></span>
+        <b>Teferi, Arquimago Temporal</b>
+        <span class="gd-cand__pe"><span class="gd-pips gd-pips--mini"><i class="gd-w"></i><i class="gd-u"></i></span><span class="gd-cand__st">Elegível</span></span>
+      </button>
+      <button class="gd-cand gd-cand--fora">
+        <span class="gd-cand__art"><img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""></span>
+        <b>Teferi, Mestre do Tempo</b>
+        <span class="gd-cand__pe"><span class="gd-pips gd-pips--mini"><i class="gd-u"></i></span><span class="gd-cand__st">Não é comandante</span></span>
+      </button>
+    </div>
+    <div class="bt-hint">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" width="20" height="20"><use href="#i-busca"/></svg></span>
+      <p><b>Três letras</b> já bastam. A busca só mostra quem pode ser comandante no formato.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SEGUNDO NÍVEL 2 — o deck principal inteiro (#lista)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="gd-sobre gd-sobre--lista">
+  <div class="gd-sobre__head">
+    <button class="bt-back" aria-label="Voltar"><svg><use href="#i-volta"/></svg></button>
+    <h2>Deck principal</h2>
+    <button class="bt-x bt-x--head" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </div>
+  <div class="gd-sobre__corpo">
+    <div class="gd-grupos">
+      <button class="gd-grupo"><span><em>24</em><b>Criaturas</b></span>
+        <span class="gd-grupo__tira"><i><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""></i><i><img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""></i></span></button>
+      <button class="gd-grupo"><span><em>18</em><b>Mágicas</b></span>
+        <span class="gd-grupo__tira"><i><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""></i></span></button>
+      <button class="gd-grupo"><span><em>12</em><b>Artefatos</b></span>
+        <span class="gd-grupo__tira"><i><img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""></i></span></button>
+      <button class="gd-grupo"><span><em>37</em><b>Terrenos</b></span>
+        <span class="gd-grupo__tira"><i><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""></i></span></button>
+    </div>
+    <div class="gd-cartas">
+      <figure class="gd-carta"><span class="gd-carta__art"><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><b class="gd-carta__qtd">9x</b><span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-u"></i></span></span><figcaption>Ilha</figcaption></figure>
+      <figure class="gd-carta"><span class="gd-carta__art"><img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><b class="gd-carta__qtd">1x</b><span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-b"></i></span></span><figcaption>Anel Solar</figcaption></figure>
+      <figure class="gd-carta"><span class="gd-carta__art"><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><b class="gd-carta__qtd">1x</b><span class="gd-pips gd-pips--selo gd-pips--mini"><i class="gd-w"></i></span></span><figcaption>Ordem do Sol Sagrado</figcaption></figure>
+    </div>
+    <button class="gd-mais"><em>88</em><b>Linhas restantes<br>em ordem de mana</b><svg><use href="#i-seta"/></svg></button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SEGUNDO NÍVEL 3 — formato e o que depende dele (#formato)
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="gd-sobre gd-sobre--formato">
+  <div class="gd-sobre__head">
+    <button class="bt-back" aria-label="Voltar"><svg><use href="#i-volta"/></svg></button>
+    <h2>Formato</h2>
+    <button class="bt-x bt-x--head" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+  </div>
+  <div class="gd-sobre__corpo">
+    <div class="gd-fmt">
+      <button class="gd-arq gd-arq--sel gd-fmt__g" style="justify-content:flex-end">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+        <b style="font:700 24px/1 var(--bt-display)">Commander</b>
+        <span style="font:800 10px/1 var(--bt-ui); letter-spacing:.1em; text-transform:uppercase; color:rgba(11,13,18,.72); margin-top:6px">100 cartas · uma de cada</span>
+      </button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Brawl</span></span><span class="gd-t__val"><em>60</em></span></button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Standard</span></span><span class="gd-t__val"><em>60</em></span></button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Modern</span></span><span class="gd-t__val"><em>60</em></span></button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Pioneer</span></span><span class="gd-t__val"><em>60</em></span></button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Legacy</span></span><span class="gd-t__val"><em>60</em></span></button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Vintage</span></span><span class="gd-t__val"><em>60</em></span></button>
+      <button class="gd-t"><span class="gd-t__top"><span class="gd-t__cap">Pauper</span></span><span class="gd-t__val"><em>60</em></span></button>
+    </div>
+
+    <div class="gd-bloco">
+      <span class="gd-bloco__cap">Bracket do Commander</span>
+      <div class="gd-fila">
+        <button class="bt-vpiece"><span class="bt-vpiece__num">1</span></button>
+        <button class="bt-vpiece bt-vpiece--on"><span class="bt-vpiece__num">2</span><span class="gd-vnome">Core</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">3</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">4</span></button>
+        <button class="bt-vpiece"><span class="bt-vpiece__num">5</span></button>
+      </div>
+      <p style="margin:0; font:600 19px/1.28 var(--bt-display); color:var(--bt-marfim)">
+        Plano direto, nenhuma carta que vira a mesa sozinha, vitória telegrafada a partir do turno oito.
+      </p>
+    </div>
+
+    <div class="bt-hint">
+      <span class="bt-hint__ico"><svg viewBox="0 0 24 24" width="20" height="20"><use href="#i-escudo"/></svg></span>
+      <p>Trocar de formato <b>não apaga</b> a proposta que já está na tela.</p>
+    </div>
+  </div>
+</div>
+
+<div class="gd-gesto" aria-hidden="true"></div>
+
+<script>
+/* estados por hash: o body ganha data-estado e o CSS mostra a tela certa. */
+(function(){
+  var ok = ['vazio','preenchido','gerando','resultado','erro','cota','negado',
+            'bloqueado','buscar','lista','formato','direto','salvando'];
+  function aplica(){
+    var h = (location.hash || '').replace('#','');
+    var e = ok.indexOf(h) >= 0 ? h : 'vazio';
+    document.body.dataset.estado = e;
+    /* as três variantes do painel de trabalho moram na mesma tela */
+    ['gerando','direto','salvando'].forEach(function(v){
+      document.querySelectorAll('.gd-so-' + v).forEach(function(n){ n.hidden = (e !== v); });
+    });
+  }
+  addEventListener('hashchange', aplica);
+  aplica();
+})();
+</script>
+</body>
+</html>

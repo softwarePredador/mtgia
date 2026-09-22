@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BrewTact · Gerador de Decks · direção Forja</title>
+<link rel="stylesheet" href="../../../ui-kit/kit.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   DIREÇÃO "FORJA" — Gerador de Decks com IA
+   Régua: docs/design/life-counter-prototype (menu.png, jogadores.png,
+          vt-04-regras, vt-05-jogador, vt-06-dados, vt-07-quem-comeca).
+   Kit congelado: ../../../ui-kit/kit.css — usado como está.
+
+   A tese: a tela é pensada em torno do JOB ASSÍNCRONO.
+     · antes de gerar   → a receita é um punhado de peças que mostram o valor dentro;
+     · durante          → o herói vira um numeral Fraunces gigante contando cartas
+                          e as cinco etapas são azulejos que acendem um a um;
+     · depois           → as cartas-chave são miniaturas reais.
+   A cota de IA é peça-numeral dentro da tela, nunca aviso em caixa.
+
+   Nada de cor/raio/sombra/tipo do kit é redefinido. Só layout, e dois grupos
+   de tokens novos, registrados no mapa de funções:
+     --gd-w/u/b/r/g  identidade de cor de MTG (não existe no kit e não pode virar
+                     latão: é informação de regra da carta).
+     --gd-vinho      o `--vinho: #6E1B2A` da RÉGUA (estado ruim valendo), fora do kit.
+   ═══════════════════════════════════════════════════════════════════════════ */
+*{ -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; height:100%; }
+main{ height:100%; }
+body.bt-base{ overflow:hidden; }
+
+:root{
+  --gd-topo:44px; --gd-pe:28px; --gd-lado:16px;
+  --gd-vinho:#6E1B2A;
+  --gd-w:#E8DCB6; --gd-u:#3C7EB8; --gd-b:#453E4E; --gd-r:#B5402B; --gd-g:#356B45;
+}
+
+/* ── a lista de decks continua viva embaixo (reconhecível pela FORMA) ─────── */
+.gd-fundo{ position:fixed; inset:0; display:flex; flex-direction:column; gap:10px;
+  padding:50px 14px 0; box-sizing:border-box; pointer-events:none;
+  filter:blur(8px) saturate(.9); }
+.gd-fundo__bar{ display:flex; align-items:center; gap:10px; height:32px; flex:none; }
+.gd-fundo__mark{ width:25px; height:25px; border-radius:9px; background:var(--bt-latao-500); }
+.gd-fundo__bar u{ flex:1; }
+.gd-fundo__bar i{ width:25px; height:25px; border-radius:50%; background:rgba(243,239,227,.2); }
+.gd-fundo__decks{ display:grid; grid-template-columns:1fr 1fr; gap:10px; flex:1 1 0; min-height:0; }
+.gd-fundo__c{ border-radius:16px; padding:8px; box-sizing:border-box; display:grid;
+  grid-template-rows:1fr auto auto; gap:5px; background:rgba(41,48,65,.9);
+  box-shadow:inset 0 0 0 1px rgba(243,239,227,.08); min-height:0; }
+.gd-fundo__c img{ width:100%; height:100%; object-fit:cover; border-radius:10px; }
+.gd-fundo__c s{ display:block; height:7px; border-radius:4px; background:rgba(243,239,227,.32); }
+.gd-fundo__c s.gd-curto{ width:54%; background:rgba(243,239,227,.16); }
+.gd-fundo__nav{ flex:none; height:56px; display:flex; align-items:center; justify-content:space-around;
+  margin-inline:-14px; padding:0 18px 8px;
+  background:linear-gradient(180deg, rgba(58,68,90,0), rgba(58,68,90,.98) 30%);
+  box-shadow:inset 0 1px 0 rgba(243,239,227,.12); }
+.gd-fundo__nav i{ width:27px; height:27px; border-radius:9px; background:rgba(243,239,227,.6); }
+.gd-fundo__nav i:first-child{ background:var(--bt-latao-400); }
+.gd-veu{ position:fixed; inset:0; pointer-events:none;
+  background:
+    radial-gradient(125% 58% at 50% 2%, rgba(11,13,18,.96), rgba(11,13,18,.80) 54%, rgba(11,13,18,.46) 100%),
+    linear-gradient(180deg, rgba(11,13,18,.84) 0%, rgba(11,13,18,.72) 46%, rgba(11,13,18,.52) 78%, rgba(11,13,18,.18) 100%); }
+.gd-gesto{ position:fixed; left:50%; bottom:9px; translate:-50% 0; width:134px; height:5px;
+  border-radius:999px; background:rgba(243,239,227,.32); pointer-events:none; }
+
+/* ── a tela ───────────────────────────────────────────────────────────────── */
+.gd{ position:relative; display:none; flex-direction:column; height:100%; box-sizing:border-box;
+  padding:var(--gd-topo) var(--gd-lado) var(--gd-pe); gap:8px; }
+.gd > *{ flex:none; }
+.gd-cresce{ flex:1 1 auto; min-height:0; }
+body[data-estado="vazio"]      .gd--vazio,
+body[data-estado="preenchido"] .gd--preenchido,
+body[data-estado="gerando"]    .gd--gerando,
+body[data-estado="limite"]     .gd--limite,
+body[data-estado="direto"]     .gd--direto,
+body[data-estado="resultado"]  .gd--resultado,
+body[data-estado="lista"]      .gd--lista,
+body[data-estado="bloqueado"]  .gd--bloqueado,
+body[data-estado="salvando"]   .gd--salvando,
+body[data-estado="comandante"] .gd--comandante,
+body[data-estado="formato"]    .gd--formato,
+body[data-estado="erro"]       .gd--erro,
+body[data-estado="cota"]       .gd--cota,
+body[data-estado="negado"]     .gd--negado{ display:flex; }
+
+/* ── cabeçalho: nome da rota · o único ✕ (= volta para decks) ─────────────── */
+.gd-top{ display:flex; align-items:center; gap:8px; min-height:64px; }
+.gd-rota{ flex:1; min-width:0; font:800 10.5px/1.25 var(--bt-ui); letter-spacing:.115em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); }
+.gd-folha{ font:600 20px/1.15 var(--bt-display); letter-spacing:0; text-transform:none;
+  color:var(--bt-marfim); }
+.gd-top .bt-back{ margin-left:-10px; }
+.bt-x.bt-is-desativado{ opacity:.34; }
+
+/* ── título da tela + a cota como peça-numeral ───────────────────────────── */
+.gd-cab{ display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:44px; }
+.gd-h1{ margin:0; font:600 29px/1 var(--bt-display); letter-spacing:-.022em; color:var(--bt-marfim); }
+.gd-cota{ width:auto; height:auto; flex:none; padding:6px 12px 7px; display:flex;
+  align-items:baseline; gap:7px; }
+.gd-cota i{ font:800 10px/1.2 var(--bt-ui); font-style:normal; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); text-align:left; }
+.gd-cota i b{ display:block; color:var(--bt-nevoa); }
+
+/* ── bandas e legendas ───────────────────────────────────────────────────── */
+.gd-2col{ display:flex; gap:9px; align-items:stretch; }
+.gd-2col > *{ min-width:0; }
+.gd-2col > *:first-child{ flex:1 1 0; }
+.gd-row{ display:flex; gap:8px; min-width:0; }
+.gd-row > *{ flex:1 1 0; min-width:0; }
+.bt-rband.gd-cresce{ grid-template-rows:auto 1fr; }
+.bt-rband.gd-band3.gd-cresce{ grid-template-rows:auto auto 1fr; }
+.gd-row.gd-cresce{ align-items:stretch; }
+.gd-quota{ justify-content:center; gap:11px; }
+
+/* ── a placa: entrada de texto livre (uma e duas linhas) ─────────────────── */
+.gd-txt{ display:block; font:600 19px/1.3 var(--bt-display); font-optical-sizing:auto;
+  color:var(--bt-marfim); border-bottom:2px solid rgba(243,239,227,.22); padding:2px 0 9px;
+  text-align:left; width:100%; box-sizing:border-box; }
+.gd-txt--vazio{ color:var(--bt-nevoa-fraca); font-style:italic; }
+.gd-txt--foco{ border-bottom-color:var(--bt-latao-400); }
+.gd-plaqrow{ display:flex; align-items:baseline; gap:10px; }
+.gd-plaqrow .gd-txt{ flex:1 1 0; }
+.gd-limpar{ flex:none; font:800 10.5px/1 var(--bt-ui); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--bt-latao-400); padding:0 0 9px; }
+
+/* ── bracket: cinco peças-numeral (vt-04) ────────────────────────────────── */
+.gd-brk{ display:flex; gap:8px; }
+.gd-brk .bt-vpiece{ flex:1 1 0; width:auto; height:52px; }
+
+/* ── coleção: o trio que substitui os dois interruptores acoplados ───────── */
+.gd-trio{ display:flex; gap:8px; }
+.gd-trio .bt-rule--sm{ flex:1 1 0; width:auto; min-height:56px; padding:7px 4px; }
+.gd-trio .bt-rule--sm b{ font-size:11px; line-height:1.15; text-align:center; }
+
+/* ── peças com miniatura real ────────────────────────────────────────────── */
+.gd-moldura{ display:block; border-radius:var(--bt-raio-mini); overflow:hidden;
+  background:rgba(11,13,18,.8); flex:1 1 0; min-height:0; }
+.gd-moldura img{ width:100%; height:100%; object-fit:cover; object-position:50% 28%; display:block; }
+.gd-nome{ font:700 14.5px/1.08 var(--bt-display); letter-spacing:-.01em; color:var(--bt-marfim);
+  overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.bt-piece--on .gd-nome{ color:var(--bt-obsidiana-950); }
+.gd-pips{ display:flex; gap:4px; align-items:center; flex:none; padding-bottom:2px; }
+.gd-pips b{ width:12px; height:12px; border-radius:50%; background:var(--gd-r);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.28), 0 0 0 1.5px rgba(11,13,18,.55); }
+.gd-pips b.gd-u{ background:var(--gd-u); } .gd-pips b.gd-g{ background:var(--gd-g); }
+.gd-pips b.gd-w{ background:var(--gd-w); } .gd-pips b.gd-b{ background:var(--gd-b); }
+.gd-cmd .bt-piece__foot{ align-items:center; margin-top:8px; }
+.gd-qtd{ position:absolute; top:9px; left:10px; z-index:2; padding:3px 7px 4px;
+  border-radius:var(--bt-raio-pilula); background:rgba(11,13,18,.82);
+  font:700 13px/1 var(--bt-display); font-variant-numeric:lining-nums;
+  color:var(--bt-latao-400); box-shadow:0 0 0 1px rgba(224,169,59,.35); }
+
+/* ── o herói que conta cartas ────────────────────────────────────────────── */
+.gd-forja .bt-result__num{ line-height:.78; }
+.gd-forja{ padding-top:10px; }
+.gd-fala{ margin:0; font:600 20px/1.22 var(--bt-display); color:var(--bt-marfim); text-wrap:balance; }
+.gd-fala--brasa{ color:var(--bt-brasa); }
+
+/* ── as cinco etapas ─────────────────────────────────────────────────────── */
+.gd-etapas{ display:flex; flex-direction:column; gap:8px; }
+.gd-etapa{ min-height:88px; }
+.gd-etapa .bt-tile__ic{ width:27px; height:27px; }
+.gd-etapa .bt-tile__lb{ font-size:10.5px; letter-spacing:.075em; }
+.gd-etapa .bt-tile__estado{ top:10px; right:11px; font-size:16px; }
+
+/* ── pílulas do histórico do job ─────────────────────────────────────────── */
+.bt-log li.gd-pill--latao{ color:var(--bt-latao-400); }
+.bt-log li.gd-pill--brasa{ color:var(--bt-brasa); }
+
+/* ── faixa de ação em tinta de brasa (cancelar) ──────────────────────────── */
+.gd-lane--brasa{ color:var(--bt-brasa); }
+.gd-lane--brasa svg{ color:var(--bt-brasa); }
+
+/* ── grade das linhas do deck ────────────────────────────────────────────── */
+.gd-linhas{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:7px; }
+.gd-linha{ min-height:85px; border-radius:var(--bt-raio-mini); padding:8px 9px 7px;
+  box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between;
+  gap:3px; text-align:left; background:var(--bt-grad-peca);
+  box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.09), 0 6px 14px rgba(0,0,0,.4); }
+.gd-linha b{ font:700 20px/1 var(--bt-display); font-variant-numeric:lining-nums tabular-nums;
+  color:var(--bt-nevoa); }
+.gd-linha i{ font:700 9.5px/1.15 var(--bt-ui); font-style:normal; letter-spacing:.03em;
+  text-transform:uppercase; color:var(--bt-marfim); overflow:hidden;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+.gd-linha--mais{ grid-column:1 / -1; min-height:50px; flex-direction:row; align-items:center;
+  justify-content:flex-start; gap:12px; background:var(--bt-grad-livre);
+  box-shadow:var(--bt-sombra-livre); position:relative; }
+.gd-linha--mais::before{ content:""; position:absolute; inset:0; border:var(--bt-tracejado);
+  border-radius:inherit; pointer-events:none; }
+.gd-linha--mais b{ color:var(--bt-latao-400); font-size:24px; }
+.gd-linha--mais i{ color:var(--bt-latao-rotulo); -webkit-line-clamp:1; }
+
+/* ── candidatos do seletor de comandante ─────────────────────────────────── */
+.gd-cands{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.gd-cands .bt-piece{ min-height:238px; }
+.gd-selo{ font:800 9px/1 var(--bt-ui); letter-spacing:.08em; text-transform:uppercase;
+  color:var(--bt-nevoa-fraca); }
+.bt-piece--on .gd-selo{ color:rgba(11,13,18,.72); }
+.gd-bloq{ position:absolute; top:9px; right:10px; z-index:2; width:23px; height:23px;
+  border-radius:50%; display:grid; place-items:center; background:rgba(11,13,18,.7); color:var(--bt-nevoa); }
+.gd-bloq svg{ width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2;
+  stroke-linecap:round; stroke-linejoin:round; }
+.gd-fade{ opacity:.62; }
+
+/* ── formatos ────────────────────────────────────────────────────────────── */
+.gd-formatos{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:8px; }
+.gd-formatos.gd-cresce{ grid-template-rows:1fr 1fr; }
+.gd-formatos .bt-shape{ min-height:128px; }
+.gd-formatos .bt-shape svg{ width:32px; height:32px; }
+.gd-formatos .bt-shape__cap{ font-size:9.5px; letter-spacing:.06em; }
+.gd-shape--on{ background:var(--bt-grad-latao-peca); color:var(--bt-obsidiana-950);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45), 0 0 0 3px var(--bt-obsidiana-950),
+    0 0 0 5px rgba(224,169,59,.55); }
+.gd-shape--on .bt-shape__cap{ color:rgba(11,13,18,.78); }
+
+/* ── estado ruim que está valendo (vinho da régua) ───────────────────────── */
+.gd-ruim{ background:linear-gradient(158deg,
+    color-mix(in srgb, var(--gd-vinho) 74%, #fff), var(--gd-vinho) 45%,
+    color-mix(in srgb, var(--gd-vinho) 66%, #000));
+  color:var(--bt-marfim);
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.28), 0 0 0 3px var(--bt-obsidiana-950),
+    0 0 0 5px rgba(110,27,42,.55); }
+.gd-ruim b{ color:var(--bt-marfim); }
+.gd-ruim .bt-rule__st{ color:rgba(243,239,227,.82); }
+.gd-ruim .bt-rule__ico{ color:var(--bt-marfim); }
+
+/* ── a peça grande e tracejada (forja fria · capability negada) ──────────── */
+.gd-vazia{ min-height:132px; display:flex; flex-direction:row; align-items:center; gap:18px; }
+.gd-vazia .bt-empty__ic{ width:52px; height:52px; color:var(--bt-latao-400); }
+.gd-vazia__mid{ display:grid; gap:7px; min-width:0; flex:1 1 0; }
+.gd-vazia__num{ font:700 48px/.82 var(--bt-display); font-variant-numeric:lining-nums tabular-nums;
+  color:rgba(224,169,59,.58); letter-spacing:-.025em; }
+
+/* ── miniaturas das cartas-chave ─────────────────────────────────────────── */
+.gd-chaves{ display:flex; gap:8px; }
+.gd-chaves .bt-piece{ min-height:148px; }
+.gd-chaves .gd-nome{ font-size:11.8px; line-height:1.14; -webkit-line-clamp:3; }
+
+/* ── numeral de espera / contagem regressiva ─────────────────────────────── */
+.gd-espera{ display:flex; align-items:center; gap:11px; padding:9px 14px; box-sizing:border-box;
+  border-radius:var(--bt-raio-regra); background:rgba(29,34,44,.8);
+  box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.13); }
+.gd-espera svg{ width:20px; height:20px; flex:none; fill:none; stroke:var(--bt-latao-400);
+  stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.gd-espera b{ font:700 26px/1 var(--bt-display); font-variant-numeric:lining-nums tabular-nums;
+  color:var(--bt-latao-400); }
+.gd-espera i{ font:800 10px/1.25 var(--bt-ui); font-style:normal; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); }
+
+/* ── selos de referência aprendida (4 mini valores) ──────────────────────── */
+.gd-quatro{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:7px; }
+.gd-mini{ min-height:78px; border-radius:var(--bt-raio-mini); padding:8px 8px 7px; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:space-between; gap:4px; text-align:left;
+  background:rgba(29,34,44,.8); box-shadow:inset 0 0 0 1.5px rgba(243,239,227,.11); }
+.gd-mini b{ font:700 19px/1 var(--bt-display); font-variant-numeric:lining-nums; color:var(--bt-marfim); }
+.gd-mini b.gd-curto2{ font:700 11px/1.14 var(--bt-ui); letter-spacing:0; }
+.gd-mini i{ font:800 9px/1 var(--bt-ui); font-style:normal; letter-spacing:.09em;
+  text-transform:uppercase; color:var(--bt-nevoa-fraca); }
+
+/* ── faixa de erro do servidor (peça, nunca caixa cinza) ─────────────────── */
+.gd-falha{ min-height:150px; border-radius:var(--bt-raio-azulejo); padding:15px 17px;
+  box-sizing:border-box; display:flex; flex-direction:column; justify-content:space-between;
+  gap:12px; text-align:left; }
+.gd-falha__top{ display:flex; align-items:flex-start; gap:12px; }
+.gd-falha__ic{ width:34px; height:34px; flex:none; fill:none; stroke:var(--bt-brasa);
+  stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+.gd-falha__st{ font:800 11px/1.2 var(--bt-ui); letter-spacing:.11em; text-transform:uppercase;
+  color:var(--bt-brasa); }
+.gd-falha__num{ font:700 42px/.85 var(--bt-display); font-variant-numeric:lining-nums tabular-nums;
+  color:var(--bt-brasa); letter-spacing:-.02em; white-space:nowrap; }
+.gd-falha__num u{ font:800 11px/1 var(--bt-ui); letter-spacing:.1em; text-decoration:none; }
+.gd-falha__pe{ display:flex; align-items:flex-end; justify-content:space-between; gap:12px; }
+
+svg.gd-sprite{ position:absolute; width:0; height:0; overflow:hidden; }
+</style>
+</head>
+<body class="bt-base" data-estado="vazio">
+
+<!-- ═══ a lista de decks continua viva embaixo ═══════════════════════════════ -->
+<div class="gd-fundo" aria-hidden="true">
+  <div class="gd-fundo__bar"><span class="gd-fundo__mark"></span><u></u><i></i><i></i></div>
+  <div class="gd-fundo__decks">
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt=""><s></s><s class="gd-curto"></s></div>
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt=""><s></s><s class="gd-curto"></s></div>
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt=""><s></s><s class="gd-curto"></s></div>
+    <div class="gd-fundo__c"><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt=""><s></s><s class="gd-curto"></s></div>
+  </div>
+  <div class="gd-fundo__nav"><i></i><i></i><i></i><i></i></div>
+</div>
+<div class="gd-veu" aria-hidden="true"></div>
+
+<main>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #vazio — a forja fria. Nada preenchido.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--vazio">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">Gerar Deck</h1>
+    <button class="bt-vpiece gd-cota" aria-label="Ações de IA: 3 de 5 usadas hoje. Beta gratuita.">
+      <b class="bt-numeral bt-numeral--tile-pequeno">3</b>
+      <i>de 5<b>IA hoje</b></i>
+    </button>
+  </div>
+
+  <div class="bt-tile bt-empty bt-is-vazio gd-vazia gd-cresce">
+    <svg class="bt-empty__ic" viewBox="0 0 24 24"><use href="#i-bigorna"/></svg>
+    <span class="gd-vazia__mid">
+      <span class="gd-vazia__num">100</span>
+      <span class="bt-empty__lb">A forja está fria</span>
+    </span>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Comece por um destes</span>
+    <div class="gd-row" style="margin-bottom:8px">
+      <button class="bt-tile" style="min-height:72px"><svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-chama"/></svg><span class="bt-tile__lb">Goblins</span></button>
+      <button class="bt-tile" style="min-height:72px"><svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-gota"/></svg><span class="bt-tile__lb">Controle</span></button>
+      <button class="bt-tile" style="min-height:72px"><svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-folha"/></svg><span class="bt-tile__lb">Elfos</span></button>
+    </div>
+    <div class="gd-row">
+      <button class="bt-tile" style="min-height:72px"><svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-caveira"/></svg><span class="bt-tile__lb">Sacrifício</span></button>
+      <button class="bt-tile" style="min-height:72px"><svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-asa"/></svg><span class="bt-tile__lb">Dragões</span></button>
+      <button class="bt-tile" style="min-height:72px"><svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-lapide"/></svg><span class="bt-tile__lb">Zumbis</span></button>
+    </div>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Descreva seu deck</span>
+    <span class="gd-txt gd-txt--vazio">Ex.: goblins vermelhos, criaturas pequenas e dano em massa…</span>
+  </div>
+
+  <button class="bt-lane">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-forma"/></svg>
+    <span><b>Commander</b><i>Formato · 100 cartas</i></span>
+  </button>
+
+  <div class="gd-row">
+    <button class="bt-tile bt-tile--lit bt-tile--coroa" style="min-height:66px">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:25px;height:25px"><use href="#i-escudo"/></svg>
+      <span class="bt-tile__lb">Bracket</span><span class="bt-tile__estado">2 Core</span></button>
+    <button class="bt-tile bt-tile--livre" style="min-height:66px">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:25px;height:25px"><use href="#i-coroa"/></svg>
+      <span class="bt-tile__lb">Comandante</span><span class="bt-tile__estado">Sem</span></button>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-varinha"/></svg>
+    <p><b>Gerar cria uma proposta revisável.</b> Otimizar depois faz ajuste leve ou rebuild guiado — a IA nunca substitui validação e review.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #preenchido — a receita montada, pronta para forjar.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--preenchido">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">Gerar Deck</h1>
+    <button class="bt-vpiece gd-cota" aria-label="Ações de IA: 3 de 5 usadas hoje. Beta gratuita.">
+      <b class="bt-numeral bt-numeral--tile-pequeno">3</b>
+      <i>de 5<b>IA hoje</b></i>
+    </button>
+  </div>
+
+  <button class="bt-lane" style="min-height:60px">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-forma"/></svg>
+    <span><b>Commander</b><i>Formato · 100 cartas</i></span>
+  </button>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Bracket Commander</span>
+    <div class="gd-brk">
+      <button class="bt-vpiece"><b class="bt-vpiece__num">1</b></button>
+      <button class="bt-vpiece bt-vpiece--on"><b class="bt-vpiece__num">2</b></button>
+      <button class="bt-vpiece"><b class="bt-vpiece__num">3</b></button>
+      <button class="bt-vpiece"><b class="bt-vpiece__num">4</b></button>
+      <button class="bt-vpiece"><b class="bt-vpiece__num">5</b></button>
+    </div>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-escudo"/></svg>
+    <p><b>Core</b> — plano direto, 0 Game Changers, vitória telegrafada a partir do turno 8.</p>
+  </div>
+
+  <div class="gd-2col">
+    <div class="bt-rband">
+      <span class="bt-rband__cap">Comandante</span>
+      <button class="bt-piece bt-piece--on gd-cmd" style="min-height:94px">
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="Arte de Krenko, Mob Boss"></span>
+        <span class="bt-piece__foot">
+          <b class="gd-nome">Krenko, Mob Boss</b>
+          <i class="gd-pips"><b></b></i>
+        </span>
+      </button>
+    </div>
+    <div class="bt-rband" style="width:118px; flex:none">
+      <span class="bt-rband__cap">Aprendido</span>
+      <button class="bt-tile bt-tile--lit bt-tile--plano" style="min-height:94px">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:25px;height:25px"><use href="#i-livro"/></svg>
+        <span class="bt-tile__lb">Usar deck<br>pronto</span>
+        <span class="bt-tile__estado" style="font-size:14px">legal</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Descreva seu deck</span>
+    <span class="gd-txt">Goblins vermelhos agressivos, muitas criaturas pequenas e dano em massa.</span>
+  </div>
+
+  <div class="gd-2col">
+    <div class="bt-rband">
+      <span class="bt-rband__cap">Minha coleção</span>
+      <div class="gd-trio">
+        <button class="bt-rule bt-rule--sm"><span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><use href="#i-mundo"/></svg></span><b>Ignorar</b></button>
+        <button class="bt-rule bt-rule--sm bt-rule--on"><span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><use href="#i-caixa"/></svg></span><b>Preferir</b></button>
+        <button class="bt-rule bt-rule--sm"><span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><use href="#i-cadeado"/></svg></span><b>Só o que<br>tenho</b></button>
+      </div>
+    </div>
+    <div class="bt-rband" style="width:112px; flex:none; align-content:end">
+      <span class="bt-rband__cap">Orçamento</span>
+      <span class="gd-txt" style="font-size:22px; padding-top:5px">R$ 350</span>
+    </div>
+  </div>
+
+  <ul class="bt-log">
+    <li class="gd-pill--latao">Receita retomada · há 2 min</li>
+    <li>Chave 7C2F</li>
+  </ul>
+
+  <button class="bt-hero">
+    <span class="bt-hero__turno"><b class="bt-numeral bt-numeral--hero">100</b><i class="bt-hero__sub">cartas</i></span>
+    <span class="bt-hero__mid"><span class="bt-hero__lb">Gasta 1 de 5</span><span class="bt-hero__quem">Forjar</span></span>
+    <span class="bt-hero__go"><svg viewBox="0 0 24 24"><use href="#i-seta"/></svg></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #gerando — o job assíncrono: numeral que conta, cinco etapas, cancelar.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--gerando">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">Forjando</h1>
+    <button class="bt-vpiece gd-cota" aria-label="Ações de IA: 4 de 5 usadas hoje.">
+      <b class="bt-numeral bt-numeral--tile-pequeno">4</b>
+      <i>de 5<b>IA hoje</b></i>
+    </button>
+  </div>
+
+  <p class="gd-fala">Ajustando mana e quantidades antes do preview…</p>
+
+  <div class="bt-result bt-result--tem gd-forja gd-cresce" style="min-height:168px; max-height:204px">
+    <b class="bt-result__num">37</b>
+    <span class="bt-result__cap">de 100 cartas na bigorna</span>
+  </div>
+
+  <div class="gd-espera">
+    <svg viewBox="0 0 24 24"><use href="#i-relogio"/></svg>
+    <b>2:41</b>
+    <i>Tempo do job<br>negociado com o servidor</i>
+  </div>
+
+  <div class="gd-etapas">
+    <div class="gd-row">
+      <div class="bt-tile bt-tile--lit bt-tile--iniciativa gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-check"/></svg>
+        <span class="bt-tile__lb">Pedido<br>aceito</span><span class="bt-tile__estado">1</span></div>
+      <div class="bt-tile bt-tile--lit bt-tile--iniciativa gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-fio"/></svg>
+        <span class="bt-tile__lb">Tecendo<br>a lista</span><span class="bt-tile__estado">2</span></div>
+      <div class="bt-tile bt-tile--lit bt-tile--iniciativa gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-escudo"/></svg>
+        <span class="bt-tile__lb">Validando<br>legalidade</span><span class="bt-tile__estado">3</span></div>
+    </div>
+    <div class="gd-row">
+      <div class="bt-tile bt-tile--lit bt-tile--coroa bt-is-carregando gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-gota"/></svg>
+        <span class="bt-tile__lb">Ajustando mana</span><span class="bt-tile__estado">4</span></div>
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-varinha"/></svg>
+        <span class="bt-tile__lb">Pronto para revisar</span><span class="bt-tile__estado">5</span></div>
+    </div>
+  </div>
+
+  <ul class="bt-log">
+    <li class="gd-pill--latao">Retomado do rascunho</li>
+    <li>Chave 7C2F</li>
+    <li>Limite do servidor · esperou 8 s</li>
+  </ul>
+
+  <button class="bt-lane gd-lane--brasa">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-parar"/></svg>
+    <span><b>Cancelar</b><i>a forja para · nada é cobrado</i></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #limite — 429 durante o polling · job retomado do servidor · cancelando.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--limite">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">Forjando</h1>
+    <button class="bt-vpiece gd-cota"><b class="bt-numeral bt-numeral--tile-pequeno">4</b><i>de 5<b>IA hoje</b></i></button>
+  </div>
+
+  <p class="gd-fala">O servidor pediu um instante. A forja segura o calor e continua sozinha.</p>
+
+  <div class="bt-result bt-result--tem gd-forja gd-cresce" style="min-height:150px; max-height:234px">
+    <b class="bt-result__num">28</b>
+    <span class="bt-result__cap">de 100 cartas na bigorna</span>
+  </div>
+
+  <div class="gd-espera">
+    <svg viewBox="0 0 24 24"><use href="#i-relogio"/></svg>
+    <b>8 s</b>
+    <i>Limite do servidor<br>volta sozinho</i>
+  </div>
+
+  <div class="gd-etapas">
+    <div class="gd-row">
+      <div class="bt-tile bt-tile--lit bt-tile--iniciativa gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-check"/></svg>
+        <span class="bt-tile__lb">Pedido<br>aceito</span><span class="bt-tile__estado">1</span></div>
+      <div class="bt-tile bt-tile--lit bt-tile--coroa bt-is-carregando gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-fio"/></svg>
+        <span class="bt-tile__lb">Tecendo<br>a lista</span><span class="bt-tile__estado">2</span></div>
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-escudo"/></svg>
+        <span class="bt-tile__lb">Validando<br>legalidade</span><span class="bt-tile__estado">3</span></div>
+    </div>
+    <div class="gd-row">
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-gota"/></svg>
+        <span class="bt-tile__lb">Ajustando mana</span><span class="bt-tile__estado">4</span></div>
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-varinha"/></svg>
+        <span class="bt-tile__lb">Pronto para revisar</span><span class="bt-tile__estado">5</span></div>
+    </div>
+  </div>
+
+  <ul class="bt-log">
+    <li class="gd-pill--latao">Retomado do servidor</li>
+    <li>Chave 7C2F</li>
+  </ul>
+
+  <button class="bt-lane gd-lane--brasa bt-is-carregando">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-parar"/></svg>
+    <span><b>Cancelando…</b><i>pedindo ao servidor para soltar o job</i></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #direto — servidor sem job: sem contagem e sem cancelar (não é travamento).
+     O mesmo desenho serve para "buscando deck aprendido" (progresso sem job).
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--direto">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">Forjando</h1>
+    <button class="bt-vpiece gd-cota"><b class="bt-numeral bt-numeral--tile-pequeno">4</b><i>de 5<b>IA hoje</b></i></button>
+  </div>
+
+  <p class="gd-fala">Enviando pedido para a IA. Esta versão do servidor entrega o deck de uma vez só.</p>
+
+  <div class="bt-result bt-is-carregando gd-forja gd-cresce" style="min-height:150px; max-height:196px">
+    <b class="bt-result__num">?</b>
+    <span class="bt-result__cap">sem contagem nesta versão</span>
+  </div>
+
+  <div class="gd-espera">
+    <svg viewBox="0 0 24 24"><use href="#i-relogio"/></svg>
+    <b>3:15</b>
+    <i>Tempo limite<br>o pedido não se perde</i>
+  </div>
+
+  <div class="gd-etapas">
+    <div class="gd-row">
+      <div class="bt-tile bt-tile--lit bt-tile--coroa bt-is-carregando gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-check"/></svg>
+        <span class="bt-tile__lb">Pedido<br>enviado</span><span class="bt-tile__estado">1</span></div>
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-fio"/></svg>
+        <span class="bt-tile__lb">Tecendo<br>a lista</span><span class="bt-tile__estado">2</span></div>
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-escudo"/></svg>
+        <span class="bt-tile__lb">Validando<br>legalidade</span><span class="bt-tile__estado">3</span></div>
+    </div>
+    <div class="gd-row">
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-gota"/></svg>
+        <span class="bt-tile__lb">Ajustando mana</span><span class="bt-tile__estado">4</span></div>
+      <div class="bt-tile bt-is-desativado gd-etapa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-varinha"/></svg>
+        <span class="bt-tile__lb">Pronto para revisar</span><span class="bt-tile__estado">5</span></div>
+    </div>
+  </div>
+
+  <ul class="bt-log">
+    <li class="gd-pill--latao">Sem job · não dá para cancelar</li>
+    <li>Chave 7C2F</li>
+  </ul>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-relogio"/></svg>
+    <p><b>Nada travou.</b> Este servidor não conta as etapas: o relógio acima é o único sinal, e o deck chega inteiro no fim.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #resultado — a proposta pronta: cartas-chave, prévia, salvar.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--resultado">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Nome do deck</span>
+    <span class="gd-txt" style="font-size:24px">Krenko e a Multidão</span>
+  </div>
+
+  <div class="gd-row">
+    <div class="bt-tile bt-tile--lit bt-tile--iniciativa" style="min-height:84px">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:26px;height:26px"><use href="#i-check"/></svg>
+      <span class="bt-tile__lb">Legalidade validada<br>pelo servidor</span>
+    </div>
+    <div class="bt-tile bt-tile--lit bt-tile--coroa" style="min-height:84px">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:26px;height:26px"><use href="#i-escudo"/></svg>
+      <span class="bt-tile__lb">Bracket confirmado</span>
+      <span class="bt-tile__estado">2 Core</span>
+    </div>
+  </div>
+
+  <div class="bt-rband gd-cresce">
+    <span class="bt-rband__cap">Cartas-chave</span>
+    <div class="gd-chaves" style="height:100%">
+      <button class="bt-piece">
+        <span class="gd-qtd">1x</span>
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="Arte de Skullclamp"></span>
+        <span class="bt-piece__foot" style="margin-top:8px"><b class="gd-nome">Skullclamp</b></span>
+      </button>
+      <button class="bt-piece">
+        <span class="gd-qtd">1x</span>
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="Arte de Purphoros"></span>
+        <span class="bt-piece__foot" style="margin-top:8px"><b class="gd-nome">Purphoros, God of the Forge</b></span>
+      </button>
+      <button class="bt-piece">
+        <span class="gd-qtd">1x</span>
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="Arte de Thousand-Year Elixir"></span>
+        <span class="bt-piece__foot" style="margin-top:8px"><b class="gd-nome">Thousand-Year Elixir</b></span>
+      </button>
+    </div>
+  </div>
+
+  <ul class="bt-log">
+    <li>Coleção 62</li>
+    <li>Comprar 38</li>
+    <li>R$ 214</li>
+    <li class="gd-pill--latao">Sem preço 4</li>
+  </ul>
+
+  <button class="bt-lane">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pilha"/></svg>
+    <span><b>Deck principal</b><i>99 cartas · 71 linhas</i></span>
+  </button>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-varinha"/></svg>
+    <p>Confira comandante, quantidade e avisos. <b>Nada entra na sua coleção até você salvar.</b></p>
+  </div>
+
+  <button class="bt-hero">
+    <span class="bt-hero__turno"><b class="bt-numeral bt-numeral--hero">100</b><i class="bt-hero__sub">cartas</i></span>
+    <span class="bt-hero__mid"><span class="bt-hero__lb">Revisado</span><span class="bt-hero__quem">Salvar</span></span>
+    <span class="bt-hero__go"><svg viewBox="0 0 24 24"><use href="#i-seta"/></svg></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #lista — segundo nível: as 71 linhas do deck principal.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--lista">
+  <div class="gd-top">
+    <button class="bt-back" aria-label="Voltar para a proposta"><svg viewBox="0 0 24 24"><use href="#i-volta"/></svg></button>
+    <span class="gd-rota gd-folha">Deck principal</span>
+    <button class="bt-x bt-x--head" aria-label="Fechar"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-2col">
+    <div class="bt-result bt-result--tem" style="min-height:86px">
+      <b class="bt-result__num" style="font-size:50px">99</b>
+      <span class="bt-result__cap">cartas · 71 linhas</span>
+    </div>
+    <div class="bt-tile bt-tile--lit bt-tile--plano" style="width:168px; min-height:86px; flex:none">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:24px;height:24px"><use href="#i-coroa"/></svg>
+      <span class="bt-tile__lb">Krenko, Mob Boss<br>fora das 99</span>
+      <span class="bt-tile__estado">1x</span>
+    </div>
+  </div>
+
+  <div class="gd-linhas">
+    <div class="gd-linha"><b>34x</b><i>Mountain</i></div>
+    <div class="gd-linha"><b>1x</b><i>Sol Ring</i></div>
+    <div class="gd-linha"><b>1x</b><i>Arcane Signet</i></div>
+    <div class="gd-linha"><b>1x</b><i>Skullclamp</i></div>
+    <div class="gd-linha"><b>1x</b><i>Goblin Chieftain</i></div>
+    <div class="gd-linha"><b>1x</b><i>Goblin Warchief</i></div>
+    <div class="gd-linha"><b>1x</b><i>Goblin Matron</i></div>
+    <div class="gd-linha"><b>1x</b><i>Goblin Recruiter</i></div>
+    <div class="gd-linha"><b>1x</b><i>Skirk Prospector</i></div>
+    <div class="gd-linha"><b>1x</b><i>Mogg War Marshal</i></div>
+    <div class="gd-linha"><b>1x</b><i>Krenko's Command</i></div>
+    <div class="gd-linha"><b>1x</b><i>Goblin Bombardment</i></div>
+    <div class="gd-linha"><b>1x</b><i>Impact Tremors</i></div>
+    <div class="gd-linha"><b>1x</b><i>Purphoros, God of the Forge</i></div>
+    <div class="gd-linha"><b>1x</b><i>Shared Animosity</i></div>
+    <div class="gd-linha"><b>1x</b><i>Coat of Arms</i></div>
+    <div class="gd-linha"><b>1x</b><i>Dockside Extortionist</i></div>
+    <div class="gd-linha"><b>1x</b><i>Thousand-Year Elixir</i></div>
+    <button class="gd-linha gd-linha--mais"><b>+53</b><i>linhas no deck principal</i></button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #bloqueado — proposta que chega pronta e já nasce travada (deck aprendido).
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--bloqueado">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Nome do deck</span>
+    <span class="gd-txt" style="font-size:24px">Deck Aprendido</span>
+  </div>
+
+  <div class="bt-rule gd-ruim" style="min-height:118px">
+    <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#i-aviso"/></svg></span>
+    <b>A legalidade do deck não foi confirmada pelo servidor.</b>
+    <span class="bt-rule__st">Não dá para salvar ainda</span>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Referência aprendida</span>
+    <div class="gd-quatro">
+      <div class="gd-mini"><b class="gd-curto2">Comunidade</b><i>Origem</i></div>
+      <div class="gd-mini"><b>0,86</b><i>Score</i></div>
+      <div class="gd-mini"><b class="gd-curto2">Não confirmada</b><i>Legalidade</i></div>
+      <div class="gd-mini"><b class="gd-curto2">Média</b><i>Confiança</i></div>
+    </div>
+  </div>
+
+  <div class="bt-rband gd-cresce">
+    <span class="bt-rband__cap">O que travou</span>
+    <div class="gd-row gd-cresce" style="min-height:112px; max-height:150px">
+      <div class="bt-rule bt-is-erro bt-rule--estado">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#i-escudo"/></svg></span>
+        <b>Ancestral Recall não é legal em Commander</b>
+      </div>
+      <div class="bt-rule bt-is-erro bt-rule--estado">
+        <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pilha"/></svg></span>
+        <b>Duas cópias de Sol Ring num formato singleton</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-aviso"/></svg>
+    <p><b>Avisos.</b> Gerado em modo mock, sem a IA configurada. Cartas removidas por não serem encontradas: <b>Goblin Grenade Jr.</b></p>
+  </div>
+
+  <button class="bt-lane">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pilha"/></svg>
+    <span><b>Deck principal</b><i>99 cartas · 71 linhas · dá para conferir</i></span>
+  </button>
+
+  <ul class="bt-log">
+    <li class="gd-pill--brasa">Salvar travado</li>
+    <li>Chave 7C2F</li>
+  </ul>
+
+  <button class="bt-hero">
+    <span class="bt-hero__turno"><b class="bt-numeral bt-numeral--hero">2</b><i class="bt-hero__sub">travas</i></span>
+    <span class="bt-hero__mid"><span class="bt-hero__lb">Forjar · gasta 1 de 5</span><span class="bt-hero__quem">De novo</span></span>
+    <span class="bt-hero__go"><svg viewBox="0 0 24 24"><use href="#i-seta"/></svg></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #salvando — tarefa bloqueante, sem saída até terminar.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--salvando">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x bt-is-desativado" disabled aria-label="Saída fechada durante o salvamento"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">Salvando</h1>
+    <button class="bt-vpiece gd-cota"><b class="bt-numeral bt-numeral--tile-pequeno">4</b><i>de 5<b>IA hoje</b></i></button>
+  </div>
+
+  <p class="gd-fala">Criando a lista e preparando o deck para abrir na sua coleção.</p>
+
+  <div class="bt-result bt-result--tem bt-is-carregando gd-cresce" style="min-height:180px; max-height:354px">
+    <b class="bt-result__num">100</b>
+    <span class="bt-result__cap">cartas indo para a coleção</span>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-relogio"/></svg>
+    <p><b>O deck só aparece na coleção depois que o salvamento termina.</b></p>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pilha"/></svg>
+    <p>As cartas geradas estão sendo convertidas para a estrutura final do app.</p>
+  </div>
+
+  <div class="bt-lane bt-is-desativado">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pilha"/></svg>
+    <span><b>Krenko e a Multidão</b><i>vai abrir em meus decks</i></span>
+  </div>
+
+  <ul class="bt-log">
+    <li class="gd-pill--latao">Rascunho apagado ao terminar</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #comandante — segundo nível: escolher a carta canônica.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--comandante">
+  <div class="gd-top">
+    <button class="bt-back" aria-label="Voltar para a receita"><svg viewBox="0 0 24 24"><use href="#i-volta"/></svg></button>
+    <span class="gd-rota gd-folha">Escolher comandante</span>
+    <button class="bt-x bt-x--head" aria-label="Fechar"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">Nome da carta</span>
+    <div class="gd-plaqrow">
+      <span class="gd-txt gd-txt--foco" style="font-size:22px">krenko</span>
+      <button class="gd-limpar">Limpar</button>
+    </div>
+  </div>
+
+  <div class="bt-rband gd-cresce">
+    <span class="bt-rband__cap">Candidatos para Commander</span>
+    <div class="gd-cands" style="height:100%">
+      <button class="bt-piece bt-piece--on">
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="Arte de Krenko, Mob Boss"></span>
+        <span class="bt-piece__foot" style="align-items:center; margin-top:8px">
+          <span style="display:grid; gap:4px; min-width:0">
+            <b class="gd-nome">Krenko, Mob Boss</b>
+            <i class="gd-selo">Elegível</i>
+          </span>
+          <i class="gd-pips"><b></b></i>
+        </span>
+      </button>
+      <button class="bt-piece">
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="Arte de Krenko, Tin Street Kingpin"></span>
+        <span class="bt-piece__foot" style="align-items:center; margin-top:8px">
+          <span style="display:grid; gap:4px; min-width:0">
+            <b class="gd-nome">Krenko, Tin Street Kingpin</b>
+            <i class="gd-selo">Elegível</i>
+          </span>
+          <i class="gd-pips"><b></b></i>
+        </span>
+      </button>
+      <button class="bt-piece gd-fade" disabled>
+        <span class="gd-bloq"><svg viewBox="0 0 24 24"><use href="#i-cadeado"/></svg></span>
+        <span class="gd-moldura"><img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="Arte de Krenko's Command"></span>
+        <span class="bt-piece__foot" style="align-items:center; margin-top:8px">
+          <span style="display:grid; gap:4px; min-width:0">
+            <b class="gd-nome">Krenko's Command</b>
+            <i class="gd-selo">Não é comandante</i>
+          </span>
+          <i class="gd-pips"><b></b></i>
+        </span>
+      </button>
+      <button class="bt-piece">
+        <span class="gd-moldura" style="display:grid; place-items:center">
+          <svg viewBox="0 0 24 24" style="width:44px;height:44px;fill:none;stroke:var(--bt-latao-400);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><use href="#i-coroa"/></svg>
+        </span>
+        <span class="bt-piece__foot" style="align-items:center; margin-top:8px">
+          <span style="display:grid; gap:4px; min-width:0">
+            <b class="gd-nome">Krenko, Baron of Tin Street</b>
+            <i class="gd-selo">Arte indisponível</i>
+          </span>
+          <i class="gd-pips"><b></b></i>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-lupa"/></svg>
+    <p><b>A escolha vale no toque.</b> Digite ao menos 3 letras; a busca mostra só comandantes elegíveis e fixa arte, tipo e identidade de cor.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #formato — segundo nível: os oito formatos e o que depende deles.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--formato">
+  <div class="gd-top">
+    <button class="bt-back" aria-label="Voltar para a receita"><svg viewBox="0 0 24 24"><use href="#i-volta"/></svg></button>
+    <span class="gd-rota gd-folha">Formato</span>
+    <button class="bt-x bt-x--head" aria-label="Fechar"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-formatos gd-cresce" style="min-height:272px; max-height:344px">
+    <button class="bt-shape gd-shape--on"><svg viewBox="0 0 24 24"><use href="#i-coroa"/></svg><span class="bt-shape__cap">Commander</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-espada"/></svg><span class="bt-shape__cap">Brawl</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-forma"/></svg><span class="bt-shape__cap">Standard</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-raio"/></svg><span class="bt-shape__cap">Modern</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-bussola"/></svg><span class="bt-shape__cap">Pioneer</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-livro"/></svg><span class="bt-shape__cap">Legacy</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-caveira"/></svg><span class="bt-shape__cap">Vintage</span></button>
+    <button class="bt-shape"><svg viewBox="0 0 24 24"><use href="#i-moeda"/></svg><span class="bt-shape__cap">Pauper</span></button>
+  </div>
+
+  <div class="bt-rband gd-cresce">
+    <span class="bt-rband__cap">Só para Commander</span>
+    <button class="bt-tile bt-tile--lit bt-tile--coroa" style="height:100%; min-height:96px; max-height:116px">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-escudo"/></svg>
+      <span class="bt-tile__lb">Bracket Commander</span>
+      <span class="bt-tile__estado">2 · Core</span>
+    </button>
+  </div>
+
+  <div class="bt-rband gd-cresce">
+    <span class="bt-rband__cap">Commander e Brawl</span>
+    <button class="bt-tile bt-tile--lit bt-tile--plano" style="height:100%; min-height:96px; max-height:116px">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-coroa"/></svg>
+      <span class="bt-tile__lb">Carta do comandante</span>
+      <span class="bt-tile__estado" style="font-size:15px">Krenko</span>
+    </button>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-forma"/></svg>
+    <p>Nos outros seis formatos as duas peças acima <b>somem da receita</b> e a proposta que já está na tela continua.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #erro — falha recuperável: palavra de gente, dono e saída.
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--erro">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">A forja parou</h1>
+    <button class="bt-vpiece gd-cota"><b class="bt-numeral bt-numeral--tile-pequeno">4</b><i>de 5<b>IA hoje</b></i></button>
+  </div>
+
+  <div class="bt-tile bt-is-erro gd-falha" style="min-height:150px">
+    <div class="gd-falha__top">
+      <svg class="gd-falha__ic" viewBox="0 0 24 24"><use href="#i-raio"/></svg>
+      <p class="gd-fala gd-fala--brasa" style="margin:0">A IA ficou indisponível por alguns instantes. O pedido não se perdeu.</p>
+    </div>
+    <div class="gd-falha__pe">
+      <span class="gd-falha__st">Dá para tentar<br>de novo</span>
+      <span class="gd-falha__num">37<u> DE 100</u></span>
+    </div>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-caixa"/></svg>
+    <p>A mesma chave volta com você: <b>tentar de novo não cria um segundo deck</b> nem gasta outra ação de IA. Seu rascunho continua salvo neste aparelho.</p>
+  </div>
+
+  <div class="bt-rband gd-band3 gd-cresce">
+    <span class="bt-rband__cap">A receita continua inteira</span>
+    <button class="bt-lane" style="min-height:58px; margin-bottom:8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-forma"/></svg>
+      <span><b>Commander</b><i>Formato · 100 cartas</i></span>
+    </button>
+    <div>
+      <div class="gd-row" style="min-height:102px; margin-bottom:10px">
+        <div class="bt-tile bt-tile--lit bt-tile--coroa">
+          <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:26px;height:26px"><use href="#i-escudo"/></svg>
+          <span class="bt-tile__lb">Bracket</span><span class="bt-tile__estado">2 Core</span></div>
+        <div class="bt-tile bt-tile--lit bt-tile--plano">
+          <svg class="bt-tile__ic" viewBox="0 0 24 24" style="width:26px;height:26px"><use href="#i-coroa"/></svg>
+          <span class="bt-tile__lb">Comandante</span><span class="bt-tile__estado" style="font-size:15px">Krenko</span></div>
+      </div>
+      <span class="gd-txt" style="font-size:17px">Goblins vermelhos agressivos, muitas criaturas pequenas e dano em massa.</span>
+    </div>
+  </div>
+
+  <ul class="bt-log">
+    <li>Chave 7C2F</li>
+    <li class="gd-pill--latao">Rascunho salvo neste aparelho</li>
+  </ul>
+
+  <button class="bt-hero">
+    <span class="bt-hero__turno"><b class="bt-numeral bt-numeral--hero">100</b><i class="bt-hero__sub">cartas</i></span>
+    <span class="bt-hero__mid"><span class="bt-hero__lb">Mesma chave</span><span class="bt-hero__quem">Tentar</span></span>
+    <span class="bt-hero__go"><svg viewBox="0 0 24 24"><use href="#i-seta"/></svg></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #cota — a cota esgotada NÃO é erro: é um estado que está valendo (cor cheia).
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--cota">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Entendi. Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">A forja descansa</h1>
+  </div>
+
+  <div class="bt-tile bt-tile--lit bt-tile--noite gd-quota gd-cresce" style="min-height:158px; max-height:216px">
+    <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-bigorna"/></svg>
+    <span class="bt-numeral bt-numeral--tile">5 de 5</span>
+    <span class="bt-tile__lb">Ações de IA usadas hoje · beta gratuita</span>
+  </div>
+
+  <div class="gd-espera">
+    <svg viewBox="0 0 24 24"><use href="#i-relogio"/></svg>
+    <b>6 h 12</b>
+    <i>O saldo volta sozinho<br>no próximo período UTC</i>
+  </div>
+
+  <div class="bt-hint">
+    <svg class="bt-hint__ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-varinha"/></svg>
+    <p><b>Não existe compra, upgrade nem paywall nesta fase.</b> O teto é operacional.</p>
+  </div>
+
+  <div class="bt-rband gd-cresce">
+    <span class="bt-rband__cap">Sua receita fica guardada</span>
+    <div class="gd-row gd-cresce">
+      <div class="bt-tile bt-tile--lit bt-tile--coroa">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-escudo"/></svg>
+        <span class="bt-tile__lb">Bracket</span><span class="bt-tile__estado">2 Core</span></div>
+      <div class="bt-tile bt-tile--lit bt-tile--plano">
+        <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-coroa"/></svg>
+        <span class="bt-tile__lb">Comandante</span><span class="bt-tile__estado" style="font-size:15px">Krenko</span></div>
+    </div>
+  </div>
+
+  <button class="bt-lane">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-livro"/></svg>
+    <span><b>Ver o plano e o teto da beta</b><i>detalhes das ações de IA</i></span>
+  </button>
+
+  <button class="bt-hero">
+    <span class="bt-hero__turno"><b class="bt-numeral bt-numeral--hero">0</b><i class="bt-hero__sub">de IA</i></span>
+    <span class="bt-hero__mid"><span class="bt-hero__lb">Sem gastar cota</span><span class="bt-hero__quem">Montar</span></span>
+    <span class="bt-hero__go"><svg viewBox="0 0 24 24"><use href="#i-seta"/></svg></span>
+  </button>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     #negado — capability negada: vazio SEM DONO, logo tracejado (nunca brasa).
+     ══════════════════════════════════════════════════════════════════════════ -->
+<section class="gd gd--negado">
+  <div class="gd-top">
+    <span class="gd-rota">Gerador de Decks</span>
+    <button class="bt-x" aria-label="Fechar e voltar para meus decks"><svg viewBox="0 0 24 24"><use href="#i-x"/></svg></button>
+  </div>
+
+  <div class="gd-cab">
+    <h1 class="gd-h1">A forja não abriu</h1>
+  </div>
+
+  <div class="bt-tile bt-empty bt-is-vazio gd-vazia gd-cresce" style="min-height:140px; max-height:206px">
+    <svg class="bt-empty__ic" viewBox="0 0 24 24" style="width:60px;height:60px"><use href="#i-bigorna"/></svg>
+    <span class="gd-vazia__mid">
+      <span class="bt-empty__lb" style="font-size:12.5px">Gerar deck por IA não está liberado nesta versão do app</span>
+    </span>
+  </div>
+
+  <p class="gd-fala">O servidor não liberou a geração por IA para o seu app agora. Nada foi gasto da sua cota.</p>
+
+  <div class="gd-row gd-cresce" style="min-height:96px; max-height:132px">
+    <div class="bt-tile bt-tile--livre">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-livro"/></svg>
+      <span class="bt-tile__lb">Deck aprendido</span><span class="bt-tile__estado">Fora</span></div>
+    <div class="bt-tile bt-tile--livre">
+      <svg class="bt-tile__ic" viewBox="0 0 24 24"><use href="#i-varinha"/></svg>
+      <span class="bt-tile__lb">Ações de IA</span><span class="bt-tile__estado">Sem</span></div>
+  </div>
+
+  <div class="bt-rband">
+    <span class="bt-rband__cap">O caminho continua por aqui</span>
+    <button class="bt-lane">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-pilha"/></svg>
+      <span><b>Voltar para meus decks</b><i>14 decks guardados</i></span>
+    </button>
+  </div>
+
+  <ul class="bt-log">
+    <li>Sem cobrança</li>
+    <li>Nenhum rascunho perdido</li>
+  </ul>
+
+  <button class="bt-hero">
+    <span class="bt-hero__turno"><b class="bt-numeral bt-numeral--hero">0</b><i class="bt-hero__sub">de IA</i></span>
+    <span class="bt-hero__mid"><span class="bt-hero__lb">Não depende da IA</span><span class="bt-hero__quem">Montar</span></span>
+    <span class="bt-hero__go"><svg viewBox="0 0 24 24"><use href="#i-seta"/></svg></span>
+  </button>
+</section>
+
+</main>
+
+<div class="gd-gesto" aria-hidden="true"></div>
+
+<!-- ═══ ícones: SVG próprio, traço simples ═══════════════════════════════════ -->
+<svg class="gd-sprite" aria-hidden="true">
+  <symbol id="i-bigorna" viewBox="0 0 24 24"><path d="M3.2 7.4h12.2l5.4 1.8-5.4 1.8h-1.2v3.2c0 .9.7 1.6 1.6 1.6h1.6l1.4 4.2H5.2l1.4-4.2h1.6c.9 0 1.6-.7 1.6-1.6v-3.2H3.2z"/></symbol>
+  <symbol id="i-chama" viewBox="0 0 24 24"><path d="M12 2.6c3 4 5.2 5.9 5.2 9.6a5.2 5.2 0 0 1-10.4 0c0-1.8.7-3.1 1.8-4.4.3 1.4 1 2.3 1.9 2.7-.7-2.5.1-5.4 1.5-7.9z"/></symbol>
+  <symbol id="i-gota" viewBox="0 0 24 24"><path d="M12 2.8s6.4 6.8 6.4 10.6A6.4 6.4 0 0 1 5.6 13.4C5.6 9.6 12 2.8 12 2.8z"/></symbol>
+  <symbol id="i-folha" viewBox="0 0 24 24"><path d="M4.5 19.5C4.5 10.2 10.8 4.6 19.5 4.6c0 8.6-5.5 14.9-15 14.9z"/><path d="M4.5 19.5c3.1-4.3 6.4-6.6 10.6-8.6"/></symbol>
+  <symbol id="i-caveira" viewBox="0 0 24 24"><path d="M12 2.8a7.3 7.3 0 0 0-7.3 7.3v3.1l2 2v3.4h10.6v-3.4l2-2v-3.1A7.3 7.3 0 0 0 12 2.8z"/><circle cx="9.3" cy="11" r="1.7"/><circle cx="14.7" cy="11" r="1.7"/></symbol>
+  <symbol id="i-asa" viewBox="0 0 24 24"><path d="M2.8 4.4c3.8-.4 7 .8 9.6 3.6 2.6 2.8 4.4 6.6 5.4 11.4-2-1.8-3.8-3-5.4-3.6.4 1.4.4 2.6.2 3.6-1.4-1.8-3-3-4.8-3.6.3 1.2.3 2.3 0 3.2C4.4 14.6 3 10 2.8 4.4z"/></symbol>
+  <symbol id="i-lapide" viewBox="0 0 24 24"><path d="M5.2 20.6V9.4a6.8 6.8 0 0 1 13.6 0v11.2z"/><path d="M12 10.4v6.2M9.2 13.2h5.6"/></symbol>
+  <symbol id="i-forma" viewBox="0 0 24 24"><path d="M12 2.8l8.6 4.2-8.6 4.2-8.6-4.2z"/><path d="M3.4 11.9l8.6 4.2 8.6-4.2M3.4 16.5l8.6 4.2 8.6-4.2"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 2.6l7.4 3v5.1c0 5.2-3.1 8.4-7.4 10.6-4.3-2.2-7.4-5.4-7.4-10.6V5.6z"/><path d="M8.8 9.6h6.4M8.8 13h6.4"/></symbol>
+  <symbol id="i-coroa" viewBox="0 0 24 24"><path d="M3.6 18.2h16.8"/><path d="M3.6 18.2L2.3 8l5.3 3.2L12 4.4l4.4 6.8L21.7 8l-1.3 10.2"/></symbol>
+  <symbol id="i-caixa" viewBox="0 0 24 24"><path d="M3.2 7.2L12 2.9l8.8 4.3v9.6L12 21.1l-8.8-4.3z"/><path d="M3.2 7.2L12 11.5l8.8-4.3M12 11.5v9.6"/></symbol>
+  <symbol id="i-cadeado" viewBox="0 0 24 24"><rect x="4.6" y="10.2" width="14.8" height="10.4" rx="2.6"/><path d="M8.2 10.2V7.4a3.8 3.8 0 0 1 7.6 0v2.8"/></symbol>
+  <symbol id="i-mundo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="M3.2 12h17.6M12 3.2c2.4 2.5 3.6 5.4 3.6 8.8s-1.2 6.3-3.6 8.8c-2.4-2.5-3.6-5.4-3.6-8.8S9.6 5.7 12 3.2z"/></symbol>
+  <symbol id="i-varinha" viewBox="0 0 24 24"><path d="M10.4 2.6l1.7 4.7 4.7 1.7-4.7 1.7-1.7 4.7-1.7-4.7L4 9l4.7-1.7z"/><path d="M17.6 14.2l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="M4.6 12h14.2M12.6 5.8L18.8 12l-6.2 6.2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.2 6.2l11.6 11.6M17.8 6.2L6.2 17.8"/></symbol>
+  <symbol id="i-volta" viewBox="0 0 24 24"><path d="M15 4.6L7.6 12 15 19.4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.4 12.6l5.2 5.2L19.6 6.4"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="M12 6.6v5.8l3.6 2.1"/></symbol>
+  <symbol id="i-raio" viewBox="0 0 24 24"><path d="M13.4 2.4L5 13.6h5.6L9.8 21.6 19 10.4h-5.6z"/></symbol>
+  <symbol id="i-livro" viewBox="0 0 24 24"><path d="M3.8 5.4A2.6 2.6 0 0 1 6.4 2.8h13.4v15.4H6.4a2.6 2.6 0 0 0-2.6 2.6z"/><path d="M7.8 7.2h7.6M7.8 10.6h5.4"/></symbol>
+  <symbol id="i-lupa" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.6"/><path d="M15.6 15.6l4.8 4.8"/></symbol>
+  <symbol id="i-aviso" viewBox="0 0 24 24"><path d="M12 3.4l8.8 15.4H3.2z"/><path d="M12 9.4v4.2M12 16.4v.1"/></symbol>
+  <symbol id="i-pilha" viewBox="0 0 24 24"><rect x="3.4" y="6.2" width="11.4" height="15" rx="2.2"/><path d="M7.8 2.8h9a2.2 2.2 0 0 1 2.2 2.2v13"/></symbol>
+  <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 4.6v14.8M4.6 12h14.8"/></symbol>
+  <symbol id="i-fio" viewBox="0 0 24 24"><path d="M3.2 7.4h4l3.4 9.2h3.4l3.4-9.2h3.4"/><path d="M3.2 16.6h4L10.6 7.4H14l3.4 9.2h3.4"/></symbol>
+  <symbol id="i-moeda" viewBox="0 0 24 24"><ellipse cx="12" cy="6.8" rx="7.6" ry="3.2"/><path d="M4.4 6.8v5c0 1.8 3.4 3.2 7.6 3.2s7.6-1.4 7.6-3.2v-5"/><path d="M4.4 11.8v5c0 1.8 3.4 3.2 7.6 3.2s7.6-1.4 7.6-3.2v-5"/></symbol>
+  <symbol id="i-espada" viewBox="0 0 24 24"><path d="M20.4 2.8l-2.6 9.4-5.2 5.2-1.6-1.6 5.2-5.2z"/><path d="M8.6 13.6l2.2 2.2M6.4 15.4l3.4 3.4M4.2 19.2l1.6 1.6"/></symbol>
+  <symbol id="i-bussola" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="M15.4 8.6l-1.9 5-5 1.9 1.9-5z"/></symbol>
+  <symbol id="i-parar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.8"/><path d="M9.2 9.2h5.6v5.6H9.2z"/></symbol>
+</svg>
+
+<script>
+(function () {
+  var validos = ['vazio','preenchido','gerando','limite','direto','resultado','lista',
+                 'bloqueado','salvando','comandante','formato','erro','cota','negado'];
+  function pinta() {
+    var h = (location.hash || '').replace('#', '');
+    document.body.dataset.estado = validos.indexOf(h) >= 0 ? h : 'vazio';
+  }
+  addEventListener('hashchange', pinta);
+  pinta();
+})();
+</script>
+</body>
+</html>

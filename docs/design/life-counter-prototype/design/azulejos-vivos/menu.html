@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Azulejos vivos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --obsidian-950:#0B0D12; --obsidian-900:#151821; --slate-850:#1D222C; --slate-750:#293041;
+  --ivory:#F3EFE3; --mist:#B8C0CC; --mist-dim:#8A93A3;
+  --brass-400:#E0A93B; --brass-500:#C58B2A; --frost-400:#6FA8DC; --danger:#FF8A80;
+  --brasa:#B5402B; --ambar:#94621A; --musgo:#3E7A4C; --mare:#1F6F8C; --indigo:#3B4699; --ameixa:#7A3B86;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:874px;height:402px;overflow:hidden;background:var(--obsidian-950);font-family:Inter,system-ui,sans-serif;color:var(--ivory);-webkit-font-smoothing:antialiased}
+.screen{position:relative;width:874px;height:402px;overflow:hidden}
+.mesa{position:absolute;inset:-8px;background:url("../ref/nossa-mesa-874x402.png") center/calc(100% - 16px) calc(100% - 16px) no-repeat}
+.veu{position:absolute;inset:0}
+.state{display:none;position:absolute;inset:0}
+body[data-s="menu"] #menu, body[data-s="jogadores"] #jogadores{display:block}
+body[data-s="menu"] .mesa{filter:blur(2.5px) saturate(.9) brightness(.46)}
+body[data-s="menu"] .veu{background:radial-gradient(ellipse at 50% 50%,rgba(11,13,18,0) 0%,rgba(11,13,18,.35) 60%,rgba(11,13,18,.7) 100%)}
+body[data-s="jogadores"] .mesa{filter:blur(6px) saturate(.9) brightness(.34)}
+body[data-s="jogadores"] .veu{background:radial-gradient(ellipse at 50% 50%,rgba(11,13,18,.25) 0%,rgba(11,13,18,.7) 100%)}
+
+/* ---------- grade ---------- */
+.grid{position:absolute;left:62px;right:62px;top:20px;bottom:21px;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(3,1fr);gap:10px}
+.tile{position:relative;border-radius:24px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(33,38,50,.80) 0%,rgba(17,20,28,.86) 100%);
+  -webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);
+  border:1px solid rgba(243,239,227,.09);
+  box-shadow:0 1px 0 rgba(243,239,227,.10) inset,0 14px 30px -12px rgba(0,0,0,.7);
+  display:flex;flex-direction:column;align-items:center;padding:10px 10px 13px}
+.tile.w2{grid-column:span 2}
+.vis{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;width:100%}
+.val{font-size:14px;font-weight:600;line-height:17px;letter-spacing:-.005em;color:var(--ivory);display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.lab{font-size:11px;font-weight:700;line-height:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--mist-dim);text-align:center}
+.ico{width:42px;height:42px;fill:none;stroke:var(--ivory);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chip{width:10px;height:10px;border-radius:50%;box-shadow:0 0 0 1.5px rgba(243,239,227,.85)}
+.num{font-family:Fraunces,serif;font-weight:600;font-variation-settings:"opsz" 144;line-height:1;color:var(--ivory);letter-spacing:-.02em}
+
+/* vivo = latão */
+.tile.on{border-color:rgba(224,169,59,.55);
+  background:linear-gradient(180deg,rgba(74,54,20,.78) 0%,rgba(24,22,22,.88) 70%);
+  box-shadow:0 1px 0 rgba(255,222,150,.28) inset,0 0 0 1px rgba(224,169,59,.10),0 14px 34px -12px rgba(224,169,59,.35)}
+.tile.on::before{content:"";position:absolute;left:50%;top:-46px;width:150px;height:110px;transform:translateX(-50%);background:radial-gradient(closest-side,rgba(224,169,59,.42),rgba(224,169,59,0));pointer-events:none}
+.tile.on .ico{stroke:var(--brass-400)}
+.tile.on .ico .fill{fill:var(--brass-400)}
+.tile.on .val{color:var(--brass-400)}
+.tile.on .lab{color:#C9B48A}
+.tile.on .vis{position:relative}
+
+.tile.off{background:linear-gradient(180deg,rgba(24,28,37,.62),rgba(14,16,22,.72));border:1.5px dashed rgba(184,192,204,.26);box-shadow:none}
+.tile.off .ico{stroke:var(--mist-dim);opacity:.85}
+.tile.off .val{color:var(--mist-dim);font-weight:500}
+
+.tile.fim{border-color:rgba(255,138,128,.30);background:linear-gradient(180deg,rgba(64,26,26,.70),rgba(20,14,17,.86))}
+.tile.fim .ico{stroke:var(--danger)}
+.tile.fim .lab{color:#F0A9A2}
+
+/* herói: passar a vez */
+.hero .vis{justify-content:space-between;padding:0 8px 0 12px;gap:12px}
+.hero .turno{display:flex;align-items:center;gap:12px}
+.hero .num{font-size:74px;color:var(--brass-400);margin-top:-8px;text-shadow:0 0 28px rgba(224,169,59,.45)}
+.hero .quem{display:flex;flex-direction:column;gap:3px}
+.hero .quem small{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--mist-dim);text-transform:uppercase}
+.hero .quem b{font-family:Fraunces,serif;font-weight:600;font-size:27px;line-height:30px;display:flex;align-items:center;gap:8px}
+.hero .quem .chip{width:12px;height:12px}
+.go{width:54px;height:54px;border-radius:50%;background:linear-gradient(180deg,var(--brass-400),var(--brass-500));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px -6px rgba(224,169,59,.6),0 1px 0 rgba(255,240,200,.6) inset;flex:none}
+.go svg{width:26px;height:26px;fill:none;stroke:#1a1305;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.hero{border-color:rgba(224,169,59,.30)}
+
+/* dados */
+.dados .vis{gap:20px}
+.dados .ico{width:44px;height:44px}
+.dados .ico .pip{fill:var(--ivory);stroke:none}
+
+/* numerais */
+.numtile .vis{gap:10px}
+.numtile .num{font-size:50px;margin-top:-6px}
+.numtile .ico{width:34px;height:34px}
+.mini{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;width:50px;height:34px}
+.mini i{border-radius:5px}
+
+.pips{position:absolute;top:12px;right:13px;display:flex;gap:4px}
+.pips i{width:8px;height:8px;background:var(--brass-400);transform:rotate(45deg);border-radius:2px;box-shadow:0 0 8px rgba(224,169,59,.8)}
+
+/* hub */
+.hubcell{display:flex;align-items:center;justify-content:center}
+.hub{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#1c2029,#0B0D12 70%);border:2px solid var(--brass-400);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 7px rgba(11,13,18,.85),0 0 0 8px rgba(224,169,59,.22),0 0 34px rgba(224,169,59,.35)}
+.hub svg{width:28px;height:28px;stroke:var(--ivory);stroke-width:2.6;stroke-linecap:round;fill:none}
+
+/* ---------- jogadores ---------- */
+.jg{position:absolute;left:62px;right:62px;top:20px;bottom:21px;display:grid;grid-template-rows:1fr 84px 1fr;gap:8px}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.seatopt{border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;border:1.5px solid transparent;position:relative}
+.seatopt .thumb{width:112px;height:52px;display:flex;flex-direction:column;gap:4px}
+.seatopt .thumb div{flex:1;display:flex;gap:4px}
+.seatopt .thumb i{flex:1;border-radius:7px;background:var(--ivory);opacity:.92}
+.seatopt .num{font-size:30px;color:var(--mist)}
+.seatopt.sel{background:linear-gradient(180deg,rgba(74,54,20,.72),rgba(22,21,22,.88));border-color:var(--brass-400);box-shadow:0 1px 0 rgba(255,222,150,.28) inset,0 16px 36px -12px rgba(224,169,59,.45);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.seatopt.sel .num{color:var(--brass-400);text-shadow:0 0 18px rgba(224,169,59,.5)}
+.seatopt.sel .thumb i{opacity:1}
+.band{display:grid;grid-template-columns:1fr 84px 1fr;align-items:center}
+.band h1{font-family:Fraunces,serif;font-weight:600;font-size:30px;line-height:32px;letter-spacing:-.01em}
+.band h1 em{font-style:italic;color:var(--brass-400);font-weight:500}
+.band .kick{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mist-dim);margin-bottom:4px}
+.band .hub{justify-self:center}
+.vida{display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.vida .kick{margin:0 8px 0 0;text-align:right;line-height:14px}
+.vopt{width:78px;height:72px;border-radius:22px;display:flex;align-items:center;justify-content:center;position:relative;border:1.5px solid transparent}
+.vopt .num{font-size:44px;color:var(--mist-dim);margin-top:-5px}
+.vopt.sel{background:linear-gradient(180deg,rgba(74,54,20,.72),rgba(22,21,22,.88));border-color:var(--brass-400);box-shadow:0 1px 0 rgba(255,222,150,.28) inset,0 12px 30px -10px rgba(224,169,59,.5)}
+.vopt.sel .num{color:var(--brass-400);font-size:47px;text-shadow:0 0 18px rgba(224,169,59,.5)}
+</style>
+</head>
+<body data-s="menu">
+<div class="screen">
+  <div class="mesa"></div><div class="veu"></div>
+
+  <!-- ================= MENU ================= -->
+  <section class="state" id="menu">
+    <div class="grid">
+      <!-- linha 1 -->
+      <div class="tile w2 hero">
+        <div class="vis">
+          <div class="turno">
+            <span class="num">3</span>
+            <div class="quem"><small>Turno · vez de</small><b><span class="chip" style="background:var(--musgo)"></span>Léo</b></div>
+          </div>
+          <div class="go"><svg viewBox="0 0 24 24"><path d="M5 12h13M12.5 6l6 6-6 6"/></svg></div>
+        </div>
+        <div class="lab">Passar a vez</div>
+      </div>
+      <div class="tile">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><path d="M10 15h14.5a8.5 8.5 0 0 1 0 17H15"/><path d="M16 8.5 9.5 15l6.5 6.5"/></svg></div>
+        <div class="lab">Desfazer</div>
+      </div>
+      <div class="tile w2 dados">
+        <div class="vis">
+          <svg class="ico" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14"/><circle cx="20" cy="20" r="9.5" stroke-dasharray="2 3.4"/><path d="M20 15.5v9M17 18l3-2.5"/></svg>
+          <svg class="ico" viewBox="0 0 40 40"><path d="M20 6 35 32H5Z"/><path d="M20 6v17M5 32l15-9 15 9"/></svg>
+          <svg class="ico" viewBox="0 0 40 40"><rect x="6.5" y="6.5" width="27" height="27" rx="7"/><circle class="pip" cx="14" cy="14" r="2.3"/><circle class="pip" cx="26" cy="14" r="2.3"/><circle class="pip" cx="20" cy="20" r="2.3"/><circle class="pip" cx="14" cy="26" r="2.3"/><circle class="pip" cx="26" cy="26" r="2.3"/></svg>
+          <svg class="ico" viewBox="0 0 40 40"><path d="M20 4.5 33.5 12.2v15.6L20 35.5 6.5 27.800V12.2Z"/><path d="M20 12.500 28 26H12Z"/><path d="M20 4.5v8M6.500 12.2 12 26M33.500 12.2 28 26M12 26l8 9.500 8-9.5M6.500 12.200 20 12.5l13.500-.3"/></svg>
+        </div>
+        <div class="lab">Dados</div>
+      </div>
+
+      <!-- linha 2 -->
+      <div class="tile on">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><path class="fill" d="M27.500 25.500A12.500 12.500 0 0 1 15 6.500a13.500 13.500 0 1 0 17.500 17.300 12.400 12.400 0 0 1-5 1.700Z"/><path d="M29 7.500v5M26.500 10h5" stroke-width="1.8"/><path d="M34 16.500v3M32.500 18h3" stroke-width="1.6"/></svg></div>
+        <div class="val">Noite</div>
+        <div class="lab">Dia / Noite</div>
+      </div>
+      <div class="tile on">
+        <div class="pips"><i></i><i></i></div>
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><g transform="rotate(-24 20 20)"><path d="M4 20A16 5.500 0 0 1 36 20"/><circle cx="20" cy="20" r="9" fill="#3a2c12"/><path d="M4 20A16 5.500 0 0 0 36 20"/></g><path d="M15 17.500c1.800-2.300 5-3 7.500-1.500" stroke-width="1.800"/></svg></div>
+        <div class="val">Caos 2</div>
+        <div class="lab">Plano</div>
+      </div>
+      <div class="hubcell"><div class="hub"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></div></div>
+      <div class="tile on">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><path class="fill" d="M6.500 13.500 13.500 21 20 9l6.500 12 7-7.500L31 29H9Z"/><path d="M10 33.500h20"/></svg></div>
+        <div class="val"><span class="chip" style="background:var(--ambar)"></span>Bia</div>
+        <div class="lab">Coroa</div>
+      </div>
+      <div class="tile off">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><path d="M11 5.500v29"/><path d="M11 8h19l-5 6.500 5 6.500H11"/><path d="M7 34.500h8"/></svg></div>
+        <div class="val">sem dono</div>
+        <div class="lab">Iniciativa</div>
+      </div>
+
+      <!-- linha 3 -->
+      <div class="tile">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><circle cx="20" cy="20" r="14.500" stroke-dasharray="1 6.590"/><path d="M26.500 13.500 22.300 22.300 13.500 26.500l4.200-8.800Z"/><circle cx="20" cy="20" r="1.200" fill="#F3EFE3"/></svg></div>
+        <div class="lab">Quem começa</div>
+      </div>
+      <div class="tile numtile">
+        <div class="vis"><div class="mini"><i style="background:var(--mare)"></i><i style="background:var(--musgo)"></i><i style="background:var(--brasa)"></i><i style="background:var(--ambar)"></i></div><span class="num">4</span></div>
+        <div class="lab">Jogadores</div>
+      </div>
+      <div class="tile numtile">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40" style="stroke:var(--danger)"><path d="M20 33S6 24.500 6 14.800A7.300 7.300 0 0 1 20 11.500a7.300 7.300 0 0 1 14 3.300C34 24.500 20 33 20 33Z" stroke-width="2.600"/></svg><span class="num">40</span></div>
+        <div class="lab">Vida inicial</div>
+      </div>
+      <div class="tile numtile">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40" stroke-width="2.600"><rect x="13" y="5" width="20" height="26" rx="4.500" opacity=".45"/><rect x="7" y="10" width="20" height="26" rx="4.500" fill="#1b1f29"/><path d="M13 18h8M13 24h5"/></svg><span class="num">3</span></div>
+        <div class="lab">Partidas guardadas</div>
+      </div>
+      <div class="tile fim">
+        <div class="vis"><svg class="ico" viewBox="0 0 40 40"><path d="M17 6.500h-6a4 4 0 0 0-4 4v19a4 4 0 0 0 4 4h6"/><path d="M16 20h17M26.500 13l7 7-7 7"/></svg></div>
+        <div class="lab">Encerrar partida</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= JOGADORES ================= -->
+  <section class="state" id="jogadores">
+    <div class="jg">
+      <div class="row" id="r1"></div>
+      <div class="band">
+        <div><div class="kick">Jogadores</div><h1>Quantos <em>à mesa?</em></h1></div>
+        <div class="hub"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></div>
+        <div class="vida">
+          <div class="kick">Vida<br>inicial</div>
+          <div class="vopt"><span class="num">20</span></div>
+          <div class="vopt"><span class="num">30</span></div>
+          <div class="vopt sel"><span class="num">40</span></div>
+        </div>
+      </div>
+      <div class="row" id="r2"></div>
+    </div>
+  </section>
+</div>
+<script>
+const cores=['--mare','--musgo','--brasa','--ambar','--indigo','--ameixa'];
+function opt(n,sel){
+  const top=Math.floor(n/2),bot=Math.ceil(n/2);let k=0;
+  const seat=()=>{const c=sel?` style="background:var(${cores[k++%6]})"`:'';return `<i${c}></i>`};
+  const line=c=>c?`<div>${Array.from({length:c},seat).join('')}</div>`:'';
+  return `<div class="seatopt${sel?' sel':''}"><div class="thumb">${line(top)}${line(bot)}</div><span class="num">${n}</span></div>`;
+}
+r1.innerHTML=[1,2,3,4,5].map(n=>opt(n,n===4)).join('');
+r2.innerHTML=[6,7,8,9,10].map(n=>opt(n,false)).join('');
+function go(){document.body.dataset.s=(location.hash||'#menu').slice(1)}
+addEventListener('hashchange',go);go();
+</script>
+</body>
+</html>

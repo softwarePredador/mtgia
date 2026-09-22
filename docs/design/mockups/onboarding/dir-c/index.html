@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Bancada viva — Seu primeiro passo</title>
+<link rel="stylesheet" href="../../../ui-kit/kit.css">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Direção C · "Bancada viva" — onboarding "Seu primeiro passo"
+   Só layout de tela e ilustração da Home. Nenhuma cor, raio, sombra ou tipo
+   do kit é redefinido: tudo vem de kit.css e dos tokens --bt-*.
+   ═══════════════════════════════════════════════════════════════════════════ */
+html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+/* as peças do kit trazem display próprio e ganhariam do [hidden] da folha do agente */
+[hidden] { display: none !important; }
+.tela { position: relative; width: 390px; height: 844px; overflow: hidden; background: var(--bt-obsidiana-950); }
+
+/* ── 1 · A HOME VIVA EMBAIXO (ilustração) ─────────────────────────────────── */
+.home { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.home__bar { flex: none; height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 14px; }
+.home__marca { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
+  font: 700 19px/1 var(--bt-display); color: var(--bt-latao-400); letter-spacing: -.01em; }
+.home__av { width: 26px; height: 26px; border-radius: 50%; flex: none;
+  box-shadow: inset 0 0 0 1.5px rgba(184,192,204,.55); }
+.home__ic { width: 24px; height: 24px; flex: none; color: var(--bt-nevoa); position: relative; }
+.home__ic svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7;
+  stroke-linecap: round; stroke-linejoin: round; }
+.home__badge { position: absolute; top: -4px; right: -5px; min-width: 15px; height: 15px; border-radius: 999px;
+  background: var(--bt-brasa); color: var(--bt-obsidiana-950); font: 800 9px/15px var(--bt-ui);
+  text-align: center; padding: 0 3px; box-sizing: border-box; }
+.home__corpo { flex: 1; padding: 6px 14px 0; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.home__banner { position: relative; height: 132px; border-radius: var(--bt-raio-azulejo); overflow: hidden;
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.10); background: var(--bt-obsidiana-900); flex: none; }
+.home__banner img { position: absolute; right: -14px; top: -20px; width: 210px; opacity: .75; }
+.home__banner::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(11,13,18,.95) 34%, rgba(11,13,18,.15) 88%); }
+.home__banner div { position: relative; z-index: 1; padding: 16px 0 0 16px; }
+.home__ola { font: 700 25px/1.08 var(--bt-display); color: var(--bt-marfim); max-width: 175px; }
+.home__sub { display: block; margin-top: 6px; font: 500 12px/1.35 var(--bt-ui); color: var(--bt-nevoa); max-width: 165px; }
+.home__pill { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; height: 38px; padding: 0 16px;
+  border-radius: 14px; background: var(--bt-grad-latao); color: var(--bt-obsidiana-950);
+  font: 800 11.5px/1 var(--bt-ui); letter-spacing: .085em; text-transform: uppercase; }
+.home__cap { display: flex; align-items: center; gap: 8px; font: 700 17px/1 var(--bt-display);
+  color: var(--bt-marfim); margin: 2px 0 0; }
+.home__cap::before { content: ""; width: 3px; height: 15px; border-radius: 2px; background: var(--bt-latao-400); }
+.home__quick { display: flex; gap: 10px; }
+.home__quick div { flex: 1; height: 58px; border-radius: var(--bt-raio-dica); display: flex; align-items: center;
+  gap: 9px; padding: 0 12px; box-sizing: border-box; background: var(--bt-obsidiana-900);
+  box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.08); font: 700 12.5px/1 var(--bt-ui); color: var(--bt-marfim); }
+.home__quick i { width: 26px; height: 26px; border-radius: 9px; flex: none; display: grid; place-items: center;
+  background: rgba(224,169,59,.14); color: var(--bt-latao-400); }
+.home__quick i svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.9;
+  stroke-linecap: round; stroke-linejoin: round; }
+.home__deck { display: flex; gap: 11px; padding: 10px; border-radius: var(--bt-raio-painel);
+  background: var(--bt-obsidiana-900); box-shadow: inset 0 0 0 1.5px rgba(243,239,227,.08); }
+.home__deck img { width: 62px; height: 78px; border-radius: var(--bt-raio-mini); object-fit: cover; flex: none; }
+.home__deck > div { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 5px; }
+.home__deck b { font: 700 13.5px/1.2 var(--bt-ui); color: var(--bt-marfim); }
+.home__deck em { font-style: normal; font: 500 11.5px/1.2 var(--bt-ui); color: var(--bt-nevoa); }
+.home__deck u { text-decoration: none; font: 700 11.5px/1 var(--bt-ui); color: var(--bt-latao-400);
+  font-variant-numeric: tabular-nums; }
+.home__barra { height: 3px; border-radius: 2px; background: rgba(224,169,59,.25); position: relative; }
+.home__barra::after { content: ""; position: absolute; inset: 0 34% 0 0; border-radius: 2px; background: var(--bt-latao-400); }
+.home__nav { flex: none; height: 52px; display: flex; align-items: center; padding: 0 4px 4px;
+  box-shadow: inset 0 1px 0 rgba(243,239,227,.08); }
+.home__nav span { flex: 1; display: grid; justify-items: center; gap: 4px; color: var(--bt-nevoa);
+  font: 600 9.5px/1 var(--bt-ui); }
+.home__nav span svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7;
+  stroke-linecap: round; stroke-linejoin: round; }
+.home__nav span.on { color: var(--bt-latao-400); }
+body[data-estado="negado"] .home__nav span:nth-child(2),
+body[data-estado="negado"] .home__nav span:nth-child(3),
+body[data-estado="negado"] .home__nav span:nth-child(4) { opacity: .22; }
+/* nada acendeu: a Home recua para o herói apagado não deixar o conteúdo dela transparecer */
+body[data-estado="pendente"] .home__corpo { opacity: .25; }
+
+/* ── 2 · O VÉU: forte em cima (camada), fraco embaixo (a Home continua viva) ── */
+.veu { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  -webkit-backdrop-filter: var(--bt-blur-menu); backdrop-filter: var(--bt-blur-menu);
+  background: linear-gradient(180deg,
+      rgba(11,13,18,.34) 0%, rgba(11,13,18,.90) 11%, rgba(11,13,18,.95) 62%,
+      rgba(11,13,18,.66) 79%, rgba(11,13,18,.14) 91%, rgba(11,13,18,0) 100%); }
+.veu::before { content: ""; position: absolute; inset: 0; background: var(--bt-veu-menu);
+  -webkit-mask-image: linear-gradient(180deg, #000 0 70%, transparent 88%);
+  mask-image: linear-gradient(180deg, #000 0 70%, transparent 88%); }
+
+/* ── 3 · O PEDAÇO DA HOME QUE ACENDEU (acima do véu: nítido e vivo) ───────── */
+.aceso { position: absolute; z-index: 3; left: 26px; right: 26px; bottom: 58px;
+  min-height: 78px; flex-direction: row; align-items: center; gap: 11px; padding: 9px 12px; }
+.aceso__art { width: 54px; height: 54px; border-radius: var(--bt-raio-mini); object-fit: cover; flex: none;
+  box-shadow: 0 0 0 1.5px rgba(11,13,18,.5), 0 4px 10px rgba(0,0,0,.45); }
+.aceso__txt { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.aceso__tit { flex: none; max-width: 172px; white-space: nowrap; }
+.aceso .on-frase { color: rgba(243,239,227,.86); }
+.on-frase { font: 500 11.5px/1.32 var(--bt-ui); text-wrap: balance; }
+body[data-estado="vazio"] .aceso,
+body[data-estado="pendente"] .aceso,
+body[data-estado="erro"] .aceso,
+body[data-estado="negado"] .aceso { display: none; }
+
+/* ── 4 · A CAMADA DE AZULEJOS ─────────────────────────────────────────────── */
+.camada { position: absolute; inset: 0; z-index: 4; box-sizing: border-box;
+  padding: 56px 14px 52px; display: flex; flex-direction: column; gap: 8px; }
+
+.on-head { position: relative; flex: none; padding-right: 100px; min-height: 93px; }
+.on-head__txt { display: grid; gap: 3px; align-content: start; }
+.on-rotulo { font: 800 11px/1 var(--bt-ui); letter-spacing: .14em; text-transform: uppercase;
+  color: var(--bt-latao-400); }
+.on-pergunta { margin: 0; font: 600 24px/1.12 var(--bt-display); color: var(--bt-marfim);
+  letter-spacing: -.01em; text-wrap: balance; }
+.on-carga { position: absolute; left: 0; right: 94px; bottom: -7px; overflow: hidden; }
+.on-carga::after { content: ""; position: absolute; top: 0; bottom: 0; width: 42%; border-radius: 999px;
+  background: var(--bt-latao-400); animation: on-corre 1.25s ease-in-out infinite alternate; }
+@keyframes on-corre { from { left: 0; } to { left: 58%; } }
+.on-sair { position: absolute; top: -2px; right: 0; width: 92px; display: grid; justify-items: center; gap: 7px; }
+.on-sair .bt-vcap { margin-right: 0; white-space: nowrap; }
+
+.on-banda { flex: none; }
+.on-banda em { font-style: normal; color: var(--bt-nevoa-fraca); }
+.on-linha { display: flex; gap: var(--bt-gap-azulejo); }
+.on-linha--a { min-height: 92px; margin-bottom: 6px; }
+.on-linha--b { min-height: 82px; }
+.on-linha--c { min-height: 86px; align-items: stretch; }
+#formato { flex: 0 0 116px; min-width: 0; }
+/* o kit trava o estado em nowrap na peça de 3 colunas; aqui ele precisa quebrar */
+.camada .bt-rule--estado > * { max-width: 100%; }
+.camada .bt-rule--estado .bt-rule__st { white-space: normal; }
+.on-slot { flex: 1 1 auto; min-width: 0; display: flex; gap: var(--bt-gap-azulejo); }
+.on-slot > * { flex: 1 1 0; min-width: 0; }
+.on-lupa { flex: 3 1 0; }
+
+/* o azulejo de objetivo: ícone em cima, rótulo e subrótulo embaixo */
+.on-alvo { flex: 1 1 0; }
+.on-alvo--maior { flex: 2 1 0; }
+.camada .bt-tile > div { display: grid; gap: 3px; min-width: 0; }
+
+/* a peça vazia (tracejada) ocupa o lugar do que ainda não tem dono */
+.on-vazia { justify-content: center; gap: 10px; }
+.on-vazia .bt-empty__lb { max-width: 100%; }
+
+/* o aviso: peça-regra deitada, largura cheia */
+.on-aviso { display: none; position: absolute; left: 26px; right: 26px; bottom: 56px;
+  grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto;
+  align-items: start; gap: 6px 12px; min-height: 78px; justify-items: stretch; }
+.on-aviso .bt-rule__ico { grid-row: 1 / 3; align-self: center; }
+body[data-estado="erro"] .on-aviso, body[data-estado="negado"] .on-aviso { display: grid; }
+
+/* o herói: a jogada principal */
+.on-hero { flex: none; min-height: 100px; }
+.on-hero .bt-hero__mid { gap: 4px; }
+.on-hero .bt-hero__lb { max-width: 100%; }
+
+/* tudo inerte enquanto salva ou lê */
+body[data-estado="carregando"] .camada .bt-tile,
+body[data-estado="carregando"] .camada .bt-rule,
+body[data-estado="carregando"] .camada .bt-empty,
+body[data-estado="carregando"] .on-sair { opacity: .38; }
+body[data-estado="carregando"] .on-hero { opacity: 1; }
+
+/* ── 5 · SEGUNDO NÍVEL: os sete formatos (ON-81) ──────────────────────────── */
+.on-formatos { display: none; z-index: 6; }
+body[data-estado="formato"] .on-formatos { display: flex; }
+.on-fmt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--bt-gap-regra); }
+.on-fmt-grid .bt-rule--estado:first-child { grid-column: 1 / -1; min-height: 104px; }
+.on-fmt-grid .bt-rule__st { white-space: normal; }
+.on-fmt-grid .bt-rule--estado { min-height: 92px; }
+.on-fmt-grid .bt-rule__ico, .on-fmt-grid .bt-rule__ico svg { width: 26px; height: 26px; }
+.on-formatos .bt-overlay__body { flex: 1; align-content: center; }
+</style>
+</head>
+<body class="bt-base" data-estado="preenchido">
+<div class="tela">
+
+  <!-- ═══ A HOME VIVA EMBAIXO ═══════════════════════════════════════════════ -->
+  <div class="home" aria-hidden="true">
+    <div class="home__bar">
+      <span class="home__av"></span>
+      <span class="home__marca">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 4h9l-3 6h5l-8 10 2-8H5z"/></svg>
+        BrewTact
+      </span>
+      <span class="home__ic"><svg viewBox="0 0 24 24"><path d="M4 6h16v10H9l-5 4V6Z"/></svg><i class="home__badge">3</i></span>
+      <span class="home__ic"><svg viewBox="0 0 24 24"><path d="M6 10a6 6 0 0 1 12 0v5l2 3H4l2-3v-5Z"/><path d="M10 20h4"/></svg><i class="home__badge">12</i></span>
+    </div>
+
+    <div class="home__corpo">
+      <div class="home__banner">
+        <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+        <div>
+          <span class="home__ola">Olá,<br>Planeswalker</span>
+          <span class="home__sub">Sua próxima jogada começa aqui.</span>
+          <span class="home__pill">Jogar agora</span>
+        </div>
+      </div>
+
+      <p class="home__cap">Acesso rápido</p>
+      <div class="home__quick">
+        <div><i><svg viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/></svg></i>Jogar agora</div>
+        <div><i><svg viewBox="0 0 24 24"><path d="M5 5h9v14H5zM14 8h5v11h-5z"/></svg></i>Construir deck</div>
+      </div>
+
+      <p class="home__cap">Decks recentes</p>
+      <div class="home__deck">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_ring.webp" alt="">
+        <div>
+          <b>Talrand, Mestre do Céu</b>
+          <em>Commander · azul mono</em>
+          <u>100/100 cartas</u>
+          <span class="home__barra"></span>
+        </div>
+      </div>
+      <div class="home__deck">
+        <img src="../../../../../app/assets/branding/visual_fixture_ember_raiders.webp" alt="">
+        <div>
+          <b>Krenko, Chefe de Guerra</b>
+          <em>Commander · vermelho mono</em>
+          <u>96/100 cartas</u>
+          <span class="home__barra"></span>
+        </div>
+      </div>
+      <div class="home__deck">
+        <img src="../../../../../app/assets/branding/visual_fixture_blue_spell.webp" alt="">
+        <div>
+          <b>Atraxa, Voz Praetoriana</b>
+          <em>Commander · quatro cores</em>
+          <u>100/100 cartas</u>
+          <span class="home__barra"></span>
+        </div>
+      </div>
+      <div class="home__deck">
+        <img src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+        <div>
+          <b>Urza, Artífice Supremo</b>
+          <em>Commander · azul mono</em>
+          <u>91/100 cartas</u>
+          <span class="home__barra"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="home__nav">
+      <span class="on"><svg viewBox="0 0 24 24"><path d="M5 4h9l-3 6h5l-8 10 2-8H5z"/></svg>Início</span>
+      <span><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6zM9 8h6"/></svg>Decks</span>
+      <span><svg viewBox="0 0 24 24"><path d="M4 7h16v13H4zM4 7l2-3h12l2 3"/></svg>Coleção</span>
+      <span><svg viewBox="0 0 24 24"><circle cx="9" cy="9" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5M16 8h4M16 12h4"/></svg>Comunidade</span>
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3.5-6 7-6s7 2 7 6"/></svg>Perfil</span>
+    </div>
+  </div>
+
+  <div class="veu"></div>
+
+  <!-- ═══ O PEDAÇO DA HOME QUE ACENDEU ══════════════════════════════════════ -->
+  <div class="aceso bt-tile bt-tile--lit bt-tile--plano" id="aceso">
+    <img class="aceso__art" id="acesoArt" src="../../../../../app/assets/branding/visual_fixture_arcane_artificer.webp" alt="">
+    <span class="aceso__txt">
+      <span class="bt-overlay__title aceso__tit" id="acesoTit">Oficina de decks</span>
+      <span class="on-frase" id="acesoFrase">Vamos transformar uma ideia em uma lista jogável.</span>
+    </span>
+    <span class="bt-tile__estado" id="acesoEst">na Home</span>
+  </div>
+
+  <!-- ═══ A CAMADA DE AZULEJOS ══════════════════════════════════════════════ -->
+  <div class="camada">
+
+    <div class="on-head">
+      <div class="on-head__txt">
+        <span class="on-rotulo" id="rotulo">Comece pelo seu jogo</span>
+        <h1 class="on-pergunta" id="pergunta">O que você quer fazer primeiro?</h1>
+        <span class="bt-carga on-carga" id="carga" hidden></span>
+      </div>
+      <div class="on-sair" id="sair">
+        <button class="bt-x" type="button" aria-label="Pular por enquanto — seu objetivo continua salvo">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <span class="bt-vcap">Pular<br>fica salvo</span>
+      </div>
+    </div>
+
+    <!-- aviso de persistência / capability (ON-23..ON-29, ON-41) -->
+    <button class="bt-rule bt-rule--estado bt-is-erro on-aviso" type="button" id="aviso">
+      <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 0 1 12.6-5.5M19.5 12a7.5 7.5 0 0 1-12.6 5.5"/><path d="M17.5 3v4h-4M6.5 21v-4h4"/><path d="M12 9.5v3.2"/><circle cx="12" cy="16.2" r=".95" fill="currentColor" stroke="none"/></svg></span>
+      <b id="avisoMsg">Não foi possível salvar seu plano. A navegação foi pausada para evitar perder a escolha.</b>
+      <span class="bt-rule__st" id="avisoSt">Tentar de novo</span>
+    </button>
+
+    <!-- 1 · objetivo -->
+    <section class="bt-rband on-banda">
+      <span class="bt-rband__cap" id="cap1">1 · O que resolver <em>· muda depois</em></span>
+
+      <div id="alvos">
+        <div class="on-linha on-linha--a">
+          <button class="bt-tile on-alvo on-alvo--maior" type="button" data-alvo="montar">
+            <svg class="bt-tile__ic" viewBox="0 0 34 34"><path d="M7 11.5h12.5a2.2 2.2 0 0 1 2.2 2.2v12.6a2.2 2.2 0 0 1-2.2 2.2H7a2.2 2.2 0 0 1-2.2-2.2V13.7A2.2 2.2 0 0 1 7 11.5Z"/><path d="M12 7.2h11.8A3.2 3.2 0 0 1 27 10.4v12"/></svg>
+            <div><span class="bt-tile__lb">Montar um deck</span><span class="bt-tile__sub">Do zero ou com uma base</span></div>
+          </button>
+          <button class="bt-tile on-alvo" type="button" data-alvo="importar">
+            <svg class="bt-tile__ic" viewBox="0 0 34 34"><path d="M15 8h-5a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M13 8.5V6h8v2.5Z"/><path d="M29 13h-9"/><path d="M23.5 8.5 19 13l4.5 4.5"/></svg>
+            <div><span class="bt-tile__lb">Importar uma lista</span></div>
+          </button>
+        </div>
+        <div class="on-linha on-linha--b">
+          <button class="bt-tile on-alvo" type="button" data-alvo="catalogar">
+            <svg class="bt-tile__ic" viewBox="0 0 34 34"><path d="M6 14h22v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V14Z"/><path d="m6 14 2.4-5.2A2 2 0 0 1 10.2 7.6h13.6a2 2 0 0 1 1.8 1.2L28 14"/><path d="M17 14v14"/></svg>
+            <div><span class="bt-tile__lb">Catalogar coleção</span></div>
+          </button>
+          <button class="bt-tile on-alvo" type="button" data-alvo="jogar">
+            <svg class="bt-tile__ic" viewBox="0 0 34 34"><rect x="4.6" y="7" width="24.8" height="20" rx="5"/><rect class="bt-f" x="8.4" y="11" width="8" height="5.6" rx="1.8"/><rect class="bt-f" x="17.6" y="11" width="8" height="5.6" rx="1.8"/><rect class="bt-f" x="8.4" y="18.4" width="8" height="5.6" rx="1.8"/><rect class="bt-f" x="17.6" y="18.4" width="8" height="5.6" rx="1.8"/></svg>
+            <div><span class="bt-tile__lb">Jogar uma partida</span></div>
+          </button>
+          <button class="bt-tile on-alvo" type="button" data-alvo="melhorar">
+            <svg class="bt-tile__ic" viewBox="0 0 34 34"><path d="M7 11h20M7 17h20M7 23h20"/><circle cx="13" cy="11" r="2.7"/><circle cx="22" cy="17" r="2.7"/><circle cx="15" cy="23" r="2.7"/></svg>
+            <div><span class="bt-tile__lb">Melhorar um deck</span></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="bt-empty bt-is-vazio on-vazia on-linha--b" id="alvosVazios" hidden>
+        <svg class="bt-empty__ic" viewBox="0 0 38 38"><path d="M10 30c0-8 19-8 19-16a5 5 0 0 0-10 0"/><circle cx="10" cy="30" r="3.2"/><circle cx="24" cy="10" r="3.2"/></svg>
+        <span class="bt-empty__lb">Nenhum caminho liberado nesta versão</span>
+      </div>
+    </section>
+
+    <!-- 2 · momento -->
+    <section class="bt-rband on-banda">
+      <span class="bt-rband__cap">2 · Como você chega <em>· não muda as regras</em></span>
+      <div class="bt-rulegrid3" id="momentos">
+        <button class="bt-rule bt-rule--estado" type="button" data-exp="comecando">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-7.5"/><path d="M12.4 13.5c0-3.1 2.1-5.2 5.2-5.2 0 3.1-2.1 5.2-5.2 5.2Z"/><path d="M11.6 16c0-2.6-1.8-4.4-4.4-4.4 0 2.6 1.8 4.4 4.4 4.4Z"/></svg></span>
+          <b>Começando agora</b>
+          <span class="bt-rule__st">Estreando</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button" data-exp="voltando">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3.5v5h-5"/></svg></span>
+          <b>Voltando ao Magic</b>
+          <span class="bt-rule__st">Já joguei</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button" data-exp="frequente">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19v-5M12 19V6M18 19v-8"/></svg></span>
+          <b>Jogo com frequência</b>
+          <span class="bt-rule__st">Semanal</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3 · a jogada -->
+    <section class="bt-rband on-banda">
+      <span class="bt-rband__cap" id="cap3">3 · Sua próxima jogada</span>
+      <div class="on-linha on-linha--c">
+
+        <button class="bt-tile bt-tile--lit bt-tile--coroa on-formato" type="button" id="formato">
+          <svg class="bt-tile__ic" viewBox="0 0 34 34"><path d="M17 4.5 27.3 10.5v12L17 28.5 6.7 22.5v-12Z"/><circle cx="17" cy="16.5" r="3.4"/></svg>
+          <div><span class="bt-tile__lb" id="formatoNome">Commander</span><span class="bt-tile__sub">Formato</span></div>
+        </button>
+
+        <div class="on-slot" id="slot">
+          <!-- modo de construção (só para "Montar um deck") -->
+          <button class="bt-rule bt-rule--estado" type="button" data-modo="manual" id="modoManual">
+            <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19.2 8.8a2.1 2.1 0 0 0-3-3L5 17v3Z"/><path d="m15 6.8 3 3"/></svg></span>
+            <b>Criar do zero</b>
+            <span class="bt-rule__st">Carta por carta</span>
+          </button>
+          <button class="bt-rule bt-rule--estado" type="button" data-modo="guided" id="modoGuiado">
+            <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5 11.7 8l4.5 1.7L11.7 11.4 10 16l-1.7-4.6L3.8 9.7 8.3 8Z"/><path d="m18 14.5 1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1Z"/></svg></span>
+            <b>Gerar uma base</b>
+            <span class="bt-rule__st">Você revisa antes</span>
+          </button>
+
+          <!-- faixa do que vai acontecer (objetivos sem modo de construção) -->
+          <button class="bt-lane on-lupa" type="button" id="faixa" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M4 12h10M4 17h6"/><path d="m15 16.4 2.6 2.6 4.4-5"/></svg>
+            <span><b id="faixaTit">Prepare sua lista</b><i id="faixaSub">Cole, confira e resolva pendências</i></span>
+          </button>
+
+          <!-- vazio: nada escolhido ainda -->
+          <div class="bt-empty bt-is-vazio on-vazia on-lupa" id="acaoVazia" hidden>
+            <svg class="bt-empty__ic" viewBox="0 0 38 38"><path d="M10 30c0-8 19-8 19-16a5 5 0 0 0-10 0"/><circle cx="10" cy="30" r="3.2"/><circle cx="24" cy="10" r="3.2"/></svg>
+            <span class="bt-empty__lb">Escolha um objetivo para ver a próxima ação</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- o herói: a jogada principal -->
+    <button class="bt-hero on-hero" type="button" id="hero">
+      <span class="bt-hero__turno">
+        <span class="bt-numeral bt-numeral--hero" id="heroPasso">3</span>
+        <span class="bt-hero__sub">passo</span>
+      </span>
+      <span class="bt-hero__mid">
+        <span class="bt-hero__lb" id="heroLb">Gerar uma base para revisar</span>
+        <span class="bt-hero__quem" id="heroQuem">Commander</span>
+        <span class="bt-hero__pips" id="heroPips" style="--bt-c2: var(--bt-latao-700)">
+          <i class="bt-on"></i><i class="bt-on"></i><i class="bt-on"></i>
+        </span>
+      </span>
+      <span class="bt-hero__go"><svg viewBox="0 0 24 24"><path d="M5 12h12"/><path d="m12.5 6.5 5.5 5.5-5.5 5.5"/></svg></span>
+    </button>
+  </div>
+
+  <!-- ═══ SEGUNDO NÍVEL: OS SETE FORMATOS ═══════════════════════════════════ -->
+  <div class="bt-overlay on-formatos">
+    <div class="bt-overlay__head">
+      <button class="bt-back" type="button" aria-label="Voltar"><svg viewBox="0 0 24 24"><path d="M15 4.5 8 12l7 7.5"/></svg></button>
+      <h2 class="bt-overlay__title">Formato principal</h2>
+      <button class="bt-x bt-x--head" type="button" aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="bt-overlay__body">
+      <div class="on-fmt-grid">
+        <button class="bt-rule bt-rule--estado bt-rule--on" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 18h15M4.8 18 3.6 8l5 3.6L12 5l3.4 6.6 5-3.6L19.2 18"/></svg></span>
+          <b>Commander</b><span class="bt-rule__st">100 cartas · 1 comandante</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/></svg></span>
+          <b>Standard</b><span class="bt-rule__st">Só as coleções recentes</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 19 8v8l-7 4-7-4V8Z"/></svg></span>
+          <b>Modern</b><span class="bt-rule__st">De 8ª Edição para cá</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4Z"/></svg></span>
+          <b>Pioneer</b><span class="bt-rule__st">De Retorno a Ravnica para cá</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 20h8M9.5 20V9h5v11M7 9h10l-5-5Z"/></svg></span>
+          <b>Legacy</b><span class="bt-rule__st">Quase tudo é permitido</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5h10M7 20.5h10M7 3.5c0 5 5 5.5 5 8.5s-5 3.5-5 8.5M17 3.5c0 5-5 5.5-5 8.5s5 3.5 5 8.5"/></svg></span>
+          <b>Vintage</b><span class="bt-rule__st">Tudo, com restrições</span>
+        </button>
+        <button class="bt-rule bt-rule--estado" type="button">
+          <span class="bt-rule__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M9 12h6"/></svg></span>
+          <b>Pauper</b><span class="bt-rule__st">Só cartas comuns</span>
+        </button>
+      </div>
+      <div class="bt-hint">
+        <span class="bt-hint__ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><circle cx="12" cy="7.8" r=".9" fill="currentColor" stroke="none"/></svg></span>
+        <p>Usaremos isso como <b>contexto</b> para o caminho escolhido. O formato viaja com as rotas de deck; a coleção não recebe formato.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const ARTE = '../../../../../app/assets/branding/';
+const ALVOS = {
+  montar:    { hero: 'Gerar uma base para revisar', quem: 'Commander', cap3: '3 · Escolha como começar',
+               tit: 'Oficina', frase: 'Vamos transformar uma ideia em uma lista jogável.',
+               art: 'visual_fixture_arcane_artificer.webp', cor: 'bt-tile--plano' },
+  importar:  { hero: 'Revisar minha lista', quem: 'Modern', cap3: '3 · Prepare sua lista',
+               faixa: ['Prepare sua lista', 'Cole, confira e resolva pendências'],
+               tit: 'Sua lista', frase: 'Sua lista será revisada antes de criar qualquer deck.',
+               art: 'visual_fixture_blue_spell.webp', cor: 'bt-tile--iniciativa' },
+  catalogar: { hero: 'Importar minha coleção', quem: 'Coleção', cap3: '3 · Traga suas cartas',
+               faixa: ['Traga suas cartas', 'Impressão, idioma, acabamento e condição'],
+               tit: 'Sua coleção', frase: 'Vamos montar uma fila segura para revisar suas cópias.',
+               art: 'visual_fixture_arcane_ring.webp', cor: 'bt-tile--coroa' },
+  jogar:     { hero: 'Continuar para a mesa', quem: 'A mesa', cap3: '3 · Prepare a mesa',
+               faixa: ['Prepare a mesa', 'Com um deck revisado ou sem deck'],
+               tit: 'A mesa', frase: 'A Home vai preparar uma única entrada para a sua mesa.',
+               art: 'visual_fixture_ember_raiders.webp', cor: 'bt-tile--noite' },
+  melhorar:  { hero: 'Escolher deck para melhorar', quem: 'Commander', cap3: '3 · Escolha o deck certo',
+               faixa: ['Escolha o deck certo', 'Preview, fontes e desfazer na Oficina'],
+               tit: 'A Oficina', frase: 'Vamos partir de um deck real e manter você no controle.',
+               art: 'visual_fixture_arcane_ring.webp', cor: 'bt-tile--plano' }
+};
+const ESTADOS = {
+  vazio:      { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: null, exp: null, fmt: 'Commander', modo: null, hero: false },
+  preenchido: { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: 'montar', exp: 'comecando', fmt: 'Commander', modo: 'guided', hero: true, passo: 3, feitos: 3 },
+  pendente:   { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: 'montar', exp: null, fmt: 'Commander', modo: 'guided', hero: true, passo: 2, feitos: 1,
+                heroOff: true, heroLb: 'Falta dizer como você chega' },
+  carregando: { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: 'montar', exp: 'comecando', fmt: 'Commander', modo: 'guided', hero: true, passo: 3, feitos: 3,
+                carga: true, salvando: true },
+  erro:       { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: 'montar', exp: 'comecando', fmt: 'Commander', modo: 'guided', hero: true, passo: 3, feitos: 3,
+                aviso: ['Não foi possível salvar seu plano. A navegação foi pausada para evitar perder a escolha.', 'Tentar de novo'] },
+  retomado:   { rotulo: 'Plano retomado', pergunta: 'Continue de onde você parou.',
+                alvo: 'importar', exp: 'voltando', fmt: 'Modern', modo: null, hero: true, passo: 3, feitos: 3 },
+  negado:     { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: null, exp: 'voltando', fmt: 'Commander', modo: null, hero: false, semAlvos: true,
+                aviso: ['Não foi possível confirmar seu progresso salvo. Tente novamente antes de continuar.', 'Tentar de novo'] },
+  rota:       { rotulo: 'Ajuste sua rota', pergunta: 'Qual é sua próxima jogada?',
+                alvo: 'melhorar', exp: 'frequente', fmt: 'Commander', modo: null, hero: true, passo: 3, feitos: 3,
+                semSair: true },
+  formato:    { rotulo: 'Comece pelo seu jogo', pergunta: 'O que você quer fazer primeiro?',
+                alvo: 'montar', exp: 'comecando', fmt: 'Commander', modo: 'guided', hero: true, passo: 3, feitos: 3 }
+};
+
+function pinta(nome) {
+  const e = ESTADOS[nome], a = e.alvo ? ALVOS[e.alvo] : null;
+  const $ = (id) => document.getElementById(id);
+
+  $('rotulo').textContent = e.rotulo;
+  $('pergunta').textContent = e.pergunta;
+  $('carga').hidden = !e.carga;
+  $('sair').style.visibility = e.semSair ? 'hidden' : 'visible';
+
+  document.querySelectorAll('[data-alvo]').forEach(b =>
+    b.classList.toggle('bt-tile--sel', b.dataset.alvo === e.alvo));
+  document.querySelectorAll('[data-exp]').forEach(b =>
+    b.classList.toggle('bt-rule--on', b.dataset.exp === e.exp));
+  $('alvos').hidden = !!e.semAlvos;
+  $('alvosVazios').hidden = !e.semAlvos;
+
+  $('formatoNome').textContent = e.fmt;
+  $('cap3').innerHTML = a ? a.cap3 : '3 · Sua próxima jogada';
+
+  const temModo = e.alvo === 'montar';
+  $('modoManual').hidden = !temModo;
+  $('modoGuiado').hidden = !temModo;
+  $('modoManual').classList.toggle('bt-rule--on', temModo && e.modo === 'manual');
+  $('modoGuiado').classList.toggle('bt-rule--on', temModo && e.modo === 'guided');
+  const temFaixa = !!(a && a.faixa);
+  $('faixa').hidden = !temFaixa;
+  if (temFaixa) { $('faixaTit').textContent = a.faixa[0]; $('faixaSub').textContent = a.faixa[1]; }
+  $('acaoVazia').hidden = !!a;
+
+  const hero = $('hero');
+  hero.hidden = !e.hero;
+  if (e.hero) {
+    $('heroLb').textContent = e.salvando ? 'Salvando seu plano…' : (e.heroLb || a.hero);
+    $('heroQuem').textContent = e.salvando ? 'Aguarde' : a.quem;
+    $('heroPasso').textContent = String(e.passo || 3);
+    const nf = e.feitos === undefined ? 3 : e.feitos;
+    $('heroPips').innerHTML = [1, 2, 3].map(i =>
+      `<i class="${i <= nf ? '' : 'bt-out'}"></i>`).join('');
+    hero.classList.toggle('bt-is-desativado', !!e.heroOff);
+    hero.classList.toggle('bt-is-carregando', !!e.salvando);
+  }
+
+  if (e.aviso) { $('avisoMsg').textContent = e.aviso[0]; $('avisoSt').textContent = e.aviso[1]; }
+
+  const aceso = $('aceso');
+  if (a) {
+    aceso.className = 'aceso bt-tile bt-tile--lit ' + a.cor + (e.salvando ? ' bt-is-carregando' : '');
+    $('acesoArt').src = ARTE + a.art;
+    $('acesoTit').textContent = a.tit;
+    $('acesoFrase').textContent = a.frase;
+    $('acesoEst').textContent = e.salvando ? 'abrindo' : 'na Home';
+  }
+}
+
+function aplica() {
+  const k = (location.hash || '#preenchido').slice(1);
+  const nome = ESTADOS[k] ? k : 'preenchido';
+  document.body.dataset.estado = nome;
+  pinta(nome);
+}
+addEventListener('hashchange', aplica);
+aplica();
+</script>
+</body>
+</html>
