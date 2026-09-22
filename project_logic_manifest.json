@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "e8c43ed0a7e9d9c3d338fa0eaa2639a42f907e7259687f2cd038c0328abce67d",
+  "source_digest_sha256": "4d30d0d2d696fc8142eda0db24b6bf143bf56c2cb569c92a3330631e1783fd57",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -69,8 +69,8 @@
     "dart_symbols": 5196,
     "semantic_resolved_files": 687,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42730,
-    "semantic_resolved_call_sites": 68115,
+    "semantic_resolved_call_edges": 42731,
+    "semantic_resolved_call_sites": 68116,
     "semantic_resolved_type_references": 16075,
     "modules": 153,
     "app_routes": 46,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1222,
+    "tests": 1223,
     "flows": 8,
     "traceability_rules": 12,
     "tasks": 220,
@@ -38886,49 +38886,49 @@
       "name": "_buildPriceInsight",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 295
+      "line": 318
     },
     {
       "name": "_buildTrustInsight",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 390
+      "line": 413
     },
     {
       "name": "_dateString",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 441
+      "line": 464
     },
     {
       "name": "_dateTimeString",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 448
+      "line": 471
     },
     {
       "name": "_round2",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 439
+      "line": 462
     },
     {
       "name": "_toDouble",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 426
+      "line": 449
     },
     {
       "name": "_toInt",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 432
+      "line": 455
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 8
+      "line": 9
     },
     {
       "name": "onRequest",
@@ -41019,9 +41019,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42730,
-    "resolved_call_site_count": 68115,
-    "workspace_call_edge_count": 13310,
+    "resolved_call_edge_count": 42731,
+    "resolved_call_site_count": 68116,
+    "workspace_call_edge_count": 13311,
     "unresolved_call_edge_count": 541,
     "unresolved_call_site_count": 750,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -179287,7 +179287,18 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 222,
+        "line": 17,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "readAuthenticatedUserId",
+        "target": "readAuthenticatedUserId",
+        "target_library": "package:server/community_request_auth.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/community/marketplace/index.dart",
+        "line": 245,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -179298,7 +179309,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 260,
+        "line": 283,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_dateTimeString",
@@ -179309,7 +179320,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 262,
+        "line": 285,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_buildPriceInsight",
@@ -179320,7 +179331,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 271,
+        "line": 294,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_buildTrustInsight",
@@ -179331,7 +179342,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 280,
+        "line": 303,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -179342,7 +179353,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 287,
+        "line": 310,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "e",
@@ -179353,7 +179364,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 296,
+        "line": 319,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_toDouble",
@@ -179364,7 +179375,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 299,
+        "line": 322,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -179375,7 +179386,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 309,
+        "line": 332,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_dateString",
@@ -179386,7 +179397,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 329,
+        "line": 352,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_round2",
@@ -179397,7 +179408,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 381,
+        "line": 404,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_dateTimeString",
@@ -179408,7 +179419,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 394,
+        "line": 417,
         "caller": "_buildTrustInsight",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -179419,7 +179430,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 418,
+        "line": 441,
         "caller": "_buildTrustInsight",
         "kind": "method",
         "lexical_target": "_toDouble",
@@ -191305,8 +191316,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/community_request_auth.dart",
-        "unique_references": 16,
-        "occurrences": 16
+        "unique_references": 17,
+        "occurrences": 17
       },
       {
         "target_scope": "workspace",
@@ -249030,6 +249041,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249051,6 +249063,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249072,6 +249085,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249094,6 +249108,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249116,6 +249131,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249137,6 +249153,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249158,6 +249175,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249179,6 +249197,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249200,6 +249219,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249221,6 +249241,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249242,6 +249263,7 @@
         "app/test/features/community/screens/community_deck_detail_screen_test.dart",
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -249992,6 +250014,7 @@
       "tests": [
         "app/integration_test/binder_marketplace_trade_runtime_test.dart",
         "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/market_movers_test.dart"
       ],
       "method_contract": "source"
@@ -250008,6 +250031,7 @@
       "tests": [
         "app/integration_test/binder_marketplace_trade_runtime_test.dart",
         "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
+        "server/test/community_marketplace_privacy_contract_test.dart",
         "server/test/market_movers_test.dart"
       ],
       "method_contract": "source"
@@ -271132,6 +271156,7 @@
     "server/test/commercial_metrics_service_test.dart",
     "server/test/commercial_quality_gate_contract_test.dart",
     "server/test/community_engagement_contract_test.dart",
+    "server/test/community_marketplace_privacy_contract_test.dart",
     "server/test/container_supply_chain_contract_test.dart",
     "server/test/core_flow_smoke_test.dart",
     "server/test/cors_policy_test.dart",
@@ -280047,7 +280072,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "e8c43ed0a7e9d9c3d338fa0eaa2639a42f907e7259687f2cd038c0328abce67d"
+    "project_logic_source_digest_sha256": "4d30d0d2d696fc8142eda0db24b6bf143bf56c2cb569c92a3330631e1783fd57"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -282822,6 +282847,7 @@
       "server/test/commercial_metrics_service_test.dart",
       "server/test/commercial_quality_gate_contract_test.dart",
       "server/test/community_engagement_contract_test.dart",
+      "server/test/community_marketplace_privacy_contract_test.dart",
       "server/test/container_supply_chain_contract_test.dart",
       "server/test/core_flow_smoke_test.dart",
       "server/test/cors_policy_test.dart",

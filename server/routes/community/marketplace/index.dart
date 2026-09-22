@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
+import '../../../lib/community_request_auth.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 import '../../../lib/scryfall_image_url.dart';
@@ -13,6 +14,7 @@ Future<Response> onRequest(RequestContext context) async {
 
   try {
     final pool = context.read<Pool>();
+    final viewerUserId = await readAuthenticatedUserId(context);
     final params = context.request.uri.queryParameters;
 
     final page = int.tryParse(params['page'] ?? '1') ?? 1;
@@ -31,8 +33,29 @@ Future<Response> onRequest(RequestContext context) async {
       '(bi.for_trade = TRUE OR bi.for_sale = TRUE)',
       'item_availability.available_quantity > 0',
       'u.deleted_at IS NULL',
+      // Privacidade do dono. Sem estas cláusulas a busca global devolvia
+      // fichário de perfil privado e de quem bloqueou o observador. Espelha
+      // /community/binders/:userId e findTradeMatches, que filtram os mesmos
+      // dados assim. Observador anônimo (viewerUserId nulo) só vê público.
+      "(u.binder_visibility = 'public' OR u.id = CAST(@viewerUserId AS uuid))",
+      "(u.profile_visibility = 'public' OR u.id = CAST(@viewerUserId AS uuid))",
+      '''(
+        u.id = CAST(@viewerUserId AS uuid)
+        OR CAST(@viewerUserId AS uuid) IS NULL
+        OR NOT EXISTS (
+          SELECT 1
+          FROM user_blocks b
+          WHERE (
+            b.blocker_id = CAST(@viewerUserId AS uuid)
+            AND b.blocked_id = u.id
+          ) OR (
+            b.blocked_id = CAST(@viewerUserId AS uuid)
+            AND b.blocker_id = u.id
+          )
+        )
+      )''',
     ];
-    final sqlParams = <String, dynamic>{};
+    final sqlParams = <String, dynamic>{'viewerUserId': viewerUserId};
 
     if (search != null && search.isNotEmpty) {
       whereClauses.add('c.name ILIKE @search');
