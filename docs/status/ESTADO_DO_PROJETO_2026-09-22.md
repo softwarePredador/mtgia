@@ -183,6 +183,11 @@ Nenhuma é código; as duas são decisão do dono.
    capturas) e reler todas. É por isso que 16 commits saíram com `--no-verify`. Sem política de
    lote, a prova de UI se paga uma vez por tarefa.
 
+Decididas em 2026-09-22: D-02 (duas raias, com WIP-1 em cada uma; o contrato da fila muda no
+`BT-GOV-002`) e D-03 (recaptura em lote). O classificador de escopo staged entrou em `ac70f3d98`:
+commit sem UI passa pelo `pre-commit` sem a prova de UI, e os cinco commits de 2026-09-22 saíram
+sem `--no-verify`.
+
 ### A ordem que a medição sugere para começar
 
 1. `BT-WEB-003`: o desbloqueio mais barato (2 a 3 arquivos, sem teste novo, fora do digest); tira
@@ -199,7 +204,9 @@ Nenhuma é código; as duas são decisão do dono.
 **Isso diverge da ordem decidida pelo dono em 2026-09-21** (kit visual logo depois do
 `BT-SCP-001`). A decisão continua valendo, porque prioridade é dele. O que a medição acrescenta: o
 kit tem folga de 3 elos no caminho crítico e força outra recaptura de UI; `BT-DB-001` e
-`BT-DB-004` estão na corrente com folga zero e não tocam no digest. A reavaliação está na D-06 do registro de decisões (§9).
+`BT-DB-004` estão na corrente com folga zero e não tocam no digest. Resolvido em 2026-09-22 pela
+D-06: banco e kit andam juntos, cada um na sua raia. `BT-WEB-003` foi feito no mesmo dia
+(`8f9427bb4`).
 
 ---
 

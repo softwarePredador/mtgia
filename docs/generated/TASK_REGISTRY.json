@@ -5100,7 +5100,7 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/execution/CURRENT_QUEUE.md",
-      "sha256": "aff6c673ee808b29f857914a2bb856e36fa53698751897b8ae09e96b6ce25bde"
+      "sha256": "192d926462e3497d08a3c0e0474aae2c85f9e80b568009f5baed5a114732beb8"
     },
     "wip_limit": 1,
     "active_slot_count": 1,
@@ -9831,5 +9831,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "3775ef56c34afd31eff97f552fafddb8d6fe405d9ea5285de59b30342f67610a"
+  "project_logic_source_digest_sha256": "14791fc04029c3289b556800013a2e30e59d99657c49ddaab685c1446ac4c6e3"
 }

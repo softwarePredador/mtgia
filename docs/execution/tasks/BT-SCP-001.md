@@ -12,9 +12,9 @@
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic source digest de abertura:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Registry `generated_from.sha256` corrente: `dd1fe8ff0a41a10b680350ff197a4dfa32e3c25fe2acda6a5410be4ed109216f` (o aceite desta task
+- Registry `generated_from.sha256` corrente: `5b60b6cea15442538b52e40bdccbf92b81f587580c8634a3bddac32976ce5b4f`, do commit `f973f81c5`, com as decisões do dono de 2026-09-22 (antes delas, `dd1fe8ff…`; o aceite desta task
   foi ampliado em `f6f791098`)
-- Linha canônica: `222`
+- Linha canônica: `260` (em `f973f81c5`)
 - Decisão corrente: `docs/status/CURRENT_PRODUCT_DECISION.md`
 - Dependência canônica: `BT-GOV-001=PASS`
 
