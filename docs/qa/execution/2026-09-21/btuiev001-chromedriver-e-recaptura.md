@@ -278,3 +278,90 @@ enquanto a capability estiver off) é do dono.
 - A fixture autenticada exige `MANALOOM_CONFIRM_POSTGRES_WRITES` e
   `MANALOOM_CONFIRM_LIVE_MUTATIONS` com a frase de aprovação explícita. Elas
   autorizam apenas os dados descartáveis da rotina local.
+
+---
+
+## Adendo: `play-vs-ai-web-real`, o 23º manifest
+
+O E2E que recaptura este pack falhava numa asserção de produto. Investigado até
+o fim; são **dois** defeitos distintos, e nenhum dos dois é este trabalho.
+
+### 1. A asserção nunca pôde passar — corrigida
+
+`play_vs_ai_real_xmage_e2e_test.dart:357` exigia
+`interactive_battle_action_stale`. O servidor devolve
+`interactive_battle_not_waiting`. Medido duas vezes, ambas falhando aos 3
+segundos — determinístico, não flaky.
+
+A causa está na ordem das checagens de `reserveAction`
+(`interactive_battle_store.dart:560-640`):
+
+| # | checagem | erro |
+| --- | --- | --- |
+| 1 | chave de idempotência já vista | `duplicate` |
+| 2 | status terminal | terminal |
+| **3** | **`status != waitingForAction` ou `prompt == null`** | **`not_waiting`** |
+| 4 | expirado | `session_expired` |
+| 6 | `UPDATE … WHERE status='waiting_for_action' AND state_version=@v AND active_prompt_id=@p` casa 0 linhas | `action_stale` |
+
+A primeira ação aceita executa o `UPDATE` que põe `status='action_pending'` e
+`active_prompt_id=NULL` (linhas 600-626). O reenvio sequencial da mesma ação
+com chave nova, portanto, bate na checagem 3 e **nunca chega** à 6.
+`action_stale` só é alcançável em corrida real — duas requisições simultâneas
+passando a checagem 3 e só uma vencendo o `UPDATE`. Um teste sequencial com
+`await` não consegue produzi-lo por construção.
+
+**O teste nunca passou, e não é regressão.** O histórico prova: o arquivo
+nasceu em `f6f791098` (um único commit, sem ancestral), e o mesmo commit não
+tocou a ordem das checagens do store — só o tratamento de status terminal. E
+ninguém percebeu porque o teste exige **seis** variáveis de ambiente
+simultâneas, incluindo as duas frases de aprovação e um `DB_NAME` casando
+`^manaloom_s1_api_[A-Za-z0-9_]+$`. É a mesma classe de problema do `full` nunca
+cobrir `app/integration_test/`: teste que não roda não protege.
+
+Corrigido para aceitar os dois códigos — ambos são rejeição legítima do mesmo
+replay — com o raciocínio acima escrito no lugar. Verificado: o estágio
+`real_api_postgresql_xmage_contract` passa a passar.
+
+### 2. Bug de produto que a investigação revelou — NÃO corrigido
+
+`app/lib/features/battle/services/interactive_battle_service.dart:265-275`
+traduz `interactive_battle_action_stale` para *"A mesa avançou antes desta
+escolha. O estado será atualizado."* e **não tem ramo para
+`interactive_battle_not_waiting`** — que é o erro que o servidor realmente
+devolve nesse cenário. O jogador recebe o fallback genérico *"Não foi possível
+atualizar a mesa."*
+
+A diferença importa: uma mensagem diz que o app se recupera sozinho, a outra
+parece falha. E o cenário é comum — duplo toque numa opção, ou tocar de novo
+quando a rede demora.
+
+A correção é uma linha, acrescentar `'interactive_battle_not_waiting' ||` ao
+mesmo ramo. **Não fiz**: `app/lib` está no escopo do digest `8bba809c`, e
+mexer ali invalidaria os 216 screenshots recém-capturados. Entra quando o
+conjunto fechar.
+
+### 3. O que ainda bloqueia a recaptura
+
+Com a asserção corrigida, o E2E avança e passa a falhar no estágio seguinte,
+`start_browser_qa_api_fixture`:
+
+```
+BLOCKED: build output has a consumer
+Browser QA API fixture exited before readiness
+```
+
+`manaloom_server_contract_e2e_isolated.sh:353-365` recusa começar se `lsof`
+encontra qualquer processo segurando `server/build`. O E2E invoca esse script
+**duas vezes** — contrato e depois fixture de browser — e o servidor da
+primeira invocação ainda não soltou o diretório quando a guarda da segunda
+verifica. Medido: logo após a falha, `lsof +D server/build` não devolve nada;
+o consumidor existe apenas durante a transição.
+
+Reproduzido duas vezes seguidas. É corrida de handoff na orquestração, não
+ambiente e não este trabalho. A guarda em si está certa — o que falta é o
+estágio esperar a liberação antes de checar.
+
+**Estado final: 22 de 23 manifests no digest corrente.** `latest.json` segue
+intocado, e a evidência antiga do pack foi restaurada byte a byte ao estado
+commitado depois de cada tentativa.

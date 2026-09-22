@@ -353,8 +353,34 @@ void main() {
             actionBody,
             idempotencyKey: 'play-stale-$suffix',
           );
+          // Reenvio da MESMA acao com chave de idempotencia nova, depois que
+          // a primeira ja foi aceita. O servidor rejeita com 409, mas o codigo
+          // depende de onde a sessao esta quando a segunda chamada chega, e os
+          // dois codigos abaixo sao rejeicoes legitimas do mesmo replay:
+          //
+          //   interactive_battle_not_waiting  — a primeira acao ja rodou o
+          //     UPDATE que poe status='action_pending' e active_prompt_id=NULL
+          //     (interactive_battle_store.dart:600-626), entao a terceira
+          //     checagem de reserveAction dispara antes do UPDATE condicional.
+          //     E o caminho normal num teste sequencial com await.
+          //   interactive_battle_action_stale — so se o XMage ja tiver
+          //     produzido o PROXIMO prompt e devolvido a sessao para
+          //     waiting_for_action: ai a checagem de status passa e quem falha
+          //     e o UPDATE, por state_version/prompt_id velhos.
+          //
+          // Medido duas vezes nesta maquina: not_waiting nas duas, aos 3s. A
+          // asserção original cobrava action_stale exato e nunca passou — o
+          // teste nasceu em f6f791098 e as seis variaveis de ambiente que o
+          // habilitam impediram que alguem descobrisse.
           expect(stale.statusCode, 409, reason: stale.body);
-          expect(_json(stale)['error'], 'interactive_battle_action_stale');
+          expect(
+            _json(stale)['error'],
+            anyOf(
+              'interactive_battle_not_waiting',
+              'interactive_battle_action_stale',
+            ),
+            reason: stale.body,
+          );
           firstActionProved = true;
         }
 
