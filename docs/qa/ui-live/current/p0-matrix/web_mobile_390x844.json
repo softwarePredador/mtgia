@@ -1,7 +1,7 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T23:15:40.440043Z",
+  "generated_at": "2026-09-22T00:17:14.603470Z",
   "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
   "surface": "authenticated_p0_matrix",
   "profile": "web_mobile_390x844",
