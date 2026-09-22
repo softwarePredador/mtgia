@@ -1,6 +1,13 @@
 # Plano de Sprints de Execucao - MTGIA
 
-> Ordem oficial recomendada de execucao.
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-23`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/execution/CURRENT_QUEUE.md`.
+
 > Este documento detalha a fila de sprints a partir do contexto atual, sem substituir a precedencia de `CONTEXTO_PRODUTO_ATUAL.md`.
 
 ## Objetivo

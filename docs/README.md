@@ -9,6 +9,7 @@ documentos ou data mais recente não cria autoridade.
 ## 1. Decisão e trabalho corrente
 
 - [Decisão corrente](status/CURRENT_PRODUCT_DECISION.md)
+- [Estado verificado do projeto — 2026-09-22](status/ESTADO_DO_PROJETO_2026-09-22.md) (onde estamos, o que falta; evidência em [`verdade/FATOS.md`](verdade/FATOS.md))
 - [Backlog mestre](BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md)
 - [Fila operacional WIP 1](execution/CURRENT_QUEUE.md)
 - [Contrato de execução](execution/README.md)
@@ -19,6 +20,7 @@ dependências, estado e aceite. A fila e as fichas são coordenação/ledger.
 ## 2. Estrutura gerada
 
 - [Sistema atual](generated/CURRENT_SYSTEM.md)
+- [Registry de tasks](generated/TASK_REGISTRY.json)
 - [Arquitetura](generated/ARCHITECTURE.md)
 - [Matriz de rastreabilidade](generated/TRACEABILITY_MATRIX.md)
 - `../project_logic_manifest.json`
@@ -35,6 +37,8 @@ estrutura e lineage, não intenção arquitetural nem conclusão de release.
 - [Ingestão da coleção](MANALOOM_COLLECTION_INGESTION_CONTRACT.md)
 - [Agenda read-only de deltas externos](MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md)
 - [API e dados](../server/doc/API_CONTRACTS_AND_DATA_MAP.md)
+- [Mapa operacional](MAPA_OPERACIONAL_DO_PROJETO.md) — medições estáticas, sem autoridade de prioridade
+- [Mapa de superfícies de teste de UI](../app/doc/UI_TEST_SURFACE_MAP.md)
 
 ## 4. Deck, IA, Battle e dados MTG
 
@@ -46,6 +50,8 @@ estrutura e lineage, não intenção arquitetural nem conclusão de release.
 - [Capabilities XMage/Forge](hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json)
 - [Transição de pin XMage](hermes-analysis/EXTERNAL_ENGINE_PIN_TRANSITION_CONTRACT.json)
 - [Patch governado XMage](hermes-analysis/XMAGE_GOVERNED_RUNTIME_PATCH_CONTRACT.json)
+- [Modelo de qualidade de deck](DECK_QUALITY_MODEL.md)
+- [Ponte app↔IA](hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md)
 
 PostgreSQL/backend é a verdade de produto. Hermes/SQLite é cache, laboratório
 ou evidência. Execução XMage/Forge não promove automaticamente regra nativa,
@@ -66,6 +72,10 @@ ADRs não são reescritos retroativamente; uma decisão posterior cria novo ADR.
 
 Arquivos em `docs/qa/` são evidência, não prioridade. Um receipt prova somente
 o SHA/digest e o escopo que declara.
+
+## 6b. Apoio não canônico (2026-09-21)
+
+`flows/` — 11 fluxos com verificação adversarial estática; `design/visual-audit-2026-09-21/` — auditoria visual; `PONTO_DE_RETOMADA_COORDENACAO_2026-09-21.md` — ponto de retomada. Nenhum define prioridade.
 
 ## 7. Histórico e arquivo
 

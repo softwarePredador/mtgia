@@ -26,6 +26,7 @@ release, não define prioridade e não autoriza mutações.
 | Assunto | Autoridade |
 | --- | --- |
 | Produto e release | `docs/status/CURRENT_PRODUCT_DECISION.md` |
+| Capabilities de release | `server/config/release_capabilities.json` (server-authoritative, default-deny) e a matriz em `docs/status/CURRENT_PRODUCT_DECISION.md` |
 | Trabalho e prioridade | backlog mestre e registry gerado |
 | Estrutura do sistema | `project_logic_manifest.json` e `docs/generated/*` |
 | Dados de produto | backend, PostgreSQL e migrations versionadas |

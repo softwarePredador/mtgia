@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "4d30d0d2d696fc8142eda0db24b6bf143bf56c2cb569c92a3330631e1783fd57",
+  "x-manaloom-source-digest-sha256": "14f83a80923200919da8a2cbe89042ac57727a783320fce2d585491e148fdae0",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1191,6 +1191,11 @@
           "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py",
           "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_exact_scope_split.py"
         ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "default": {
             "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
@@ -1332,6 +1337,11 @@
         ],
         "x-manaloom-source": "server/routes/billing/webhook/index.dart",
         "x-manaloom-contract-level": "structural_generated",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "default": {
             "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
@@ -1619,11 +1629,6 @@
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "app/test/core/config/release_capabilities_test.dart"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
         ],
         "responses": {
           "default": {
@@ -4214,6 +4219,11 @@
           "app/integration_test/sets_search_catalog_runtime_test.dart",
           "app/test/features/collection/sets_catalog_screen_test.dart",
           "server/test/sets_route_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
         ],
         "responses": {
           "default": {

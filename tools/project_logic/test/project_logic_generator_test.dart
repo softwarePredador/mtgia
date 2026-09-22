@@ -40,7 +40,7 @@ void main() {
     expect(stats['database_tables'], 79);
     expect(stats['database_views'], 6);
     expect(stats['migrations'], 58);
-    expect(stats['flows'], 8);
+    expect(stats['flows'], 13);
   });
 
   test('publishes the following feed as an explicit API route alias', () {
@@ -885,21 +885,30 @@ void main() {
       generate['receipt_contract_ids'],
       contains('deck_ai_learning_gate_v2'),
     );
-    final battleCoach = routes.singleWhere(
+    // `/decks/{id}/battle-coach` deixou de ser entrypoint em 2026-09-22: é só
+    // redirect de compatibilidade (`deprecated_redirects`); a entrada de API do
+    // fluxo interativo é `/ai/battle/sessions`.
+    final battleSessions = routes.singleWhere(
       (route) =>
           route['flow_id'] == 'battle_replay' &&
-          route['entrypoint'] == '/decks/{id}/battle-coach',
+          route['entrypoint'] == '/ai/battle/sessions',
     );
-    expect(battleCoach['surfaces'], contains('app'));
+    expect(battleSessions['surfaces'], contains('api'));
 
-    final releaseScripts = (registry['non_route_entrypoints'] as List<dynamic>)
+    // O rótulo 'release scripts' virou caminhos verificáveis; o plano de
+    // controle (`GET /capabilities`) é produzido pelo portão de capability.
+    final capabilities = (registry['non_route_entrypoints'] as List<dynamic>)
         .cast<Map<String, Object?>>()
         .singleWhere(
-          (entrypoint) => entrypoint['entrypoint'] == 'release scripts',
+          (entrypoint) => entrypoint['entrypoint'] == 'GET /capabilities',
         );
     expect(
-      releaseScripts['flow_producers'],
-      contains('scripts/manaloom_build_beta_release.sh'),
+      capabilities['flow_producers'],
+      containsAll(<String>[
+        'scripts/manaloom_build_beta_release.sh',
+        'server/lib/release_capability_policy.dart',
+        'server/routes/capabilities/index.dart',
+      ]),
     );
 
     final projectLogicReceipt = receipts.singleWhere(

@@ -1,6 +1,6 @@
 # Commander Learning API - 2026-06-03
 
-> Lifecycle: `HISTORICAL_EVIDENCE · ROUTE_DISABLED`.
+> Lifecycle: `HISTORICAL_EVIDENCE · ROUTE_DISABLED · NO_MUTATION_AUTHORITY`.
 > A rota descrita aqui **não responde** hoje: `learning_reads` está
 > `allowed=false` em `server/config/release_capabilities.json`, e
 > `server/routes/ai/commander-learning/index.dart` retorna `503` antes de

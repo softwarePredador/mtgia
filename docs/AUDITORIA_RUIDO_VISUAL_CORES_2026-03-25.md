@@ -1,5 +1,15 @@
 # Auditoria de Ruído Visual e Uso de Cores
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-25`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/MANALOOM_VISUAL_EXECUTION_BASE_2026-04-19.md`,
+> `app/lib/core/theme/app_theme.dart`,
+> `docs/design/visual-audit-2026-09-21/README.md`.
+
 > Auditoria estática do app Flutter em `2026-03-25`.
 > Escopo: `app/lib/features/**`, `app/lib/core/widgets/**` e tema global.
 

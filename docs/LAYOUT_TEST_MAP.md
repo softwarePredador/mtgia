@@ -1,5 +1,22 @@
 # Mapa de Testes de Layout e Validação Visual — ManaLoom
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-05-30`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `app/doc/UI_TEST_SURFACE_MAP.md` (S3-01…S3-08), `app/test/ui/fixtures/*.json`.
+> Testes removidos em `d08985bca` (2026-07-01): `deck_card_overflow_test.dart`,
+> `life_counter_screen_test.dart`, `life_counter_clone_proof_test.dart`.
+> Lacunas do §8 fechadas (6 de 9): golden de telas funcionais
+> (`home_screen_test.dart`, `deck_list_responsive_test.dart`); Life Counter
+> Flutter shell (`lotus_life_counter_overflow_test.dart`); `community_screen`
+> (`community_screen_responsive_test.dart`); `trade_detail_screen`
+> (`trade_detail_screen_overflow_test.dart`); `binder_screen`
+> (`binder_screen_overflow_test.dart`, `binder_screen_resilience_test.dart`);
+> `chat_screen` (`chat_screen_test.dart`).
+
 > Data: 2026-05-30
 > Objetivo: Listagem completa de todos os testes que validam layout, overflow, responsividade, golden comparison, e DOM probes visuais.
 

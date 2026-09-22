@@ -1,6 +1,6 @@
 # EasyPanel Runbook - MTGIA
 
-> Lifecycle: `HISTORICAL_EVIDENCE · NO_DEPLOY_AUTHORITY`.
+> Lifecycle: `HISTORICAL_EVIDENCE · NO_MUTATION_AUTHORITY · NO_DEPLOY_AUTHORITY`.
 > **NÃO EXECUTE OS COMANDOS DESTE DOCUMENTO.**
 >
 > Fotografia operacional de `2026-03-24`. A decisão corrente é

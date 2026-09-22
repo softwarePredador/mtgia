@@ -12,6 +12,8 @@
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic source digest de abertura:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
+- Registry `generated_from.sha256` corrente: `dd1fe8ff0a41a10b680350ff197a4dfa32e3c25fe2acda6a5410be4ed109216f` (o aceite desta task
+  foi ampliado em `f6f791098`)
 - Linha canônica: `222`
 - Decisão corrente: `docs/status/CURRENT_PRODUCT_DECISION.md`
 - Dependência canônica: `BT-GOV-001=PASS`
@@ -45,8 +47,8 @@
 - Owner único: `/root`; WIP `1`, sem subagentes de Desenvolvimento. Auditorias
   coordenadas pela gerência são somente leitura. Nenhum novo ID funcional foi
   aberto, e o aceite canônico de `BT-SCP-001` continua pendente.
-- Base atual do principal: `354983a1e8a37f8fe1139b6282ca9e909a4f886d`, tree
-  `bcaf98d1c839ad7ba867ad3d7846097bcf7f9fe2`. Home/UX e recovery isolados não
+- Base atual: `d15beb05b` (2026-09-21). Consolidação herdada landou em
+  `f6f791098` (313 arquivos). Home/UX e recovery isolados não
   foram importados. O pacote é de consolidação do trabalho já existente,
   não um fechamento de Battle, MVP ou release.
 - Destino enumerado: `271` paths herdados (`94` fontes/testes/contratos,
@@ -100,14 +102,12 @@
   idênticos. Preparação proporcional: usar esse seed privado como fonte
   somente leitura e criar outro cache independente pelo launcher canônico;
   não reetiquetar marcador nem alterar cache global/SDK compartilhados.
-- Próximo marco: auditoria dirigida, freeze, geração oficial e campanha local
-  de `23/23` manifests e `439/439` PNGs novos no mesmo UI digest, todos abertos
-  pelos revisores designados. A policy inclui emulador Android (`54`) e Web
-  real (`385`); físico, TalkBack e teclado humano não recebem PASS implícito.
-- Veredito corrente: `INHERITED_CONSOLIDATION_NOT_READY`. Os PASS focais de
-  agosto registrados abaixo continuam vinculados somente aos seus snapshots;
-  não comprovam o checkout atual. Commit/push normais dependem dos gates e da
-  auditoria exata do índice. Fechamento canônico SCP exigirá aceite separado.
+- Próximo marco: `play-vs-ai-web-real` recapturado e `latest.json` reescrito
+  (hoje 22/23 manifests em `8bba809c`; 0 casam digest+hash).
+- Veredito corrente (2026-09-21): `GATE_AMPLO_NAO_ALCANCADO` — `full` `EXIT=1`
+  em `npm audit`; `ui-audit` (`BT-UIEV-001`), `custom-lint`, `patrol-smoke` e
+  `dependency_audit` não exercitados. Provado: bootstrap frio + suíte
+  project-logic + guard por mutação (`d83e9b1e1`, `07014b431`, `d26f23a16`).
 - Capabilities de produto continuam `29/29 OFF`; nenhum deploy, DML/migration
   live, sincronização, pin ou runtime publicado foi alterado nesta retomada.
 
@@ -161,8 +161,9 @@
 - A mesa apresenta mão própria, campo, pilha e ações tipadas card-first; opção
   ambígua não dispara ação e indisponibilidade XMage falha fechada sem Forge,
   simulação ou replay substituto.
-- Um runner isolado passou a provar API, PostgreSQL, XMage pinado, replay,
-  Flutter Web release, reconexão, terminal, rematch e cleanup no mesmo fluxo.
+- O runner isolado (`scripts/manaloom_play_vs_ai_e2e.sh`) provou o fluxo em
+  2026-08-25 (receipt); a versão de 2026-09-18 tinha asserção impossível
+  (corrigida em `d08c18717`) e ainda não voltou a passar no HEAD.
 - Nenhum pin, migration, DML live, capability, deck/regra de produto, deploy ou
   runtime publicado foi alterado.
 
@@ -278,6 +279,7 @@ reexecução aplicável e prova vinculada ao digest congelado.
 | Analyzer focal | Flutter analyzer nos sources Battle alterados | `PASS` | sem issues | `0` | worktree | saída local |
 | E2E XMage + browser | `MANALOOM_PLAY_VS_AI_BROWSER_QA=1 ./scripts/manaloom_play_vs_ai_e2e.sh` com confirmações descartáveis | `PASS` | `PASS`; 3 níveis UI, replay/PG e cleanup | `0` | UI digest `a81e8c2a…` | relatório `20260825T193821Z_67071_13837` |
 | Project logic / full / schema | comandos de fechamento | `PASS` | pendente desta consolidação | — | — | — |
+| Full 2026-09-21 | `./scripts/manaloom_local_ci.sh full` | `PARCIAL` | `EXIT=1` em `npm audit` (`next` critical, `sharp` high); zero falha de teste nos estágios que rodaram | `1` | `b4473a98a`→`07014b431` | `docs/qa/execution/2026-09-21/btscp001-gate-amplo.md` |
 
 ## Receipts
 
@@ -285,6 +287,9 @@ reexecução aplicável e prova vinculada ao digest congelado.
 | --- | --- | --- | --- | --- | --- |
 | Baseline policy | repository | observado | `server/config/release_capabilities.json` · `ace782b3969a…` | yes | revisão baseline |
 | Play vs AI focal | `/root` | `PASS_FOCAL_NOT_TASK_CLOSURE` | `docs/qa/execution/2026-08-25/play-vs-ai-real-xmage-e2e.md` | yes | worktree/UI digest/bundle/pins/target |
+| Gate amplo 2026-09-21 | sessão de 2026-09-21 | `PARCIAL` | `docs/qa/execution/2026-09-21/btscp001-gate-amplo.md` | yes | SHA `b4473a98a`→`07014b431`; corrigido após revisão adversarial |
+| `BT-UIEV-001` ChromeDriver e recaptura | sessão de 2026-09-21 | `PARCIAL` | `docs/qa/execution/2026-09-21/btuiev001-chromedriver-e-recaptura.md` | yes | SHA `d26f23a16`; UI digest `8bba809c…` (22/23 manifests) |
+| Ponto de retomada 2026-09-21 | sessão de 2026-09-21 | `PARCIAL` | `docs/qa/execution/2026-09-21/PONTO_DE_RETOMADA.md` | yes | estado, não autoridade |
 | `BT-SCP-001` | `/root` | fechamento pendente | será emitido depois de full, clean-SHA e auditoria | yes | SHA/digest/target obrigatórios |
 
 ## Aceite canônico
@@ -305,8 +310,11 @@ reexecução aplicável e prova vinculada ao digest congelado.
 - Gate-eligible: `false`
 - Release identity: produção não reobservada; último estado conhecido
   `SERVER_BEHIND`
-- Bloqueios: project logic, gates amplo/schema, secret scan, clean-SHA,
-  auditoria independente e receipt final
+- Bloqueios (2026-09-21): (1) `npm audit` do web público — bump `next` 15.5.25
+  / `sharp` 0.35.4 autorizado pelo dono em 2026-09-21, execução pendente;
+  (2) `BT-UIEV-001` — `latest.json` com 23 manifests; (3) `custom-lint`,
+  `patrol-smoke`, `dependency_audit` nunca exercitados; (4) clean-SHA com hooks
+  (16 commits `--no-verify`); (5) auditoria independente e receipt final
 - Riscos residuais: aggregate UI global stale, Android físico,
   teclado/TalkBack e todos os P0/rollout Battle continuam abertos
 - Rollback verificado: cleanup do runtime descartável passou sem kill forçado;
@@ -315,4 +323,15 @@ reexecução aplicável e prova vinculada ao digest congelado.
 - Veredito da execução: `IN_PROGRESS_CONTAINED`; o estado canônico continua no
   backlog até todos os gates de `BT-SCP-001` fecharem
 - Commit que atualiza o estado canônico: `pending`
-- Próximo ID elegível depois do fechamento: `BT-OFFER-001`
+- Próximo ID elegível depois do fechamento: `BT-UX-KIT-001` (kit visual em
+  `app/lib`; decisão do dono em 2026-09-21; `BT-SCP-001` continua `NOW` até
+  fechar)
+
+## Nota de 2026-09-22 — dependências explicitadas
+
+`BT-UIEV-001` e `BT-WEB-003` passaram a constar como dependências deste ID no backlog. Não é
+mudança de aceite: é tornar visível o que já bloqueava o `PASS` — o gate amplo morre no
+`npm audit` (`BT-WEB-003`) e em `ui_live_evidence` (`BT-UIEV-001`). Antes, `BT-UIEV-001`
+declarava depender deste ID, o que criava impasse. Com dependências abertas, o slot segue
+como contenção fail-closed (`IN_PROGRESS_CONTAINED`), com o marcador declarado em
+`docs/execution/CURRENT_QUEUE.md`.

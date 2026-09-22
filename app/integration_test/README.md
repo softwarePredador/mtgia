@@ -91,4 +91,8 @@ The project must continue to list `RunnerUITests`, and the workspace must list
 
 `./scripts/quality_gate.sh e2e` runs the local product/deckbuilder/battle/AI
 contract suite. Its live Flutter, backend, and production layers are opt-in via
-the `MANALOOM_RUN_*_E2E` variables documented in `test/README.md`.
+`MANALOOM_RUN_FLUTTER_RUNTIME_E2E`, `MANALOOM_RUN_SERVER_LIVE_E2E`,
+`MANALOOM_RUN_LIVE_PRODUCT_E2E`, `MANALOOM_RUN_MUTATING_RESOLUTION_E2E` and
+`MANALOOM_RUN_MUTATING_BATTLE_PRODUCT_E2E` (read in
+`scripts/manaloom_e2e_suite.sh:85-91`); the guarded profile additionally
+requires the `MANALOOM_CONFIRM_*` phrases shown in `test/README.md`.

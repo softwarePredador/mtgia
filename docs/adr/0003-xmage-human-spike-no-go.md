@@ -1,7 +1,6 @@
 # ADR 0003 — NO-GO do spike XMage humano contra IA
 
-- Estado: substituído pelo ADR 0012 em 2026-07-27; o arquivo ADR 0004 com o
-  antigo número permanece somente como evidência histórica
+- Estado: substituído em 2026-07-27 pela decisão GO registrada originalmente como 0004-xmage-human-spike-go.md e renumerada como ADR 0012 em 2026-08-12; o arquivo com o número antigo permanece somente como evidência histórica
 - Data: 2026-07-26
 - Programa: `BL7`
 - Decisão: `NO_GO`
@@ -72,5 +71,5 @@ Até lá, o produto não oferece Coach Mode.
 
 Na data desta decisão, o harness validava o pin Maven/bytecode, executava sete
 testes e ainda não possuía prova runtime. O script atual foi evoluído após a
-reabertura e reflete o GO do ADR 0004; não deve ser usado para reescrever
+reabertura e reflete o GO do ADR 0012; não deve ser usado para reescrever
 retroativamente este registro histórico.

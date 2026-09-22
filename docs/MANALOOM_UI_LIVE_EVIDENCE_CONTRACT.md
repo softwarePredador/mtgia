@@ -134,6 +134,13 @@ Capturar o stream Battle Live somente para diagnóstico interno:
 Essa rotina interna não registra uma rota pública nem concede aprovação ao
 produto Jogar contra IA.
 
+Toda captura Web resolve o ChromeDriver por `scripts/lib/manaloom_chromedriver.sh`:
+`MANALOOM_CHROMEDRIVER_BIN` (override explícito, precisa ser executável) → pin
+`153.0.8010.52` em `~/Library/Caches/manaloom/chromedriver/` → `BLOCKED`
+apontando para `scripts/manaloom_chromedriver_bootstrap.sh`. O PATH nunca é
+consultado. O major do driver precisa ser igual ao do Chrome instalado;
+divergência falha fechada.
+
 Recapturar o pack histórico Battle Learning em três builds Web release reais:
 
 ```bash
@@ -229,6 +236,10 @@ Visual System Workspace e Critical Overlays and States mantêm suas matrizes
 próprias. Os packs Battle Live e Battle Learning antigos são internos e não
 entram no conjunto público obrigatório. Jogar contra IA em Android e teclado
 Web só recebe crédito quando seus perfis forem vinculados ao digest corrente.
+Os perfis P0 são `web_mobile_390x844`, `web_desktop_1440x900`,
+`web_wide_1920x1080` e `android_emulator_manaloom_api34` (54/53/53/54
+checkpoints); Binder Import usa `web_binder_import_*` (7 × 3) e Deck Workshop
+`web_deck_workshop_*` (12 × 3).
 
 Os manifests ficam sob `docs/qa/ui-live/current`. O aggregate `latest.json`
 registra o hash de cada manifesto, todos os perfis revisados e a quantidade
@@ -304,6 +315,23 @@ resources Android, contrato de superfícies e o próprio harness de prova.
   `app/integration_test/critical_overlays_states_runtime_proof_test.dart`;
 - captura Critical Overlays and States:
   `scripts/manaloom_critical_overlays_states_visual_qa.sh`;
+- ChromeDriver pinado/bootstrap: `scripts/lib/manaloom_chromedriver.sh`,
+  `scripts/manaloom_chromedriver_bootstrap.sh`;
+- integração Binder Import:
+  `app/integration_test/binder_import_visual_runtime_proof_test.dart`;
+- captura Binder Import: `scripts/manaloom_binder_import_visual_qa.sh`;
+- integração Deck Workshop:
+  `app/integration_test/deck_workshop_visual_runtime_proof_test.dart`;
+- captura Deck Workshop: `scripts/manaloom_deck_workshop_visual_qa.sh`;
+- integração matriz P0 autenticada:
+  `app/integration_test/app_existing_user_visual_audit_test.dart`;
+- captura matriz P0: `scripts/manaloom_p0_runtime_capture.sh` +
+  `scripts/manaloom_ui_live_evidence_gate.sh --index-p0-matrix` (manifests em
+  `docs/qa/ui-live/current/p0-matrix/`);
+- integração core product:
+  `app/integration_test/core_product_acceptance_runtime_test.dart` +
+  `scripts/manaloom_ui_live_evidence_gate.sh --capture-core-product`;
+- recorte de screenshots runtime: `app/test_driver/runtime_screenshot_crop.dart`;
 - extração/verificação: `app/tool/ui_runtime_evidence.dart`;
 - gate: `scripts/manaloom_ui_live_evidence_gate.sh`;
 - digest: `scripts/manaloom_ui_source_digest.sh`;

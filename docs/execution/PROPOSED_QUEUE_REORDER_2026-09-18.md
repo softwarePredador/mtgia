@@ -1,5 +1,15 @@
 # Proposta de reordenação da fila por fan-out — 2026-09-18
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-09-18`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/execution/CURRENT_QUEUE.md`.
+> Procedência: alcance transitivo sem excluir DEFERRED_BY_SCOPE (com exclusão:
+> 95/73/51/40/32); BT-PRIV-002 tem 1 dep aberta.
+
 Status: `PROPOSAL · NOT_MERGED · NO_AUTHORITY`
 
 Este documento **não** reordena nada. `docs/execution/CURRENT_QUEUE.md` é a

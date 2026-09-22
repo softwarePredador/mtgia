@@ -2,14 +2,8 @@
 
 Status: `PROPOSAL · NOT_MERGED · NO_AUTHORITY`
 
-Este documento **não** é autoridade. Ele existe porque
-`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` e
-`docs/execution/CURRENT_QUEUE.md` estão sob edição em andamento (renomeação de
-"Coach" para "Jogar contra IA", inclusão de `BT-PLAY-001/002`), e escrever
-neles agora colidiria com esse trabalho.
-
-As linhas abaixo estão prontas para colar no backlog mestre quando a edição
-em curso fechar. Até lá, nenhuma delas tem ID reservado nem posição na fila.
+Este documento não é autoridade. As linhas da Parte 2 aguardam decisão do dono
+para entrar no backlog mestre (a edição que bloqueava, `f6f791098`, já landou).
 
 Origem factual: `docs/DECK_QUALITY_MODEL.md`, verificado contra código em
 `a2d044618`. Números de banco vêm do backup local de 2026-08-03.
@@ -74,7 +68,7 @@ Estado atual: `P1 · IN_PROGRESS_CONTAINED`.
 Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependências | aceite`.
 
 ```
-| `BT-UIEV-001` | P0 CORE | TODO | Restabelecer a prova de UI viva após mudança de fonte, incluindo o pin de ChromeDriver. | `BT-PLAY-001` | `manaloom_local_ci.sh quick` passa sem bypass; os 35 packs com digest corrente e manifesto conferido. |
+| `BT-UIEV-001` | P0 CORE | IN_PROGRESS_CONTAINED | Restabelecer a prova de UI viva após mudança de fonte, com pin único de ChromeDriver. | `BT-SCP-001` | `manaloom_local_ci.sh quick` passa sem --no-verify; os 23 manifests de docs/qa/ui-live/latest.json no digest corrente e latest.json reescrito. Evidência: b397f477b, 9a9ba66de, d08c18717; receipt docs/qa/execution/2026-09-21/btuiev001-chromedriver-e-recaptura.md (22/23 em 8bba809c). |
 | `BT-META-001` | P0 AI | TODO | Filtrar o corpus de meta insights por formato Commander. | — | `extract_meta_insights` ignora decks não-Commander; o ranking do pool deixa de ser liderado por staples de Legacy/Vintage. |
 | `BT-META-002` | P0 AI | TODO | Tornar `card_meta_insights.usage_count` idempotente e com decaimento. | `BT-META-001` | Rodar o extractor duas vezes não altera o resultado; carta ausente do corpus corrente perde posição; divergência corpus↔tabela vai a zero. |
 | `BT-FRESH-001` | P1 | TODO | Comparar a lista oficial de Game Changers com a fonte upstream, não só JSON↔Dart. | `BT-CAT-01` | O gate falha quando `source_checked_at` excede o limite de idade ou quando a lista upstream diverge; segue read-only, com provenance. |
@@ -83,8 +77,12 @@ Formato da tabela do backlog: `ID | prioridade | estado | entrega | dependência
 
 ### Justificativa de cada uma
 
-**`BT-CI-001` — RESOLVIDO em 2026-09-18, commit `d83e9b1e1`.** Mantido aqui
-como registro; não precisa entrar no backlog.
+**`BT-CI-001` — RESOLVIDO em 2026-09-18, commit `d83e9b1e1`.** Linha para o
+backlog mestre:
+
+```
+| `BT-CI-001` | P0 CORE | IMPLEMENTED_LOCAL_PENDING_FULL_GATE | Suíte de project logic roda dentro do bootstrap frio; bootstrap e validação usam a mesma lista de pacotes. | — | `manaloom_project_logic.sh --test` passa; divergência bootstrap↔validação falha por mutação. Commits d83e9b1e1, 07014b431; receipt formal pendente. |
+```
 
 Causa raiz: `bin/manaloom_project_logic.dart` chamava um
 `_bootstrapWorkspacePackages(root)` **privado** antes de `generate()`. Essa
@@ -135,25 +133,14 @@ afetada.
 **Bloqueio de ambiente adicional.** A captura usa `flutter drive` contra build
 real de Chrome, com ChromeDriver pinado. Medido:
 
-| | Versão |
-| --- | --- |
-| ChromeDriver pinado (em **6 scripts**) | 150.0.7871.124 |
-| Também em cache | 151.0.7922.77 |
-| Homebrew | 147.0.7727.50 |
-| Chrome instalado | **153.0.8010.50** |
+Resolvido em `b397f477b`: pin único `153.0.8010.52` em
+`scripts/lib/manaloom_chromedriver.sh`, bootstrap com SHA-256, contrato "every
+ChromeDriver consumer resolves through the shared pin". Ver receipt
+`2026-09-21/btuiev001-chromedriver-e-recaptura.md`.
 
-A tentativa de captura falha rápido, com guarda própria:
-`ChromeDriver major 150 does not match Chrome major 153`. Nenhum script do
-repositório baixa ChromeDriver — o cache foi populado à mão. Destravar exige
-baixar o 153 e **subir o pin nos 6 scripts**, o que altera o contrato de
-captura de todo o projeto, não só destes packs.
-
-**Recomendação: não recapturar agora.** `BT-PLAY-001/002` seguem abertos, então
-a superfície vai mudar de novo antes de fechar; congelar 23 packs agora produz
-evidência que será descartada. E subir o pin para gerar evidência descartável
-é pagar o custo de contrato sem retorno. O caminho de commit segue exigindo
-`--no-verify` por **este** motivo, isolado e com dono conhecido — o que é
-melhor do que o estado anterior, em que o bloqueio era difuso.
+Estado em 2026-09-21: recapturado (22/23). Falta: (1) o estágio esperar a
+liberação de `server/build`; (2) recapturar `play-vs-ai-web-real`; (3)
+reescrever `latest.json` com 23 manifests.
 
 **`BT-META-001`** — maior retorno por esforço de toda a cadeia, e é um `WHERE`.
 `server/bin/extract_meta_insights.dart:134-149` lê `SELECT ... FROM meta_decks
@@ -182,8 +169,9 @@ documento o governa, e dois segredos seguem válidos. Ver a análise em
 
 ## Parte 3 — Ordem recomendada
 
-1. `BT-SCP-001` (já é o slot `NOW`) → destrava commit/push sem bypass, e
-   `BT-CI-001` sai junto ou logo depois.
+1. `BT-SCP-001` (`NOW`) só destrava commit/push sem bypass depois de
+   `BT-UIEV-001` fechar `latest.json` e do bump `next` 15.5.25 / `sharp`
+   0.35.4 (autorizado pelo dono em 2026-09-21, execução pendente).
 2. `BT-FRESH-001` → bug de produto vivo, barato, independente do resto.
 3. `BT-META-001` e `BT-META-002` → limpam o sinal.
 4. `BT-AI-011` → só depois de 3, porque sinergia sobre sinal contaminado é

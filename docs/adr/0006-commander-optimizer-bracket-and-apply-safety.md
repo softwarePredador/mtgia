@@ -59,7 +59,7 @@ Use defense in depth with explicit boundaries:
    role floor. Both mutation routes validate the actual before/after delta,
    forbid condition/commander-role drift and recompute the role floor inside
    the owner transaction before destructive writes.
-9. The persistent optimize cache contract advances to `v19`, invalidating
+9. The persistent optimize cache contract is at v20 (v19 in this decision; bumped to v20 on 2026-08-13 by the free-beta all-off baseline), invalidating
    previews produced before ranked commander-reference packages and explicit
    target-archetype affinity were enforced. Actionable
    Commander cache hits require internally satisfied bracket and

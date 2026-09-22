@@ -10,9 +10,11 @@
 > Beta. A matriz commitada mantém Coach/Battle/Live OFF e os scripts recusam
 > `MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE=1` antes de qualquer mutação.
 
+> Emenda 2026-08-25: o ADR 0013 substitui este ADR quanto ao nome ("Jogar contra IA"), à rota canônica (/decks/:id/play-vs-ai[/sessionId]) e à experiência (mesa card-first, sem espectador público). Os limites de privacidade, persistência, autenticação e resposta tipada abaixo continuam válidos. Onde este texto diz "ADR 0004", leia ADR 0012.
+
 ## Contexto
 
-O GO limitado do ADR 0004 provou que um participante humano pode responder a
+O GO limitado do ADR 0012 provou que um participante humano pode responder a
 callbacks allowlisted do XMage sem deadlock ou vazamento e que o timeout pode
 terminar a partida por concessão. Ele não transformou o replay nem o Live
 Spectator em sessão restaurável e não autorizou rota pública.
@@ -38,7 +40,7 @@ forma silenciosa.
 5. O usuário pode responder opções, inteiro, múltiplos valores ou delegar o
    prompt atual. A validação final de legalidade continua no XMage.
 6. Não existe preferência automática de delegação para prompts futuros no
-   alpha. Ela contradiz a política aprovada do ADR 0004: se o prazo acabar, a
+   alpha. Ela contradiz a política aprovada do ADR 0012: se o prazo acabar, a
    sessão concede e termina. Mudar isso exige novo contrato/prova de takeover.
 7. A visão privada permite mão própria e zonas públicas. Para o oponente,
    zonas ocultas são somente contagens. Snapshot privado nunca é reutilizado
@@ -46,9 +48,7 @@ forma silenciosa.
 8. O sidecar inicia em exatamente um modo: `XMAGE_RUNTIME_MODE=batch` ou
    `XMAGE_RUNTIME_MODE=interactive`. Cada modo rejeita as rotas do outro. A
    capacidade interativa é limitada e publicada na readiness sem IDs.
-9. O app retoma pela URL
-   `/decks/:id/battle-coach/:sessionId`; `shared_preferences` não é fonte de
-   sessão, prompt, ação ou replay.
+9. O app retoma pela URL /decks/:id/play-vs-ai/:sessionId (ADR 0013); /decks/:id/battle-coach/:sessionId existe apenas como redirect de compatibilidade. shared_preferences não é fonte de sessão, prompt, ação ou replay.
 10. Backend e app permanecem protegidos, respectivamente, por
     `INTERACTIVE_BATTLE_ENABLED=false` e
     `ENABLE_INTERACTIVE_BATTLE=false`. Na Free Beta, backend e bundles recusam

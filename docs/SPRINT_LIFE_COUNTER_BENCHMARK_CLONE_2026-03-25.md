@@ -1,9 +1,14 @@
 # Sprint de Clone: Life Counter Benchmark
 
-> Documento operacional criado em `2026-03-25`.
-> Status: `ACTIVE`.
-> Esta sprint substitui a direcao visual e interacional definida em `docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md` para a frente `life counter`.
-> Task complementar ativa: `docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md`.
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-25`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `app/lib/features/home/lotus_life_counter_screen.dart`,
+> `docs/flows/life_counter_post_game.md`, backlog Épico H;
+> código-alvo removido em `d08985bca` (2026-07-01).
 
 ## Objetivo
 

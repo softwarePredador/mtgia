@@ -2,7 +2,8 @@
 
 Date: 2026-04-19
 
-Status: Active visual source of truth for the non-Life-Counter app experience
+> Lifecycle: `SUPPORTING_REFERENCE_NON_AUTHORITATIVE · CONSUMED_BY_CODE`.
+> Base visual citada por `app/lib/core/theme/app_theme.dart:12` e `server/config/premium_visual_qa_surfaces.json:4`. Não define prioridade. A direção corrente de qualidade visual (régua do contador, azulejos, numerais) está em `docs/design/visual-audit-2026-09-21/README.md` e no backlog; onde este documento e o tema divergirem, vale `app_theme.dart`.
 
 ## Purpose
 
@@ -96,10 +97,10 @@ data and context, not as a replacement brand logo.
 
 ### Core surfaces
 
-- `obsidian-950`: `#0F1115`
-- `obsidian-900`: `#171A21`
-- `slate-800`: `#232735`
-- `slate-700`: `#2B3142`
+- `obsidian-950`: `#0B0D12`
+- `obsidian-900`: `#151821`
+- `slate-850` (surfaceElevated): `#1D222C`
+- `slate-750` (outlineMuted): `#293041`
 
 Use these for:
 
@@ -383,7 +384,7 @@ not:
 
 ## Agent operating instructions
 
-### ManaLoom App Visual QA
+### manaloom-ux-design-auditor
 
 Must:
 
@@ -393,7 +394,7 @@ Must:
 - say plainly when a screen is still noisy, inconsistent, or weak
 - write handoffs with references to these visual rules
 
-### ManaLoom App Release Engineer
+### mobile-runtime-device-qa
 
 Must:
 
@@ -401,14 +402,6 @@ Must:
 - preserve the color system and hierarchy rules
 - avoid solving every screen differently
 - update handoffs with what changed and what remains
-
-### ManaLoom Release Coordinator
-
-Must:
-
-- require this document as part of visual readiness
-- refuse visual approval when changes contradict this direction
-- coordinate App Visual QA and App Release Engineer using this as baseline
 
 ## Validation rules
 

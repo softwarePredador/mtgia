@@ -1,5 +1,14 @@
 # Sprint de Auditoria de Produto, UX e Direção Visual
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-25`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/design/visual-audit-2026-09-21/README.md`,
+> `docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md`.
+
 > Documento operacional criado em `2026-03-25`.
 > Objetivo: transformar a revisão visual do app em uma sprint formal, com critério de produto, checklist de avaliação por tela e critérios objetivos de aceite.
 
@@ -655,16 +664,6 @@ Cada tela deve terminar com estes campos preenchidos:
 
 - `DONE`
 - `REVISIT`
-
-## Ordem oficial de execução
-
-1. core de deck
-2. home e auth
-3. scanner
-4. community/social/messages
-5. market/collection/binder/trades
-
-Nenhuma tela lateral deve furar o core de deck.
 
 ## Definição de encerramento da sprint
 

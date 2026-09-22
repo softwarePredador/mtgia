@@ -5,6 +5,8 @@
 - Responsáveis: ManaLoom engineering
 - Programa: `BL0–BL10`
 
+> Emenda 2026-08-25 (ADR 0013): o "Live Spectator" deixou de ser superfície de usuário. O stream público sanitizado, os checkpoints e o replay permanecem como transporte, recuperação, observabilidade e evidência internos; nenhuma rota, CTA ou modo de espectador existe no app. O produto interativo chama-se Jogar contra IA; "Coach Mode" sobrevive apenas como identificador técnico (capability `battle_coach`, `BattleCoachScreen`). Os limites técnicos desta decisão continuam válidos.
+
 ## Contexto
 
 O Battle atual executa uma simulação fechada por meio de
@@ -112,7 +114,7 @@ começa após um GO explícito desse spike.
 
 ## Provas obrigatórias
 
-- `docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md`
+- docs/MANALOOM_BATTLE_LAB_DELIVERY_PLAN.md (evidência histórica do programa BL0–BL10; não define prioridade nem autoriza mutação)
 - `docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md`
 - `docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json`
 - `./scripts/quality_gate.sh battle`

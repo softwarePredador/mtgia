@@ -17,7 +17,10 @@ schema, contrato de privacidade e concorrência.
 O workspace persistente `/collection/import` é a superfície canônica. Ele não
 aplica nada ao ler a fonte: primeiro cria candidatos, exige as decisões
 pendentes, compara o lote com PostgreSQL e só então oferece uma confirmação de
-apply.
+apply. A rota e os endpoints `/binder/import/*` ficam sob a capability
+`collection_private`; com ela `off` (política `brewtact_free_beta_2026-08-13`)
+o app redireciona para `/home` e o servidor responde 404
+`capability_unavailable`.
 
 ## Formato da entrada
 
@@ -110,8 +113,12 @@ cliente nunca apresenta um erro de transporte como confirmação de escrita.
 
 ## Sessão de scanner
 
-Quando `ENABLE_SCANNER_RELEASE=true`, o workspace pode abrir
-`CardScannerScreen` em `continuousBinderSession`. Cada confirmação devolve uma
+Quando o artefato foi compilado com `ENABLE_SCANNER_RELEASE=true` **e** a
+capability `scanner` de `server/config/release_capabilities.json` está
+`allowed`, o workspace pode abrir `CardScannerScreen` em
+`continuousBinderSession`. O flag de build nunca é autorização por si só
+(`app/lib/core/config/launch_features.dart:4-11`). Hoje a capability está
+`off`. Cada confirmação devolve uma
 impressão concreta para a mesma fila, agrega scans repetidos e reinicia o
 scanner sem persistir no Fichário. Fechar a câmera retorna à revisão; o apply
 continua sendo o único ponto de escrita.

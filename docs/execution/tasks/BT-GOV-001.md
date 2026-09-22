@@ -1,5 +1,13 @@
 # Ficha de execução — `BT-GOV-001`
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-08-14`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/qa/execution/2026-08-14/BT-GOV-001.md`.
+
 > Ledger não autoritativo. A linha do backlog/registry define a task.
 
 ## Autoridade

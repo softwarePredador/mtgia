@@ -1,5 +1,14 @@
 # Auditoria UX Logica Performance - 2026-03-23
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-23`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/BREWTACT_DECKBUILDER_AI_CURRENT_FLOW_2026-08-12.md`,
+> `docs/DECK_QUALITY_MODEL.md`, `docs/flows/deck_ai.md`.
+
 ## Escopo
 
 Auditoria completa do `mtgia` com foco em:

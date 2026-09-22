@@ -1,7 +1,8 @@
 # BrewTact — decisão corrente de produto
 
 - Lifecycle: `CURRENT_PRODUCT_DECISION`
-- Data da decisão: `2026-08-25`
+- Data da decisão: `2026-08-25`; atualizada em `2026-09-22` com as decisões do
+  dono sobre a beta (`docs/status/DECISOES_PENDENTES_2026-09-22.md`)
 - Estado de release: `NO_GO_PUBLIC_RELEASE`
 - Candidato pretendido: `CONTROLLED_FREE_BETA`
 - Público inicial: coorte pequena e controlada
@@ -20,9 +21,7 @@ receipts continuam sendo necessários para provar implementação e release.
 - Host público técnico de deploy, smoke e rollback:
   `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`; ele não é a
   identidade pública do produto.
-- App Web: rota reservada `/app` na origem canônica, mas permanece inacessível
-  enquanto a matriz server-authoritative desta revisão estiver totalmente
-  `OFF` e sem receipt P0.
+- App Web: rota reservada `/app` na origem canônica. Enquanto a matriz server-authoritative estiver totalmente `OFF`, nenhuma superfície pública aponta para `/app`, nenhuma capability de produto responde, e `/app` serve apenas o plano de controle de conta (login, recuperação, verificação, perfil, exportação e exclusão) para contas pré-existentes; auto-cadastro continua `OFF`. Por decisão de 2026-09-22 (D-13), o `/app` pode ser implantado com a matriz toda `OFF`, como release de plano de controle.
 - A Web pública e os relatórios compartilhados não exibem CTA nem link para
   `/app` nesse estado; mostram apenas `Acesso ainda não liberado` sem ação.
 - API aprovada pelo contrato de release:
@@ -55,18 +54,22 @@ consultar PostgreSQL ou chamar um provedor.
 
 | Área | `implementation_status` | `release_capability` | `live_verified_as_of` |
 | --- | --- | --- | --- |
-| Cadastro de nova conta | Implementado e guardado | `OFF`; a coorte é admitida somente por decisão/receipt próprios | `null` |
+| Cadastro de nova conta | Implementado e guardado | `OFF`; a coorte é admitida somente por decisão/receipt próprios, por convite de uso único emitido pelo dono, em lotes de 20 a 30 (D-16, `BT-AUTH-006`) | `null` |
 | Login, recuperação, verificação, exportação e exclusão de conta existente | Plano de controle de acesso e privacidade | Disponível; não autoriza nenhuma capability de produto | `null` |
 | Catálogo read-only, cartas, coleção/fichário privado e deck manual | Implementado, com P0 de release ainda abertos | `OFF_UNTIL_P0_RECEIPT` | `null` |
-| Analyze/Optimize consultivo, sempre revisável | Experimental guardado, com P0 de IA ainda abertos | `OFF_UNTIL_P0_RECEIPT` | `null` |
+| Analyze/Optimize consultivo, sempre revisável | Experimental guardado, com P0 de IA ainda abertos | `OFF_UNTIL_P0_RECEIPT`; segunda onda, depois da primeira coorte (D-07) | `null` |
 | Generate/Rebuild | Experimental guardado | `OFF`; futura allowlist exige decisão e receipt próprios | `null` |
-| Life Counter local | Implementado; isolamento/saída confiável ainda precisam fechar | `OFF_UNTIL_P0_RECEIPT` | `null` |
+| Life Counter local | Implementado; isolamento/saída confiável ainda precisam fechar | `OFF_UNTIL_P0_RECEIPT`; entra na primeira coorte depois dos seus P0 LIFE (D-07) | `null` |
 | Battle batch e Jogar contra IA | Implementação/laboratório existente; Live é infraestrutura interna, não produto espectador | `OFF` até o programa Battle horizontal e a prova de partida real completa | `null` |
-| Scanner/OCR | Implementação/provas históricas existentes | `OFF` | `null` |
+| Scanner/OCR | Implementação/provas históricas existentes | `OFF`; câmera fora do build de release no Android e no Web (D-41) | `null` |
 | Galeria, perfis públicos, busca social, comments, follows, DMs e push social | Implementação parcial existente | `OFF` | `null` |
-| Binder público, marketplace e trades | Implementação parcial existente | `OFF` | `null` |
+| Binder público, marketplace e trades | Implementação parcial existente | `OFF`; na beta, troca e venda do fichário ficam escondidas e a escrita responde 422 (D-39) | `null` |
 | Checkout, assinatura, anúncios e paywall | Backend de billing contém bloqueio fail-closed | `OFF` | `null` |
 | Aprendizado, leitura de learned decks e promoção | Contenção local existente; programa definitivo incompleto | `OFF` | `null` |
+| Rotas de IA legadas (`/ai/ml-status`, `/ai/simulate-matchup`, `/ai/weakness-analysis`, `/ai/optimize/telemetry`, recommendations/simulate de deck) | Contenção legada, sem chamador no app | `OFF`; as quatro sem consumidor serão removidas (D-31, `BT-AI-029`), e `ml-status` fica com o `BT-AI-027` | `null` |
+| Substituição integral de deck (`PUT /decks/:id`, `POST /decks/:id/cards/replace`, `POST /import/to-deck`) | Implementado e guardado | `OFF`; a edição por carta entra sob `decks_private` (D-27, `DCK-P0-00`) | `null` |
+
+`OFF_UNTIL_P0_RECEIPT` e `Disponível` são rótulos desta decisão; no artefato executável (`server/config/release_capabilities.json`) o valor é sempre `off` ou `on`, e `allowed` tem de ser igual a `release_capability == 'on'`.
 
 ## Regras de abertura
 
@@ -90,8 +93,7 @@ consultar PostgreSQL ou chamar um provedor.
 - Cobertura XMage interativa incompleta bloqueia o início de forma explícita;
   não existe fallback para Forge, simulação automática ou replay assistido no
   fluxo Jogar contra IA.
-- A rota planejada é `/decks/:id/play-vs-ai[/sessionId]`; o nome histórico
-  Battle Coach é apenas compatibilidade técnica temporária.
+- A rota é `/decks/:id/play-vs-ai[/:sessionId]` (`app/lib/main.dart:677,692`), compilada apenas com `ENABLE_INTERACTIVE_BATTLE=true` e guardada por `battle_coach`; `/decks/:id/battle-coach[/:sessionId]` sobrevive apenas como redirect de compatibilidade (`main.dart:706,715`).
 - O aceite exige partida XMage real completa e retorno esperado por caso de
   uso. Fixture, mock, golden e widget test continuam úteis, mas não provam esse
   resultado.
@@ -112,6 +114,20 @@ O trabalho atual é a Onda 0: tornar esta decisão executável, fechar oferta e
 capabilities server-side, reconciliar lifecycle documental e endurecer os
 gates. Somente receipts da mesma revisão podem mover uma linha de
 `OFF_UNTIL_P0_RECEIPT` para `ON`.
+
+Decidido em 2026-09-22:
+
+- Depois do `BT-SCP-001`, a linha de base contida vai ao ar (`BT-REL-000`):
+  backup cifrado, merge, migration 058, deploy do backend com tudo `OFF` e
+  observação same-SHA. Em 2026-09-22 a API aprovada rodava `a6ee09c8f`
+  (2026-08-03), sem a política de capabilities, com cadastro aberto e IA e Battle
+  ligados. Cada passo em produção pede a aprovação do dono na hora (regra 6).
+- Os quatro buracos do plano de controle de conta (exportação sem
+  reautenticação, exclusão sem limite de tentativas, login que denuncia contas e
+  relatório de deck apagado) fecham antes de qualquer capability abrir (D-19).
+- O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
+  linha de base contida com a 058, catálogo com menos de 7 dias, rollback
+  treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`).
 
 Detalhamento e ordem:
 `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.

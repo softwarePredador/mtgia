@@ -1,12 +1,14 @@
-# BrewTact — mapa operacional do projeto — 2026-09-18
+# BrewTact — mapa operacional do projeto — 2026-09-18, atualizado em 2026-09-21 e 2026-09-22
 
-Status: `MAP · STATIC_ANALYSIS · NO_AUTHORITY · NOT_RATIFIED`
+Status: `MAP · STATIC_ANALYSIS · NO_PRIORITY_AUTHORITY · NO_MUTATION_AUTHORITY · CANONICAL_CURRENT_CONTRACT (desde 8e6a7e0ed)`
 
 Este documento é **mapa, não autorização**. Ele não decide escopo, não abre
 capability, não autoriza deploy, migração, escrita live nem promoção. Ele
 existe para que alguém entenda o projeto inteiro sem depender de memória.
 
-Tudo aqui foi medido por análise estática deste checkout em 2026-09-18. Ele
+As seções 1-6, 8 (C1-C15), 9 e 10 foram medidas por análise estática em
+2026-09-18 sobre `0677762d7`; a seção 7 e C16-C17 em 2026-09-21 sobre
+`b397f477b`; a seção 4.3 foi remedida em 2026-09-22 sobre `d15beb05b`. Ele
 **não observa runtime nem produção**. Onde um fato exige o host ou o banco,
 está na seção 9 com o comando que o resolve.
 
@@ -57,7 +59,7 @@ antes do middleware de plano rodar.
 
 ## 2. Mapa de jornadas
 
-### Os dois portões, ambos fail-closed
+### Os três portões, todos fail-closed
 
 - **Servidor** — `server/routes/_middleware.dart:105-116` consulta
   `ReleaseCapabilityPolicy` em toda requisição. Capability negada → **404
@@ -68,6 +70,14 @@ antes do middleware de plano rodar.
   ligado em `app/lib/main.dart:426`. O snapshot default é `denied()` e
   qualquer falha de refresh volta a `denied()`: backend inalcançável
   equivale a tudo desligado.
+- **Scheduler** — `server/bin/manaloom_ops_daemon.py:145-205` carrega o mesmo
+  `server/config/release_capabilities.json` (envelope inválido ⇒ política
+  vazia) e `_jobs_for_release_policy` (`:736-745`) só agenda um job se todas
+  as capabilities de `JOB_REQUIRED_CAPABILITIES` (`:711-734`, 16 jobs)
+  estiverem `allowed`. Com 29/29 `off` roda 1 de 16
+  (`hermes_cron_governor_report`) e o daemon sobe em `safe_housekeeping_only`
+  com `/health` próprio na porta `MANALOOM_NATIVE_BATTLE_PORT` (`:396-465`); o
+  deploy reasserta isso (`scripts/manaloom_deploy_ops_image.sh:366,369`).
 
 ### Números medidos
 
@@ -90,14 +100,15 @@ auto-cadastro (`account_registration` off; o app redireciona `/register` para
 | Jornada | Implementado | Alcançável hoje | Capability que segura |
 | --- | --- | --- | --- |
 | auth_session | sim | **sim** (sem cadastro) | — / `account_registration` |
-| card_collection | sim | não | `catalog_private` |
-| deck_lifecycle | sim | não | `decks_private` |
+| card_collection | sim | não | `catalog_private` (catálogo, edições, `/market/*`) + `collection_private` (fichário/import) · `scanner` no scan · `trades` em `/collection/matches` |
+| deck_lifecycle | sim | não | `decks_private` (base) + `deck_replace_all` (PUT /decks/:id, replace, import/to-deck) + `catalog_private` (busca) + `scanner` (scan) + `gallery_public` (/decks/:id/reports) |
 | deck_ai — Analyze | sim | não | `ai_analyze_optimize_advisory` |
 | deck_ai — Generate | experimental | não | `ai_generate_rebuild` |
 | deck_ai — Optimize/Complete | sim, guardado | não | `ai_analyze_optimize_advisory` |
 | deck_ai — Rebuild | sim | não | `ai_generate_rebuild` |
-| battle / jogar contra IA | **não compilado no artefato** | não | `battle_batch` + trava de compilação |
-| life_counter | client-only | parcial | `life_counter_local` (sem rota) |
+| battle — Battle Lab / replays | sim, compilado | não | `battle_batch` |
+| battle — Jogar contra IA | **não compilado no artefato** (`ENABLE_INTERACTIVE_BATTLE` default `false`) | não | `battle_coach` + trava de compilação |
+| life_counter | client-only (bundle web + 14 folhas nativas) | não — rota `/life-counter` existe (`main.dart:491-501`) e o guard a devolve a `/home` | `life_counter_local` |
 | social_trade | sim | não | `marketplace` |
 | release_operations | sim | n/a | plano de controle |
 
@@ -146,11 +157,11 @@ Esta é a seção que o projeto não tinha.
 | Fronteira | sidecar isolado por API | **processo isolado, API apenas, proibido copiar fonte para o backend** |
 | Pin canônico | `services/xmage-sidecar/XMAGE_COMMIT` | `services/forge-sidecar/FORGE_COMMIT` |
 | Valor atual | `2c43ec8cd…` | `a62915f50…` |
-| Atualizado em | 2026-07-28 (**52 dias**) | 2026-07-14 (**66 dias**) |
+| Atualizado em | 2026-07-28 (`c05774e0f`) | 2026-07-14 (`0c9a4075c`) |
 | Espelhos obrigatórios | **7** | 2 no auditor (+1 de facto fora dele) |
 
 O XMage tem um segundo pin, de **patch governado** —
-`XMAGE_PATCH_COMMIT = 991948742…`, atualizado em 2026-08-03 (46 dias) — que
+`XMAGE_PATCH_COMMIT = 991948742…`, 2026-08-03 (`a6ee09c8f`) — que
 existe para aplicar correções próprias sobre o upstream sem forkar.
 
 A fronteira do Forge é **jurídica, não técnica**: GPL-3.0 contaminaria o
@@ -173,40 +184,43 @@ Escala da última transição (`34d81ea…` → `2c43ec8…`): 152 commits, 356 
 **169 implementações de carta alteradas**, 34 em escopo de produto, 133
 bloqueadas por política de ativação. Atualizar pin não é trocar um SHA.
 
-### 4.3 Detecção de drift — e por que não está funcionando
+### 4.3 Detecção de drift — funciona quando a árvore está limpa
 
 O mecanismo existe e é bom: `external_engine_upstream_delta_audit.py` compara
 o pin contra `master` pela GitHub Compare API, para os dois repositórios.
-Cadência pretendida: domingo, 09:17, via LaunchAgent.
+Cadência declarada (`docs/MANALOOM_EXTERNAL_ENGINE_DELTA_SCHEDULE.md:43-48`):
+domingo, 09:17, por automação cron local do Codex ("ManaLoom • Deltas
+XMage/Forge"), porque o checkout está sob `~/Documents` e o instalador de
+LaunchAgent recusa pastas protegidas por TCC
+(`scripts/manaloom_install_external_engine_delta_schedule.sh:58-64`). O
+LaunchAgent não está instalado e não é o caminho para este checkout.
 
 **Estado real medido:**
 
 | Relatório | Status |
 | --- | --- |
-| 2026-07-28 | consultou upstream (`review_required`) |
-| 2026-08-25 | consultou upstream (`review_required`) |
+| 2026-07-28, 2026-08-25, 2026-09-20 | consultou upstream (`review_required`) |
 | 08-02, 08-10, 08-17, 08-24, 08-31, 09-13 | **`skipped · dirty_worktree`** |
-| `latest.json` | `skipped · dirty_worktree` |
+| `latest.json` | 2026-09-20, `review_required` |
 
-**Seis das oito auditorias foram puladas porque a árvore de trabalho está
-suja.** Com centenas de arquivos modificados pendentes, a auditoria se recusa
-a rodar. O LaunchAgent também não está instalado, e o instalador recusa
-checkouts sob `~/Documents` por TCC — que é exatamente onde este repo está.
-
-Consequência: **hoje o projeto não sabe o quanto os dois motores
-divergiram.**
+**Seis das nove auditorias foram puladas por árvore suja.** A de 2026-09-20
+mediu: XMage master **775 commits** à frente do pin, Forge **780**; 211 cartas
+e 212 fixtures candidatos; `pin_contract_failures: 0`. O projeto sabe o delta
+desde 2026-09-20; o que não existe é a revisão nominal das 211 cartas nem
+decisão de avançar pin. A árvore voltou a ficar suja em 2026-09-21; a
+auditoria de 2026-09-27 será pulada se não for limpa antes.
 
 ### 4.4 Upstreams de dado
 
-| Fonte | Consome | Última checagem | Dias | Checagem automática |
-| --- | --- | --- | --- | --- |
-| MTGJSON (catálogo) | `sync_cards.dart` | 2026-06-06 | 104 | script existe, **não registrado** |
-| Scryfall (legalidades) | `sync_card_legalities_from_scryfall.py` | 2026-06-06 | 104 | job registrado, **dry-run por padrão** |
-| Scryfall (rulings) | `sync_rulings.dart` | — | — | script existe, não registrado |
-| EDHREC | `cron_snapshot_edhrec.sh` | 2026-06-02 | 108 | não registrado |
-| WotC Comprehensive Rules | `sync_rules.dart` | 2026-06-19 | 91 | comparador upstream real, **fora de cron e CI** |
-| WotC Game Changers | `commander_game_changers.json` | 2026-07-14 | **66** | gate roda a cada commit mas **nunca compara com a WotC** |
-| Corpus de meta interno | `extract_meta_insights.dart` | 2026-03-13 | **189** | nenhuma |
+| Fonte | Consome | Última checagem (backup PG 2026-08-03; Game Changers via git) | Checagem automática |
+| --- | --- | --- | --- |
+| MTGJSON (catálogo) | `sync_cards.dart` | 2026-06-06 | script existe, **não registrado** |
+| Scryfall (legalidades) | `sync_card_legalities_from_scryfall.py` | 2026-06-06 | job registrado, **dry-run por padrão** |
+| Scryfall (rulings) | `sync_rulings.dart` | — | script existe, não registrado |
+| EDHREC | `cron_snapshot_edhrec.sh` | 2026-06-02 | não registrado |
+| WotC Comprehensive Rules | `sync_rules.dart` | 2026-06-19 | comparador upstream real, **fora de cron e CI** |
+| WotC Game Changers | `commander_game_changers.json` | 2026-07-14 | gate roda a cada commit mas **nunca compara com a WotC** |
+| Corpus de meta interno | `extract_meta_insights.dart` | 2026-03-13 | nenhuma |
 
 Padrão único e repetido: **os fetchers existem, são determinísticos e têm
 provenance; o relógio não existe.** Oito scripts de sync vivem como receita de
@@ -237,7 +251,7 @@ crontab em comentário, nunca registrados em `manaloom_ops_daemon.py`.
 | Flutter Web | `app/` | `manaloom_deploy_flutter_web.sh` | **bloqueado** — exige capability aberta |
 | APK Android | `app/` | `manaloom_publish_android_release.sh` | sim — fixa o snapshot de capabilities na identidade do release |
 | Web público (Next.js) | `web-public/` | `manaloom_deploy_public_web.sh` | sim — **único sem nenhuma referência a capability** |
-| `hermes-lab` | `server/Dockerfile.hermes-lab` | nenhum | **não** — dormente desde 2026-06-23 |
+| `hermes-lab` | `server/Dockerfile.hermes-lab` | nenhum | **desconhecido** — último commit no Dockerfile 2026-06-18 (`637f22193`); estado do container só com o comando da §9 |
 
 O `manaloom-ops` sobe em `safe_housekeeping_only` com exatamente um job
 habilitado, `hermes_cron_governor_report`, que só resume o próprio scheduler
@@ -276,7 +290,7 @@ Para a proposta da cadeia de qualidade de deck, ver
 | MCP local | quick | passa |
 | secret scan | quick | passa |
 | **project logic** | quick | **passa** — corrigido em `d83e9b1e1` |
-| **`ui_live_evidence`** | quick **e full** | **falha** — 23 de 35 packs com digest defasado |
+| **`ui_live_evidence`** | quick **e full** | **falha** — 22 de 23 manifests exigidos estão no digest atual `8bba809c`; falta `play-vs-ai-web-real` e o `source_digest` de `docs/qa/ui-live/latest.json` (ambos em `865e6041`); 0 casam digest+hash até latest.json ser reescrito |
 | **`manaloom_public_web_surface_contract`** | full | **passa** — corrigido em 2026-09-21 |
 | **`npm audit` do web público** | full | **falha** — advisory upstream, `next` critical + `sharp` high |
 | `custom-lint`, `patrol-smoke`, `dependency-audit` | full | **não exercitados** — nunca alcançados |
@@ -301,8 +315,9 @@ porque o `grep` do meu shell é **ugrep 7.8.4**, enquanto os scripts resolvem
 `/usr/bin/grep` (BSD). Comprovar um contrato de shell exige rodá-lo pelo mesmo
 caminho que o CI usa, não pelo `grep` do PATH interativo.
 
-Com aquele contrato corrigido, o `full` passou a chegar ao **último** estágio e
-revelou o bloqueio que estava escondido atrás de todos os outros:
+Com aquele contrato corrigido, o `full` passou a chegar ao **segundo de seis**
+estágios do `melos run quality` (`quality_gate.sh full`, arm
+`run_public_web_full`) e revelou o bloqueio seguinte:
 `manaloom_public_web_smoke.sh:199` roda
 `npm audit --omit=dev --audit-level=moderate`, e `web-public` tem duas
 vulnerabilidades — `next` (**critical**, RCE não autenticado) e `sharp`
@@ -313,7 +328,8 @@ vulnerabilidades — `next` (**critical**, RCE não autenticado) e `sharp`
 Medido isoladamente, fora do gate: `npm audit` falha por conta própria. Não é
 regressão de nenhum trabalho em curso — é advisory upstream que só ficou
 visível quando o gate passou a chegar lá. Envolve bumpar dependência do
-artefato público deployável: decisão do dono, não da fila.
+artefato público deployável: decisão do dono, não da fila — autorizado pelo
+dono em 2026-09-21, execução pendente.
 
 **Corrigindo uma afirmação anterior deste documento e do receipt de
 2026-09-21:** `full` e `quick` *não* diferem quanto a `ui_live_evidence`.
@@ -328,13 +344,21 @@ três estágios ainda não exercitados.
 UI é **global por desenho** (`scripts/manaloom_ui_source_digest.sh` cobre
 `app/lib`, `app/assets`, `app/web`, Android, pubspecs, 11 testes de prova
 visual, drivers e fixtures), então qualquer mudança em `app/lib` invalida os
-35 packs de uma vez — não há granularidade por superfície. E a recaptura está
-travada por versão: o ChromeDriver pinado em 6 scripts é o 150, o Chrome
-instalado é o 153, e nenhum script do repositório baixa driver.
+35 packs de uma vez — não há granularidade por superfície. A trava de versão
+do ChromeDriver foi resolvida em `b397f477b`: pin único
+(`scripts/lib/manaloom_chromedriver.sh:14`, 153.0.8010.52) com bootstrap que
+baixa e confere SHA-256; o pin entra no digest de UI
+(`manaloom_ui_source_digest.sh:75`). O que trava a recaptura hoje é o E2E de
+Jogar contra IA (`manaloom_play_vs_ai_e2e.sh` invoca
+`manaloom_server_contract_e2e_isolated.sh` duas vezes e a segunda para em
+`BLOCKED: build output has a consumer`), registrado em
+`docs/PONTO_DE_RETOMADA_COORDENACAO_2026-09-21.md:23-28`.
 
 **Consequência séria:** hoje nenhum commit nem push passa sem `--no-verify`.
-`git log --grep=no-verify -i` devolve **11 commits** nesta branch, 9 deles em
-2026-09-18, todos sob autorização explícita. Este documento registrava três, e
+`git log --grep=no-verify -i` devolve **16 commits** (medido em 2026-09-22):
+9 em 2026-09-18 e 7 em 2026-09-21; são 19 commits desde `354983a1e` (último
+que passou pelo hook) e 3 não declaram o bypass na mensagem. O número cresce
+enquanto `ui_live_evidence` não fechar. Este documento registrava três, e
 o número subestimado é o que se usava para julgar se o hábito estava
 escalando. Um gate
 que sempre é contornado deixa de proteger.
@@ -362,7 +386,7 @@ Esta é a seção mais acionável.
 | C4 | Battle descrito como "guardado" quando **não é compilado no artefato** | `main.dart:675,690,704,713` |
 | C5 | `OFF_UNTIL_P0_RECEIPT` não é valor legal do schema; o JSON guarda `off` puro | decisão vs `policy:65-69` |
 | C6 | Cabeçalho do wrapper de rulings cita MTGJSON; o código consome Scryfall | `cron_sync_rulings.sh:5` vs `sync_rulings.dart:25` |
-| C7 | Cadência semanal de drift declarada como instalada; não está, e não pode ser neste caminho | schedule vs `~/Library/LaunchAgents` |
+| C7 | O agendamento semanal existe e roda (9 relatórios, último 2026-09-20 com upstream consultado), mas 6 de 9 execuções foram puladas por árvore suja; a árvore voltou a ficar suja em 2026-09-21 | `~/Library/Application Support/ManaLoom/external-engine-delta/` vs `git status` |
 | C8 | O Forge tem um terceiro espelho de pin **fora** do auditor de drift | `battle_engine_config.dart:12` |
 | C9 | 26 IDs `P0 CORE` não são ancestrais de `BT-DEC-001`, contra a prosa do backlog | DAG do registry |
 | C10 | A fila registra hash de abertura diferente do hash atual do backlog | `CURRENT_QUEUE.md:12-13` |
@@ -383,7 +407,7 @@ oito mutações. Nas duas etapas só o teste mudou, o script do dono ficou
 intacto, e o guard de egress nunca se perdeu (`run_pg` é `run_no_egress` com
 `PGPASSWORD`, ainda sob `sandbox-exec` loopback-only). A lição é sobre a forma
 do contrato: asserções que fixam **texto literal** de um script quebram em
-qualquer refactor legítimo, e quando 18 de 22 continuam passando a deriva não
+qualquer refactor legítimo, e quando 23 de 27 continuam passando a deriva não
 grita. Contratos de shell deveriam cobrar a **propriedade** — "todo passo
 privilegiado executa sob `EGRESS_GUARD`, e depois do self-test" — e não o
 recorte exato da linha.
@@ -448,13 +472,18 @@ posterior a 2026-06-19.
 | `docs/execution/README.md` | como o trabalho é conduzido e provado |
 | **este documento** | como as peças se encaixam, e quando atualizar o que vem de fora |
 
-Material sob `docs/hermes-analysis/` é histórico e não tem autoridade atual.
+Sob `docs/hermes-analysis/`, oito arquivos são contratos canônicos
+(`canonical_documents`); `archive/`, `deduplicated-report-content/` e
+`master_optimizer_reports/` são `historical_evidence`; o resto é referência de
+apoio sem autoridade.
 
 ---
 
 ## Procedência
 
-Análise estática deste checkout em 2026-09-18, sobre `0677762d7`. Números de
-banco vêm do backup local de 2026-08-03. Nenhum acesso a produção, nenhuma
-chamada de rede. Este documento ainda não está em `canonical_documents` de
-`docs/project_logic_contracts.json` — registrá-lo é decisão de governança.
+Análise estática em três camadas: 2026-09-18 sobre `0677762d7` (seções 1-6,
+8, 9, 10), 2026-09-21 sobre `b397f477b` (seção 7, C16, C17) e 2026-09-22 sobre
+`d15beb05b` (seção 4.3, seção 7 revalidada). Números de banco vêm do backup
+local de 2026-08-03. Nenhum acesso a produção, nenhuma chamada de rede. Este
+documento está em `canonical_documents` desde `8e6a7e0ed` (2026-09-18), com
+estado `current_contract`: é referência, não autoridade de prioridade.

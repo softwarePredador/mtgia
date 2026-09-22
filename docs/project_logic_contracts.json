@@ -170,6 +170,111 @@
         "path": "server/manual-de-instrucao.md",
         "state": "historical_evidence",
         "reason": "large historical manual retained for evidence and explicitly excluded from operational authority"
+      },
+      {
+        "path": "AGENTS.md",
+        "state": "current_contract",
+        "reason": "mandatory agent contract that routes to the current decision and task index; no priority authority"
+      },
+      {
+        "path": "docs/MANALOOM_VISUAL_EXECUTION_BASE_2026-04-19.md",
+        "state": "supporting_reference_non_authoritative",
+        "reason": "visual baseline consumed by app_theme.dart and premium_visual_qa_surfaces.json; not a priority source"
+      },
+      {
+        "path": "docs/execution/PROPOSED_QUEUE_REORDER_2026-09-18.md",
+        "state": "historical_evidence",
+        "reason": "dated queue-reorder proposal, NOT_MERGED; fan-out table kept as evidence"
+      },
+      {
+        "path": "docs/AUDITORIA_RUIDO_VISUAL_CORES_2026-03-25.md",
+        "state": "historical_evidence",
+        "reason": "March 2026 colour audit; rule adopted (no Color(0x) outside theme), targets since deleted"
+      },
+      {
+        "path": "docs/AUDITORIA_UX_LOGICA_PERFORMANCE_2026-03-23.md",
+        "state": "historical_evidence",
+        "reason": "March 2026 UX/perf audit; counts superseded"
+      },
+      {
+        "path": "docs/MATRIZ_TESTES_OTIMIZACAO_2026-03-23.md",
+        "state": "historical_evidence",
+        "reason": "March 2026 test matrix (206 tests then; 270 now)"
+      },
+      {
+        "path": "docs/PLANO_SPRINTS_EXECUCAO_MTGIA_2026-03-23.md",
+        "state": "historical_evidence",
+        "reason": "March 2026 sprint plan; must not be read as execution order"
+      },
+      {
+        "path": "docs/SENTRY_SETUP_MTGIA_2026-03-24.md",
+        "state": "historical_evidence",
+        "reason": "March 2026 Sentry setup; implementation still live, pending items not tracked"
+      },
+      {
+        "path": "docs/SPRINT_AUDITORIA_PRODUTO_UX_2026-03-25.md",
+        "state": "historical_evidence",
+        "reason": "March 2026 UX sprint; 5 IN_PROGRESS screens frozen"
+      },
+      {
+        "path": "docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md",
+        "state": "historical_evidence",
+        "reason": "clone sprint whose target screen was deleted in d08985bca"
+      },
+      {
+        "path": "docs/SPRINT_LIFE_COUNTER_TABLETOP_2026-03-25.md",
+        "state": "historical_evidence",
+        "reason": "clone sprint whose target screen was deleted in d08985bca"
+      },
+      {
+        "path": "docs/TASK_LIFE_COUNTER_PERFEICAO_2026-03-26.md",
+        "state": "historical_evidence",
+        "reason": "clone sprint whose target screen was deleted in d08985bca"
+      },
+      {
+        "path": "docs/LAYOUT_TEST_MAP.md",
+        "state": "historical_evidence",
+        "reason": "2026-05-30 layout test photo; 3 files deleted, 6 of 9 gaps closed"
+      },
+      {
+        "path": "docs/EASYPANEL_RUNBOOK_MTGIA_2026-03-24.md",
+        "state": "historical_evidence",
+        "reason": "server cutover record 2026-06/07; commands not executable"
+      },
+      {
+        "path": "docs/PROJECT_LOGIC_FULL_REPORT_2026-06-11.md",
+        "state": "historical_evidence",
+        "reason": "2026-06-11 full report; superseded by generated CURRENT_SYSTEM"
+      },
+      {
+        "path": "docs/MANALOOM_PRODUCT_READINESS_RUNBOOK_2026-07-06.md",
+        "state": "historical_evidence",
+        "reason": "pre-free-beta readiness runbook; checkout/Pro/webhook no longer exist"
+      },
+      {
+        "path": "server/doc/MANALOOM_CRONS_E_PENDENCIAS.md",
+        "state": "historical_evidence",
+        "reason": "historical; banner present since d93867b68"
+      },
+      {
+        "path": "server/doc/COMMANDER_LEARNING_API_2026-06-03.md",
+        "state": "historical_evidence",
+        "reason": "commander learning API documentation for a route that is disabled; superseded by the release capability policy and the deck_ai flow contract"
+      },
+      {
+        "path": "docs/status/ESTADO_DO_PROJETO_2026-09-22.md",
+        "state": "current_context",
+        "reason": "verified project state and distance to the controlled beta, derived from docs/verdade/FATOS.md; routes to decision and backlog without setting priority"
+      },
+      {
+        "path": "docs/status/DECISOES_PENDENTES_2026-09-22.md",
+        "state": "current_context",
+        "reason": "single register of owner-only decisions, each with a recommendation; a recommendation is not a decision, and decided items move to the product decision or the backlog"
+      },
+      {
+        "path": "docs/PONTO_DE_RETOMADA_COORDENACAO_2026-09-21.md",
+        "state": "historical_evidence",
+        "reason": "end-of-day snapshot of the four parallel fronts of 2026-09-21; superseded by docs/status/ESTADO_DO_PROJETO_2026-09-22.md"
       }
     ],
     "prefix_rules": [
@@ -239,7 +344,7 @@
       "id": "deck_ai_learning_gate_v2",
       "flows": ["deck_ai"],
       "producers": ["scripts/manaloom_deck_ai_learning_gate.sh", "scripts/manaloom_deck_ai_learning_release_receipt.sh"],
-      "consumers": ["scripts/quality_gate.sh", "scripts/manaloom_local_ci.sh"],
+      "consumers": ["scripts/quality_gate.sh"],
       "schemas": ["manaloom.deck_ai_learning_gate_run.v2", "manaloom.deck_ai_learning_release_receipt.v2"],
       "durability": "ephemeral_until_reviewed_and_tracked",
       "allowed_statuses": ["PASS_CODE_ONLY", "PASS", "BLOCKED", "FAIL"],
@@ -301,20 +406,23 @@
   },
   "public_api_paths": [
     "/",
+    "/capabilities",
     "/ready",
     "/health",
     "/health/live",
     "/health/ready",
     "/auth/login",
-    "/auth/register",
     "/auth/forgot-password",
     "/auth/reset-password",
     "/auth/verify-email",
     "/auth/resend-verification",
-    "/sets",
-    "/reports/{id}",
-    "/billing/webhook"
+    "/reports/{id}"
   ],
+  "public_when_capability_on": {
+    "/sets": "catalog_private",
+    "/billing/webhook": "billing_checkout",
+    "/auth/register": "account_registration"
+  },
   "flows": [
     {
       "id": "auth_session",
@@ -345,23 +453,79 @@
       ]
     },
     {
+      "id": "home_onboarding_notifications",
+      "name": "Home, onboarding, notificações e retenção",
+      "status": "active_release_scope",
+      "source_of_truth": "notifications and activation_funnel_events in PostgreSQL; onboarding disposition lives only on the device (SharedPreferences); /notifications and PUT /users/me/fcm-token require social_push",
+      "entrypoints": ["/home", "/onboarding/core-flow", "/notifications", "POST /users/me/activation-events", "PUT /users/me/fcm-token"],
+      "implementation": [
+        "app/lib/main.dart",
+        "app/lib/features/home/home_screen.dart",
+        "app/lib/features/home/onboarding_core_flow_screen.dart",
+        "app/lib/features/home/services/onboarding_state_store.dart",
+        "app/lib/features/notifications/providers/notification_provider.dart",
+        "app/lib/features/notifications/screens/notification_screen.dart",
+        "app/lib/features/notifications/widgets/notification_permission_boundary.dart",
+        "app/lib/core/widgets/shell_app_bar_actions.dart",
+        "app/lib/core/widgets/main_scaffold.dart",
+        "app/lib/core/services/activation_funnel_service.dart",
+        "app/lib/core/services/push_notification_service.dart",
+        "app/lib/core/services/realtime_notification_coordinator.dart",
+        "server/routes/notifications/_middleware.dart",
+        "server/routes/notifications/index.dart",
+        "server/routes/notifications/count.dart",
+        "server/routes/notifications/read-all.dart",
+        "server/routes/notifications/[id]/read.dart",
+        "server/routes/users/me/fcm-token/index.dart",
+        "server/routes/users/me/activation-events/index.dart",
+        "server/lib/notification_service.dart",
+        "server/lib/push_notification_service.dart"
+      ],
+      "storage": ["notifications", "activation_funnel_events", "users", "local:onboarding_state", "local:activation_funnel_receipts"],
+      "tests": [
+        "app/test/core/config/release_capabilities_test.dart",
+        "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/home/onboarding_core_flow_screen_test.dart",
+        "app/test/features/home/services/onboarding_state_store_test.dart",
+        "app/test/features/home/home_screen_test.dart",
+        "app/test/core/services/activation_funnel_service_test.dart",
+        "app/test/core/services/realtime_notification_coordinator_test.dart",
+        "app/test/features/notifications/models/notification_models_test.dart",
+        "app/test/features/notifications/screens/notification_screen_test.dart",
+        "app/test/features/notifications/widgets/notification_permission_boundary_test.dart",
+        "app/integration_test/onboarding_first_run_runtime_test.dart",
+        "app/integration_test/realtime_notifications_runtime_test.dart",
+        "server/test/activation_events_contract_test.dart",
+        "server/test/push_notification_service_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_ui_live_evidence_gate.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "abre o app"},
+        {"from": "Flutter", "to": "Capabilities API", "message": "GET /capabilities antes de qualquer rota"},
+        {"from": "Flutter", "to": "Local Store", "message": "disposição do onboarding: pending, completed ou skipped"},
+        {"from": "Flutter", "to": "Activation API", "message": "POST /users/me/activation-events com recibo local"},
+        {"from": "Activation API", "to": "PostgreSQL", "message": "INSERT activation_funnel_events"},
+        {"from": "Flutter", "to": "Notifications API", "message": "GET /notifications/count a cada 30 s; PUT /users/me/fcm-token só com social_push"},
+        {"from": "Notifications API", "to": "PostgreSQL", "message": "SELECT e UPDATE notifications"},
+        {"from": "Notifications API", "to": "Flutter", "message": "lista, badge ou 404 capability_unavailable"}
+      ]
+    },
+    {
       "id": "card_collection",
       "name": "Descoberta de cartas e coleção",
       "status": "active_release_scope",
       "source_of_truth": "cards, sets, card_legalities and collection availability in PostgreSQL",
-      "entrypoints": ["/collection", "/collection/sets", "/cards", "/sets"],
+      "entrypoints": ["/collection", "/collection/sets", "/cards/{cardId}", "GET /cards", "GET /sets"],
       "implementation": [
         "app/lib/features/cards/providers/card_provider.dart",
         "app/lib/features/collection/screens/sets_catalog_screen.dart",
         "server/routes/cards/index.dart",
-        "server/routes/sets/index.dart",
-        "server/lib/collection_availability_contract.dart"
+        "server/routes/sets/index.dart"
       ],
-      "storage": ["cards", "sets", "card_legalities", "user_binder_items"],
+      "storage": ["cards", "sets", "card_legalities"],
       "tests": [
         "app/test/features/cards/providers/card_provider_search_test.dart",
-        "app/test/features/collection/sets_catalog_screen_test.dart",
-        "server/test/collection_availability_contract_test.dart"
+        "app/test/features/collection/sets_catalog_screen_test.dart"
       ],
       "gates": ["scripts/quality_gate.sh"],
       "sequence": [
@@ -372,11 +536,71 @@
       ]
     },
     {
+      "id": "binder_collection_scanner",
+      "name": "Fichário, importação de coleção e scanner",
+      "status": "active_release_scope",
+      "source_of_truth": "user_binder_items in PostgreSQL under binder_item_contract and binder_import_contract (compare-and-set per physical identity); availability derived from decks; scanner requires ENABLE_SCANNER_RELEASE build flag plus the scanner capability",
+      "entrypoints": ["/collection/import", "/collection/matches", "GET /binder", "POST /binder", "PUT /binder/{id}", "DELETE /binder/{id}", "POST /binder/import/preview", "POST /binder/import/apply", "GET /community/trade-matches", "GET /community/binders/{userId}"],
+      "implementation": [
+        "app/lib/features/collection/screens/collection_screen.dart",
+        "app/lib/features/binder/screens/binder_screen.dart",
+        "app/lib/features/binder/screens/binder_import_screen.dart",
+        "app/lib/features/binder/providers/binder_provider.dart",
+        "app/lib/features/binder/providers/binder_import_provider.dart",
+        "app/lib/features/binder/models/binder_import_models.dart",
+        "app/lib/features/binder/services/binder_import_draft_store.dart",
+        "app/lib/features/binder/widgets/binder_item_editor.dart",
+        "app/lib/features/scanner/screens/card_scanner_screen.dart",
+        "app/lib/features/scanner/providers/scanner_provider.dart",
+        "app/lib/features/scanner/services/scanner_card_search_service.dart",
+        "app/lib/features/trades/screens/trade_matches_screen.dart",
+        "app/lib/core/config/launch_features.dart",
+        "server/routes/binder/_middleware.dart",
+        "server/routes/binder/index.dart",
+        "server/routes/binder/[id]/index.dart",
+        "server/routes/binder/import/preview/index.dart",
+        "server/routes/binder/import/apply/index.dart",
+        "server/routes/community/trade-matches/index.dart",
+        "server/routes/community/binders/[userId].dart",
+        "server/lib/binder_item_contract.dart",
+        "server/lib/binder_import_contract.dart",
+        "server/lib/collection_availability_contract.dart",
+        "server/lib/community_engagement_service.dart"
+      ],
+      "storage": ["user_binder_items", "cards", "sets", "trade_items", "trade_offers", "local:binder_import_draft"],
+      "tests": [
+        "app/test/features/binder/providers/binder_provider_test.dart",
+        "app/test/features/binder/providers/binder_import_provider_test.dart",
+        "app/test/features/binder/screens/binder_screen_resilience_test.dart",
+        "app/test/features/binder/screens/binder_import_screen_test.dart",
+        "app/test/features/collection/collection_screen_responsive_test.dart",
+        "app/test/features/scanner/scanner_collection_session_contract_test.dart",
+        "app/test/features/trades/screens/trade_matches_screen_test.dart",
+        "server/test/binder_route_test.dart",
+        "server/test/binder_item_contract_test.dart",
+        "server/test/binder_import_contract_test.dart",
+        "server/test/collection_availability_contract_test.dart",
+        "server/test/collection_availability_route_contract_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_binder_import_visual_qa.sh", "scripts/manaloom_ui_live_evidence_gate.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "abrir Coleção (tab Fichário) ou Importar lista"},
+        {"from": "Flutter", "to": "Binder API", "message": "GET /binder paginado e GET /binder/stats"},
+        {"from": "Binder API", "to": "PostgreSQL", "message": "user_binder_items com cards, sets e disponibilidade"},
+        {"from": "Flutter", "to": "Cards API", "message": "resolve/batch e printings para a lista colada ou escaneada"},
+        {"from": "Flutter", "to": "Binder API", "message": "POST /binder/import/preview com baseline"},
+        {"from": "Pessoa", "to": "Flutter", "message": "confirma o lote revisado"},
+        {"from": "Flutter", "to": "Binder API", "message": "POST /binder/import/apply com batch_id"},
+        {"from": "Binder API", "to": "PostgreSQL", "message": "FOR UPDATE e compare-and-set por identidade física"},
+        {"from": "Binder API", "to": "Flutter", "message": "created, updated, unchanged, failed e summary"}
+      ]
+    },
+    {
       "id": "deck_lifecycle",
       "name": "Criar, importar, editar e validar deck",
       "status": "active_release_scope",
       "source_of_truth": "decks and deck_cards under DeckRulesService validation",
-      "entrypoints": ["/decks", "/decks/generate", "/decks/import", "/import"],
+      "entrypoints": ["/decks", "/decks/import", "/decks/{id}", "/decks/{id}/search", "/decks/{id}/scan", "POST /import/to-deck"],
       "implementation": [
         "app/lib/features/decks/providers/deck_provider.dart",
         "app/lib/features/decks/screens/deck_details_screen.dart",
@@ -403,9 +627,9 @@
     {
       "id": "deck_ai",
       "name": "Gerar, analisar e otimizar deck com IA",
-      "status": "experimental_guarded",
+      "status": "experimental_split: analyze_optimize=experimental_p0_open; generate_rebuild=experimental_guarded",
       "source_of_truth": "Commander deckbuilding contract plus backend deterministic and quality gates",
-      "entrypoints": ["/ai/generate", "/ai/optimize", "/ai/rebuild", "/ai/commander-reference", "/ai/commander-learning", "/decks/{id}/analysis", "/decks/{id}/ai-analysis"],
+      "entrypoints": ["/decks/generate", "/ai/generate", "/ai/optimize", "/ai/rebuild", "/ai/commander-learning", "/decks/{id}/analysis", "/decks/{id}/ai-analysis"],
       "implementation": [
         "server/routes/ai/generate/index.dart",
         "server/routes/ai/optimize/index.dart",
@@ -414,6 +638,7 @@
         "server/routes/ai/commander-learning/index.dart",
         "server/routes/decks/[id]/analysis/index.dart",
         "server/routes/decks/[id]/ai-analysis/index.dart",
+        "server/routes/decks/[id]/index.dart",
         "server/lib/deck_rules_service.dart",
         "server/lib/ai_generate_job.dart",
         "server/lib/ai/optimize_job.dart",
@@ -456,7 +681,8 @@
       "name": "Battle, Jogar contra IA, evidência de carta e replay",
       "status": "active_guarded",
       "source_of_truth": "persisted battle attempts, jobs and replays plus pinned execution identity; external pins do not promote native rules",
-      "entrypoints": ["/ai/simulate", "/ai/battle/jobs", "/ai/battle/jobs/{id}", "/ai/battle/jobs/{id}/live", "/ai/battle/sessions", "/ai/battle/sessions/{id}", "/ai/battle/sessions/{id}/actions", "/ai/battle/sessions/{id}/concede", "/decks/{id}/battle-preflight", "/decks/{id}/play-vs-ai", "/decks/{id}/play-vs-ai/{sessionId}", "/decks/{id}/battle-coach", "/decks/{id}/battle-coach/{sessionId}", "/decks/{id}/battle-replays", "/decks/{id}/battle-replays/{replayId}/annotations"],
+      "entrypoints": ["/ai/simulate", "/ai/battle/jobs", "/ai/battle/jobs/{id}", "/ai/battle/jobs/{id}/live", "/ai/battle/sessions", "/ai/battle/sessions/{id}", "/ai/battle/sessions/{id}/actions", "/ai/battle/sessions/{id}/concede", "/decks/{id}/battle-preflight", "/decks/{id}/play-vs-ai", "/decks/{id}/play-vs-ai/{sessionId}", "/decks/{id}/battle-replays", "/decks/{id}/battle-replays/{replayId}/annotations"],
+      "deprecated_redirects": ["/decks/{id}/battle-coach", "/decks/{id}/battle-coach/{sessionId}"],
       "implementation": [
         "server/lib/ai/battle_engine_config.dart",
         "server/lib/battle/battle_execution_runtime.dart",
@@ -584,7 +810,7 @@
         "server/test/community_engagement_contract_test.dart",
         "app/test/features/trades/providers/trade_provider_test.dart"
       ],
-      "gates": ["scripts/manaloom_e2e_suite.sh"],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_e2e_suite.sh"],
       "sequence": [
         {"from": "Pessoa", "to": "Flutter", "message": "publicar, conversar ou propor troca"},
         {"from": "Flutter", "to": "Social API", "message": "ação autenticada"},
@@ -597,7 +823,7 @@
       "name": "Build, migração, deploy, observabilidade e rollback",
       "status": "guarded_no_implicit_live_write",
       "source_of_truth": "same-SHA release contract, artifact digests, migration ledger and health/readiness",
-      "entrypoints": ["quality gates", "release scripts", "/health", "/ready"],
+      "entrypoints": ["GET /", "GET /capabilities", "GET /health", "GET /health/live", "GET /health/ready", "GET /ready", "scripts/quality_gate.sh", "scripts/manaloom_local_ci.sh", "scripts/manaloom_build_beta_release.sh"],
       "implementation": [
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
@@ -605,23 +831,148 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "server/bin/migrate.dart",
-        "server/lib/health_readiness_support.dart"
+        "server/lib/health_readiness_support.dart",
+        "server/routes/_middleware.dart",
+        "server/lib/release_capability_policy.dart",
+        "server/routes/capabilities/index.dart",
+        "app/lib/core/config/release_capabilities.dart",
+        "server/bin/manaloom_ops_daemon.py"
       ],
-      "storage": ["schema_migrations", "sync_log"],
+      "storage": ["schema_migrations"],
       "tests": [
         "server/test/deploy_rollback_convergence_contract_test.dart",
         "server/test/ops_sidecar_digest_release_contract_test.dart",
         "server/test/release_sbom_scope_test.py",
         "server/test/flutter_web_deploy_contract_test.dart",
-        "server/test/data_model_migration_test.dart"
+        "server/test/data_model_migration_test.dart",
+        "server/test/release_capability_policy_test.dart",
+        "app/test/core/config/release_capabilities_test.dart",
+        "app/test/core/config/release_capability_surface_contract_test.dart",
+        "server/test/manaloom_ops_daemon_test.py"
       ],
-      "gates": ["scripts/manaloom_release_ops_contract_test.sh", "scripts/manaloom_e2e_suite.sh"],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_release_ops_contract_test.sh", "scripts/manaloom_e2e_suite.sh"],
       "sequence": [
         {"from": "Git", "to": "Build", "message": "SHA congelada e SDK pinado"},
         {"from": "Build", "to": "Artifact", "message": "digest, SBOM e identidade"},
         {"from": "Operator", "to": "Migration", "message": "aprovação explícita e backup"},
         {"from": "Artifact", "to": "Runtime", "message": "deploy controlado"},
         {"from": "Runtime", "to": "Operator", "message": "health, smoke, observabilidade ou rollback"}
+      ]
+    },
+    {
+      "id": "commercial_plans",
+      "name": "Plano, cota de IA e comércio (beta gratuita, sem cobrança)",
+      "status": "free_beta_no_commerce",
+      "source_of_truth": "user_plans and ai_logs in PostgreSQL under PlanService; offer_mode free_beta_no_commerce in server/config/release_capabilities.json; no payment provider exists",
+      "entrypoints": ["/plans", "/upgrade", "/checkout", "GET /users/me/plan", "POST /users/me/plan/checkout", "POST /billing/webhook"],
+      "implementation": [
+        "app/lib/features/commercial/models/commercial_launch_policy.dart",
+        "app/lib/features/commercial/models/manaloom_plan.dart",
+        "app/lib/features/commercial/providers/commercial_provider.dart",
+        "app/lib/features/commercial/screens/plan_screen.dart",
+        "app/lib/features/commercial/screens/upgrade_screen.dart",
+        "app/lib/features/commercial/screens/checkout_screen.dart",
+        "app/lib/features/commercial/widgets/ai_usage_gate.dart",
+        "app/lib/features/commercial/widgets/ai_usage_meter.dart",
+        "app/lib/core/config/release_capabilities.dart",
+        "server/routes/users/me/plan/index.dart",
+        "server/routes/users/me/plan/checkout/index.dart",
+        "server/routes/billing/webhook/index.dart",
+        "server/routes/health/commercial/index.dart",
+        "server/routes/ai/_middleware.dart",
+        "server/lib/plan_service.dart",
+        "server/lib/plan_middleware.dart",
+        "server/lib/billing/payment_provider.dart"
+      ],
+      "storage": ["user_plans", "ai_logs", "local:commercial_usage"],
+      "tests": [
+        "app/test/features/commercial/commercial_provider_test.dart",
+        "app/test/features/commercial/ai_usage_gate_test.dart",
+        "app/test/features/commercial/ai_usage_meter_test.dart",
+        "app/test/features/commercial/checkout_screen_test.dart",
+        "app/test/features/commercial/commercial_screens_responsive_test.dart",
+        "app/test/features/commercial/legal_account_cycle_test.dart",
+        "app/test/features/commercial/manaloom_plan_test.dart",
+        "app/test/core/config/release_capabilities_test.dart",
+        "server/test/plan_checkout_contract_test.dart",
+        "server/test/payment_provider_url_test.dart",
+        "server/test/ai_middleware_order_contract_test.dart",
+        "server/test/ai_plan_async_settlement_contract_test.dart",
+        "server/test/release_capability_policy_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_commercial_quality_gate.sh"],
+      "sequence": [
+        {"from": "Pessoa", "to": "Flutter", "message": "abre /plans; /upgrade e /checkout redirecionam para /plans"},
+        {"from": "Flutter", "to": "Plan API", "message": "GET /users/me/plan (plano de controle, sem capability)"},
+        {"from": "Plan API", "to": "PostgreSQL", "message": "user_plans e uso mensal em ai_logs"},
+        {"from": "Flutter", "to": "AI API", "message": "ação de IA com cota"},
+        {"from": "AI API", "to": "Plan Middleware", "message": "capability primeiro; depois teto de 120 ações por mês UTC"},
+        {"from": "Billing API", "to": "Flutter", "message": "checkout e webhook fail-closed: 404 capability_unavailable antes do handler"}
+      ]
+    },
+    {
+      "id": "public_web",
+      "name": "Site público (brewtact.com) e relatório compartilhável",
+      "status": "active_release_scope",
+      "source_of_truth": "web-public/src/lib/product-data.ts and routes.ts under the free-beta offer contract; shared_deck_reports in PostgreSQL for GET /reports/{id}; no product capability is served",
+      "entrypoints": ["/", "/blog", "/blog/{slug}", "/healthz", "/legal/disclaimer", "/legal/privacy", "/legal/terms", "/pricing", "/reports/{id}", "/robots.txt", "/sitemap.xml", "GET /reports/{id}", "scripts/manaloom_deploy_public_web.sh"],
+      "implementation": [
+        "web-public/src/app/page.tsx",
+        "web-public/src/app/pricing/page.tsx",
+        "web-public/src/app/reports/[id]/page.tsx",
+        "web-public/src/components/site-shell.tsx",
+        "web-public/src/components/ui.tsx",
+        "web-public/src/lib/product-data.ts",
+        "web-public/src/lib/public-server.ts",
+        "web-public/src/lib/routes.ts",
+        "server/routes/reports/[id].dart",
+        "server/lib/reports/shareable_report_service.dart",
+        "server/lib/public_site_url.dart",
+        "scripts/manaloom_deploy_public_web.sh",
+        "scripts/manaloom_public_web_smoke.sh"
+      ],
+      "storage": ["shared_deck_reports", "decks", "deck_cards"],
+      "tests": [
+        "web-public/tests/free-beta-offer-contract.mjs",
+        "server/test/user_facing_brand_contract_test.dart"
+      ],
+      "gates": ["scripts/quality_gate.sh", "scripts/manaloom_public_web_smoke.sh"],
+      "sequence": [
+        {"from": "Visitante", "to": "Next.js", "message": "abre brewtact.com (11 rotas estáticas)"},
+        {"from": "Next.js", "to": "Visitante", "message": "beta gratuita; nenhum link para /app"},
+        {"from": "Visitante", "to": "Next.js", "message": "abre /reports/{id}"},
+        {"from": "Next.js", "to": "Reports API", "message": "GET /reports/{id} anônimo"},
+        {"from": "Reports API", "to": "PostgreSQL", "message": "shared_deck_reports com decks e deck_cards"},
+        {"from": "Reports API", "to": "Next.js", "message": "relatório público ou 404"}
+      ]
+    },
+    {
+      "id": "ops_scheduler",
+      "name": "Scheduler operacional (manaloom-ops) e sincronizações",
+      "status": "guarded_no_implicit_live_write",
+      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (16 jobs) reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report runs (safe_housekeeping_only)",
+      "entrypoints": ["server/bin/manaloom_ops_daemon.py", "scripts/manaloom_deploy_ops_image.sh", "GET /health (daemon, porta MANALOOM_NATIVE_BATTLE_PORT)"],
+      "implementation": [
+        "server/bin/manaloom_ops_daemon.py",
+        "scripts/manaloom_deploy_ops_image.sh",
+        "server/bin/hermes_cron_governor_report.sh",
+        "server/bin/cron_cleanup_optimize_telemetry.sh",
+        "server/bin/sync_card_legalities_from_scryfall.sh",
+        "server/bin/sync_cards.dart",
+        "server/bin/sync_staples.dart",
+        "server/bin/sync_status.dart"
+      ],
+      "storage": ["sync_log", "sync_state", "data_source_snapshots"],
+      "tests": [
+        "server/test/manaloom_ops_daemon_test.py"
+      ],
+      "gates": ["scripts/manaloom_battle_product_gate.sh"],
+      "sequence": [
+        {"from": "Operator", "to": "Ops Image", "message": "deploy da imagem do daemon (mesmo SHA)"},
+        {"from": "Ops Daemon", "to": "Capability Policy", "message": "lê release_capabilities.json no boot"},
+        {"from": "Ops Daemon", "to": "Job", "message": "só agenda job cuja capability está on; senão safe_housekeeping_only"},
+        {"from": "Job", "to": "PostgreSQL", "message": "sync_log, sync_state e data_source_snapshots"},
+        {"from": "Ops Daemon", "to": "Operator", "message": "GET /health próprio e relatório do governor"}
       ]
     }
   ],
@@ -652,14 +1003,14 @@
       "implementation": ["docs/hermes-analysis/manaloom-knowledge/scripts/pg_hermes_sqlite_contract_audit.py"],
       "tests": ["docs/hermes-analysis/manaloom-knowledge/scripts/test_pg_hermes_sqlite_contract_audit.py"],
       "tables": ["cards", "deck_cards", "card_battle_rules"],
-      "canonical_source": "docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md"
+      "canonical_source": "docs/hermes-analysis/DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md"
     },
     {
       "rule": "Join de deck com inteligência multirrow precisa agregar por card_id antes.",
       "implementation": ["server/lib/ai/candidate_quality_data_support.dart"],
       "tests": ["server/test/candidate_quality_data_support_test.dart"],
       "tables": ["deck_cards", "card_battle_rules", "card_meta_insights"],
-      "canonical_source": "docs/hermes-analysis/DATA_MODEL_FINAL_VALIDATION_2026-06-15.md"
+      "canonical_source": "docs/hermes-analysis/DATA_FIELD_ALIAS_CONTRACT_2026-06-30.md"
     },
     {
       "rule": "Battle externo não promove regra nativa nem prova uso individual sem evento.",

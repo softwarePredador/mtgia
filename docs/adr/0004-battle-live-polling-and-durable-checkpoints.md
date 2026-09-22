@@ -5,6 +5,8 @@
 - Programa: `BL5–BL6`
 - Rollout: desabilitado por padrão
 
+> Emenda 2026-08-25 (ADR 0013): a superfície de espectador (tela Flutter `BattleLiveSpectatorScreen`, rota `battle-live/:jobId`, CTA) deixou de existir como produto e o roteador é proibido de construí-la por teste de contrato. As decisões 1–6 e 8–11 continuam válidas como infraestrutura interna, recuperação e evidência. O item 7 descreve a tela histórica. Coach Mode recebeu GO de engenharia no ADR 0012 e virou Jogar contra IA no ADR 0013.
+
 ## Contexto
 
 O Live Spectator precisa mostrar progresso público enquanto o XMage executa sem

@@ -1,8 +1,14 @@
 # Sprint de Mesa: Life Counter Tabletop
 
-> Documento superado em `2026-03-25` para a direcao visual/interacional do `life counter`.
-> A direcao ativa desta frente passou a ser `docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md`.
-> Este arquivo permanece como historico da fase "inspirar sem copiar".
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-25`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `app/lib/features/home/lotus_life_counter_screen.dart`,
+> `docs/flows/life_counter_post_game.md`, backlog Épico H;
+> código-alvo removido em `d08985bca` (2026-07-01).
 
 > Documento operacional criado em `2026-03-25`.
 > Objetivo: transformar o `life_counter_screen.dart` em uma ferramenta de mesa realmente superior para partidas de Commander, usando benchmark visual e de usabilidade de um app concorrente analisado por captura.
@@ -282,7 +288,6 @@ Esta sprint só termina quando:
 
 ## Veredito atual
 
-- status: `IN_PROGRESS`
 - direção: correta
 - benchmark: ainda está na frente em imediaticidade de mesa
 - meta da sprint: virar esse placar sem sacrificar a identidade visual do app

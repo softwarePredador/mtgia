@@ -48,6 +48,7 @@ decisão e a paleta Obsidian + Brass + Frost já vigente.
 10. Nenhum fallback pode apontar para `manaloom.com`. Até a aquisição e
     configuração de domínio BrewTact, links públicos usam a URL de deploy
     configurada ou o host público EasyPanel aprovado.
+   > Superseded pelo ADR 0011 em 2026-08-11: a origem pública canônica é https://brewtact.com. Permanece válida a proibição de fallback para manaloom.com.
 
 ## Consequences
 
@@ -60,8 +61,7 @@ decisão e a paleta Obsidian + Brass + Frost já vigente.
 - Qualquer mudança em `app/assets`, shell Web ou resources Android invalida a
   prova visual corrente. A entrega exige nova matriz Web e Android conforme o
   contrato de prova viva.
-- Um domínio definitivo e remetente de e-mail BrewTact continuam dependentes
-  de aquisição/verificação externa; o código não presume que isso ocorreu.
+- O domínio definitivo é brewtact.com (ADR 0011). O remetente de e-mail BrewTact continua dependente de verificação externa; o código não presume que isso ocorreu.
 
 ## Rejected alternatives
 

@@ -1,6 +1,6 @@
 # BrewTact — modelo de qualidade de deck gerado — 2026-09-18
 
-Status: `MECHANISM_MAPPED · SOURCE_VERIFIED_AGAINST_CODE · DB_FIGURES_FROM_2026-08-03_BACKUP · NOT_RATIFIED`
+Status: `MECHANISM_MAPPED · SOURCE_VERIFIED_AGAINST_CODE · DB_FIGURES_FROM_2026-08-03_BACKUP · CANONICAL_CURRENT_CONTRACT_2026-09-18 (desde 8e6a7e0ed)`
 
 Este documento responde uma pergunta que nenhum outro documento do repositório
 responde: **o que decide a qualidade de um deck Commander gerado pela IA.**
@@ -10,9 +10,11 @@ O mapa existente cobre topologia, contenção e governança.
 jornada faz e o que está guardado; `docs/status/CURRENT_PRODUCT_DECISION.md`
 decide escopo. Nenhum dos dois desce à camada de mecanismo: os termos
 `referenceProfile`, `usage_count`, `commander_reference_profiles` e
-`optimize_filler_loader_support` têm **zero ocorrências** em `docs/generated/`
-e em `docs/project_logic_contracts.json`. É essa lacuna que este documento
-preenche.
+`optimize_filler_loader_support` têm zero ocorrências em
+`docs/generated/CURRENT_SYSTEM.md`, `docs/generated/openapi.generated.json` e
+`docs/project_logic_contracts.json`; `docs/generated/DATABASE_ERD.md` lista a
+tabela e a coluna como schema, sem explicar o que decidem. É essa lacuna que
+este documento preenche.
 
 Toda afirmação aqui foi verificada contra o código. Números de banco vêm do
 backup local `backups/manaloom-postgres/manaloom-postgres-20260803T141713Z.dump`
@@ -116,9 +118,9 @@ persistido. A confiança declarada no JSON é curada à mão, não derivada.
 
 | Fonte | Alegação | Situação |
 | --- | --- | --- |
-| Built-ins no código | 2 (Lorehold, Kaalia) | `commander_reference_profile_support.dart:47,57` — certos |
+| Built-ins no código | 2 (Lorehold, Kaalia) | `commander_reference_profile_support.dart:6,10` (nomes) e `:47,53` (candidatos) — certos |
 | Lote Strixhaven | 10 JSONs em `docs/qa/commander_reference_profiles_secrets_of_strixhaven_2026-05-11/` | README diz **"no database apply was run"** |
-| `API_CONTRACTS_AND_DATA_MAP.md:224` | lote 1 + lote 2 + "Anchor 30 batches A-C" persistidos (~42) | JSONs dos lotes 2 e Anchor-30 **foram apagados da árvore** no commit `8cab6400b` |
+| `API_CONTRACTS_AND_DATA_MAP.md:372-395` | lote 1 + lote 2 + "Anchor 30 batches A-C" persistidos (~42) | JSONs dos lotes 2 e Anchor-30 **foram apagados da árvore** no commit `8cab6400b` |
 
 As duas últimas linhas são mutuamente inconsistentes e **não podem ser
 resolvidas sem consultar o banco**. Ver seção 7.
@@ -352,6 +354,7 @@ Verificado por leitura de código em `354983a1e`/`a2d044618`, branch
 extraídos com `pg_restore` (PostgreSQL 17) do backup local de 2026-08-03;
 nenhum acesso a produção foi feito.
 
-Este documento ainda **não** está em `canonical_documents` de
-`docs/project_logic_contracts.json`. Registrá-lo é uma linha, e é decisão de
-governança do dono.
+Este documento está em `canonical_documents` de
+`docs/project_logic_contracts.json` desde `8e6a7e0ed` (2026-09-18) e herda o
+estado `current_contract`. Ele descreve mecanismo; não define prioridade nem
+autoriza mutação.

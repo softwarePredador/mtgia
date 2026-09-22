@@ -2,7 +2,11 @@
 
 Atualizado em 2026-08-13.
 
-Status: `SECOND_AUDIT_MAPPED · CONTAINMENT_PARTIAL · IMPLEMENTATION_PACKAGE_NOT_STARTED`.
+Status: `SECOND_AUDIT_MAPPED · CONTAINMENT_PARTIAL · IMPLEMENTATION_PACKAGE_STARTED_GOVERNANCE_ONLY`.
+
+Estado por task: ver `docs/generated/TASK_REGISTRY.json` (3 PASS, 3
+IN_PROGRESS_CONTAINED, 6 IMPLEMENTED_LOCAL_PENDING_FULL_GATE, 14 EVIDENCE_REQUIRED em
+2026-09-22 — 12 linhas que alegavam implementação sem receipt foram rebaixadas nesta data).
 
 Este documento é o mapa manual canônico da implementação existente. Ele
 responde o que cada jornada faz hoje, onde os dados vivem e quais fronteiras
@@ -296,7 +300,9 @@ Comportamento atual:
 - `MANALOOM_ENABLE_PROMOTED_LEARNED_DECK_READS` e
   `MANALOOM_ENABLE_COMMANDER_USAGE_CORPUS_READS` aceitam somente o literal `1`;
   ausentes ou inválidas fazem zero leitura PG. A rota
-  `/ai/commander-learning` responde `503` antes do banco enquanto desligada;
+  `/ai/commander-learning` responde 404 `capability_unavailable` enquanto
+  `learning_reads` estiver `off`; com a capability ligada e as duas variáveis
+  ausentes ela responde `503` antes de tocar o banco;
 - o knowledge import periódico é `report_only`, não carrega credencial PG nem
   cria artefato interno; `--apply`/env legacy falham antes do runner. O scan
   atual encontrou 2.809 candidatos, incluindo 1.921 duplicatas por chave
@@ -349,39 +355,39 @@ observabilidade e custo em `BT-BAT-000..010`. Battle nunca é atalho para
 
 ## Inventário de rotas e efeitos
 
-| Superfície | Consumer conhecido | Efeito persistente atual | Postura até fechar tasks |
-| --- | --- | --- | --- |
-| `POST /ai/generate` + jobs | Flutter Generate | job/cache/usage; preview não grava learning | allowlist experimental; `DCK-P0-04`, `BT-AI-021..025` |
-| `POST /ai/optimize` + jobs | Flutter Optimize | job/cache/preferências/logs/provider usage; preview não é accepted | guardado; `DCK-P1-07`, `BT-AI-031` |
-| `POST /ai/rebuild` | Flutter fallback guiado | pode inserir clone draft | default clone não está pronto; `DCK-P1-08` |
-| `GET /decks/:id/analysis` | Deck Details/Analysis | leitura | não é autoridade legal final; `DCK-P1-04` |
-| `POST /decks/:id/ai-analysis` | Deck Details/Analysis | provider real atualiza score/textos no deck | OFF/guardado até `BT-AI-003`/`BT-AI-020` |
-| `POST /ai/archetypes` | estratégia no app | cache/provider usage | entra no registry/capability de `BT-AI-029` |
-| `POST /ai/explain` | detalhe de carta | pode persistir `cards.ai_description` | inventariar/autorizar explicitamente em `BT-AI-029` |
-| `GET /ai/commander-reference` | backend Generate/Optimize | zero DML; preview externo transitório | manter read-only; ingestão é `BT-AI-017` |
-| `GET /ai/commander-learning` | Flutter Generate | zero PG quando capability OFF; read quando ON | default-off até `DCK-P0-05` |
-| `POST /decks/:id/recommendations` | nenhum Flutter encontrado | provider/plan; sem persistir sugestão | default-off, telemetria→adapter/410 em `BT-AI-029` |
-| `POST /ai/weakness-analysis` | nenhum Flutter encontrado | grava `deck_weakness_reports` | default-off antes de PG; decidir em `BT-AI-029` |
-| `POST /ai/simulate-matchup` | nenhum Flutter encontrado | grava `deck_matchups` | default-off; `/ai/simulate` é caminho atual |
-| `GET /decks/:id/simulate` | nenhum Flutter encontrado | cálculo legacy | default-off; decidir adapter/410 |
-| `GET /ai/ml-status` | admin | leitura de lane ML parcialmente ausente do baseline | não pode declarar active; `BT-AI-027`/`BT-DB-005` |
+| Superfície | Consumer conhecido | Efeito persistente atual | Capability (hoje `off`) | Postura até fechar tasks |
+| --- | --- | --- | --- | --- |
+| `POST /ai/generate` + jobs | Flutter Generate | job/cache/usage; preview não grava learning | `ai_generate_rebuild` | allowlist experimental; `DCK-P0-04`, `BT-AI-021..025` |
+| `POST /ai/optimize` + jobs | Flutter Optimize | job/cache/preferências/logs/provider usage; preview não é accepted | `ai_analyze_optimize_advisory` | guardado; `DCK-P1-07`, `BT-AI-031` |
+| `POST /ai/rebuild` | Flutter fallback guiado | pode inserir clone draft | `ai_generate_rebuild` | default clone não está pronto; `DCK-P1-08` |
+| `GET /decks/:id/analysis` | Deck Details/Analysis | leitura | `ai_analyze_optimize_advisory` | não é autoridade legal final; `DCK-P1-04` |
+| `POST /decks/:id/ai-analysis` | Deck Details/Analysis | provider real atualiza score/textos no deck | `ai_analyze_optimize_advisory` | OFF/guardado até `BT-AI-003`/`BT-AI-020` |
+| `POST /ai/archetypes` | estratégia no app | cache/provider usage | `ai_analyze_optimize_advisory` | já classificada; `BT-AI-029` decide adapter/410/remover |
+| `POST /ai/explain` | detalhe de carta | pode persistir `cards.ai_description` | `ai_analyze_optimize_advisory` | inventariar/autorizar explicitamente em `BT-AI-029` |
+| `GET /ai/commander-reference` | backend Generate/Optimize | zero DML; preview externo transitório | `ai_generate_rebuild` | manter read-only; ingestão é `BT-AI-017` |
+| `GET /ai/commander-learning` | Flutter Generate | zero PG quando capability OFF; read quando ON | `learning_reads` | default-off até `DCK-P0-05` |
+| `POST /decks/:id/recommendations` | nenhum Flutter encontrado | provider/plan; sem persistir sugestão | `legacy_ai_routes` | default-off, telemetria→adapter/410 em `BT-AI-029` |
+| `POST /ai/weakness-analysis` | nenhum Flutter encontrado | grava `deck_weakness_reports` | `legacy_ai_routes` | default-off antes de PG; decidir em `BT-AI-029` |
+| `POST /ai/simulate-matchup` | nenhum Flutter encontrado | grava `deck_matchups` | `legacy_ai_routes` | default-off; `/ai/simulate` é caminho atual |
+| `GET /decks/:id/simulate` | nenhum Flutter encontrado | cálculo legacy | `legacy_ai_routes` | default-off; decidir adapter/410 |
+| `GET /ai/ml-status` | admin | leitura de lane ML parcialmente ausente do baseline | `legacy_ai_routes` | não pode declarar active; `BT-AI-027`/`BT-DB-005` |
 
 Esse inventário deve virar registry machine-readable em `BT-AI-029`; a tabela
 manual não substitui enforcement server-side nem telemetria de clientes externos.
 
 ## Matriz de prontidão por jornada
 
-| Jornada | Funciona hoje | Contenção presente | Impede declarar final |
-| --- | --- | --- | --- |
-| criar/importar/editar | sim, em PostgreSQL | auth, ownership e regras existentes | revision, ledger, artifact, soft-delete e session epoch |
-| Analyze determinístico | sim | leitura owner-scoped e snapshot anti-fanout | quatro autoridades de readiness precisam convergir |
-| Analyze IA | sim, guardado | mock não persiste no server | revision/OCC/provenance no app, cache/freshness e score calibrado |
-| Generate | sim, experimental | preview no-write, validação e cache hit por commander | primeira resposta, job durável, materialização e review 100/100 |
-| Optimize | sim, guardado | preview sem aceite, cache isolado, quality gates | router de modo, job durável, apply único, ledger e constraints |
-| Complete | sim, dentro de Optimize | floors, top-up e validação final | exatamente um job, cancel físico e parity de gates |
-| Rebuild | clone preserva original | original não aplicado | preview-first, idempotência, lineage, revision/partner/constraints |
-| Learning | telemetria/candidato apenas | writes e reads promovidos default-off, source quarantine, import inativo | state machine, consentimento, uso, receipt |
-| Battle | sim como evidência guardada | pins/provenance e não promoção | P0 Battle, escala/custo e rollout |
+| Jornada | Implementado | Alcançável hoje (capability) | Contenção presente | Impede declarar final |
+| --- | --- | --- | --- | --- |
+| criar/importar/editar | sim, em PostgreSQL | não · `decks_private` | auth, ownership e regras existentes | revision, ledger, artifact, soft-delete e session epoch |
+| Analyze determinístico | sim | não · `ai_analyze_optimize_advisory` | leitura owner-scoped e snapshot anti-fanout | quatro autoridades de readiness precisam convergir |
+| Analyze IA | sim, guardado | não · `ai_analyze_optimize_advisory` | mock não persiste no server | revision/OCC/provenance no app, cache/freshness e score calibrado |
+| Generate | sim, experimental | não · `ai_generate_rebuild` | preview no-write, validação e cache hit por commander | primeira resposta, job durável, materialização e review 100/100 |
+| Optimize | sim, guardado | não · `ai_analyze_optimize_advisory` | preview sem aceite, cache isolado, quality gates | router de modo, job durável, apply único, ledger e constraints |
+| Complete | sim, dentro de Optimize | não · `ai_analyze_optimize_advisory` | floors, top-up e validação final | exatamente um job, cancel físico e parity de gates |
+| Rebuild | clone preserva original | não · `ai_generate_rebuild` | original não aplicado | preview-first, idempotência, lineage, revision/partner/constraints |
+| Learning | telemetria/candidato apenas | não · `learning_*` | writes e reads promovidos default-off, source quarantine, import inativo | state machine, consentimento, uso, receipt |
+| Battle | sim como evidência guardada | não · `battle_batch` **e** não compilado | pins/provenance e não promoção | P0 Battle, escala/custo e rollout |
 
 ## Código canônico, compatibilidade e duplicações
 
@@ -431,7 +437,7 @@ manual não substitui enforcement server-side nem telemetria de clientes externo
   produto por presença no repositório;
 - relatórios antigos em `docs/hermes-analysis/` e
   `master_optimizer_reports/`: evidência datada, não fila de execução;
-- `optimize_feedback_support.dart`: removido do caminho runtime porque preview
+- `optimize_feedback_support.dart`: removido da árvore em `b2d3fc04f`; preview
   não é aceite; o receipt futuro deve nascer no apply confirmado, não ressuscitar
   inferência por HTTP 2xx.
 - métodos DML sem consumer e a lane `MLKnowledgeService`/`ml-status` ficam sob
@@ -495,8 +501,8 @@ implementações paralelas continuam inventariados em `BT-AI-029`.
 
 Ordem recomendada, mantendo os IDs do backlog mestre:
 
-1. verdade/capabilities/DAG/gates: `BT-GOV-001`, `BT-SCP-001`, `BT-DOC-004`,
-   `BT-GATE-001`, `BT-GATE-002`;
+1. verdade/capabilities/DAG/gates: ~~`BT-GOV-001`~~ (PASS), `BT-SCP-001` (NOW),
+   ~~`BT-DOC-004`~~ (PASS), `BT-GATE-001`, `BT-GATE-002`;
 2. baseline e boundary DDL: `BT-DB-001`, `BT-DB-004`, `BT-DB-005`;
 3. containment de surfaces: `DCK-P0-00`, `BT-AI-029`; learning continua OFF;
 4. revision/artifact/sessão: `DCK-P0-01`, `DCK-P0-02`, `DCK-P0-07`;
@@ -576,7 +582,7 @@ consolidada confirmar esse comportamento no digest final.
 
 O owner pode abrir o pacote de implementação quando:
 
-1. `BT-DOC-004` provar IDs/dependências/lifecycle sem ambiguidades;
+1. `BT-DOC-004` (PASS) provou IDs/dependências/lifecycle;
 2. `BT-DB-001` registrar o baseline real e `BT-DB-004` impedir DDL paralelo;
 3. cada P0 da primeira onda tiver task sheet, owner, escopo, rollback e aceite;
 4. capabilities adiadas, learning e rotas legadas estiverem fail-closed também

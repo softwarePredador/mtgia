@@ -1,8 +1,14 @@
 # Task de Perfeicao: Life Counter
 
-> Documento operacional criado em `2026-03-26`.
-> Status: `ACTIVE`.
-> Esta task complementa `docs/SPRINT_LIFE_COUNTER_BENCHMARK_CLONE_2026-03-25.md` e define o recorte final de refinamento para o `life counter`.
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-26`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `app/lib/features/home/lotus_life_counter_screen.dart`,
+> `docs/flows/life_counter_post_game.md`, backlog Épico H;
+> código-alvo removido em `d08985bca` (2026-07-01).
 
 ## Objetivo
 
@@ -282,16 +288,3 @@ O `life counter` so pode ser marcado como `DONE` quando:
 5. a rotacao/centragem parecer correta a olho, nao so no codigo
 6. os contadores MTG nao denunciarem "adaptacao em cima"
 7. o resultado visual final puder ser chamado honestamente de clone e nao de interpretacao
-
-## Proxima task operacional
-
-Inicio recomendado desta task:
-
-1. revisar geometria `3p/4p` e compactacao
-2. revisar centragem optica dos numerais por assento
-3. so depois mexer no restante
-
-Motivo:
-
-- esse e o ponto que mais afeta a primeira impressao da mesa
-- se a base geometrica estiver errada, todo o resto fica "bonito em cima de proporcao errada"

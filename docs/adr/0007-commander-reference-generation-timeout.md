@@ -35,13 +35,11 @@ Game Changer to conflict with the selected hard cap.
 
 Use 75 seconds as the default
 `OPENAI_TIMEOUT_GENERATE_REFERENCE_SECONDS` budget for Commander and Brawl
-when reference guidance is enabled. Reserve 6,000 output tokens by default for
-Commander generation, with an explicit Commander-only 800–8,000 operational
-clamp. Append the
+when reference guidance is enabled. Reserve 6,000 output tokens by default for Commander generation (2,200/2,600 for other formats), with a Commander-only override OPENAI_MAX_TOKENS_GENERATE_COMMANDER; every generation format keeps the 800–8,000 operational clamp. Append the
 exact governed Game Changer list and bracket cap after all reference material,
 making clear that the hard cap overrides every learned, staple, collection,
 budget and theme suggestion. Invalidate old generation cache entries with
-contract `v6` and reference-prompt policy `v8`.
+contract v8 (v6 in this decision; v7 on 2026-08-02 and v8 on 2026-08-13) and reference-prompt policy v9 (v8 in this decision; bumped the same day by 96208fa9e).
 
 Preserve all existing boundaries:
 

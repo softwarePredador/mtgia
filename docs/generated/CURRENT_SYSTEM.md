@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `4d30d0d2d696fc8142eda0db24b6bf143bf56c2cb569c92a3330631e1783fd57`
+**Digest das fontes:** `14f83a80923200919da8a2cbe89042ac57727a783320fce2d585491e148fdae0`
 
 ## Fontes de verdade
 
@@ -34,11 +34,11 @@
 | `scripts_and_jobs` | 688 |
 | `environment_variables` | 717 |
 | `tests` | 1223 |
-| `flows` | 8 |
+| `flows` | 13 |
 | `traceability_rules` | 12 |
-| `tasks` | 220 |
-| `task_dependency_edges` | 402 |
-| `route_consumer_bindings` | 42 |
+| `tasks` | 244 |
+| `task_dependency_edges` | 436 |
+| `route_consumer_bindings` | 57 |
 | `receipt_contracts` | 6 |
 
 ## Fluxos canônicos
@@ -46,13 +46,18 @@
 | Fluxo | Estado declarado | Fonte de verdade |
 |---|---|---|
 | Autenticação, recuperação e sessão | `active_release_scope` | users/auth_version and backend auth policies |
+| Home, onboarding, notificações e retenção | `active_release_scope` | notifications and activation_funnel_events in PostgreSQL; onboarding disposition lives only on the device (SharedPreferences); /notifications and PUT /users/me/fcm-token require social_push |
 | Descoberta de cartas e coleção | `active_release_scope` | cards, sets, card_legalities and collection availability in PostgreSQL |
+| Fichário, importação de coleção e scanner | `active_release_scope` | user_binder_items in PostgreSQL under binder_item_contract and binder_import_contract (compare-and-set per physical identity); availability derived from decks; scanner requires ENABLE_SCANNER_RELEASE build flag plus the scanner capability |
 | Criar, importar, editar e validar deck | `active_release_scope` | decks and deck_cards under DeckRulesService validation |
-| Gerar, analisar e otimizar deck com IA | `experimental_guarded` | Commander deckbuilding contract plus backend deterministic and quality gates |
+| Gerar, analisar e otimizar deck com IA | `experimental_split: analyze_optimize=experimental_p0_open; generate_rebuild=experimental_guarded` | Commander deckbuilding contract plus backend deterministic and quality gates |
 | Battle, Jogar contra IA, evidência de carta e replay | `active_guarded` | persisted battle attempts, jobs and replays plus pinned execution identity; external pins do not promote native rules |
 | Life Counter, sessão e pós-jogo | `active_release_scope` | local game session stores plus PostgreSQL post_game_notes after sync |
 | Comunidade, mensagens, binder e trades | `active_requires_release_e2e` | PostgreSQL ownership and transition services |
 | Build, migração, deploy, observabilidade e rollback | `guarded_no_implicit_live_write` | same-SHA release contract, artifact digests, migration ledger and health/readiness |
+| Plano, cota de IA e comércio (beta gratuita, sem cobrança) | `free_beta_no_commerce` | user_plans and ai_logs in PostgreSQL under PlanService; offer_mode free_beta_no_commerce in server/config/release_capabilities.json; no payment provider exists |
+| Site público (brewtact.com) e relatório compartilhável | `active_release_scope` | web-public/src/lib/product-data.ts and routes.ts under the free-beta offer contract; shared_deck_reports in PostgreSQL for GET /reports/{id}; no product capability is served |
+| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (16 jobs) reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report runs (safe_housekeeping_only) |
 
 ## Como validar
 

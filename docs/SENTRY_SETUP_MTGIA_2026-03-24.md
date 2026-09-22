@@ -1,5 +1,14 @@
 # Sentry Setup Operacional - MTGIA
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-03-24`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/flows/release_operations.md` §observabilidade,
+> `server/test/observability_test.dart`.
+
 > Setup operacional implementado em `2026-03-24`.
 > Usa como referência o desenho validado no `carMatch`, mas adaptado ao stack Dart/Flutter do `mtgia`.
 

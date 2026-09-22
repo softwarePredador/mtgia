@@ -1,5 +1,13 @@
 # Ficha de execução — `BT-DOC-004`
 
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
+> Fotografia de `2026-08-24`. Não define prioridade, status nem aceite.
+> Comandos, caminhos e números abaixo são exemplo histórico; vários já não
+> existem ou mudaram (ver "Superado por").
+> Superado por: `docs/status/CURRENT_PRODUCT_DECISION.md` (decisão),
+> `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md` (tasks),
+> `docs/qa/execution/2026-08-24/BT-DOC-004.md`.
+
 > Ledger de execução não autoritativo. ID, prioridade, estado, dependências,
 > entrega e aceite continuam resolvidos no backlog mestre/registry.
 

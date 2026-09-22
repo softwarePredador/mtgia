@@ -31,6 +31,7 @@ docs/execution/
 ├── README.md
 ├── CURRENT_QUEUE.md
 ├── TASK_PACKET_TEMPLATE.md
+├── PROPOSED_*.md   (propostas datadas, NOT_MERGED, sem autoridade; arquivar quando decididas)
 ├── waves/
 │   ├── 00-truth-and-evidence.md
 │   ├── 01-platform-safety.md
@@ -46,7 +47,7 @@ docs/execution/
 
 Os pacotes de onda explicam o resultado e o fechamento específico de cada ID
 da sequência aprovada. A ficha individual só é criada quando o ID vai entrar no
-slot `NOW`; assim, não surgem 217 cópias que envelhecem fora do backlog.
+slot `NOW`; assim, não surgem 220 cópias que envelhecem fora do backlog.
 
 ## 3. Regra de WIP 1
 
@@ -196,7 +197,7 @@ git diff --check
 Fechamento local amplo, quando aplicável:
 
 ```bash
-MANALOOM_NODE_BIN=/opt/homebrew/bin/node ./scripts/manaloom_local_ci.sh full
+MANALOOM_NODE_BIN=/opt/homebrew/opt/node@22/bin/node ./scripts/manaloom_local_ci.sh full
 ./scripts/manaloom_local_ci.sh schema
 ./scripts/manaloom_local_ci.sh e2e
 ```

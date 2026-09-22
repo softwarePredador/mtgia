@@ -1,6 +1,6 @@
 # ManaLoom Project Logic Full Report - 2026-06-11
 
-> **HISTORICAL / SUPERSEDED — NAO USE COMO ESTADO, CONTRATO OU PLANO ATUAL.**
+> Lifecycle: `HISTORICAL_EVIDENCE · SUPERSEDED · NO_MUTATION_AUTHORITY`.
 >
 > Este relatorio preserva a fotografia do checkout de 2026-06-11. Hosts,
 > prioridades, status, crons, fluxos de IA/aprendizado e recomendacoes abaixo
@@ -10,8 +10,8 @@
 > Para tarefas e prioridades vigentes, use
 > [`docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`](BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md).
 
-> Relatorio canonico de arquitetura, logica de produto, banco, IA, Hermes,
-> crons, regras e validacao do ManaLoom no estado atual do repositorio.
+> Relatório histórico de arquitetura, logica de produto, banco, IA, Hermes,
+> crons, regras e validacao do ManaLoom no checkout de 2026-06-11.
 >
 > Base local verificada: `master@b11456cf43c7aa5b8bfd2cd012816648afc64e78`.
 > Este documento nao contem secrets, tokens, DSNs completos, JWTs ou connection

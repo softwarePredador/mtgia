@@ -26,7 +26,7 @@ A fonte estruturada do inventário é
 as keys e os contratos de interação; o JSON classifica toda a superfície
 descoberta no código e o teste impede dívida silenciosa.
 
-Inventário corrente da beta Web + Android em 2026-08-25:
+Inventário corrente (guard verde em 2026-09-22; fixture alterado por último em f6f791098):
 
 | Tipo | Quantidade classificada |
 |---|---:|
@@ -52,9 +52,12 @@ Cada ocorrência pertence a um contrato de domínio que declara:
 - política de deep link.
 
 As 46 rotas também declaram path canônico, tela/destino e escopo
-`active`, `deferred_by_scope` ou `compatibility_redirect`. O Scanner permanece
-explicitamente deferido e `/market` é apenas compatibilidade para
-`/community?tab=3`; nenhum deles é contabilizado como tela ativa própria.
+`active`, `deferred_by_scope` ou `compatibility_redirect`. 38 rotas são
+`active`; 3 são `deferred_by_scope` (Scanner `/decks/:id/scan` e as duas rotas
+de Jogar contra IA `/decks/:id/play-vs-ai[/:sessionId]`, enquanto
+`battle_coach` estiver OFF); 5 são `compatibility_redirect` (`/market`,
+`/marketplace`, `/quotes` e os dois aliases `battle-coach`). Nenhuma das 8
+conta como tela ativa própria.
 
 O guard compara a ordem real de todas as `GoRoute`, os arquivos que contêm
 superfícies imperativas e a contagem por tipo. Adicionar, remover ou trocar uma
@@ -221,11 +224,11 @@ antes de o `ui-audit` aceitar a mudança.
 
 ## Matriz executável de viewports — S3-03
 
-`app/test/ui/fixtures/ui_viewport_matrix.json` declara 16 casos canônicos:
-mobile 320×568, 390×844 e 412×915; tablet 768×1024 e 1024×768 landscape;
-boundaries 599/600, 839/840, 1199/1200 e 1599/1600; desktop 1280×900,
-1440×900 e 1920×1080. Cada caso possui orientação e classe responsiva
-explícitas.
+`app/test/ui/fixtures/ui_viewport_matrix.json` declara 18 casos canônicos:
+mobile 320×568, 390×844 e 412×915 e seus landscapes 844×390 e 915×412; tablet
+768×1024 e 1024×768; boundaries 599/600, 839/840, 1199/1200 e 1599/1600;
+desktop 1280×900, 1440×900 e 1920×1080. Cada caso possui orientação e classe
+responsiva explícitas.
 
 O guard `app/test/ui/ui_viewport_matrix_test.dart` confirma:
 
@@ -335,9 +338,14 @@ descartável em quatro plataformas:
 | Web mobile | viewport 390×844; raster 500×844 | 54 |
 | Web desktop | 1440×900 | 53 |
 | Web wide | 1920×1080 | 53 |
-| Android físico Samsung SM-A135M | 1080×2408; Life Counter 2408×1080 | 54 |
+| Android emulador `ManaLoom_API34` | 411×914 | 54 |
 
-Os 214 PNGs aprovados vivem em `app/test/ui/goldens/runtime`. O comparador
+Android físico (SM-A135M) não faz parte do gate de baseline; é item de release
+separado, hoje `stale_not_claimed` em `docs/qa/ui-live/latest.json`.
+
+O gate compara 214 PNGs (54+53+53+54) em quatro perfis. Os diretórios
+`android/` e `android_physical/` (54 cada) são baselines históricos fora do
+gate; remover ou mover para `docs/archive/` exige decisão registrada. O comparador
 `app/tool/authenticated_visual_diff.dart` rejeita arquivo ausente/inesperado,
 dimensão diferente e razão de pixels alterados acima de `0.001`; divergências
 são materializadas em `app/test/ui/failures/runtime`.
@@ -360,11 +368,11 @@ pelo compositor do aparelho com `adb screencap`, depois de um marcador de
 prontidão; screenshot da surface Flutter, que não compõe a view nativa, não é
 aceita.
 
-A execução vinculada ao digest
-`c78b0b120a4c69277f8f8c8b70c261feeac19663cacd7676624405b044b8c3c9` é
-histórica. Alterações app-facing e a decisão Jogar contra IA invalidam seu
-crédito corrente; `docs/qa/ui-live/latest.json` só volta a aprovar após nova
-captura e revisão visual de todos os PNGs no mesmo digest.
+A aprovação em `docs/qa/ui-live/latest.json` vale apenas para o
+`source_digest` que ela registra. Qualquer alteração nos caminhos listados em
+`scripts/manaloom_ui_source_digest.sh` muda o digest e invalida o PASS
+(fail-closed). Confira com `./scripts/manaloom_ui_source_digest.sh`; não copie
+o digest para este documento.
 
 ## Onboarding e primeiro uso — S3-08
 
@@ -378,7 +386,7 @@ Keys estáveis do fluxo:
 
 - `onboarding-scroll-view`;
 - `onboarding-format-dropdown`;
-- `onboarding-storage-notice` e `onboarding-storage-retry`;
+- `onboarding-persistence-error` e `onboarding-persistence-retry`;
 - `onboarding-generate-action` e `onboarding-import-action`;
 - `onboarding-complete-action` e `onboarding-skip-action`.
 
@@ -422,7 +430,7 @@ dart run tool/authenticated_visual_diff.dart \
 | Erros criar deck | `DeckListScreen` | `deck-create-name-error`, `deck-create-submit-error` | Nome obrigatório fica anexado ao campo e falha de API permanece no modal; ambos preservam os dados e nunca usam `SnackBar` por trás do diálogo. | Validar descendência/bounds dentro de `deck-create-dialog`, foco no nome vazio, `liveRegion` na falha de submit e ausência de `SnackBar`. |
 | Ações criar deck | `DeckListScreen` | `deck-create-cancel-button`, `deck-create-submit-button` | Cancela ou cria deck. | Tap por key + API/lista. |
 | Lista de decks | `DeckListScreen` | `deck-list`, `deck-list-row-<deckId>`, `deck-list-empty-create-button`, `deck-list-empty-generate-button`, `deck-list-fab-menu`, `deck-list-menu-create`, `deck-list-menu-generate`, `deck-list-menu-import` | Lista/FAB não dependem de copy para abrir fluxos. | O menu e o dialog vivem no `Overlay`; localizar por key global. |
-| Ações do deck | `DeckDetailsScreen` | `deck-details-optimize-button`, `deck-details-menu`, `deck-details-menu-import-list` | Abre optimize e importar lista sem depender de ícone/texto do menu. | Tap por key; texto como evidência visual. |
+| Ações do deck | `DeckDetailsScreen` | `deck-optimize-button` (Visão Geral), `deck-workshop-optimize-button` (Oficina), `deck-details-menu`, `deck-details-menu-import-list` | Abre optimize e importar lista sem depender de ícone/texto do menu. | Tap por key; texto como evidência visual. |
 | Análise funcional | `DeckAnalysisTab` aba `Análise` | `deck-analysis-functional-section-<deckId>`, `deck-analysis-functional-origin-<deckId>`, `deck-analysis-functional-bucket-<deckId>-<ramp|draw|removal|wipes|protection|tutor|recursion|wincon>`, `deck-analysis-functional-count-<deckId>-<bucket>`, `deck-analysis-functional-samples-<deckId>-<bucket>`, `deck-analysis-functional-sample-<deckId>-<bucket>-<index>` | Consome `/decks/:id/analysis` e mostra contagens + amostras de `functional_tags`; quando `sample_details` v2 existe, exibe motivo amigável, confidence, speed e mana efficiency com fallback para `samples`/`stats.composition` legado. | Usar keys por deck/bucket; texto só como evidência da origem/cobertura. |
 | Estados análise funcional | `DeckAnalysisTab` aba `Análise` | `deck-analysis-functional-loading`, `deck-analysis-functional-error`, `deck-analysis-functional-empty`, `deck-analysis-functional-retry-button`, `deck-analysis-functional-refresh-button` | Diferencia loading, erro amigável e resposta sem contagens. | Validar ausência de erro técnico cru e retry por key. |
 | Importar lista no deck | `DeckDetailsScreen` dialog | `deck-import-list-dialog`, `deck-import-list-dialog-field`, `deck-import-list-dialog-replace-switch`, `deck-import-list-dialog-submit-button`, `deck-import-list-dialog-cancel-button` | Cola lista no deck atual e opcionalmente substitui cartas. | `enterText` e tap por key; validar refresh/API. |
@@ -485,14 +493,13 @@ dart run tool/authenticated_visual_diff.dart \
 | Superfície | Rota/Tela | Key estável | Contrato esperado | Validação recomendada |
 |---|---|---|---|---|
 | Tabs da coleção | `CollectionScreen` | `collection-hub-tabs` | Alterna Fichário, Marketplace, Trades e Coleções. | Localizar key antes de selecionar tab. |
-| Atalho catálogo | `CollectionScreen` | `collection-open-sets-catalog` | Abre catálogo de coleções. | Tap por key. |
-| Atalho última edição | `CollectionScreen` | `collection-open-latest-set` | Abre latest set. | Tap por key. |
+| Aba catálogo | `CollectionScreen` | `collection-tab-sets` | Abre o catálogo de coleções embutido. | Tap por key. |
 | Dashboard do fichário | `BinderTabContent` | `binder-stats-dashboard` | Mostra resumo de coleção. | Screenshot + validar números por API quando possível. |
 | Cards totais/únicas/duplicadas | `BinderTabContent` | `binder-stat-total`, `binder-stat-unique`, `binder-stat-duplicates` | Métricas principais visíveis. | Texto como evidência visual. |
 | Busca do fichário | `BinderTabContent` | `binder-search-field` | Filtra binder. | `enterText` por key. |
 | Lista do fichário | `BinderTabContent` | `binder-list-<have|want>` | Renderiza itens do binder. | `find.byKey`. |
 | Loading fichário | `BinderTabContent` | `binder-list-loading-<have|want>` | Diferencia carregamento inicial de lista vazia. | `find.byKey`. |
-| Erro fichário | `BinderTabContent` | `binder-list-error-<have|want>` | Falha de `/binder` nao deve aparecer como lista vazia. | `find.byKey` + retry `binder-list-retry-<have|want>`. |
+| Erro fichário | `BinderTabContent` | `binder-list-error-<have|want>` | Falha de `/binder` não deve aparecer como lista vazia. | `find.byKey` + ação de retry do `AppStatePanel` (sem key própria; `binder-pagination-retry-<have|want>` cobre só paginação). |
 | Vazio fichário | `BinderTabContent` | `binder-list-empty-<have|want>` | Estado real sem itens no filtro/lista. | `find.byKey`; validar ausencia de erro. |
 | Card do fichário | `BinderTabContent` | `binder-item-card-<binderItemId>` | Abre editor do item. | Tap por key + API. |
 | Ação adicionar no fichário | `BinderTabContent` | `binder-add-card-action` | Abre busca para adicionar. | Tap por key. |
@@ -507,7 +514,7 @@ dart run tool/authenticated_visual_diff.dart \
 | Busca marketplace | `MarketplaceTabContent` | `marketplace-search-field` | Filtra marketplace. | `enterText` por key. |
 | Lista marketplace | `MarketplaceTabContent` | `marketplace-list` | Renderiza `/community/marketplace`. | Screenshot + latência. |
 | Loading marketplace | `MarketplaceTabContent` | `marketplace-list-loading` | Diferencia carregamento inicial de marketplace vazio. | `find.byKey`. |
-| Erro marketplace | `MarketplaceTabContent` | `marketplace-list-error` | Falha de marketplace nao deve aparecer como lista vazia. | `find.byKey` + retry `marketplace-list-retry`. |
+| Erro marketplace | `MarketplaceTabContent` | `marketplace-list-error` | Falha de marketplace nao deve aparecer como lista vazia. | `find.byKey` + ação de retry do `AppStatePanel` (sem key própria); vazio expõe `marketplace-empty-action`. |
 | Vazio marketplace | `MarketplaceTabContent` | `marketplace-list-empty` | Estado real sem cards para filtros atuais. | `find.byKey`; validar ausencia de erro. |
 | Card marketplace | `MarketplaceTabContent` | `marketplace-item-card-<marketItemId>` | Mostra item, preço, trust e ações. | `find.byKey`. |
 | Dono do item | `MarketplaceTabContent` | `marketplace-owner-<ownerId>` | Abre perfil público. | Tap por key quando seguro. |
