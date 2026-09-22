@@ -3,7 +3,22 @@ set -euo pipefail
 
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 MODE="${1:-quick}"
+SCOPE_MODE="${2:-}"
 PINNED_FLUTTER="$HOME/.manaloom/toolchains/flutter-3.44.6/bin/flutter"
+
+if [[ "$#" -gt 2 ]]; then
+  echo "uso: $0 quick [--staged-scope]|schema|full|e2e|release" >&2
+  exit 2
+fi
+
+STAGED_SCOPE=0
+if [[ -n "$SCOPE_MODE" ]]; then
+  if [[ "$MODE" != "quick" || "$SCOPE_MODE" != "--staged-scope" ]]; then
+    echo "--staged-scope é permitido somente com quick" >&2
+    exit 2
+  fi
+  STAGED_SCOPE=1
+fi
 
 source "$ROOT_DIR/scripts/lib/manaloom_dart_toolchain.sh"
 
@@ -95,6 +110,10 @@ run_shell_contracts() {
     "$ROOT_DIR/.githooks/pre-commit" \
     "$ROOT_DIR/.githooks/pre-push"
   "$ROOT_DIR/scripts/manaloom_install_local_hooks.sh" --check
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/staged_ui_scope_classifier_test.py"
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/local_ci_staged_scope_dispatcher_test.py"
 }
 
 run_mcp_preflight() {
@@ -121,6 +140,46 @@ run_commander_game_changer_source() {
 run_ui_live_evidence() {
   print_header "Prova UI viva e revisada"
   "$ROOT_DIR/scripts/manaloom_ui_live_evidence_gate.sh" --check
+}
+
+classify_staged_ui_scope() {
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/scripts/manaloom_staged_ui_scope.py"
+}
+
+parse_staged_ui_scope_record() {
+  local record="$1"
+  local extra=""
+  if [[ "$record" == *$'\n'* ]]; then
+    echo "classificador staged de UI retornou mais de um registro" >&2
+    return 2
+  fi
+  PARSED_SCOPE_STATUS=""
+  PARSED_SCOPE_HEAD_OID=""
+  PARSED_SCOPE_INDEX_TREE_OID=""
+  IFS=$'\t' read -r \
+    PARSED_SCOPE_STATUS \
+    PARSED_SCOPE_HEAD_OID \
+    PARSED_SCOPE_INDEX_TREE_OID \
+    extra <<<"$record"
+  case "$PARSED_SCOPE_STATUS" in
+    AFFECTS_UI|N/A_UI_SOURCE_UNCHANGED_STAGED_SCOPE|BOOTSTRAP_STAGED_UI_SCOPE_CONTROL_PLANE)
+      ;;
+    *)
+      echo "classificador staged de UI retornou estado inválido" >&2
+      return 2
+      ;;
+  esac
+  if [[ "$PARSED_SCOPE_HEAD_OID" != "UNBORN" ]] && \
+    [[ ! "$PARSED_SCOPE_HEAD_OID" =~ ^([0-9a-f]{40}|[0-9a-f]{64})$ ]]; then
+    echo "classificador staged de UI retornou HEAD inválido" >&2
+    return 2
+  fi
+  if [[ ! "$PARSED_SCOPE_INDEX_TREE_OID" =~ ^([0-9a-f]{40}|[0-9a-f]{64})$ ]] || \
+    [[ -n "$extra" ]]; then
+    echo "classificador staged de UI retornou index tree inválido" >&2
+    return 2
+  fi
 }
 
 run_secret_scan() {
@@ -214,12 +273,54 @@ run_strict_e2e_gate() {
 }
 
 run_quick() {
+  local initial_scope_record=""
+  local initial_scope_status=""
+  local initial_head_oid=""
+  local initial_index_tree_oid=""
+  if [[ "$STAGED_SCOPE" == "1" ]]; then
+    initial_scope_record="$(classify_staged_ui_scope)"
+    parse_staged_ui_scope_record "$initial_scope_record"
+    initial_scope_status="$PARSED_SCOPE_STATUS"
+    initial_head_oid="$PARSED_SCOPE_HEAD_OID"
+    initial_index_tree_oid="$PARSED_SCOPE_INDEX_TREE_OID"
+  fi
   run_shell_contracts
   run_commander_game_changer_source
   run_mcp_preflight
   run_secret_scan
   run_project_logic
-  run_ui_live_evidence
+  if [[ "$STAGED_SCOPE" != "1" ]]; then
+    run_ui_live_evidence
+    return 0
+  fi
+
+  if [[ "$initial_scope_status" == "AFFECTS_UI" ]]; then
+    print_header "Escopo UI do índice staged"
+    run_ui_live_evidence
+  fi
+
+  local final_scope_record=""
+  final_scope_record="$(classify_staged_ui_scope)"
+  parse_staged_ui_scope_record "$final_scope_record"
+  if [[ "$final_scope_record" != "$initial_scope_record" ]]; then
+    echo "HEAD, index tree, binding ou classificação mudou durante o gate" >&2
+    return 2
+  fi
+
+  print_header "Escopo UI imutável do índice staged"
+  if [[ "$initial_scope_status" == "AFFECTS_UI" ]]; then
+    printf \
+      '{"status":"AFFECTS_UI","ui_gate_required":true,"head_oid":"%s","index_tree_oid":"%s"}\n' \
+      "$initial_head_oid" \
+      "$initial_index_tree_oid"
+  else
+    printf \
+      '{"status":"ACCEPTED_STAGED_NON_UI_SCOPE","scope_status":"%s","commit_gate_only":true,"ui_pass_claimed":false,"local_completion_credit":false,"release_credit":false,"head_oid":"%s","index_tree_oid":"%s"}\n' \
+      "$initial_scope_status" \
+      "$initial_head_oid" \
+      "$initial_index_tree_oid"
+    staged_non_ui_accepted=1
+  fi
 }
 
 run_full() {
@@ -256,9 +357,14 @@ case "$MODE" in
     "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
     ;;
   *)
-    echo "uso: $0 quick|schema|full|e2e|release" >&2
+    echo "uso: $0 quick [--staged-scope]|schema|full|e2e|release" >&2
     exit 2
     ;;
 esac
+
+if [[ "$MODE" == "quick" && "$STAGED_SCOPE" == "1" ]] && \
+  [[ "${staged_non_ui_accepted:-0}" == "1" ]]; then
+  exit 0
+fi
 
 printf '\nPASS: gate local gratuito concluído (%s); nenhum GitHub Actions usado.\n' "$MODE"

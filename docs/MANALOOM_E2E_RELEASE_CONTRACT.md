@@ -28,6 +28,25 @@ eles não substituem este contrato.
   zero. O modo diagnóstico que tolera `PARTIAL` exige `--allow-partial`, é
   marcado como não elegível para gate/release e nunca pode ser descrito como
   sucesso do gate.
+- O `pre-commit` classifica exclusivamente o índice staged com
+  `quick --staged-scope`. O classificador exige igualdade integral entre
+  worktree e índice, nenhum untracked não ignorado e blobs idênticos do próprio
+  controle de escopo. Ele fixa os OIDs de `HEAD` e da tree do índice antes dos
+  gates e repete a classificação depois deles; qualquer divergência encerra o
+  gate sem aceite terminal.
+- O primeiro bootstrap do classificador exige uma allowlist exata do hook,
+  dispatcher, classificador, contratos e quatro derivados canônicos conferidos
+  por `project_logic --check`. Após o bootstrap, mudança nesse controle exige a
+  prova UI integral. Parser ambíguo, conflito, erro Git, path faltante ou extra
+  falha fechado.
+- Quando a união dos `SOURCE_ROOTS` literais dos blobs `HEAD` e `INDEX` do
+  digest UI não é tocada, o terminal é
+  `ACCEPTED_STAGED_NON_UI_SCOPE` com
+  `commit_gate_only=true`, `ui_pass_claimed=false`,
+  `local_completion_credit=false` e `release_credit=false`. Isso não é `PASS`
+  nem `SKIP` e não promove evidência stale. `quick` manual continua executando
+  a prova UI global. `full`, `e2e` e `release` não aceitam `--staged-scope` e
+  preservam o comportamento anterior; `ui-proof` permanece um gate separado.
 
 ## Perfis canônicos
 
@@ -39,6 +58,8 @@ eles não substituem este contrato.
 | `isolated-play-vs-ai` | partida humana real contra IA, API, replay, UI Web e XMage pinado | cria somente cluster, conta, decks e sessão descartáveis em loopback | `MANALOOM_PLAY_VS_AI_BROWSER_QA=1 ./scripts/manaloom_play_vs_ai_e2e.sh` + duas confirmações locais | `PASS` somente com casos de uso, PNGs/review, PostgreSQL/replay e cleanup coerentes |
 | `live-smoke` | Flutter runtime, API viva e smoke comercial | pode criar/apagar dados e chamar serviços externos | flags `MANALOOM_RUN_*_E2E=1` + tokens live/PG aplicáveis | `PASS` somente no alvo explicitamente aprovado |
 | `release-target` | build instalável, device/simulador, saúde e SHA implantado | depende do alvo de release | checklist desta página | conclusão de release, não apenas conclusão local |
+
+O runner grava em `summary.json` `requested_profile` ∈ {`deterministic-read-only`, `isolated-mutating`, `live-smoke`, `live-smoke+isolated-mutating`} e `execution_policy` ∈ {`strict-gate`, `diagnostic-allow-partial`}. As linhas `isolated-play-vs-ai` e `release-target` são etapas desta página, executadas por `scripts/manaloom_play_vs_ai_e2e.sh` e pelo checklist de release, e não aparecem como perfil no summary.
 
 O resumo da suíte é gravado por padrão em
 `/tmp/manaloom_e2e_suite_reports/<run>/summary.md` e `summary.json`. Os status
@@ -78,8 +99,9 @@ selecionam `--strict`; portanto nenhum deles propaga `PARTIAL` como sucesso.
 
 O gate de battle deve ser reprodutível sem o `~/.m2` da máquina. O bootstrap
 `services/xmage-sidecar/bin/bootstrap_pinned_xmage_maven.sh` instala os módulos
-XMage ausentes do Maven Central a partir do SHA de `XMAGE_COMMIT`; o CI executa
-esse bootstrap antes do gate.
+XMage ausentes do Maven Central a partir do SHA de `XMAGE_COMMIT`;
+`scripts/manaloom_local_ci.sh release` e `scripts/manaloom_battle_product_gate.sh`
+executam esse bootstrap antes do gate. Não há CI remoto.
 
 Um pin XMage atualizado só pode ser implantado quando o contrato versionado de
 transição estiver com `qualification.status=pass`. O gate estrutural aceita

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "556ba631fd046cdf47e9a07e93cbf12421326dd018155af22b6be0b53e9d0d0c",
+  "source_digest_sha256": "e8c43ed0a7e9d9c3d338fa0eaa2639a42f907e7259687f2cd038c0328abce67d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,9 +79,9 @@
     "database_tables": 79,
     "database_views": 6,
     "migrations": 58,
-    "scripts_and_jobs": 687,
+    "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1220,
+    "tests": 1222,
     "flows": 8,
     "traceability_rules": 12,
     "tasks": 220,
@@ -261789,6 +261789,12 @@
       ]
     },
     {
+      "path": "scripts/manaloom_staged_ui_scope.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_tbls_local_gate.sh",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -271225,6 +271231,7 @@
     "server/test/legal_consent_contract_test.dart",
     "server/test/legal_consent_live_test.dart",
     "server/test/local_ci_contract_test.dart",
+    "server/test/local_ci_staged_scope_dispatcher_test.py",
     "server/test/lorehold_candidate_patch_contract_test.dart",
     "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
     "server/test/magic_rules_source_test.dart",
@@ -271375,6 +271382,7 @@
     "server/test/social_trading_live_test.dart",
     "server/test/source_reachability_audit_test.dart",
     "server/test/sql_statement_splitter_test.dart",
+    "server/test/staged_ui_scope_classifier_test.py",
     "server/test/sync_card_legalities_from_scryfall_test.py",
     "server/test/sync_cards_test.dart",
     "server/test/sync_localized_card_names_test.dart",
@@ -280039,7 +280047,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "556ba631fd046cdf47e9a07e93cbf12421326dd018155af22b6be0b53e9d0d0c"
+    "project_logic_source_digest_sha256": "e8c43ed0a7e9d9c3d338fa0eaa2639a42f907e7259687f2cd038c0328abce67d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -282120,6 +282128,7 @@
       "scripts/manaloom_secret_scan.sh",
       "scripts/manaloom_server_contract_e2e_isolated.sh",
       "scripts/manaloom_social_trade_visual_qa.sh",
+      "scripts/manaloom_staged_ui_scope.py",
       "scripts/manaloom_tbls_local_gate.sh",
       "scripts/manaloom_tbls_readonly.sh",
       "scripts/manaloom_ui_live_evidence_gate.sh",
@@ -282912,6 +282921,7 @@
       "server/test/legal_consent_contract_test.dart",
       "server/test/legal_consent_live_test.dart",
       "server/test/local_ci_contract_test.dart",
+      "server/test/local_ci_staged_scope_dispatcher_test.py",
       "server/test/lorehold_candidate_patch_contract_test.dart",
       "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
       "server/test/magic_rules_source_test.dart",
@@ -283062,6 +283072,7 @@
       "server/test/social_trading_live_test.dart",
       "server/test/source_reachability_audit_test.dart",
       "server/test/sql_statement_splitter_test.dart",
+      "server/test/staged_ui_scope_classifier_test.py",
       "server/test/sync_card_legalities_from_scryfall_test.py",
       "server/test/sync_cards_test.dart",
       "server/test/sync_localized_card_names_test.dart",

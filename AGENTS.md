@@ -23,9 +23,21 @@ Depois de alterar código, rota, migration, script, gate ou contrato, rode:
 
 Este projeto não usa GitHub Actions. Ative os gates gratuitos do checkout uma
 vez com `./scripts/manaloom_install_local_hooks.sh --install`. O `pre-commit`
-executa `./scripts/manaloom_local_ci.sh quick`; o `pre-push` executa
-`./scripts/manaloom_local_ci.sh full`. Para schema, E2E e release use,
-respectivamente, os modos `schema`, `e2e` e `release`.
+executa `./scripts/manaloom_local_ci.sh quick --staged-scope`; nesse modo, a
+prova UI global só é executada quando o snapshot imutável do índice toca a
+união fail-closed dos `SOURCE_ROOTS` antigos e novos. O classificador exige
+worktree sem delta unstaged ou untracked, fixa `HEAD` e a tree do índice antes
+dos gates e exige a mesma identidade ao final. Seu primeiro bootstrap aceita
+uma allowlist fechada; depois disso, qualquer mudança do próprio controle de
+escopo exige a prova UI integral.
+`N/A_UI_SOURCE_UNCHANGED_STAGED_SCOPE` e o bootstrap são aceites exclusivos do
+gate de commit: não são `PASS`/`SKIP`, não atualizam evidência e não concedem
+crédito local, de UI ou release. O comando manual
+`./scripts/manaloom_local_ci.sh quick` continua verificando a prova UI global.
+`full`, `e2e` e `release` não aceitam `--staged-scope` e preservam seu
+comportamento anterior. O `pre-push` executa `./scripts/manaloom_local_ci.sh
+full`. Para schema, E2E e release use, respectivamente, os modos `schema`,
+`e2e` e `release`.
 
 O gate de schema cria um PostgreSQL exclusivamente loopback em `/tmp`, aplica o
 DDL/migrations, roda `tbls`/Mermaid, compara tabelas, views, colunas e FKs com o
