@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "14f83a80923200919da8a2cbe89042ac57727a783320fce2d585491e148fdae0",
+  "source_digest_sha256": "3775ef56c34afd31eff97f552fafddb8d6fe405d9ea5285de59b30342f67610a",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -244801,12 +244801,12 @@
         {
           "package": "eslint-config-next",
           "scope": "devDependencies",
-          "constraint": "15.5.21"
+          "constraint": "15.5.25"
         },
         {
           "package": "next",
           "scope": "dependencies",
-          "constraint": "15.5.21"
+          "constraint": "15.5.25"
         },
         {
           "package": "postcss",
@@ -244849,7 +244849,7 @@
         },
         {
           "package": "@emnapi/runtime",
-          "version": "1.11.2",
+          "version": "1.11.3",
           "dev": false,
           "optional": true
         },
@@ -244915,157 +244915,157 @@
         },
         {
           "package": "@img/sharp-darwin-arm64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-darwin-x64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-freebsd-wasm32",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-darwin-arm64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-darwin-x64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linux-arm",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linux-arm64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linux-ppc64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linux-riscv64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linux-s390x",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linux-x64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linuxmusl-arm64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-libvips-linuxmusl-x64",
-          "version": "1.3.2",
+          "version": "1.3.3",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linux-arm",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linux-arm64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linux-ppc64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linux-riscv64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linux-s390x",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linux-x64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linuxmusl-arm64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-linuxmusl-x64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-wasm32",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-webcontainers-wasm32",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-win32-arm64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-win32-ia32",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
         {
           "package": "@img/sharp-win32-x64",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
@@ -245101,61 +245101,61 @@
         },
         {
           "package": "@next/env",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": false
         },
         {
           "package": "@next/eslint-plugin-next",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": true,
           "optional": false
         },
         {
           "package": "@next/swc-darwin-arm64",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-darwin-x64",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-linux-arm64-gnu",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-linux-arm64-musl",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-linux-x64-gnu",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-linux-x64-musl",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-win32-arm64-msvc",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
         {
           "package": "@next/swc-win32-x64-msvc",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": true
         },
@@ -245587,7 +245587,7 @@
         },
         {
           "package": "baseline-browser-mapping",
-          "version": "2.10.40",
+          "version": "2.11.25",
           "dev": true,
           "optional": false
         },
@@ -245617,7 +245617,7 @@
         },
         {
           "package": "browserslist",
-          "version": "4.28.4",
+          "version": "4.29.0",
           "dev": true,
           "optional": false
         },
@@ -245653,7 +245653,7 @@
         },
         {
           "package": "caniuse-lite",
-          "version": "1.0.30001800",
+          "version": "1.0.30001810",
           "dev": false,
           "optional": false
         },
@@ -245821,7 +245821,7 @@
         },
         {
           "package": "electron-to-chromium",
-          "version": "1.5.383",
+          "version": "1.5.434",
           "dev": true,
           "optional": false
         },
@@ -245905,7 +245905,7 @@
         },
         {
           "package": "eslint-config-next",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": true,
           "optional": false
         },
@@ -246487,7 +246487,7 @@
         },
         {
           "package": "js-yaml",
-          "version": "4.3.1",
+          "version": "4.3.2",
           "dev": true,
           "optional": false
         },
@@ -246643,7 +246643,7 @@
         },
         {
           "package": "next",
-          "version": "15.5.21",
+          "version": "15.5.25",
           "dev": false,
           "optional": false
         },
@@ -246655,7 +246655,7 @@
         },
         {
           "package": "node-releases",
-          "version": "2.0.50",
+          "version": "2.0.56",
           "dev": true,
           "optional": false
         },
@@ -247033,7 +247033,7 @@
         },
         {
           "package": "sharp",
-          "version": "0.35.3",
+          "version": "0.35.4",
           "dev": false,
           "optional": true
         },
@@ -247291,7 +247291,7 @@
         },
         {
           "package": "update-browserslist-db",
-          "version": "1.2.3",
+          "version": "1.3.3",
           "dev": true,
           "optional": false
         },
@@ -282522,7 +282522,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "14f83a80923200919da8a2cbe89042ac57727a783320fce2d585491e148fdae0"
+    "project_logic_source_digest_sha256": "3775ef56c34afd31eff97f552fafddb8d6fe405d9ea5285de59b30342f67610a"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
