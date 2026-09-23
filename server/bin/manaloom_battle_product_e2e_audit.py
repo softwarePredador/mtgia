@@ -336,7 +336,7 @@ def build_report() -> dict[str, object]:
                 "MANALOOM_IMPORT_APPLY=0",
                 "MANALOOM_BATTLE_RULES_APPLY_PG=0",
                 "disabled_by_release_capability",
-                "['manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
+                "['manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
                 "manaloom_battle_product_gate.sh",
             ),
             absent=(

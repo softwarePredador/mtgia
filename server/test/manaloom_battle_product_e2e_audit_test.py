@@ -177,7 +177,7 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
         self.assertIn("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0", ops_deploy)
         self.assertIn("MANALOOM_BATTLE_RULES_APPLY_PG=0", ops_deploy)
         self.assertIn("disabled_by_release_capability", ops_deploy)
-        self.assertIn("['manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']", ops_deploy)
+        self.assertIn("['manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']", ops_deploy)
         self.assertNotIn("sync_pg_target_deck_to_hermes.py", ops_deploy)
         self.assertNotIn("battle_target_deck_identity_guard.py", ops_deploy)
         self.assertNotIn("--protected-pg-deck-id", ops_deploy)

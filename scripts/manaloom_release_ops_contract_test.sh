@@ -69,7 +69,7 @@ for required_ops_marker in \
   'MANALOOM_IMPORT_APPLY=0' \
   'MANALOOM_BATTLE_RULES_APPLY_PG=0' \
   'disabled_by_release_capability' \
-  "['manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']"; do
+  "['manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']"; do
   if ! grep -Fq "$required_ops_marker" "$OPS_DEPLOY_SOURCE"; then
     echo "deploy manaloom-ops sem contencao all-OFF: $required_ops_marker" >&2
     exit 1
@@ -565,12 +565,13 @@ grep -Fq "('056', 'create_interactive_battle_sessions')" "$ROOT_DIR/scripts/mana
 grep -Fq "('057', 'expand_battle_job_async_timeout')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('058', 'snapshot_trade_item_identity')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('059', 'align_trade_items_owner_fk')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('060', 'create_account_deletion_outbox')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_039_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_040_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq 'migrations_041_059_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'migrations_041_060_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.release_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.required_range == "038-059"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.latest_migration == "059"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.required_range == "038-060"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.latest_migration == "060"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_job_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'require_live_mutation_approval "deploy do backend ManaLoom"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

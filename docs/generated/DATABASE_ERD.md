@@ -4,6 +4,8 @@
 
 ```mermaid
 erDiagram
+    privacy_keyring ||--o{ account_deletion_outbox : "key_version -> key_version"
+    account_deletion_receipts ||--o{ account_deletion_outbox : "receipt_id -> id"
     decks ||--o{ activation_funnel_events : "deck_id -> id"
     users ||--o{ activation_funnel_events : "user_id -> id"
     users ||--o{ ai_generate_jobs : "user_id -> id"
@@ -102,6 +104,22 @@ erDiagram
     users ||--o{ user_follows : "follower_id -> id"
     users ||--o{ user_follows : "following_id -> id"
     users ||--o{ user_plans : "user_id -> id"
+    account_deletion_outbox {
+        number attempts
+        datetime completed_at
+        string consumer
+        datetime created_at
+        string deck_tokens
+        uuid id PK
+        number key_version
+        string last_error_code
+        datetime lease_expires_at
+        string lease_owner
+        datetime next_attempt_at
+        uuid receipt_id
+        string status
+        datetime updated_at
+    }
     account_deletion_receipts {
         datetime completed_at
         string deletion_mode
@@ -1119,4 +1137,4 @@ erDiagram
     }
 ```
 
-Tabelas: 79; views: 6; migrations: 59 (latest `059`).
+Tabelas: 80; views: 6; migrations: 60 (latest `060`).

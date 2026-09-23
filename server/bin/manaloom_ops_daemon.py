@@ -330,6 +330,9 @@ def _base_env(policy: ReleasePolicy | None = None) -> dict[str, str]:
             "MANALOOM_CATALOG_REFERENCE_OUTPUT_DIR": str(
                 ARTIFACT_DIR / "catalog_reference_refresh"
             ),
+            "MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR": str(
+                ARTIFACT_DIR / "account_deletion_outbox"
+            ),
         }
     )
     return env
@@ -584,6 +587,15 @@ JOBS = [
         script_name="cron_cleanup_optimize_telemetry.sh",
     ),
     Job(
+        name="manaloom_account_deletion_outbox",
+        schedule=os.environ.get(
+            "MANALOOM_ACCOUNT_DELETION_OUTBOX_CRON", "*/15 * * * *"
+        ),
+        lockfile=LOCK_DIR / "manaloom_account_deletion_outbox.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/cron_account_deletion_outbox.sh',
+        script_name="cron_account_deletion_outbox.sh",
+    ),
+    Job(
         name="pull_learning_events",
         schedule=os.environ.get("PULL_LEARNING_EVENTS_CRON", "0 * * * *"),
         lockfile=LOCK_DIR / "pull_learning_events.lock",
@@ -745,6 +757,9 @@ JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
     # in cards). It needs no release capability, so it runs with all 29 off,
     # but only under the apply contract listed in REFERENCE_DATA_JOBS.
     "manaloom_catalog_reference_refresh": (),
+    # Privacy obligation that runs whatever the product capabilities are, but
+    # only under the contract listed in PRIVACY_CONTROL_JOBS (D-68).
+    "manaloom_account_deletion_outbox": (),
     # This report only summarizes the local scheduler manifest/log status. It
     # is the liveness/housekeeping job that also runs on an invalid policy.
     "hermes_cron_governor_report": (),
@@ -761,13 +776,30 @@ REFERENCE_DATA_JOBS: dict[str, str] = {
     "manaloom_catalog_reference_refresh": "catalog_reference_apply_v1",
 }
 
+# Privacy obligations (owner decision D-68). They need no release capability,
+# because the account deletion they serve is not a product surface that can be
+# switched off, and each runs under the versioned contract named here, which
+# lives in the job: account_deletion_outbox_v1 only touches
+# account_deletion_outbox and leaves a receipt per run without identifiers.
+# Like the reference-data jobs, they stop on an invalid or unauthorized policy
+# file (fail closed).
+PRIVACY_CONTROL_JOBS: dict[str, str] = {
+    "manaloom_account_deletion_outbox": "account_deletion_outbox_v1",
+}
+
 
 def _jobs_for_release_policy(policy: ReleasePolicy) -> list[Job]:
     return [
         job
         for job in JOBS
         if job.name in JOB_REQUIRED_CAPABILITIES
-        and (job.name not in REFERENCE_DATA_JOBS or policy.valid)
+        and (
+            (
+                job.name not in REFERENCE_DATA_JOBS
+                and job.name not in PRIVACY_CONTROL_JOBS
+            )
+            or policy.valid
+        )
         and all(
             policy.allowed(capability)
             for capability in JOB_REQUIRED_CAPABILITIES[job.name]

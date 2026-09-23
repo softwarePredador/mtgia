@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "542423b3178979913a785c6a6a0d6f8f9b0a70d1b6818fc4dcc7c16d4bd26c99"
+    "sha256": "3dee585d7729f3c4224e76dea3bfd8bf2cfa5bae7f048806ad01c0950ccf8753"
   },
   "required_task_fields": [
     "id",
@@ -306,7 +306,7 @@
         "BT-AUTH-004",
         "BT-PRIV-003"
       ],
-      "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono.",
+      "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar, e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (falta rota e credencial do job para confirmar a varredura do sidecar; o Battle está desligado) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Pendente de decisão: se o sidecar pode ser dado como limpo pelo teto de vida da sessão, como o EndpointCache; aplicar a 060 na produção pede a palavra do dono.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 323
     },
@@ -9361,6 +9361,8 @@
       "entrypoint": "GET /health (daemon, porta MANALOOM_NATIVE_BATTLE_PORT)",
       "flow_producers": [
         "scripts/manaloom_deploy_ops_image.sh",
+        "server/bin/account_deletion_outbox_worker.dart",
+        "server/bin/cron_account_deletion_outbox.sh",
         "server/bin/cron_cleanup_optimize_telemetry.sh",
         "server/bin/cron_sync_cards.sh",
         "server/bin/hermes_cron_governor_report.sh",
@@ -9369,7 +9371,8 @@
         "server/bin/sync_cards.dart",
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_staples.dart",
-        "server/bin/sync_status.dart"
+        "server/bin/sync_status.dart",
+        "server/lib/privacy/account_deletion_outbox.dart"
       ],
       "flow_consumers": []
     },
@@ -9378,6 +9381,8 @@
       "entrypoint": "scripts/manaloom_deploy_ops_image.sh",
       "flow_producers": [
         "scripts/manaloom_deploy_ops_image.sh",
+        "server/bin/account_deletion_outbox_worker.dart",
+        "server/bin/cron_account_deletion_outbox.sh",
         "server/bin/cron_cleanup_optimize_telemetry.sh",
         "server/bin/cron_sync_cards.sh",
         "server/bin/hermes_cron_governor_report.sh",
@@ -9386,7 +9391,8 @@
         "server/bin/sync_cards.dart",
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_staples.dart",
-        "server/bin/sync_status.dart"
+        "server/bin/sync_status.dart",
+        "server/lib/privacy/account_deletion_outbox.dart"
       ],
       "flow_consumers": []
     },
@@ -9395,6 +9401,8 @@
       "entrypoint": "server/bin/manaloom_ops_daemon.py",
       "flow_producers": [
         "scripts/manaloom_deploy_ops_image.sh",
+        "server/bin/account_deletion_outbox_worker.dart",
+        "server/bin/cron_account_deletion_outbox.sh",
         "server/bin/cron_cleanup_optimize_telemetry.sh",
         "server/bin/cron_sync_cards.sh",
         "server/bin/hermes_cron_governor_report.sh",
@@ -9403,7 +9411,8 @@
         "server/bin/sync_cards.dart",
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_staples.dart",
-        "server/bin/sync_status.dart"
+        "server/bin/sync_status.dart",
+        "server/lib/privacy/account_deletion_outbox.dart"
       ],
       "flow_consumers": []
     },
@@ -9869,5 +9878,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "b1e8ab5f8900cba2ab7117de2e1f8e1e3aba525d57d8a1fee2e88ee01143adfc"
+  "project_logic_source_digest_sha256": "8063d3e326d475e8798d1f084ceaaf9bddc1e48f60c8d5c76cd116f7c4a5b9c5"
 }

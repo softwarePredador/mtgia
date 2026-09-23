@@ -928,7 +928,7 @@ SQL
   fi
 }
 
-require_migrations_041_059_contract() {
+require_migrations_041_060_contract() {
   local contract_status
   contract_status="$(
     "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
@@ -954,7 +954,8 @@ WITH required_migrations(version, name) AS (
     ('056', 'create_interactive_battle_sessions'),
     ('057', 'expand_battle_job_async_timeout'),
     ('058', 'snapshot_trade_item_identity'),
-    ('059', 'align_trade_items_owner_fk')
+    ('059', 'align_trade_items_owner_fk'),
+    ('060', 'create_account_deletion_outbox')
 ), checks(check_name, ok) AS (
   VALUES
     (
@@ -964,7 +965,7 @@ WITH required_migrations(version, name) AS (
     (
       'required_migrations_registered',
       (
-        SELECT COUNT(*) = 19
+        SELECT COUNT(*) = 20
         FROM required_migrations required
         JOIN public.schema_migrations actual
           ON actual.version = required.version
@@ -972,11 +973,11 @@ WITH required_migrations(version, name) AS (
       )
     ),
     (
-      'latest_migration_059',
+      'latest_migration_060',
       COALESCE(
         (SELECT MAX(version) FROM public.schema_migrations),
         ''
-      ) = '059'
+      ) = '060'
     )
 ), missing AS (
   SELECT check_name
@@ -984,8 +985,8 @@ WITH required_migrations(version, name) AS (
   WHERE NOT ok
 )
 SELECT CASE
-  WHEN COUNT(*) = 0 THEN 'migrations_041_059_ready'
-  ELSE 'migrations_041_059_incomplete:' ||
+  WHEN COUNT(*) = 0 THEN 'migrations_041_060_ready'
+  ELSE 'migrations_041_060_incomplete:' ||
        string_agg(check_name, ',' ORDER BY check_name)
 END
 FROM missing;
@@ -993,8 +994,8 @@ ROLLBACK;
 SQL
   )"
 
-  if [[ "$contract_status" != "migrations_041_059_ready" ]]; then
-    echo "deploy recusado: contrato read-only das migrations 041-059 incompleto: $contract_status" >&2
+  if [[ "$contract_status" != "migrations_041_060_ready" ]]; then
+    echo "deploy recusado: contrato read-only das migrations 041-060 incompleto: $contract_status" >&2
     exit 2
   fi
 }
@@ -1167,7 +1168,7 @@ require_clean_worktree
 require_migration_038_contract
 require_migration_039_contract
 require_migration_040_contract
-require_migrations_041_059_contract
+require_migrations_041_060_contract
 
 drain_timeout_seconds="${MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS:-300}"
 if ! [[ "$drain_timeout_seconds" =~ ^[0-9]+$ ]]; then
@@ -1741,8 +1742,8 @@ for attempt in $(seq 1 "$readiness_attempts"); do
        .checks.release_capabilities.offer_mode == $offer_mode and
        .checks.release_capabilities.policy_digest_sha256 == $policy_digest_sha256 and
        .checks.release_schema.status == "healthy" and
-       .checks.release_schema.required_range == "038-059" and
-       .checks.release_schema.latest_migration == "059" and
+       .checks.release_schema.required_range == "038-060" and
+       .checks.release_schema.latest_migration == "060" and
        .checks.battle_job_schema.status == "healthy" and
        disabled_by_policy(.checks.battle_job_worker; "battle_batch") and
        disabled_by_policy(.checks.battle_runtime; "battle_batch") and

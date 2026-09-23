@@ -4092,6 +4092,60 @@ final migrations = <Migration>[
       \$trade_items_owner_trigger\$;
     ''',
   ),
+  Migration(
+    version: '060',
+    name: 'create_account_deletion_outbox',
+    // D-68 (BT-PRIV-002): o outbox da exclusão avisa, com recibo por
+    // consumidor, lease e nova tentativa, os lugares fora do PostgreSQL. A
+    // exclusão grava uma linha por consumidor na mesma transação do recibo
+    // (lib/privacy/account_deletion_outbox.dart). Sem identificador do
+    // titular: a linha aponta para o recibo e leva os decks como o HMAC dos
+    // tombstones, nunca o UUID cru. DDL aprovado na D-68.
+    up: '''
+      CREATE TABLE IF NOT EXISTS account_deletion_outbox (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        receipt_id UUID NOT NULL
+          REFERENCES account_deletion_receipts(id) ON DELETE RESTRICT,
+        consumer TEXT NOT NULL CHECK (consumer IN (
+          'hermes_learning_sqlite',
+          'interactive_battle_sidecar',
+          'endpoint_cache',
+          'sentry',
+          'backups'
+        )),
+        key_version SMALLINT NOT NULL
+          REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+        deck_tokens TEXT[] NOT NULL DEFAULT '{}',
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'processing', 'done', 'failed')),
+        attempts INTEGER NOT NULL DEFAULT 0 CHECK (attempts BETWEEN 0 AND 100),
+        next_attempt_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP,
+        lease_owner TEXT,
+        lease_expires_at TIMESTAMP WITH TIME ZONE,
+        last_error_code TEXT,
+        completed_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT uq_account_deletion_outbox_consumer
+          UNIQUE (receipt_id, consumer),
+        CONSTRAINT chk_account_deletion_outbox_done
+          CHECK ((status = 'done') = (completed_at IS NOT NULL)),
+        CONSTRAINT chk_account_deletion_outbox_lease
+          CHECK (
+            (status = 'processing') =
+            (lease_owner IS NOT NULL AND lease_expires_at IS NOT NULL)
+          )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_account_deletion_outbox_due
+        ON account_deletion_outbox (next_attempt_at)
+        WHERE status IN ('pending', 'failed');
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS account_deletion_outbox;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4162,7 +4216,9 @@ enum MigrationRollbackPolicy { standard, emptyOnly, manualOnly }
 
 MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
     switch (version) {
-      '033' || '035' => MigrationRollbackPolicy.emptyOnly,
+      // A 060 cria o outbox da exclusão (D-68): o down só roda com a tabela
+      // vazia, porque cada linha é a obrigação de um consumidor.
+      '033' || '035' || '060' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
       '034' ||
@@ -4222,6 +4278,11 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
             WHERE source = 'scryfall' OR ruling_source <> ''
           )
       ''')).first[0] ==
+          true,
+    '060' =>
+      (await tx.execute(
+            'SELECT EXISTS (SELECT 1 FROM account_deletion_outbox)',
+          )).first[0] ==
           true,
     _ => false,
   };

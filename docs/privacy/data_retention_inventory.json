@@ -17,7 +17,8 @@
     "D-26": "Testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono.",
     "D-29": "Prompt bruto do Generate retido por 30 dias e fora de decks.description.",
     "D-30": "Lixeira de decks com purge em 30 dias; deck na lixeira entra na exportação.",
-    "D-32": "Jobs de IA retidos por 24 h."
+    "D-32": "Jobs de IA retidos por 24 h.",
+    "D-68": "Outbox da exclusão (D-23) aprovado: tabela account_deletion_outbox e job de consumo sem capability; a migration pede a palavra do dono na execução."
   },
   "vocabulary": {
     "category": [
@@ -145,6 +146,31 @@
     }
   ],
   "tables": {
+    "account_deletion_outbox": {
+      "category": "privacy_control",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Outbox da exclusão (D-68): uma linha por consumidor fora do PostgreSQL (SQLite do Hermes, sidecar de Jogar contra IA, EndpointCache, Sentry, backups), com lease, nova tentativa e recibo por consumidor.",
+      "owner": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo; os tokens de deck saem da linha quando o consumidor conclui",
+        "decision": "D-68",
+        "enforced_by": "job manaloom_account_deletion_outbox (server/bin/account_deletion_outbox_worker.dart via server/bin/manaloom_ops_daemon.py), sem capability, contrato account_deletion_outbox_v1",
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "não tem vínculo com o titular: aponta para o recibo e leva decks só como HMAC"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "Gravado na exclusão, na transação do recibo; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes e o sidecar."
+      },
+      "legal_exception": "Prova, por consumidor, de que a exclusão chegou aos lugares fora do banco; não guarda identificador da pessoa."
+    },
     "account_deletion_receipts": {
       "category": "privacy_control",
       "subject_kind": "none",
@@ -2854,9 +2880,10 @@
       "personal_data": true,
       "retention": "teto de 24 h em qualquer entrada; a vencida sai da memória na primeira leitura ou gravação depois de 1 min, mesmo que a chave não volte a ser lida",
       "export": "fora da exportação: cópia derivada e passageira",
-      "deletion": "não há invalidação na exclusão; vale o TTL de até 24 h (D-23)",
+      "deletion": "não há invalidação direta; vale o teto de 24 h (D-23). O outbox (D-68) conclui a obrigação 24 h 5 min depois da exclusão (endpoint_cache: expired_by_24h_cache_cap)",
       "decisions": [
-        "D-23"
+        "D-23",
+        "D-68"
       ],
       "gap": "sem nenhum acesso ao cache, a entrada vencida espera o próximo acesso ou o reinício, sem ser servida"
     },
@@ -2876,9 +2903,11 @@
       "personal_data": true,
       "retention": "até o TTL da sessão",
       "export": "fora da exportação; a sessão persistida entra por interactive_battle_sessions",
-      "deletion": "não recebe aviso da exclusão",
-      "decisions": [],
-      "gap": "sem sinal de cancelamento para o sidecar (BT-PRIV-002, BT-BAT-002)"
+      "deletion": "a sessão sai da memória até 7200 s + 10 s + 10 min depois de criada, na varredura a cada chamada ao sidecar; o outbox (D-68) guarda a obrigação (blocked_sidecar_expiry_not_confirmable)",
+      "decisions": [
+        "D-68"
+      ],
+      "gap": "o job de ops não tem rota nem credencial para confirmar a varredura no sidecar; o Battle está desligado em produção (D-57) (BT-PRIV-002, BT-BAT-002)"
     },
     "hermes_sqlite_learning": {
       "kind": "sidecar_store",
@@ -2886,9 +2915,11 @@
       "personal_data": true,
       "retention": "sem prazo",
       "export": "fora da exportação",
-      "deletion": "não é apagado na exclusão; hoje contido porque learning_writes está OFF",
-      "decisions": [],
-      "gap": "purga por sujeito no BT-AI-030"
+      "deletion": "não é apagado na exclusão; o outbox (D-68) guarda a obrigação com os tokens HMAC dos decks (blocked_hermes_purge_not_implemented); contido porque learning_writes está OFF",
+      "decisions": [
+        "D-68"
+      ],
+      "gap": "falta o consumidor na imagem de ops: abrir o knowledge.db, calcular no PostgreSQL o HMAC de cada deck_id de user_learning_events com a chave da linha e apagar os que baterem (BT-AI-030)"
     },
     "server_logs": {
       "kind": "logs",
@@ -2906,9 +2937,10 @@
       "personal_data": true,
       "retention": "retenção do plano da conta Sentry; conferir no painel do Sentry e registrar aqui",
       "export": "fora da exportação",
-      "deletion": "não há exclusão por titular no provedor",
+      "deletion": "não há exclusão por titular no provedor; o outbox (D-68) conclui na hora, porque os eventos do servidor não levam o usuário (sentry: server_events_carry_no_user_id). Eventos de antes de 2026-09-23 14:49 UTC seguem a retenção do plano",
       "decisions": [
-        "D-23"
+        "D-23",
+        "D-68"
       ],
       "gap": "a retenção do plano Sentry ainda não foi conferida no painel (dono)"
     },
@@ -2960,10 +2992,11 @@
       "personal_data": true,
       "retention": "backups não são reescritos na exclusão; o prazo de rotação entra na política (D-23)",
       "export": "fora da exportação",
-      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação",
+      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação. O outbox (D-68) guarda a obrigação (blocked_backup_rotation_not_applied) até a rotação de 30 dias da D-69",
       "decisions": [
         "D-23",
-        "D-26"
+        "D-26",
+        "D-68"
       ],
       "gap": "prazo de rotação não decidido; cópia fora da máquina e cifra em aberto (BT-DR-001); limpeza do manaloom_deploy_audit no BT-DB-006"
     },

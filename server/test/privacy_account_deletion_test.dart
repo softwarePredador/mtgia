@@ -197,7 +197,7 @@ void main() {
   });
 
   test('o recibo diz o que a exclusão faz', () {
-    expect(accountDeletionPolicyVersion, 'brewtact-beta-privacy-v3');
+    expect(accountDeletionPolicyVersion, 'brewtact-beta-privacy-v4');
     expect(accountDeletionRetentionSummary, {
       'trades_and_disputes': 'anonymized',
       'open_trade_offers': 'cancelled',
@@ -207,6 +207,7 @@ void main() {
       'third_party_simulations_against_public_decks': 'anonymized',
       'blocks_and_account_tokens': 'deleted',
       'deleted_deck_anti_resurrection_keys': 'opaque_identifier_only',
+      'copies_outside_database': 'queued_for_each_consumer',
     });
   });
 }

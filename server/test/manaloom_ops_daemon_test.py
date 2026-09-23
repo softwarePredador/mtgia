@@ -190,7 +190,7 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             ["hermes_cron_governor_report"],
         )
 
-    def test_all_off_policy_schedules_only_governor_and_catalog_reference(
+    def test_all_off_policy_schedules_only_governor_catalog_and_privacy_jobs(
         self,
     ) -> None:
         module = _load_module()
@@ -202,7 +202,11 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
 
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(all_off)],
-            ["manaloom_catalog_reference_refresh", "hermes_cron_governor_report"],
+            [
+                "manaloom_account_deletion_outbox",
+                "manaloom_catalog_reference_refresh",
+                "hermes_cron_governor_report",
+            ],
         )
         self.assertEqual(
             {job.name for job in module.JOBS},
@@ -218,7 +222,9 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             ["hermes_cron_governor_report"],
         )
 
-    def test_catalog_reference_is_the_only_new_capability_free_job(self) -> None:
+    def test_only_catalog_and_privacy_contract_jobs_are_capability_free(
+        self,
+    ) -> None:
         module = _load_module()
         capability_free = {
             name
@@ -227,11 +233,19 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         }
         self.assertEqual(
             capability_free,
-            {"hermes_cron_governor_report", "manaloom_catalog_reference_refresh"},
+            {
+                "hermes_cron_governor_report",
+                "manaloom_catalog_reference_refresh",
+                "manaloom_account_deletion_outbox",
+            },
         )
         self.assertEqual(
             module.REFERENCE_DATA_JOBS,
             {"manaloom_catalog_reference_refresh": "catalog_reference_apply_v1"},
+        )
+        self.assertEqual(
+            module.PRIVACY_CONTROL_JOBS,
+            {"manaloom_account_deletion_outbox": "account_deletion_outbox_v1"},
         )
         # No other job was opened: each keeps the capabilities it required
         # before BT-CAT-01.
@@ -282,6 +296,39 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertEqual(module.REFERENCE_DATA_JOBS[job.name], refresh.APPLY_CONTRACT)
         self.assertTrue(
             module._matches_schedule(job.schedule, module.datetime(2026, 9, 24, 6, 20))
+        )
+
+    def test_account_deletion_outbox_job_runs_its_contract_every_15_minutes(
+        self,
+    ) -> None:
+        module = _load_module()
+        jobs = {job.name: job for job in module.JOBS}
+        job = jobs["manaloom_account_deletion_outbox"]
+
+        self.assertEqual(job.schedule, "*/15 * * * *")
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME" && ./server/bin/cron_account_deletion_outbox.sh',
+        )
+        self.assertEqual(job.script_name, "cron_account_deletion_outbox.sh")
+        self.assertFalse(job.background)
+        contract_source = (
+            module.REPO_ROOT / "server/lib/privacy/account_deletion_outbox.dart"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "const accountDeletionOutboxContract = "
+            f"'{module.PRIVACY_CONTROL_JOBS[job.name]}';",
+            contract_source,
+        )
+        script = module.REPO_ROOT / "server/bin" / job.script_name
+        self.assertTrue(os.access(script, os.X_OK), script)
+        self.assertTrue(
+            module._matches_schedule(job.schedule, module.datetime(2026, 9, 24, 6, 45))
+        )
+        env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        self.assertEqual(
+            env["MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR"],
+            str(module.ARTIFACT_DIR / "account_deletion_outbox"),
         )
 
     def test_base_env_sends_catalog_receipts_to_the_artifact_dir(self) -> None:

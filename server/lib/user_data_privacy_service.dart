@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
 import 'auth_service.dart';
+import 'privacy/account_deletion_outbox.dart';
 import 'privacy/deleted_deck_anonymizer.dart';
 import 'privacy/privacy_export_allowlist.dart';
 import 'privacy/privacy_export_pseudonymizer.dart';
@@ -15,8 +16,9 @@ const accountDeletionConfirmation = 'EXCLUIR MINHA CONTA';
 /// Versão da política gravada em cada recibo. A v2 anonimiza as simulações
 /// de outras pessoas contra o deck público de quem saiu (D-23), fecha as
 /// lacunas do inventário (BT-PRIV-003) e para quando falta uma relação. A v3
-/// cancela as ofertas de troca abertas e trata os itens de troca (D-66).
-const accountDeletionPolicyVersion = 'brewtact-beta-privacy-v3';
+/// cancela as ofertas de troca abertas e trata os itens de troca (D-66). A v4
+/// grava o outbox da exclusão para os lugares fora do PostgreSQL (D-68).
+const accountDeletionPolicyVersion = 'brewtact-beta-privacy-v4';
 
 /// Nota gravada no histórico da oferta aberta que a exclusão cancela (D-66).
 const openTradeOfferCancelledNote = 'Oferta cancelada: a conta foi excluída.';
@@ -31,11 +33,13 @@ const accountDeletionRetentionSummary = <String, String>{
   'third_party_simulations_against_public_decks': 'anonymized',
   'blocks_and_account_tokens': 'deleted',
   'deleted_deck_anti_resurrection_keys': 'opaque_identifier_only',
+  'copies_outside_database': 'queued_for_each_consumer',
 };
 
 /// Relações que a exclusão toca. Todas são conferidas antes da primeira
 /// escrita: relação ausente para a exclusão em vez de virar sucesso.
 const accountDeletionRelations = <String>[
+  'account_deletion_outbox',
   'account_deletion_receipts',
   'activation_funnel_events',
   'ai_generate_jobs',
@@ -524,19 +528,34 @@ class UserDataPrivacyService {
               privacy_deleted_deck_tombstones.deleted_at,
               EXCLUDED.deleted_at
             )
-            RETURNING 1
+            RETURNING deck_token
           )
           SELECT
             (SELECT COUNT(*)::int FROM owned_decks) AS owned_deck_count,
-            (SELECT COUNT(*)::int FROM upserted) AS tombstone_count
+            (SELECT COUNT(*)::int FROM upserted) AS tombstone_count,
+            (SELECT key_version::int FROM active_key) AS key_version,
+            (
+              SELECT COALESCE(
+                array_agg(deck_token ORDER BY deck_token),
+                ARRAY[]::text[]
+              )
+              FROM upserted
+            ) AS deck_tokens
         '''),
         parameters: {'userId': userId, 'deletedAt': deletedAt},
       );
       final tombstoneCounts = deckTombstoneResult.first.toColumnMap();
-      if (tombstoneCounts['owned_deck_count'] !=
-          tombstoneCounts['tombstone_count']) {
+      final keyVersion = tombstoneCounts['key_version'];
+      if (keyVersion is! int ||
+          tombstoneCounts['owned_deck_count'] !=
+              tombstoneCounts['tombstone_count']) {
         throw StateError('privacy_keyring ativa ausente; exclusão abortada.');
       }
+      // D-68: os mesmos tokens dos tombstones vão para o outbox, para quem
+      // precisa achar os decks fora do PostgreSQL.
+      final deckTokens = [
+        for (final token in tombstoneCounts['deck_tokens'] as List) '$token',
+      ];
       await _executeOnAll(
         session,
         const ['deck_learning_events', 'decks'],
@@ -696,7 +715,7 @@ class UserDataPrivacyService {
       if (anonymized.isEmpty) throw UserDataNotFoundException();
 
       const retention = accountDeletionRetentionSummary;
-      await session.execute(
+      final receipt = await session.execute(
         Sql.named('''
           INSERT INTO account_deletion_receipts (
             policy_version, deletion_mode, retention_summary, completed_at
@@ -704,12 +723,22 @@ class UserDataPrivacyService {
           VALUES (
             @policyVersion, 'anonymized', @retention::jsonb, @completedAt
           )
+          RETURNING id::text
         '''),
         parameters: {
           'policyVersion': accountDeletionPolicyVersion,
           'retention': jsonEncode(retention),
           'completedAt': deletedAt,
         },
+      );
+      // D-68: uma linha por consumidor fora do PostgreSQL, na mesma
+      // transação do recibo. Se o outbox falhar, a exclusão inteira volta.
+      await enqueueAccountDeletionOutbox(
+        session,
+        receiptId: receipt.single.single! as String,
+        keyVersion: keyVersion,
+        deckTokens: deckTokens,
+        completedAt: deletedAt,
       );
 
       return <String, dynamic>{
