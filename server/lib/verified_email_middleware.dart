@@ -15,48 +15,68 @@ void overrideVerifiedEmailRequirementForTesting(bool? required) {
   _verifiedEmailRequiredOverride = required;
 }
 
-Middleware verifiedEmailForMutations() {
+/// Exige e-mail verificado nas escritas (métodos que não são GET, HEAD ou
+/// OPTIONS). [appliesTo] restringe a quais escritas a exigência vale; sem
+/// ele, vale para todas.
+Middleware verifiedEmailForMutations({
+  bool Function(Request request)? appliesTo,
+}) {
   return (handler) {
     return (context) async {
       final method = context.request.method;
-      if (!(_verifiedEmailRequiredOverride ?? isVerifiedEmailRequired()) ||
-          method == HttpMethod.get ||
+      if (method == HttpMethod.get ||
           method == HttpMethod.head ||
           method == HttpMethod.options) {
         return handler(context);
       }
-
-      final header = context.request.headers[HttpHeaders.authorizationHeader];
-      if (header == null || !header.startsWith('Bearer ')) {
-        return Response.json(
-          statusCode: HttpStatus.unauthorized,
-          body: const {
-            'error': 'authentication_required',
-            'message': 'Entre para continuar.',
-          },
-        );
+      if (appliesTo != null && !appliesTo(context.request)) {
+        return handler(context);
       }
-      final user = await AuthService().getUserFromToken(header.substring(7));
-      if (user == null) {
-        return Response.json(
-          statusCode: HttpStatus.unauthorized,
-          body: const {
-            'error': 'invalid_session',
-            'message': 'Faça login novamente para continuar.',
-          },
-        );
-      }
-      if (user['email_verified'] != true) {
-        return Response.json(
-          statusCode: HttpStatus.forbidden,
-          body: const {
-            'error': 'email_verification_required',
-            'message':
-                'Verifique seu email antes de publicar, conversar ou negociar.',
-          },
-        );
-      }
-      return handler(context);
+      final blocked = await verifiedEmailRequiredResponse(context.request);
+      return blocked ?? handler(context);
     };
   };
+}
+
+/// Resposta de bloqueio quando a exigência está ligada e a conta do token
+/// ainda não verificou o e-mail, ou `null` para seguir.
+///
+/// O middleware usa esta função; rotas que só às vezes gravam (como
+/// `POST /ai/rebuild` com `save_mode=draft_clone`) chamam dentro do handler.
+Future<Response?> verifiedEmailRequiredResponse(Request request) async {
+  if (!(_verifiedEmailRequiredOverride ?? isVerifiedEmailRequired())) {
+    return null;
+  }
+
+  final header = request.headers[HttpHeaders.authorizationHeader];
+  if (header == null || !header.startsWith('Bearer ')) {
+    return Response.json(
+      statusCode: HttpStatus.unauthorized,
+      body: const {
+        'error': 'authentication_required',
+        'message': 'Entre para continuar.',
+      },
+    );
+  }
+  final user = await AuthService().getUserFromToken(header.substring(7));
+  if (user == null) {
+    return Response.json(
+      statusCode: HttpStatus.unauthorized,
+      body: const {
+        'error': 'invalid_session',
+        'message': 'Faça login novamente para continuar.',
+      },
+    );
+  }
+  if (user['email_verified'] != true) {
+    return Response.json(
+      statusCode: HttpStatus.forbidden,
+      body: const {
+        'error': 'email_verification_required',
+        'message':
+            'Verifique seu email antes de publicar, conversar ou negociar.',
+      },
+    );
+  }
+  return null;
 }

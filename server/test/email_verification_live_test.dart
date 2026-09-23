@@ -93,6 +93,28 @@ void main() {
       expect(blocked.statusCode, 403, reason: blocked.body);
       expect(body(blocked)['error'], 'email_verification_required');
 
+      // BT-AUTH-010 e a decisão do dono de 2026-09-23: importar e escrever
+      // deck também exigem e-mail verificado; ler os próprios decks, não.
+      final deckPayload = {
+        'name': 'Deck verificado $suffix',
+        'format': 'commander',
+      };
+      final blockedDeck = await post('/decks', deckPayload, token: actorToken);
+      expect(blockedDeck.statusCode, 403, reason: blockedDeck.body);
+      expect(body(blockedDeck)['error'], 'email_verification_required');
+      final blockedImport = await post('/import', {
+        'list': '1 Sol Ring',
+        'name': 'Import verificado $suffix',
+        'format': 'commander',
+      }, token: actorToken);
+      expect(blockedImport.statusCode, 403, reason: blockedImport.body);
+      expect(body(blockedImport)['error'], 'email_verification_required');
+      final ownDecks = await http.get(
+        Uri.parse('$baseUrl/decks'),
+        headers: headers(actorToken),
+      );
+      expect(ownDecks.statusCode, 200, reason: ownDecks.body);
+
       final initialToken = actor['test_verification_token'] as String;
       await expire(initialToken);
       final expired = await post('/auth/verify-email', {'token': initialToken});
@@ -122,6 +144,15 @@ void main() {
         'user_id': targetId,
       }, token: actorToken);
       expect(conversation.statusCode, 200, reason: conversation.body);
+
+      final verifiedDeck = await post('/decks', deckPayload, token: actorToken);
+      expect(verifiedDeck.statusCode, 200, reason: verifiedDeck.body);
+      final deckId = body(verifiedDeck)['id'] as String;
+      final deletion = await http.delete(
+        Uri.parse('$baseUrl/decks/$deckId'),
+        headers: headers(actorToken),
+      );
+      expect(deletion.statusCode, 204, reason: deletion.body);
 
       final alreadyVerified = await post(
         '/auth/resend-verification',

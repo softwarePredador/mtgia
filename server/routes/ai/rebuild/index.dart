@@ -12,6 +12,7 @@ import '../../../lib/http_responses.dart';
 import '../../../lib/json_object_support.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/verified_email_middleware.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
@@ -57,6 +58,13 @@ Future<Response> onRequest(RequestContext context) async {
     return badRequest(
       'rebuild_scope must be auto, repair_partial or full_non_commander_rebuild.',
     );
+  }
+
+  // Salvar o rascunho cria um deck novo, e escrever deck exige e-mail
+  // verificado (decisão do dono, 2026-09-23). A prévia não grava nada.
+  if (saveMode == 'draft_clone') {
+    final blocked = await verifiedEmailRequiredResponse(context.request);
+    if (blocked != null) return blocked;
   }
 
   try {

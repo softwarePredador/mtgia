@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "0cfc3f27159387201e868902c4d1e11392b3e9670efa3730ac11465a6f5591e8"
+    "sha256": "63c9df9fded42a1c4ee90a875376d163c2980ef5696a224eb147ab495ee0a581"
   },
   "required_task_fields": [
     "id",
@@ -228,7 +228,7 @@
         "BT-AUTH-002",
         "BT-SCP-001"
       ],
-      "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir.",
+      "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`).",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 300
     },
@@ -268,7 +268,7 @@
       "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "O import exige e-mail verificado, como o fichário (achado 11 dos fluxos).",
       "depends_on": [],
-      "acceptance": "`/import` e `/import/*` passam pela mesma verificação de e-mail do fichário; teste negativo com conta não verificada. Feito em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `server/routes/import/_middleware.dart` instala `verifiedEmailForMutations()` por dentro do `authMiddleware`, igual ao fichário. Evidência: `server/test/import_verified_email_test.dart` (conta não verificada recebe 403 `email_verification_required` em `/import`, `/import/to-deck` e `/import/validate` sem o handler rodar; conta verificada passa) e a lista estrutural de `server/test/email_verification_contract_test.dart`; a versão da base falha nos dois. `/decks` continua sem o portão: conta não verificada ainda cria deck pela rota de decks.",
+      "acceptance": "`/import` e `/import/*` passam pela mesma verificação de e-mail do fichário; teste negativo com conta não verificada. Feito em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `server/routes/import/_middleware.dart` instala `verifiedEmailForMutations()` por dentro do `authMiddleware`, igual ao fichário. Evidência: `server/test/import_verified_email_test.dart` (conta não verificada recebe 403 `email_verification_required` em `/import`, `/import/to-deck` e `/import/validate` sem o handler rodar; conta verificada passa) e a lista estrutural de `server/test/email_verification_contract_test.dart`; a versão da base falha nos dois. Decisão do dono em 2026-09-23: escrever deck também exige e-mail verificado; ler os próprios decks e apagar o próprio deck, não. Feito no mesmo dia, na mesma branch: `server/routes/decks/_middleware.dart` instala `verifiedEmailForDeckContentWrites()`, com a regra em `server/lib/deck_write_verification_policy.dart` (sob `/decks` toda escrita exige, menos apagar o próprio deck, os cálculos do servidor sobre a lista atual e os registros privados de partida), e `POST /ai/rebuild` com `save_mode=draft_clone` também exige. Evidência: `server/test/deck_write_verified_email_test.dart` (a tabela de todas as rotas de `server/routes/decks` falha se aparecer rota sem classificação; 4 mutações falham como esperado) e `server/test/email_verification_live_test.dart`, verde contra API e PostgreSQL locais. Na coorte por convite, aceitar o convite enviado ao e-mail vai contar como verificação; isso entra no `BT-AUTH-006`. O app precisa tratar `email_verification_required` nas telas de deck e oferecer o reenvio da verificação.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 304
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "ef897e1fd121a9dae277faf400b9795b439a6500b27175bcdc8addddef016b29"
+  "project_logic_source_digest_sha256": "ce5ff8852a8416083c2ba18d29160fd7bcb708c3f82524b0699b9b0f544ce629"
 }

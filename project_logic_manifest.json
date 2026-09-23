@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "ef897e1fd121a9dae277faf400b9795b439a6500b27175bcdc8addddef016b29",
+  "source_digest_sha256": "ce5ff8852a8416083c2ba18d29160fd7bcb708c3f82524b0699b9b0f544ce629",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,16 +63,16 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 687,
+    "dart_source_files": 688,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5208,
-    "semantic_resolved_files": 687,
+    "dart_symbols": 5212,
+    "semantic_resolved_files": 688,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42772,
-    "semantic_resolved_call_sites": 68164,
-    "semantic_resolved_type_references": 16087,
-    "modules": 153,
+    "semantic_resolved_call_edges": 42785,
+    "semantic_resolved_call_sites": 68186,
+    "semantic_resolved_type_references": 16096,
+    "modules": 154,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1230,
+    "tests": 1231,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1470,6 +1470,17 @@
       "services": []
     },
     {
+      "id": "server/lib/deck_write_verification_policy",
+      "layer": "server",
+      "files": [
+        "server/lib/deck_write_verification_policy.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 3,
+      "providers": [],
+      "services": []
+    },
+    {
       "id": "server/lib/decks",
       "layer": "server",
       "files": [
@@ -2046,7 +2057,7 @@
         "server/lib/verified_email_middleware.dart"
       ],
       "file_count": 1,
-      "symbol_count": 2,
+      "symbol_count": 3,
       "providers": [],
       "services": []
     },
@@ -26809,13 +26820,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -33697,6 +33708,24 @@
       "line": 14
     },
     {
+      "name": "DeckWriteVerificationExemption",
+      "kind": "class",
+      "source": "server/lib/deck_write_verification_policy.dart",
+      "line": 91
+    },
+    {
+      "name": "isDeckContentWrite",
+      "kind": "function",
+      "source": "server/lib/deck_write_verification_policy.dart",
+      "line": 5
+    },
+    {
+      "name": "verifiedEmailForDeckContentWrites",
+      "kind": "function",
+      "source": "server/lib/deck_write_verification_policy.dart",
+      "line": 100
+    },
+    {
       "name": "_readDouble",
       "kind": "function",
       "source": "server/lib/decks/deck_applied_analysis_support.dart",
@@ -37193,6 +37222,12 @@
       "line": 18
     },
     {
+      "name": "verifiedEmailRequiredResponse",
+      "kind": "function",
+      "source": "server/lib/verified_email_middleware.dart",
+      "line": 41
+    },
+    {
       "name": "_header",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
@@ -38261,13 +38296,13 @@
       "name": "_loadDeckCards",
       "kind": "function",
       "source": "server/routes/ai/rebuild/index.dart",
-      "line": 330
+      "line": 338
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/ai/rebuild/index.dart",
-      "line": 16
+      "line": 17
     },
     {
       "name": "_analyzeMatchup",
@@ -39701,7 +39736,7 @@
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/decks/_middleware.dart",
-      "line": 4
+      "line": 5
     },
     {
       "name": "_createDeck",
@@ -40403,7 +40438,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 687,
+    "resolved_file_count": 688,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -40892,6 +40927,7 @@
       "server/lib/deck_snapshot_contract.dart",
       "server/lib/deck_validation_route_support.dart",
       "server/lib/deck_validation_state_support.dart",
+      "server/lib/deck_write_verification_policy.dart",
       "server/lib/decks/deck_applied_analysis_support.dart",
       "server/lib/decks/deck_optimization_history_service.dart",
       "server/lib/decks/optimization_apply_authorization_support.dart",
@@ -41099,11 +41135,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42772,
-    "resolved_call_site_count": 68164,
-    "workspace_call_edge_count": 13341,
-    "unresolved_call_edge_count": 542,
-    "unresolved_call_site_count": 751,
+    "resolved_call_edge_count": 42785,
+    "resolved_call_site_count": 68186,
+    "workspace_call_edge_count": 13347,
+    "unresolved_call_edge_count": 543,
+    "unresolved_call_site_count": 753,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -157663,6 +157699,39 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/deck_write_verification_policy.dart",
+        "line": 102,
+        "caller": "verifiedEmailForDeckContentWrites",
+        "kind": "method",
+        "lexical_target": "verifiedEmailForMutations",
+        "target": "verifiedEmailForMutations",
+        "target_library": "package:server/verified_email_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/deck_write_verification_policy.dart",
+        "line": 104,
+        "caller": "verifiedEmailForDeckContentWrites",
+        "kind": "method",
+        "lexical_target": "isDeckContentWrite",
+        "target": "isDeckContentWrite",
+        "target_library": "package:server/deck_write_verification_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/deck_write_verification_policy.dart",
+        "line": 43,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "DeckWriteVerificationExemption",
+        "target": "DeckWriteVerificationExemption.DeckWriteVerificationExemption",
+        "target_library": "package:server/deck_write_verification_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
         "source": "server/lib/decks/deck_applied_analysis_support.dart",
         "line": 48,
         "caller": "buildAppliedDeckPostAnalysis",
@@ -166992,8 +167061,19 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 22,
+        "line": 35,
         "caller": "verifiedEmailForMutations",
+        "kind": "method",
+        "lexical_target": "verifiedEmailRequiredResponse",
+        "target": "verifiedEmailRequiredResponse",
+        "target_library": "package:server/verified_email_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/verified_email_middleware.dart",
+        "line": 47,
+        "caller": "verifiedEmailRequiredResponse",
         "kind": "method",
         "lexical_target": "isVerifiedEmailRequired",
         "target": "isVerifiedEmailRequired",
@@ -167003,8 +167083,8 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 39,
-        "caller": "verifiedEmailForMutations",
+        "line": 61,
+        "caller": "verifiedEmailRequiredResponse",
         "kind": "constructor",
         "lexical_target": "AuthService",
         "target": "AuthService.AuthService",
@@ -167014,8 +167094,8 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 39,
-        "caller": "verifiedEmailForMutations",
+        "line": 61,
+        "caller": "verifiedEmailRequiredResponse",
         "kind": "method",
         "lexical_target": "getUserFromToken",
         "target": "AuthService.getUserFromToken",
@@ -175660,7 +175740,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 165,
+        "line": 173,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "resolveCardColorIdentity",
@@ -175671,7 +175751,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 174,
+        "line": 182,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "RebuildGuidedService",
@@ -175682,7 +175762,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 175,
+        "line": 183,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "build",
@@ -175693,7 +175773,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 18,
+        "line": 19,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -175704,7 +175784,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 190,
+        "line": 198,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "createDraftClone",
@@ -175715,7 +175795,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 206,
+        "line": 214,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_loadDeckCards",
@@ -175726,7 +175806,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 218,
+        "line": 226,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckArchetypeAnalyzer",
@@ -175737,7 +175817,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 218,
+        "line": 226,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "generateAnalysis",
@@ -175748,7 +175828,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 223,
+        "line": 231,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessDeckOptimizationState",
@@ -175759,7 +175839,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 26,
+        "line": 27,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "requireJsonObject",
@@ -175770,7 +175850,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 273,
+        "line": 281,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -175781,7 +175861,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 276,
+        "line": 284,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -175792,7 +175872,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 28,
+        "line": 29,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -175803,7 +175883,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 319,
+        "line": 327,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "e",
@@ -175814,7 +175894,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 320,
+        "line": 328,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -175825,7 +175905,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 326,
+        "line": 334,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -175836,7 +175916,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 33,
+        "line": 34,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "parseRebuildRouteRequest",
@@ -175847,7 +175927,18 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 79,
+        "line": 66,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "verifiedEmailRequiredResponse",
+        "target": "verifiedEmailRequiredResponse",
+        "target_library": "package:server/verified_email_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/rebuild/index.dart",
+        "line": 87,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "notFound",
@@ -183954,12 +184045,23 @@
       },
       {
         "source": "server/routes/decks/_middleware.dart",
-        "line": 8,
+        "line": 13,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "authMiddleware",
         "target": "authMiddleware",
         "target_library": "package:server/auth_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/_middleware.dart",
+        "line": 13,
+        "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "verifiedEmailForDeckContentWrites",
+        "target": "verifiedEmailForDeckContentWrites",
+        "target_library": "package:server/deck_write_verification_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -187886,8 +187988,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14216,
-        "occurrences": 24804
+        "unique_references": 14223,
+        "occurrences": 24811
       },
       {
         "target_scope": "dart_sdk",
@@ -188001,7 +188103,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
         "unique_references": 17,
-        "occurrences": 38
+        "occurrences": 39
       },
       {
         "target_scope": "dependency",
@@ -191845,6 +191947,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/deck_write_verification_policy.dart",
+        "unique_references": 3,
+        "occurrences": 11
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/decks/deck_applied_analysis_support.dart",
         "unique_references": 4,
         "occurrences": 5
@@ -192230,8 +192338,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/verified_email_middleware.dart",
-        "unique_references": 6,
-        "occurrences": 6
+        "unique_references": 9,
+        "occurrences": 9
       },
       {
         "target_scope": "workspace",
@@ -197211,11 +197319,19 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 26,
+        "line": 30,
         "caller": "verifiedEmailForMutations",
         "kind": "function_expression",
         "lexical_target": "handler",
-        "occurrences": 2
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/verified_email_middleware.dart",
+        "line": 32,
+        "caller": "verifiedEmailForMutations",
+        "kind": "function_expression",
+        "lexical_target": "appliesTo",
+        "occurrences": 1
       },
       {
         "source": "server/routes/_middleware.dart",
@@ -197346,8 +197462,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16087,
-    "workspace_type_reference_count": 3391,
+    "resolved_type_reference_count": 16096,
+    "workspace_type_reference_count": 3392,
     "unresolved_type_reference_count": 348,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -226762,6 +226878,16 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/deck_write_verification_policy.dart",
+        "line": 42,
+        "lexical_type": "DeckWriteVerificationExemption",
+        "resolved_type": "DeckWriteVerificationExemption",
+        "target": "DeckWriteVerificationExemption",
+        "target_library": "package:server/deck_write_verification_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 10
+      },
+      {
         "source": "server/lib/decks/deck_applied_analysis_support.dart",
         "line": 63,
         "lexical_type": "DeckArchetypeAnalyzerCore",
@@ -228353,7 +228479,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 39,
+        "line": 61,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -229453,7 +229579,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 174,
+        "line": 182,
         "lexical_type": "RebuildGuidedService",
         "resolved_type": "RebuildGuidedService",
         "target": "RebuildGuidedService",
@@ -229463,7 +229589,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 218,
+        "line": 226,
         "lexical_type": "DeckArchetypeAnalyzer",
         "resolved_type": "DeckArchetypeAnalyzer",
         "target": "DeckArchetypeAnalyzer",
@@ -229473,7 +229599,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 27,
+        "line": 28,
         "lexical_type": "JsonObjectValidationException",
         "resolved_type": "JsonObjectValidationException",
         "target": "JsonObjectValidationException",
@@ -229483,7 +229609,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 304,
+        "line": 312,
         "lexical_type": "RebuildException",
         "resolved_type": "RebuildException",
         "target": "RebuildException",
@@ -229493,7 +229619,7 @@
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
-        "line": 309,
+        "line": 317,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -231272,8 +231398,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1079,
-        "occurrences": 2186
+        "unique_references": 1080,
+        "occurrences": 2187
       },
       {
         "target_scope": "dart_sdk",
@@ -231290,8 +231416,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6171,
-        "occurrences": 39427
+        "unique_references": 6175,
+        "occurrences": 39436
       },
       {
         "target_scope": "dart_sdk",
@@ -231374,8 +231500,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 268,
-        "occurrences": 1088
+        "unique_references": 270,
+        "occurrences": 1091
       },
       {
         "target_scope": "dependency",
@@ -231386,8 +231512,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
-        "unique_references": 5,
-        "occurrences": 9
+        "unique_references": 6,
+        "occurrences": 10
       },
       {
         "target_scope": "dependency",
@@ -234736,6 +234862,12 @@
         "target_library": "package:server/deck_snapshot_contract.dart",
         "unique_references": 1,
         "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/deck_write_verification_policy.dart",
+        "unique_references": 1,
+        "occurrences": 10
       },
       {
         "target_scope": "workspace",
@@ -271683,6 +271815,7 @@
     "server/test/deck_validation_state_route_contract_test.dart",
     "server/test/deck_validation_state_support_test.dart",
     "server/test/deck_validation_test.dart",
+    "server/test/deck_write_verified_email_test.dart",
     "server/test/decks_crud_test.dart",
     "server/test/decks_incremental_add_test.dart",
     "server/test/deep_ai_alignment_read_only_contract_test.dart",
@@ -273180,7 +273313,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "0cfc3f27159387201e868902c4d1e11392b3e9670efa3730ac11465a6f5591e8"
+      "sha256": "63c9df9fded42a1c4ee90a875376d163c2980ef5696a224eb147ab495ee0a581"
     },
     "required_task_fields": [
       "id",
@@ -273406,7 +273539,7 @@
           "BT-AUTH-002",
           "BT-SCP-001"
         ],
-        "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir.",
+        "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`).",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 300
       },
@@ -273446,7 +273579,7 @@
         "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "O import exige e-mail verificado, como o fichário (achado 11 dos fluxos).",
         "depends_on": [],
-        "acceptance": "`/import` e `/import/*` passam pela mesma verificação de e-mail do fichário; teste negativo com conta não verificada. Feito em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `server/routes/import/_middleware.dart` instala `verifiedEmailForMutations()` por dentro do `authMiddleware`, igual ao fichário. Evidência: `server/test/import_verified_email_test.dart` (conta não verificada recebe 403 `email_verification_required` em `/import`, `/import/to-deck` e `/import/validate` sem o handler rodar; conta verificada passa) e a lista estrutural de `server/test/email_verification_contract_test.dart`; a versão da base falha nos dois. `/decks` continua sem o portão: conta não verificada ainda cria deck pela rota de decks.",
+        "acceptance": "`/import` e `/import/*` passam pela mesma verificação de e-mail do fichário; teste negativo com conta não verificada. Feito em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `server/routes/import/_middleware.dart` instala `verifiedEmailForMutations()` por dentro do `authMiddleware`, igual ao fichário. Evidência: `server/test/import_verified_email_test.dart` (conta não verificada recebe 403 `email_verification_required` em `/import`, `/import/to-deck` e `/import/validate` sem o handler rodar; conta verificada passa) e a lista estrutural de `server/test/email_verification_contract_test.dart`; a versão da base falha nos dois. Decisão do dono em 2026-09-23: escrever deck também exige e-mail verificado; ler os próprios decks e apagar o próprio deck, não. Feito no mesmo dia, na mesma branch: `server/routes/decks/_middleware.dart` instala `verifiedEmailForDeckContentWrites()`, com a regra em `server/lib/deck_write_verification_policy.dart` (sob `/decks` toda escrita exige, menos apagar o próprio deck, os cálculos do servidor sobre a lista atual e os registros privados de partida), e `POST /ai/rebuild` com `save_mode=draft_clone` também exige. Evidência: `server/test/deck_write_verified_email_test.dart` (a tabela de todas as rotas de `server/routes/decks` falha se aparecer rota sem classificação; 4 mutações falham como esperado) e `server/test/email_verification_live_test.dart`, verde contra API e PostgreSQL locais. Na coorte por convite, aceitar o convite enviado ao e-mail vai contar como verificação; isso entra no `BT-AUTH-006`. O app precisa tratar `email_verification_required` nas telas de deck e oferecer o reenvio da verificação.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 304
       },
@@ -283003,7 +283136,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "ef897e1fd121a9dae277faf400b9795b439a6500b27175bcdc8addddef016b29"
+    "project_logic_source_digest_sha256": "ce5ff8852a8416083c2ba18d29160fd7bcb708c3f82524b0699b9b0f544ce629"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285546,6 +285679,7 @@
       "server/lib/deck_snapshot_contract.dart",
       "server/lib/deck_validation_route_support.dart",
       "server/lib/deck_validation_state_support.dart",
+      "server/lib/deck_write_verification_policy.dart",
       "server/lib/decks/deck_applied_analysis_support.dart",
       "server/lib/decks/deck_optimization_history_service.dart",
       "server/lib/decks/optimization_apply_authorization_support.dart",
@@ -285931,6 +286065,7 @@
       "server/test/deck_validation_state_route_contract_test.dart",
       "server/test/deck_validation_state_support_test.dart",
       "server/test/deck_validation_test.dart",
+      "server/test/deck_write_verified_email_test.dart",
       "server/test/decks_crud_test.dart",
       "server/test/decks_incremental_add_test.dart",
       "server/test/deep_ai_alignment_read_only_contract_test.dart",
