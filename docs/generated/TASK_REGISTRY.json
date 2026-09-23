@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245"
+    "sha256": "5a90f7661d752f06b4d148bc9bad21643ea30ce5dfa3c00249050e7530db7323"
   },
   "required_task_fields": [
     "id",
@@ -313,10 +313,10 @@
     {
       "id": "BT-PRIV-003",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Inventário de retenção por tabela/artefato, incluindo replays, prompts, logs e UGC.",
       "depends_on": [],
-      "acceptance": "Owner, finalidade, prazo, export/delete e exceção legal por classe. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): este inventário é insumo de `BT-PRIV-001`, `BT-PRIV-002` e `DCK-P0-04` — a dependência declarada está invertida; corrigir exige decidir a prioridade desta tarefa (hoje P1), decisão do dono. Decisão do dono em 2026-09-22: D-25, promovido a P0 CORE e dependência invertida: o inventário vem antes da exportação, da exclusão e do `DCK-P0-04`.",
+      "acceptance": "Owner, finalidade, prazo, export/delete e exceção legal por classe. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): este inventário é insumo de `BT-PRIV-001`, `BT-PRIV-002` e `DCK-P0-04` — a dependência declarada está invertida; corrigir exige decidir a prioridade desta tarefa (hoje P1), decisão do dono. Decisão do dono em 2026-09-22: D-25, promovido a P0 CORE e dependência invertida: o inventário vem antes da exportação, da exclusão e do `DCK-P0-04`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`: inventário legível por máquina em `docs/privacy/data_retention_inventory.json` (as 79 tabelas do schema versionado, 44 com dado pessoal, cada uma com finalidade, dono, prazo, quem apaga, exportação, exclusão e exceção legal; 6 views; 20 tabelas e 3 colunas que só existem na produção, uma delas com dado pessoal (`ml_prompt_feedback.user_rating`); 13 artefatos fora do banco, como caches, sidecars, logs, Sentry, provedores, backups e aparelho; classificação de exportação das 517 colunas das 39 tabelas exportadas; os prazos das D-23, D-29, D-30 e D-32) e resumo em `docs/privacy/INVENTARIO_DE_RETENCAO.md`. Evidência: `server/test/privacy_data_inventory_test.dart` (14 testes contra o schema do manifesto, os prazos decididos e o serviço de exclusão; 10 mutações falham como esperado) e `server/test/privacy_data_inventory_db_live_test.dart` (4 testes verdes contra PostgreSQL descartável com as 58 migrations; tabela e coluna novas no banco fazem 2 falharem). Achado: nenhum prazo automático roda em produção, porque o job de limpeza exige `ai_analyze_optimize_advisory`, que está OFF. Seguem com o dono: prazo de rotação dos backups; prazos de analytics, replays, notificações e feedback de IA; retenção declarada por Sentry, OpenAI e Resend; base legal de trocas, moderação e nomes de jogador de torneio (advogado).",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 311
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "5db6c75c08f7ca89771c7f01a356c07e11aa1716191e5c34520a074a70674c78"
+  "project_logic_source_digest_sha256": "1f25ded9d6c38a8c8e7b7cea2ca2daeeabe337fe653761f840da9fba5b76373b"
 }

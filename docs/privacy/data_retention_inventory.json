@@ -1,0 +1,2997 @@
+{
+  "schema_version": 1,
+  "id": "BT-PRIV-003",
+  "title": "Inventário de retenção de dados do BrewTact",
+  "as_of": "2026-09-23",
+  "sources": {
+    "schema": "project_logic_manifest.json#/database, gerado de server/database_setup.sql, server/bin/migrate.dart e das constantes SQL do backend; o gate tbls confere o manifesto contra um PostgreSQL descartável migrado",
+    "production_structure": "docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md",
+    "decisions": "docs/status/DECISOES_PENDENTES_2026-09-22.md",
+    "measurement": "docs/flows/_p0/privacidade-telemetria.md"
+  },
+  "decisions": {
+    "D-22": "Exportação gerada sob demanda e entregue como download, sem guardar; só dados do próprio usuário, com IDs de outras pessoas anonimizados; sem hashes nem fingerprints internos.",
+    "D-23": "Exclusão orquestrada por outbox; caches com TTL de até 24 h; Sentry sem o ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra o deck público de quem saiu são anonimizadas.",
+    "D-24": "Histórico de aceites guardado como prova de consentimento; confirmar com o advogado.",
+    "D-25": "Este inventário é P0 CORE e vem antes da exportação, da exclusão e do DCK-P0-04.",
+    "D-26": "Testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono.",
+    "D-29": "Prompt bruto do Generate retido por 30 dias e fora de decks.description.",
+    "D-30": "Lixeira de decks com purge em 30 dias; deck na lixeira entra na exportação.",
+    "D-32": "Jobs de IA retidos por 24 h."
+  },
+  "vocabulary": {
+    "category": [
+      "account",
+      "user_content",
+      "user_activity",
+      "ai_runtime",
+      "battle",
+      "social",
+      "trade",
+      "moderation",
+      "security",
+      "privacy_control",
+      "catalog",
+      "reference",
+      "operational"
+    ],
+    "subject_kind": [
+      "account_holder",
+      "staff",
+      "third_party_public",
+      "none"
+    ],
+    "retention_class": [
+      "account_lifetime",
+      "ttl",
+      "legal_hold",
+      "third_party_reference",
+      "not_personal"
+    ],
+    "deletion_mode": [
+      "delete",
+      "anonymize",
+      "cascade",
+      "keep_legal",
+      "gap",
+      "outside_account_scope",
+      "not_personal"
+    ],
+    "column_export": {
+      "include": "vai para a exportação como está",
+      "include_if_subject_authored": "vai só quando o titular é o autor da linha",
+      "person_ref": "UUID de pessoa: mantido se for o titular; pseudônimo se for outra pessoa",
+      "deck_ref": "UUID de deck: mantido se for do titular; pseudônimo se for de outra pessoa",
+      "entity_ref": "referência genérica: mantida se for do titular ou de algo de que ele participa; pseudônimo nos demais casos",
+      "omit_secret": "segredo de autenticação ou do aparelho",
+      "omit_hash": "hash, fingerprint, chave de cache ou de idempotência",
+      "omit_internal": "estado operacional interno",
+      "omit_third_party": "conteúdo de outra pessoa",
+      "omit_catalog_id": "UUID interno do catálogo; a identidade pública da carta vai em card_identity"
+    }
+  },
+  "export_policy": {
+    "decision": "D-22",
+    "state": "Política da D-22, ainda não implementada: em 47dc3b698, 25 relações saem por to_jsonb da linha inteira (inclusive request_fingerprint, request_key, cache_key e hashes de deck), battle_jobs sai por denylist e IDs de outras pessoas saem crus. A implementação é o BT-PRIV-001.",
+    "delivery": "POST /users/me/export com a senha atual; gerado sob demanda numa transação somente leitura e devolvido como anexo com Cache-Control no-store; nada é guardado no servidor",
+    "pseudonym": "HMAC-SHA256 com chave aleatória por exportação: a mesma pessoa ou deck de terceiro recebe o mesmo pseudônimo dentro do arquivo e outro em cada exportação",
+    "nested_forbidden_keys": {
+      "exact": [
+        "cache_key",
+        "request_key",
+        "request_fingerprint",
+        "fingerprint",
+        "idempotency_key",
+        "lease_token",
+        "lease_owner",
+        "deck_signature",
+        "password_hash",
+        "token_hash",
+        "fcm_token",
+        "access_token",
+        "refresh_token",
+        "jwt"
+      ],
+      "suffixes": [
+        "_fingerprint",
+        "_hash"
+      ]
+    }
+  },
+  "decided_retention": [
+    {
+      "decision": "D-23",
+      "rule": "caches com TTL de até 24 h",
+      "applies_to": [
+        "ai_optimize_cache",
+        "artifact:endpoint_cache_memory"
+      ],
+      "status": "ai_optimize_cache vence em 6 h; o EndpointCache não tem teto de TTL e as entradas vencidas ficam na memória (BT-PRIV-002)"
+    },
+    {
+      "decision": "D-29",
+      "rule": "prompt bruto do Generate retido por 30 dias, fora de decks.description",
+      "applies_to": [
+        "decks.description",
+        "ai_generate_jobs.result"
+      ],
+      "status": "não implementado: o app grava o prompt em decks.description e o job que o ecoa some em 30 min; o armazenamento do prompt com prazo é o DCK-P0-04"
+    },
+    {
+      "decision": "D-30",
+      "rule": "purga da lixeira de decks em 30 dias",
+      "applies_to": [
+        "decks.deleted_at"
+      ],
+      "status": "não implementado: DCK-P0-06"
+    },
+    {
+      "decision": "D-32",
+      "rule": "jobs de IA retidos por 24 h",
+      "applies_to": [
+        "ai_generate_jobs",
+        "ai_optimize_jobs"
+      ],
+      "status": "o código ainda apaga em 30 min (ai_generate_job.dart:12, optimize_job.dart:23, AI_JOB_RETENTION_MINUTES=30): BT-AI-032"
+    },
+    {
+      "decision": "D-23",
+      "rule": "backups não são reescritos na exclusão; o prazo de rotação entra na política",
+      "applies_to": [
+        "artifact:backups"
+      ],
+      "status": "prazo de rotação ainda não decidido; backup local sem cifra e sem cópia fora da máquina (BT-DR-001)"
+    }
+  ],
+  "tables": {
+    "account_deletion_receipts": {
+      "category": "privacy_control",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Recibo de cada exclusão de conta (versão da política, modo, resumo de retenção), sem identificador do titular.",
+      "owner": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "não tem vínculo com o titular"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "Gravado na própria exclusão."
+      },
+      "legal_exception": "Prova de que a exclusão foi feita; não guarda identificador da pessoa."
+    },
+    "activation_funnel_events": {
+      "category": "user_activity",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Funil de ativação (eventos do onboarding e do primeiro deck).",
+      "owner": "server/routes/users/me/activation-events/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo: nenhum job apaga eventos antigos",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "prazo de retenção de analytics não decidido; o job de limpeza não toca a tabela (BT-KPI-001)"
+      },
+      "export": {
+        "section": "data.activation_events"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "event_name": "include",
+        "format": "include",
+        "id": "include",
+        "metadata": "include",
+        "source": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_generate_jobs": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Jobs assíncronos do Generate; o resultado ecoa o prompt do usuário e o deck gerado.",
+      "owner": "server/lib/ai_generate_job.dart; server/routes/ai/generate/**",
+      "retention": {
+        "class": "ttl",
+        "period": "decidido: 24 h; hoje: 30 min",
+        "decision": "D-32",
+        "enforced_by": "limpeza no próprio serviço a cada job novo (ai_generate_job.dart:12 e :345, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
+        "gap": "o código ainda apaga em 30 min; subir para 24 h é o BT-AI-032. O prompt bruto retido por 30 dias (D-29) depende do DCK-P0-04"
+      },
+      "export": {
+        "section": "data.ai_activity.generate_jobs"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "cache_key": "omit_hash",
+        "cancelled_at": "include",
+        "created_at": "include",
+        "error": "omit_internal",
+        "format": "include",
+        "id": "include",
+        "request_fingerprint": "omit_hash",
+        "request_key": "omit_hash",
+        "result": "include",
+        "result_status_code": "include",
+        "stage": "include",
+        "stage_number": "include",
+        "status": "include",
+        "total_stages": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_logs": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Registro de chamadas de IA (endpoint, modelo, resumo de até 500 caracteres do prompt e da resposta, tokens) e reservas de cota do plano.",
+      "owner": "server/lib/ai_log_service.dart; server/lib/plan_service.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "180 dias (AI_LOG_RETENTION_DAYS); reservas de cota não confirmadas em 10 min",
+        "decision": null,
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
+        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+      },
+      "export": {
+        "section": "data.ai_activity.logs"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "endpoint": "include",
+        "error_message": "omit_internal",
+        "id": "include",
+        "input_tokens": "omit_internal",
+        "latency_ms": "omit_internal",
+        "model": "include",
+        "output_tokens": "omit_internal",
+        "prompt_summary": "include",
+        "response_summary": "include",
+        "success": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_optimize_cache": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Cache do resultado do Optimize por usuário, deck e assinatura do deck.",
+      "owner": "server/lib/ai/optimize_cache_support.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "6 h (expires_at), dentro do teto de 24 h da D-23",
+        "decision": "D-23",
+        "enforced_by": "leitura ignora linha vencida; a purga física só roda na manutenção probabilística das gravações (optimize_cache_support.dart:147-151)",
+        "gap": "sem gravação nova, linhas vencidas podem ficar no banco além de 24 h"
+      },
+      "export": {
+        "section": "data.ai_activity.optimize_cache"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "cache_key": "omit_hash",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "deck_signature": "omit_hash",
+        "expires_at": "include",
+        "id": "include",
+        "payload": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_optimize_fallback_telemetry": {
+      "category": "user_activity",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Telemetria do fallback do Optimize (contagens de candidatos e trocas).",
+      "owner": "server/lib/ai/optimize_fallback_telemetry_support.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "180 dias (TELEMETRY_RETENTION_DAYS)",
+        "decision": null,
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
+        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+      },
+      "export": {
+        "section": "data.ai_activity.fallback_telemetry"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "applied": "include",
+        "candidate_count": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "id": "include",
+        "mode": "include",
+        "no_candidate": "include",
+        "no_replacement": "include",
+        "pair_count": "include",
+        "recognized_format": "include",
+        "replacement_count": "include",
+        "triggered": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_optimize_jobs": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Jobs assíncronos do Optimize, com o resultado sugerido para o deck.",
+      "owner": "server/lib/ai/optimize_job.dart; server/routes/ai/optimize/**",
+      "retention": {
+        "class": "ttl",
+        "period": "decidido: 24 h; hoje: 30 min",
+        "decision": "D-32",
+        "enforced_by": "limpeza no próprio serviço a cada job novo (optimize_job.dart:23 e :450, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
+        "gap": "o código ainda apaga em 30 min; subir para 24 h é o BT-AI-032"
+      },
+      "export": {
+        "section": "data.ai_activity.optimize_jobs"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "archetype": "include",
+        "cancelled_at": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "error": "omit_internal",
+        "id": "include",
+        "quality_error": "include",
+        "request_fingerprint": "omit_hash",
+        "request_key": "omit_hash",
+        "result": "include",
+        "stage": "include",
+        "stage_number": "include",
+        "status": "include",
+        "total_stages": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_user_preferences": {
+      "category": "account",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Preferências de IA escolhidas pelo usuário (cores, arquétipo, bracket, orçamento).",
+      "owner": "server/lib/ai/optimize_runtime_support.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.ai_preferences"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "budget_tier": "include",
+        "created_at": "include",
+        "keep_theme_default": "include",
+        "playstyle": "include",
+        "preferred_archetype": "include",
+        "preferred_bracket": "include",
+        "preferred_colors": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "archetype_counters": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Contra-estratégias por arquétipo.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "battle_job_live_records": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "job_id -> battle_jobs.user_id",
+      "purpose": "Registros ao vivo de um job de simulação (eventos visíveis do replay).",
+      "owner": "server/lib/battle/battle_live_store.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o job existir",
+        "decision": null,
+        "enforced_by": "FK battle_job_live_records.job_id ON DELETE CASCADE",
+        "gap": null
+      },
+      "export": {
+        "section": "data.battle_live_records",
+        "reason": "só os registros com public_visible"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK battle_job_live_records.job_id -> battle_jobs ON DELETE CASCADE",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "content_truncated": "include",
+        "created_at": "include",
+        "fingerprint": "omit_hash",
+        "id": "omit_internal",
+        "job_id": "include",
+        "kind": "include",
+        "payload": "include",
+        "public_visible": "omit_internal",
+        "record_id": "include",
+        "schema_version": "omit_internal",
+        "sequence": "include",
+        "source_kind": "omit_internal",
+        "source_process_id": "omit_internal",
+        "source_record_id": "omit_internal",
+        "source_sequence": "omit_internal",
+        "source_truncated": "include"
+      }
+    },
+    "battle_jobs": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Fila de simulações assíncronas (estado, progresso, motor).",
+      "owner": "server/lib/battle/battle_job_store.dart; server/bin/battle_job_worker.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo: nenhum job apaga",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem prazo de retenção decidido"
+      },
+      "export": {
+        "section": "data.battle_jobs"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apaga os jobs do titular. Jobs de outras pessoas contra o deck público dele perdem o deck_b_id (FK SET NULL), mas guardam o hash e, em request_payload, a lista do deck."
+      },
+      "legal_exception": null,
+      "columns": {
+        "attempt_count": "omit_internal",
+        "attempt_id": "include",
+        "cancel_requested_at": "include",
+        "claimed_at": "omit_internal",
+        "created_at": "include",
+        "deck_a_hash": "omit_hash",
+        "deck_a_id": "deck_ref",
+        "deck_b_hash": "omit_hash",
+        "deck_b_id": "deck_ref",
+        "deck_hash_schema": "omit_internal",
+        "engine": "include",
+        "engine_build": "include",
+        "engine_commit": "include",
+        "engine_lane": "omit_internal",
+        "engine_process_id": "omit_internal",
+        "engine_process_started_at": "omit_internal",
+        "engine_request_correlation_source": "omit_internal",
+        "engine_request_hash": "omit_hash",
+        "engine_request_schema_version": "omit_internal",
+        "engine_version": "include",
+        "error_code": "include",
+        "finished_at": "include",
+        "heartbeat_at": "omit_internal",
+        "id": "include",
+        "idempotency_key": "omit_hash",
+        "lease_expires_at": "omit_internal",
+        "lease_owner": "omit_internal",
+        "lease_token": "omit_secret",
+        "progress_current": "include",
+        "progress_total": "include",
+        "quota_global_limit": "omit_internal",
+        "quota_user_limit": "omit_internal",
+        "replay_id": "include",
+        "request_fingerprint": "omit_hash",
+        "request_hash": "omit_hash",
+        "request_payload": "omit_internal",
+        "request_schema_version": "include",
+        "requested_engine": "include",
+        "schema_version": "include",
+        "stage": "include",
+        "started_at": "include",
+        "status": "include",
+        "terminal_reason": "include",
+        "timeout_ms": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "battle_replay_annotations": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Anotações do usuário sobre um replay.",
+      "owner": "server/lib/battle/battle_replay_annotation_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta e o replay existirem",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.battle_replay_annotations"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Também caem por cascata quando o replay ou o deck sujeito são apagados."
+      },
+      "legal_exception": null,
+      "columns": {
+        "attempt_id": "include",
+        "created_at": "include",
+        "deck_hash_schema": "omit_internal",
+        "event_ref": "include",
+        "id": "include",
+        "idempotency_key": "omit_hash",
+        "kind": "include",
+        "payload": "include",
+        "replay_id": "include",
+        "request_fingerprint": "omit_hash",
+        "snapshot_ref": "include",
+        "subject_deck_hash": "omit_hash",
+        "subject_deck_id": "deck_ref",
+        "subject_deck_key": "include",
+        "subject_deck_revision": "omit_hash",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "battle_simulation_attempts": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Tentativa de simulação: pedido, desfecho e proveniência do motor.",
+      "owner": "server/lib/battle/battle_simulation_attempt_service.dart; server/lib/battle/interactive_battle_store.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo: nenhum job apaga",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem prazo de retenção decidido"
+      },
+      "export": {
+        "section": "data.battle_simulation_attempts"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Hoje apaga também as tentativas de outras pessoas contra o deck do titular; a D-23 manda anonimizar (BT-BAT-002)."
+      },
+      "legal_exception": null,
+      "columns": {
+        "deck_a_hash": "omit_hash",
+        "deck_a_id": "deck_ref",
+        "deck_b_hash": "omit_hash",
+        "deck_b_id": "deck_ref",
+        "deck_hash_schema": "omit_internal",
+        "engine": "include",
+        "engine_build": "include",
+        "engine_commit": "include",
+        "engine_process_id": "omit_internal",
+        "engine_request_correlation_source": "omit_internal",
+        "engine_version": "include",
+        "error_code": "include",
+        "events_truncated": "include",
+        "finished_at": "include",
+        "id": "include",
+        "job_request_hash": "omit_hash",
+        "job_request_schema_version": "omit_internal",
+        "outcome": "include",
+        "outcome_reason": "include",
+        "provenance": "include",
+        "replay_id": "include",
+        "request_hash": "omit_hash",
+        "request_id": "omit_internal",
+        "request_schema_version": "include",
+        "simulation_type": "include",
+        "snapshots_truncated": "include",
+        "started_at": "include",
+        "test_objective": "include",
+        "timeout_ms": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "battle_simulations": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "deck_a_id -> decks.user_id (o deck A é sempre de quem iniciou)",
+      "purpose": "Replay de simulação (log da partida e métricas). O deck B pode ser o deck público de outra pessoa.",
+      "owner": "server/lib/battle/battle_simulation_persistence_service.dart; server/routes/ai/simulate/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo: nenhum job apaga",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem prazo de retenção decidido para replays"
+      },
+      "export": {
+        "section": "data.battle_simulations"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Hoje a exclusão apaga toda simulação que cite um deck do titular, inclusive as que outra pessoa rodou contra o deck público dele; a D-23 manda anonimizar essas (BT-BAT-002)."
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "deck_a_id": "deck_ref",
+        "deck_b_id": "deck_ref",
+        "game_log": "include",
+        "id": "include",
+        "metrics": "include",
+        "simulation_type": "include",
+        "turns_played": "include",
+        "winner_deck_id": "deck_ref"
+      }
+    },
+    "card_battle_rules": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Regras de Battle por carta, com revisão da equipe (reviewed_by é rótulo de processo, não conta de usuário).",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_combos": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Combos conhecidos (Commander Spellbook).",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_function_tags": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Funções de cada carta para a IA.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_legalities": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Legalidade de cada carta por formato.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_localized_names": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Nomes localizados das cartas para o import.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_meta_insights": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Uso agregado de carta no meta.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_role_scores": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Pontuação de papel por carta.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_rulings": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Rulings oficiais das cartas.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "card_semantic_tags_v2": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Tags semânticas de carta.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "cards": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Catálogo de cartas (Scryfall).",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "combo_cards": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Cartas de cada combo.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_card_synergy": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Sinergia agregada entre comandante e carta.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_card_usage": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Contagem agregada de uso de carta por comandante, sem vínculo com conta.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_learned_decks": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Decks curados pelo laboratório Hermes (source_system), com ativação desligada.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_reference_card_stats": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Estatística de referência por comandante.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_reference_deck_analysis": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Análise agregada do corpus de referência.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_reference_deck_cards": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Cartas do corpus externo de referência.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_reference_decks": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Decks do corpus externo de referência.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "commander_reference_profiles": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Perfil de referência por comandante.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "content_report_appeals": {
+      "category": "moderation",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "appellant_user_id",
+      "purpose": "Recursos contra decisões de moderação.",
+      "owner": "server/lib/social_safety_service.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "a exclusão de conta não trata a tabela"
+      },
+      "export": {
+        "section": "data.content_report_appeals",
+        "reason": "só os recursos do titular",
+        "gap": "fora da exportação atual"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "O receipt da exclusão diz moderation_records: anonymized, mas o recurso fica com o texto e o apelante."
+      },
+      "legal_exception": "Registro de moderação.",
+      "columns": {
+        "appellant_user_id": "person_ref",
+        "created_at": "include",
+        "id": "include",
+        "reason": "include",
+        "report_id": "include",
+        "resolution": "include",
+        "reviewed_at": "include",
+        "reviewed_by": "omit_third_party",
+        "status": "include"
+      }
+    },
+    "content_reports": {
+      "category": "moderation",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "reporter_user_id",
+      "purpose": "Denúncias de conteúdo feitas pelo usuário e sua resolução.",
+      "owner": "server/lib/social_safety_service.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "mantida depois da exclusão, anonimizada",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.content_reports",
+        "reason": "só as denúncias feitas pelo titular"
+      },
+      "deletion": {
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "reporter_user_id vira nulo e details vira vazio; evidence, enviada pelo denunciante, não é limpa hoje."
+      },
+      "legal_exception": "Registro de moderação e segurança; confirmar o prazo com o advogado (BT-LEGAL-001).",
+      "columns": {
+        "created_at": "include",
+        "details": "include",
+        "evidence": "include",
+        "id": "include",
+        "priority": "omit_internal",
+        "reason": "include",
+        "reporter_user_id": "person_ref",
+        "resolution": "include",
+        "resolution_action": "include",
+        "reviewed_at": "include",
+        "reviewed_by": "omit_third_party",
+        "sla_due_at": "omit_internal",
+        "status": "include",
+        "target_id": "entity_ref",
+        "target_type": "include",
+        "updated_at": "include"
+      }
+    },
+    "conversations": {
+      "category": "social",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_a_id, user_b_id",
+      "purpose": "Conversas de mensagem direta entre duas contas.",
+      "owner": "server/routes/conversations/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a outra pessoa mantiver a conversa",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.conversations"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "A conversa fica para a outra pessoa; as mensagens do titular são substituídas e ele aparece como 'Usuário excluído'."
+      },
+      "legal_exception": "A outra pessoa mantém o próprio histórico de conversa; confirmar com o advogado (BT-LEGAL-001).",
+      "columns": {
+        "created_at": "include",
+        "id": "include",
+        "last_message_at": "include",
+        "user_a_id": "person_ref",
+        "user_b_id": "person_ref"
+      }
+    },
+    "data_source_snapshots": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Proveniência das importações de dados externos.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "deck_cards": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "deck_id -> decks.user_id",
+      "purpose": "Cartas de cada deck.",
+      "owner": "server/routes/decks/[id]/cards/**; server/routes/import/**",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o deck existir",
+        "decision": null,
+        "enforced_by": "FK deck_cards.deck_id ON DELETE CASCADE",
+        "gap": null
+      },
+      "export": {
+        "section": "data.deck_cards"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK deck_cards.deck_id -> decks ON DELETE CASCADE",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "card_id": "omit_catalog_id",
+        "condition": "include",
+        "deck_id": "deck_ref",
+        "id": "include",
+        "is_commander": "include",
+        "quantity": "include"
+      }
+    },
+    "deck_comments": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Comentários que o usuário escreveu em decks da comunidade.",
+      "owner": "server/lib/community_engagement_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.comments"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Comentários de outras pessoas nos decks do titular caem por cascata quando os decks são apagados."
+      },
+      "legal_exception": null,
+      "columns": {
+        "body": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "id": "include",
+        "status": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "deck_learning_events": {
+      "category": "user_activity",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "deck_id -> decks.user_id",
+      "purpose": "Eventos de aprendizado derivados do deck (lista de cartas e comandante) para o laboratório Hermes. A escrita depende de learning_writes, hoje OFF.",
+      "owner": "server/lib/ai/deck_learning_event_support.dart; server/bin/pull_learning_events.py (cópia para o SQLite Hermes)",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o deck existir",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)"
+      },
+      "export": {
+        "section": "data.deck_learning_events"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apagada por deck do titular; o trigger manaloom_guard_deck_learning_event recusa evento novo de deck com tombstone."
+      },
+      "legal_exception": null,
+      "columns": {
+        "card_count": "include",
+        "commander_name": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "event_data": "include",
+        "format": "include",
+        "id": "include",
+        "source": "include",
+        "synced_at": "omit_internal",
+        "synced_to_hermes": "omit_internal"
+      }
+    },
+    "deck_matchups": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "deck_id -> decks.user_id",
+      "purpose": "Resultado legado de simulação de confronto entre dois decks (POST /ai/simulate-matchup, desligada e com remoção decidida na D-31).",
+      "owner": "server/routes/ai/simulate-matchup/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o deck existir",
+        "decision": null,
+        "enforced_by": "FK deck_matchups.deck_id e opponent_deck_id ON DELETE CASCADE",
+        "gap": null
+      },
+      "export": {
+        "section": "data.deck_matchups",
+        "gap": "fora da exportação atual"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK deck_matchups.deck_id/opponent_deck_id -> decks ON DELETE CASCADE",
+        "notes": "Confrontos de outras pessoas contra o deck do titular também caem."
+      },
+      "legal_exception": null,
+      "columns": {
+        "deck_id": "deck_ref",
+        "id": "include",
+        "notes": "include",
+        "opponent_deck_id": "deck_ref",
+        "updated_at": "include",
+        "win_rate": "include"
+      }
+    },
+    "deck_optimization_events": {
+      "category": "user_activity",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Histórico de otimizações aplicadas ou revertidas no deck (antes, depois e contexto).",
+      "owner": "server/lib/decks/deck_optimization_history_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta e o deck existirem",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.optimization_events"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "additions": "include",
+        "after_snapshot": "include",
+        "archetype": "include",
+        "battle_message": "include",
+        "battle_status": "include",
+        "before_snapshot": "include",
+        "bracket": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "event_type": "include",
+        "id": "include",
+        "intensity": "include",
+        "mode": "include",
+        "recommendation_context": "include",
+        "removals": "include",
+        "report_payload": "include",
+        "selected_change_count": "include",
+        "user_id": "person_ref",
+        "validation_status": "include"
+      }
+    },
+    "deck_weakness_reports": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "deck_id -> decks.user_id",
+      "purpose": "Relatório legado de fraquezas do deck (POST /ai/weakness-analysis, desligada e com remoção decidida na D-31).",
+      "owner": "server/routes/ai/weakness-analysis/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o deck existir",
+        "decision": null,
+        "enforced_by": "FK deck_weakness_reports.deck_id ON DELETE CASCADE",
+        "gap": null
+      },
+      "export": {
+        "section": "data.deck_weakness_reports",
+        "gap": "fora da exportação atual"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK deck_weakness_reports.deck_id -> decks ON DELETE CASCADE",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "addressed": "include",
+        "auto_detected": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "description": "include",
+        "id": "include",
+        "recommendations": "include",
+        "severity": "include",
+        "weakness_type": "include"
+      }
+    },
+    "decks": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Decks do usuário, com descrição, validação e preço calculado. A descrição pode conter o prompt bruto do Generate, porque o app o grava ali ao salvar (app/lib/features/decks/screens/deck_generate_screen.dart:883).",
+      "owner": "server/routes/decks/**; server/routes/import/**",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e deveria ser purgado em 30 dias",
+        "decision": "D-30",
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "a purga da lixeira em 30 dias ainda não existe (DCK-P0-06); o prompt bruto em decks.description contraria a D-29 (DCK-P0-04)"
+      },
+      "export": {
+        "section": "data.decks"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Antes de apagar, grava tombstone HMAC de cada deck (privacy_deleted_deck_tombstones). A cascata apaga deck_cards, deck_matchups, deck_weakness_reports, post_game_notes do deck, deck_comments no deck (inclusive de outras pessoas), deck_optimization_events, ai_optimize_jobs do deck e anotações de replay com o deck como sujeito."
+      },
+      "legal_exception": null,
+      "columns": {
+        "archetype": "include",
+        "bracket": "include",
+        "created_at": "include",
+        "deleted_at": "include",
+        "description": "include",
+        "format": "include",
+        "id": "include",
+        "is_public": "include",
+        "name": "include",
+        "pricing_currency": "include",
+        "pricing_missing_cards": "include",
+        "pricing_source": "include",
+        "pricing_total": "include",
+        "pricing_updated_at": "include",
+        "strengths": "include",
+        "synergy_score": "include",
+        "user_id": "person_ref",
+        "validation_reasons": "include",
+        "validation_state": "include",
+        "validation_updated_at": "include",
+        "weaknesses": "include"
+      }
+    },
+    "direct_messages": {
+      "category": "social",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "sender_id",
+      "purpose": "Mensagens diretas.",
+      "owner": "server/routes/conversations/[id]/messages.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conversa existir",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.direct_messages_sent",
+        "reason": "só as mensagens enviadas pelo titular"
+      },
+      "deletion": {
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "O texto das mensagens enviadas pelo titular vira '[mensagem removida pelo titular]'."
+      },
+      "legal_exception": null,
+      "columns": {
+        "client_request_id": "omit_internal",
+        "conversation_id": "include",
+        "created_at": "include",
+        "id": "include",
+        "message": "include",
+        "moderation_status": "include",
+        "read_at": "include",
+        "sender_id": "person_ref"
+      }
+    },
+    "edhrec_card_snapshots": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Snapshots do EDHREC.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "email_verification_tokens": {
+      "category": "security",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Hash de token de verificação de e-mail.",
+      "owner": "server/lib/auth_service.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "vale 24 h (auth_service.dart:401); a linha fica depois de usada ou vencida",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "sem purga das linhas vencidas e a exclusão de conta não as apaga"
+      },
+      "export": {
+        "section": null,
+        "reason": "segredo de autenticação"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "Os fluxos exigem conta ativa (auth_service.dart:413)."
+      },
+      "legal_exception": null
+    },
+    "external_commander_meta_candidates": {
+      "category": "reference",
+      "subject_kind": "third_party_public",
+      "personal_data": true,
+      "subject_link": null,
+      "purpose": "Candidatos de meta de torneios externos (EDHTop16 e afins) para pesquisa; o research_payload pode trazer o nome público do jogador.",
+      "owner": "server/lib/meta/external_commander_deck_expansion_support.dart",
+      "retention": {
+        "class": "third_party_reference",
+        "period": "sem prazo; dado público de terceiros, não de contas do BrewTact",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "base legal e prazo para nome de jogador de torneio não decididos (BT-LEGAL-001)"
+      },
+      "export": {
+        "section": null,
+        "reason": "não é dado de conta do BrewTact"
+      },
+      "deletion": {
+        "mode": "outside_account_scope",
+        "by": null,
+        "notes": "A exclusão de conta não se aplica: são pessoas de fora do produto."
+      },
+      "legal_exception": null
+    },
+    "format_staples": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Staples por formato.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "interactive_battle_records": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "session_id -> interactive_battle_sessions.user_id",
+      "purpose": "Registros de uma sessão de Jogar contra IA (visão privada do participante e referências do replay público).",
+      "owner": "server/lib/battle/interactive_battle_store.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a sessão existir",
+        "decision": null,
+        "enforced_by": "FK interactive_battle_records.session_id ON DELETE CASCADE",
+        "gap": null
+      },
+      "export": {
+        "section": "data.interactive_battle_records",
+        "reason": "só visibility private_user e public_replay_ref"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK interactive_battle_records.session_id -> interactive_battle_sessions ON DELETE CASCADE",
+        "notes": "Registros são imutáveis (trigger manaloom_interactive_battle_record_no_update)."
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "id": "include",
+        "idempotency_key": "omit_hash",
+        "option_id": "include",
+        "payload": "include",
+        "prompt_id": "include",
+        "record_kind": "include",
+        "request_fingerprint": "omit_hash",
+        "schema_version": "include",
+        "sequence": "include",
+        "session_id": "include",
+        "state_version": "include",
+        "visibility": "include"
+      }
+    },
+    "interactive_battle_sessions": {
+      "category": "battle",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Sessão de Jogar contra IA: estado privado do participante e prompt ativo.",
+      "owner": "server/lib/battle/interactive_battle_store.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "a sessão expira pelo ttl_seconds (expires_at), mas a linha fica até a exclusão da conta",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sessão expirada não é purgada"
+      },
+      "export": {
+        "section": "data.interactive_battle_sessions"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Sessões de outras pessoas contra o deck público do titular perdem o deck_b_id (FK SET NULL) e guardam o hash e a lista em request_payload."
+      },
+      "legal_exception": null,
+      "columns": {
+        "active_prompt": "include",
+        "active_prompt_id": "omit_internal",
+        "attempt_id": "include",
+        "created_at": "include",
+        "deck_a_hash": "omit_hash",
+        "deck_a_id": "deck_ref",
+        "deck_b_hash": "omit_hash",
+        "deck_b_id": "deck_ref",
+        "deck_hash_schema": "omit_internal",
+        "engine": "include",
+        "engine_build": "include",
+        "engine_commit": "include",
+        "engine_process_id": "omit_internal",
+        "engine_process_started_at": "omit_internal",
+        "engine_version": "include",
+        "error_code": "include",
+        "expires_at": "include",
+        "finished_at": "include",
+        "id": "include",
+        "idempotency_key": "omit_hash",
+        "last_activity_at": "include",
+        "private_state": "include",
+        "prompt_deadline_at": "include",
+        "replay_id": "include",
+        "request_fingerprint": "omit_hash",
+        "request_hash": "omit_hash",
+        "request_payload": "omit_internal",
+        "request_schema_version": "include",
+        "runtime_session_id": "omit_internal",
+        "schema_version": "include",
+        "started_at": "include",
+        "state_version": "include",
+        "status": "include",
+        "terminal_reason": "include",
+        "ttl_seconds": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "meta_decks": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Decks de meta de fontes públicas (sem nome de jogador).",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "ml_prompt_feedback": {
+      "category": "user_activity",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Retorno do usuário sobre sugestões da IA (cartas aceitas, rejeitadas e comentário).",
+      "owner": "server/lib/ml_knowledge_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo: nenhum job apaga",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem prazo de retenção decidido"
+      },
+      "export": {
+        "section": "data.ai_activity.feedback"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "archetype": "include",
+        "cards_accepted": "include",
+        "cards_rejected": "include",
+        "commander_name": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "effectiveness_score": "include",
+        "id": "include",
+        "prompt_version": "omit_internal",
+        "user_comment": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "moderation_actions": {
+      "category": "moderation",
+      "subject_kind": "staff",
+      "personal_data": true,
+      "subject_link": "moderator_user_id",
+      "purpose": "Ações de moderação (quem moderou, justificativa e evidência).",
+      "owner": "server/lib/social_safety_service.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "moderator_user_id não é anonimizado quando a conta do moderador é excluída"
+      },
+      "export": {
+        "section": null,
+        "reason": "registro da equipe de moderação, não do usuário comum; a resolução aparece na denúncia"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "A FK é ON DELETE SET NULL, mas a conta não é apagada."
+      },
+      "legal_exception": "Registro de moderação."
+    },
+    "notifications": {
+      "category": "social",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Notificações in-app; o título leva o nome de quem agiu.",
+      "owner": "server/lib/notification_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo: nenhum job apaga",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem prazo de retenção decidido"
+      },
+      "export": {
+        "section": "data.notifications"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apaga as do titular e as de outras pessoas que o citam (novo seguidor, troca, conversa)."
+      },
+      "legal_exception": null,
+      "columns": {
+        "body": "omit_third_party",
+        "created_at": "include",
+        "id": "include",
+        "read_at": "include",
+        "reference_id": "entity_ref",
+        "title": "omit_third_party",
+        "type": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "optimize_rejection_penalties": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Penalidades agregadas de rejeição do Optimize, sem vínculo com conta.",
+      "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "password_reset_tokens": {
+      "category": "security",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Hash de token de recuperação de senha.",
+      "owner": "server/lib/auth_service.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "vale 20 min (auth_service.dart:503); a linha fica depois de usada ou vencida",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "sem purga das linhas vencidas e a exclusão de conta não as apaga"
+      },
+      "export": {
+        "section": null,
+        "reason": "segredo de autenticação"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "Os fluxos exigem conta ativa (auth_service.dart:523), então não reativam a conta, mas as linhas ficam."
+      },
+      "legal_exception": null
+    },
+    "post_game_notes": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Notas de pós-jogo do usuário sobre seus decks.",
+      "owner": "server/lib/retention/post_game_note_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir; nota apagada fica com deleted_at, sem purga",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "nota apagada pelo usuário (deleted_at) não tem purga"
+      },
+      "export": {
+        "section": "data.post_game_notes"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "deck_snapshot_hash": "omit_hash",
+        "deck_version_at": "include",
+        "deleted_at": "include",
+        "id": "include",
+        "issues": "include",
+        "notes": "include",
+        "performed_well": "include",
+        "play_session_id": "include",
+        "result": "include",
+        "revision": "include",
+        "session_ended_at": "include",
+        "session_started_at": "include",
+        "table_level": "include",
+        "underperformed": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "post_game_sync_state": {
+      "category": "operational",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Marca d'água da sincronização de notas pós-jogo (só um timestamp).",
+      "owner": "server/bin/** e server/lib/**",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "price_history": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Histórico de preço por carta.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "privacy_deleted_deck_tombstones": {
+      "category": "privacy_control",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Token HMAC de cada deck apagado, que impede recriar dado de aprendizado ligado a ele.",
+      "owner": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "identificador opaco sem vínculo reversível sem a chave"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "Gravado na exclusão; guarda só HMAC com chave versionada."
+      },
+      "legal_exception": "Garantia de não ressurreição do dado apagado."
+    },
+    "privacy_keyring": {
+      "category": "privacy_control",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Chave HMAC versionada dos tombstones (segredo, sem dado pessoal).",
+      "owner": "server/bin/migrate.dart (migração 038)",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto houver tombstone com a versão",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "rate_limit_events": {
+      "category": "security",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "identifier ('user:<uuid>' ou identidade derivada do e-mail)",
+      "purpose": "Contagem de tentativas para limite distribuído (login, recuperação, reverificação).",
+      "owner": "server/lib/distributed_rate_limiter.dart; server/lib/rate_limit_middleware.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "24 h (RATE_LIMIT_EVENT_RETENTION_HOURS); cada acerto também apaga as linhas do mesmo balde e identidade mais velhas que duas janelas",
+        "decision": null,
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory; e distributed_rate_limiter.dart:32",
+        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+      },
+      "export": {
+        "section": null,
+        "reason": "controle de segurança"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apaga pelas identidades do titular (UUID, e-mail, user:<uuid> e a identidade de credencial do e-mail)."
+      },
+      "legal_exception": null
+    },
+    "rules": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Texto de regras.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "schema_migrations": {
+      "category": "operational",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Ledger de migrations.",
+      "owner": "server/bin/** e server/lib/**",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "sets": {
+      "category": "catalog",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Coleções.",
+      "owner": "server/bin/sync_*.dart e ferramentas de catálogo",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "shared_deck_reports": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Relatório de deck compartilhável por link público.",
+      "owner": "server/lib/reports/shareable_report_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck é apagado (D-19)",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas"
+      },
+      "export": {
+        "section": "data.shared_deck_reports"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "description": "include",
+        "expires_at": "include",
+        "id": "include",
+        "is_public": "include",
+        "payload": "include",
+        "title": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "sync_log": {
+      "category": "operational",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Log das sincronizações de catálogo.",
+      "owner": "server/bin/** e server/lib/**",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "sync_state": {
+      "category": "operational",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Estado das sincronizações de catálogo.",
+      "owner": "server/bin/** e server/lib/**",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "trade_items": {
+      "category": "trade",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "owner_id",
+      "purpose": "Itens de cada troca, com snapshot imutável da carta.",
+      "owner": "server/routes/trades/index.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "mantido com a troca",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": "data.trade_items",
+        "reason": "só os itens do titular"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "Fica com a troca; o snapshot é só da carta (sem texto do usuário) e é imutável (trigger manaloom_trade_item_snapshot_immutable)."
+      },
+      "legal_exception": "Parte do registro da troca.",
+      "columns": {
+        "agreed_price": "include",
+        "binder_item_id": "include",
+        "direction": "include",
+        "id": "include",
+        "item_snapshot": "include",
+        "owner_id": "person_ref",
+        "quantity": "include",
+        "snapshot_captured_at": "include",
+        "snapshot_schema_version": "include",
+        "snapshot_status": "include",
+        "trade_offer_id": "include"
+      }
+    },
+    "trade_messages": {
+      "category": "trade",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "sender_id",
+      "purpose": "Mensagens dentro de uma troca.",
+      "owner": "server/routes/trades/[id]/messages.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "mantida com a troca",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.trade_messages",
+        "reason": "só as enviadas pelo titular"
+      },
+      "deletion": {
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Texto vira '[mensagem removida pelo titular]' e anexo vira nulo."
+      },
+      "legal_exception": "Parte do registro da troca.",
+      "columns": {
+        "attachment_type": "include",
+        "attachment_url": "include",
+        "client_request_id": "omit_internal",
+        "created_at": "include",
+        "id": "include",
+        "message": "include",
+        "moderation_status": "include",
+        "sender_id": "person_ref",
+        "trade_offer_id": "include"
+      }
+    },
+    "trade_offers": {
+      "category": "trade",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "sender_id, receiver_id",
+      "purpose": "Propostas de troca ou venda entre duas contas.",
+      "owner": "server/routes/trades/index.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "mantida depois da exclusão, anonimizada",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.trades"
+      },
+      "deletion": {
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte."
+      },
+      "legal_exception": "Registro de negociação entre duas partes (trocas e disputas); confirmar o prazo com o advogado (BT-LEGAL-001).",
+      "columns": {
+        "created_at": "include",
+        "delivery_method": "include",
+        "id": "include",
+        "message": "include_if_subject_authored",
+        "payment_amount": "include",
+        "payment_currency": "include",
+        "payment_method": "include",
+        "receiver_id": "person_ref",
+        "sender_id": "person_ref",
+        "status": "include",
+        "tracking_code": "include",
+        "type": "include",
+        "updated_at": "include"
+      }
+    },
+    "trade_status_history": {
+      "category": "trade",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "changed_by",
+      "purpose": "Histórico de mudanças de status de uma troca.",
+      "owner": "server/routes/trades/[id]/status.dart",
+      "retention": {
+        "class": "legal_hold",
+        "period": "mantido com a troca",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.trade_status_history",
+        "reason": "só as mudanças feitas pelo titular"
+      },
+      "deletion": {
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'."
+      },
+      "legal_exception": "Parte do registro da troca.",
+      "columns": {
+        "changed_by": "person_ref",
+        "created_at": "include",
+        "id": "include",
+        "new_status": "include",
+        "notes": "include",
+        "old_status": "include",
+        "trade_offer_id": "include"
+      }
+    },
+    "user_binder_items": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Fichário: coleção, lista de desejos e itens marcados para troca ou venda.",
+      "owner": "server/routes/binder/index.dart; server/routes/binder/import/apply/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.binder_items"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Trocas que citavam o item ficam com binder_item_id nulo (FK SET NULL) e mantêm o snapshot imutável da carta."
+      },
+      "legal_exception": null,
+      "columns": {
+        "card_id": "omit_catalog_id",
+        "condition": "include",
+        "created_at": "include",
+        "currency": "include",
+        "for_sale": "include",
+        "for_trade": "include",
+        "id": "include",
+        "is_foil": "include",
+        "language": "include",
+        "list_type": "include",
+        "notes": "include",
+        "price": "include",
+        "quantity": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "user_block_events": {
+      "category": "social",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "actor_user_id, target_user_id",
+      "purpose": "Trilha de auditoria de bloquear e desbloquear, com motivo e request_id.",
+      "owner": "server/lib/social_safety_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "sem prazo",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "a exclusão de conta não trata a tabela"
+      },
+      "export": {
+        "section": "data.block_events",
+        "reason": "só os eventos em que o titular agiu",
+        "gap": "fora da exportação atual"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "A FK é ON DELETE SET NULL, mas a conta não é apagada: actor/target e o motivo ficam."
+      },
+      "legal_exception": null,
+      "columns": {
+        "action": "include",
+        "actor_user_id": "person_ref",
+        "created_at": "include",
+        "id": "include",
+        "reason": "include",
+        "request_id": "omit_internal",
+        "target_user_id": "person_ref"
+      }
+    },
+    "user_blocks": {
+      "category": "social",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "blocker_id, blocked_id",
+      "purpose": "Bloqueios entre contas, com motivo opcional em texto livre.",
+      "owner": "server/lib/social_safety_service.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto as duas contas existirem",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "a exclusão de conta não trata a tabela"
+      },
+      "export": {
+        "section": "data.blocks",
+        "reason": "só os bloqueios feitos pelo titular",
+        "gap": "fora da exportação atual"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "A FK é ON DELETE CASCADE, mas a conta é pseudonimizada, não apagada: as linhas ficam."
+      },
+      "legal_exception": null,
+      "columns": {
+        "blocked_id": "person_ref",
+        "blocker_id": "person_ref",
+        "created_at": "include",
+        "reason": "include"
+      }
+    },
+    "user_follows": {
+      "category": "social",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "follower_id, following_id",
+      "purpose": "Quem o usuário segue e quem o segue.",
+      "owner": "server/routes/users/[id]/follow/index.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto as duas contas existirem",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.follows"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apaga as duas direções."
+      },
+      "legal_exception": null,
+      "columns": {
+        "created_at": "include",
+        "follower_id": "person_ref",
+        "following_id": "person_ref",
+        "id": "include"
+      }
+    },
+    "user_plans": {
+      "category": "account",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Plano da conta (beta gratuita) e renovação.",
+      "owner": "server/lib/plan_service.dart; server/lib/auth_service.dart (cadastro)",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "data.plan"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "plan_name": "include",
+        "renews_at": "include",
+        "started_at": "include",
+        "status": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "users": {
+      "category": "account",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "id",
+      "purpose": "Conta: identidade de login, perfil público, preferências de visibilidade e registro de aceite de Termos e Privacidade.",
+      "owner": "server/lib/auth_service.dart (cadastro, login, senha); server/routes/users/me/index.dart (perfil)",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto a conta existir; depois da exclusão a linha fica pseudonimizada",
+        "decision": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
+      },
+      "export": {
+        "section": "account"
+      },
+      "deletion": {
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "A linha não é apagada: usuário, e-mail e senha são trocados por valores aleatórios, nome vira 'Usuário excluído', avatar, localização, notas de troca e token FCM viram nulos e deleted_at é gravado. Registros compartilhados (trocas, conversas, denúncias) continuam apontando para o UUID pseudonimizado."
+      },
+      "legal_exception": "As colunas de aceite (terms_*, privacy_*) ficam na linha pseudonimizada como histórico de consentimento (D-24); confirmar com o advogado (BT-LEGAL-001).",
+      "columns": {
+        "auth_version": "omit_internal",
+        "avatar_url": "include",
+        "binder_visibility": "include",
+        "created_at": "include",
+        "deleted_at": "omit_internal",
+        "display_name": "include",
+        "email": "include",
+        "email_verified_at": "include",
+        "fcm_token": "omit_secret",
+        "id": "include",
+        "location_city": "include",
+        "location_state": "include",
+        "location_visibility": "include",
+        "message_visibility": "include",
+        "password_changed_at": "include",
+        "password_hash": "omit_secret",
+        "privacy_accepted_at": "include",
+        "privacy_version": "include",
+        "profile_visibility": "include",
+        "terms_accepted_at": "include",
+        "terms_version": "include",
+        "trade_notes": "include",
+        "trade_notes_visibility": "include",
+        "trade_visibility": "include",
+        "updated_at": "include",
+        "username": "include"
+      }
+    }
+  },
+  "views": {
+    "binder_item_availability": {
+      "personal_data": true,
+      "base_tables": [
+        "user_binder_items"
+      ],
+      "note": "Derivada do fichário; não guarda dado próprio."
+    },
+    "card_identity_bridge": {
+      "personal_data": false,
+      "base_tables": [
+        "cards"
+      ],
+      "note": "Catálogo."
+    },
+    "card_intelligence_snapshot": {
+      "personal_data": false,
+      "base_tables": [
+        "cards"
+      ],
+      "note": "Catálogo e referência."
+    },
+    "collection_availability_snapshot": {
+      "personal_data": true,
+      "base_tables": [
+        "user_binder_items"
+      ],
+      "note": "Derivada do fichário; não guarda dado próprio."
+    },
+    "commander_learning_snapshot": {
+      "personal_data": false,
+      "base_tables": [
+        "commander_learned_decks"
+      ],
+      "note": "Referência."
+    },
+    "optimize_candidate_quality_summary": {
+      "personal_data": false,
+      "base_tables": [
+        "card_role_scores"
+      ],
+      "note": "Referência."
+    }
+  },
+  "production_only_tables": {
+    "optimization_analysis_logs": {
+      "group": "used_by_code_without_migration",
+      "personal_data": false,
+      "note": "Log de análise do Optimize com nome do comandante e listas de cartas, sem user_id nem deck_id (server/lib/ai/optimize_analysis_support.dart:206); fora da exportação e da exclusão por não ter vínculo com conta."
+    },
+    "synergy_packages": {
+      "group": "used_by_code_without_migration",
+      "personal_data": null,
+      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
+    },
+    "archetype_patterns": {
+      "group": "used_by_code_without_migration",
+      "personal_data": null,
+      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
+    },
+    "theme_contextual_rules": {
+      "group": "used_by_code_without_migration",
+      "personal_data": null,
+      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
+    },
+    "ml_learning_state": {
+      "group": "used_by_code_without_migration",
+      "personal_data": null,
+      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
+    },
+    "card_rulings_legacy": {
+      "group": "used_by_code_without_migration",
+      "personal_data": null,
+      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
+    },
+    "analysis_sources": {
+      "group": "used_by_code_without_migration",
+      "personal_data": null,
+      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
+    },
+    "card_battle_rules_backup_pg780b_hash_new_server": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "card_battle_rules_backup_pg814_hash_new_server": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg252_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg253_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg254_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg255_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg256_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg257_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "pg596b_oracle_hash_backfill_backup": {
+      "group": "manual_operation_backup",
+      "personal_data": null,
+      "note": "Backup de operação manual; o receipt abrevia os nomes pg252 a pg257. Tratamento no BT-DB-006 (D-49, D-50)."
+    },
+    "card_deck_profiles": {
+      "group": "unused_by_product_code",
+      "personal_data": null,
+      "note": "Sem uso no código de produto, 124 MB, com FK deck_id -> decks: derivada de decks de usuários. Tratamento no BT-DB-006."
+    },
+    "card_extended": {
+      "group": "unused_by_product_code",
+      "personal_data": null,
+      "note": "Sem uso no código de produto; colunas não inspecionadas."
+    },
+    "posts": {
+      "group": "unused_by_product_code",
+      "personal_data": null,
+      "note": "Sem uso no código de produto; colunas não inspecionadas."
+    },
+    "search_subjects": {
+      "group": "unused_by_product_code",
+      "personal_data": null,
+      "note": "Sem uso no código de produto; colunas não inspecionadas."
+    }
+  },
+  "production_only_columns": {
+    "ml_prompt_feedback.user_rating": {
+      "personal_data": true,
+      "note": "Nota do usuário sobre a sugestão da IA; existe só na produção (receipt de 2026-09-22) e nenhum código a usa. Fica fora da exportação, e a exclusão apaga a linha inteira do titular."
+    },
+    "cards.edhrec_rank": {
+      "personal_data": false,
+      "note": "Catálogo; existe só na produção e é lida pelo Optimize (server/lib/ai/otimizacao.dart:563)."
+    },
+    "card_meta_insights.id": {
+      "personal_data": false,
+      "note": "Catálogo; na produção a tabela tem id e não tem created_at."
+    }
+  },
+  "artifacts": {
+    "endpoint_cache_memory": {
+      "kind": "memory_cache",
+      "what": "EndpointCache em memória por réplica (server/lib/endpoint_cache.dart): análise de arquétipo por deck (10 min), payload do Generate por pedido (AI_GENERATE_CACHE_TTL_SECONDS, padrão 600 s, teto 3600 s) e catálogo.",
+      "personal_data": true,
+      "retention": "o TTL só controla o que é servido; a entrada vencida fica na memória até a mesma chave ser lida de novo ou o processo reiniciar",
+      "export": "fora da exportação: cópia derivada e passageira",
+      "deletion": "não há invalidação na exclusão; vale o TTL de até 24 h (D-23)",
+      "decisions": [
+        "D-23"
+      ],
+      "gap": "clearExpired não tem chamador e o TTL não tem teto de 24 h"
+    },
+    "request_metrics_memory": {
+      "kind": "memory_cache",
+      "what": "RequestMetricsService (server/lib/request_metrics_service.dart): contadores por caminho cru, que pode ter UUID de usuário ou deck.",
+      "personal_data": true,
+      "retention": "até o processo reiniciar",
+      "export": "fora da exportação: métrica operacional",
+      "deletion": "não há limpeza na exclusão",
+      "decisions": [],
+      "gap": "o caminho cru com IDs é chave de métrica (BT-OBS-001, BT-SEC-AI-002)"
+    },
+    "interactive_battle_sidecar_memory": {
+      "kind": "sidecar_store",
+      "what": "Estado em memória do motor de Jogar contra IA (services/xmage-sidecar) durante a sessão.",
+      "personal_data": true,
+      "retention": "até o TTL da sessão",
+      "export": "fora da exportação; a sessão persistida entra por interactive_battle_sessions",
+      "deletion": "não recebe aviso da exclusão",
+      "decisions": [],
+      "gap": "sem sinal de cancelamento para o sidecar (BT-PRIV-002, BT-BAT-002)"
+    },
+    "hermes_sqlite_learning": {
+      "kind": "sidecar_store",
+      "what": "SQLite do laboratório Hermes (knowledge.db, tabela user_learning_events), preenchido por server/bin/pull_learning_events.py com deck_id cru e até 200 cartas por evento.",
+      "personal_data": true,
+      "retention": "sem prazo",
+      "export": "fora da exportação",
+      "deletion": "não é apagado na exclusão; hoje contido porque learning_writes está OFF",
+      "decisions": [],
+      "gap": "purga por sujeito no BT-AI-030"
+    },
+    "server_logs": {
+      "kind": "logs",
+      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais.",
+      "personal_data": true,
+      "retention": "rotação do host, não configurada no repositório",
+      "export": "fora da exportação",
+      "deletion": "não há limpeza na exclusão",
+      "decisions": [],
+      "gap": "prazo de rotação dos logs não documentado; pseudonimização é o BT-SEC-AI-002"
+    },
+    "sentry_server": {
+      "kind": "error_tracking",
+      "what": "Sentry do servidor (server/lib/observability.dart): eventos de erro com request_id, método, caminho cru (tag http_path e título) e o ID do usuário (scope.setUser).",
+      "personal_data": true,
+      "retention": "retenção do plano da conta Sentry; conferir no painel do Sentry e registrar aqui",
+      "export": "fora da exportação",
+      "deletion": "não há exclusão por titular no provedor",
+      "decisions": [
+        "D-23"
+      ],
+      "gap": "a D-23 manda parar de enviar o ID do usuário; o caminho cru também leva UUIDs"
+    },
+    "sentry_app": {
+      "kind": "error_tracking",
+      "what": "Sentry do app (app/lib/core/observability/app_observability.dart:240-259): usuário identificado pelo ID da conta.",
+      "personal_data": true,
+      "retention": "retenção do plano da conta Sentry",
+      "export": "fora da exportação",
+      "deletion": "não há exclusão por titular no provedor",
+      "decisions": [
+        "D-23"
+      ],
+      "gap": "a D-23 manda parar de enviar o ID do usuário; a mudança é na raia do app"
+    },
+    "ai_provider": {
+      "kind": "external_processor",
+      "what": "Provedor de IA (OpenAI, modelo gpt-4o-mini no /ready): recebe prompt, lista de cartas e contexto do deck em Generate, Optimize e Analyze.",
+      "personal_data": true,
+      "retention": "retenção do provedor para a API; conferir o contrato e registrar",
+      "export": "fora da exportação",
+      "deletion": "não há exclusão por titular no provedor",
+      "decisions": [],
+      "gap": "disclosure e minimização do provedor no BT-AI-008"
+    },
+    "email_provider": {
+      "kind": "external_processor",
+      "what": "Provedor de e-mail transacional (Resend, integrado em 5dabb08c4): endereço e link de verificação ou recuperação.",
+      "personal_data": true,
+      "retention": "retenção do provedor",
+      "export": "fora da exportação",
+      "deletion": "não há exclusão por titular no provedor",
+      "decisions": [],
+      "gap": "prazo do provedor não documentado"
+    },
+    "push_provider": {
+      "kind": "external_processor",
+      "what": "Firebase Cloud Messaging: token do aparelho (users.fcm_token) e título das notificações, que leva o nome de quem agiu.",
+      "personal_data": true,
+      "retention": "o token some da conta na exclusão; o provedor guarda conforme a política do Firebase",
+      "export": "fora da exportação: segredo do aparelho",
+      "deletion": "users.fcm_token vira nulo na exclusão",
+      "decisions": [],
+      "gap": null
+    },
+    "backups": {
+      "kind": "backup",
+      "what": "Backup local do PostgreSQL de produção feito no BT-REL-000 (sem cifra, nesta máquina); 3 dumps completos de 2026-07-17 e 2026-08-03 fora do git (D-26); schema manaloom_deploy_audit na produção com 1.033 tabelas de backups de operações manuais; 9 tabelas de backup no schema public.",
+      "personal_data": true,
+      "retention": "backups não são reescritos na exclusão; o prazo de rotação entra na política (D-23)",
+      "export": "fora da exportação",
+      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação",
+      "decisions": [
+        "D-23",
+        "D-26"
+      ],
+      "gap": "prazo de rotação não decidido; cópia fora da máquina e cifra em aberto (BT-DR-001); limpeza do manaloom_deploy_audit no BT-DB-006"
+    },
+    "device_storage": {
+      "kind": "device_storage",
+      "what": "Aparelho do usuário: token em armazenamento seguro, rascunhos de mensagem e de deck, notas pós-jogo locais, estado do contador de vida, recibos do funil e snapshots do Lotus (SharedPreferences e sqflite).",
+      "personal_data": true,
+      "retention": "até o app ser desinstalado; o logout limpa só as credenciais (app/lib/features/auth/providers/auth_provider.dart:418-434)",
+      "export": "fora da exportação do servidor",
+      "deletion": "a exclusão não limpa o aparelho",
+      "decisions": [],
+      "gap": "limpeza local depois da exclusão é da raia do app"
+    },
+    "data_export_file": {
+      "kind": "export_file",
+      "what": "Arquivo JSON da exportação (POST /users/me/export).",
+      "personal_data": true,
+      "retention": "gerado sob demanda e entregue como download; o servidor não guarda cópia (transação somente leitura e Cache-Control no-store)",
+      "export": "é a própria exportação",
+      "deletion": "não há o que apagar no servidor",
+      "decisions": [
+        "D-22"
+      ],
+      "gap": null
+    }
+  }
+}
