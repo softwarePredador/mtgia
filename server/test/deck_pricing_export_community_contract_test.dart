@@ -5,17 +5,19 @@ import 'package:test/test.dart';
 void main() {
   group('pricing/export/community source contracts', () {
     test(
-      'pricing route is write-capable and returns current response fields',
+      'pricing route reads catalog prices, writes only the deck snapshot and '
+      'returns current response fields',
       () {
         final source =
             File('routes/decks/[id]/pricing/index.dart').readAsStringSync();
 
+        // D-35: no Scryfall call and no write to `cards` on a user request;
+        // the behavior proof is deck_pricing_read_only_test.dart.
         expect(source, contains('context.request.method != HttpMethod.post'));
-        expect(source, contains("body['force'] == true"));
-        expect(source, contains('UPDATE cards'));
-        expect(source, contains('price_usd = @price'));
-        expect(source, contains('price_source = @source'));
-        expect(source, contains('price_updated_at = NOW()'));
+        expect(source, isNot(contains('package:http/')));
+        expect(source, isNot(contains('api.scryfall.com')));
+        expect(source, isNot(contains('UPDATE cards')));
+        expect(source, contains('c.price_usd'));
         expect(source, contains('UPDATE decks'));
         expect(source, contains('pricing_total = @total'));
 
@@ -52,9 +54,9 @@ void main() {
             File('routes/community/marketplace/index.dart').readAsStringSync();
 
         expect(route, contains('nullableKnownTotal'));
-        expect(route, contains('price_usd = @price'));
-        expect(route, contains("'source': pricingSourceScryfall"));
-        expect(route, contains('_priceFetchTimeout'));
+        expect(route, contains("readNullablePrice(m['price_usd'])"));
+        expect(route, isNot(contains('price_usd = @price')));
+        expect(route, isNot(contains('_priceFetchTimeout')));
         expect(scryfallSync, contains("price_source = 'scryfall'"));
         expect(mtgJsonSync, contains("price_source = 'mtgjson'"));
         expect(

@@ -329,8 +329,11 @@ void main() {
       expect(pricing, contains('missing_price_cards'));
       expect(pricing, contains('does not return `total` or `missing` aliases'));
       expect(pricing, contains('always updates the deck pricing snapshot'));
-      expect(pricing, contains('may update card prices'));
-      expect(pricing, contains('write-capable'));
+      expect(pricing, contains('No Scryfall call and no write to `cards`'));
+      expect(pricing, contains('have no effect since D-35'));
+      expect(pricing, isNot(contains('may update card prices')));
+      expect(pricing, isNot(contains('Scryfall fetches')));
+      expect(pricing, contains('write-capable only because'));
       expect(pricing, contains('not deck strategy evidence'));
 
       expect(export, isNot(contains('deck_id`,')));
