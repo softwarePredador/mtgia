@@ -78,7 +78,11 @@ Future<Response> onRequest(RequestContext context) async {
 
     // Token OCR must not resolve to a normal card with a similar name.
     if (includeTokens) {
-      return cardNotInCatalogResponse(name);
+      return cardNotInCatalogResponse(
+        name,
+        route: catalogDemandRouteResolve,
+        includeTokens: true,
+      );
     }
 
     // ─── 2) Busca local com resolução controlada (prefix/contains únicos) ───
@@ -117,7 +121,7 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     // ─── 3) Carta ausente: sem Scryfall e sem escrita (D-35) ───
-    return cardNotInCatalogResponse(name);
+    return cardNotInCatalogResponse(name, route: catalogDemandRouteResolve);
   } catch (e) {
     print('[ERROR] Erro ao resolver carta: $e');
     return Response.json(

@@ -216,6 +216,13 @@ void main() {
       expect(resolve, contains('cards_resolve_read_only_test.dart'));
       expect(resolve, isNot(contains('Scryfall fallback')));
 
+      // D-63: a demanda de carta ausente sai do log, sem tabela.
+      for (final row in [printings, resolve]) {
+        expect(row, contains('`MANALOOM_CATALOG_CARD_DEMAND` log line'));
+        expect(row, contains('no table and no database write'));
+        expect(row, contains('catalog_card_demand_log_test.dart'));
+      }
+
       expect(batchResolve, contains('card_identity_bridge` first'));
       expect(batchResolve, contains('bridge `match_priority`'));
       expect(batchResolve, contains('before preferred-printing'));

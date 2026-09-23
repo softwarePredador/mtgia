@@ -84,7 +84,13 @@ void main() {
       expect(source, contains("'is_reserved': m['is_reserved'] == true"));
       expect(source, contains("'power': m['power']"));
       expect(source, contains("'toughness': m['toughness']"));
-      expect(source, contains('return cardNotInCatalogResponse(name);'));
+      // D-63: a resposta de carta ausente deixa a linha de demanda da rota.
+      expect(
+        source,
+        contains(
+          'return cardNotInCatalogResponse(name, route: catalogDemandRouteResolve);',
+        ),
+      );
       expect(source, isNot(contains('package:http/')));
       expect(source, isNot(contains('api.scryfall.com')));
       expect(source, isNot(matches(dml)));

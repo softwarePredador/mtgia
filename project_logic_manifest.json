@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "f759eb6148d41a4c41e243d62352e05cf231eaf9dce4511a9b82ad37842e66dc",
+  "source_digest_sha256": "709bac95224ba0636a797bd1b82a2773c85a86813011b11f4ab85133fd1609f6",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 696,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5258,
+    "dart_symbols": 5260,
     "semantic_resolved_files": 696,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42944,
-    "semantic_resolved_call_sites": 68421,
-    "semantic_resolved_type_references": 16208,
+    "semantic_resolved_call_edges": 42955,
+    "semantic_resolved_call_sites": 68434,
+    "semantic_resolved_type_references": 16211,
     "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 691,
     "environment_variables": 718,
-    "tests": 1249,
+    "tests": 1250,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1139,7 +1139,7 @@
         "server/lib/catalog_read_contract.dart"
       ],
       "file_count": 1,
-      "symbol_count": 3,
+      "symbol_count": 5,
       "providers": [],
       "services": []
     },
@@ -26926,13 +26926,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -32911,19 +32911,31 @@
       "name": "_shownName",
       "kind": "function",
       "source": "server/lib/catalog_read_contract.dart",
-      "line": 33
+      "line": 90
     },
     {
       "name": "cardNotInCatalogMessage",
       "kind": "function",
       "source": "server/lib/catalog_read_contract.dart",
-      "line": 16
+      "line": 30
     },
     {
       "name": "cardNotInCatalogResponse",
       "kind": "function",
       "source": "server/lib/catalog_read_contract.dart",
-      "line": 22
+      "line": 36
+    },
+    {
+      "name": "catalogCardDemandLogLine",
+      "kind": "function",
+      "source": "server/lib/catalog_read_contract.dart",
+      "line": 58
+    },
+    {
+      "name": "normalizeCatalogDemandName",
+      "kind": "function",
+      "source": "server/lib/catalog_read_contract.dart",
+      "line": 73
     },
     {
       "name": "_catalogRateLimitEnvironment",
@@ -39261,25 +39273,25 @@
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 275
+      "line": 279
     },
     {
       "name": "_parseBool",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 265
+      "line": 269
     },
     {
       "name": "_resolveLocalCandidate",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 231
+      "line": 235
     },
     {
       "name": "_searchLocal",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 134
+      "line": 138
     },
     {
       "name": "onRequest",
@@ -41529,9 +41541,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42944,
-    "resolved_call_site_count": 68421,
-    "workspace_call_edge_count": 13438,
+    "resolved_call_edge_count": 42955,
+    "resolved_call_site_count": 68434,
+    "workspace_call_edge_count": 13441,
     "unresolved_call_edge_count": 557,
     "unresolved_call_site_count": 768,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -155949,7 +155961,7 @@
       },
       {
         "source": "server/lib/catalog_read_contract.dart",
-        "line": 17,
+        "line": 31,
         "caller": "cardNotInCatalogMessage",
         "kind": "method",
         "lexical_target": "_shownName",
@@ -155960,7 +155972,18 @@
       },
       {
         "source": "server/lib/catalog_read_contract.dart",
-        "line": 27,
+        "line": 46,
+        "caller": "cardNotInCatalogResponse",
+        "kind": "method",
+        "lexical_target": "catalogCardDemandLogLine",
+        "target": "catalogCardDemandLogLine",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/catalog_read_contract.dart",
+        "line": 52,
         "caller": "cardNotInCatalogResponse",
         "kind": "method",
         "lexical_target": "cardNotInCatalogMessage",
@@ -155971,12 +155994,34 @@
       },
       {
         "source": "server/lib/catalog_read_contract.dart",
-        "line": 28,
+        "line": 53,
         "caller": "cardNotInCatalogResponse",
         "kind": "method",
         "lexical_target": "_shownName",
         "target": "_shownName",
         "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/catalog_read_contract.dart",
+        "line": 68,
+        "caller": "catalogCardDemandLogLine",
+        "kind": "method",
+        "lexical_target": "normalizeCatalogDemandName",
+        "target": "normalizeCatalogDemandName",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/catalog_read_contract.dart",
+        "line": 84,
+        "caller": "normalizeCatalogDemandName",
+        "kind": "method",
+        "lexical_target": "sanitizeLogMessage",
+        "target": "sanitizeLogMessage",
+        "target_library": "package:server/log_sanitizer.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -180435,7 +180480,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 141,
+        "line": 145,
         "caller": "_searchLocal",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -180446,7 +180491,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 142,
+        "line": 146,
         "caller": "_searchLocal",
         "kind": "method",
         "lexical_target": "cardIdentitySelectSql",
@@ -180457,7 +180502,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 204,
+        "line": 208,
         "caller": "_searchLocal",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -180468,7 +180513,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 262,
+        "line": 266,
         "caller": "_resolveLocalCandidate",
         "kind": "method",
         "lexical_target": "resolveCardCandidateNames",
@@ -180523,7 +180568,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 85,
+        "line": 89,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_resolveLocalCandidate",
@@ -189377,14 +189422,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 583,
-        "occurrences": 728
+        "unique_references": 584,
+        "occurrences": 729
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14295,
-        "occurrences": 24894
+        "unique_references": 14302,
+        "occurrences": 24903
       },
       {
         "target_scope": "dart_sdk",
@@ -193163,8 +193208,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/catalog_read_contract.dart",
-        "unique_references": 5,
-        "occurrences": 6
+        "unique_references": 7,
+        "occurrences": 8
       },
       {
         "target_scope": "workspace",
@@ -193487,8 +193532,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/log_sanitizer.dart",
-        "unique_references": 7,
-        "occurrences": 7
+        "unique_references": 8,
+        "occurrences": 8
       },
       {
         "target_scope": "workspace",
@@ -199017,7 +199062,7 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16208,
+    "resolved_type_reference_count": 16211,
     "workspace_type_reference_count": 3420,
     "unresolved_type_reference_count": 352,
     "resolved_type_references_scope": "workspace_targets_only",
@@ -231954,7 +231999,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 231,
+        "line": 235,
         "lexical_type": "CardResolutionDecision",
         "resolved_type": "CardResolutionDecision",
         "target": "CardResolutionDecision",
@@ -233251,8 +233296,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6242,
-        "occurrences": 39714
+        "unique_references": 6245,
+        "occurrences": 39727
       },
       {
         "target_scope": "dart_sdk",
@@ -273681,6 +273726,7 @@
     "server/test/cards_reserved_schema_contract_test.dart",
     "server/test/cards_resolve_read_only_test.dart",
     "server/test/cards_route_test.dart",
+    "server/test/catalog_card_demand_log_test.dart",
     "server/test/catalog_routes_read_only_guard_test.dart",
     "server/test/catalog_search_rate_limit_test.dart",
     "server/test/cmc_safety_test.dart",
@@ -275283,7 +275329,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "72ac288c00b45db85aee6733144e6ae14a3c9f9df6bec2d52ef8a4137ee84fd4"
+      "sha256": "2b7ab9b6a1c462a86a405d126ac94d05450ab7b50fa2ab7a2b296042f06eedc7"
     },
     "required_task_fields": [
       "id",
@@ -276171,7 +276217,7 @@
         "depends_on": [
           "BT-CAT-01"
         ],
-        "acceptance": "Leitura causa 0 DML e 0 upstream calls; `sync=true` rejeitado; app não o envia. Decisão do dono em 2026-09-22: D-35, carta ausente responde 404 `card_not_in_catalog` com frase em português e soma num contador de demanda; nenhuma sincronização disparada por usuário; as linhas-alias Oracle ficam enquanto houver referência e migram numa correção de dados com receipt (escrita em produção com aprovação por execução). Feito em 2026-09-23, na branch `catalogo/2026-09-23`: as 7 rotas de catálogo só leem. `POST /cards/resolve` perdeu o fallback da Scryfall e a escrita em `cards`, `sets` e `card_legalities`, e `GET /cards/printings` (somente leitura desde o `BT-CAT-04`) responde 404 quando não há edição; carta ausente responde 404 `card_not_in_catalog` com frase em português (`server/lib/catalog_read_contract.dart`). Evidência: `server/test/cards_resolve_read_only_test.dart` (carta ausente, token ausente, carta local e nome ambíguo, sempre sem chamada externa e sem DML; a versão da base chama a Scryfall e cai em 500), `server/test/cards_printings_read_only_test.dart` e `server/test/catalog_routes_read_only_guard_test.dart` (as 7 rotas e as bibliotecas que elas importam, sem cliente HTTP nem DML). Falta: `sync=true` é ignorado, não rejeitado, porque o app ainda o envia (`app/lib/features/cards/providers/card_provider.dart:531`) e rejeitar agora quebraria o \"Escolher edição\"; o 400 depende da raia do app tirar o parâmetro e tratar o 404. O contador de demanda exige tabela nova e ficou como proposta de DDL (pendente de decisão). A migração das linhas-alias Oracle é a fase 2 da D-35. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisão do dono em 2026-09-23: D-63, sem tabela de demanda; a contagem sai do log. Na mesma linha da D-35, feito em 2026-09-23 na branch `catalogo/preco-d62-2026-09-23`, ainda fora do ar: `POST /decks/:id/pricing` deixou de buscar preço na Scryfall a pedido do usuário e de gravar em `cards`; lê o preço do banco, que o job do `BT-CAT-01` mantém (D-62), e só grava o snapshot de preço do próprio deck. `force` e `refresh_missing` continuam aceitos e não têm efeito; o contrato de resposta ficou igual, com `cache_status` sempre `cached` e os contadores de busca em zero (`server/doc/API_CONTRACTS_AND_DATA_MAP.md`). Evidência: `server/test/deck_pricing_read_only_test.dart` (carta sem preço com o corpo que o app envia, com `force`, sem corpo e com corpo inválido; `force` repetido 5 vezes; deck de outro usuário; sempre sem chamada externa e sem escrita em `cards`; a versão da base chama a Scryfall) e 6 mutações derrubadas.",
+        "acceptance": "Leitura causa 0 DML e 0 upstream calls; `sync=true` rejeitado; app não o envia. Decisão do dono em 2026-09-22: D-35, carta ausente responde 404 `card_not_in_catalog` com frase em português e soma num contador de demanda; nenhuma sincronização disparada por usuário; as linhas-alias Oracle ficam enquanto houver referência e migram numa correção de dados com receipt (escrita em produção com aprovação por execução). Feito em 2026-09-23, na branch `catalogo/2026-09-23`: as 7 rotas de catálogo só leem. `POST /cards/resolve` perdeu o fallback da Scryfall e a escrita em `cards`, `sets` e `card_legalities`, e `GET /cards/printings` (somente leitura desde o `BT-CAT-04`) responde 404 quando não há edição; carta ausente responde 404 `card_not_in_catalog` com frase em português (`server/lib/catalog_read_contract.dart`). Evidência: `server/test/cards_resolve_read_only_test.dart` (carta ausente, token ausente, carta local e nome ambíguo, sempre sem chamada externa e sem DML; a versão da base chama a Scryfall e cai em 500), `server/test/cards_printings_read_only_test.dart` e `server/test/catalog_routes_read_only_guard_test.dart` (as 7 rotas e as bibliotecas que elas importam, sem cliente HTTP nem DML). Falta: `sync=true` é ignorado, não rejeitado, porque o app ainda o envia (`app/lib/features/cards/providers/card_provider.dart:531`) e rejeitar agora quebraria o \"Escolher edição\"; o 400 depende da raia do app tirar o parâmetro e tratar o 404. O contador de demanda exige tabela nova e ficou como proposta de DDL (pendente de decisão). A migração das linhas-alias Oracle é a fase 2 da D-35. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisão do dono em 2026-09-23: D-63, sem tabela de demanda; a contagem sai do log. Na mesma linha da D-35, feito em 2026-09-23 na branch `catalogo/preco-d62-2026-09-23`, ainda fora do ar: `POST /decks/:id/pricing` deixou de buscar preço na Scryfall a pedido do usuário e de gravar em `cards`; lê o preço do banco, que o job do `BT-CAT-01` mantém (D-62), e só grava o snapshot de preço do próprio deck. `force` e `refresh_missing` continuam aceitos e não têm efeito; o contrato de resposta ficou igual, com `cache_status` sempre `cached` e os contadores de busca em zero (`server/doc/API_CONTRACTS_AND_DATA_MAP.md`). Evidência: `server/test/deck_pricing_read_only_test.dart` (carta sem preço com o corpo que o app envia, com `force`, sem corpo e com corpo inválido; `force` repetido 5 vezes; deck de outro usuário; sempre sem chamada externa e sem escrita em `cards`; a versão da base chama a Scryfall) e 6 mutações derrubadas. Decisão do dono em 2026-09-23: D-72, a rota de preço continua gravando o total no próprio deck. D-63 feita no mesmo dia na branch `catalogo/refino-d73-2026-09-23`, ainda fora do ar: cada 404 `card_not_in_catalog` de `GET /cards/printings` e `POST /cards/resolve` escreve no log uma linha `MANALOOM_CATALOG_CARD_DEMAND` com um JSON (evento, rota, `include_tokens` e o nome normalizado: em minúsculas, com espaços e caracteres de controle reduzidos, e-mail e segredo mascarados e no máximo 200 caracteres). A linha não leva dado do usuário, e não há tabela nem escrita no banco. O `POST /cards/resolve/batch` responde 200 com `unresolved` e não escreve a linha. Evidência: `server/test/catalog_card_demand_log_test.dart` (as duas rotas com cabeçalhos de usuário que não aparecem na linha, a busca com tokens, carta encontrada e nome ambíguo sem linha, nome hostil sempre em JSON de uma linha) e 8 mutações derrubadas.",
         "section": "P0",
         "source_line": 440
       },
@@ -285150,7 +285196,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "f759eb6148d41a4c41e243d62352e05cf231eaf9dce4511a9b82ad37842e66dc"
+    "project_logic_source_digest_sha256": "709bac95224ba0636a797bd1b82a2773c85a86813011b11f4ab85133fd1609f6"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288014,6 +288060,7 @@
       "server/test/cards_reserved_schema_contract_test.dart",
       "server/test/cards_resolve_read_only_test.dart",
       "server/test/cards_route_test.dart",
+      "server/test/catalog_card_demand_log_test.dart",
       "server/test/catalog_routes_read_only_guard_test.dart",
       "server/test/catalog_search_rate_limit_test.dart",
       "server/test/cmc_safety_test.dart",

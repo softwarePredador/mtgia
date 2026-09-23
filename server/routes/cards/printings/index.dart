@@ -44,7 +44,7 @@ Future<Response> onRequest(RequestContext context) async {
     deduplicate: deduplicate,
   );
   if (data.isEmpty) {
-    return cardNotInCatalogResponse(name);
+    return cardNotInCatalogResponse(name, route: catalogDemandRoutePrintings);
   }
 
   return Response.json(
