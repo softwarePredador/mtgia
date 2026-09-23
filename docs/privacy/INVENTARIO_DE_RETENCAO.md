@@ -71,7 +71,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
    pela linha inteira (`to_jsonb`), com `request_fingerprint`, `request_key`, `cache_key` e
    hashes de deck, e IDs de outras pessoas saíam crus. Agora cada seção sai só com as colunas
    deste inventário, IDs de terceiros viram pseudônimos válidos só no arquivo, e as cinco
-   tabelas que ficavam de fora entraram.
+   tabelas que ficavam de fora entraram. Desde a D-71, cada pedido deixa uma linha de log
+   `MANALOOM_PRIVACY_EXPORT_REQUEST` com horário, resultado e referência pseudônima de quem
+   pediu, sem o ID nem o conteúdo.
 3. **Exclusão** (parte corrigida no `BT-PRIV-002`, 2026-09-23): bloqueios e tokens do titular
    agora saem; eventos de bloqueio, recursos, ações de moderação e a evidência da denúncia ficam sem a
    pessoa; as simulações de outras pessoas contra o deck público do titular ficam com elas,

@@ -19,7 +19,8 @@
     "D-30": "Lixeira de decks com purge em 30 dias; deck na lixeira entra na exportação.",
     "D-32": "Jobs de IA retidos por 24 h.",
     "D-68": "Outbox da exclusão (D-23) aprovado: tabela account_deletion_outbox e job de consumo sem capability; a migration pede a palavra do dono na execução.",
-    "D-70": "Limpeza por prazo separada da capability ai_analyze_optimize_advisory, com recibo por execução; ligar em produção só com a palavra do dono."
+    "D-70": "Limpeza por prazo separada da capability ai_analyze_optimize_advisory, com recibo por execução; ligar em produção só com a palavra do dono.",
+    "D-71": "Registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo."
   },
   "vocabulary": {
     "category": [
@@ -2974,12 +2975,14 @@
     },
     "server_logs": {
       "kind": "logs",
-      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais.",
+      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais. Cada pedido de exportação deixa uma linha MANALOOM_PRIVACY_EXPORT_REQUEST (server/lib/privacy/privacy_export_request_log.dart) só com horário, resultado e uma referência de quem pediu: HMAC-SHA256 do ID com chave derivada do JWT_SECRET, truncado em 16 hexadecimais; nunca o ID, a senha ou o conteúdo (D-71).",
       "personal_data": true,
       "retention": "rotação do host, não configurada no repositório",
       "export": "fora da exportação",
       "deletion": "não há limpeza na exclusão",
-      "decisions": [],
+      "decisions": [
+        "D-71"
+      ],
       "gap": "prazo de rotação dos logs não documentado; pseudonimização é o BT-SEC-AI-002"
     },
     "sentry_server": {
