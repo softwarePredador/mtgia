@@ -144,6 +144,10 @@ Decidido em 2026-09-22:
   troca na exclusão, outbox da exclusão, prazos de retenção a confirmar com o
   advogado, limpeza por prazo sem capability e registro dos pedidos de
   exportação).
+- À noite, o dono decidiu a D-73 (o preço de deck ignora impressões oversized e
+  de borda dourada) e aceitou a D-72 (o total do deck continua gravado), a D-74
+  (códigos de set duplicados, com a palavra dele na hora de apagar) e a D-75
+  (`price_history` desligada até depois da coorte).
 - O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
   linha de base contida com a 058, catálogo com menos de 7 dias, rollback
   treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`). O catálogo está

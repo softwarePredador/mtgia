@@ -240,6 +240,32 @@ CREATE INDEX IF NOT EXISTS idx_account_deletion_outbox_due
 **D-71 · Registro dos pedidos de exportação.**
 - **Recomendação aprovada:** registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo. Isso ajuda a perceber abuso.
 
+### Decididas em 2026-09-23 (noite), na segunda rodada do catálogo
+
+O dono decidiu, na conversa de coordenação:
+- **D-73:** refinar antes de subir;
+- **D-72, D-74 e D-75:** aceitou as recomendações;
+- **deploy:** sobe com dry-run, e os preços de deck se aplicam na execução diária das 06:20 UTC.
+
+**D-72 · O total do deck continua sendo gravado.**
+- **Contexto:** a rota `POST /decks/:id/pricing` deixou de chamar a Scryfall e de gravar no catálogo (D-35). Ela continua gravando o total no próprio deck (`decks.pricing_*`), que a tela do deck mostra.
+- **Recomendação aprovada:** manter, porque é dado do usuário, não sincronização de catálogo.
+
+**D-73 · Refino do preço de deck (D-62).**
+- **Mudança:** o menor preço em papel deixa de considerar impressões *oversized* e de borda dourada, que não valem em torneio e barateavam cartas caras.
+- **Recomendação aprovada:** implementar antes do deploy.
+
+**D-74 · Códigos de set duplicados.**
+- **Contexto:** 84 códigos aparecem duas vezes, em maiúscula e em minúscula (971 linhas para 887 códigos). O defeito é anterior. Leituras e o job já comparam sem distinguir maiúsculas de minúsculas, então nada piora até o conserto.
+- **Recomendação aprovada:**
+  1. conferir por leitura que nada aponta para as linhas excedentes;
+  2. apagá-las em produção, com a palavra do dono na hora;
+  3. criar uma migration com índice único em `LOWER(code)`.
+
+**D-75 · `price_history` desligada até depois da coorte.**
+- **Contexto:** a tabela ocupa 1,0 GB dos 2,2 GB do banco, e nenhum job grava nela. Religar agora compararia o preço antigo (MTGJSON) com o novo (Scryfall) e mostraria altas e quedas que não aconteceram.
+- **Recomendação aprovada:** deixar desligada. Quando religar, recomeçar a série a partir da Scryfall.
+
 O andamento das demais está no backlog e na fila.
 
 ---

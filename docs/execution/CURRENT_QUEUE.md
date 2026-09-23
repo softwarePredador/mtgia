@@ -15,9 +15,9 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (registro da ativação do catálogo, branch
-  `integracao/2026-09-23`): `aaabfb1fd49f1d7b76baa2f923ca8a9a7db4beedcd859fdfab97508ac2be2528`
-  (244 tasks; antes, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
+- Backlog/registry SHA-256 corrente (decisões D-72 a D-75, branch
+  `integracao/2026-09-23`): `320ebd9d320afed86f472e962e7369fe139e1c957fdaec2faaf44df54d9cff96`
+  (244 tasks; antes, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
   `d15beb05b`, `333b6c0b…` com 220 tasks e 402 arestas, valor de `f6f791098`)
 - Project logic digest em HEAD `d15beb05b`: `556ba631…`. O digest da árvore de trabalho
   não é copiado aqui, porque este arquivo entra no próprio digest: ver
