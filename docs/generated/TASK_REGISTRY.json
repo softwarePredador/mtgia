@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "fcd2bc58733cb8ea61a41503cfc1827aee9d730d9eca3bce24aa68b2a578e4df"
+    "sha256": "b415333dbc7b86e05aafdb01f3793feebaeb55e4b7b5ce0c78957f315dc2d921"
   },
   "required_task_fields": [
     "id",
@@ -197,12 +197,12 @@
     {
       "id": "BT-AUTH-004",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Exigir step-up/reautenticação para export e exclusão de conta.",
       "depends_on": [
         "BT-AUTH-003"
       ],
-      "acceptance": "Token antigo ou sessão roubada não executa ação sensível; rate limit distribuído. Decisão do dono em 2026-09-22: D-19 e D-20, reverificação de senha por requisição, sem migração, na exportação, na exclusão e na troca de e-mail; `DELETE /users/me` entra no limite de tentativas de credencial; a exportação deixa de sair só com o token de sessão.",
+      "acceptance": "Token antigo ou sessão roubada não executa ação sensível; rate limit distribuído. Decisão do dono em 2026-09-22: D-19 e D-20, reverificação de senha por requisição, sem migração, na exportação, na exclusão e na troca de e-mail; `DELETE /users/me` entra no limite de tentativas de credencial; a exportação deixa de sair só com o token de sessão. Buracos 1 e 2 da D-19 fechados no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: a exportação virou `POST /users/me/export` com a senha no corpo, conferida a cada requisição (sem senha 400, senha errada 401, e o `GET` saiu da rota e do plano de controle); `DELETE /users/me` e a exportação entram no bucket de credenciais por IP, agora instalado no middleware de `/users`, e ganharam o limite por conta `account_reverification` (10 por 15 min em produção, distribuído como o de `/auth`); troca de e-mail não existe em rota nenhuma, e um teste falha se `PATCH /users/me` passar a gravar e-mail. Evidência: `server/test/account_reverification_test.dart` (9 testes; 5 mutações falham como esperado) e `server/test/privacy_account_live_test.dart` reescrito para o contrato novo, verde contra API e PostgreSQL locais. O app ainda chama `GET /users/me/export` (`app/lib/features/profile/account_privacy_service.dart:36`): precisa pedir a senha e usar `POST`, na raia do app, com a prova de UI.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 298
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "d0944efc9105a3a81cee1f4d0b3836027ef250c2ba2e1835725f8a57fc82c082"
+  "project_logic_source_digest_sha256": "4fcb2583bd70f1cd5b0997b272945af4ef7a231d3780dd15af9d195e922c2c36"
 }

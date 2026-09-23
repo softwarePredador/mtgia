@@ -117,7 +117,7 @@
 | `/users/me` | `DELETE, GET, PATCH` | `server/routes/users/me/index.dart` | 2 | `source` |
 | `/users/me/activation-events` | `GET, POST` | `server/routes/users/me/activation-events/index.dart` | 2 | `source` |
 | `/users/me/blocks` | `GET` | `server/routes/users/me/blocks/index.dart` | 2 | `source` |
-| `/users/me/export` | `GET` | `server/routes/users/me/export/index.dart` | 2 | `source` |
+| `/users/me/export` | `POST` | `server/routes/users/me/export/index.dart` | 2 | `source` |
 | `/users/me/fcm-token` | `DELETE, PUT` | `server/routes/users/me/fcm-token/index.dart` | 2 | `source` |
 | `/users/me/plan` | `GET` | `server/routes/users/me/plan/index.dart` | 2 | `source` |
 | `/users/me/plan/checkout` | `POST` | `server/routes/users/me/plan/checkout/index.dart` | 2 | `source` |

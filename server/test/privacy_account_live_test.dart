@@ -136,16 +136,38 @@ void main() {
       );
       expect(postGame.statusCode, 201, reason: postGame.body);
 
-      final unauthenticatedExport = await http.get(
-        Uri.parse('$baseUrl/users/me/export'),
-        headers: headers(),
-      );
+      Future<http.Response> exportWith(String? token, Object? body) =>
+          http.post(
+            Uri.parse('$baseUrl/users/me/export'),
+            headers: headers(token),
+            body: body == null ? null : jsonEncode(body),
+          );
+
+      final unauthenticatedExport = await exportWith(null, {
+        'password': password,
+      });
       expect(unauthenticatedExport.statusCode, 401);
 
-      final export = await http.get(
+      // D-19/D-20: o token de sessão sozinho não exporta; a senha é conferida
+      // a cada requisição, e o GET antigo deixou de existir.
+      final tokenOnlyExport = await exportWith(token, const {});
+      expect(tokenOnlyExport.statusCode, 400, reason: tokenOnlyExport.body);
+      expect(objectBody(tokenOnlyExport)['error'], 'password_required');
+
+      final legacyGetExport = await http.get(
         Uri.parse('$baseUrl/users/me/export'),
         headers: headers(token),
       );
+      expect(legacyGetExport.statusCode, isNot(200));
+      expect(legacyGetExport.body, isNot(contains('schema_version')));
+
+      final wrongPasswordExport = await exportWith(token, {
+        'password': 'WrongPassword!2026',
+      });
+      expect(wrongPasswordExport.statusCode, 401);
+      expect(objectBody(wrongPasswordExport)['error'], 'invalid_password');
+
+      final export = await exportWith(token, {'password': password});
       expect(export.statusCode, 200, reason: export.body);
       expect(
         export.headers['cache-control']?.toLowerCase(),
@@ -239,10 +261,7 @@ void main() {
       final oldLogin = await login(email, password);
       expect(oldLogin.statusCode, 401, reason: oldLogin.body);
 
-      final exportAfterDelete = await http.get(
-        Uri.parse('$baseUrl/users/me/export'),
-        headers: headers(token),
-      );
+      final exportAfterDelete = await exportWith(token, {'password': password});
       expect(exportAfterDelete.statusCode, 401, reason: exportAfterDelete.body);
 
       final publicDeckAfterDelete = await http.get(

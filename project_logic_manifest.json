@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "d0944efc9105a3a81cee1f4d0b3836027ef250c2ba2e1835725f8a57fc82c082",
+  "source_digest_sha256": "4fcb2583bd70f1cd5b0997b272945af4ef7a231d3780dd15af9d195e922c2c36",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 687,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5202,
+    "dart_symbols": 5206,
     "semantic_resolved_files": 687,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42747,
-    "semantic_resolved_call_sites": 68132,
-    "semantic_resolved_type_references": 16080,
+    "semantic_resolved_call_edges": 42768,
+    "semantic_resolved_call_sites": 68158,
+    "semantic_resolved_type_references": 16086,
     "modules": 153,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1225,
+    "tests": 1226,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1882,7 +1882,7 @@
         "server/lib/rate_limit_middleware.dart"
       ],
       "file_count": 1,
-      "symbol_count": 24,
+      "symbol_count": 27,
       "providers": [],
       "services": []
     },
@@ -2412,7 +2412,7 @@
         "server/routes/users/me/plan/index.dart"
       ],
       "file_count": 12,
-      "symbol_count": 30,
+      "symbol_count": 31,
       "providers": [],
       "services": []
     }
@@ -26809,13 +26809,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -36489,7 +36489,7 @@
       "name": "CredentialEmailBucket",
       "kind": "enum",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 455
+      "line": 463
     },
     {
       "name": "RateLimiter",
@@ -36505,10 +36505,16 @@
       ]
     },
     {
+      "name": "_accountScopedRateLimitResponse",
+      "kind": "function",
+      "source": "server/lib/rate_limit_middleware.dart",
+      "line": 578
+    },
+    {
       "name": "_aiRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 563
+      "line": 631
     },
     {
       "name": "_hasForwardedFor",
@@ -36565,22 +36571,28 @@
       "line": 241
     },
     {
+      "name": "accountReverificationRateLimitResponse",
+      "kind": "function",
+      "source": "server/lib/rate_limit_middleware.dart",
+      "line": 553
+    },
+    {
       "name": "aiPollingRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 555
+      "line": 623
     },
     {
       "name": "aiRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 547
+      "line": 615
     },
     {
       "name": "authRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 363
+      "line": 371
     },
     {
       "name": "buildAiRateLimitIdentifier",
@@ -36610,13 +36622,13 @@
       "name": "credentialEmailRateLimitIdentifier",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 489
+      "line": 497
     },
     {
       "name": "credentialEmailRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 499
+      "line": 507
     },
     {
       "name": "isAuthCredentialAttempt",
@@ -36625,10 +36637,16 @@
       "line": 338
     },
     {
+      "name": "overrideAccountReverificationRateLimiterForTesting",
+      "kind": "function",
+      "source": "server/lib/rate_limit_middleware.dart",
+      "line": 548
+    },
+    {
       "name": "overrideCredentialEmailRateLimiterForTesting",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 484
+      "line": 492
     },
     {
       "name": "rateLimitMiddleware",
@@ -36671,25 +36689,25 @@
       "name": "_hasExactKeys",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 646
+      "line": 647
     },
     {
       "name": "_invalidPolicy",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 629
+      "line": 630
     },
     {
       "name": "_isNonEmptyString",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 651
+      "line": 652
     },
     {
       "name": "_isValidTimestamp",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 655
+      "line": 656
     },
     {
       "name": "_isolatedConfigIsAuthorized",
@@ -36701,7 +36719,7 @@
       "name": "_normalizePath",
       "kind": "function",
       "source": "server/lib/release_capability_policy.dart",
-      "line": 662
+      "line": 663
     },
     {
       "name": "isReleaseCapabilityControlPlaneRequest",
@@ -37129,29 +37147,31 @@
       "name": "InvalidAccountPasswordException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 14
+      "line": 15
     },
     {
       "name": "UserDataNotFoundException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 12
+      "line": 13
     },
     {
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 16,
+      "line": 17,
       "members": [
         "_deleteIfPresent",
         "_executeIfAllPresent",
         "_executeIfPresent",
         "_jsonObject",
         "_optionalJsonRows",
+        "_passwordMatches",
         "_relationExists",
         "_secureRandomToken",
         "deleteAndAnonymizeAccount",
-        "exportUserData"
+        "exportUserData",
+        "verifyCurrentPassword"
       ]
     },
     {
@@ -40275,7 +40295,7 @@
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/users/_middleware.dart",
-      "line": 4
+      "line": 5
     },
     {
       "name": "_getSummary",
@@ -40302,10 +40322,16 @@
       "line": 8
     },
     {
+      "name": "_readPassword",
+      "kind": "function",
+      "source": "server/routes/users/me/export/index.dart",
+      "line": 68
+    },
+    {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/users/me/export/index.dart",
-      "line": 8
+      "line": 11
     },
     {
       "name": "_deleteToken",
@@ -40329,25 +40355,25 @@
       "name": "_deleteMe",
       "kind": "function",
       "source": "server/routes/users/me/index.dart",
-      "line": 310
+      "line": 311
     },
     {
       "name": "_getMe",
       "kind": "function",
       "source": "server/routes/users/me/index.dart",
-      "line": 25
+      "line": 26
     },
     {
       "name": "_patchMe",
       "kind": "function",
       "source": "server/routes/users/me/index.dart",
-      "line": 92
+      "line": 93
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/users/me/index.dart",
-      "line": 11
+      "line": 12
     },
     {
       "name": "onRequest",
@@ -41061,9 +41087,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42747,
-    "resolved_call_site_count": 68132,
-    "workspace_call_edge_count": 13325,
+    "resolved_call_edge_count": 42768,
+    "resolved_call_site_count": 68158,
+    "workspace_call_edge_count": 13339,
     "unresolved_call_edge_count": 542,
     "unresolved_call_site_count": 751,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -164365,7 +164391,7 @@
         "target": "RateLimiter.RateLimiter",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
-        "occurrences": 8
+        "occurrences": 10
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
@@ -164534,7 +164560,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 372,
+        "line": 380,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "isAuthCredentialAttempt",
@@ -164545,7 +164571,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 376,
+        "line": 384,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -164556,7 +164582,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 377,
+        "line": 385,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_isProductionEnvironment",
@@ -164567,7 +164593,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 381,
+        "line": 389,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_requestRemoteAddress",
@@ -164578,7 +164604,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 382,
+        "line": 390,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "resolveRateLimitClientIdentity",
@@ -164589,7 +164615,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 388,
+        "line": 396,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_logIdentityFailure",
@@ -164600,7 +164626,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 394,
+        "line": 402,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitIdentityUnavailable",
@@ -164611,7 +164637,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 402,
+        "line": 410,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_isAllowedDistributedIfAvailable",
@@ -164622,7 +164648,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 413,
+        "line": 421,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -164633,7 +164659,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 420,
+        "line": 428,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
@@ -164644,7 +164670,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 432,
+        "line": 440,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -164655,7 +164681,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 507,
+        "line": 515,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -164666,18 +164692,18 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 510,
+        "line": 516,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_isProductionEnvironment",
-        "target": "_isProductionEnvironment",
+        "lexical_target": "_accountScopedRateLimitResponse",
+        "target": "_accountScopedRateLimitResponse",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 513,
+        "line": 519,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitIdentifier",
@@ -164688,44 +164714,11 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 515,
+        "line": 522,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_isAllowedDistributedIfAvailable",
-        "target": "_isAllowedDistributedIfAvailable",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 523,
-        "caller": "credentialEmailRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "isAllowed",
-        "target": "RateLimiter.isAllowed",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 528,
-        "caller": "credentialEmailRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "buildRateLimitResponseBody",
-        "target": "buildRateLimitResponseBody",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 539,
-        "caller": "credentialEmailRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "buildRateLimitHeaders",
-        "target": "buildRateLimitHeaders",
+        "lexical_target": "_isProductionEnvironment",
+        "target": "_isProductionEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -164743,22 +164736,33 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 548,
-        "caller": "aiRateLimit",
+        "line": 562,
+        "caller": "accountReverificationRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_aiRateLimit",
-        "target": "_aiRateLimit",
+        "lexical_target": "_rateLimitRuntimeEnvironment",
+        "target": "_rateLimitRuntimeEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 556,
-        "caller": "aiPollingRateLimit",
+        "line": 563,
+        "caller": "accountReverificationRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_aiRateLimit",
-        "target": "_aiRateLimit",
+        "lexical_target": "_accountScopedRateLimitResponse",
+        "target": "_accountScopedRateLimitResponse",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 569,
+        "caller": "accountReverificationRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "_isProductionEnvironment",
+        "target": "_isProductionEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -164776,88 +164780,55 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 571,
-        "caller": "_aiRateLimit",
+        "line": 585,
+        "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
-        "lexical_target": "matches",
-        "target": "InternalAiRequestToken.matches",
-        "target_library": "package:server/internal_ai_request_token.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 575,
-        "caller": "_aiRateLimit",
-        "kind": "method",
-        "lexical_target": "_rateLimitRuntimeEnvironment",
-        "target": "_rateLimitRuntimeEnvironment",
+        "lexical_target": "_isAllowedDistributedIfAvailable",
+        "target": "_isAllowedDistributedIfAvailable",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 577,
-        "caller": "_aiRateLimit",
+        "line": 593,
+        "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_isProductionEnvironment",
-        "target": "_isProductionEnvironment",
+        "lexical_target": "isAllowed",
+        "target": "RateLimiter.isAllowed",
         "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 591,
-        "caller": "_aiRateLimit",
-        "kind": "method",
-        "lexical_target": "_requestRemoteAddress",
-        "target": "_requestRemoteAddress",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 592,
-        "caller": "_aiRateLimit",
-        "kind": "method",
-        "lexical_target": "resolveRateLimitClientIdentity",
-        "target": "resolveRateLimitClientIdentity",
-        "target_library": "package:server/auth_runtime_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
         "line": 598,
-        "caller": "_aiRateLimit",
+        "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_logIdentityFailure",
-        "target": "_logIdentityFailure",
+        "lexical_target": "buildRateLimitResponseBody",
+        "target": "buildRateLimitResponseBody",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 604,
-        "caller": "_aiRateLimit",
+        "line": 607,
+        "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_rateLimitIdentityUnavailable",
-        "target": "_rateLimitIdentityUnavailable",
+        "lexical_target": "buildRateLimitHeaders",
+        "target": "buildRateLimitHeaders",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 610,
-        "caller": "_aiRateLimit",
+        "line": 616,
+        "caller": "aiRateLimit",
         "kind": "method",
-        "lexical_target": "_isAllowedDistributedIfAvailable",
-        "target": "_isAllowedDistributedIfAvailable",
+        "lexical_target": "_aiRateLimit",
+        "target": "_aiRateLimit",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -164875,7 +164846,106 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 621,
+        "line": 624,
+        "caller": "aiPollingRateLimit",
+        "kind": "method",
+        "lexical_target": "_aiRateLimit",
+        "target": "_aiRateLimit",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 639,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "matches",
+        "target": "InternalAiRequestToken.matches",
+        "target_library": "package:server/internal_ai_request_token.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 643,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_rateLimitRuntimeEnvironment",
+        "target": "_rateLimitRuntimeEnvironment",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 645,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_isProductionEnvironment",
+        "target": "_isProductionEnvironment",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 659,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_requestRemoteAddress",
+        "target": "_requestRemoteAddress",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 660,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "resolveRateLimitClientIdentity",
+        "target": "resolveRateLimitClientIdentity",
+        "target_library": "package:server/auth_runtime_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 666,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_logIdentityFailure",
+        "target": "_logIdentityFailure",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 672,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_rateLimitIdentityUnavailable",
+        "target": "_rateLimitIdentityUnavailable",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 678,
+        "caller": "_aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_isAllowedDistributedIfAvailable",
+        "target": "_isAllowedDistributedIfAvailable",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 689,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -164886,7 +164956,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 629,
+        "line": 697,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
@@ -164897,7 +164967,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 641,
+        "line": 709,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -165106,7 +165176,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 622,
+        "line": 623,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityEntry",
@@ -165117,7 +165187,7 @@
       },
       {
         "source": "server/lib/release_capability_policy.dart",
-        "line": 630,
+        "line": 631,
         "caller": "_invalidPolicy",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityPolicy._",
@@ -166657,7 +166727,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1001,
+        "line": 1037,
         "caller": "UserDataPrivacyService._optionalJsonRows",
         "kind": "method",
         "lexical_target": "_relationExists",
@@ -166668,7 +166738,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1006,
+        "line": 1042,
         "caller": "UserDataPrivacyService._optionalJsonRows",
         "kind": "method",
         "lexical_target": "_jsonObject",
@@ -166679,7 +166749,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1014,
+        "line": 1050,
         "caller": "UserDataPrivacyService._deleteIfPresent",
         "kind": "method",
         "lexical_target": "_executeIfPresent",
@@ -166690,7 +166760,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1023,
+        "line": 1059,
         "caller": "UserDataPrivacyService._executeIfPresent",
         "kind": "method",
         "lexical_target": "_relationExists",
@@ -166701,7 +166771,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1037,
+        "line": 1073,
         "caller": "UserDataPrivacyService._executeIfAllPresent",
         "kind": "method",
         "lexical_target": "_relationExists",
@@ -166712,7 +166782,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 18,
+        "line": 19,
         "caller": "UserDataPrivacyService.<constructor>",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -166723,8 +166793,8 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 47,
-        "caller": "UserDataPrivacyService.exportUserData",
+        "line": 41,
+        "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
         "target": "UserDataNotFoundException.UserDataNotFoundException",
@@ -166734,18 +166804,40 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 49,
-        "caller": "UserDataPrivacyService.exportUserData",
+        "line": 43,
+        "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "method",
-        "lexical_target": "_optionalJsonRows",
-        "target": "UserDataPrivacyService._optionalJsonRows",
+        "lexical_target": "_passwordMatches",
+        "target": "UserDataPrivacyService._passwordMatches",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 33
+        "occurrences": 1
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 533,
+        "line": 44,
+        "caller": "UserDataPrivacyService.verifyCurrentPassword",
+        "kind": "constructor",
+        "lexical_target": "InvalidAccountPasswordException",
+        "target": "InvalidAccountPasswordException.InvalidAccountPasswordException",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 50,
+        "caller": "UserDataPrivacyService._passwordMatches",
+        "kind": "method",
+        "lexical_target": "verifyPassword",
+        "target": "AuthService.verifyPassword",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 566,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "_jsonObject",
@@ -166756,7 +166848,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 613,
+        "line": 646,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -166767,18 +166859,18 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 619,
+        "line": 650,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
-        "lexical_target": "verifyPassword",
-        "target": "AuthService.verifyPassword",
-        "target_library": "package:server/auth_service.dart",
+        "lexical_target": "_passwordMatches",
+        "target": "UserDataPrivacyService._passwordMatches",
+        "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 623,
+        "line": 651,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -166789,7 +166881,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 626,
+        "line": 655,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_secureRandomToken",
@@ -166800,7 +166892,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 633,
+        "line": 662,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -166811,7 +166903,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 636,
+        "line": 665,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_deleteIfPresent",
@@ -166822,7 +166914,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 727,
+        "line": 756,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_executeIfPresent",
@@ -166833,7 +166925,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 732,
+        "line": 761,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_executeIfAllPresent",
@@ -166841,6 +166933,39 @@
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
         "occurrences": 5
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 80,
+        "caller": "UserDataPrivacyService.exportUserData",
+        "kind": "constructor",
+        "lexical_target": "UserDataNotFoundException",
+        "target": "UserDataNotFoundException.UserDataNotFoundException",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 82,
+        "caller": "UserDataPrivacyService.exportUserData",
+        "kind": "method",
+        "lexical_target": "_optionalJsonRows",
+        "target": "UserDataPrivacyService._optionalJsonRows",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 33
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 967,
+        "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
+        "kind": "method",
+        "lexical_target": "credentialEmailRateLimitIdentifier",
+        "target": "credentialEmailRateLimitIdentifier",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
@@ -187106,12 +187231,23 @@
       },
       {
         "source": "server/routes/users/_middleware.dart",
-        "line": 5,
+        "line": 11,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "authMiddleware",
         "target": "authMiddleware",
         "target_library": "package:server/auth_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/_middleware.dart",
+        "line": 11,
+        "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "authRateLimit",
+        "target": "authRateLimit",
+        "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -187227,7 +187363,18 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 11,
+        "line": 20,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "methodNotAllowed",
+        "target": "methodNotAllowed",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 22,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "getUserId",
@@ -187238,7 +187385,29 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 13,
+        "line": 23,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_readPassword",
+        "target": "_readPassword",
+        "target_library": "workspace:server/routes/users/me/export/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 35,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "accountReverificationRateLimitResponse",
+        "target": "accountReverificationRateLimitResponse",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 41,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "UserDataPrivacyService",
@@ -187249,7 +187418,18 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 13,
+        "line": 42,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "verifyCurrentPassword",
+        "target": "UserDataPrivacyService.verifyCurrentPassword",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 43,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "exportUserData",
@@ -187260,7 +187440,7 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 26,
+        "line": 62,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "notFound",
@@ -187271,22 +187451,11 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 28,
+        "line": 64,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "internalServerError",
         "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/users/me/export/index.dart",
-        "line": 9,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
         "target_library": "package:server/http_responses.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -187337,7 +187506,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 100,
+        "line": 101,
         "caller": "_patchMe",
         "kind": "method",
         "lexical_target": "w",
@@ -187348,7 +187517,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 14,
+        "line": 15,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_getMe",
@@ -187359,7 +187528,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 17,
+        "line": 18,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_patchMe",
@@ -187370,7 +187539,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 20,
+        "line": 21,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_deleteMe",
@@ -187381,7 +187550,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 26,
+        "line": 27,
         "caller": "_getMe",
         "kind": "method",
         "lexical_target": "getUserId",
@@ -187392,7 +187561,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 295,
+        "line": 296,
         "caller": "_patchMe",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -187403,7 +187572,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 302,
+        "line": 303,
         "caller": "_patchMe",
         "kind": "method",
         "lexical_target": "e",
@@ -187414,7 +187583,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 311,
+        "line": 312,
         "caller": "_deleteMe",
         "kind": "method",
         "lexical_target": "getUserId",
@@ -187425,7 +187594,18 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 342,
+        "line": 345,
+        "caller": "_deleteMe",
+        "kind": "method",
+        "lexical_target": "accountReverificationRateLimitResponse",
+        "target": "accountReverificationRateLimitResponse",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/index.dart",
+        "line": 351,
         "caller": "_deleteMe",
         "kind": "constructor",
         "lexical_target": "UserDataPrivacyService",
@@ -187436,7 +187616,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 342,
+        "line": 351,
         "caller": "_deleteMe",
         "kind": "method",
         "lexical_target": "deleteAndAnonymizeAccount",
@@ -187447,7 +187627,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 360,
+        "line": 369,
         "caller": "_deleteMe",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -187458,7 +187638,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 367,
+        "line": 376,
         "caller": "_deleteMe",
         "kind": "method",
         "lexical_target": "e",
@@ -187469,7 +187649,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 77,
+        "line": 78,
         "caller": "_getMe",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -187480,7 +187660,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 84,
+        "line": 85,
         "caller": "_getMe",
         "kind": "method",
         "lexical_target": "e",
@@ -187491,7 +187671,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 93,
+        "line": 94,
         "caller": "_patchMe",
         "kind": "method",
         "lexical_target": "getUserId",
@@ -187672,8 +187852,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14212,
-        "occurrences": 24799
+        "unique_references": 14215,
+        "occurrences": 24802
       },
       {
         "target_scope": "dart_sdk",
@@ -187780,14 +187960,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 484,
-        "occurrences": 950
+        "unique_references": 485,
+        "occurrences": 953
       },
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
         "unique_references": 17,
-        "occurrences": 36
+        "occurrences": 37
       },
       {
         "target_scope": "dependency",
@@ -189034,8 +189214,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1203,
-        "occurrences": 1978
+        "unique_references": 1206,
+        "occurrences": 1981
       },
       {
         "target_scope": "dependency",
@@ -191932,8 +192112,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/rate_limit_middleware.dart",
-        "unique_references": 48,
-        "occurrences": 60
+        "unique_references": 56,
+        "occurrences": 70
       },
       {
         "target_scope": "workspace",
@@ -192010,8 +192190,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/user_data_privacy_service.dart",
-        "unique_references": 18,
-        "occurrences": 81
+        "unique_references": 23,
+        "occurrences": 86
       },
       {
         "target_scope": "workspace",
@@ -192774,6 +192954,12 @@
         "target_library": "workspace:server/routes/users/me/activation-events/index.dart",
         "unique_references": 2,
         "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/routes/users/me/export/index.dart",
+        "unique_references": 1,
+        "occurrences": 1
       },
       {
         "target_scope": "workspace",
@@ -196975,7 +197161,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 373,
+        "line": 381,
         "caller": "authRateLimit",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -196983,7 +197169,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 572,
+        "line": 640,
         "caller": "_aiRateLimit",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -197126,8 +197312,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16080,
-    "workspace_type_reference_count": 3390,
+    "resolved_type_reference_count": 16086,
+    "workspace_type_reference_count": 3391,
     "unresolved_type_reference_count": 347,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -227889,7 +228075,7 @@
         "target": "RateLimiter",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
-        "occurrences": 11
+        "occurrences": 14
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
@@ -227913,17 +228099,17 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 369,
+        "line": 377,
         "lexical_type": "RateLimiter?",
         "resolved_type": "RateLimiter?",
         "target": "RateLimiter",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
-        "occurrences": 3
+        "occurrences": 5
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 505,
+        "line": 513,
         "lexical_type": "CredentialEmailBucket",
         "resolved_type": "CredentialEmailBucket",
         "target": "CredentialEmailBucket",
@@ -228093,7 +228279,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 17,
+        "line": 18,
         "lexical_type": "AuthService?",
         "resolved_type": "AuthService?",
         "target": "AuthService",
@@ -228103,7 +228289,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 18,
+        "line": 19,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -228113,23 +228299,23 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 47,
+        "line": 41,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 3
+        "occurrences": 4
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 623,
+        "line": 44,
         "lexical_type": "InvalidAccountPasswordException",
         "resolved_type": "InvalidAccountPasswordException",
         "target": "InvalidAccountPasswordException",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
@@ -230953,7 +231139,7 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 13,
+        "line": 41,
         "lexical_type": "UserDataPrivacyService",
         "resolved_type": "UserDataPrivacyService",
         "target": "UserDataPrivacyService",
@@ -230963,7 +231149,17 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 25,
+        "line": 53,
+        "lexical_type": "InvalidAccountPasswordException",
+        "resolved_type": "InvalidAccountPasswordException",
+        "target": "InvalidAccountPasswordException",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 61,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
@@ -230973,7 +231169,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 342,
+        "line": 351,
         "lexical_type": "UserDataPrivacyService",
         "resolved_type": "UserDataPrivacyService",
         "target": "UserDataPrivacyService",
@@ -230983,7 +231179,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 349,
+        "line": 358,
         "lexical_type": "InvalidAccountPasswordException",
         "resolved_type": "InvalidAccountPasswordException",
         "target": "InvalidAccountPasswordException",
@@ -230993,7 +231189,7 @@
       },
       {
         "source": "server/routes/users/me/index.dart",
-        "line": 354,
+        "line": 363,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
@@ -231042,8 +231238,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1078,
-        "occurrences": 2182
+        "unique_references": 1079,
+        "occurrences": 2186
       },
       {
         "target_scope": "dart_sdk",
@@ -231060,8 +231256,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6167,
-        "occurrences": 39404
+        "unique_references": 6170,
+        "occurrences": 39417
       },
       {
         "target_scope": "dart_sdk",
@@ -231144,8 +231340,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 267,
-        "occurrences": 1081
+        "unique_references": 268,
+        "occurrences": 1088
       },
       {
         "target_scope": "dependency",
@@ -232381,7 +232577,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 251,
-        "occurrences": 949
+        "occurrences": 950
       },
       {
         "target_scope": "dependency",
@@ -234733,7 +234929,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/rate_limit_middleware.dart",
         "unique_references": 3,
-        "occurrences": 15
+        "occurrences": 20
       },
       {
         "target_scope": "workspace",
@@ -234780,8 +234976,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/user_data_privacy_service.dart",
-        "unique_references": 7,
-        "occurrences": 9
+        "unique_references": 8,
+        "occurrences": 12
       },
       {
         "target_scope": "workspace",
@@ -236967,7 +237163,7 @@
         "source": "server/lib/rate_limit_middleware.dart",
         "line": 91,
         "lexical_type": "void",
-        "occurrences": 4
+        "occurrences": 5
       },
       {
         "source": "server/lib/request_metrics_service.dart",
@@ -236983,9 +237179,9 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1009,
+        "line": 27,
         "lexical_type": "void",
-        "occurrences": 3
+        "occurrences": 4
       },
       {
         "source": "server/routes/_middleware.dart",
@@ -238459,17 +238655,19 @@
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 16,
+      "line": 17,
       "members": [
         "_deleteIfPresent",
         "_executeIfAllPresent",
         "_executeIfPresent",
         "_jsonObject",
         "_optionalJsonRows",
+        "_passwordMatches",
         "_relationExists",
         "_secureRandomToken",
         "deleteAndAnonymizeAccount",
-        "exportUserData"
+        "exportUserData",
+        "verifyCurrentPassword"
       ]
     }
   ],
@@ -250542,7 +250740,7 @@
     {
       "path": "/users/me/export",
       "methods": [
-        "GET"
+        "POST"
       ],
       "source": "server/routes/users/me/export/index.dart",
       "middleware": [
@@ -271264,6 +271462,7 @@
     "server/bin/test_auto_promote_battle_rules.py",
     "server/bin/test_battle_runtime_cli_paths.py",
     "server/test/account_email_delivery_transport_test.dart",
+    "server/test/account_reverification_test.dart",
     "server/test/account_security_live_test.dart",
     "server/test/account_security_schema_contract_test.dart",
     "server/test/activation_events_contract_test.dart",
@@ -272937,7 +273136,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "fcd2bc58733cb8ea61a41503cfc1827aee9d730d9eca3bce24aa68b2a578e4df"
+      "sha256": "b415333dbc7b86e05aafdb01f3793feebaeb55e4b7b5ce0c78957f315dc2d921"
     },
     "required_task_fields": [
       "id",
@@ -273132,12 +273331,12 @@
       {
         "id": "BT-AUTH-004",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Exigir step-up/reautenticação para export e exclusão de conta.",
         "depends_on": [
           "BT-AUTH-003"
         ],
-        "acceptance": "Token antigo ou sessão roubada não executa ação sensível; rate limit distribuído. Decisão do dono em 2026-09-22: D-19 e D-20, reverificação de senha por requisição, sem migração, na exportação, na exclusão e na troca de e-mail; `DELETE /users/me` entra no limite de tentativas de credencial; a exportação deixa de sair só com o token de sessão.",
+        "acceptance": "Token antigo ou sessão roubada não executa ação sensível; rate limit distribuído. Decisão do dono em 2026-09-22: D-19 e D-20, reverificação de senha por requisição, sem migração, na exportação, na exclusão e na troca de e-mail; `DELETE /users/me` entra no limite de tentativas de credencial; a exportação deixa de sair só com o token de sessão. Buracos 1 e 2 da D-19 fechados no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: a exportação virou `POST /users/me/export` com a senha no corpo, conferida a cada requisição (sem senha 400, senha errada 401, e o `GET` saiu da rota e do plano de controle); `DELETE /users/me` e a exportação entram no bucket de credenciais por IP, agora instalado no middleware de `/users`, e ganharam o limite por conta `account_reverification` (10 por 15 min em produção, distribuído como o de `/auth`); troca de e-mail não existe em rota nenhuma, e um teste falha se `PATCH /users/me` passar a gravar e-mail. Evidência: `server/test/account_reverification_test.dart` (9 testes; 5 mutações falham como esperado) e `server/test/privacy_account_live_test.dart` reescrito para o contrato novo, verde contra API e PostgreSQL locais. O app ainda chama `GET /users/me/export` (`app/lib/features/profile/account_privacy_service.dart:36`): precisa pedir a senha e usar `POST`, na raia do app, com a prova de UI.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 298
       },
@@ -282760,7 +282959,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "d0944efc9105a3a81cee1f4d0b3836027ef250c2ba2e1835725f8a57fc82c082"
+    "project_logic_source_digest_sha256": "4fcb2583bd70f1cd5b0997b272945af4ef7a231d3780dd15af9d195e922c2c36"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285507,6 +285706,7 @@
       "server/routes/users/me/plan/checkout/index.dart",
       "server/routes/users/me/plan/index.dart",
       "server/test/account_email_delivery_transport_test.dart",
+      "server/test/account_reverification_test.dart",
       "server/test/account_security_live_test.dart",
       "server/test/account_security_schema_contract_test.dart",
       "server/test/activation_events_contract_test.dart",

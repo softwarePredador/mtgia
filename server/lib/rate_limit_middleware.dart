@@ -340,32 +340,40 @@ Middleware rateLimitMiddleware({
 ///
 /// Token validation (`GET /auth/me`) is deliberately excluded: it is a
 /// high-frequency session bootstrap/read operation, not a credential attempt.
+///
+/// The account actions that re-verify the password on every request (D-20)
+/// are credential attempts too: `DELETE /users/me` and `POST /users/me/export`
+/// share this bucket with the `/auth` submissions.
 bool isAuthCredentialAttempt(Request request) {
-  if (request.method != HttpMethod.post) return false;
-
   final path = request.uri.path;
   final normalizedPath =
       path.length > 1 && path.endsWith('/')
           ? path.substring(0, path.length - 1)
           : path;
-  return const {
-    '/auth/login',
-    '/auth/register',
-    '/auth/forgot-password',
-    '/auth/reset-password',
-    '/auth/change-password',
-    '/auth/revoke-sessions',
-    '/auth/verify-email',
-    '/auth/resend-verification',
-  }.contains(normalizedPath);
+  return _credentialAttemptRequests.contains(
+    '${request.method.name.toUpperCase()} $normalizedPath',
+  );
 }
+
+const _credentialAttemptRequests = <String>{
+  'POST /auth/login',
+  'POST /auth/register',
+  'POST /auth/forgot-password',
+  'POST /auth/reset-password',
+  'POST /auth/change-password',
+  'POST /auth/revoke-sessions',
+  'POST /auth/verify-email',
+  'POST /auth/resend-verification',
+  'DELETE /users/me',
+  'POST /users/me/export',
+};
 
 /// Middleware específico para tentativas de autenticação (mais restritivo).
 ///
-/// Only credential submissions (`POST /auth/login` and
-/// `POST /auth/register`) consume this bucket. Other routes under `/auth`, in
-/// particular `GET /auth/me`, pass through without consuming or being blocked
-/// by the brute-force limiter.
+/// Only credential submissions ([isAuthCredentialAttempt]) consume this
+/// bucket. Other routes, in particular `GET /auth/me` and the rest of
+/// `/users`, pass through without consuming or being blocked by the
+/// brute-force limiter. It is installed on `/auth` and on `/users`.
 Middleware authRateLimit({RateLimiter? limiterOverrideForTesting}) {
   return (handler) {
     return (context) async {
@@ -503,35 +511,95 @@ Future<Response?> credentialEmailRateLimitResponse(
   RequestContext context, {
   required String email,
   required CredentialEmailBucket bucket,
-}) async {
+}) {
   final environment = _rateLimitRuntimeEnvironment();
-  final limiter =
-      _credentialEmailRateLimiterOverride ??
-      (_isProductionEnvironment(environment)
-          ? _credentialEmailRateLimiter
-          : _credentialEmailRateLimiterDev);
-  final identifier = credentialEmailRateLimitIdentifier(email);
-
-  final distributedAllowed = await _isAllowedDistributedIfAvailable(
+  return _accountScopedRateLimitResponse(
     context,
     bucket: bucket.bucket,
+    identifier: credentialEmailRateLimitIdentifier(email),
+    limiter:
+        _credentialEmailRateLimiterOverride ??
+        (_isProductionEnvironment(environment)
+            ? _credentialEmailRateLimiter
+            : _credentialEmailRateLimiterDev),
+    message:
+        'Muitas tentativas com este e-mail. Aguarde alguns minutos e tente '
+        'novamente.',
+  );
+}
+
+/// Bucket da reverificação de senha por requisição (D-20): exportação e
+/// exclusão da conta, e a troca de e-mail quando ela existir.
+const accountReverificationRateLimitBucket = 'account_reverification';
+
+/// Produção: 10 reverificações por conta a cada 15 minutos.
+final _accountReverificationRateLimiter = RateLimiter(
+  maxRequests: 10,
+  windowSeconds: 900,
+);
+
+final _accountReverificationRateLimiterDev = RateLimiter(
+  maxRequests: 200,
+  windowSeconds: 60,
+);
+
+RateLimiter? _accountReverificationRateLimiterOverride;
+
+@visibleForTesting
+void overrideAccountReverificationRateLimiterForTesting(RateLimiter? limiter) {
+  _accountReverificationRateLimiterOverride = limiter;
+}
+
+/// Limite por conta das ações que pedem a senha de novo a cada requisição.
+///
+/// O [authRateLimit] instalado em `/users` limita por IP; este limita pelo
+/// usuário do token, então um token roubado usado de vários IPs também para.
+/// Devolve a resposta 429, ou `null` para seguir.
+Future<Response?> accountReverificationRateLimitResponse(
+  RequestContext context, {
+  required String userId,
+}) {
+  final environment = _rateLimitRuntimeEnvironment();
+  return _accountScopedRateLimitResponse(
+    context,
+    bucket: accountReverificationRateLimitBucket,
+    identifier: 'user:${userId.trim()}',
+    limiter:
+        _accountReverificationRateLimiterOverride ??
+        (_isProductionEnvironment(environment)
+            ? _accountReverificationRateLimiter
+            : _accountReverificationRateLimiterDev),
+    message:
+        'Muitas tentativas com a senha desta conta. Aguarde alguns minutos e '
+        'tente novamente.',
+  );
+}
+
+Future<Response?> _accountScopedRateLimitResponse(
+  RequestContext context, {
+  required String bucket,
+  required String identifier,
+  required RateLimiter limiter,
+  required String message,
+}) async {
+  final distributedAllowed = await _isAllowedDistributedIfAvailable(
+    context,
+    bucket: bucket,
     clientId: identifier,
     maxRequests: limiter.maxRequests,
     windowSeconds: limiter.windowSeconds,
   );
   final allowed =
-      distributedAllowed ?? limiter.isAllowed('${bucket.bucket}|$identifier');
+      distributedAllowed ?? limiter.isAllowed('$bucket|$identifier');
   if (allowed) return null;
 
   return Response.json(
     statusCode: HttpStatus.tooManyRequests,
     body: buildRateLimitResponseBody(
       error: 'Too Many Login Attempts',
-      message:
-          'Muitas tentativas com este e-mail. Aguarde alguns minutos e tente '
-          'novamente.',
+      message: message,
       retryAfterSeconds: limiter.windowSeconds,
-      bucket: bucket.bucket,
+      bucket: bucket,
       scope: 'account',
       backend:
           distributedAllowed == null ? 'in_memory_fallback' : 'distributed',

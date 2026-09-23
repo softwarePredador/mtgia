@@ -1,5 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
-import 'package:postgres/postgres.dart';
+import 'package:postgres/postgres.dart' hide Type;
+import 'package:postgres/postgres.dart' as pg show Type;
 
 /// Pool roteirizado para testes sem PostgreSQL.
 ///
@@ -35,7 +36,7 @@ class ScriptedPool implements Pool<Object?>, TxSession {
     QueryMode? queryMode,
     Duration? timeout,
   }) async {
-    queries.add(query is Sql ? query.toString() : '$query');
+    queries.add(_sqlText(query));
     this.parameters.add(parameters);
     if (_next >= _steps.length) {
       throw StateError('Consulta inesperada #${_next + 1}: $query');
@@ -74,6 +75,16 @@ class ScriptedPool implements Pool<Object?>, TxSession {
   }) => throw UnimplementedError('withConnection não é usado nestes testes');
 }
 
+/// Texto SQL de um `Sql.named` (a classe concreta não é exportada) ou string.
+String _sqlText(Object query) {
+  if (query is String) return query;
+  try {
+    return (query as dynamic).sql as String;
+  } on NoSuchMethodError {
+    return '$query';
+  }
+}
+
 /// Resultado com as colunas nomeadas, para `toColumnMap()` funcionar.
 Result scriptedResult({
   List<String> columns = const [],
@@ -83,7 +94,7 @@ Result scriptedResult({
     for (final column in columns)
       ResultSchemaColumn(
         typeOid: 0,
-        type: Type.unspecified,
+        type: pg.Type.unspecified,
         columnName: column,
       ),
   ]);
@@ -94,7 +105,8 @@ Result scriptedResult({
   );
 }
 
-/// Contexto de requisição com provedores explícitos por tipo.
+/// Contexto de requisição com provedores explícitos por tipo (o `Type` do
+/// Dart, não o do pacote postgres).
 class ScriptedRequestContext implements RequestContext {
   ScriptedRequestContext(this.request, {Map<Type, Object> providers = const {}})
     : _providers = providers;

@@ -262,7 +262,7 @@ void main() {
         'POST /auth/reset-password',
         'POST /auth/resend-verification',
         'POST /auth/verify-email',
-        'GET /users/me/export',
+        'POST /users/me/export',
       ];
       for (final request in requests) {
         final separator = request.indexOf(' ');
@@ -353,6 +353,8 @@ void main() {
         'GET /reports/report/extra',
         'GET /users/me/plan/checkout',
         'GET /billing/webhook',
+        // A exportação só sai com a senha no corpo (D-19, D-20).
+        'GET /users/me/export',
       ];
       for (final request in denied) {
         final separator = request.indexOf(' ');

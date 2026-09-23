@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
 import 'auth_service.dart';
+import 'rate_limit_middleware.dart' show credentialEmailRateLimitIdentifier;
 
 const accountDeletionConfirmation = 'EXCLUIR MINHA CONTA';
 const accountDeletionPolicyVersion = 'manaloom-beta-privacy-v1';
@@ -19,6 +20,38 @@ class UserDataPrivacyService {
 
   final Pool pool;
   final AuthService _authService;
+
+  /// Reverificação de senha por requisição (D-20), sem migração: compara a
+  /// senha enviada com `users.password_hash`. A exportação chama antes de
+  /// montar o arquivo; a exclusão confere dentro da própria transação.
+  Future<void> verifyCurrentPassword({
+    required String userId,
+    required String password,
+  }) async {
+    final result = await pool.execute(
+      Sql.named('''
+        SELECT password_hash
+        FROM users
+        WHERE id = CAST(@userId AS uuid)
+          AND deleted_at IS NULL
+        LIMIT 1
+      '''),
+      parameters: {'userId': userId},
+    );
+    if (result.isEmpty) throw UserDataNotFoundException();
+    final passwordHash = result.first.toColumnMap()['password_hash'];
+    if (!_passwordMatches(password, passwordHash?.toString() ?? '')) {
+      throw InvalidAccountPasswordException();
+    }
+  }
+
+  bool _passwordMatches(String password, String passwordHash) {
+    try {
+      return _authService.verifyPassword(password, passwordHash);
+    } catch (_) {
+      return false;
+    }
+  }
 
   Future<Map<String, dynamic>> exportUserData(String userId) {
     return pool.runTx(
@@ -614,13 +647,9 @@ class UserDataPrivacyService {
 
       final user = userResult.first.toColumnMap();
       final passwordHash = user['password_hash']?.toString() ?? '';
-      var passwordMatches = false;
-      try {
-        passwordMatches = _authService.verifyPassword(password, passwordHash);
-      } catch (_) {
-        passwordMatches = false;
+      if (!_passwordMatches(password, passwordHash)) {
+        throw InvalidAccountPasswordException();
       }
-      if (!passwordMatches) throw InvalidAccountPasswordException();
 
       final originalEmail = user['email']?.toString() ?? '';
       final randomSecret = _secureRandomToken();
@@ -926,10 +955,17 @@ class UserDataPrivacyService {
         'rate_limit_events',
         '''
           DELETE FROM rate_limit_events
-          WHERE identifier IN (@userId, @email)
+          WHERE identifier IN (
+            @userId, @email, @userIdentity, @emailIdentity
+          )
         ''',
         userId,
-        extraParameters: {'email': originalEmail.toLowerCase()},
+        extraParameters: {
+          'email': originalEmail.toLowerCase(),
+          // Identidades dos limites por conta (D-20, D-21).
+          'userIdentity': 'user:$userId',
+          'emailIdentity': credentialEmailRateLimitIdentifier(originalEmail),
+        },
       );
 
       final anonymized = await session.execute(

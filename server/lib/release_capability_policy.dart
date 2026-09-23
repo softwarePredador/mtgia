@@ -609,7 +609,8 @@ const _exactControlPlaneRequests = <String>{
   'GET /users/me',
   'PATCH /users/me',
   'DELETE /users/me',
-  'GET /users/me/export',
+  // POST: a exportação pede a senha no corpo a cada requisição (D-20).
+  'POST /users/me/export',
   'GET /users/me/plan',
   'GET /users/me/blocks',
   'GET /users/me/activation-events',

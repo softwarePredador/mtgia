@@ -6,6 +6,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/auth_middleware.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/rate_limit_middleware.dart';
 import '../../../lib/user_data_privacy_service.dart';
 
 Future<Response> onRequest(RequestContext context) async {
@@ -339,6 +340,14 @@ Future<Response> _deleteMe(RequestContext context) async {
   }
 
   try {
+    // A senha é conferida a cada pedido (D-20); além do bucket de
+    // credenciais por IP do middleware de /users, há o limite por conta.
+    final limited = await accountReverificationRateLimitResponse(
+      context,
+      userId: userId,
+    );
+    if (limited != null) return limited;
+
     final result = await UserDataPrivacyService(
       context.read<Pool>(),
     ).deleteAndAnonymizeAccount(userId: userId, password: password);
