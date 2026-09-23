@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "b415333dbc7b86e05aafdb01f3793feebaeb55e4b7b5ce0c78957f315dc2d921"
+    "sha256": "b637d766c16900c52c88c5ff61933408501e59c339c0ff19a4ba471a8f0a67fb"
   },
   "required_task_fields": [
     "id",
@@ -435,12 +435,12 @@
     {
       "id": "DCK-P0-06",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Soft-delete, lixeira, restore e purge posterior governado.",
       "depends_on": [
         "BT-DB-001"
       ],
-      "acceptance": "DELETE não apaga cards imediatamente; some de todas as superfícies; restore íntegro e privado. Decisão do dono em 2026-09-22: D-30, purge em 30 dias; deck na lixeira não conta em limite nem em aprendizado e entra na exportação; restaurar não republica relatório. D-19: `/reports/:id` segue público, mas é invalidado quando o deck é apagado.",
+      "acceptance": "DELETE não apaga cards imediatamente; some de todas as superfícies; restore íntegro e privado. Decisão do dono em 2026-09-22: D-30, purge em 30 dias; deck na lixeira não conta em limite nem em aprendizado e entra na exportação; restaurar não republica relatório. D-19: `/reports/:id` segue público, mas é invalidado quando o deck é apagado. Parte da D-19 (buraco 4) feita localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `getPublicReport` só serve o relatório com o deck vivo e fora da lixeira (JOIN em `decks` com `deleted_at IS NULL`), sem migração; vale também para os relatórios de decks apagados antes da correção. Evidência: `server/test/shareable_report_deleted_deck_test.dart` e `server/test/shareable_report_deleted_deck_db_live_test.dart` (PostgreSQL descartável: deck apagado e deck na lixeira deixam de servir, o de deck vivo segue 200; a versão da base falha nos dois). Soft-delete, lixeira, restore e purge continuam abertos; quando o restore existir, ele precisa manter o relatório invalidado (D-30), porque o filtro de leitura sozinho voltaria a servi-lo.",
       "section": "P0 do ciclo",
       "source_line": 325
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "4fcb2583bd70f1cd5b0997b272945af4ef7a231d3780dd15af9d195e922c2c36"
+  "project_logic_source_digest_sha256": "ba1911c35f7acf322f2079a6b5c606c2712651c6fef4bb7f3f8310ff489f9082"
 }

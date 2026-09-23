@@ -82,15 +82,22 @@ class ShareableReportService {
     return result.isEmpty ? null : _rowToJson(result.first);
   }
 
+  /// Relatório público pelo id. Continua público, porque é o
+  /// compartilhamento, mas deixa de ser servido quando o deck foi apagado
+  /// (D-19): apagar o deck zera `deck_id` (`ON DELETE SET NULL`) e a lixeira
+  /// marca `decks.deleted_at`; nos dois casos o JOIN não encontra o deck.
   Future<Map<String, dynamic>?> getPublicReport(String reportId) async {
     final result = await pool.execute(
       Sql.named('''
-        SELECT id, deck_id, title, description, payload, is_public,
-               created_at, updated_at, expires_at
-        FROM shared_deck_reports
-        WHERE id = @reportId
-          AND is_public = TRUE
-          AND (expires_at IS NULL OR expires_at > NOW())
+        SELECT r.id, r.deck_id, r.title, r.description, r.payload,
+               r.is_public, r.created_at, r.updated_at, r.expires_at
+        FROM shared_deck_reports r
+        JOIN decks d
+          ON d.id = r.deck_id
+         AND d.deleted_at IS NULL
+        WHERE r.id = @reportId
+          AND r.is_public = TRUE
+          AND (r.expires_at IS NULL OR r.expires_at > NOW())
         LIMIT 1
       '''),
       parameters: {'reportId': reportId},
