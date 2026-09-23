@@ -5,6 +5,7 @@ import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_service.dart';
 import '../../lib/observability.dart';
 import '../../lib/password_reset_delivery_service.dart';
+import '../../lib/rate_limit_middleware.dart';
 import '../../lib/runtime_environment.dart';
 
 const _publicMessage =
@@ -26,6 +27,13 @@ Future<Response> onRequest(RequestContext context) async {
   PasswordResetRequest? resetRequest;
   if (email.isNotEmpty && email.contains('@')) {
     try {
+      // Limite por e-mail (D-21); o limite por IP roda no middleware de /auth.
+      final limited = await credentialEmailRateLimitResponse(
+        context,
+        email: email,
+        bucket: CredentialEmailBucket.recovery,
+      );
+      if (limited != null) return limited;
       resetRequest = await AuthService().createPasswordResetRequest(
         email: email,
       );

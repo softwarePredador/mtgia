@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:dart_frog/dart_frog.dart';
+import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 
 import 'auth_runtime_policy.dart';
@@ -447,6 +450,98 @@ Middleware authRateLimit({RateLimiter? limiterOverrideForTesting}) {
       return handler(context);
     };
   };
+}
+
+/// Buckets do limite por e-mail (D-21: "limite por e-mail e por IP").
+///
+/// O limite por IP é o [authRateLimit], que roda no middleware antes do
+/// handler. Este é a outra metade: roda dentro do handler, depois de ler o
+/// e-mail, e conta as tentativas contra o mesmo e-mail vindas de qualquer IP.
+/// Login e recuperação têm buckets separados, para quem esgota o login de
+/// alguém não bloquear também a recuperação de senha dessa pessoa.
+enum CredentialEmailBucket {
+  login('auth_login_email'),
+  recovery('auth_recovery_email');
+
+  const CredentialEmailBucket(this.bucket);
+
+  final String bucket;
+}
+
+/// Produção: 10 tentativas por e-mail a cada 15 minutos, em cada bucket.
+final _credentialEmailRateLimiter = RateLimiter(
+  maxRequests: 10,
+  windowSeconds: 900,
+);
+
+final _credentialEmailRateLimiterDev = RateLimiter(
+  maxRequests: 200,
+  windowSeconds: 60,
+);
+
+RateLimiter? _credentialEmailRateLimiterOverride;
+
+@visibleForTesting
+void overrideCredentialEmailRateLimiterForTesting(RateLimiter? limiter) {
+  _credentialEmailRateLimiterOverride = limiter;
+}
+
+/// Identificador pseudônimo do e-mail alvo. Só o digest chega ao limitador
+/// (e a `rate_limit_events`, em produção); o e-mail nunca é guardado.
+String credentialEmailRateLimitIdentifier(String email) {
+  final normalized = email.trim().toLowerCase();
+  final digest = sha256.convert(
+    utf8.encode('brewtact:credential-email:$normalized'),
+  );
+  return 'email:$digest';
+}
+
+/// Devolve a resposta 429 quando o e-mail esgotou as tentativas do [bucket],
+/// ou `null` para seguir. Vale igual para e-mail com ou sem conta, então o
+/// limite não denuncia cadastro.
+Future<Response?> credentialEmailRateLimitResponse(
+  RequestContext context, {
+  required String email,
+  required CredentialEmailBucket bucket,
+}) async {
+  final environment = _rateLimitRuntimeEnvironment();
+  final limiter =
+      _credentialEmailRateLimiterOverride ??
+      (_isProductionEnvironment(environment)
+          ? _credentialEmailRateLimiter
+          : _credentialEmailRateLimiterDev);
+  final identifier = credentialEmailRateLimitIdentifier(email);
+
+  final distributedAllowed = await _isAllowedDistributedIfAvailable(
+    context,
+    bucket: bucket.bucket,
+    clientId: identifier,
+    maxRequests: limiter.maxRequests,
+    windowSeconds: limiter.windowSeconds,
+  );
+  final allowed =
+      distributedAllowed ?? limiter.isAllowed('${bucket.bucket}|$identifier');
+  if (allowed) return null;
+
+  return Response.json(
+    statusCode: HttpStatus.tooManyRequests,
+    body: buildRateLimitResponseBody(
+      error: 'Too Many Login Attempts',
+      message:
+          'Muitas tentativas com este e-mail. Aguarde alguns minutos e tente '
+          'novamente.',
+      retryAfterSeconds: limiter.windowSeconds,
+      bucket: bucket.bucket,
+      scope: 'account',
+      backend:
+          distributedAllowed == null ? 'in_memory_fallback' : 'distributed',
+    ),
+    headers: buildRateLimitHeaders(
+      maxRequests: limiter.maxRequests,
+      windowSeconds: limiter.windowSeconds,
+      retryAfterSeconds: limiter.windowSeconds,
+    ),
+  );
 }
 
 /// Middleware específico para rotas de IA (controla custos)

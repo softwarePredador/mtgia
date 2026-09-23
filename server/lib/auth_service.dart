@@ -24,7 +24,10 @@ class AuthService {
 
   late final String _jwtSecret;
 
-  AuthService._internal({String? jwtSecret}) {
+  AuthService._internal({
+    String? jwtSecret,
+    bool Function(String password, String hash)? loginPasswordVerifier,
+  }) : _loginPasswordVerifierForTesting = loginPasswordVerifier {
     if (jwtSecret != null) {
       _jwtSecret = jwtSecret;
       return;
@@ -40,13 +43,38 @@ class AuthService {
     _jwtSecret = secret!;
   }
 
+  /// [loginPasswordVerifier] substitui a comparação bcrypt do login, para o
+  /// teste observar que ela roda também quando o e-mail não tem conta.
   @visibleForTesting
-  static void resetForTesting({String jwtSecret = 'hermes-local-test-secret'}) {
-    _instance = AuthService._internal(jwtSecret: jwtSecret);
+  static void resetForTesting({
+    String jwtSecret = 'hermes-local-test-secret',
+    bool Function(String password, String hash)? loginPasswordVerifier,
+  }) {
+    _instance = AuthService._internal(
+      jwtSecret: jwtSecret,
+      loginPasswordVerifier: loginPasswordVerifier,
+    );
   }
 
   /// Duração de validade do token (24 horas)
   final Duration _tokenDuration = const Duration(hours: 24);
+
+  final bool Function(String password, String hash)?
+  _loginPasswordVerifierForTesting;
+
+  /// Hash bcrypt de um segredo aleatório, gerado por [hashPassword] e portanto
+  /// com o mesmo custo dos hashes guardados.
+  ///
+  /// O login compara a senha recebida com ele quando o e-mail não tem conta:
+  /// conta inexistente paga o mesmo bcrypt que conta existente, e o tempo de
+  /// resposta deixa de denunciar quais e-mails estão cadastrados (D-21).
+  late final String _missingAccountPasswordHash = hashPassword(
+    _newOpaqueToken(),
+  );
+
+  @visibleForTesting
+  String get missingAccountPasswordHashForTesting =>
+      _missingAccountPasswordHash;
 
   /// Cria um hash seguro da senha usando bcrypt
   ///
@@ -255,6 +283,10 @@ class AuthService {
   /// - Email existe no banco
   /// - Senha corresponde ao hash armazenado
   ///
+  /// Conta inexistente e senha errada falham do mesmo jeito, com
+  /// [InvalidCredentialsException], e pelo mesmo caminho: uma verificação
+  /// bcrypt em ambos os casos (D-21).
+  ///
   /// Retorna: Map com 'userId', 'username', 'email' e 'token'
   Future<Map<String, dynamic>> login({
     required String email,
@@ -279,21 +311,22 @@ class AuthService {
       parameters: {'email': normalizedEmail},
     );
 
-    if (result.isEmpty) {
-      throw Exception('Credenciais inválidas');
+    final row = result.isEmpty ? null : result.first;
+
+    // Verificar senha. Roda também quando o e-mail não tem conta, contra um
+    // hash fictício de mesmo custo, para o tempo não denunciar a conta.
+    final passwordMatches = _loginPasswordMatches(
+      password,
+      row == null ? null : row[3] as String?,
+    );
+    if (row == null || !passwordMatches) {
+      throw const InvalidCredentialsException();
     }
 
-    final row = result.first;
     final userId = row[0] as String;
     final username = row[1] as String;
     final userEmail = row[2] as String;
-    final passwordHash = row[3] as String;
     final authVersion = _readInteger(row[4]);
-
-    // Verificar senha
-    if (!verifyPassword(password, passwordHash)) {
-      throw Exception('Credenciais inválidas');
-    }
 
     // Gerar token
     final token = generateToken(userId, username, authVersion: authVersion);
@@ -305,6 +338,22 @@ class AuthService {
       'token': token,
       'emailVerified': row[5] != null,
     };
+  }
+
+  /// Faz sempre exatamente uma verificação de senha: contra [storedHash] ou,
+  /// se a conta não existe, contra [_missingAccountPasswordHash].
+  ///
+  /// Hash guardado malformado conta como senha errada; o texto da exceção
+  /// não sai daqui.
+  bool _loginPasswordMatches(String password, String? storedHash) {
+    final verify = _loginPasswordVerifierForTesting ?? verifyPassword;
+    var matches = false;
+    try {
+      matches = verify(password, storedHash ?? _missingAccountPasswordHash);
+    } on Exception {
+      matches = false;
+    }
+    return storedHash != null && matches;
   }
 
   /// Busca informações do usuário a partir do token JWT
@@ -779,6 +828,17 @@ class AccountSecurityResult {
     'token': token,
     'user': {'id': userId, 'username': username, 'email': email},
   };
+}
+
+/// Login recusado. Vale igual para conta inexistente e senha errada, para a
+/// resposta não denunciar quais e-mails têm conta.
+class InvalidCredentialsException implements Exception {
+  const InvalidCredentialsException();
+
+  static const message = 'Credenciais inválidas';
+
+  @override
+  String toString() => message;
 }
 
 class AccountSecurityException implements Exception {

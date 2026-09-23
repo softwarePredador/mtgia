@@ -20,6 +20,18 @@ class Database {
     _instance = Database._internal();
   }
 
+  /// Serve [pool] como a conexão já aberta, sem tocar a rede.
+  ///
+  /// Permite testar serviços que usam o singleton (como o login do
+  /// `AuthService`) com um pool roteirizado.
+  @visibleForTesting
+  static void useConnectionForTesting(Pool pool) {
+    _instance =
+        Database._internal()
+          .._pool = pool
+          .._connected = true;
+  }
+
   /// Verifica se o banco está conectado.
   bool get isConnected => _connected;
 
