@@ -5,12 +5,73 @@ import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
 import 'auth_service.dart';
+import 'privacy/deleted_deck_anonymizer.dart';
 import 'privacy/privacy_export_allowlist.dart';
 import 'privacy/privacy_export_pseudonymizer.dart';
 import 'rate_limit_middleware.dart' show credentialEmailRateLimitIdentifier;
 
 const accountDeletionConfirmation = 'EXCLUIR MINHA CONTA';
-const accountDeletionPolicyVersion = 'manaloom-beta-privacy-v1';
+
+/// Versão da política gravada em cada recibo. A v2 anonimiza as simulações
+/// de outras pessoas contra o deck público de quem saiu (D-23), fecha as
+/// lacunas do inventário (BT-PRIV-003) e para quando falta uma relação.
+const accountDeletionPolicyVersion = 'brewtact-beta-privacy-v2';
+
+/// O que a exclusão faz com cada classe de dado; vai no recibo e na resposta.
+const accountDeletionRetentionSummary = <String, String>{
+  'trades_and_disputes': 'anonymized',
+  'moderation_records': 'anonymized',
+  'operational_aggregates': 'deidentified',
+  'deck_learning_and_battle_rows': 'deleted',
+  'third_party_simulations_against_public_decks': 'anonymized',
+  'blocks_and_account_tokens': 'deleted',
+  'deleted_deck_anti_resurrection_keys': 'opaque_identifier_only',
+};
+
+/// Relações que a exclusão toca. Todas são conferidas antes da primeira
+/// escrita: relação ausente para a exclusão em vez de virar sucesso.
+const accountDeletionRelations = <String>[
+  'account_deletion_receipts',
+  'activation_funnel_events',
+  'ai_generate_jobs',
+  'ai_logs',
+  'ai_optimize_cache',
+  'ai_optimize_fallback_telemetry',
+  'ai_optimize_jobs',
+  'ai_user_preferences',
+  'battle_jobs',
+  'battle_replay_annotations',
+  'battle_simulation_attempts',
+  'battle_simulations',
+  'content_report_appeals',
+  'content_reports',
+  'conversations',
+  'deck_comments',
+  'deck_learning_events',
+  'deck_optimization_events',
+  'decks',
+  'direct_messages',
+  'email_verification_tokens',
+  'interactive_battle_sessions',
+  'ml_prompt_feedback',
+  'moderation_actions',
+  'notifications',
+  'password_reset_tokens',
+  'post_game_notes',
+  'privacy_deleted_deck_tombstones',
+  'privacy_keyring',
+  'rate_limit_events',
+  'shared_deck_reports',
+  'trade_messages',
+  'trade_offers',
+  'trade_status_history',
+  'user_binder_items',
+  'user_block_events',
+  'user_blocks',
+  'user_follows',
+  'user_plans',
+  'users',
+];
 
 class UserDataNotFoundException implements Exception {}
 
@@ -184,6 +245,8 @@ class UserDataPrivacyService {
       if (!_passwordMatches(password, passwordHash)) {
         throw InvalidAccountPasswordException();
       }
+      await _requireRelations(session, accountDeletionRelations);
+      final ownDeckIds = await _ownDeckIds(session, userId);
 
       final originalEmail = user['email']?.toString() ?? '';
       final randomSecret = _secureRandomToken();
@@ -196,90 +259,90 @@ class UserDataPrivacyService {
       final replacementPasswordHash = _authService.hashPassword(randomSecret);
       final deletedAt = DateTime.now().toUtc();
 
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ai_logs',
         'DELETE FROM ai_logs WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ai_optimize_fallback_telemetry',
         'DELETE FROM ai_optimize_fallback_telemetry '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ai_optimize_cache',
         'DELETE FROM ai_optimize_cache WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ai_optimize_jobs',
         'DELETE FROM ai_optimize_jobs WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ai_generate_jobs',
         'DELETE FROM ai_generate_jobs WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'battle_jobs',
         'DELETE FROM battle_jobs WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'interactive_battle_sessions',
         'DELETE FROM interactive_battle_sessions '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ml_prompt_feedback',
         'DELETE FROM ml_prompt_feedback WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'activation_funnel_events',
         'DELETE FROM activation_funnel_events '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'deck_optimization_events',
         'DELETE FROM deck_optimization_events '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'shared_deck_reports',
         'DELETE FROM shared_deck_reports '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'post_game_notes',
         'DELETE FROM post_game_notes WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'deck_comments',
         'DELETE FROM deck_comments WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'user_follows',
         'DELETE FROM user_follows '
@@ -287,12 +350,12 @@ class UserDataPrivacyService {
             'OR following_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _executeIfPresent(session, 'notifications', '''
+      await _executeOn(session, 'notifications', '''
           DELETE FROM notifications
           WHERE type = 'new_follower'
             AND reference_id::text = @userId
         ''', userId);
-      await _executeIfAllPresent(
+      await _executeOnAll(
         session,
         const ['notifications', 'trade_offers'],
         '''
@@ -306,7 +369,7 @@ class UserDataPrivacyService {
         ''',
         userId,
       );
-      await _executeIfAllPresent(
+      await _executeOnAll(
         session,
         const ['notifications', 'conversations'],
         '''
@@ -320,42 +383,42 @@ class UserDataPrivacyService {
         ''',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'notifications',
         'DELETE FROM notifications WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _executeIfPresent(session, 'content_reports', '''
+      await _executeOn(session, 'content_reports', '''
           UPDATE content_reports
-          SET reporter_user_id = NULL, details = ''
+          SET reporter_user_id = NULL, details = '', evidence = '{}'::jsonb
           WHERE reporter_user_id = CAST(@userId AS uuid)
         ''', userId);
-      await _executeIfPresent(
+      await _executeOn(
         session,
         'content_reports',
         'UPDATE content_reports SET reviewed_by = NULL '
             'WHERE reviewed_by = CAST(@userId AS uuid)',
         userId,
       );
-      await _executeIfPresent(session, 'direct_messages', '''
+      await _executeOn(session, 'direct_messages', '''
           UPDATE direct_messages
           SET message = '[mensagem removida pelo titular]'
           WHERE sender_id = CAST(@userId AS uuid)
         ''', userId);
-      await _executeIfPresent(session, 'trade_messages', '''
+      await _executeOn(session, 'trade_messages', '''
           UPDATE trade_messages
           SET message = '[mensagem removida pelo titular]',
               attachment_url = NULL,
               attachment_type = NULL
           WHERE sender_id = CAST(@userId AS uuid)
         ''', userId);
-      await _executeIfPresent(session, 'trade_status_history', '''
+      await _executeOn(session, 'trade_status_history', '''
           UPDATE trade_status_history
           SET notes = '[detalhe removido pelo titular]'
           WHERE changed_by = CAST(@userId AS uuid)
         ''', userId);
-      await _executeIfPresent(session, 'trade_offers', '''
+      await _executeOn(session, 'trade_offers', '''
           UPDATE trade_offers
           SET message = CASE
                 WHEN sender_id = CAST(@userId AS uuid) THEN NULL
@@ -366,7 +429,7 @@ class UserDataPrivacyService {
           WHERE sender_id = CAST(@userId AS uuid)
              OR receiver_id = CAST(@userId AS uuid)
         ''', userId);
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'user_binder_items',
         'DELETE FROM user_binder_items WHERE user_id = CAST(@userId AS uuid)',
@@ -417,7 +480,7 @@ class UserDataPrivacyService {
           tombstoneCounts['tombstone_count']) {
         throw StateError('privacy_keyring ativa ausente; exclusão abortada.');
       }
-      await _executeIfAllPresent(
+      await _executeOnAll(
         session,
         const ['deck_learning_events', 'decks'],
         '''
@@ -428,63 +491,60 @@ class UserDataPrivacyService {
         ''',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'battle_replay_annotations',
         'DELETE FROM battle_replay_annotations '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _executeIfAllPresent(
+      // D-23 (BT-BAT-002): simulação que outra pessoa rodou contra o deck
+      // público do titular fica com ela, sem apontar para ele; as que o
+      // titular rodou saem.
+      await _anonymizeThirdPartySimulations(session, userId, ownDeckIds);
+      await _executeOnAll(
         session,
-        const ['battle_simulation_attempts', 'decks'],
-        '''
-          DELETE FROM battle_simulation_attempts attempt
-          WHERE attempt.user_id = CAST(@userId AS uuid)
-             OR EXISTS (
-               SELECT 1
-               FROM decks deck
-               WHERE deck.user_id = CAST(@userId AS uuid)
-                 AND deck.id IN (attempt.deck_a_id, attempt.deck_b_id)
-             )
-        ''',
-        userId,
-      );
-      await _executeIfAllPresent(
-        session,
-        const ['battle_simulations', 'decks'],
+        const ['battle_simulations', 'battle_simulation_attempts', 'decks'],
         '''
           DELETE FROM battle_simulations simulation
-          USING decks deck
-          WHERE deck.user_id = CAST(@userId AS uuid)
-            AND (
-              simulation.deck_a_id = deck.id
-              OR simulation.deck_b_id = deck.id
-              OR simulation.winner_deck_id = deck.id
-            )
+          WHERE simulation.deck_a_id IN (
+                  SELECT deck.id
+                  FROM decks deck
+                  WHERE deck.user_id = CAST(@userId AS uuid)
+                )
+             OR simulation.id IN (
+                  SELECT own_attempt.replay_id
+                  FROM battle_simulation_attempts own_attempt
+                  WHERE own_attempt.user_id = CAST(@userId AS uuid)
+                    AND own_attempt.replay_id IS NOT NULL
+                )
         ''',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(session, 'battle_simulation_attempts', '''
+          DELETE FROM battle_simulation_attempts attempt
+          WHERE attempt.user_id = CAST(@userId AS uuid)
+        ''', userId);
+      await _executeOn(
         session,
         'decks',
         'DELETE FROM decks WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'ai_user_preferences',
         'DELETE FROM ai_user_preferences '
             'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _deleteIfPresent(
+      await _executeOn(
         session,
         'user_plans',
         'DELETE FROM user_plans WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
-      await _executeIfPresent(
+      await _executeOn(
         session,
         'rate_limit_events',
         '''
@@ -500,6 +560,54 @@ class UserDataPrivacyService {
           'userIdentity': 'user:$userId',
           'emailIdentity': credentialEmailRateLimitIdentifier(originalEmail),
         },
+      );
+      // Lacunas do inventário (BT-PRIV-003): bloqueios, tokens, recursos,
+      // ações de moderação e trilha de bloqueios.
+      await _executeOn(session, 'user_blocks', '''
+          DELETE FROM user_blocks
+          WHERE blocker_id = CAST(@userId AS uuid)
+             OR blocked_id = CAST(@userId AS uuid)
+        ''', userId);
+      // Um comando por coluna: o trigger de conta ativa roda só na coluna
+      // alterada, e a outra ponta pode ser uma conta já excluída.
+      await _executeOn(session, 'user_block_events', '''
+          UPDATE user_block_events
+          SET actor_user_id = NULL, reason = NULL
+          WHERE actor_user_id = CAST(@userId AS uuid)
+        ''', userId);
+      await _executeOn(session, 'user_block_events', '''
+          UPDATE user_block_events
+          SET target_user_id = NULL
+          WHERE target_user_id = CAST(@userId AS uuid)
+        ''', userId);
+      await _executeOn(session, 'content_report_appeals', '''
+          UPDATE content_report_appeals
+          SET reason = '[recurso removido pelo titular]'
+          WHERE appellant_user_id = CAST(@userId AS uuid)
+        ''', userId);
+      await _executeOn(session, 'content_report_appeals', '''
+          UPDATE content_report_appeals
+          SET reviewed_by = NULL
+          WHERE reviewed_by = CAST(@userId AS uuid)
+        ''', userId);
+      await _executeOn(session, 'moderation_actions', '''
+          UPDATE moderation_actions
+          SET moderator_user_id = NULL
+          WHERE moderator_user_id = CAST(@userId AS uuid)
+        ''', userId);
+      await _executeOn(
+        session,
+        'password_reset_tokens',
+        'DELETE FROM password_reset_tokens '
+            'WHERE user_id = CAST(@userId AS uuid)',
+        userId,
+      );
+      await _executeOn(
+        session,
+        'email_verification_tokens',
+        'DELETE FROM email_verification_tokens '
+            'WHERE user_id = CAST(@userId AS uuid)',
+        userId,
       );
 
       final anonymized = await session.execute(
@@ -530,13 +638,7 @@ class UserDataPrivacyService {
       );
       if (anonymized.isEmpty) throw UserDataNotFoundException();
 
-      const retention = <String, String>{
-        'trades_and_disputes': 'anonymized',
-        'moderation_records': 'anonymized',
-        'operational_aggregates': 'deidentified',
-        'deck_learning_and_battle_rows': 'deleted',
-        'deleted_deck_anti_resurrection_keys': 'opaque_identifier_only',
-      };
+      const retention = accountDeletionRetentionSummary;
       await session.execute(
         Sql.named('''
           INSERT INTO account_deletion_receipts (
@@ -562,45 +664,141 @@ class UserDataPrivacyService {
     });
   }
 
-  Future<void> _deleteIfPresent(
+  /// Para a exclusão, antes de qualquer escrita, se alguma relação faltar.
+  /// Os nomes vêm de [accountDeletionRelations], constantes do código.
+  Future<void> _requireRelations(
     Session session,
-    String relation,
-    String query,
-    String userId,
-  ) => _executeIfPresent(session, relation, query, userId);
+    List<String> relations,
+  ) async {
+    final names = relations.map((relation) {
+      if (!RegExp(r'^[a-z_]+$').hasMatch(relation)) {
+        throw StateError('Nome de relação inválido: $relation');
+      }
+      return "'$relation'";
+    });
+    final result = await session.execute('''
+      SELECT relation
+      FROM unnest(ARRAY[${names.join(', ')}]::text[]) AS relation
+      WHERE to_regclass('public.' || relation) IS NULL
+      ORDER BY relation
+    ''');
+    final missing = [for (final row in result) '${row[0]}'];
+    if (missing.isNotEmpty) {
+      throw StateError(
+        'Relações obrigatórias ausentes na exclusão: ${missing.join(', ')}.',
+      );
+    }
+  }
 
-  Future<void> _executeIfPresent(
+  Future<List<String>> _ownDeckIds(Session session, String userId) async {
+    final result = await session.execute(
+      Sql.named('''
+        SELECT id::text
+        FROM decks
+        WHERE user_id = CAST(@userId AS uuid)
+      '''),
+      parameters: {'userId': userId},
+    );
+    return [for (final row in result) '${row[0]}'];
+  }
+
+  /// D-23: o replay (`game_log`, `metrics`) de uma simulação que outra
+  /// pessoa rodou contra o deck público do titular perde o UUID e o nome do
+  /// deck dele, e a tentativa perde o hash do lado dele. `deck_b_id` e
+  /// `winner_deck_id` viram nulos pela FK quando os decks são apagados.
+  Future<void> _anonymizeThirdPartySimulations(
+    Session session,
+    String userId,
+    List<String> ownDeckIds,
+  ) async {
+    if (ownDeckIds.isEmpty) return;
+    const ownDecks = '''
+      SELECT deck.id
+      FROM decks deck
+      WHERE deck.user_id = CAST(@userId AS uuid)
+    ''';
+    final replays = await session.execute(
+      Sql.named('''
+        SELECT simulation.id::text, simulation.game_log, simulation.metrics
+        FROM battle_simulations simulation
+        WHERE (
+            simulation.deck_b_id IN ($ownDecks)
+            OR simulation.winner_deck_id IN ($ownDecks)
+          )
+          AND (
+            simulation.deck_a_id IS NULL
+            OR simulation.deck_a_id NOT IN ($ownDecks)
+          )
+        FOR UPDATE
+      '''),
+      parameters: {'userId': userId},
+    );
+    for (final replay in replays) {
+      await session.execute(
+        Sql.named('''
+          UPDATE battle_simulations
+          SET game_log = CAST(@gameLog AS jsonb),
+              metrics = CAST(@metrics AS jsonb)
+          WHERE id = CAST(@id AS uuid)
+        '''),
+        parameters: {
+          'id': '${replay[0]}',
+          'gameLog': _anonymizedReplayJson(replay[1], ownDeckIds),
+          'metrics': _anonymizedReplayJson(replay[2], ownDeckIds),
+        },
+      );
+    }
+    await session.execute(
+      Sql.named('''
+        UPDATE battle_simulation_attempts attempt
+        SET deck_a_hash = CASE
+              WHEN attempt.deck_a_id IN ($ownDecks) THEN NULL
+              ELSE attempt.deck_a_hash
+            END,
+            deck_b_hash = CASE
+              WHEN attempt.deck_b_id IN ($ownDecks) THEN NULL
+              ELSE attempt.deck_b_hash
+            END
+        WHERE attempt.user_id <> CAST(@userId AS uuid)
+          AND (
+            attempt.deck_a_id IN ($ownDecks)
+            OR attempt.deck_b_id IN ($ownDecks)
+          )
+      '''),
+      parameters: {'userId': userId},
+    );
+  }
+
+  static String? _anonymizedReplayJson(Object? value, List<String> deckIds) {
+    if (value == null) return null;
+    final decoded = value is String ? jsonDecode(value) : value;
+    return jsonEncode(anonymizeDeletedDeckReferences(decoded, deckIds));
+  }
+
+  /// Executa um comando da exclusão sobre [relation], já conferida por
+  /// [_requireRelations].
+  Future<void> _executeOn(
     Session session,
     String relation,
     String query,
     String userId, {
     Map<String, dynamic> extraParameters = const {},
   }) async {
-    if (!await _relationExists(session, relation)) return;
+    assert(accountDeletionRelations.contains(relation));
     await session.execute(
       Sql.named(query),
       parameters: {'userId': userId, ...extraParameters},
     );
   }
 
-  Future<void> _executeIfAllPresent(
+  Future<void> _executeOnAll(
     Session session,
     List<String> relations,
     String query,
     String userId,
   ) async {
-    for (final relation in relations) {
-      if (!await _relationExists(session, relation)) return;
-    }
+    assert(relations.every(accountDeletionRelations.contains));
     await session.execute(Sql.named(query), parameters: {'userId': userId});
-  }
-
-  Future<bool> _relationExists(Session session, String relation) async {
-    final result = await session.execute(
-      Sql.named('SELECT to_regclass(@relation)'),
-      parameters: {'relation': 'public.$relation'},
-    );
-    return result.isNotEmpty && result.first[0] != null;
   }
 
   static Map<String, dynamic> _jsonObject(Object? value) {

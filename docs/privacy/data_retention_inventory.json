@@ -106,7 +106,7 @@
         "ai_optimize_cache",
         "artifact:endpoint_cache_memory"
       ],
-      "status": "ai_optimize_cache vence em 6 h; o EndpointCache não tem teto de TTL e as entradas vencidas ficam na memória (BT-PRIV-002)"
+      "status": "ai_optimize_cache vence em 6 h e o EndpointCache tem teto de 24 h com limpeza periódica das entradas vencidas (BT-PRIV-002)"
     },
     {
       "decision": "D-29",
@@ -637,7 +637,7 @@
       "deletion": {
         "mode": "delete",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "Hoje apaga também as tentativas de outras pessoas contra o deck do titular; a D-23 manda anonimizar (BT-BAT-002)."
+        "notes": "Apaga as tentativas do titular. As de outra pessoa contra o deck dele ficam (D-23): o deck vira nulo pela FK e o hash do lado dele vira nulo."
       },
       "legal_exception": null,
       "columns": {
@@ -694,7 +694,7 @@
       "deletion": {
         "mode": "delete",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "Hoje a exclusão apaga toda simulação que cite um deck do titular, inclusive as que outra pessoa rodou contra o deck público dele; a D-23 manda anonimizar essas (BT-BAT-002)."
+        "notes": "Apaga as simulações que o titular rodou (deck A dele ou replay de uma tentativa dele). As que outra pessoa rodou contra o deck público dele ficam com ela (D-23): deck_b_id e winner_deck_id viram nulos pela FK e, no game_log e em metrics, o UUID do deck vira 'deck-removido' e o nome no objeto do deck vira 'Deck removido'. Nomes de deck em texto livre do motor não são tocados."
       },
       "legal_exception": null,
       "columns": {
@@ -1193,19 +1193,19 @@
       "owner": "server/lib/social_safety_service.dart",
       "retention": {
         "class": "legal_hold",
-        "period": "sem prazo",
+        "period": "sem prazo; depois da exclusão fica sem o texto do titular",
         "decision": null,
-        "enforced_by": null,
-        "gap": "a exclusão de conta não trata a tabela"
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
       },
       "export": {
         "section": "data.content_report_appeals",
         "reason": "só os recursos do titular"
       },
       "deletion": {
-        "mode": "gap",
-        "by": null,
-        "notes": "O receipt da exclusão diz moderation_records: anonymized, mas o recurso fica com o texto e o apelante."
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "O texto do recurso vira '[recurso removido pelo titular]' (o CHECK exige de 10 a 2000 caracteres) e reviewed_by do titular vira nulo; appellant_user_id é NOT NULL e fica apontando para a conta pseudonimizada."
       },
       "legal_exception": "Registro de moderação.",
       "columns": {
@@ -1241,7 +1241,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "reporter_user_id vira nulo e details vira vazio; evidence, enviada pelo denunciante, não é limpa hoje."
+        "notes": "reporter_user_id vira nulo, details vira vazio e evidence vira {}; reviewed_by do titular vira nulo."
       },
       "legal_exception": "Registro de moderação e segurança; confirmar o prazo com o advogado (BT-LEGAL-001).",
       "columns": {
@@ -1650,17 +1650,17 @@
         "class": "ttl",
         "period": "vale 24 h (auth_service.dart:401); a linha fica depois de usada ou vencida",
         "decision": null,
-        "enforced_by": null,
-        "gap": "sem purga das linhas vencidas e a exclusão de conta não as apaga"
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem purga das linhas vencidas de contas ativas"
       },
       "export": {
         "section": null,
         "reason": "segredo de autenticação"
       },
       "deletion": {
-        "mode": "gap",
-        "by": null,
-        "notes": "Os fluxos exigem conta ativa (auth_service.dart:413)."
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apagados na exclusão; os fluxos já exigiam conta ativa (auth_service.dart:413)."
       },
       "legal_exception": null
     },
@@ -1890,17 +1890,17 @@
         "class": "legal_hold",
         "period": "sem prazo",
         "decision": null,
-        "enforced_by": null,
-        "gap": "moderator_user_id não é anonimizado quando a conta do moderador é excluída"
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
       },
       "export": {
         "section": null,
         "reason": "registro da equipe de moderação, não do usuário comum; a resolução aparece na denúncia"
       },
       "deletion": {
-        "mode": "gap",
-        "by": null,
-        "notes": "A FK é ON DELETE SET NULL, mas a conta não é apagada."
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "moderator_user_id do titular vira nulo; a justificativa fica como registro de moderação."
       },
       "legal_exception": "Registro de moderação."
     },
@@ -1974,17 +1974,17 @@
         "class": "ttl",
         "period": "vale 20 min (auth_service.dart:503); a linha fica depois de usada ou vencida",
         "decision": null,
-        "enforced_by": null,
-        "gap": "sem purga das linhas vencidas e a exclusão de conta não as apaga"
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": "sem purga das linhas vencidas de contas ativas"
       },
       "export": {
         "section": null,
         "reason": "segredo de autenticação"
       },
       "deletion": {
-        "mode": "gap",
-        "by": null,
-        "notes": "Os fluxos exigem conta ativa (auth_service.dart:523), então não reativam a conta, mas as linhas ficam."
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apagados na exclusão; os fluxos já exigiam conta ativa (auth_service.dart:523)."
       },
       "legal_exception": null
     },
@@ -2514,22 +2514,22 @@
       "purpose": "Trilha de auditoria de bloquear e desbloquear, com motivo e request_id.",
       "owner": "server/lib/social_safety_service.dart",
       "retention": {
-        "class": "account_lifetime",
-        "period": "sem prazo",
+        "class": "legal_hold",
+        "period": "sem prazo; depois da exclusão fica sem a pessoa",
         "decision": null,
-        "enforced_by": null,
-        "gap": "a exclusão de conta não trata a tabela"
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
       },
       "export": {
         "section": "data.block_events",
         "reason": "só os eventos em que o titular agiu"
       },
       "deletion": {
-        "mode": "gap",
-        "by": null,
-        "notes": "A FK é ON DELETE SET NULL, mas a conta não é apagada: actor/target e o motivo ficam."
+        "mode": "anonymize",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "actor_user_id e target_user_id do titular viram nulos, cada um num comando, e o motivo que ele escreveu some; o evento fica como trilha de segurança."
       },
-      "legal_exception": null,
+      "legal_exception": "Trilha de segurança de bloqueios, sem a pessoa; confirmar o prazo com o advogado (BT-LEGAL-001).",
       "columns": {
         "action": "include",
         "actor_user_id": "person_ref",
@@ -2551,17 +2551,17 @@
         "class": "account_lifetime",
         "period": "enquanto as duas contas existirem",
         "decision": null,
-        "enforced_by": null,
-        "gap": "a exclusão de conta não trata a tabela"
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null
       },
       "export": {
         "section": "data.blocks",
         "reason": "só os bloqueios feitos pelo titular"
       },
       "deletion": {
-        "mode": "gap",
-        "by": null,
-        "notes": "A FK é ON DELETE CASCADE, mas a conta é pseudonimizada, não apagada: as linhas ficam."
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "Apaga os bloqueios feitos pelo titular e os feitos contra ele."
       },
       "legal_exception": null,
       "columns": {
@@ -2851,13 +2851,13 @@
       "kind": "memory_cache",
       "what": "EndpointCache em memória por réplica (server/lib/endpoint_cache.dart): análise de arquétipo por deck (10 min), payload do Generate por pedido (AI_GENERATE_CACHE_TTL_SECONDS, padrão 600 s, teto 3600 s) e catálogo.",
       "personal_data": true,
-      "retention": "o TTL só controla o que é servido; a entrada vencida fica na memória até a mesma chave ser lida de novo ou o processo reiniciar",
+      "retention": "teto de 24 h em qualquer entrada; a vencida sai da memória na primeira leitura ou gravação depois de 1 min, mesmo que a chave não volte a ser lida",
       "export": "fora da exportação: cópia derivada e passageira",
       "deletion": "não há invalidação na exclusão; vale o TTL de até 24 h (D-23)",
       "decisions": [
         "D-23"
       ],
-      "gap": "clearExpired não tem chamador e o TTL não tem teto de 24 h"
+      "gap": "sem nenhum acesso ao cache, a entrada vencida espera o próximo acesso ou o reinício, sem ser servida"
     },
     "request_metrics_memory": {
       "kind": "memory_cache",
@@ -2901,7 +2901,7 @@
     },
     "sentry_server": {
       "kind": "error_tracking",
-      "what": "Sentry do servidor (server/lib/observability.dart): eventos de erro com request_id, método, caminho cru (tag http_path e título) e o ID do usuário (scope.setUser).",
+      "what": "Sentry do servidor (server/lib/observability.dart): eventos de erro com request_id, método e caminho. Nenhum evento leva o usuário, e todo UUID de caminho, título, tag, exceção e contexto vira :id no beforeSend (o request_id fica).",
       "personal_data": true,
       "retention": "retenção do plano da conta Sentry; conferir no painel do Sentry e registrar aqui",
       "export": "fora da exportação",
@@ -2909,7 +2909,7 @@
       "decisions": [
         "D-23"
       ],
-      "gap": "a D-23 manda parar de enviar o ID do usuário; o caminho cru também leva UUIDs"
+      "gap": "a retenção do plano Sentry ainda não foi conferida no painel (dono)"
     },
     "sentry_app": {
       "kind": "error_tracking",
