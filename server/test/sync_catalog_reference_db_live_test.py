@@ -32,7 +32,15 @@ def _load_module():
 
 
 ENABLED = os.environ.get("RUN_CATALOG_REFERENCE_DB_TESTS") == "1"
-FIXTURE = Path(__file__).resolve().parent / "fixtures" / "scryfall_default_cards_sample.json"
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+# Por padrão, o formato de produção desde 2026-09-23: JSON Lines com gzip. A
+# lista JSON antiga roda com CATALOG_REFERENCE_DB_BULK=json. As asserções são
+# as mesmas: os dois arquivos trazem os mesmos cards.
+BULK_FIXTURES = {
+    "jsonl": (FIXTURES / "scryfall_default_cards_sample.jsonl.gz", "jsonl"),
+    "json": (FIXTURES / "scryfall_default_cards_sample.json", "json_array"),
+}
+FIXTURE, BULK_FORMAT = BULK_FIXTURES[os.environ.get("CATALOG_REFERENCE_DB_BULK", "jsonl")]
 SOURCE_UPDATED_AT = "2026-09-22T09:00:00+00:00"
 # Relógio fixo: o alerta de frescor (7 dias) não pode depender da data do teste.
 NOW = datetime(2026, 9, 23, 10, 0, tzinfo=timezone.utc)
@@ -224,6 +232,7 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
 
         code, receipt = self.run_job("--mode", "activate", *bulk, approval=True)
         self.assertEqual((code, receipt["status"]), (0, "activated"), receipt)
+        self.assertEqual(receipt["source"]["format"], BULK_FORMAT)
         counts = receipt["counts"]
         self.assertEqual(counts["cards"]["inserted"], 4)
         self.assertEqual(counts["cards"]["updated"], 1)
