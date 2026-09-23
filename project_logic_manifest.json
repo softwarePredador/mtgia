@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "3e5f3f5a8db9f1e0cd20b8788f542c6dd5d77afc265082b23b0e30834a83b8e9",
+  "source_digest_sha256": "1902bf6a70a3dc9fd1951d6d494b45ac7f6466aa190c80a430547ab8d8fb833d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 689,
+    "dart_source_files": 691,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5217,
-    "semantic_resolved_files": 689,
+    "dart_symbols": 5243,
+    "semantic_resolved_files": 691,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42801,
-    "semantic_resolved_call_sites": 68204,
-    "semantic_resolved_type_references": 16108,
-    "modules": 155,
+    "semantic_resolved_call_edges": 42922,
+    "semantic_resolved_call_sites": 68418,
+    "semantic_resolved_type_references": 16168,
+    "modules": 156,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
     "database_tables": 79,
     "database_views": 6,
     "migrations": 58,
-    "scripts_and_jobs": 688,
-    "environment_variables": 717,
-    "tests": 1234,
+    "scripts_and_jobs": 690,
+    "environment_variables": 720,
+    "tests": 1235,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -613,6 +613,7 @@
         "server/bin/run_three_commander_optimization_validation.dart",
         "server/bin/run_three_commander_resolution_validation.dart",
         "server/bin/sacrifice_outlet_family_audit.dart",
+        "server/bin/schema_audit.dart",
         "server/bin/seed_database.dart",
         "server/bin/seed_legalities.dart",
         "server/bin/seed_legalities_optimized.dart",
@@ -635,8 +636,8 @@
         "server/bin/update_schema.dart",
         "server/bin/verify_schema.dart"
       ],
-      "file_count": 63,
-      "symbol_count": 682,
+      "file_count": 64,
+      "symbol_count": 690,
       "providers": [],
       "services": []
     },
@@ -1977,6 +1978,17 @@
       ],
       "file_count": 1,
       "symbol_count": 1,
+      "providers": [],
+      "services": []
+    },
+    {
+      "id": "server/lib/schema_audit",
+      "layer": "server",
+      "files": [
+        "server/lib/schema_audit/schema_audit.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 18,
       "providers": [],
       "services": []
     },
@@ -21117,6 +21129,54 @@
       "line": 17
     },
     {
+      "name": "_InventoryRead",
+      "kind": "class",
+      "source": "server/bin/schema_audit.dart",
+      "line": 133
+    },
+    {
+      "name": "_Options",
+      "kind": "class",
+      "source": "server/bin/schema_audit.dart",
+      "line": 109
+    },
+    {
+      "name": "_inventory",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 227
+    },
+    {
+      "name": "_parseArgs",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 140
+    },
+    {
+      "name": "_readInventory",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 192
+    },
+    {
+      "name": "count",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 248
+    },
+    {
+      "name": "inScope",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 238
+    },
+    {
+      "name": "main",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 29
+    },
+    {
       "name": "_downloadJson",
       "kind": "function",
       "source": "server/bin/seed_database.dart",
@@ -36982,6 +37042,141 @@
       "line": 5
     },
     {
+      "name": "AuditTarget",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 23
+    },
+    {
+      "name": "AuditUsageException",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 13,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "ColumnShape",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 123,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "DiffBucket",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 179,
+      "members": [
+        "counts",
+        "isEmpty",
+        "toJson"
+      ]
+    },
+    {
+      "name": "ForeignKeyShape",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 141,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "IndexShape",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 150,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "SchemaAuditReport",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 201,
+      "members": [
+        "_inventorySummary",
+        "_markdownItem",
+        "buckets",
+        "hasDifferences",
+        "latestMigration",
+        "toJson",
+        "toJsonText",
+        "toMarkdown"
+      ]
+    },
+    {
+      "name": "SchemaInventory",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 80
+    },
+    {
+      "name": "_compareIndexes",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 526
+    },
+    {
+      "name": "_compareMaps",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 505
+    },
+    {
+      "name": "_compareSets",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 500
+    },
+    {
+      "name": "_normalizeSql",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 577
+    },
+    {
+      "name": "compareSchemaInventories",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 371
+    },
+    {
+      "name": "foreignKeySignature",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 168
+    },
+    {
+      "name": "inCommonTable",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 423
+    },
+    {
+      "name": "inExtraSchema",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 386
+    },
+    {
+      "name": "normalizeIndexDefinition",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 162
+    },
+    {
+      "name": "parseAuditTarget",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 44
+    },
+    {
       "name": "_isDirectNormalImageForPrinting",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
@@ -40487,7 +40682,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 689,
+    "resolved_file_count": 691,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -40767,6 +40962,7 @@
       "server/bin/run_three_commander_optimization_validation.dart",
       "server/bin/run_three_commander_resolution_validation.dart",
       "server/bin/sacrifice_outlet_family_audit.dart",
+      "server/bin/schema_audit.dart",
       "server/bin/seed_database.dart",
       "server/bin/seed_legalities.dart",
       "server/bin/seed_legalities_optimized.dart",
@@ -41035,6 +41231,7 @@
       "server/lib/request_trace.dart",
       "server/lib/retention/post_game_note_service.dart",
       "server/lib/runtime_environment.dart",
+      "server/lib/schema_audit/schema_audit.dart",
       "server/lib/scryfall_image_url.dart",
       "server/lib/sets_catalog_contract.dart",
       "server/lib/social_safety_service.dart",
@@ -41185,11 +41382,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42801,
-    "resolved_call_site_count": 68204,
-    "workspace_call_edge_count": 13361,
-    "unresolved_call_edge_count": 550,
-    "unresolved_call_site_count": 760,
+    "resolved_call_edge_count": 42922,
+    "resolved_call_site_count": 68418,
+    "workspace_call_edge_count": 13401,
+    "unresolved_call_edge_count": 552,
+    "unresolved_call_site_count": 763,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -117005,6 +117202,204 @@
         "occurrences": 3
       },
       {
+        "source": "server/bin/schema_audit.dart",
+        "line": 179,
+        "caller": "_parseArgs",
+        "kind": "constructor",
+        "lexical_target": "_Options",
+        "target": "_Options._Options",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 212,
+        "caller": "_readInventory",
+        "kind": "method",
+        "lexical_target": "_inventory",
+        "target": "_inventory",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 244,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "inScope",
+        "target": "inScope",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 262,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "count",
+        "target": "count",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 296,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "ColumnShape",
+        "target": "ColumnShape.ColumnShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 30,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_parseArgs",
+        "target": "_parseArgs",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 322,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "foreignKeySignature",
+        "target": "foreignKeySignature",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 324,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "ForeignKeyShape",
+        "target": "ForeignKeyShape.ForeignKeyShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 342,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "IndexShape",
+        "target": "IndexShape.IndexShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 344,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "normalizeIndexDefinition",
+        "target": "normalizeIndexDefinition",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 364,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "_InventoryRead",
+        "target": "_InventoryRead._InventoryRead",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 365,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "SchemaInventory",
+        "target": "SchemaInventory.SchemaInventory",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 41,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "parseAuditTarget",
+        "target": "parseAuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 60,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_readInventory",
+        "target": "_readInventory",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 80,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "compareSchemaInventories",
+        "target": "compareSchemaInventories",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 86,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "toJsonText",
+        "target": "SchemaAuditReport.toJsonText",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 87,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "toMarkdown",
+        "target": "SchemaAuditReport.toMarkdown",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 90,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "counts",
+        "target": "DiffBucket.counts",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/seed_database.dart",
         "line": 101,
         "caller": "_processAndInsertCards",
@@ -166472,6 +166867,248 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 212,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "DiffBucket",
+        "target": "DiffBucket.DiffBucket",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 253,
+        "caller": "SchemaAuditReport.toJson",
+        "kind": "method",
+        "lexical_target": "_inventorySummary",
+        "target": "SchemaAuditReport._inventorySummary",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 256,
+        "caller": "SchemaAuditReport.toJson",
+        "kind": "method",
+        "lexical_target": "counts",
+        "target": "DiffBucket.counts",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 260,
+        "caller": "SchemaAuditReport.toJson",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DiffBucket.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 275,
+        "caller": "SchemaAuditReport._inventorySummary",
+        "kind": "method",
+        "lexical_target": "latestMigration",
+        "target": "SchemaAuditReport.latestMigration",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 279,
+        "caller": "SchemaAuditReport.toJsonText",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "SchemaAuditReport.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 296,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "_inventorySummary",
+        "target": "SchemaAuditReport._inventorySummary",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 319,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "counts",
+        "target": "DiffBucket.counts",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 346,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DiffBucket.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 353,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "_markdownItem",
+        "target": "SchemaAuditReport._markdownItem",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 378,
+        "caller": "compareSchemaInventories",
+        "kind": "constructor",
+        "lexical_target": "SchemaAuditReport",
+        "target": "SchemaAuditReport.SchemaAuditReport",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 399,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_compareSets",
+        "target": "_compareSets",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 401,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "inExtraSchema",
+        "target": "inExtraSchema",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 405,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_compareMaps",
+        "target": "_compareMaps",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 415,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_normalizeSql",
+        "target": "_normalizeSql",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 431,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "inCommonTable",
+        "target": "inCommonTable",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 438,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "ColumnShape.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 459,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "ForeignKeyShape.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 470,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_compareIndexes",
+        "target": "_compareIndexes",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 54,
+        "caller": "parseAuditTarget",
+        "kind": "constructor",
+        "lexical_target": "AuditUsageException",
+        "target": "AuditUsageException.AuditUsageException",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 561,
+        "caller": "_compareIndexes",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "IndexShape.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 71,
+        "caller": "parseAuditTarget",
+        "kind": "constructor",
+        "lexical_target": "AuditTarget",
+        "target": "AuditTarget.AuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/scryfall_image_url.dart",
         "line": 186,
         "caller": "_provenPrintingCdnUrl",
@@ -188186,14 +188823,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 584,
-        "occurrences": 731
+        "unique_references": 587,
+        "occurrences": 735
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14223,
-        "occurrences": 24811
+        "unique_references": 14291,
+        "occurrences": 24922
       },
       {
         "target_scope": "dart_sdk",
@@ -188204,8 +188841,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 397,
-        "occurrences": 641
+        "unique_references": 400,
+        "occurrences": 651
       },
       {
         "target_scope": "dart_sdk",
@@ -189554,8 +190191,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1207,
-        "occurrences": 1984
+        "unique_references": 1214,
+        "occurrences": 2001
       },
       {
         "target_scope": "dependency",
@@ -192505,6 +193142,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "unique_references": 33,
+        "occurrences": 54
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/scryfall_image_url.dart",
         "unique_references": 34,
         "occurrences": 34
@@ -192772,6 +193415,12 @@
         "target_library": "workspace:server/bin/sacrifice_outlet_family_audit.dart",
         "unique_references": 15,
         "occurrences": 22
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "unique_references": 7,
+        "occurrences": 18
       },
       {
         "target_scope": "workspace",
@@ -197584,6 +198233,22 @@
         "occurrences": 3
       },
       {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 516,
+        "caller": "_compareMaps",
+        "kind": "function_expression",
+        "lexical_target": "describe",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 520,
+        "caller": "_compareMaps",
+        "kind": "function_expression",
+        "lexical_target": "difference",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/verified_email_middleware.dart",
         "line": 30,
         "caller": "verifiedEmailForMutations",
@@ -197728,9 +198393,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16108,
-    "workspace_type_reference_count": 3395,
-    "unresolved_type_reference_count": 349,
+    "resolved_type_reference_count": 16168,
+    "workspace_type_reference_count": 3413,
+    "unresolved_type_reference_count": 351,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -220364,6 +221029,96 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/schema_audit.dart",
+        "line": 136,
+        "lexical_type": "SchemaInventory",
+        "resolved_type": "SchemaInventory",
+        "target": "SchemaInventory",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 140,
+        "lexical_type": "_Options?",
+        "resolved_type": "_Options?",
+        "target": "_Options",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 179,
+        "lexical_type": "_Options",
+        "resolved_type": "_Options",
+        "target": "_Options",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 278,
+        "lexical_type": "ColumnShape",
+        "resolved_type": "ColumnShape",
+        "target": "ColumnShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 309,
+        "lexical_type": "ForeignKeyShape",
+        "resolved_type": "ForeignKeyShape",
+        "target": "ForeignKeyShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 331,
+        "lexical_type": "IndexShape",
+        "resolved_type": "IndexShape",
+        "target": "IndexShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 37,
+        "lexical_type": "AuditTarget",
+        "resolved_type": "AuditTarget",
+        "target": "AuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 51,
+        "lexical_type": "AuditUsageException",
+        "resolved_type": "AuditUsageException",
+        "target": "AuditUsageException",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 57,
+        "lexical_type": "_InventoryRead",
+        "resolved_type": "_InventoryRead",
+        "target": "_InventoryRead",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
         "source": "server/bin/seed_database.dart",
         "line": 12,
         "lexical_type": "Database",
@@ -228714,6 +229469,96 @@
         "occurrences": 2
       },
       {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 109,
+        "lexical_type": "ColumnShape",
+        "resolved_type": "ColumnShape",
+        "target": "ColumnShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 113,
+        "lexical_type": "ForeignKeyShape",
+        "resolved_type": "ForeignKeyShape",
+        "target": "ForeignKeyShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 116,
+        "lexical_type": "IndexShape",
+        "resolved_type": "IndexShape",
+        "target": "IndexShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 208,
+        "lexical_type": "SchemaInventory",
+        "resolved_type": "SchemaInventory",
+        "target": "SchemaInventory",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 212,
+        "lexical_type": "DiffBucket",
+        "resolved_type": "DiffBucket",
+        "target": "DiffBucket",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 11
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 372,
+        "lexical_type": "SchemaAuditReport",
+        "resolved_type": "SchemaAuditReport",
+        "target": "SchemaAuditReport",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 47,
+        "lexical_type": "AuditTarget",
+        "resolved_type": "AuditTarget",
+        "target": "AuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 506,
+        "lexical_type": "T",
+        "resolved_type": "T",
+        "target": "_compareMaps.T",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 54,
+        "lexical_type": "AuditUsageException",
+        "resolved_type": "AuditUsageException",
+        "target": "AuditUsageException",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
         "source": "server/lib/social_safety_service.dart",
         "line": 106,
         "lexical_type": "SocialSafetyException",
@@ -231694,8 +232539,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1083,
-        "occurrences": 2202
+        "unique_references": 1085,
+        "occurrences": 2205
       },
       {
         "target_scope": "dart_sdk",
@@ -231706,20 +232551,20 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 40,
-        "occurrences": 52
+        "unique_references": 41,
+        "occurrences": 53
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6180,
-        "occurrences": 39453
+        "unique_references": 6214,
+        "occurrences": 39652
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 82,
-        "occurrences": 184
+        "unique_references": 83,
+        "occurrences": 186
       },
       {
         "target_scope": "dart_sdk",
@@ -233032,8 +233877,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 251,
-        "occurrences": 951
+        "unique_references": 255,
+        "occurrences": 955
       },
       {
         "target_scope": "dependency",
@@ -235431,6 +236276,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "unique_references": 15,
+        "occurrences": 53
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/social_safety_service.dart",
         "unique_references": 17,
         "occurrences": 38
@@ -235560,6 +236411,12 @@
         "target_library": "workspace:server/bin/sacrifice_outlet_family_audit.dart",
         "unique_references": 3,
         "occurrences": 8
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "unique_references": 3,
+        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -236944,6 +237801,12 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/schema_audit.dart",
+        "line": 29,
+        "lexical_type": "void",
+        "occurrences": 2
+      },
+      {
         "source": "server/bin/seed_database.dart",
         "line": 11,
         "lexical_type": "void",
@@ -237644,6 +238507,12 @@
         "line": 35,
         "lexical_type": "void",
         "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 500,
+        "lexical_type": "void",
+        "occurrences": 3
       },
       {
         "source": "server/lib/sql_statement_splitter.dart",
@@ -262680,6 +263549,16 @@
       ]
     },
     {
+      "path": "scripts/manaloom_schema_audit.sh",
+      "role": "audit",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "MANALOOM_APPROVE_DISPOSABLE_POSTGRES",
+        "MANALOOM_PG17_BIN",
+        "TMPDIR"
+      ]
+    },
+    {
       "path": "scripts/manaloom_secret_scan.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -264117,6 +264996,15 @@
       "environment_variables": []
     },
     {
+      "path": "server/bin/schema_audit.dart",
+      "role": "audit",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "BASELINE_PGPASSWORD",
+        "TARGET_PGPASSWORD"
+      ]
+    },
+    {
       "path": "server/bin/seed_database.dart",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -264728,6 +265616,14 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_deploy_battle_sidecars.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "BASELINE_PGPASSWORD",
+      "classification": "sensitive_name_only",
+      "sources": [
+        "server/bin/schema_audit.dart"
       ],
       "value_captured": false
     },
@@ -266364,6 +267260,7 @@
       "name": "MANALOOM_APPROVE_DISPOSABLE_POSTGRES",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_schema_audit.sh",
         "scripts/manaloom_tbls_local_gate.sh"
       ],
       "value_captured": false
@@ -268571,6 +269468,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_PG17_BIN",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_schema_audit.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_PG_DUMP_BIN",
       "classification": "configuration",
       "sources": [
@@ -270678,6 +271583,14 @@
       "value_captured": false
     },
     {
+      "name": "TARGET_PGPASSWORD",
+      "classification": "sensitive_name_only",
+      "sources": [
+        "server/bin/schema_audit.dart"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "TBLS_DSN",
       "classification": "sensitive_name_only",
       "sources": [
@@ -270730,6 +271643,7 @@
         "scripts/manaloom_p0_runtime_capture.sh",
         "scripts/manaloom_play_vs_ai_e2e.sh",
         "scripts/manaloom_project_logic.sh",
+        "scripts/manaloom_schema_audit.sh",
         "scripts/manaloom_server_contract_e2e_isolated.sh",
         "scripts/manaloom_social_trade_visual_qa.sh",
         "scripts/manaloom_tbls_local_gate.sh",
@@ -272325,6 +273239,7 @@
     "server/test/runtime_environment_test.dart",
     "server/test/runtime_schema_migration_contract_test.dart",
     "server/test/sacrifice_outlet_family_reconciliation_source_test.dart",
+    "server/test/schema_audit_test.dart",
     "server/test/scryfall_image_url_test.dart",
     "server/test/seed_database_image_selection_test.dart",
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
@@ -273624,7 +274539,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "829cf62ce3792c4fd250c09213032adbf2b3dbe4a875bd9f4b4f0adf3c0b535c"
+      "sha256": "15d9093b8d62b58452efeecb3988b6855d95832901d13222c3b8b12cf81eef8e"
     },
     "required_task_fields": [
       "id",
@@ -276227,10 +277142,10 @@
       {
         "id": "BT-DB-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Auditar schema real fresh contra baseline 058 antes de desenhar próximo DDL.",
         "depends_on": [],
-        "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”. Leitura read-only da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): inventário e diff feitos — 99 tabelas em `public` (as 79 do baseline e mais 20), 4 com colunas divergentes, 2 chaves estrangeiras ausentes e 1 a mais, schema `manaloom_deploy_audit` com 1.033 tabelas, ledger em 057; falta ferramenta reproduzível e o receipt da tarefa. Decisão do dono em 2026-09-22: D-48, comparar produção com ambiente fresco (a leitura de 2026-09-22 já cobriu o lado da produção); D-06, raia de servidor.",
+        "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”. Leitura read-only da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): inventário e diff feitos — 99 tabelas em `public` (as 79 do baseline e mais 20), 4 com colunas divergentes, 2 chaves estrangeiras ausentes e 1 a mais, schema `manaloom_deploy_audit` com 1.033 tabelas, ledger em 057; a ferramenta reproduzível e o receipt vieram em 2026-09-23 (abaixo). Decisão do dono em 2026-09-22: D-48, comparar produção com ambiente fresco (a leitura de 2026-09-22 já cobriu o lado da produção); D-06, raia de servidor. Feito em 2026-09-23, na branch `servidor/raia-2026-09-23`: `scripts/manaloom_schema_audit.sh` sobe um PostgreSQL 17 descartável sem rede, cria a base do zero pelas migrations, monta o alvo de um dump só com a estrutura e o ledger (e para se outra tabela tiver linhas) e roda `server/bin/schema_audit.dart`, que lê os dois catálogos em transação `READ ONLY` e classifica tabelas, views, colunas (tipo, nulidade e default), chaves estrangeiras, índices e o ledger em faltando, sobrando e divergente, em JSON e Markdown, sem apagar nada. Rodado contra o backup de 2026-09-23 00:51 UTC; receipt `docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.md`, com as saídas da ferramenta ao lado. Confirma as diferenças de 2026-09-22 e acrescenta 32 colunas divergentes em 12 tabelas, 3 views com texto diferente (a `commander_learning_snapshot` com lógica diferente, porque as migrations 023 e 024 interpolam uma constante que mudou depois), 4 chaves estrangeiras com outra ação de `ON DELETE` (em `trade_items.owner_id`, `CASCADE` no repositório e nenhuma na produção) e 87 índices a mais, 6 deles `UNIQUE` em tabelas comuns. Evidência: `server/test/schema_audit_test.dart` (12 testes; três mutações falham) e o receipt.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 652
       },
@@ -283485,7 +284400,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "3e5f3f5a8db9f1e0cd20b8788f542c6dd5d77afc265082b23b0e30834a83b8e9"
+    "project_logic_source_digest_sha256": "1902bf6a70a3dc9fd1951d6d494b45ac7f6466aa190c80a430547ab8d8fb833d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285669,6 +286584,7 @@
       "scripts/manaloom_release_observability_gate.sh",
       "scripts/manaloom_release_ops_contract_test.sh",
       "scripts/manaloom_report_retention_audit.sh",
+      "scripts/manaloom_schema_audit.sh",
       "scripts/manaloom_secret_scan.sh",
       "scripts/manaloom_server_contract_e2e_isolated.sh",
       "scripts/manaloom_social_trade_visual_qa.sh",
@@ -285808,6 +286724,7 @@
       "server/bin/run_three_commander_optimization_validation.dart",
       "server/bin/run_three_commander_resolution_validation.dart",
       "server/bin/sacrifice_outlet_family_audit.dart",
+      "server/bin/schema_audit.dart",
       "server/bin/seed_database.dart",
       "server/bin/seed_legalities.dart",
       "server/bin/seed_legalities_optimized.dart",
@@ -286087,6 +287004,7 @@
       "server/lib/request_trace.dart",
       "server/lib/retention/post_game_note_service.dart",
       "server/lib/runtime_environment.dart",
+      "server/lib/schema_audit/schema_audit.dart",
       "server/lib/scryfall_image_url.dart",
       "server/lib/sets_catalog_contract.dart",
       "server/lib/social_safety_service.dart",
@@ -286617,6 +287535,7 @@
       "server/test/runtime_environment_test.dart",
       "server/test/runtime_schema_migration_contract_test.dart",
       "server/test/sacrifice_outlet_family_reconciliation_source_test.dart",
+      "server/test/schema_audit_test.dart",
       "server/test/scryfall_image_url_test.dart",
       "server/test/seed_database_image_selection_test.dart",
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
