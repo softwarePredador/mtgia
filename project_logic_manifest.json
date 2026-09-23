@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "276b0d053d13be6911956806e1869ed2c9051a6ee16016f2ad2a4971c28f9059",
+  "source_digest_sha256": "1faf84b92014514aeb26fde364cf98446d8a8e0db6c39c91e40a154a9c0227dc",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,16 +63,16 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 693,
+    "dart_source_files": 696,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5249,
-    "semantic_resolved_files": 693,
+    "dart_symbols": 5260,
+    "semantic_resolved_files": 696,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42885,
-    "semantic_resolved_call_sites": 68333,
-    "semantic_resolved_type_references": 16175,
-    "modules": 158,
+    "semantic_resolved_call_edges": 42966,
+    "semantic_resolved_call_sites": 68460,
+    "semantic_resolved_type_references": 16216,
+    "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 691,
     "environment_variables": 718,
-    "tests": 1241,
+    "tests": 1248,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1789,7 +1789,7 @@
         "server/lib/observability.dart"
       ],
       "file_count": 1,
-      "symbol_count": 20,
+      "symbol_count": 22,
       "providers": [],
       "services": []
     },
@@ -1893,6 +1893,19 @@
       ],
       "file_count": 1,
       "symbol_count": 5,
+      "providers": [],
+      "services": []
+    },
+    {
+      "id": "server/lib/privacy",
+      "layer": "server",
+      "files": [
+        "server/lib/privacy/deleted_deck_anonymizer.dart",
+        "server/lib/privacy/privacy_export_allowlist.dart",
+        "server/lib/privacy/privacy_export_pseudonymizer.dart"
+      ],
+      "file_count": 3,
+      "symbol_count": 9,
       "providers": [],
       "services": []
     },
@@ -34330,8 +34343,11 @@
       "source": "server/lib/endpoint_cache.dart",
       "line": 8,
       "members": [
+        "_clearExpired",
+        "_sweepIfDue",
         "clearExpired",
         "get",
+        "length",
         "set"
       ]
     },
@@ -36256,7 +36272,13 @@
       "name": "_initializeObservability",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 307
+      "line": 364
+    },
+    {
+      "name": "_redactObservedIdentifiersDeep",
+      "kind": "function",
+      "source": "server/lib/observability.dart",
+      "line": 151
     },
     {
       "name": "_sentryDsn",
@@ -36280,25 +36302,25 @@
       "name": "captureObservedException",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 336
+      "line": 393
     },
     {
       "name": "captureObservedMessage",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 392
+      "line": 450
     },
     {
       "name": "captureRouteException",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 448
+      "line": 507
     },
     {
       "name": "ensureObservabilityInitialized",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 303
+      "line": 360
     },
     {
       "name": "isSensitiveObservedKey",
@@ -36313,6 +36335,12 @@
       "line": 32
     },
     {
+      "name": "redactObservedIdentifiers",
+      "kind": "function",
+      "source": "server/lib/observability.dart",
+      "line": 145
+    },
+    {
       "name": "resolveSentryTracesSampleRate",
       "kind": "function",
       "source": "server/lib/observability.dart",
@@ -36322,25 +36350,25 @@
       "name": "sanitizeObservedBreadcrumb",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 239
+      "line": 270
     },
     {
       "name": "sanitizeObservedEvent",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 251
+      "line": 282
     },
     {
       "name": "sanitizeObservedHeaders",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 202
+      "line": 233
     },
     {
       "name": "sanitizeObservedMap",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 196
+      "line": 227
     },
     {
       "name": "sanitizeObservedQuery",
@@ -36352,7 +36380,7 @@
       "name": "sanitizeObservedRequest",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 222
+      "line": 253
     },
     {
       "name": "sanitizeObservedText",
@@ -36364,13 +36392,13 @@
       "name": "sanitizeObservedUrl",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 140
+      "line": 169
     },
     {
       "name": "sanitizeObservedValue",
       "kind": "function",
       "source": "server/lib/observability.dart",
-      "line": 159
+      "line": 190
     },
     {
       "name": "OpenAiRuntimeConfig",
@@ -36686,6 +36714,70 @@
       "kind": "function",
       "source": "server/lib/pricing_contract.dart",
       "line": 7
+    },
+    {
+      "name": "anonymizeDeletedDeckReferences",
+      "kind": "function",
+      "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "line": 20
+    },
+    {
+      "name": "isDeletedDeck",
+      "kind": "function",
+      "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "line": 32
+    },
+    {
+      "name": "walk",
+      "kind": "function",
+      "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "line": 35
+    },
+    {
+      "name": "PrivacyExportField",
+      "kind": "enum",
+      "source": "server/lib/privacy/privacy_export_allowlist.dart",
+      "line": 12
+    },
+    {
+      "name": "PrivacyExportSection",
+      "kind": "class",
+      "source": "server/lib/privacy/privacy_export_allowlist.dart",
+      "line": 32
+    },
+    {
+      "name": "_columnExpression",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_allowlist.dart",
+      "line": 941
+    },
+    {
+      "name": "privacyExportSectionSql",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_allowlist.dart",
+      "line": 905
+    },
+    {
+      "name": "PrivacyExportPseudonymizer",
+      "kind": "class",
+      "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+      "line": 42,
+      "members": [
+        "_apply",
+        "_pseudonym",
+        "_randomKey",
+        "deck",
+        "entity",
+        "person",
+        "replacements",
+        "scrub"
+      ]
+    },
+    {
+      "name": "isPrivacyExportForbiddenKey",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+      "line": 31
     },
     {
       "name": "_isLoopbackHost",
@@ -37532,27 +37624,31 @@
       "name": "InvalidAccountPasswordException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 15
+      "line": 78
     },
     {
       "name": "UserDataNotFoundException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 13
+      "line": 76
     },
     {
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 17,
+      "line": 80,
       "members": [
-        "_deleteIfPresent",
-        "_executeIfAllPresent",
-        "_executeIfPresent",
+        "_anonymizeThirdPartySimulations",
+        "_anonymizedReplayJson",
+        "_assembleExport",
+        "_executeOn",
+        "_executeOnAll",
         "_jsonObject",
-        "_optionalJsonRows",
+        "_ownDeckIds",
         "_passwordMatches",
-        "_relationExists",
+        "_pseudonymizeRow",
+        "_putExportPath",
+        "_requireRelations",
         "_secureRandomToken",
         "deleteAndAnonymizeAccount",
         "exportUserData",
@@ -40740,7 +40836,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 693,
+    "resolved_file_count": 696,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41282,6 +41378,9 @@
       "server/lib/plan_middleware.dart",
       "server/lib/plan_service.dart",
       "server/lib/pricing_contract.dart",
+      "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "server/lib/privacy/privacy_export_allowlist.dart",
+      "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -41442,11 +41541,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42885,
-    "resolved_call_site_count": 68333,
-    "workspace_call_edge_count": 13410,
-    "unresolved_call_edge_count": 553,
-    "unresolved_call_site_count": 764,
+    "resolved_call_edge_count": 42966,
+    "resolved_call_site_count": 68460,
+    "workspace_call_edge_count": 13441,
+    "unresolved_call_edge_count": 557,
+    "unresolved_call_site_count": 768,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -159646,7 +159745,18 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 11,
+        "line": 20,
+        "caller": "EndpointCache.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "EndpointCache._",
+        "target": "EndpointCache.EndpointCache._",
+        "target_library": "package:server/endpoint_cache.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 22,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "EndpointCache._",
@@ -159657,11 +159767,55 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 26,
+        "line": 39,
+        "caller": "EndpointCache.get",
+        "kind": "method",
+        "lexical_target": "_sweepIfDue",
+        "target": "EndpointCache._sweepIfDue",
+        "target_library": "package:server/endpoint_cache.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 55,
+        "caller": "EndpointCache.set",
+        "kind": "method",
+        "lexical_target": "_sweepIfDue",
+        "target": "EndpointCache._sweepIfDue",
+        "target_library": "package:server/endpoint_cache.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 57,
         "caller": "EndpointCache.set",
         "kind": "constructor",
         "lexical_target": "_CacheItem",
         "target": "_CacheItem._CacheItem",
+        "target_library": "package:server/endpoint_cache.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 60,
+        "caller": "EndpointCache.clearExpired",
+        "kind": "method",
+        "lexical_target": "_clearExpired",
+        "target": "EndpointCache._clearExpired",
+        "target_library": "package:server/endpoint_cache.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 66,
+        "caller": "EndpointCache._sweepIfDue",
+        "kind": "method",
+        "lexical_target": "_clearExpired",
+        "target": "EndpointCache._clearExpired",
         "target_library": "package:server/endpoint_cache.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -163848,7 +164002,40 @@
       },
       {
         "source": "server/lib/observability.dart",
+        "line": 152,
+        "caller": "_redactObservedIdentifiersDeep",
+        "kind": "method",
+        "lexical_target": "redactObservedIdentifiers",
+        "target": "redactObservedIdentifiers",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/observability.dart",
         "line": 156,
+        "caller": "_redactObservedIdentifiersDeep",
+        "kind": "method",
+        "lexical_target": "_redactObservedIdentifiersDeep",
+        "target": "_redactObservedIdentifiersDeep",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/observability.dart",
+        "line": 185,
+        "caller": "sanitizeObservedUrl",
+        "kind": "method",
+        "lexical_target": "redactObservedIdentifiers",
+        "target": "redactObservedIdentifiers",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/observability.dart",
+        "line": 186,
         "caller": "sanitizeObservedUrl",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -163859,7 +164046,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 160,
+        "line": 191,
         "caller": "sanitizeObservedValue",
         "kind": "method",
         "lexical_target": "isSensitiveObservedKey",
@@ -163870,7 +164057,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 167,
+        "line": 198,
         "caller": "sanitizeObservedValue",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -163881,7 +164068,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 179,
+        "line": 210,
         "caller": "sanitizeObservedValue",
         "kind": "method",
         "lexical_target": "sanitizeObservedValue",
@@ -163892,7 +164079,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 198,
+        "line": 229,
         "caller": "sanitizeObservedMap",
         "kind": "method",
         "lexical_target": "sanitizeObservedValue",
@@ -163903,7 +164090,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 214,
+        "line": 245,
         "caller": "sanitizeObservedHeaders",
         "kind": "method",
         "lexical_target": "isSensitiveObservedKey",
@@ -163914,7 +164101,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 216,
+        "line": 247,
         "caller": "sanitizeObservedHeaders",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -163925,7 +164112,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 227,
+        "line": 258,
         "caller": "sanitizeObservedRequest",
         "kind": "method",
         "lexical_target": "sanitizeObservedUrl",
@@ -163936,7 +164123,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 232,
+        "line": 263,
         "caller": "sanitizeObservedRequest",
         "kind": "method",
         "lexical_target": "sanitizeObservedQuery",
@@ -163947,7 +164134,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 233,
+        "line": 264,
         "caller": "sanitizeObservedRequest",
         "kind": "method",
         "lexical_target": "sanitizeObservedValue",
@@ -163958,7 +164145,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 234,
+        "line": 265,
         "caller": "sanitizeObservedRequest",
         "kind": "method",
         "lexical_target": "sanitizeObservedHeaders",
@@ -163969,7 +164156,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 243,
+        "line": 274,
         "caller": "sanitizeObservedBreadcrumb",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -163980,7 +164167,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 246,
+        "line": 277,
         "caller": "sanitizeObservedBreadcrumb",
         "kind": "method",
         "lexical_target": "sanitizeObservedMap",
@@ -163991,7 +164178,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 252,
+        "line": 283,
         "caller": "sanitizeObservedEvent",
         "kind": "method",
         "lexical_target": "sanitizeObservedRequest",
@@ -164002,7 +164189,18 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 255,
+        "line": 286,
+        "caller": "sanitizeObservedEvent",
+        "kind": "method",
+        "lexical_target": "redactObservedIdentifiers",
+        "target": "redactObservedIdentifiers",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "server/lib/observability.dart",
+        "line": 287,
         "caller": "sanitizeObservedEvent",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -164013,7 +164211,18 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 261,
+        "line": 298,
+        "caller": "sanitizeObservedEvent",
+        "kind": "method",
+        "lexical_target": "_redactObservedIdentifiersDeep",
+        "target": "_redactObservedIdentifiersDeep",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/observability.dart",
+        "line": 298,
         "caller": "sanitizeObservedEvent",
         "kind": "method",
         "lexical_target": "sanitizeObservedValue",
@@ -164024,7 +164233,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 270,
+        "line": 314,
         "caller": "sanitizeObservedEvent",
         "kind": "method",
         "lexical_target": "sanitizeObservedBreadcrumb",
@@ -164035,7 +164244,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 277,
+        "line": 331,
         "caller": "sanitizeObservedEvent",
         "kind": "method",
         "lexical_target": "isSensitiveObservedKey",
@@ -164046,7 +164255,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 287,
+        "line": 344,
         "caller": "sanitizeObservedEvent",
         "kind": "method",
         "lexical_target": "sanitizeObservedMap",
@@ -164057,7 +164266,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 304,
+        "line": 361,
         "caller": "ensureObservabilityInitialized",
         "kind": "method",
         "lexical_target": "_initializeObservability",
@@ -164068,7 +164277,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 308,
+        "line": 365,
         "caller": "_initializeObservability",
         "kind": "method",
         "lexical_target": "isSentryEnabled",
@@ -164079,7 +164288,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 309,
+        "line": 366,
         "caller": "_initializeObservability",
         "kind": "method",
         "lexical_target": "i",
@@ -164090,7 +164299,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 313,
+        "line": 370,
         "caller": "_initializeObservability",
         "kind": "method",
         "lexical_target": "resolveSentryTracesSampleRate",
@@ -164101,7 +164310,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 324,
+        "line": 381,
         "caller": "_initializeObservability",
         "kind": "method",
         "lexical_target": "sanitizeObservedEvent",
@@ -164112,7 +164321,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 327,
+        "line": 384,
         "caller": "_initializeObservability",
         "kind": "method",
         "lexical_target": "sanitizeObservedBreadcrumb",
@@ -164123,7 +164332,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 345,
+        "line": 406,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "isSentryEnabled",
@@ -164134,7 +164343,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 349,
+        "line": 410,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "ensureObservabilityInitialized",
@@ -164145,7 +164354,18 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 365,
+        "line": 421,
+        "caller": "captureObservedException",
+        "kind": "method",
+        "lexical_target": "redactObservedIdentifiers",
+        "target": "redactObservedIdentifiers",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/observability.dart",
+        "line": 427,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "sanitizeObservedQuery",
@@ -164156,7 +164376,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 366,
+        "line": 428,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "sanitizeObservedHeaders",
@@ -164167,7 +164387,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 377,
+        "line": 435,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -164178,7 +164398,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 378,
+        "line": 436,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "isSensitiveObservedKey",
@@ -164189,7 +164409,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 386,
+        "line": 444,
         "caller": "captureObservedException",
         "kind": "method",
         "lexical_target": "sanitizeObservedMap",
@@ -164200,7 +164420,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 401,
+        "line": 463,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "isSentryEnabled",
@@ -164211,7 +164431,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 405,
+        "line": 467,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "ensureObservabilityInitialized",
@@ -164222,7 +164442,18 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 408,
+        "line": 470,
+        "caller": "captureObservedMessage",
+        "kind": "method",
+        "lexical_target": "redactObservedIdentifiers",
+        "target": "redactObservedIdentifiers",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/observability.dart",
+        "line": 470,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "sanitizeObservedText",
@@ -164233,7 +164464,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 421,
+        "line": 484,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "sanitizeObservedQuery",
@@ -164244,7 +164475,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 422,
+        "line": 485,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "sanitizeObservedHeaders",
@@ -164255,7 +164486,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 434,
+        "line": 493,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "isSensitiveObservedKey",
@@ -164266,7 +164497,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 442,
+        "line": 501,
         "caller": "captureObservedMessage",
         "kind": "method",
         "lexical_target": "sanitizeObservedMap",
@@ -164277,7 +164508,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 471,
+        "line": 524,
         "caller": "captureRouteException",
         "kind": "method",
         "lexical_target": "captureObservedException",
@@ -165220,6 +165451,138 @@
         "target_library": "package:server/plan_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
+        "line": 38,
+        "caller": "walk",
+        "kind": "method",
+        "lexical_target": "isDeletedDeck",
+        "target": "isDeletedDeck",
+        "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
+        "line": 45,
+        "caller": "walk",
+        "kind": "method",
+        "lexical_target": "walk",
+        "target": "walk",
+        "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
+        "line": 61,
+        "caller": "anonymizeDeletedDeckReferences",
+        "kind": "method",
+        "lexical_target": "walk",
+        "target": "walk",
+        "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_allowlist.dart",
+        "line": 102,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "PrivacyExportSection",
+        "target": "PrivacyExportSection.PrivacyExportSection",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "target_scope": "workspace",
+        "occurrences": 39
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_allowlist.dart",
+        "line": 912,
+        "caller": "privacyExportSectionSql",
+        "kind": "method",
+        "lexical_target": "_columnExpression",
+        "target": "_columnExpression",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 109,
+        "caller": "PrivacyExportPseudonymizer._apply",
+        "kind": "method",
+        "lexical_target": "_pseudonym",
+        "target": "PrivacyExportPseudonymizer._pseudonym",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 56,
+        "caller": "PrivacyExportPseudonymizer.<constructor>",
+        "kind": "method",
+        "lexical_target": "_randomKey",
+        "target": "PrivacyExportPseudonymizer._randomKey",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 69,
+        "caller": "PrivacyExportPseudonymizer.person",
+        "kind": "method",
+        "lexical_target": "_apply",
+        "target": "PrivacyExportPseudonymizer._apply",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 72,
+        "caller": "PrivacyExportPseudonymizer.deck",
+        "kind": "method",
+        "lexical_target": "_apply",
+        "target": "PrivacyExportPseudonymizer._apply",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 76,
+        "caller": "PrivacyExportPseudonymizer.entity",
+        "kind": "method",
+        "lexical_target": "_apply",
+        "target": "PrivacyExportPseudonymizer._apply",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 88,
+        "caller": "PrivacyExportPseudonymizer.scrub",
+        "kind": "method",
+        "lexical_target": "isPrivacyExportForbiddenKey",
+        "target": "isPrivacyExportForbiddenKey",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 89,
+        "caller": "PrivacyExportPseudonymizer.scrub",
+        "kind": "method",
+        "lexical_target": "scrub",
+        "target": "PrivacyExportPseudonymizer.scrub",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
       },
       {
         "source": "server/lib/public_site_url.dart",
@@ -167962,73 +168325,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1037,
-        "caller": "UserDataPrivacyService._optionalJsonRows",
-        "kind": "method",
-        "lexical_target": "_relationExists",
-        "target": "UserDataPrivacyService._relationExists",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1042,
-        "caller": "UserDataPrivacyService._optionalJsonRows",
-        "kind": "method",
-        "lexical_target": "_jsonObject",
-        "target": "UserDataPrivacyService._jsonObject",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1050,
-        "caller": "UserDataPrivacyService._deleteIfPresent",
-        "kind": "method",
-        "lexical_target": "_executeIfPresent",
-        "target": "UserDataPrivacyService._executeIfPresent",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1059,
-        "caller": "UserDataPrivacyService._executeIfPresent",
-        "kind": "method",
-        "lexical_target": "_relationExists",
-        "target": "UserDataPrivacyService._relationExists",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 1073,
-        "caller": "UserDataPrivacyService._executeIfAllPresent",
-        "kind": "method",
-        "lexical_target": "_relationExists",
-        "target": "UserDataPrivacyService._relationExists",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 19,
-        "caller": "UserDataPrivacyService.<constructor>",
-        "kind": "constructor",
-        "lexical_target": "AuthService",
-        "target": "AuthService.AuthService",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 41,
+        "line": 104,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168039,7 +168336,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 43,
+        "line": 106,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "method",
         "lexical_target": "_passwordMatches",
@@ -168050,7 +168347,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 44,
+        "line": 107,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -168061,7 +168358,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 50,
+        "line": 113,
         "caller": "UserDataPrivacyService._passwordMatches",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -168072,7 +168369,18 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 566,
+        "line": 134,
+        "caller": "UserDataPrivacyService.exportUserData",
+        "kind": "method",
+        "lexical_target": "privacyExportSectionSql",
+        "target": "privacyExportSectionSql",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 138,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "_jsonObject",
@@ -168083,7 +168391,106 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 646,
+        "line": 141,
+        "caller": "UserDataPrivacyService.exportUserData",
+        "kind": "constructor",
+        "lexical_target": "UserDataNotFoundException",
+        "target": "UserDataNotFoundException.UserDataNotFoundException",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 145,
+        "caller": "UserDataPrivacyService.exportUserData",
+        "kind": "method",
+        "lexical_target": "_assembleExport",
+        "target": "UserDataPrivacyService._assembleExport",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 158,
+        "caller": "UserDataPrivacyService._assembleExport",
+        "kind": "constructor",
+        "lexical_target": "PrivacyExportPseudonymizer",
+        "target": "PrivacyExportPseudonymizer.PrivacyExportPseudonymizer",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 172,
+        "caller": "UserDataPrivacyService._assembleExport",
+        "kind": "method",
+        "lexical_target": "_pseudonymizeRow",
+        "target": "UserDataPrivacyService._pseudonymizeRow",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 181,
+        "caller": "UserDataPrivacyService._assembleExport",
+        "kind": "method",
+        "lexical_target": "_putExportPath",
+        "target": "UserDataPrivacyService._putExportPath",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 191,
+        "caller": "UserDataPrivacyService._assembleExport",
+        "kind": "method",
+        "lexical_target": "scrub",
+        "target": "PrivacyExportPseudonymizer.scrub",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 201,
+        "caller": "UserDataPrivacyService._pseudonymizeRow",
+        "kind": "method",
+        "lexical_target": "person",
+        "target": "PrivacyExportPseudonymizer.person",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 202,
+        "caller": "UserDataPrivacyService._pseudonymizeRow",
+        "kind": "method",
+        "lexical_target": "deck",
+        "target": "PrivacyExportPseudonymizer.deck",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 203,
+        "caller": "UserDataPrivacyService._pseudonymizeRow",
+        "kind": "method",
+        "lexical_target": "entity",
+        "target": "PrivacyExportPseudonymizer.entity",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 241,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168094,7 +168501,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 650,
+        "line": 245,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_passwordMatches",
@@ -168105,7 +168512,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 651,
+        "line": 246,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -168116,7 +168523,29 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 655,
+        "line": 248,
+        "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
+        "kind": "method",
+        "lexical_target": "_requireRelations",
+        "target": "UserDataPrivacyService._requireRelations",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 249,
+        "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
+        "kind": "method",
+        "lexical_target": "_ownDeckIds",
+        "target": "UserDataPrivacyService._ownDeckIds",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 252,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_secureRandomToken",
@@ -168127,7 +168556,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 662,
+        "line": 259,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -168138,67 +168567,78 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 665,
+        "line": 262,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
-        "lexical_target": "_deleteIfPresent",
-        "target": "UserDataPrivacyService._deleteIfPresent",
+        "lexical_target": "_executeOn",
+        "target": "UserDataPrivacyService._executeOn",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 20
+        "occurrences": 37
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 756,
+        "line": 358,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
-        "lexical_target": "_executeIfPresent",
-        "target": "UserDataPrivacyService._executeIfPresent",
+        "lexical_target": "_executeOnAll",
+        "target": "UserDataPrivacyService._executeOnAll",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 8
+        "occurrences": 4
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 761,
+        "line": 504,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
-        "lexical_target": "_executeIfAllPresent",
-        "target": "UserDataPrivacyService._executeIfAllPresent",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 80,
-        "caller": "UserDataPrivacyService.exportUserData",
-        "kind": "constructor",
-        "lexical_target": "UserDataNotFoundException",
-        "target": "UserDataNotFoundException.UserDataNotFoundException",
+        "lexical_target": "_anonymizeThirdPartySimulations",
+        "target": "UserDataPrivacyService._anonymizeThirdPartySimulations",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 82,
-        "caller": "UserDataPrivacyService.exportUserData",
-        "kind": "method",
-        "lexical_target": "_optionalJsonRows",
-        "target": "UserDataPrivacyService._optionalJsonRows",
-        "target_library": "package:server/user_data_privacy_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 33
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 967,
+        "line": 561,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitIdentifier",
         "target": "credentialEmailRateLimitIdentifier",
         "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 746,
+        "caller": "UserDataPrivacyService._anonymizeThirdPartySimulations",
+        "kind": "method",
+        "lexical_target": "_anonymizedReplayJson",
+        "target": "UserDataPrivacyService._anonymizedReplayJson",
+        "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 775,
+        "caller": "UserDataPrivacyService._anonymizedReplayJson",
+        "kind": "method",
+        "lexical_target": "anonymizeDeletedDeckReferences",
+        "target": "anonymizeDeletedDeckReferences",
+        "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 82,
+        "caller": "UserDataPrivacyService.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "AuthService",
+        "target": "AuthService.AuthService",
+        "target_library": "package:server/auth_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -188982,14 +189422,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 582,
-        "occurrences": 729
+        "unique_references": 585,
+        "occurrences": 732
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14262,
-        "occurrences": 24854
+        "unique_references": 14307,
+        "occurrences": 24915
       },
       {
         "target_scope": "dart_sdk",
@@ -189012,8 +189452,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 91,
-        "occurrences": 122
+        "unique_references": 94,
+        "occurrences": 125
       },
       {
         "target_scope": "dart_sdk",
@@ -189078,8 +189518,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/digest.dart",
-        "unique_references": 37,
-        "occurrences": 40
+        "unique_references": 38,
+        "occurrences": 41
       },
       {
         "target_scope": "dependency",
@@ -189090,14 +189530,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hmac.dart",
-        "unique_references": 9,
-        "occurrences": 9
+        "unique_references": 11,
+        "occurrences": 11
       },
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 489,
-        "occurrences": 953
+        "occurrences": 952
       },
       {
         "target_scope": "dependency",
@@ -190350,8 +190790,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1206,
-        "occurrences": 1989
+        "unique_references": 1207,
+        "occurrences": 1994
       },
       {
         "target_scope": "dependency",
@@ -190410,14 +190850,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:sentry/src/protocol/sentry_user.dart",
-        "unique_references": 5,
-        "occurrences": 5
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "dependency",
         "target_library": "package:sentry/src/scope.dart",
-        "unique_references": 14,
-        "occurrences": 30
+        "unique_references": 12,
+        "occurrences": 28
       },
       {
         "target_scope": "dependency",
@@ -193032,8 +193472,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/endpoint_cache.dart",
-        "unique_references": 10,
-        "occurrences": 13
+        "unique_references": 15,
+        "occurrences": 18
       },
       {
         "target_scope": "workspace",
@@ -193200,8 +193640,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/observability.dart",
-        "unique_references": 121,
-        "occurrences": 136
+        "unique_references": 128,
+        "occurrences": 152
       },
       {
         "target_scope": "workspace",
@@ -193256,6 +193696,24 @@
         "target_library": "package:server/pricing_contract.dart",
         "unique_references": 6,
         "occurrences": 8
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
+        "unique_references": 4,
+        "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "unique_references": 3,
+        "occurrences": 41
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "unique_references": 12,
+        "occurrences": 13
       },
       {
         "target_scope": "workspace",
@@ -193357,7 +193815,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/user_data_privacy_service.dart",
         "unique_references": 23,
-        "occurrences": 86
+        "occurrences": 64
       },
       {
         "target_scope": "workspace",
@@ -198148,6 +198606,30 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 38,
+        "caller": "EndpointCache.get",
+        "kind": "function_expression",
+        "lexical_target": "_clock",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 54,
+        "caller": "EndpointCache.set",
+        "kind": "function_expression",
+        "lexical_target": "_clock",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 60,
+        "caller": "EndpointCache.clearExpired",
+        "kind": "function_expression",
+        "lexical_target": "_clock",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/health_readiness_support.dart",
         "line": 1219,
         "caller": "evaluateInteractiveBattleReadiness",
@@ -198372,6 +198854,14 @@
         "occurrences": 3
       },
       {
+        "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "line": 106,
+        "caller": "PrivacyExportPseudonymizer._apply",
+        "kind": "function_expression",
+        "lexical_target": "isOwn",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/push_notification_service.dart",
         "line": 272,
         "caller": "PushNotificationService._sendToUser",
@@ -198572,9 +199062,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16175,
-    "workspace_type_reference_count": 3416,
-    "unresolved_type_reference_count": 351,
+    "resolved_type_reference_count": 16216,
+    "workspace_type_reference_count": 3420,
+    "unresolved_type_reference_count": 352,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -228309,17 +228799,17 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 11,
+        "line": 20,
         "lexical_type": "EndpointCache",
         "resolved_type": "EndpointCache",
         "target": "EndpointCache",
         "target_library": "package:server/endpoint_cache.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 13,
+        "line": 31,
         "lexical_type": "_CacheItem",
         "resolved_type": "_CacheItem",
         "target": "_CacheItem",
@@ -229269,7 +229759,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 340,
+        "line": 401,
         "lexical_type": "RequestTrace?",
         "resolved_type": "RequestTrace?",
         "target": "RequestTrace",
@@ -229279,7 +229769,7 @@
       },
       {
         "source": "server/lib/observability.dart",
-        "line": 460,
+        "line": 518,
         "lexical_type": "RequestTrace",
         "resolved_type": "RequestTrace",
         "target": "RequestTrace",
@@ -229476,6 +229966,26 @@
         "target_library": "package:server/plan_service.dart",
         "target_scope": "workspace",
         "occurrences": 5
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_allowlist.dart",
+        "line": 101,
+        "lexical_type": "PrivacyExportSection",
+        "resolved_type": "PrivacyExportSection",
+        "target": "PrivacyExportSection",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "target_scope": "workspace",
+        "occurrences": 42
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_allowlist.dart",
+        "line": 53,
+        "lexical_type": "PrivacyExportField",
+        "resolved_type": "PrivacyExportField",
+        "target": "PrivacyExportField",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
       },
       {
         "source": "server/lib/push_notification_service.dart",
@@ -229809,27 +230319,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 18,
-        "lexical_type": "AuthService?",
-        "resolved_type": "AuthService?",
-        "target": "AuthService",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 19,
-        "lexical_type": "AuthService",
-        "resolved_type": "AuthService",
-        "target": "AuthService",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/user_data_privacy_service.dart",
-        "line": 41,
+        "line": 104,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
@@ -229839,11 +230329,51 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 44,
+        "line": 107,
         "lexical_type": "InvalidAccountPasswordException",
         "resolved_type": "InvalidAccountPasswordException",
         "target": "InvalidAccountPasswordException",
         "target_library": "package:server/user_data_privacy_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 158,
+        "lexical_type": "PrivacyExportPseudonymizer",
+        "resolved_type": "PrivacyExportPseudonymizer",
+        "target": "PrivacyExportPseudonymizer",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 195,
+        "lexical_type": "PrivacyExportSection",
+        "resolved_type": "PrivacyExportSection",
+        "target": "PrivacyExportSection",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 81,
+        "lexical_type": "AuthService?",
+        "resolved_type": "AuthService?",
+        "target": "AuthService",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 82,
+        "lexical_type": "AuthService",
+        "resolved_type": "AuthService",
+        "target": "AuthService",
+        "target_library": "package:server/auth_service.dart",
         "target_scope": "workspace",
         "occurrences": 2
       },
@@ -232748,7 +233278,7 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1084,
+        "unique_references": 1083,
         "occurrences": 2200
       },
       {
@@ -232766,8 +233296,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6214,
-        "occurrences": 39602
+        "unique_references": 6249,
+        "occurrences": 39743
       },
       {
         "target_scope": "dart_sdk",
@@ -232778,8 +233308,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 30,
-        "occurrences": 50
+        "unique_references": 31,
+        "occurrences": 51
       },
       {
         "target_scope": "dart_sdk",
@@ -232844,8 +233374,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hmac.dart",
-        "unique_references": 3,
-        "occurrences": 5
+        "unique_references": 4,
+        "occurrences": 6
       },
       {
         "target_scope": "dependency",
@@ -234087,7 +234617,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 255,
-        "occurrences": 949
+        "occurrences": 951
       },
       {
         "target_scope": "dependency",
@@ -234170,8 +234700,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:sentry/src/protocol/sentry_user.dart",
-        "unique_references": 3,
-        "occurrences": 6
+        "unique_references": 2,
+        "occurrences": 3
       },
       {
         "target_scope": "dependency",
@@ -234236,8 +234766,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 405,
-        "occurrences": 4755
+        "unique_references": 407,
+        "occurrences": 4767
       },
       {
         "target_scope": "workspace",
@@ -236271,7 +236801,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/endpoint_cache.dart",
         "unique_references": 2,
-        "occurrences": 4
+        "occurrences": 5
       },
       {
         "target_scope": "workspace",
@@ -236440,6 +236970,18 @@
         "target_library": "package:server/plan_service.dart",
         "unique_references": 10,
         "occurrences": 19
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/privacy_export_allowlist.dart",
+        "unique_references": 3,
+        "occurrences": 45
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
+        "unique_references": 1,
+        "occurrences": 2
       },
       {
         "target_scope": "workspace",
@@ -238617,9 +239159,15 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 25,
+        "line": 16,
+        "lexical_type": "DateTime",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 49,
         "lexical_type": "void",
-        "occurrences": 2
+        "occurrences": 4
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
@@ -238737,9 +239285,9 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 27,
+        "line": 90,
         "lexical_type": "void",
-        "occurrences": 4
+        "occurrences": 6
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
@@ -240213,15 +240761,19 @@
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 17,
+      "line": 80,
       "members": [
-        "_deleteIfPresent",
-        "_executeIfAllPresent",
-        "_executeIfPresent",
+        "_anonymizeThirdPartySimulations",
+        "_anonymizedReplayJson",
+        "_assembleExport",
+        "_executeOn",
+        "_executeOnAll",
         "_jsonObject",
-        "_optionalJsonRows",
+        "_ownDeckIds",
         "_passwordMatches",
-        "_relationExists",
+        "_pseudonymizeRow",
+        "_putExportPath",
+        "_requireRelations",
         "_secureRandomToken",
         "deleteAndAnonymizeAccount",
         "exportUserData",
@@ -273265,6 +273817,7 @@
     "server/test/edhrec_service_authorization_test.dart",
     "server/test/email_verification_contract_test.dart",
     "server/test/email_verification_live_test.dart",
+    "server/test/endpoint_cache_ttl_test.dart",
     "server/test/error_contract_test.dart",
     "server/test/experimental_deck_ai_authorization_source_test.dart",
     "server/test/external_commander_deck_expansion_support_test.dart",
@@ -273419,7 +273972,13 @@
     "server/test/premium_visual_audit_test.py",
     "server/test/pricing_contract_test.dart",
     "server/test/printing_identity_flow_contract_test.dart",
+    "server/test/privacy_account_deletion_db_live_test.dart",
+    "server/test/privacy_account_deletion_test.dart",
     "server/test/privacy_account_live_test.dart",
+    "server/test/privacy_data_inventory_db_live_test.dart",
+    "server/test/privacy_data_inventory_test.dart",
+    "server/test/privacy_export_allowlist_test.dart",
+    "server/test/privacy_export_db_live_test.dart",
     "server/test/privacy_migration_sql_regression_test.dart",
     "server/test/product_retention_report_contract_test.dart",
     "server/test/product_shape_live_test.dart",
@@ -274768,7 +275327,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "0dc4a35ef2d97f7602fcbfb1adf81b61b6028ff3a25b83981b7ecd393222b129"
+      "sha256": "7c3aba85362e2d01d883d65833b188e20924576880721e5e54fc980c6603c464"
     },
     "required_task_fields": [
       "id",
@@ -275053,36 +275612,36 @@
       {
         "id": "BT-PRIV-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Tornar export de dados um job allowlisted, sem fingerprints/IDs internos indevidos.",
         "depends_on": [
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`.",
+        "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sobre o inventário do `BT-PRIV-003`: a exportação segue gerada sob demanda numa transação somente leitura e entregue como anexo `no-store`, sem cópia no servidor; cada uma das 39 seções sai por `jsonb_build_object` só com as colunas que o inventário marca para sair (`server/lib/privacy/privacy_export_allowlist.dart`), sem nenhum `to_jsonb`; UUIDs de outras pessoas e de decks de outras pessoas viram pseudônimos HMAC com chave aleatória por arquivo; `request_fingerprint`, `request_key`, `cache_key`, hashes de deck e chaves de idempotência e de lease saem de qualquer profundidade do JSON; entraram bloqueios, eventos de bloqueio, recursos de moderação, confrontos e fraquezas de deck e o registro de consentimento da conta; saíram as simulações que outra pessoa rodou contra o deck público do titular; relação ausente derruba a exportação; formato `schema_version` 2. Evidência: `server/test/privacy_export_allowlist_test.dart` (13 testes; falha se a allowlist e o inventário divergirem) e `server/test/privacy_export_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável com três contas e dado nas 39 tabelas exportadas: nenhum ID cru nem texto de outra pessoa, nenhum hash ou fingerprint, nada gravado no banco); 8 mutações falham como esperado. O job, a expiração e o download auditado do aceite original saíram com a D-22 (nada é guardado); a auditoria do pedido de exportação não foi decidida. O app ainda chama `GET /users/me/export` e precisa pedir a senha, usar `POST` e entregar o arquivo (raia do app).",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 314
       },
       {
         "id": "BT-PRIV-002",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IN_PROGRESS_CONTAINED",
         "delivery": "Orquestrar exclusão com outbox/reconciliação de sidecars, jobs, caches e arquivos.",
         "depends_on": [
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`.",
+        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 315
       },
       {
         "id": "BT-PRIV-003",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Inventário de retenção por tabela/artefato, incluindo replays, prompts, logs e UGC.",
         "depends_on": [],
-        "acceptance": "Owner, finalidade, prazo, export/delete e exceção legal por classe. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): este inventário é insumo de `BT-PRIV-001`, `BT-PRIV-002` e `DCK-P0-04` — a dependência declarada está invertida; corrigir exige decidir a prioridade desta tarefa (hoje P1), decisão do dono. Decisão do dono em 2026-09-22: D-25, promovido a P0 CORE e dependência invertida: o inventário vem antes da exportação, da exclusão e do `DCK-P0-04`.",
+        "acceptance": "Owner, finalidade, prazo, export/delete e exceção legal por classe. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): este inventário é insumo de `BT-PRIV-001`, `BT-PRIV-002` e `DCK-P0-04` — a dependência declarada está invertida; corrigir exige decidir a prioridade desta tarefa (hoje P1), decisão do dono. Decisão do dono em 2026-09-22: D-25, promovido a P0 CORE e dependência invertida: o inventário vem antes da exportação, da exclusão e do `DCK-P0-04`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`: inventário legível por máquina em `docs/privacy/data_retention_inventory.json` (as 79 tabelas do schema versionado, 44 com dado pessoal, cada uma com finalidade, dono, prazo, quem apaga, exportação, exclusão e exceção legal; 6 views; 20 tabelas e 3 colunas que só existem na produção, uma delas com dado pessoal (`ml_prompt_feedback.user_rating`); 13 artefatos fora do banco, como caches, sidecars, logs, Sentry, provedores, backups e aparelho; classificação de exportação das 517 colunas das 39 tabelas exportadas; os prazos das D-23, D-29, D-30 e D-32) e resumo em `docs/privacy/INVENTARIO_DE_RETENCAO.md`. Evidência: `server/test/privacy_data_inventory_test.dart` (14 testes contra o schema do manifesto, os prazos decididos e o serviço de exclusão; 10 mutações falham como esperado) e `server/test/privacy_data_inventory_db_live_test.dart` (4 testes verdes contra PostgreSQL descartável com as 58 migrations; tabela e coluna novas no banco fazem 2 falharem). Achado: nenhum prazo automático roda em produção, porque o job de limpeza exige `ai_analyze_optimize_advisory`, que está OFF. Seguem com o dono: prazo de rotação dos backups; prazos de analytics, replays, notificações e feedback de IA; retenção declarada por Sentry, OpenAI e Resend; base legal de trocas, moderação e nomes de jogador de torneio (advogado).",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 316
       },
@@ -284635,7 +285194,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "276b0d053d13be6911956806e1869ed2c9051a6ee16016f2ad2a4971c28f9059"
+    "project_logic_source_digest_sha256": "1faf84b92014514aeb26fde364cf98446d8a8e0db6c39c91e40a154a9c0227dc"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -287233,6 +287792,9 @@
       "server/lib/plan_middleware.dart",
       "server/lib/plan_service.dart",
       "server/lib/pricing_contract.dart",
+      "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "server/lib/privacy/privacy_export_allowlist.dart",
+      "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -287587,6 +288149,7 @@
       "server/test/edhrec_service_authorization_test.dart",
       "server/test/email_verification_contract_test.dart",
       "server/test/email_verification_live_test.dart",
+      "server/test/endpoint_cache_ttl_test.dart",
       "server/test/error_contract_test.dart",
       "server/test/experimental_deck_ai_authorization_source_test.dart",
       "server/test/external_commander_deck_expansion_support_test.dart",
@@ -287741,7 +288304,13 @@
       "server/test/premium_visual_audit_test.py",
       "server/test/pricing_contract_test.dart",
       "server/test/printing_identity_flow_contract_test.dart",
+      "server/test/privacy_account_deletion_db_live_test.dart",
+      "server/test/privacy_account_deletion_test.dart",
       "server/test/privacy_account_live_test.dart",
+      "server/test/privacy_data_inventory_db_live_test.dart",
+      "server/test/privacy_data_inventory_test.dart",
+      "server/test/privacy_export_allowlist_test.dart",
+      "server/test/privacy_export_db_live_test.dart",
       "server/test/privacy_migration_sql_regression_test.dart",
       "server/test/product_retention_report_contract_test.dart",
       "server/test/product_shape_live_test.dart",

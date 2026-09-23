@@ -137,6 +137,35 @@ String sanitizeObservedQuery(String query) {
       .join('&');
 }
 
+final _observedUuidPattern = RegExp(
+  r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-'
+  r'[0-9a-fA-F]{12}',
+);
+
+/// D-23 (BT-PRIV-002): o Sentry não recebe ID de usuário. Todo UUID de
+/// caminho, título, mensagem, tag ou contexto vira `:id`, o que também tira
+/// IDs de deck e de conversa.
+String redactObservedIdentifiers(String value) =>
+    value.replaceAll(_observedUuidPattern, ':id');
+
+Object? _redactObservedIdentifiersDeep(Object? value) {
+  if (value is String) return redactObservedIdentifiers(value);
+  if (value is Map) {
+    return <String, Object?>{
+      for (final entry in value.entries)
+        entry.key.toString(): _redactObservedIdentifiersDeep(entry.value),
+    };
+  }
+  if (value is Iterable) {
+    return value.map(_redactObservedIdentifiersDeep).toList(growable: false);
+  }
+  return value;
+}
+
+/// Tag que continua crua: o request_id serve para achar a requisição no log
+/// e não identifica a pessoa.
+const _observedRequestIdTag = 'request_id';
+
 String? sanitizeObservedUrl(String? value) {
   if (value == null || value.isEmpty) {
     return value;
@@ -153,7 +182,9 @@ String? sanitizeObservedUrl(String? value) {
           : boundaryCandidates.reduce(
             (left, right) => left < right ? left : right,
           );
-  return sanitizeObservedText(value.substring(0, boundary));
+  return redactObservedIdentifiers(
+    sanitizeObservedText(value.substring(0, boundary)),
+  );
 }
 
 Object? sanitizeObservedValue(Object? value, {String? key, int depth = 0}) {
@@ -252,22 +283,45 @@ SentryEvent sanitizeObservedEvent(SentryEvent event) {
   event.request = sanitizeObservedRequest(event.request);
   final message = event.message;
   if (message != null) {
-    message.formatted = sanitizeObservedText(message.formatted);
+    message.formatted = redactObservedIdentifiers(
+      sanitizeObservedText(message.formatted),
+    );
     message.template =
         message.template == null
             ? null
-            : sanitizeObservedText(message.template!);
+            : redactObservedIdentifiers(
+              sanitizeObservedText(message.template!),
+            );
     message.params = message.params
-        ?.map((value) => sanitizeObservedValue(value))
+        ?.map(
+          (value) =>
+              _redactObservedIdentifiersDeep(sanitizeObservedValue(value)),
+        )
         .toList(growable: false);
+  }
+  final transaction = event.transaction;
+  if (transaction != null) {
+    event.transaction = redactObservedIdentifiers(transaction);
   }
   for (final exception in event.exceptions ?? const <SentryException>[]) {
     exception.value =
-        exception.value == null ? null : sanitizeObservedText(exception.value!);
+        exception.value == null
+            ? null
+            : redactObservedIdentifiers(sanitizeObservedText(exception.value!));
     exception.throwable = null;
   }
   for (final breadcrumb in event.breadcrumbs ?? const <Breadcrumb>[]) {
     sanitizeObservedBreadcrumb(breadcrumb);
+    breadcrumb.message =
+        breadcrumb.message == null
+            ? null
+            : redactObservedIdentifiers(breadcrumb.message!);
+    final data = breadcrumb.data;
+    if (data != null) {
+      breadcrumb.data = Map<String, dynamic>.from(
+        _redactObservedIdentifiersDeep(data)! as Map,
+      );
+    }
   }
   final tags = event.tags;
   if (tags != null) {
@@ -276,7 +330,9 @@ SentryEvent sanitizeObservedEvent(SentryEvent event) {
         sanitizeObservedText(entry.key):
             (isSensitiveObservedKey(entry.key)
                 ? observedFilteredValue
-                : sanitizeObservedText(entry.value)),
+                : entry.key == _observedRequestIdTag
+                ? sanitizeObservedText(entry.value)
+                : redactObservedIdentifiers(sanitizeObservedText(entry.value))),
     };
   }
   // Legacy SDK integrations can still populate `extra`; sanitize before send.
@@ -284,19 +340,20 @@ SentryEvent sanitizeObservedEvent(SentryEvent event) {
   final extra = event.extra;
   if (extra != null) {
     // ignore: deprecated_member_use
-    event.extra = Map<String, dynamic>.from(sanitizeObservedMap(extra));
+    event.extra = Map<String, dynamic>.from(
+      _redactObservedIdentifiersDeep(sanitizeObservedMap(extra))! as Map,
+    );
   }
   for (final key in event.contexts.keys.toList(growable: false)) {
     final value = event.contexts[key];
     if (value is Map || value is Iterable || value is String) {
-      event.contexts[key] = sanitizeObservedValue(value, key: key);
+      event.contexts[key] = _redactObservedIdentifiersDeep(
+        sanitizeObservedValue(value, key: key),
+      );
     }
   }
-  final userId = event.user?.id?.trim();
-  event.user =
-      userId == null || userId.isEmpty
-          ? null
-          : SentryUser(id: sanitizeObservedText(userId));
+  // D-23: nenhum evento sai com o usuário, nem só com o ID.
+  event.user = null;
   return event;
 }
 
@@ -333,6 +390,10 @@ Future<void> _initializeObservability() async {
   );
 }
 
+/// Envia uma exceção ao Sentry.
+///
+/// `userId` é aceito por compatibilidade com os chamadores e não vai ao
+/// Sentry (D-23): nenhum evento carrega o usuário.
 Future<void> captureObservedException(
   Object error, {
   StackTrace? stackTrace,
@@ -357,18 +418,15 @@ Future<void> captureObservedException(
       }
 
       if (request != null) {
+        final path = redactObservedIdentifiers(request.uri.path);
         scope.setTag('http_method', request.method.name.toUpperCase());
-        scope.setTag('http_path', request.uri.path);
+        scope.setTag('http_path', path);
         scope.setContexts('request', <String, Object?>{
           'method': request.method.name.toUpperCase(),
-          'path': request.uri.path,
+          'path': path,
           'query': sanitizeObservedQuery(request.uri.query),
           'headers': sanitizeObservedHeaders(request.headers),
         });
-      }
-
-      if (userId != null && userId.isNotEmpty) {
-        scope.setUser(SentryUser(id: userId));
       }
 
       if (tags != null) {
@@ -389,6 +447,10 @@ Future<void> captureObservedException(
   );
 }
 
+/// Envia uma mensagem ao Sentry.
+///
+/// `userId` é aceito por compatibilidade com os chamadores e não vai ao
+/// Sentry (D-23): nenhum evento carrega o usuário.
 Future<void> captureObservedMessage(
   String message, {
   Request? request,
@@ -405,7 +467,7 @@ Future<void> captureObservedMessage(
   await ensureObservabilityInitialized();
 
   await Sentry.captureMessage(
-    sanitizeObservedText(message),
+    redactObservedIdentifiers(sanitizeObservedText(message)),
     level: level,
     withScope: (scope) {
       if (trace != null) {
@@ -413,18 +475,15 @@ Future<void> captureObservedMessage(
       }
 
       if (request != null) {
+        final path = redactObservedIdentifiers(request.uri.path);
         scope.setTag('http_method', request.method.name.toUpperCase());
-        scope.setTag('http_path', request.uri.path);
+        scope.setTag('http_path', path);
         scope.setContexts('request', <String, Object?>{
           'method': request.method.name.toUpperCase(),
-          'path': request.uri.path,
+          'path': path,
           'query': sanitizeObservedQuery(request.uri.query),
           'headers': sanitizeObservedHeaders(request.headers),
         });
-      }
-
-      if (userId != null && userId.isNotEmpty) {
-        scope.setUser(SentryUser(id: userId));
       }
 
       if (tags != null) {
@@ -454,7 +513,6 @@ Future<void> captureRouteException(
   Map<String, Object?>? extras,
 }) async {
   RequestTrace? trace;
-  String? userId;
 
   try {
     trace = context.read<RequestTrace>();
@@ -462,18 +520,12 @@ Future<void> captureRouteException(
     trace = null;
   }
 
-  try {
-    userId = context.read<String>();
-  } catch (_) {
-    userId = null;
-  }
-
+  // D-23: o usuário da requisição não vai ao Sentry.
   await captureObservedException(
     error,
     stackTrace: stackTrace,
     request: context.request,
     trace: trace,
-    userId: userId,
     tags: {'source': source, if (tags != null) ...tags},
     extras: extras,
   );

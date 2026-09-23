@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "0dc4a35ef2d97f7602fcbfb1adf81b61b6028ff3a25b83981b7ecd393222b129"
+    "sha256": "7c3aba85362e2d01d883d65833b188e20924576880721e5e54fc980c6603c464"
   },
   "required_task_fields": [
     "id",
@@ -287,36 +287,36 @@
     {
       "id": "BT-PRIV-001",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Tornar export de dados um job allowlisted, sem fingerprints/IDs internos indevidos.",
       "depends_on": [
         "BT-AUTH-004",
         "BT-PRIV-003"
       ],
-      "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`.",
+      "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sobre o inventário do `BT-PRIV-003`: a exportação segue gerada sob demanda numa transação somente leitura e entregue como anexo `no-store`, sem cópia no servidor; cada uma das 39 seções sai por `jsonb_build_object` só com as colunas que o inventário marca para sair (`server/lib/privacy/privacy_export_allowlist.dart`), sem nenhum `to_jsonb`; UUIDs de outras pessoas e de decks de outras pessoas viram pseudônimos HMAC com chave aleatória por arquivo; `request_fingerprint`, `request_key`, `cache_key`, hashes de deck e chaves de idempotência e de lease saem de qualquer profundidade do JSON; entraram bloqueios, eventos de bloqueio, recursos de moderação, confrontos e fraquezas de deck e o registro de consentimento da conta; saíram as simulações que outra pessoa rodou contra o deck público do titular; relação ausente derruba a exportação; formato `schema_version` 2. Evidência: `server/test/privacy_export_allowlist_test.dart` (13 testes; falha se a allowlist e o inventário divergirem) e `server/test/privacy_export_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável com três contas e dado nas 39 tabelas exportadas: nenhum ID cru nem texto de outra pessoa, nenhum hash ou fingerprint, nada gravado no banco); 8 mutações falham como esperado. O job, a expiração e o download auditado do aceite original saíram com a D-22 (nada é guardado); a auditoria do pedido de exportação não foi decidida. O app ainda chama `GET /users/me/export` e precisa pedir a senha, usar `POST` e entregar o arquivo (raia do app).",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 314
     },
     {
       "id": "BT-PRIV-002",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Orquestrar exclusão com outbox/reconciliação de sidecars, jobs, caches e arquivos.",
       "depends_on": [
         "BT-AUTH-004",
         "BT-PRIV-003"
       ],
-      "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`.",
+      "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 315
     },
     {
       "id": "BT-PRIV-003",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Inventário de retenção por tabela/artefato, incluindo replays, prompts, logs e UGC.",
       "depends_on": [],
-      "acceptance": "Owner, finalidade, prazo, export/delete e exceção legal por classe. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): este inventário é insumo de `BT-PRIV-001`, `BT-PRIV-002` e `DCK-P0-04` — a dependência declarada está invertida; corrigir exige decidir a prioridade desta tarefa (hoje P1), decisão do dono. Decisão do dono em 2026-09-22: D-25, promovido a P0 CORE e dependência invertida: o inventário vem antes da exportação, da exclusão e do `DCK-P0-04`.",
+      "acceptance": "Owner, finalidade, prazo, export/delete e exceção legal por classe. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): este inventário é insumo de `BT-PRIV-001`, `BT-PRIV-002` e `DCK-P0-04` — a dependência declarada está invertida; corrigir exige decidir a prioridade desta tarefa (hoje P1), decisão do dono. Decisão do dono em 2026-09-22: D-25, promovido a P0 CORE e dependência invertida: o inventário vem antes da exportação, da exclusão e do `DCK-P0-04`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`: inventário legível por máquina em `docs/privacy/data_retention_inventory.json` (as 79 tabelas do schema versionado, 44 com dado pessoal, cada uma com finalidade, dono, prazo, quem apaga, exportação, exclusão e exceção legal; 6 views; 20 tabelas e 3 colunas que só existem na produção, uma delas com dado pessoal (`ml_prompt_feedback.user_rating`); 13 artefatos fora do banco, como caches, sidecars, logs, Sentry, provedores, backups e aparelho; classificação de exportação das 517 colunas das 39 tabelas exportadas; os prazos das D-23, D-29, D-30 e D-32) e resumo em `docs/privacy/INVENTARIO_DE_RETENCAO.md`. Evidência: `server/test/privacy_data_inventory_test.dart` (14 testes contra o schema do manifesto, os prazos decididos e o serviço de exclusão; 10 mutações falham como esperado) e `server/test/privacy_data_inventory_db_live_test.dart` (4 testes verdes contra PostgreSQL descartável com as 58 migrations; tabela e coluna novas no banco fazem 2 falharem). Achado: nenhum prazo automático roda em produção, porque o job de limpeza exige `ai_analyze_optimize_advisory`, que está OFF. Seguem com o dono: prazo de rotação dos backups; prazos de analytics, replays, notificações e feedback de IA; retenção declarada por Sentry, OpenAI e Resend; base legal de trocas, moderação e nomes de jogador de torneio (advogado).",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 316
     },
@@ -9869,5 +9869,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "276b0d053d13be6911956806e1869ed2c9051a6ee16016f2ad2a4971c28f9059"
+  "project_logic_source_digest_sha256": "1faf84b92014514aeb26fde364cf98446d8a8e0db6c39c91e40a154a9c0227dc"
 }

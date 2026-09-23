@@ -17,62 +17,17 @@ void main() {
       expect(exportRoute, contains("'Content-Disposition':"));
       expect(exportRoute, contains('brewtact-user-data-'));
       expect(exportRoute, isNot(contains('manaloom-user-data-')));
-      expect(service, contains("'schema_version': 1"));
-      expect(service, contains("'decks': decks"));
-      expect(service, contains("'deck_learning_events': deckLearningEvents"));
-      expect(service, contains("'battle_simulations': battleSimulations"));
-      expect(service, contains("'battle_jobs': battleJobs"));
-      expect(service, contains("'battle_live_records': battleLiveRecords"));
-      expect(
-        service,
-        contains("'interactive_battle_sessions': interactiveBattleSessions"),
-      );
-      expect(
-        service,
-        contains("'interactive_battle_records': interactiveBattleRecords"),
-      );
-      expect(service, contains("- 'request_payload'"));
-      expect(service, contains("- 'lease_token'"));
-      expect(
-        service,
-        contains("'battle_simulation_attempts': battleSimulationAttempts"),
-      );
-      expect(
-        service,
-        contains("'battle_replay_annotations': battleReplayAnnotations"),
-      );
-      expect(service, contains('FROM battle_simulation_attempts attempt'));
-      expect(service, contains('FROM battle_job_live_records record'));
-      expect(service, contains('AND record.public_visible'));
-      expect(
-        service,
-        contains('FROM interactive_battle_sessions battle_session'),
-      );
-      expect(service, contains('FROM interactive_battle_records record'));
-      expect(
-        service,
-        contains("record.visibility IN ('private_user', 'public_replay_ref')"),
-      );
-      expect(service, contains("'interactive_battle_internal_records'"));
-      expect(service, contains("'interactive_battle_request_payload'"));
-      expect(service, contains("'interactive_battle_request_fingerprints'"));
-      expect(service, contains('FROM battle_replay_annotations annotation'));
-      expect(service, isNot(contains("'request_fingerprint'")));
-      expect(service, contains("'binder_items': binderItems"));
-      expect(service, contains("'post_game_notes': postGameNotes"));
-      expect(service, contains("'direct_messages_sent': directMessagesSent"));
-      expect(service, contains("'conversations': conversations"));
-      expect(service, contains("'feedback': aiFeedback"));
-      expect(service, contains("'fallback_telemetry': aiFallbackTelemetry"));
-      expect(service, contains("'optimize_cache': aiOptimizeCache"));
+      // BT-PRIV-001 (D-22): as seções, as colunas, os pseudônimos e a limpeza
+      // de hashes e fingerprints são provados em
+      // privacy_export_allowlist_test.dart (contra o inventário) e em
+      // privacy_export_db_live_test.dart (PostgreSQL descartável).
+      expect(service, contains('privacyExportSections'));
+      expect(service, contains('pseudonymizer.scrub('));
+      expect(service, isNot(contains('to_jsonb(')));
       expect(service, contains('IsolationLevel.repeatableRead'));
       expect(service, contains('AccessMode.readOnly'));
-      expect(service, contains("'messages_authored_by_other_users'"));
       expect(service, isNot(contains("'password_hash':")));
       expect(service, isNot(contains("'fcm_token':")));
-      expect(service, contains("WHEN t.sender_id = CAST(@userId AS uuid)"));
-      expect(service, isNot(contains('SELECT to_jsonb(t) FROM trade_offers')));
-      expect(service, contains("'notification_message_bodies'"));
     });
 
     test(
