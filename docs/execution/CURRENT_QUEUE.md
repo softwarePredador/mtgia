@@ -23,7 +23,7 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   não é copiado aqui, porque este arquivo entra no próprio digest: ver
   `project_logic_manifest.json > source_digest_sha256`.
 - WIP máximo: `1`
-- Exceção de contenção fail-closed do NOW: `BT-SCP-001` — o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham
+- Exceção de contenção fail-closed do NOW (servidor): `BT-SCP-001` — o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham
 - Writers em 2026-09-21: quatro sessões paralelas (ver
   `docs/PONTO_DE_RETOMADA_COORDENACAO_2026-09-21.md`). Só a frente A serviu ao
   slot NOW; as demais produziram `docs/design`, `docs/flows` e a correção não
@@ -35,11 +35,12 @@ backlog mestre e o registry gerado.
 
 ## Slot atual
 
-| Slot | ID | Ficha | Objetivo de coordenação |
-| --- | --- | --- | --- |
-| `NOW` | `BT-SCP-001` | `docs/execution/tasks/BT-SCP-001.md` | Provar o manifesto server-authoritative, default-deny e same-SHA sem abrir nenhuma capability. |
+| Slot | Raia | ID | Ficha | Objetivo de coordenação |
+| --- | --- | --- | --- | --- |
+| `NOW` | `servidor` | `BT-SCP-001` | `docs/execution/tasks/BT-SCP-001.md` | Provar o manifesto server-authoritative, default-deny e same-SHA sem abrir nenhuma capability. |
 
-Nenhum outro ID pode receber implementação enquanto este slot estiver aberto.
+Nenhum outro ID da raia de servidor pode receber implementação enquanto este slot
+estiver aberto. A raia do app ainda não tem slot.
 Auditorias paralelas servem apenas ao mesmo ID.
 
 Exceções ocorridas (não retroativamente autorizadas): `a2d044618` (gate
@@ -50,9 +51,10 @@ BT-CI-001 (`d83e9b1e1`) e BT-UIEV-001 (`b397f477b`, `9a9ba66de`, `d08c18717`)
 ## Horizonte imediato, em ordem
 
 Por decisão do dono de 2026-09-22 (D-02), o trabalho corre em duas raias,
-separadas pela fronteira do digest de UI, com WIP-1 em cada uma. O gerador ainda
-aceita um só slot `NOW`; a raia do app abre quando `BT-UIEV-001` fechar e o
-`BT-GOV-002` mudar o contrato da fila. Até lá, só a raia de servidor tem slot.
+separadas pela fronteira do digest de UI, com WIP-1 em cada uma. Desde o
+`BT-GOV-002` o gerador aceita até dois slots `NOW`, um por raia (sintaxe em "Como
+mover o slot"); a raia do app abre quando `BT-UIEV-001` fechar, por decisão da
+coordenação. Até lá, só a raia de servidor tem slot.
 
 ### Raia de servidor, banco e gates (slot `NOW` atual)
 
@@ -189,3 +191,27 @@ contador de vida.
 
 Estado em 2026-09-22: passos 5 (hashes) e 6 (arquivar fichas fechadas)
 pendentes desde `f6f791098`.
+
+### Duas raias (`BT-GOV-002`, D-02)
+
+A tabela "Slot atual" leva a coluna `Raia` logo depois de `Slot`, com o valor
+`servidor` (servidor, banco e gates) ou `app`. O gerador (`tools/project_logic`)
+confere estas regras a cada `--write` e `--check`:
+
+- no máximo dois slots `NOW`, um por raia. Três slots, raia repetida, raia fora
+  dessas duas ou o mesmo ID nas duas raias falham;
+- cada slot tem ficha própria, com as mesmas exigências do slot único: caminho
+  `docs/execution/tasks/` mais o ID, `Task ID` igual, cabeçalho de ledger não
+  autoritativo e limite de autorização declarado;
+- cada slot tem linha de contenção própria, rotulada pela raia entre parênteses
+  logo depois de "do NOW", como a linha de contenção do topo deste arquivo, com
+  a regra do slot único: `none` quando todas as dependências estão em `PASS`;
+  senão, o próprio ID, em `IN_PROGRESS_CONTAINED`, e o motivo;
+- linha de contenção de raia sem slot falha, e cada raia tem uma só;
+- o `WIP máximo` de 1 vale por raia.
+
+Para abrir a raia do app, quando o `BT-UIEV-001` fechar e a coordenação decidir:
+acrescentar na tabela uma linha `NOW` com a raia `app`, o ID e a ficha; criar a
+ficha; acrescentar a linha de contenção rotulada `(app)`; rodar `--write` e
+`--check`; commitar. Sem a coluna `Raia`, o formato antigo de um slot só continua
+aceito e fica na raia de servidor.

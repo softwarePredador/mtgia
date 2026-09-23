@@ -1556,7 +1556,8 @@ class ProjectLogicGenerator {
         'dependency_graph_acyclic': true,
         'out_of_table_task_definitions': 0,
         'execution_wip_limit': 1,
-        'execution_active_slots': 1,
+        'execution_wip_scope': 'per_lane',
+        'execution_active_slots': executionLedger['active_slot_count'],
         'execution_dependencies_closed_or_contained': true,
         'execution_ledger_priority_authority': false,
         'execution_ledger_status_authority': false,
@@ -1569,6 +1570,10 @@ class ProjectLogicGenerator {
       },
     };
   }
+
+  /// Raias da fila (D-02, `BT-GOV-002`): servidor, banco e gates numa; app na
+  /// outra. Cada raia tem no máximo um slot `NOW` (WIP 1 por raia).
+  static const executionLanes = <String>['servidor', 'app'];
 
   Map<String, Object?> _executionLedger(
     String source, {
@@ -1586,30 +1591,160 @@ class ProjectLogicGenerator {
       );
     }
 
-    final activeSlots = <Map<String, String>>[];
-    for (final line in const LineSplitter().convert(source)) {
-      if (!line.trimLeft().startsWith('|')) continue;
-      final cells = _markdownTableCells(line);
-      if (cells.length < 3 || _stripSingleBacktickPair(cells.first) != 'NOW') {
-        continue;
-      }
-      activeSlots.add({
-        'task_id': _stripSingleBacktickPair(cells[1]),
-        'packet_path': _stripSingleBacktickPair(cells[2]),
-      });
-    }
-    if (activeSlots.length != 1) {
+    final activeSlots = _nowSlots(source, sourcePath);
+    if (activeSlots.isEmpty || activeSlots.length > executionLanes.length) {
       throw ProjectLogicException(
-        '$sourcePath must contain exactly one NOW slot; found '
+        '$sourcePath must contain one or two NOW slots, one per lane; found '
         '${activeSlots.length}.',
       );
     }
+    final laned = activeSlots.first.lane != null;
+    if (!laned && activeSlots.length > 1) {
+      throw ProjectLogicException(
+        '$sourcePath must declare the Raia column to hold two NOW slots.',
+      );
+    }
+    final lanes = <String>{};
+    final taskIds = <String>{};
+    for (final slot in activeSlots) {
+      if (laned && !executionLanes.contains(slot.lane)) {
+        throw ProjectLogicException(
+          'NOW slot ${slot.taskId} in $sourcePath has unknown lane '
+          '${slot.lane}; lanes are ${executionLanes.join(', ')}.',
+        );
+      }
+      if (laned && !lanes.add(slot.lane!)) {
+        throw ProjectLogicException(
+          '$sourcePath repeats the ${slot.lane} lane; each lane holds at '
+          'most one NOW slot.',
+        );
+      }
+      if (!taskIds.add(slot.taskId)) {
+        throw ProjectLogicException(
+          'NOW task ${slot.taskId} occupies more than one slot in '
+          '$sourcePath.',
+        );
+      }
+    }
 
-    final active = activeSlots.single;
-    final taskId = active['task_id']!;
-    final packetPath = active['packet_path']!;
+    final containmentMatches = RegExp(
+      r'^- Exceção de contenção fail-closed do NOW(?: \(([^)]*)\))?:'
+      r'\s*`([^`]+)`(?:\s*—\s*(\S.*))?\s*$',
+      multiLine: true,
+    ).allMatches(source).toList();
+    final containmentByLane = <String?, RegExpMatch>{};
+    for (final match in containmentMatches) {
+      final markerLane = match.group(1);
+      if (laned ? !lanes.contains(markerLane) : markerLane != null) {
+        throw ProjectLogicException(
+          '$sourcePath declares a NOW containment marker for '
+          '${markerLane ?? 'no lane'}, which has no NOW slot.',
+        );
+      }
+      if (containmentByLane.containsKey(markerLane)) {
+        throw ProjectLogicException(
+          '$sourcePath must declare exactly one structured NOW containment '
+          'exception marker per slot.',
+        );
+      }
+      containmentByLane[markerLane] = match;
+    }
+
     final tasks = (backlog['tasks'] as List<dynamic>)
         .cast<Map<String, Object?>>();
+    final tasksById = <String, Map<String, Object?>>{
+      for (final task in tasks) task['id']! as String: task,
+    };
+    final slotLedgers = <Map<String, Object?>>[
+      for (final slot in activeSlots)
+        _nowSlotLedger(
+          slot,
+          sourcePath: sourcePath,
+          tasks: tasks,
+          tasksById: tasksById,
+          containment: containmentByLane[slot.lane],
+          packetSourceFor: packetSourceFor,
+        ),
+    ];
+
+    return <String, Object?>{
+      'schema_version': 1,
+      'generated_from': {
+        'path': sourcePath,
+        'sha256': sha256.convert(utf8.encode(source)).toString(),
+      },
+      'wip_limit': 1,
+      'wip_scope': 'per_lane',
+      'lanes': executionLanes,
+      'lanes_declared': laned,
+      'active_slot_count': slotLedgers.length,
+      // Compatibilidade: o slot da primeira raia declarada (servidor).
+      'active_slot': slotLedgers.first,
+      'active_slots': slotLedgers,
+      'authority': {
+        'priority': false,
+        'status': false,
+        'dependencies': false,
+        'delivery': false,
+        'acceptance': false,
+        'live_mutation': false,
+      },
+    };
+  }
+
+  /// Linhas `NOW` da fila. Com a coluna `Raia` no cabeçalho da tabela, cada
+  /// linha declara a sua raia; sem ela (formato de um slot só), a raia fica
+  /// implícita: a de servidor, a única aberta até o `BT-UIEV-001` fechar.
+  List<_NowSlot> _nowSlots(String source, String sourcePath) {
+    final slots = <_NowSlot>[];
+    List<String>? header;
+    var laneColumns = 0;
+    for (final line in const LineSplitter().convert(source)) {
+      if (!line.trimLeft().startsWith('|')) {
+        header = null;
+        continue;
+      }
+      final cells = _markdownTableCells(line);
+      if (header == null) {
+        header = cells.map(_stripSingleBacktickPair).toList();
+        continue;
+      }
+      if (_stripSingleBacktickPair(cells.first) != 'NOW') continue;
+      final laneIndex = header.indexOf('Raia');
+      if (laneIndex != -1 && laneIndex != 1) {
+        throw ProjectLogicException(
+          '$sourcePath must place the Raia column right after Slot.',
+        );
+      }
+      final idIndex = laneIndex == 1 ? 2 : 1;
+      if (cells.length < idIndex + 2) continue;
+      if (laneIndex == 1) laneColumns++;
+      slots.add(
+        _NowSlot(
+          lane: laneIndex == 1 ? _stripSingleBacktickPair(cells[1]) : null,
+          taskId: _stripSingleBacktickPair(cells[idIndex]),
+          packetPath: _stripSingleBacktickPair(cells[idIndex + 1]),
+        ),
+      );
+    }
+    if (laneColumns != 0 && laneColumns != slots.length) {
+      throw ProjectLogicException(
+        '$sourcePath mixes NOW slots with and without the Raia column.',
+      );
+    }
+    return slots;
+  }
+
+  Map<String, Object?> _nowSlotLedger(
+    _NowSlot slot, {
+    required String sourcePath,
+    required List<Map<String, Object?>> tasks,
+    required Map<String, Map<String, Object?>> tasksById,
+    required RegExpMatch? containment,
+    required String? Function(String path) packetSourceFor,
+  }) {
+    final taskId = slot.taskId;
+    final packetPath = slot.packetPath;
     final matchingTasks = tasks.where((task) => task['id'] == taskId).toList();
     if (matchingTasks.length != 1) {
       throw ProjectLogicException(
@@ -1663,9 +1798,6 @@ class ProjectLogicGenerator {
     }
 
     final canonicalTask = matchingTasks.single;
-    final tasksById = <String, Map<String, Object?>>{
-      for (final task in tasks) task['id']! as String: task,
-    };
     final dependencies = (canonicalTask['depends_on'] as List<dynamic>)
         .cast<String>();
     final dependencyStates = dependencies
@@ -1676,19 +1808,14 @@ class ProjectLogicGenerator {
           },
         )
         .toList(growable: false);
-    final containmentMatches = RegExp(
-      r'^- Exceção de contenção fail-closed do NOW:\s*`([^`]+)`'
-      r'(?:\s*—\s*(\S.*))?\s*$',
-      multiLine: true,
-    ).allMatches(source).toList();
-    if (containmentMatches.length != 1) {
+    if (containment == null) {
       throw ProjectLogicException(
         '$sourcePath must declare exactly one structured NOW containment '
-        'exception marker.',
+        'exception marker${slot.lane == null ? '' : ' for the ${slot.lane} lane'}.',
       );
     }
-    final containmentValue = containmentMatches.single.group(1)!;
-    final containmentReason = containmentMatches.single.group(2)?.trim();
+    final containmentValue = containment.group(2)!;
+    final containmentReason = containment.group(3)?.trim();
     final openDependencies = dependencyStates
         .where((dependency) => dependency['status'] != 'PASS')
         .toList(growable: false);
@@ -1697,7 +1824,7 @@ class ProjectLogicGenerator {
       if (containmentValue != 'none' || containmentReason != null) {
         throw ProjectLogicException(
           '$sourcePath must use containment marker `none` when all NOW '
-          'dependencies are PASS.',
+          'dependencies of $taskId are PASS.',
         );
       }
     } else if (canonicalTask['status'] != 'IN_PROGRESS_CONTAINED' ||
@@ -1712,36 +1839,20 @@ class ProjectLogicGenerator {
     }
 
     return <String, Object?>{
-      'schema_version': 1,
-      'generated_from': {
-        'path': sourcePath,
-        'sha256': sha256.convert(utf8.encode(source)).toString(),
-      },
-      'wip_limit': 1,
-      'active_slot_count': 1,
-      'active_slot': {
-        'label': 'NOW',
-        'task_id': taskId,
-        'packet_path': packetPath,
-        'packet_identity_validated': true,
-        'canonical_status': canonicalTask['status'],
-        'canonical_dependencies': dependencyStates,
-        'dependency_gate': {
-          'all_dependencies_pass': openDependencies.isEmpty,
-          'containment_exception': hasContainmentException,
-          if (hasContainmentException) ...{
-            'containment_task_id': taskId,
-            'containment_reason': containmentReason!,
-          },
+      'label': 'NOW',
+      'lane': slot.lane ?? executionLanes.first,
+      'task_id': taskId,
+      'packet_path': packetPath,
+      'packet_identity_validated': true,
+      'canonical_status': canonicalTask['status'],
+      'canonical_dependencies': dependencyStates,
+      'dependency_gate': {
+        'all_dependencies_pass': openDependencies.isEmpty,
+        'containment_exception': hasContainmentException,
+        if (hasContainmentException) ...{
+          'containment_task_id': taskId,
+          'containment_reason': containmentReason!,
         },
-      },
-      'authority': {
-        'priority': false,
-        'status': false,
-        'dependencies': false,
-        'delivery': false,
-        'acceptance': false,
-        'live_mutation': false,
       },
     };
   }
@@ -4032,6 +4143,19 @@ int _compareJsonBySourceName(
   );
   if (bySource != 0) return bySource;
   return (left['name'] as String).compareTo(right['name'] as String);
+}
+
+class _NowSlot {
+  const _NowSlot({
+    required this.lane,
+    required this.taskId,
+    required this.packetPath,
+  });
+
+  /// `null` no formato de um slot só, sem a coluna `Raia`.
+  final String? lane;
+  final String taskId;
+  final String packetPath;
 }
 
 class _DartUnit {

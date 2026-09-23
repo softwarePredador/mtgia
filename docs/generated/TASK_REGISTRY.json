@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "c36f4b611a6452798e0008c0e128e7aa50f40f46aae96a62bd3eea6e3dd82d64"
+    "sha256": "829cf62ce3792c4fd250c09213032adbf2b3dbe4a875bd9f4b4f0adf3c0b535c"
   },
   "required_task_fields": [
     "id",
@@ -27,10 +27,10 @@
     {
       "id": "BT-GOV-002",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Fila com duas raias (D-02): servidor, banco e gates numa; app na outra; WIP-1 por raia.",
       "depends_on": [],
-      "acceptance": "O gerador aceita no máximo dois slots `NOW`, um por raia, cada um com ficha e contenção próprias; o teste do gerador cobre um e dois slots e rejeita três ou raia repetida; `CURRENT_QUEUE.md` declara a raia do app quando o `BT-UIEV-001` fechar.",
+      "acceptance": "O gerador aceita no máximo dois slots `NOW`, um por raia, cada um com ficha e contenção próprias; o teste do gerador cobre um e dois slots e rejeita três ou raia repetida; `CURRENT_QUEUE.md` declara a raia do app quando o `BT-UIEV-001` fechar. Feito em 2026-09-23, na branch `servidor/raia-2026-09-23`: `tools/project_logic/lib/project_logic_generator.dart` lê a coluna `Raia` da tabela \"Slot atual\" (`servidor` ou `app`), aceita até dois slots `NOW`, um por raia, valida ficha e linha de contenção de cada um com as regras do slot único (a linha de contenção leva a raia entre parênteses) e publica `active_slots` no registry, mantendo `active_slot` para quem já lia um slot só; o formato antigo, sem a coluna, continua aceito. `CURRENT_QUEUE.md` passou a usar a coluna com o slot da raia de servidor e documenta a sintaxe em \"Como mover o slot\". Evidência: o teste do gerador cobre um e dois slots e rejeita três slots, raia repetida, raia desconhecida, o mesmo ID nas duas raias, raia sem linha de contenção, contenção de raia sem slot, contenção repetida, ficha ausente, dois slots sem a coluna, a coluna fora do lugar e slots com e sem a coluna; uma mutação que aceita raia repetida falha no teste. A raia do app não foi aberta: isso fica para a coordenação, quando o `BT-UIEV-001` fechar.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 262
     },
@@ -5094,12 +5094,19 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/execution/CURRENT_QUEUE.md",
-      "sha256": "2057568d12e685b50eba082aef994f179ef220aade38eb59e0e098f40d8b6d58"
+      "sha256": "bc6dbaa64f5f481dd5b1a404163a8ca76c2952b69bef3828361a736b9a0c362e"
     },
     "wip_limit": 1,
+    "wip_scope": "per_lane",
+    "lanes": [
+      "servidor",
+      "app"
+    ],
+    "lanes_declared": true,
     "active_slot_count": 1,
     "active_slot": {
       "label": "NOW",
+      "lane": "servidor",
       "task_id": "BT-SCP-001",
       "packet_path": "docs/execution/tasks/BT-SCP-001.md",
       "packet_identity_validated": true,
@@ -5125,6 +5132,36 @@
         "containment_reason": "o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham"
       }
     },
+    "active_slots": [
+      {
+        "label": "NOW",
+        "lane": "servidor",
+        "task_id": "BT-SCP-001",
+        "packet_path": "docs/execution/tasks/BT-SCP-001.md",
+        "packet_identity_validated": true,
+        "canonical_status": "IN_PROGRESS_CONTAINED",
+        "canonical_dependencies": [
+          {
+            "id": "BT-GOV-001",
+            "status": "PASS"
+          },
+          {
+            "id": "BT-UIEV-001",
+            "status": "IN_PROGRESS_CONTAINED"
+          },
+          {
+            "id": "BT-WEB-003",
+            "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE"
+          }
+        ],
+        "dependency_gate": {
+          "all_dependencies_pass": false,
+          "containment_exception": true,
+          "containment_task_id": "BT-SCP-001",
+          "containment_reason": "o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham"
+        }
+      }
+    ],
     "authority": {
       "priority": false,
       "status": false,
@@ -9814,6 +9851,7 @@
     "dependency_graph_acyclic": true,
     "out_of_table_task_definitions": 0,
     "execution_wip_limit": 1,
+    "execution_wip_scope": "per_lane",
     "execution_active_slots": 1,
     "execution_dependencies_closed_or_contained": true,
     "execution_ledger_priority_authority": false,
@@ -9825,5 +9863,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "66f1c7fbd34f23e61e9bf45272fdb384921e726cb5f2554f349e8d8e9032356d"
+  "project_logic_source_digest_sha256": "3e5f3f5a8db9f1e0cd20b8788f542c6dd5d77afc265082b23b0e30834a83b8e9"
 }

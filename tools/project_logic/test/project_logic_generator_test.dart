@@ -597,6 +597,184 @@ void main() {
     );
   });
 
+  test('accepts up to two NOW slots, one per lane (BT-GOV-002)', () {
+    final generator = ProjectLogicGenerator(root);
+    const backlogSource = '''
+| ID | Pri. | Estado | Entrega | Depende de | Aceite mínimo |
+|---|---|---|---|---|---|
+| `BT-TST-000` | P1 | PASS | Entrega base. | — | Aceite base. |
+| `BT-TST-001` | P1 | TODO | Entrega servidor. | `BT-TST-000` | Aceite. |
+| `BT-TST-002` | P1 | TODO | Entrega app. | `BT-TST-000` | Aceite. |
+| `BT-TST-003` | P1 | TODO | Entrega extra. | `BT-TST-000` | Aceite. |
+''';
+    final backlog = generator.taskBacklogForTesting(backlogSource);
+    String packet(String id) =>
+        '''
+# Ficha de execução — `$id`
+
+> Ledger de execução não autoritativo.
+
+- Task ID: `$id`
+- Autorização máxima: `local-read-only`
+''';
+    final packets = {
+      for (final id in const ['BT-TST-001', 'BT-TST-002', 'BT-TST-003'])
+        'docs/execution/tasks/$id.md': packet(id),
+    };
+    String row(String lane, String id) =>
+        '| `NOW` | `$lane` | `$id` | `docs/execution/tasks/$id.md` | Provar. |';
+    String queue(List<String> rows, {List<String>? markers}) =>
+        '''
+# Fila
+
+- WIP máximo: `1`
+${(markers ?? const ['servidor', 'app']).map((lane) => '- Exceção de contenção fail-closed do NOW ($lane): `none`').join('\n')}
+
+| Slot | Raia | ID | Ficha | Objetivo |
+| --- | --- | --- | --- | --- |
+${rows.join('\n')}
+''';
+    Map<String, Object?> ledgerFor(String source) =>
+        generator.executionLedgerForTesting(
+          queueSource: source,
+          backlog: backlog,
+          packetSources: packets,
+        );
+
+    final single = ledgerFor(
+      queue([row('servidor', 'BT-TST-001')], markers: const ['servidor']),
+    );
+    expect(single['active_slot_count'], 1);
+    expect(single['lanes_declared'], true);
+    expect(single['wip_scope'], 'per_lane');
+    expect(single['active_slot'], containsPair('lane', 'servidor'));
+
+    final two = ledgerFor(
+      queue([row('servidor', 'BT-TST-001'), row('app', 'BT-TST-002')]),
+    );
+    expect(two['active_slot_count'], 2);
+    final slots = (two['active_slots'] as List<dynamic>)
+        .cast<Map<String, Object?>>();
+    expect(slots.map((slot) => slot['lane']), ['servidor', 'app']);
+    expect(slots.map((slot) => slot['task_id']), ['BT-TST-001', 'BT-TST-002']);
+    expect(
+      slots.every((slot) => slot['packet_identity_validated'] == true),
+      true,
+    );
+    expect(two['active_slot'], containsPair('task_id', 'BT-TST-001'));
+
+    for (final (reason, invalid) in [
+      (
+        'três slots',
+        queue([
+          row('servidor', 'BT-TST-001'),
+          row('app', 'BT-TST-002'),
+          row('app', 'BT-TST-003'),
+        ]),
+      ),
+      (
+        'raia repetida',
+        queue(
+          [row('servidor', 'BT-TST-001'), row('servidor', 'BT-TST-002')],
+          markers: const ['servidor'],
+        ),
+      ),
+      (
+        'raia desconhecida',
+        queue(
+          [row('servidor', 'BT-TST-001'), row('web', 'BT-TST-002')],
+          markers: const ['servidor', 'web'],
+        ),
+      ),
+      (
+        'mesmo ID nas duas raias',
+        queue([row('servidor', 'BT-TST-001'), row('app', 'BT-TST-001')]),
+      ),
+      (
+        'raia sem linha de contenção',
+        queue(
+          [row('servidor', 'BT-TST-001'), row('app', 'BT-TST-002')],
+          markers: const ['servidor'],
+        ),
+      ),
+      ('contenção de raia sem slot', queue([row('servidor', 'BT-TST-001')])),
+      (
+        'contenção repetida',
+        queue(
+          [row('servidor', 'BT-TST-001')],
+          markers: const ['servidor', 'servidor'],
+        ),
+      ),
+      (
+        'ficha da raia do app ausente',
+        queue([row('servidor', 'BT-TST-001'), row('app', 'BT-TST-004')]),
+      ),
+      (
+        'dois slots sem a coluna Raia',
+        '''
+- WIP máximo: `1`
+- Exceção de contenção fail-closed do NOW: `none`
+
+| Slot | ID | Ficha | Objetivo |
+| --- | --- | --- | --- |
+| `NOW` | `BT-TST-001` | `docs/execution/tasks/BT-TST-001.md` | Provar. |
+| `NOW` | `BT-TST-002` | `docs/execution/tasks/BT-TST-002.md` | Provar. |
+''',
+      ),
+      (
+        'coluna Raia fora do lugar',
+        '''
+- WIP máximo: `1`
+- Exceção de contenção fail-closed do NOW (servidor): `none`
+
+| Slot | ID | Raia | Ficha | Objetivo |
+| --- | --- | --- | --- | --- |
+| `NOW` | `BT-TST-001` | `servidor` | `docs/execution/tasks/BT-TST-001.md` | Provar. |
+''',
+      ),
+      (
+        'slots com e sem a coluna Raia',
+        '''
+- WIP máximo: `1`
+- Exceção de contenção fail-closed do NOW (servidor): `none`
+
+| Slot | Raia | ID | Ficha | Objetivo |
+| --- | --- | --- | --- | --- |
+| `NOW` | `servidor` | `BT-TST-001` | `docs/execution/tasks/BT-TST-001.md` | Provar. |
+
+| Slot | ID | Ficha | Objetivo |
+| --- | --- | --- | --- |
+| `NOW` | `BT-TST-002` | `docs/execution/tasks/BT-TST-002.md` | Provar. |
+''',
+      ),
+    ]) {
+      expect(
+        () => ledgerFor(invalid),
+        throwsA(isA<ProjectLogicException>()),
+        reason: reason,
+      );
+    }
+
+    // Cada raia segue a regra de contenção do slot único.
+    final blockedBacklog = generator.taskBacklogForTesting(
+      backlogSource.replaceFirst(
+        '| `BT-TST-000` | P1 | PASS |',
+        '| `BT-TST-000` | P1 | TODO |',
+      ),
+    );
+    expect(
+      () => generator.executionLedgerForTesting(
+        queueSource: queue([
+          row('servidor', 'BT-TST-001'),
+          row('app', 'BT-TST-002'),
+        ]),
+        backlog: blockedBacklog,
+        packetSources: packets,
+      ),
+      throwsA(isA<ProjectLogicException>()),
+    );
+  });
+
   test('rejects an operational historical document without a safe banner', () {
     final contracts =
         jsonDecode(
@@ -810,8 +988,12 @@ void main() {
     expect(executionQueue['priority_authority'], false);
     expect(executionQueue['mutation_authority'], false);
     expect(executionLedger['wip_limit'], 1);
+    expect(executionLedger['wip_scope'], 'per_lane');
     expect(executionLedger['active_slot_count'], 1);
+    expect(executionLedger['lanes_declared'], true);
+    expect(executionLedger['active_slots'], hasLength(1));
     final activeSlot = executionLedger['active_slot'] as Map<String, Object?>;
+    expect(activeSlot['lane'], 'servidor');
     final activeTaskId = activeSlot['task_id']! as String;
     final activeTask = tasks.singleWhere((task) => task['id'] == activeTaskId);
     expect(activeTaskId, matches(RegExp(r'^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$')));
