@@ -4,7 +4,7 @@ Lifecycle: `CURRENT_CONTEXT · VERIFIED_STATE · NO_PRIORITY_AUTHORITY`. Este do
 **onde o projeto está de verdade** e **o que falta para a beta controlada**. Não define prioridade
 (isso é da decisão e do backlog) e não autoriza mutação. Toda afirmação aqui foi verificada na
 fonte primária em 2026-09-22; a evidência linha a linha está em
-[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (155 fatos: 129 da auditoria e 26 do adendo, com a medição, a leitura da produção de 2026-09-22, os deploys, o reinício do host e o lote integrado de 2026-09-23) e a origem de cada correção em
+[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (156 fatos: 129 da auditoria e 27 do adendo, com a medição, a leitura da produção de 2026-09-22, os deploys, o reinício do host e o lote integrado de 2026-09-23) e a origem de cada correção em
 [`docs/verdade/PLANO_DE_CORRECAO.md`](../verdade/PLANO_DE_CORRECAO.md).
 
 - Checkout: `codex/free-beta-release-candidate-2026-07-17`. A correção documental e as decisões de
@@ -32,8 +32,9 @@ O BrewTact está **construído e trancado, no repositório e, desde 2026-09-23, 
   frentes (`c0f907108`, backend e agendador): recuperação de senha sem diferença de tempo,
   catálogo só de leitura, exportação com allowlist e exclusão com as lacunas fechadas. O XMage está desligado até o Battle abrir
   (D-57), e o `/app` segue numa imagem antiga. Cartas, sets e legalidades voltaram a se atualizar em
-  2026-09-23, pelo job diário ativado às 15:34 UTC (FATOS 11.26). O preço das cartas nos decks segue
-  parado até a regra da D-62.
+  2026-09-23, pelo job diário ativado às 15:34 UTC (FATOS 11.26). O preço das cartas nos decks passa a vir
+  do catálogo (D-62, D-73), com a primeira aplicação na execução das 06:20 UTC de 2026-09-24
+  (FATOS 11.27).
 - **As tarefas:** **nenhuma das 49 P0 CORE medidas está atendida.** O slot `NOW` (`BT-SCP-001`) está
   aberto há quatro semanas. Um dos dois pontos que o travavam, o `npm audit` do site público, foi resolvido em 2026-09-22 (`BT-WEB-003`, falta o receipt); o outro é o último pack de
   evidência de UI.
@@ -73,7 +74,7 @@ O que a abertura exige, por camada (`docs/MANALOOM_E2E_RELEASE_CONTRACT.md` §Cr
 | Tarefas no índice canônico | **244** depois das decisões do dono de 2026-09-22 (227 da correção documental + 17 criadas pelas decisões) e dos deploys de 2026-09-23: PASS 4 · IN_PROGRESS_CONTAINED 4 · IMPLEMENTED_LOCAL 10 · **EVIDENCE_REQUIRED 12** · TODO 98 · BLOCKED_BY_P0 79 · DEFERRED 33 · WAITING_EXTERNAL 4 | 11.1 |
 | P0 que bloqueiam a primeira coorte | **63 `P0 CORE` + 6 `P0 LIFE` abertas = 69** (escopo decidido em 2026-09-22, D-07). As 63 são as 55 da correção documental, mais 9 criadas pelas decisões, mais o `BT-PRIV-003` promovido, menos o `BT-UX-SWAP-001`, que passou a `P0 AI`, e o `BT-REL-000`, fechado em 2026-09-23. Das 145 P0 abertas, as 26 `P0 AI` ficam para a segunda onda e as demais bloqueiam só a própria capability | 11.2 |
 | P0 CORE medidas contra o código | 49 de 55: **nenhuma atendida**; 433 asserções, 16% provadas | §5 |
-| Produção — código (implantada em 2026-09-23) | Backend e agendador em `c0f907108` = `origin/master` (linha de base contida, os quatro buracos fechados, a D-56, o IP do balanceador fixado de novo e o lote integrado das três frentes); site público em `87fd5a2e6`; **29 capabilities off**; cadastro, IA, Battle e marketplace respondem `capability_unavailable`; o `/app` segue na imagem antiga; XMage com 0 réplicas (D-57). Até 2026-09-22 rodava `a6ee09c8f` (2026-08-03), sem a política de capabilities | 11.16, 11.17, 11.19, 11.20, 11.21, 11.22, 11.23 |
+| Produção — código (implantada em 2026-09-23) | Backend e agendador em `41bab49c9` = `origin/master` (linha de base contida, os quatro buracos fechados, a D-56, o IP do balanceador fixado de novo, o lote integrado das três frentes, o catálogo ativado e o preço de deck pelo catálogo); site público em `87fd5a2e6`; **29 capabilities off**; cadastro, IA, Battle e marketplace respondem `capability_unavailable`; o `/app` segue na imagem antiga; XMage com 0 réplicas (D-57). Até 2026-09-22 rodava `a6ee09c8f` (2026-08-03), sem a política de capabilities | 11.16, 11.17, 11.19, 11.20, 11.21, 11.22, 11.23, 11.26, 11.27 |
 | Produção — banco (lido em 2026-09-22) | Ledger em **058** desde 2026-09-23, aplicada depois de backup e ensaio de restauração; 99 tabelas em `public` (20 fora do repositório, 7 delas usadas pelo código sem migration); 1.033 tabelas de backup em `manaloom_deploy_audit`; **nenhuma atividade desde 2026-08-03**; catálogo parado de 2026-06-06 até 2026-09-23, quando o job diário foi ativado (38.948 cartas, 971 sets) | 11.10–11.15, 11.19, 11.26 |
 | Trabalho não commitado fora da árvore | Triado em 2026-09-22 (D-52): 6 worktrees removidos (5 limpos e o `cold-repro-fix`, superado pelo `BT-CI-001`), 2 registros mortos podados e o classificador do cleanroom trazido para a branch (D-03). Ficam 3 worktrees com trabalho não commitado, todos com backup local em `refs/backup/2026-09-22/`; nenhum no remoto, porque o `pre-push` roda o `full`, vermelho até o `BT-UIEV-001` fechar | §7, 11.6 |
 | Testes do produto | ~797 arquivos (server 401 · app 237 · integration 147); a suíte do app deu **1604 verdes, 0 falhas** com o Flutter pinado | 5.11 |
@@ -250,7 +251,8 @@ reinício trocou o IP do balanceador interno e deixou o login em 503 até o depl
 às 11:01 UTC (FATOS 11.21–11.22). À tarde, com a palavra do dono, subiu o lote integrado das
 três frentes (`c0f907108`, FATOS 11.23). O job de catálogo ficou registrado e parou no dry-run,
 porque a Scryfall mudou o formato do bulk (FATOS 11.25). Depois de ajustado (`f52fdc970`), o job
-foi ativado às 15:34 UTC, e o catálogo ficou atualizado (FATOS 11.26).
+foi ativado às 15:34 UTC, e o catálogo ficou atualizado (FATOS 11.26). À noite subiu o preço de
+deck pelo catálogo (`41bab49c9`, FATOS 11.27).
 
 ### Quebram a jornada quando as capabilities abrirem
 
