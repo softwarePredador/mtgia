@@ -15,9 +15,9 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (registro do deploy de segurança de 2026-09-23, branch
-  `seguranca/d19-buracos-2026-09-23`): `7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245`
-  (244 tasks; antes, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
+- Backlog/registry SHA-256 corrente (registro do reinício do host e do conserto do IP, branch
+  `coordenacao/proxy-lb-2026-09-23`): `85eddf5750f0f8974dd9d6dd7c3fa41d2905b77e2df60c78ce28ca68ccc384aa`
+  (244 tasks; antes, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
   `d15beb05b`, `333b6c0b…` com 220 tasks e 402 arestas, valor de `f6f791098`)
 - Project logic digest em HEAD `d15beb05b`: `556ba631…`. O digest da árvore de trabalho
   não é copiado aqui, porque este arquivo entra no próprio digest: ver
@@ -29,6 +29,14 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   slot NOW; as demais produziram `docs/design`, `docs/flows` e a correção não
   commitada do marketplace, fora de qualquer ID. Exceção ao WIP-1 registrada
   aqui, não autorizada por este documento.
+- Writers em 2026-09-23: a sessão do gate na árvore principal (raia do app, `BT-SCP-001`) e a
+  coordenação com três frentes em worktrees próprios (`.claude/worktrees/agent-*`): servidor
+  (recuperação de senha do `BT-AUTH-003`, gerador da fila do `BT-GOV-002` e auditor de schema),
+  catálogo (`BT-CAT-01` a `BT-CAT-04`) e privacidade (`BT-PRIV-001` a `BT-PRIV-003`). As duas
+  últimas foram abertas a pedido do dono ("pode adicionar mais 2 agentes"), como exceção ao WIP-1
+  da raia de servidor. `project_logic`, commits pelos hooks e `pub get` passam por uma trava FIFO da
+  coordenação, fora do repositório, porque execuções paralelas se derrubam pelo cache Pub global
+  (`BT-CI-001`).
 
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
 backlog mestre e o registry gerado.
@@ -62,11 +70,11 @@ aceita um só slot `NOW`; a raia do app abre quando `BT-UIEV-001` fechar e o
 | 1a | `BT-WEB-003` | bump feito em 2026-09-22 (D-01): `npm audit` com 0 vulnerabilidades; falta o receipt same-SHA |
 | 1b | `BT-UIEV-001` | recaptura em lote (23/23 e `latest.json`) depois das correções da D-04 |
 | 2 | `BT-GOV-002` | fila com duas raias (D-02); abre a raia do app |
-| 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`) |
+| 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`); o reinício do host (D-58) trocou o IP do balanceador e o login ficou em 503 até `22a7749a7` (11:01 UTC) |
 | 4 | `BT-AUTH-003` | login fechado e no ar em 2026-09-23 (`166aaed57`); falta o tempo da recuperação de senha |
 | 5 | `BT-AUTH-004` | feito e no ar em 2026-09-23 (`166aaed57`); falta a tela de senha no app (lote da sessão do gate) |
 | 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); falta o teste de app |
-| 7 | `BT-AUTH-010` | import no ar em 2026-09-23 (`166aaed57`); escrita de deck com e-mail verificado (D-56) em `bedafe8bf`, ainda não implantada |
+| 7 | `BT-AUTH-010` | import no ar em 2026-09-23 (`166aaed57`); escrita de deck com e-mail verificado (D-56) no ar desde as 11:01 UTC (`22a7749a7`) |
 | 8 | `BT-DB-001` | baseline PostgreSQL fresco; cabeça da corrente mais longa |
 | 9 | `BT-DB-004` | só migrations alteram schema (D-48) |
 | 10 | `DCK-P0-06` | relatório de deck apagado fechado e no ar em 2026-09-23; falta a lixeira (D-30) |
@@ -149,7 +157,9 @@ contador de vida.
   Em 2026-09-23 a linha de base contida foi implantada: `/health` com `87fd5a2e6`,
   readiness com 058 e 29/29 off (`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`).
   Às 08:08 UTC do mesmo dia o backend subiu `166aaed57`, com os quatro buracos da D-19
-  fechados (`docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`); `origin/master` = `166aaed57`.
+  fechados (`docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Às 11:01 UTC, depois do
+  reinício do host (D-58), subiu `22a7749a7`, que fixa de novo o IP do balanceador e põe no ar a
+  D-56 (`docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md`); `origin/master` = `22a7749a7`.
 - Em 2026-09-22 o dono autorizou subir o que fosse preciso ("o que tiver de subir
   no servidor pode subir", sem criar bucket), e a linha de base contida foi ao ar em
   2026-09-23, antes de o `BT-SCP-001` fechar. `origin/master` = `87fd5a2e6`,

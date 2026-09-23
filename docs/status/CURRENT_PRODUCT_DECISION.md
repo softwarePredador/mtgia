@@ -131,8 +131,12 @@ Decidido em 2026-09-22:
   (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Resta o tempo da recuperação
   de senha (`BT-AUTH-003`), que fecha antes de qualquer capability abrir (D-19).
 - Escrever deck, importar e mexer no fichário exigem e-mail verificado (D-56,
-  decidida em 2026-09-23). Na coorte por convite, aceitar o convite enviado ao
-  e-mail conta como verificação (`BT-AUTH-006`).
+  decidida em 2026-09-23; no ar desde 11:01 UTC, em `22a7749a7`). Na coorte por
+  convite, aceitar o convite enviado ao e-mail conta como verificação (`BT-AUTH-006`).
+- Em 2026-09-23 o XMage foi desligado até o Battle abrir (D-57) e o host foi
+  reiniciado com a atualização de segurança (D-58). O reinício trocou o IP do
+  balanceador interno; o backend fixa o IP novo desde `22a7749a7`. Abertas: D-59
+  a D-61, com a recomendação em `docs/status/DECISOES_PENDENTES_2026-09-22.md`.
 - O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
   linha de base contida com a 058, catálogo com menos de 7 dias, rollback
   treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`).

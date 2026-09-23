@@ -4,7 +4,7 @@ Lifecycle: `CURRENT_CONTEXT · VERIFIED_STATE · NO_PRIORITY_AUTHORITY`. Este do
 **onde o projeto está de verdade** e **o que falta para a beta controlada**. Não define prioridade
 (isso é da decisão e do backlog) e não autoriza mutação. Toda afirmação aqui foi verificada na
 fonte primária em 2026-09-22; a evidência linha a linha está em
-[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (149 fatos: 129 da auditoria e 20 do adendo, com a medição, a leitura da produção de 2026-09-22 e os deploys de 2026-09-23) e a origem de cada correção em
+[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (151 fatos: 129 da auditoria e 22 do adendo, com a medição, a leitura da produção de 2026-09-22, os deploys e o reinício do host de 2026-09-23) e a origem de cada correção em
 [`docs/verdade/PLANO_DE_CORRECAO.md`](../verdade/PLANO_DE_CORRECAO.md).
 
 - Checkout: `codex/free-beta-release-candidate-2026-07-17`. A correção documental e as decisões de
@@ -27,7 +27,9 @@ O BrewTact está **construído e trancado, no repositório e, desde 2026-09-23, 
 - **Em produção:** desde 2026-09-23 roda a linha de base contida (`87fd5a2e6`). Backend, site
   público e agendador estão com as 29 capabilities desligadas; cadastro, IA e Battle estão fechados;
   a migration 058 foi aplicada. Os quatro buracos do plano de controle foram fechados no mesmo dia
-  (backend em `166aaed57`), e o `/app` segue numa imagem antiga. Cartas e legalidades não se atualizam desde 2026-06-06.
+  (backend em `166aaed57`). Depois do reinício do host, o backend subiu `22a7749a7`, que fixa de
+  novo o IP do balanceador interno e põe no ar a D-56. O XMage está desligado até o Battle abrir
+  (D-57), e o `/app` segue numa imagem antiga. Cartas e legalidades não se atualizam desde 2026-06-06.
 - **As tarefas:** **nenhuma das 49 P0 CORE medidas está atendida.** O slot `NOW` (`BT-SCP-001`) está
   aberto há quatro semanas. Um dos dois pontos que o travavam, o `npm audit` do site público, foi resolvido em 2026-09-22 (`BT-WEB-003`, falta o receipt); o outro é o último pack de
   evidência de UI.
@@ -67,7 +69,7 @@ O que a abertura exige, por camada (`docs/MANALOOM_E2E_RELEASE_CONTRACT.md` §Cr
 | Tarefas no índice canônico | **244** depois das decisões do dono de 2026-09-22 (227 da correção documental + 17 criadas pelas decisões) e dos deploys de 2026-09-23: PASS 4 · IN_PROGRESS_CONTAINED 4 · IMPLEMENTED_LOCAL 10 · **EVIDENCE_REQUIRED 12** · TODO 98 · BLOCKED_BY_P0 79 · DEFERRED 33 · WAITING_EXTERNAL 4 | 11.1 |
 | P0 que bloqueiam a primeira coorte | **63 `P0 CORE` + 6 `P0 LIFE` abertas = 69** (escopo decidido em 2026-09-22, D-07). As 63 são as 55 da correção documental, mais 9 criadas pelas decisões, mais o `BT-PRIV-003` promovido, menos o `BT-UX-SWAP-001`, que passou a `P0 AI`, e o `BT-REL-000`, fechado em 2026-09-23. Das 145 P0 abertas, as 26 `P0 AI` ficam para a segunda onda e as demais bloqueiam só a própria capability | 11.2 |
 | P0 CORE medidas contra o código | 49 de 55: **nenhuma atendida**; 433 asserções, 16% provadas | §5 |
-| Produção — código (implantada em 2026-09-23) | Backend em `166aaed57` = `origin/master` (linha de base contida e os quatro buracos fechados); site público e agendador em `87fd5a2e6`; **29 capabilities off**; cadastro, IA, Battle e marketplace respondem `capability_unavailable`; o `/app` segue na imagem antiga. Até 2026-09-22 rodava `a6ee09c8f` (2026-08-03), sem a política de capabilities | 11.16, 11.17, 11.19, 11.20 |
+| Produção — código (implantada em 2026-09-23) | Backend em `22a7749a7` = `origin/master` (linha de base contida, os quatro buracos fechados, a D-56 e o IP do balanceador fixado de novo depois do reinício do host); site público e agendador em `87fd5a2e6`; **29 capabilities off**; cadastro, IA, Battle e marketplace respondem `capability_unavailable`; o `/app` segue na imagem antiga; XMage com 0 réplicas (D-57). Até 2026-09-22 rodava `a6ee09c8f` (2026-08-03), sem a política de capabilities | 11.16, 11.17, 11.19, 11.20, 11.21, 11.22 |
 | Produção — banco (lido em 2026-09-22) | Ledger em **058** desde 2026-09-23, aplicada depois de backup e ensaio de restauração; 99 tabelas em `public` (20 fora do repositório, 7 delas usadas pelo código sem migration); 1.033 tabelas de backup em `manaloom_deploy_audit`; **nenhuma atividade desde 2026-08-03**; catálogo parado desde 2026-06-06 | 11.10–11.15, 11.19 |
 | Trabalho não commitado fora da árvore | Triado em 2026-09-22 (D-52): 6 worktrees removidos (5 limpos e o `cold-repro-fix`, superado pelo `BT-CI-001`), 2 registros mortos podados e o classificador do cleanroom trazido para a branch (D-03). Ficam 3 worktrees com trabalho não commitado, todos com backup local em `refs/backup/2026-09-22/`; nenhum no remoto, porque o `pre-push` roda o `full`, vermelho até o `BT-UIEV-001` fechar | §7, 11.6 |
 | Testes do produto | ~797 arquivos (server 401 · app 237 · integration 147); a suíte do app deu **1604 verdes, 0 falhas** com o Flutter pinado | 5.11 |
@@ -134,7 +136,8 @@ existem só no caminho Web, guardas ausentes. Os números abaixo são os finais.
   `BT-OFFER-001` (falta só o receipt, que depende do gate amplo), `SCOPE-P0-SOC-00` (falta um
   teste de negação em runtime por rota social e o receipt) e `BT-GATE-001`.
 - **Não começadas:** `BT-AUTH-006` (convite/allowlist da coorte — zero linhas de código) e
-  `BT-CAP-001` (capacidade real por serviço).
+  `BT-CAP-001` (capacidade real por serviço; só existe a primeira leitura do host, de 2026-09-23,
+  FATOS 11.21).
 - **Só falta receipt ou commit:** `BT-CI-001` (`d83e9b1e1`, `07014b431`), `BT-DOC-006` (feito na
   árvore), `BT-OFFER-001`; fora das P0 CORE, `BT-NAV-01` (`b2d3fc04f`).
 - **Três estados estavam errados e foram corrigidos no backlog** (a evidência está na linha):
@@ -237,7 +240,10 @@ implantada no backend, no site público e no agendador (`BT-REL-000`, receipt em
 `docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`). Até então a produção rodava `a6ee09c8f`
 (2026-08-03), sem a política de capabilities, com cadastro aberto, IA e Battle ligados e o
 marketplace sem filtro de privacidade (FATOS 11.16–11.17). Os quatro buracos acima foram fechados
-no mesmo dia, no deploy de `166aaed57` às 08:08 UTC (FATOS 11.20).
+no mesmo dia, no deploy de `166aaed57` às 08:08 UTC (FATOS 11.20). Ainda em 2026-09-23, com a
+palavra do dono, o XMage foi desligado e o host reiniciado com a atualização de segurança. O
+reinício trocou o IP do balanceador interno e deixou o login em 503 até o deploy de `22a7749a7`,
+às 11:01 UTC (FATOS 11.21–11.22).
 
 ### Quebram a jornada quando as capabilities abrirem
 

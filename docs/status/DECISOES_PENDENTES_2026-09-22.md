@@ -63,10 +63,41 @@ deck à mão não exigia. Recomendação aprovada: regra única para tudo que gr
 Ler e apagar o próprio deck seguem livres. Validar, preço, análise por IA, notas de pós-jogo e
 anotações de replay ficam fora, porque não mudam o deck nem publicam nada. Na coorte por convite,
 aceitar o convite enviado ao e-mail conta como verificação (`BT-AUTH-006`).
-- Implementado em `bedafe8bf` (linha do `BT-AUTH-010`), ainda não implantado. Em produção,
-  `decks_private` está desligada e as rotas de deck nem respondem.
+- Implementado em `bedafe8bf` (linha do `BT-AUTH-010`) e no ar desde 2026-09-23 às 11:01 UTC
+  (`22a7749a7`). Em produção, `decks_private` está desligada e as rotas de deck nem respondem.
 - **Consequência:** a produção tem 1.144 contas ativas e só 7 com e-mail verificado. As demais só
   voltam a escrever deck depois de verificar o e-mail.
+
+**D-57 · XMage desligado até o Battle abrir.** Com o Battle desligado, os dois serviços do XMage
+ocupavam 2,4 GB dos 7,9 GB do host. Recomendação aprovada: 0 réplicas até o Battle abrir. Feito às
+09:23 UTC; a memória usada caiu de 4.298 para 1.851 MB. Religar é voltar para 1.
+
+**D-58 · Reinício do host com as atualizações de segurança.** O dono escolheu reiniciar na hora, em
+vez de marcar uma janela. Feito às 09:26 UTC, só com a atualização de segurança pendente (`sudo`);
+kernel 6.8.0-139. Todos os serviços e os outros projetos voltaram com os mesmos códigos HTTP. O
+reinício trocou o IP do balanceador interno, e o login do BrewTact ficou em 503 até o deploy de
+`22a7749a7` às 11:01 UTC, autorizado pelo dono (ver D-59). Receipt:
+`docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md`.
+
+### Abertas em 2026-09-23
+
+**D-59 · Confiança no proxy que sobreviva a reinício.** O backend só aceita o `X-Forwarded-For` vindo
+de um IP fixo, o balanceador do Swarm, e esse IP mudou no reinício de 2026-09-23. **Recomendo**
+manter o IP fixo por ora, porque o portão do deploy já recusa valor velho, e conferir o
+`lb-easypanel` depois de todo reinício do host. Um desenho que não dependa do IP (por exemplo, um
+segredo que só o Traefik envia) entra no `BT-SEC-001`. Destrava: reinícios sem login fora do ar.
+
+**D-60 · O proxy local do Postgres volta sozinho?** O `manaloom-pg-local-proxy` está fora do
+repositório, com restart `no`, e não voltou no reinício. Sem ele, o backup e as migrations falham
+até alguém religar. **Recomendo** `docker update --restart unless-stopped manaloom-pg-local-proxy`
+e registrar a criação dele num script do repositório (`BT-DR-001`). É configuração persistente do
+host, por isso pede a palavra do dono.
+
+**D-61 · Atualizações que não são de segurança.** Ficaram 41 pacotes de `noble-updates` (inclui o
+kernel 6.8.0-142) e 6 do repositório da Docker (Docker 29.6.1 → 29.8.1, containerd 2.2.5 → 2.3.5).
+**Recomendo** aplicar os de `noble-updates` no próximo reinício planejado. O Docker fica para uma
+janela própria, com os outros projetos avisados, porque troca o runtime de todos os serviços do
+host.
 
 O andamento das demais está no backlog e na fila.
 
