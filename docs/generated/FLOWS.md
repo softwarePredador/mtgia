@@ -295,7 +295,7 @@ Gates: `scripts/quality_gate.sh`, `scripts/manaloom_public_web_smoke.sh`.
 ## Scheduler operacional (manaloom-ops) e sincronizações
 
 Estado: `guarded_no_implicit_live_write`
-Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (16 jobs) reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report runs (safe_housekeeping_only)
+Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (17 jobs) and REFERENCE_DATA_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only) and manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) run; an invalid policy keeps only the governor
 
 ```mermaid
 sequenceDiagram
@@ -304,14 +304,17 @@ sequenceDiagram
     participant Ops_Daemon as Ops Daemon
     participant Capability_Policy as Capability Policy
     participant Job as Job
+    participant Catalog_Refresh as Catalog Refresh
+    participant Scryfall as Scryfall
     participant PostgreSQL as PostgreSQL
     Operator->>Ops_Image: deploy da imagem do daemon (mesmo SHA)
     Ops_Daemon->>Capability_Policy: lê release_capabilities.json no boot
-    Ops_Daemon->>Job: só agenda job cuja capability está on; senão safe_housekeeping_only
+    Ops_Daemon->>Job: agenda job cuja capability está on; com tudo off, só o governor e o refresh de dado de referência
+    Catalog_Refresh->>Scryfall: bulk default_cards, uma vez por dia, só com o contrato ativado
     Job->>PostgreSQL: sync_log, sync_state e data_source_snapshots
     Ops_Daemon->>Operator: GET /health próprio e relatório do governor
 ```
 
-Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`.
-Testes: `server/test/manaloom_ops_daemon_test.py`.
+Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`.
+Testes: `server/test/manaloom_ops_daemon_test.py`, `server/test/sync_catalog_reference_from_scryfall_test.py`.
 Gates: `scripts/manaloom_battle_product_gate.sh`.

@@ -327,6 +327,9 @@ def _base_env(policy: ReleasePolicy | None = None) -> dict[str, str]:
             "MANALOOM_SYNC_CARD_LEGALITIES_OUTPUT_DIR": str(
                 ARTIFACT_DIR / "sync_card_legalities_from_scryfall"
             ),
+            "MANALOOM_CATALOG_REFERENCE_OUTPUT_DIR": str(
+                ARTIFACT_DIR / "catalog_reference_refresh"
+            ),
         }
     )
     return env
@@ -700,6 +703,17 @@ JOBS = [
         script_name="hermes_mana_base_validator.sh",
     ),
     Job(
+        name="manaloom_catalog_reference_refresh",
+        schedule=os.environ.get(
+            "MANALOOM_CATALOG_REFERENCE_REFRESH_CRON", "20 6 * * *"
+        ),
+        lockfile=LOCK_DIR / "manaloom_catalog_reference_refresh.lock",
+        command=(
+            'cd "$MTGIA_HOME" && ./server/bin/cron_sync_cards.sh --mode scheduled'
+        ),
+        script_name="cron_sync_cards.sh",
+    ),
+    Job(
         name="hermes_cron_governor_report",
         schedule=os.environ.get("HERMES_CRON_GOVERNOR_REPORT_CRON", "0 */12 * * *"),
         lockfile=LOCK_DIR / "hermes_cron_governor_report.lock",
@@ -727,9 +741,24 @@ JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
     ),
     "manaloom_knowledge_import": ("learning_writes",),
     "hermes_mana_base_validator": ("ai_analyze_optimize_advisory",),
+    # Reference-data maintenance (cards, sets, legalities and the prices kept
+    # in cards). It needs no release capability, so it runs with all 29 off,
+    # but only under the apply contract listed in REFERENCE_DATA_JOBS.
+    "manaloom_catalog_reference_refresh": (),
     # This report only summarizes the local scheduler manifest/log status. It
-    # is the sole explicitly capability-free liveness/housekeeping job.
+    # is the liveness/housekeeping job that also runs on an invalid policy.
     "hermes_cron_governor_report": (),
+}
+
+# Jobs that keep reference data fresh under a versioned apply contract (BT-CAT-01,
+# owner decision D-33). The contract lives in the job: it writes only the
+# reference tables plus sync_log/sync_state, never a user table, with
+# idempotent upserts and a receipt per run, and a scheduled run applies only
+# after a supervised activation recorded in sync_state. No legacy apply flag is
+# involved. Unlike the governor, these jobs stop on an invalid or unauthorized
+# policy file (fail closed).
+REFERENCE_DATA_JOBS: dict[str, str] = {
+    "manaloom_catalog_reference_refresh": "catalog_reference_apply_v1",
 }
 
 
@@ -738,6 +767,7 @@ def _jobs_for_release_policy(policy: ReleasePolicy) -> list[Job]:
         job
         for job in JOBS
         if job.name in JOB_REQUIRED_CAPABILITIES
+        and (job.name not in REFERENCE_DATA_JOBS or policy.valid)
         and all(
             policy.allowed(capability)
             for capability in JOB_REQUIRED_CAPABILITIES[job.name]
