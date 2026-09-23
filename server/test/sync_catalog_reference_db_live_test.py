@@ -13,6 +13,7 @@ import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -33,6 +34,8 @@ def _load_module():
 ENABLED = os.environ.get("RUN_CATALOG_REFERENCE_DB_TESTS") == "1"
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "scryfall_default_cards_sample.json"
 SOURCE_UPDATED_AT = "2026-09-22T09:00:00+00:00"
+# Relógio fixo: o alerta de frescor (7 dias) não pode depender da data do teste.
+NOW = datetime(2026, 9, 23, 10, 0, tzinfo=timezone.utc)
 
 O_SOL = "5c8e7c9e-1111-4a1a-8a1a-000000000001"
 O_BOLT = "5c8e7c9e-1111-4a1a-8a1a-000000000002"
@@ -178,7 +181,10 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
             args = self.job.parse_args(
                 ["--env-file", str(Path(tmp) / "none.env"), *argv]
             )
-        return self.job.run(args, environment=environment)
+        ctx = self.job.RunContext(
+            budget=self.job.budget_from_args(args), now=lambda: NOW
+        )
+        return self.job.run(args, environment=environment, ctx=ctx)
 
     def fetch_card(self, scryfall_id: str) -> dict:
         with self.conn.cursor() as cur:
@@ -209,7 +215,12 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
         before_user_tables = self.user_tables_fingerprint()
 
         code, receipt = self.run_job("--mode", "scheduled", *bulk)
-        self.assertEqual((code, receipt["status"]), (0, "contract_inactive"), receipt)
+        # Catálogo parado desde 2026-06-06 e contrato inativo: alerta (D-36).
+        self.assertEqual(
+            (code, receipt["status"], receipt["alerts"]),
+            (self.job.FRESHNESS_ALERT_EXIT_CODE, "contract_inactive", ["catalog_stale"]),
+            receipt,
+        )
 
         code, receipt = self.run_job("--mode", "activate", *bulk, approval=True)
         self.assertEqual((code, receipt["status"]), (0, "activated"), receipt)

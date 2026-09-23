@@ -34,6 +34,13 @@ legalidades), e entram as cartas novas e as impressões dos sets lançados desde
 o último sync. Impressões antigas de cartas que já estão no catálogo são
 contadas e puladas: levar a base ao grão de impressão e migrar as linhas-alias
 Oracle é a fase 2.
+
+Frescor (BT-CAT-03, D-36): toda execução mede a idade do catálogo pela data da
+fonte já aplicada (ou, sem ela, pelo último sync). Com mais de 7 dias, o
+receipt marca `catalog_stale`, o stderr leva MANALOOM_CATALOG_FRESHNESS_ALERT
+e, no modo agendado, o job sai com 3; o daemon registra o erro e o relatório do
+governor mostra o risco. Nada disso bloqueia a leitura do catálogo, que não
+consulta o frescor.
 """
 
 from __future__ import annotations
@@ -112,6 +119,11 @@ SYNC_LOG_CARDS = "catalog_reference:cards"
 SYNC_LOG_SETS = "catalog_reference:sets"
 SYNC_LOG_LEGALITIES = "catalog_reference:card_legalities"
 SYNC_LOG_CONTRACT = "catalog_reference:contract"
+
+# Catálogo com mais de 7 dias dispara alerta, sem bloquear a leitura (D-36).
+FRESHNESS_MAX_AGE_DAYS = 7
+FRESHNESS_ALERT = "catalog_stale"
+FRESHNESS_ALERT_EXIT_CODE = 3
 
 # Impressões que não são carta de jogo nunca entram no catálogo.
 NON_GAME_LAYOUTS = frozenset({"token", "double_faced_token", "emblem", "art_series"})
@@ -807,6 +819,34 @@ class CatalogSnapshot:
     state: dict[str, str]
 
 
+def catalog_freshness(state: dict[str, str], now: datetime) -> dict[str, Any]:
+    """Idade do catálogo pela data da fonte aplicada ou, sem ela, pelo último sync."""
+    updated_at: datetime | None = None
+    for key in (STATE_SOURCE_UPDATED_AT, STATE_CARDS_LAST_SYNC_AT):
+        raw = state.get(key)
+        if not raw:
+            continue
+        try:
+            updated_at = parse_timestamp(raw)
+            break
+        except ValueError:
+            continue
+    if updated_at is None:
+        return {
+            "updated_at": None,
+            "age_days": None,
+            "max_age_days": FRESHNESS_MAX_AGE_DAYS,
+            "stale": True,
+        }
+    age = now - updated_at
+    return {
+        "updated_at": updated_at.isoformat(),
+        "age_days": round(age.total_seconds() / 86400, 2),
+        "max_age_days": FRESHNESS_MAX_AGE_DAYS,
+        "stale": age > timedelta(days=FRESHNESS_MAX_AGE_DAYS),
+    }
+
+
 def new_set_cutoff(state: dict[str, str], margin_days: int) -> date | None:
     raw = state.get(STATE_CARDS_LAST_SYNC_AT)
     if not raw:
@@ -1257,6 +1297,25 @@ def run(
     ctx: RunContext | None = None,
     connect_fn: Callable[[dict[str, str]], Any] = connect,
 ) -> tuple[int, dict[str, Any]]:
+    """Executa o job e aplica o alerta de frescor (D-36) sobre o resultado."""
+    exit_code, receipt = _run(
+        args, environment=environment, ctx=ctx, connect_fn=connect_fn
+    )
+    freshness = receipt.get("freshness")
+    if freshness and freshness.get("stale") and receipt["status"] != "deactivated":
+        receipt["alerts"] = [FRESHNESS_ALERT]
+        if args.mode == "scheduled" and exit_code == 0:
+            exit_code = FRESHNESS_ALERT_EXIT_CODE
+    return exit_code, receipt
+
+
+def _run(
+    args: argparse.Namespace,
+    *,
+    environment: dict[str, str] | None = None,
+    ctx: RunContext | None = None,
+    connect_fn: Callable[[dict[str, str]], Any] = connect,
+) -> tuple[int, dict[str, Any]]:
     environment = dict(os.environ if environment is None else environment)
     ctx = ctx or RunContext(budget=budget_from_args(args))
     ctx.start()
@@ -1279,6 +1338,8 @@ def run(
         "budget": ctx.budget.to_json(),
         "counts": {},
         "database_writes": False,
+        "freshness": None,
+        "alerts": [],
         "error": None,
     }
     exit_code = 0
@@ -1299,6 +1360,7 @@ def run(
             preflight(cur)
             state = read_state(cur)
         conn.rollback()
+        receipt["freshness"] = catalog_freshness(state, ctx.now())
 
         if args.mode == "deactivate":
             with conn.cursor() as cur:
@@ -1435,6 +1497,9 @@ def run(
             }
             if args.mode == "activate":
                 state_values[STATE_ACTIVE_CONTRACT] = APPLY_CONTRACT
+            receipt["freshness"] = catalog_freshness(
+                {**snapshot.state, **state_values}, finished_at
+            )
             write_state(cur, state_values, ctx.budget.batch_size)
             for sync_type, inserted, updated in (
                 (SYNC_LOG_CARDS, applied["cards"]["inserted"], applied["cards"]["updated"]),
@@ -1560,6 +1625,15 @@ def main(argv: list[str] | None = None) -> int:
         receipt_path = None
         exit_code = exit_code or 1
     print(f"{RECEIPT_MARKER} " + json.dumps({**receipt, "receipt_path": receipt_path}, sort_keys=True, default=str))
+    if FRESHNESS_ALERT in receipt.get("alerts", []):
+        freshness = receipt.get("freshness") or {}
+        age = freshness.get("age_days")
+        print(
+            "MANALOOM_CATALOG_FRESHNESS_ALERT error: catálogo "
+            + (f"com {age} dias" if age is not None else "sem data de atualização")
+            + f" (limite {FRESHNESS_MAX_AGE_DAYS} dias); status={receipt['status']}",
+            file=sys.stderr,
+        )
     if receipt.get("error"):
         print(
             f"{RECEIPT_MARKER}_FAILED error: {receipt['error']['kind']}: "

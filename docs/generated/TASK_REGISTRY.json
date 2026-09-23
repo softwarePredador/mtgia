@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "ee6c8724b962230e570c3e367fb1bfff7dfdf16f8654d8b84ae5090f0aa5fbda"
+    "sha256": "c0a43f712efdf4af9c1bdf90198e5ffdeb0ec54714a678bd0c2efe1260ed76c4"
   },
   "required_task_fields": [
     "id",
@@ -897,13 +897,13 @@
     {
       "id": "BT-CAT-03",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Rate limit/cache/freshness/observabilidade do catálogo.",
       "depends_on": [
         "BT-CAT-01",
         "BT-CAT-02"
       ],
-      "acceptance": "Limiter-down fail-closed quando caro; alerta de DML/upstream em leitura >0. Medição de 2026-09-22 (`docs/flows/_p0/catalogo-arte.md`): metade pode andar hoje (rate limit, fail-closed e teto do cache). Decisão do dono em 2026-09-22: D-36, catálogo com mais de 7 dias dispara alerta sem bloquear a leitura; leitura cara é busca textual sem filtro, com limite por IP.",
+      "acceptance": "Limiter-down fail-closed quando caro; alerta de DML/upstream em leitura >0. Medição de 2026-09-22 (`docs/flows/_p0/catalogo-arte.md`): metade pode andar hoje (rate limit, fail-closed e teto do cache). Decisão do dono em 2026-09-22: D-36, catálogo com mais de 7 dias dispara alerta sem bloquear a leitura; leitura cara é busca textual sem filtro, com limite por IP. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `GET /cards` com `name` e sem `set` nem `id` (a busca textual sem filtro) passa por limite por IP antes de tocar o banco (`server/lib/catalog_search_rate_limit.dart`: 60 por minuto em produção no contador distribuído, 429 `catalog_search_rate_limited`; contador fora do ar ou origem não validada dá 503 fail-closed); as outras leituras seguem sem esse limite. O job do `BT-CAT-01` mede a idade do catálogo em toda execução, pela data da fonte aplicada ou pelo último sync: com mais de 7 dias o receipt marca `catalog_stale`, o stderr leva `MANALOOM_CATALOG_FRESHNESS_ALERT` e o modo agendado sai com 3, que o daemon registra como erro e o relatório do governor mostra; a leitura nunca consulta o frescor, então nada é bloqueado. O alerta dispara mesmo com o contrato inativo, que será o caso da produção quando a imagem de ops com o job subir (catálogo de 2026-06-06, contrato inativo até a ativação supervisionada). Evidência: `server/test/catalog_search_rate_limit_test.dart` (classificação da leitura cara, 429 por IP, contador distribuído, fail-closed e rota que responde antes de consultar), `server/test/sync_catalog_reference_from_scryfall_test.py` (limite de 7 dias, data da fonte, alerta com o contrato inativo e sem alerta depois do apply) e o teste em PostgreSQL descartável com relógio fixo. Falta: o alerta de DML/upstream em leitura existe como guarda de teste (`server/test/catalog_routes_read_only_guard_test.dart` e os testes de comportamento do `BT-CAT-02`), não como contador em execução; o teto de entradas do `EndpointCache` e o `return await` de `server/lib/rate_limit_middleware.dart:263` não foram mexidos (arquivos compartilhados com outras frentes).",
       "section": "P0",
       "source_line": 431
     },
@@ -9831,5 +9831,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "f3adc22cdddc7c939759ca8fd7abfa50e623563b5ddb123202dac169c571243e"
+  "project_logic_source_digest_sha256": "ac1b6eb4f3ba648ec232f88a9ca6f09ff11fb0749bde5c651334385c16cb632a"
 }

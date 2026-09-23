@@ -646,6 +646,7 @@ class RunModesTest(unittest.TestCase):
         return code, receipt, ctx
 
     def test_scheduled_run_without_activation_calls_nothing_and_writes_nothing(self) -> None:
+        self.db.state[job.STATE_CARDS_LAST_SYNC_AT] = "2026-09-20T10:00:00Z"
         opener = ScriptedOpener([])
         code, receipt, ctx = self.run_job([], opener=opener)
 
@@ -798,11 +799,96 @@ class RunModesTest(unittest.TestCase):
             "budget",
             "counts",
             "database_writes",
+            "freshness",
+            "alerts",
             "error",
         ):
             self.assertIn(key, saved)
         self.assertEqual(saved["source"]["sha256"], hashlib.sha256(FIXTURE.read_bytes()).hexdigest())
         self.assertEqual(saved["apply_contract"], job.APPLY_CONTRACT)
+
+
+    # BT-CAT-03 (D-36): o alerta sai em qualquer modo, sem gravar nada; só o
+    # agendado muda o exit.
+    def test_stale_catalog_alerts_while_the_contract_is_inactive(self) -> None:
+        opener = ScriptedOpener([])
+        code, receipt, _ = self.run_job([], opener=opener)
+
+        self.assertEqual(code, job.FRESHNESS_ALERT_EXIT_CODE)
+        self.assertEqual(receipt["status"], "contract_inactive")
+        self.assertEqual(receipt["alerts"], [job.FRESHNESS_ALERT])
+        self.assertTrue(receipt["freshness"]["stale"])
+        self.assertEqual(opener.requests, [])
+        self.assertEqual(self.db.writes(), [])
+
+    def test_fresh_catalog_does_not_alert(self) -> None:
+        self.db.state[job.STATE_CARDS_LAST_SYNC_AT] = "2026-09-20T10:00:00Z"
+        code, receipt, _ = self.run_job([])
+
+        self.assertEqual(code, 0)
+        self.assertEqual(receipt["alerts"], [])
+        self.assertFalse(receipt["freshness"]["stale"])
+
+    def test_applied_run_is_measured_by_the_new_source(self) -> None:
+        code, receipt, _ = self.run_job(
+            ["--mode", "activate", "--bulk-json", str(FIXTURE), "--source-updated-at", SOURCE_UPDATED_AT],
+            environment={job.WRITE_APPROVAL_ENV: job.WRITE_APPROVAL_VALUE},
+        )
+
+        self.assertEqual(code, 0, receipt)
+        self.assertEqual(receipt["freshness"]["updated_at"], SOURCE_UPDATED_AT)
+        self.assertFalse(receipt["freshness"]["stale"])
+        self.assertEqual(receipt["alerts"], [])
+
+    def test_manual_modes_report_the_alert_without_changing_the_exit_code(self) -> None:
+        code, receipt, _ = self.run_job(
+            ["--mode", "dry-run", "--bulk-json", str(FIXTURE), "--source-updated-at", SOURCE_UPDATED_AT]
+        )
+
+        self.assertEqual(code, 0)
+        self.assertEqual(receipt["alerts"], [job.FRESHNESS_ALERT])
+
+
+class FreshnessTest(unittest.TestCase):
+    """BT-CAT-03 (D-36): catálogo com mais de 7 dias dispara alerta."""
+
+    NOW = datetime(2026, 9, 23, 10, 0, tzinfo=timezone.utc)
+
+    def test_seven_days_is_the_limit(self) -> None:
+        at_limit = job.catalog_freshness(
+            {job.STATE_CARDS_LAST_SYNC_AT: "2026-09-16T10:00:00Z"}, self.NOW
+        )
+        over = job.catalog_freshness(
+            {job.STATE_CARDS_LAST_SYNC_AT: "2026-09-16T09:59:00Z"}, self.NOW
+        )
+        self.assertEqual(at_limit["age_days"], 7.0)
+        self.assertFalse(at_limit["stale"])
+        self.assertTrue(over["stale"])
+        self.assertEqual(over["max_age_days"], 7)
+
+    def test_source_date_wins_over_the_last_sync(self) -> None:
+        freshness = job.catalog_freshness(
+            {
+                job.STATE_SOURCE_UPDATED_AT: "2026-09-22T09:00:00+00:00",
+                job.STATE_CARDS_LAST_SYNC_AT: "2026-06-06T12:00:00",
+            },
+            self.NOW,
+        )
+        self.assertEqual(freshness["updated_at"], "2026-09-22T09:00:00+00:00")
+        self.assertFalse(freshness["stale"])
+
+    def test_naive_timestamp_of_the_old_dart_sync_is_read_as_utc(self) -> None:
+        freshness = job.catalog_freshness(
+            {job.STATE_CARDS_LAST_SYNC_AT: "2026-06-06T12:00:00"}, self.NOW
+        )
+        self.assertEqual(freshness["updated_at"], "2026-06-06T12:00:00+00:00")
+        self.assertTrue(freshness["stale"])
+        self.assertGreater(freshness["age_days"], 100)
+
+    def test_unknown_age_is_stale(self) -> None:
+        freshness = job.catalog_freshness({}, self.NOW)
+        self.assertIsNone(freshness["updated_at"])
+        self.assertTrue(freshness["stale"])
 
 
 class WrapperTest(unittest.TestCase):

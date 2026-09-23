@@ -194,6 +194,9 @@ void main() {
       expect(cards, contains('`dedupe=false`'));
       expect(cards, contains('`commander_format=commander\\|brawl`'));
       expect(cards, contains('final commander eligibility'));
+      expect(cards, contains('limited per IP (BT-CAT-03'));
+      expect(cards, contains('429 `catalog_search_rate_limited`'));
+      expect(cards, contains('503 `rate_limit_unavailable` (fail-closed)'));
 
       expect(printings, contains('Read-only since BT-CAT-04'));
       expect(
