@@ -549,6 +549,8 @@ edita descrição, não alterna público e não troca edição.
   - receipt por execução;
   - nunca em tabela de usuário.
 - Junto: corrigir o invólucro do job, que roda `dart run` numa imagem que só tem AOT.
+- **Executado em 2026-09-23:** o job diário foi ativado às 15:34 UTC, depois de um dry-run coerente
+  (`docs/qa/execution/2026-09-23/BT-CAT-01-ativacao-do-catalogo.md`).
 
 **D-34 · Custo do refresh (D3).**
 - **Recomendo:** um download diário do bulk data do Scryfall (`default_cards`), em vez de chamadas

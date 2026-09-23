@@ -146,7 +146,9 @@ Decidido em 2026-09-22:
   exportação).
 - O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
   linha de base contida com a 058, catálogo com menos de 7 dias, rollback
-  treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`).
+  treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`). O catálogo está
+  atualizado desde 2026-09-23, com o job diário ativado às 15:34 UTC
+  (`docs/qa/execution/2026-09-23/BT-CAT-01-ativacao-do-catalogo.md`); o preço de deck espera a D-62.
 
 Detalhamento e ordem:
 `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.

@@ -61,6 +61,8 @@ A Scryfall mudou o formato do bulk. Em 2026-09-23, `GET https://api.scryfall.com
 
 O job foi escrito e testado com fixtures do formato antigo. Por isso leu a URI vazia e parou no teste de domínio, antes de qualquer download ou escrita. A frente de catálogo está ajustando o job. Depois disso, a coordenação promove o ajuste, refaz o deploy do ops e retoma "dry-run e depois ativar", com a palavra do dono para a nova promoção.
 
+**Atualização, 15:34 UTC.** O ajuste foi promovido em `f52fdc970`, o ops foi refeito e o catálogo foi ativado: `docs/qa/execution/2026-09-23/BT-CAT-01-ativacao-do-catalogo.md`.
+
 ## Estado depois deste deploy
 
 - **Job de catálogo:** fica registrado e inativo. A execução agendada das 06:20 UTC não grava nada enquanto a ativação não for feita.
