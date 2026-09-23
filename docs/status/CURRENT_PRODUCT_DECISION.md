@@ -128,8 +128,8 @@ Decidido em 2026-09-22:
 - Os quatro buracos do plano de controle de conta (exportação sem
   reautenticação, exclusão sem limite de tentativas, login que denuncia contas e
   relatório de deck apagado) foram fechados em produção em 2026-09-23
-  (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Resta o tempo da recuperação
-  de senha (`BT-AUTH-003`), que fecha antes de qualquer capability abrir (D-19).
+  (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). O tempo da recuperação
+  de senha (`BT-AUTH-003`) fechou no mesmo dia e está no ar desde 14:49 UTC (`c0f907108`).
 - Escrever deck, importar e mexer no fichário exigem e-mail verificado (D-56,
   decidida em 2026-09-23; no ar desde 11:01 UTC, em `22a7749a7`). Na coorte por
   convite, aceitar o convite enviado ao e-mail conta como verificação (`BT-AUTH-006`).
@@ -137,6 +137,13 @@ Decidido em 2026-09-22:
   reiniciado com a atualização de segurança (D-58). O reinício trocou o IP do
   balanceador interno; o backend fixa o IP novo desde `22a7749a7`. Abertas: D-59
   a D-61, com a recomendação em `docs/status/DECISOES_PENDENTES_2026-09-22.md`.
+- Em 2026-09-23 à tarde subiu o lote integrado das três frentes da coordenação
+  (`c0f907108`). No mesmo dia o dono decidiu a D-62 (o preço de deck usa a
+  impressão em papel mais barata) e aceitou as recomendações da D-63 à D-71
+  (demanda pelo log, parâmetros do catálogo, reconciliação do schema, itens de
+  troca na exclusão, outbox da exclusão, prazos de retenção a confirmar com o
+  advogado, limpeza por prazo sem capability e registro dos pedidos de
+  exportação).
 - O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
   linha de base contida com a 058, catálogo com menos de 7 dias, rollback
   treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`).

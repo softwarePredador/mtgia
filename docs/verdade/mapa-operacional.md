@@ -48,11 +48,13 @@ Formato: linha | afirmação | classificação | evidência | verdade atual | a�
   - **Scheduler** — `server/bin/manaloom_ops_daemon.py:145-205` carrega o mesmo
     `server/config/release_capabilities.json` (envelope inválido ⇒ política
     vazia; caminho diferente do canônico ⇒ política inválida) e
-    `_jobs_for_release_policy` (`:736-745`) só agenda um job se **todas** as
-    capabilities de `JOB_REQUIRED_CAPABILITIES` (`:711-734`, 16 jobs) estiverem
-    `allowed`. Com 29/29 `off`, rodam 1 de 16 (`hermes_cron_governor_report`,
-    tupla vazia), e o daemon sobe em `safe_housekeeping_only` com um `/health`
-    próprio na porta `MANALOOM_NATIVE_BATTLE_PORT` (`:396-465`). O deploy
+    `_jobs_for_release_policy` (`:765-777`) só agenda um job se **todas** as
+    capabilities de `JOB_REQUIRED_CAPABILITIES` (`:725-751`, 17 jobs) estiverem
+    `allowed`. Com 29/29 `off`, rodam 2 de 17, os dois com tupla vazia:
+    `hermes_cron_governor_report` e, desde 2026-09-23,
+    `manaloom_catalog_reference_refresh`, que só grava dado de referência depois
+    da ativação. O daemon sobe em `safe_housekeeping_only` com um `/health`
+    próprio na porta `MANALOOM_NATIVE_BATTLE_PORT` (`:399-470`). O deploy
     reasserta isso (`scripts/manaloom_deploy_ops_image.sh:366,369`).
   ```
 

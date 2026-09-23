@@ -54,7 +54,7 @@ Executado pela sessão coordenadora:
 - D-19: os quatro buracos foram fechados por uma segunda frente, só de servidor, aberta com a
   autorização do dono como exceção ao WIP-1 da raia. Subiram em 2026-09-23 às 08:08 UTC (`166aaed57`),
   com nova promoção do `master` por `--no-verify` autorizada (`docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`).
-  Resta o tempo da recuperação de senha (`BT-AUTH-003`).
+  O tempo da recuperação de senha (`BT-AUTH-003`) fechou no mesmo dia e está no ar desde 14:49 UTC (`c0f907108`).
 
 ## Decidido em 2026-09-23
 
@@ -98,6 +98,147 @@ kernel 6.8.0-142) e 6 do repositório da Docker (Docker 29.6.1 → 29.8.1, conta
 **Recomendo** aplicar os de `noble-updates` no próximo reinício planejado. O Docker fica para uma
 janela própria, com os outros projetos avisados, porque troca o runtime de todos os serviços do
 host.
+
+### Decididas em 2026-09-23, levantadas pelas frentes de catálogo, servidor e privacidade
+
+As três frentes da coordenação levantaram estas decisões com a medição na mão. O detalhe de cada uma está no backlog, nas linhas das tarefas citadas.
+
+O dono decidiu na conversa de coordenação:
+- na D-62, escolheu "impressão mais barata";
+- da D-63 à D-71, aceitou as recomendações ("aceitar todas").
+
+Migration, escrita ou exclusão em produção e o parecer do advogado continuam pedindo a palavra dele na hora da execução.
+
+**Catálogo**
+
+**D-62 · Preço das linhas-alias Oracle.**
+- **Problema:** os decks apontam para linhas-alias, uma por carta Oracle, e o job novo do catálogo só atualiza o preço das linhas de impressão exata. Sem uma regra, o preço dos decks fica parado.
+- **Decidido:** vale a impressão em papel mais barata de cada carta (não foil, USD), calculada no mesmo bulk diário. É o que responde "quanto custa montar este deck". A alternativa descartada era a impressão que a Scryfall escolhe como padrão.
+- **Destrava:** o preço de deck volta a andar. Também destrava o conserto de `POST /decks/:id/pricing`, que hoje chama a Scryfall a pedido do usuário, contra a D-35.
+
+**D-63 · Contador de demanda de cartas ausentes (D-35).**
+- **Problema:** o contador exige tabela nova. Como seria gravado por uma rota de leitura anônima, contraria a regra de leitura sem escrita do `BT-CAT-02`.
+- **Recomendação aprovada:** não criar agora. Cada carta não encontrada vira uma linha no log estruturado, e a contagem sai do log. A decisão volta depois da coorte. O DDL proposto pela frente, não aplicado, fica aqui como referência:
+
+```sql
+CREATE TABLE IF NOT EXISTS catalog_card_demand (
+  normalized_name TEXT PRIMARY KEY CHECK (char_length(normalized_name) BETWEEN 1 AND 200),
+  sample_name TEXT NOT NULL CHECK (char_length(sample_name) BETWEEN 1 AND 200),
+  hits INTEGER NOT NULL DEFAULT 1 CHECK (hits > 0),
+  first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  resolved_at TIMESTAMPTZ);
+CREATE INDEX IF NOT EXISTS idx_catalog_card_demand_open
+  ON catalog_card_demand (hits DESC, last_seen_at DESC) WHERE resolved_at IS NULL;
+-- down: DROP TABLE IF EXISTS catalog_card_demand;
+```
+
+**D-64 · Parâmetros do catálogo e contato na Scryfall.**
+- **O que a frente escolheu:**
+  - 60 buscas por minuto por IP;
+  - o job roda às 06:20 UTC;
+  - teto de 20.000 cartas novas;
+  - teto de 1,5 GiB por download;
+  - o User-Agent vai sem contato (D-37).
+- **Recomendação aprovada:** aceitar os parâmetros. No User-Agent, pôr o endereço do site (`https://brewtact.com`), sem e-mail pessoal.
+
+**Banco (auditoria de schema, `BT-DB-001`)**
+
+**D-65 · A view `commander_learning_snapshot`.**
+- **Problema:** a versão da produção não tem os filtros `card_count = 100` e "comandante na lista". As migrations 023 e 024 montam o SQL com uma constante do código Dart que mudou depois (`b70c3edd8`). Um banco novo sai diferente da produção.
+- **Recomendação aprovada:**
+  - tratar o código atual como o certo e recriar a view numa migration nova, com o SQL escrito por extenso;
+  - proibir, no `BT-DB-004`, migration que monte SQL com código que pode mudar.
+
+**D-66 · Apagar conta com itens de troca.**
+- **Problema:** `trade_items.owner_id` tem `ON DELETE CASCADE` na migration e nenhuma ação na produção. Na produção, apagar a conta de quem tem item de troca **falha**. Num banco novo, apaga os itens em silêncio.
+- **Recomendação aprovada:** a exclusão (`BT-PRIV-002`) trata os itens antes de apagar a conta, e uma migration nova alinha a chave nos dois bancos:
+  - itens de ofertas abertas: apagar;
+  - trocas concluídas: tirar o titular e manter o histórico da outra pessoa, como já foi feito com as simulações de terceiros.
+
+**D-67 · Índices `UNIQUE` e colunas `NOT NULL` que divergem.**
+- **Problema:** seis índices `UNIQUE` existem só na produção. Há 26 colunas que são `NOT NULL` na migration e aceitam nulo na produção. A D-48 manda a produção virar migration, mas não diz em que direção reconciliar.
+- **Recomendação aprovada:**
+  - os seis `UNIQUE` viram migration: já valem na produção, então não recusam nada que exista lá;
+  - as 26 colunas são apertadas na produção depois de contar os nulos por leitura;
+  - onde houver nulo, o dado é corrigido antes, com a sua palavra.
+
+**Privacidade**
+
+**D-68 · Outbox da exclusão (D-23).**
+- **O que é:** a tabela nova `account_deletion_outbox`. Ela avisa, com recibo e nova tentativa, os lugares fora do PostgreSQL:
+  - o SQLite do Hermes;
+  - o sidecar do Battle;
+  - o cache;
+  - o Sentry;
+  - os backups.
+- **Estado:** o DDL está proposto e validado num banco descartável.
+- **Recomendação aprovada:** aprovar a migration. É o que fecha a exclusão fora do banco principal.
+- **Junto com a tabela:**
+  - o job de consumo, sem capability;
+  - a lista final de consumidores e o prazo de cada um;
+  - se o app precisa consultar o estado da exclusão sem sessão.
+- **DDL proposto pela frente de privacidade, não aplicado:** a linha é gravada na mesma transação da exclusão, e os decks trafegam como o mesmo HMAC dos tombstones, nunca como UUID cru.
+
+```sql
+CREATE TABLE IF NOT EXISTS account_deletion_outbox (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    receipt_id UUID NOT NULL
+        REFERENCES account_deletion_receipts(id) ON DELETE RESTRICT,
+    consumer TEXT NOT NULL CHECK (consumer IN (
+        'hermes_learning_sqlite',
+        'interactive_battle_sidecar',
+        'endpoint_cache',
+        'sentry',
+        'backups'
+    )),
+    key_version SMALLINT NOT NULL
+        REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+    deck_tokens TEXT[] NOT NULL DEFAULT '{}',
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'processing', 'done', 'failed')),
+    attempts INTEGER NOT NULL DEFAULT 0 CHECK (attempts BETWEEN 0 AND 100),
+    next_attempt_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lease_owner TEXT,
+    lease_expires_at TIMESTAMP WITH TIME ZONE,
+    last_error_code TEXT,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_account_deletion_outbox_consumer UNIQUE (receipt_id, consumer),
+    CONSTRAINT chk_account_deletion_outbox_done
+        CHECK ((status = 'done') = (completed_at IS NOT NULL)),
+    CONSTRAINT chk_account_deletion_outbox_lease
+        CHECK ((status = 'processing') = (lease_owner IS NOT NULL AND lease_expires_at IS NOT NULL))
+);
+
+CREATE INDEX IF NOT EXISTS idx_account_deletion_outbox_due
+    ON account_deletion_outbox (next_attempt_at)
+    WHERE status IN ('pending', 'failed');
+```
+
+**D-69 · Prazos de retenção que faltam.**
+- **Pontos de partida aprovados, a confirmar com o advogado (D-24):**
+
+  | Dado | Prazo |
+  | --- | --- |
+  | Backups | 30 dias |
+  | Replays e simulações | 12 meses |
+  | Notificações | 90 dias |
+  | Feedback de IA | 12 meses |
+  | Analytics | 13 meses, só agregado |
+  | Trocas e moderação mantidas depois da exclusão | o prazo legal que o advogado indicar |
+- **Com você também:**
+  - a base legal do nome público de jogador de torneio;
+  - a conferência da retenção no painel do Sentry;
+  - a conferência nos contratos da OpenAI e da Resend.
+
+**D-70 · Limpeza por prazo em produção.**
+- **Problema:** hoje nada apaga por prazo em produção. O job de limpeza depende de `ai_analyze_optimize_advisory`, que está desligada.
+- **Recomendação aprovada:** separar a limpeza de retenção dessa capability, como foi feito com o job de catálogo, com recibo por execução. Ligar só com a sua palavra, porque é exclusão em produção.
+
+**D-71 · Registro dos pedidos de exportação.**
+- **Recomendação aprovada:** registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo. Isso ajuda a perceber abuso.
 
 O andamento das demais está no backlog e na fila.
 

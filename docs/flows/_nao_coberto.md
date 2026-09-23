@@ -328,8 +328,8 @@ Achado mais grave da auditoria: contradiz um contrato que dois documentos declar
     (`:54`); envelope inválido ⇒ `ReleasePolicy(False, digest, {})` (`:194,196`) — **fail-closed**.
   - `_load_runtime_release_policy` (`:200-205`) recusa qualquer caminho que não seja o canônico,
     devolvendo política inválida — trava de caminho que os outros dois portões não têm.
-  - Registro `JOBS` (`:565-709`): **16 jobs**, cada um com sua expressão cron.
-  - `JOB_REQUIRED_CAPABILITIES` (`:711-734`) mapeia cada job para capabilities do **mesmo
+  - Registro `JOBS` (`:568-723`): **17 jobs**, cada um com sua expressão cron (o 17º, `manaloom_catalog_reference_refresh`, entrou em 2026-09-23).
+  - `JOB_REQUIRED_CAPABILITIES` (`:725-751`) mapeia cada job para capabilities do **mesmo
     vocabulário do servidor**: `ai_analyze_optimize_advisory`, `learning_writes`,
     `catalog_private`, `battle_batch`.
   - `_jobs_for_release_policy` (`:737-746`) filtra: um job só roda se **todas** as suas

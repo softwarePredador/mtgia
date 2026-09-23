@@ -251,9 +251,11 @@ Este inventário não existia em lugar nenhum.
 
 1. **Política de release.** As 29 capabilities estão `allowed=false`
    (`server/config/release_capabilities.json`). `_jobs_for_release_policy`
-   (`manaloom_ops_daemon.py:736`) filtra os 16 jobs; sobra **um**,
-   `hermes_cron_governor_report`, que tem tupla de capability vazia e **não
-   escreve em PostgreSQL**.
+   (`manaloom_ops_daemon.py:765-777`) filtra os 17 jobs; sobram **dois**, com
+   tupla de capability vazia: `hermes_cron_governor_report`, que **não escreve
+   em PostgreSQL**, e, desde 2026-09-23, `manaloom_catalog_reference_refresh`
+   (`BT-CAT-01`), que só grava dado de referência e só depois da ativação
+   supervisionada.
 2. **Flags forçadas.** `manaloom_ops_daemon.py:241-250` sobrescreve 8 flags de
    apply para `"0"` depois de carregar o `.env`. Abrir uma capability não basta.
 3. **Guarda de learning.** `shouldWriteProductLearning`

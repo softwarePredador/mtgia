@@ -72,11 +72,13 @@ antes do middleware de plano rodar.
   equivale a tudo desligado.
 - **Scheduler** — `server/bin/manaloom_ops_daemon.py:145-205` carrega o mesmo
   `server/config/release_capabilities.json` (envelope inválido ⇒ política
-  vazia) e `_jobs_for_release_policy` (`:736-745`) só agenda um job se todas
-  as capabilities de `JOB_REQUIRED_CAPABILITIES` (`:711-734`, 16 jobs)
-  estiverem `allowed`. Com 29/29 `off` roda 1 de 16
-  (`hermes_cron_governor_report`) e o daemon sobe em `safe_housekeeping_only`
-  com `/health` próprio na porta `MANALOOM_NATIVE_BATTLE_PORT` (`:396-465`); o
+  vazia) e `_jobs_for_release_policy` (`:765-777`) só agenda um job se todas
+  as capabilities de `JOB_REQUIRED_CAPABILITIES` (`:725-751`, 17 jobs)
+  estiverem `allowed`. Com 29/29 `off` rodam 2 de 17
+  (`hermes_cron_governor_report` e, desde 2026-09-23,
+  `manaloom_catalog_reference_refresh`, que só grava dado de referência
+  depois da ativação) e o daemon sobe em `safe_housekeeping_only`
+  com `/health` próprio na porta `MANALOOM_NATIVE_BATTLE_PORT` (`:399-470`); o
   deploy reasserta isso (`scripts/manaloom_deploy_ops_image.sh:366,369`).
 
 ### Números medidos
@@ -253,9 +255,11 @@ crontab em comentário, nunca registrados em `manaloom_ops_daemon.py`.
 | Web público (Next.js) | `web-public/` | `manaloom_deploy_public_web.sh` | sim — **único sem nenhuma referência a capability** |
 | `hermes-lab` | `server/Dockerfile.hermes-lab` | nenhum | **desconhecido** — último commit no Dockerfile 2026-06-18 (`637f22193`); estado do container só com o comando da §9 |
 
-O `manaloom-ops` sobe em `safe_housekeeping_only` com exatamente um job
-habilitado, `hermes_cron_governor_report`, que só resume o próprio scheduler
-e **não escreve em PostgreSQL**. Ver `docs/DECK_QUALITY_MODEL.md` seção 5
+O `manaloom-ops` sobe em `safe_housekeeping_only` com dois jobs habilitados:
+`hermes_cron_governor_report`, que só resume o próprio scheduler e **não
+escreve em PostgreSQL**, e, desde 2026-09-23, `manaloom_catalog_reference_refresh`
+(`BT-CAT-01`), que só grava dado de referência (cartas, sets, legalidades e
+preços) e só depois da ativação supervisionada. Ver `docs/DECK_QUALITY_MODEL.md` seção 5
 para os três cadeados independentes.
 
 ---

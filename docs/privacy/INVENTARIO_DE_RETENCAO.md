@@ -62,7 +62,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 1. **Nenhum prazo automático roda em produção hoje.** O job `manaloom_ai_runtime_cleanup`
    (`ai_logs`, telemetria, `rate_limit_events`, jobs de IA) exige a capability
-   `ai_analyze_optimize_advisory`, que está OFF (`server/bin/manaloom_ops_daemon.py:712`).
+   `ai_analyze_optimize_advisory`, que está OFF (`server/bin/manaloom_ops_daemon.py:726`).
 2. **Exportação** (corrigida no `BT-PRIV-001`, 2026-09-23): em `47dc3b698`, 25 relações saíam
    pela linha inteira (`to_jsonb`), com `request_fingerprint`, `request_key`, `cache_key` e
    hashes de deck, e IDs de outras pessoas saíam crus. Agora cada seção sai só com as colunas
