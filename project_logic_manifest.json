@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "5db6c75c08f7ca89771c7f01a356c07e11aa1716191e5c34520a074a70674c78",
+  "source_digest_sha256": "ca2d5ea8f0576a90d2b0c0e27601d0898102ad8a37163e2b88867300e43357bb",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 688,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5212,
+    "dart_symbols": 5211,
     "semantic_resolved_files": 688,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42785,
-    "semantic_resolved_call_sites": 68186,
-    "semantic_resolved_type_references": 16096,
+    "semantic_resolved_call_edges": 42763,
+    "semantic_resolved_call_sites": 68142,
+    "semantic_resolved_type_references": 16092,
     "modules": 154,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1231,
+    "tests": 1232,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -2172,7 +2172,7 @@
         "server/routes/cards/resolve/index.dart"
       ],
       "file_count": 5,
-      "symbol_count": 22,
+      "symbol_count": 21,
       "providers": [],
       "services": []
     },
@@ -38791,25 +38791,19 @@
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/cards/printings/index.dart",
-      "line": 486
+      "line": 287
     },
     {
       "name": "_queryPrintings",
       "kind": "function",
       "source": "server/routes/cards/printings/index.dart",
-      "line": 71
-    },
-    {
-      "name": "_syncPrintingsFromScryfall",
-      "kind": "function",
-      "source": "server/routes/cards/printings/index.dart",
-      "line": 308
+      "line": 50
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/cards/printings/index.dart",
-      "line": 10
+      "line": 8
     },
     {
       "name": "onRequest",
@@ -41135,9 +41129,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42785,
-    "resolved_call_site_count": 68186,
-    "workspace_call_edge_count": 13347,
+    "resolved_call_edge_count": 42763,
+    "resolved_call_site_count": 68142,
+    "workspace_call_edge_count": 13343,
     "unresolved_call_edge_count": 543,
     "unresolved_call_site_count": 753,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -178776,7 +178770,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 16,
+        "line": 20,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -178787,7 +178781,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 17,
+        "line": 21,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -178798,7 +178792,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 264,
+        "line": 243,
         "caller": "_queryPrintings",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -178809,62 +178803,18 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 34,
+        "line": 36,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_queryPrintings",
         "target": "_queryPrintings",
         "target_library": "workspace:server/routes/cards/printings/index.dart",
         "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/cards/printings/index.dart",
-        "line": 355,
-        "caller": "_syncPrintingsFromScryfall",
-        "kind": "method",
-        "lexical_target": "scryfallIdentityPayload",
-        "target": "scryfallIdentityPayload",
-        "target_library": "package:server/card_identity_support.dart",
-        "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 389,
-        "caller": "_syncPrintingsFromScryfall",
-        "kind": "method",
-        "lexical_target": "scryfallNormalImageUrlFromPayload",
-        "target": "scryfallNormalImageUrlFromPayload",
-        "target_library": "package:server/scryfall_image_url.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/printings/index.dart",
-        "line": 390,
-        "caller": "_syncPrintingsFromScryfall",
-        "kind": "method",
-        "lexical_target": "scryfallNamedImageFallback",
-        "target": "scryfallNamedImageFallback",
-        "target_library": "package:server/scryfall_image_url.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/printings/index.dart",
-        "line": 46,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_syncPrintingsFromScryfall",
-        "target": "_syncPrintingsFromScryfall",
-        "target_library": "workspace:server/routes/cards/printings/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/printings/index.dart",
-        "line": 84,
+        "line": 63,
         "caller": "_queryPrintings",
         "kind": "method",
         "lexical_target": "cardIdentitySelectSql",
@@ -187982,14 +187932,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 584,
-        "occurrences": 731
+        "unique_references": 583,
+        "occurrences": 729
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14223,
-        "occurrences": 24811
+        "unique_references": 14211,
+        "occurrences": 24782
       },
       {
         "target_scope": "dart_sdk",
@@ -188000,8 +187950,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 397,
-        "occurrences": 641
+        "unique_references": 395,
+        "occurrences": 639
       },
       {
         "target_scope": "dart_sdk",
@@ -189254,8 +189204,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:http/http.dart",
-        "unique_references": 58,
-        "occurrences": 65
+        "unique_references": 57,
+        "occurrences": 63
       },
       {
         "target_scope": "dependency",
@@ -189350,8 +189300,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1207,
-        "occurrences": 1982
+        "unique_references": 1205,
+        "occurrences": 1978
       },
       {
         "target_scope": "dependency",
@@ -191744,8 +191694,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/card_identity_support.dart",
-        "unique_references": 24,
-        "occurrences": 24
+        "unique_references": 23,
+        "occurrences": 23
       },
       {
         "target_scope": "workspace",
@@ -192296,8 +192246,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/scryfall_image_url.dart",
-        "unique_references": 34,
-        "occurrences": 34
+        "unique_references": 32,
+        "occurrences": 32
       },
       {
         "target_scope": "workspace",
@@ -192830,8 +192780,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/routes/cards/printings/index.dart",
-        "unique_references": 3,
-        "occurrences": 4
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "workspace",
@@ -197462,7 +197412,7 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16096,
+    "resolved_type_reference_count": 16092,
     "workspace_type_reference_count": 3392,
     "unresolved_type_reference_count": 348,
     "resolved_type_references_scope": "workspace_targets_only",
@@ -231398,8 +231348,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1080,
-        "occurrences": 2187
+        "unique_references": 1079,
+        "occurrences": 2186
       },
       {
         "target_scope": "dart_sdk",
@@ -231416,8 +231366,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6175,
-        "occurrences": 39436
+        "unique_references": 6172,
+        "occurrences": 39414
       },
       {
         "target_scope": "dart_sdk",
@@ -232737,7 +232687,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 251,
-        "occurrences": 950
+        "occurrences": 948
       },
       {
         "target_scope": "dependency",
@@ -232749,7 +232699,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
         "unique_references": 198,
-        "occurrences": 485
+        "occurrences": 484
       },
       {
         "target_scope": "dependency",
@@ -232887,7 +232837,7 @@
         "target_scope": "unknown",
         "target_library": "<unresolved>",
         "unique_references": 405,
-        "occurrences": 4777
+        "occurrences": 4774
       },
       {
         "target_scope": "workspace",
@@ -271735,6 +271685,7 @@
     "server/test/card_identity_support_test.dart",
     "server/test/card_impact_analyzer_test.py",
     "server/test/card_resolution_support_test.dart",
+    "server/test/cards_printings_read_only_test.dart",
     "server/test/cards_reserved_schema_contract_test.dart",
     "server/test/cards_route_test.dart",
     "server/test/cmc_safety_test.dart",
@@ -273313,7 +273264,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245"
+      "sha256": "a97fbdb286f580e68c8d40680aad5cd8057e5802b5704bcc532c6a576ecf4656"
     },
     "required_task_fields": [
       "id",
@@ -274221,10 +274172,10 @@
       {
         "id": "BT-CAT-04",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "`GET /cards/printings?sync=true` deixa de escrever no banco e de chamar a Scryfall por chamador anônimo (achado 9 dos fluxos).",
         "depends_on": [],
-        "acceptance": "Nenhuma rota anônima faz DML nem chama terceiro; a sincronização sai só pelo job do `BT-CAT-01` (D-35); teste negativo.",
+        "acceptance": "Nenhuma rota anônima faz DML nem chama terceiro; a sincronização sai só pelo job do `BT-CAT-01` (D-35); teste negativo. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `server/routes/cards/printings/index.dart` só lê; o `sync` é ignorado, e saíram o cliente HTTP, as duas chamadas à Scryfall e os upserts em `cards` e `sets`. Evidência: `server/test/cards_printings_read_only_test.dart` sobe o handler com um pool roteirizado e um cliente HTTP que conta as chamadas; com `sync=true` e 0 ou 1 edição local (o gatilho antigo), e em 5 repetições, há 0 chamada externa e só as 3 leituras. A versão da base falha nos 3 casos (2 chamadas à Scryfall e `INSERT INTO cards`). A guarda de fonte de `server/test/cards_route_test.dart` foi invertida, e o contrato em `server/doc/API_CONTRACTS_AND_DATA_MAP.md` passou a dizer somente leitura. O app ainda envia `sync=true` (`app/lib/features/cards/providers/card_provider.dart:531`), que o servidor ignora; tirar o parâmetro é da raia do app. O `POST /cards/resolve`, a outra rota anônima que escreve e chama a Scryfall, fecha no `BT-CAT-02`.",
         "section": "P0",
         "source_line": 432
       },
@@ -283136,7 +283087,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "5db6c75c08f7ca89771c7f01a356c07e11aa1716191e5c34520a074a70674c78"
+    "project_logic_source_digest_sha256": "ca2d5ea8f0576a90d2b0c0e27601d0898102ad8a37163e2b88867300e43357bb"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285985,6 +285936,7 @@
       "server/test/card_identity_support_test.dart",
       "server/test/card_impact_analyzer_test.py",
       "server/test/card_resolution_support_test.dart",
+      "server/test/cards_printings_read_only_test.dart",
       "server/test/cards_reserved_schema_contract_test.dart",
       "server/test/cards_route_test.dart",
       "server/test/cmc_safety_test.dart",

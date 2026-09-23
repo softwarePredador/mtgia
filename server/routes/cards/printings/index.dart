@@ -1,12 +1,16 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_identity_support.dart';
 import '../../../lib/scryfall_image_url.dart';
 
+/// GET /cards/printings?name=<nome>[&limit=N][&dedupe=false]
+///
+/// Somente leitura (BT-CAT-04, decisão D-35 do dono): a rota consulta o
+/// catálogo local e nunca escreve no banco nem chama a Scryfall. O antigo
+/// `sync=true` não dispara mais nada; o parâmetro é ignorado. O catálogo é
+/// atualizado só pelo job interno de dado de referência (BT-CAT-01).
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
@@ -20,7 +24,6 @@ Future<Response> onRequest(RequestContext context) async {
   final name = params['name']?.trim();
   final limit = int.tryParse(params['limit'] ?? '50') ?? 50;
   final safeLimit = limit.clamp(1, 200);
-  final syncFromScryfall = params['sync'] == 'true';
   final deduplicate = params['dedupe']?.toLowerCase() != 'false';
 
   if (name == null || name.isEmpty) {
@@ -30,8 +33,7 @@ Future<Response> onRequest(RequestContext context) async {
     );
   }
 
-  // Busca local
-  var data = await _queryPrintings(
+  final data = await _queryPrintings(
     pool,
     name,
     safeLimit,
@@ -39,29 +41,6 @@ Future<Response> onRequest(RequestContext context) async {
     hasIdentityColumns,
     deduplicate: deduplicate,
   );
-
-  // Se sync=true e encontrou poucas edições, busca do Scryfall
-  if (syncFromScryfall && data.length <= 1) {
-    try {
-      final imported = await _syncPrintingsFromScryfall(
-        pool,
-        name,
-        hasIdentityColumns,
-      );
-      if (imported > 0) {
-        data = await _queryPrintings(
-          pool,
-          name,
-          safeLimit,
-          hasSets,
-          hasIdentityColumns,
-          deduplicate: deduplicate,
-        );
-      }
-    } catch (e) {
-      stderr.writeln('[printings/sync] Erro: $e');
-    }
-  }
 
   return Response.json(
     body: {'name': name, 'total_returned': data.length, 'data': data},
@@ -303,184 +282,6 @@ Future<List<Map<String, dynamic>>> _queryPrintings(
       }).toList();
 
   return data;
-}
-
-/// Busca todas as printings de uma carta no Scryfall e importa no banco
-Future<int> _syncPrintingsFromScryfall(
-  Pool pool,
-  String name,
-  bool hasIdentityColumns,
-) async {
-  // 1. Buscar a carta principal no Scryfall
-  final encoded = Uri.encodeQueryComponent(name.trim());
-  final uri = Uri.parse('https://api.scryfall.com/cards/named?fuzzy=$encoded');
-
-  final response = await http.get(
-    uri,
-    headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
-  );
-
-  if (response.statusCode != 200) return 0;
-
-  final card = jsonDecode(response.body) as Map<String, dynamic>;
-  final printsUri = card['prints_search_uri'] as String?;
-  if (printsUri == null) return 0;
-
-  // 2. Buscar todas as printings
-  final printsResponse = await http.get(
-    Uri.parse(printsUri),
-    headers: {'Accept': 'application/json', 'User-Agent': 'MTGDeckBuilder/1.0'},
-  );
-
-  if (printsResponse.statusCode != 200) return 0;
-
-  final body = jsonDecode(printsResponse.body) as Map<String, dynamic>;
-  final printings =
-      (body['data'] as List?)?.whereType<Map<String, dynamic>>() ?? [];
-  // Filtrar: só paper, sem art_series, sem tokens
-  final filtered =
-      printings
-          .where((p) {
-            final games = p['games'] as List?;
-            final isPaper = games?.contains('paper') ?? false;
-            final layout = p['layout']?.toString() ?? '';
-            return isPaper && layout != 'art_series' && layout != 'token';
-          })
-          .take(30)
-          .toList();
-
-  var imported = 0;
-
-  for (final p in filtered) {
-    final identity = scryfallIdentityPayload(p);
-
-    // Usar o ID único da printing (não oracle_id, que é igual para todas as edições)
-    final scryfallId = identity['scryfall_id'];
-    if (scryfallId == null || scryfallId.isEmpty) continue;
-
-    final cardName = p['name']?.toString() ?? '';
-    final manaCost = p['mana_cost']?.toString();
-    final typeLine = p['type_line']?.toString();
-    final oracleText = p['oracle_text']?.toString();
-    final power = p['power']?.toString();
-    final toughness = p['toughness']?.toString();
-    final setCode = p['set']?.toString();
-    final rarity = p['rarity']?.toString();
-    final isReserved = p['reserved'] is bool ? p['reserved'] as bool : null;
-    final cmc = p['cmc']?.toString();
-    final collectorNumber = p['collector_number']?.toString();
-    final foil = p['foil'] is bool ? p['foil'] as bool : null;
-
-    final colors = <String>[];
-    if (p['colors'] is List) {
-      for (final c in p['colors'] as List) {
-        colors.add(c.toString());
-      }
-    }
-
-    final colorIdentity = <String>[];
-    if (p['color_identity'] is List) {
-      for (final c in p['color_identity'] as List) {
-        colorIdentity.add(c.toString());
-      }
-    }
-
-    final imageUrl =
-        scryfallNormalImageUrlFromPayload(p) ??
-        scryfallNamedImageFallback(cardName, setCode: setCode);
-
-    try {
-      final identityInsertColumns =
-          hasIdentityColumns ? ', oracle_id, layout, card_faces_json' : '';
-      final identityInsertValues =
-          hasIdentityColumns
-              ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
-              : '';
-      final identityUpdates =
-          hasIdentityColumns
-              ? '''
-            oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
-            layout = COALESCE(EXCLUDED.layout, cards.layout),
-            card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
-'''
-              : '';
-
-      await pool.execute(
-        Sql.named('''
-          INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
-                             power, toughness,
-                             colors, color_identity, image_url, set_code, rarity, cmc,
-                             is_reserved, collector_number, foil$identityInsertColumns)
-          VALUES (
-            @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
-            @power, @toughness,
-            @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
-          )
-          ON CONFLICT (scryfall_id) DO UPDATE SET
-            image_url = COALESCE(EXCLUDED.image_url, cards.image_url),
-            power = COALESCE(EXCLUDED.power, cards.power),
-            toughness = COALESCE(EXCLUDED.toughness, cards.toughness),
-            is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
-            collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
-            foil = COALESCE(cards.foil, EXCLUDED.foil),
-            $identityUpdates
-            created_at = cards.created_at
-        '''),
-        parameters: {
-          'scryfall_id': scryfallId,
-          'oracle_id': identity['oracle_id'],
-          'name': cardName,
-          'mana_cost': manaCost,
-          'type_line': typeLine,
-          'oracle_text': oracleText,
-          'power': power,
-          'toughness': toughness,
-          'colors': colors,
-          'color_identity': colorIdentity,
-          'image_url': imageUrl,
-          'set_code': setCode,
-          'rarity': rarity,
-          'is_reserved': isReserved,
-          'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
-          'collector_number': collectorNumber,
-          'foil': foil,
-          'layout': identity['layout'],
-          'card_faces_json': identity['card_faces_json'],
-        },
-      );
-      imported++;
-    } catch (e) {
-      stderr.writeln('[printings/sync] Insert error ($cardName/$setCode): $e');
-    }
-  }
-
-  // Garantir que os sets existam
-  for (final p in filtered) {
-    final setCode = p['set']?.toString();
-    final setName = p['set_name']?.toString();
-    final releasedAt = p['released_at']?.toString();
-    if (setCode == null || setCode.isEmpty) continue;
-
-    try {
-      await pool.execute(
-        Sql.named('''
-          INSERT INTO sets (code, name, release_date)
-          VALUES (@code, @name, @release_date::date)
-          ON CONFLICT (code) DO NOTHING
-        '''),
-        parameters: {
-          'code': setCode,
-          'name': setName ?? setCode.toUpperCase(),
-          'release_date': releasedAt,
-        },
-      );
-    } catch (_) {
-      // Ignore set insertion errors
-    }
-  }
-
-  return imported;
 }
 
 Future<bool> _hasTable(Pool pool, String tableName) async {

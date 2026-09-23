@@ -156,7 +156,7 @@ void main() {
       );
       final printings = _contractRowFor(
         contracts,
-        'GET /cards/printings?name=&limit=&sync=&dedupe=',
+        'GET /cards/printings?name=&limit=&dedupe=',
       );
       final batchResolve = _contractRowFor(
         contracts,
@@ -194,10 +194,17 @@ void main() {
       expect(cards, contains('`commander_format=commander\\|brawl`'));
       expect(cards, contains('final commander eligibility'));
 
-      expect(printings, contains('sync=true'));
-      expect(printings, contains('write-capable'));
-      expect(printings, contains('upserts `cards` plus `sets`'));
-      expect(printings, contains('Treat `sync=true` as non-read-only'));
+      expect(printings, contains('Read-only since BT-CAT-04'));
+      expect(
+        printings,
+        contains('never writes to the database and never calls Scryfall'),
+      );
+      expect(
+        printings,
+        contains('A legacy `sync=true` is accepted and ignored'),
+      );
+      expect(printings, contains('cards_printings_read_only_test.dart'));
+      expect(printings, isNot(contains('write-capable')));
 
       expect(batchResolve, contains('card_identity_bridge` first'));
       expect(batchResolve, contains('bridge `match_priority`'));

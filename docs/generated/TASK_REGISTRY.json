@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245"
+    "sha256": "a97fbdb286f580e68c8d40680aad5cd8057e5802b5704bcc532c6a576ecf4656"
   },
   "required_task_fields": [
     "id",
@@ -910,10 +910,10 @@
     {
       "id": "BT-CAT-04",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "`GET /cards/printings?sync=true` deixa de escrever no banco e de chamar a Scryfall por chamador anônimo (achado 9 dos fluxos).",
       "depends_on": [],
-      "acceptance": "Nenhuma rota anônima faz DML nem chama terceiro; a sincronização sai só pelo job do `BT-CAT-01` (D-35); teste negativo.",
+      "acceptance": "Nenhuma rota anônima faz DML nem chama terceiro; a sincronização sai só pelo job do `BT-CAT-01` (D-35); teste negativo. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `server/routes/cards/printings/index.dart` só lê; o `sync` é ignorado, e saíram o cliente HTTP, as duas chamadas à Scryfall e os upserts em `cards` e `sets`. Evidência: `server/test/cards_printings_read_only_test.dart` sobe o handler com um pool roteirizado e um cliente HTTP que conta as chamadas; com `sync=true` e 0 ou 1 edição local (o gatilho antigo), e em 5 repetições, há 0 chamada externa e só as 3 leituras. A versão da base falha nos 3 casos (2 chamadas à Scryfall e `INSERT INTO cards`). A guarda de fonte de `server/test/cards_route_test.dart` foi invertida, e o contrato em `server/doc/API_CONTRACTS_AND_DATA_MAP.md` passou a dizer somente leitura. O app ainda envia `sync=true` (`app/lib/features/cards/providers/card_provider.dart:531`), que o servidor ignora; tirar o parâmetro é da raia do app. O `POST /cards/resolve`, a outra rota anônima que escreve e chama a Scryfall, fecha no `BT-CAT-02`.",
       "section": "P0",
       "source_line": 432
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "5db6c75c08f7ca89771c7f01a356c07e11aa1716191e5c34520a074a70674c78"
+  "project_logic_source_digest_sha256": "ca2d5ea8f0576a90d2b0c0e27601d0898102ad8a37163e2b88867300e43357bb"
 }
