@@ -25,6 +25,17 @@ def _load_module():
     return module
 
 
+def _load_script(file_name: str):
+    root = Path(__file__).resolve().parents[1]
+    path = root / "bin" / file_name
+    spec = importlib.util.spec_from_file_location(path.stem, path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 class ManaLoomOpsDaemonTest(unittest.TestCase):
     def test_base_env_loads_database_values_from_env_file(self) -> None:
         module = _load_module()
@@ -179,22 +190,106 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             ["hermes_cron_governor_report"],
         )
 
-    def test_all_off_or_invalid_policy_schedules_only_safe_governor(self) -> None:
+    def test_all_off_policy_schedules_only_governor_and_catalog_reference(
+        self,
+    ) -> None:
         module = _load_module()
         all_off = module._load_release_policy(
             module.REPO_ROOT / "server/config/release_capabilities.json"
         )
-        invalid = module.ReleasePolicy(False, "invalid", {})
+        self.assertTrue(all_off.valid)
+        self.assertFalse(any(all_off.capabilities.values()))
 
-        for policy in (all_off, invalid):
-            self.assertEqual(
-                [job.name for job in module._jobs_for_release_policy(policy)],
-                ["hermes_cron_governor_report"],
-            )
-
+        self.assertEqual(
+            [job.name for job in module._jobs_for_release_policy(all_off)],
+            ["manaloom_catalog_reference_refresh", "hermes_cron_governor_report"],
+        )
         self.assertEqual(
             {job.name for job in module.JOBS},
             set(module.JOB_REQUIRED_CAPABILITIES),
+        )
+
+    def test_invalid_policy_schedules_only_safe_governor(self) -> None:
+        module = _load_module()
+        invalid = module.ReleasePolicy(False, "invalid", {})
+
+        self.assertEqual(
+            [job.name for job in module._jobs_for_release_policy(invalid)],
+            ["hermes_cron_governor_report"],
+        )
+
+    def test_catalog_reference_is_the_only_new_capability_free_job(self) -> None:
+        module = _load_module()
+        capability_free = {
+            name
+            for name, capabilities in module.JOB_REQUIRED_CAPABILITIES.items()
+            if not capabilities
+        }
+        self.assertEqual(
+            capability_free,
+            {"hermes_cron_governor_report", "manaloom_catalog_reference_refresh"},
+        )
+        self.assertEqual(
+            module.REFERENCE_DATA_JOBS,
+            {"manaloom_catalog_reference_refresh": "catalog_reference_apply_v1"},
+        )
+        # No other job was opened: each keeps the capabilities it required
+        # before BT-CAT-01.
+        self.assertEqual(
+            {
+                name: capabilities
+                for name, capabilities in module.JOB_REQUIRED_CAPABILITIES.items()
+                if name not in capability_free
+            },
+            {
+                "manaloom_ai_runtime_cleanup": ("ai_analyze_optimize_advisory",),
+                "pull_learning_events": ("learning_writes",),
+                "auto_sync_learned_decks": ("learning_writes",),
+                "manaloom_sync_card_legalities_from_scryfall": ("catalog_private",),
+                "manaloom_new_card_candidate_review": ("catalog_private",),
+                "manaloom_card_data_gap_review": ("catalog_private",),
+                "manaloom_battle_rule_review_queue": ("battle_batch",),
+                "manaloom_battle_rule_focused_evidence": ("battle_batch",),
+                "manaloom_battle_rule_promotion_gate": ("battle_batch",),
+                "auto_promote_learned_decks": ("learning_writes",),
+                "manaloom_battle_strategy_audit": ("battle_batch",),
+                "manaloom_battle_strategy_nightly": ("battle_batch",),
+                "master_optimizer_preflight": (
+                    "ai_analyze_optimize_advisory",
+                    "battle_batch",
+                ),
+                "manaloom_knowledge_import": ("learning_writes",),
+                "hermes_mana_base_validator": ("ai_analyze_optimize_advisory",),
+            },
+        )
+
+    def test_catalog_reference_job_runs_the_ops_wrapper_under_its_contract(
+        self,
+    ) -> None:
+        module = _load_module()
+        refresh = _load_script("sync_catalog_reference_from_scryfall.py")
+        jobs = {job.name: job for job in module.JOBS}
+        job = jobs["manaloom_catalog_reference_refresh"]
+
+        self.assertEqual(job.schedule, "20 6 * * *")
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME" && ./server/bin/cron_sync_cards.sh --mode scheduled',
+        )
+        self.assertEqual(job.script_name, "cron_sync_cards.sh")
+        self.assertFalse(job.background)
+        self.assertEqual(refresh.JOB_NAME, job.name)
+        self.assertEqual(module.REFERENCE_DATA_JOBS[job.name], refresh.APPLY_CONTRACT)
+        self.assertTrue(
+            module._matches_schedule(job.schedule, module.datetime(2026, 9, 24, 6, 20))
+        )
+
+    def test_base_env_sends_catalog_receipts_to_the_artifact_dir(self) -> None:
+        module = _load_module()
+        env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        self.assertEqual(
+            env["MANALOOM_CATALOG_REFERENCE_OUTPUT_DIR"],
+            str(module.ARTIFACT_DIR / "catalog_reference_refresh"),
         )
 
     def test_unclassified_future_job_is_fail_closed(self) -> None:

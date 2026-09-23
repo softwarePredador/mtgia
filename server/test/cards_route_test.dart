@@ -53,50 +53,41 @@ void main() {
       expect(source, contains('canonical_sets'));
     });
 
-    test('printings sync boundary is explicit and write-capable', () {
+    // BT-CAT-04 (D-35): a rota só lê. A prova de comportamento está em
+    // `cards_printings_read_only_test.dart`; esta guarda barra a volta do
+    // cliente HTTP, da escrita e do interruptor `sync` na fonte.
+    test('printings route stays read-only and ignores sync', () {
       final source =
           File('routes/cards/printings/index.dart').readAsStringSync();
+      final dml = RegExp(
+        r'\b(INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|TRUNCATE|ON\s+CONFLICT)\b',
+        caseSensitive: false,
+      );
 
-      expect(
-        source,
-        contains("final syncFromScryfall = params['sync'] == 'true'"),
-      );
-      expect(source, contains('if (syncFromScryfall && data.length <= 1)'));
-      expect(source, contains('_syncPrintingsFromScryfall'));
-      expect(source, contains('INSERT INTO cards'));
-      expect(source, contains('is_reserved'));
-      expect(source, contains("p['reserved']"));
-      expect(source, contains('ON CONFLICT (scryfall_id) DO UPDATE SET'));
+      expect(source, isNot(contains('package:http/')));
+      expect(source, isNot(contains('api.scryfall.com')));
+      expect(source, isNot(contains("params['sync']")));
+      expect(source, isNot(matches(dml)));
       expect(source, contains('LEFT JOIN canonical_sets s'));
-      expect(source, contains('power = COALESCE(EXCLUDED.power, cards.power)'));
-      expect(
-        source,
-        contains('toughness = COALESCE(EXCLUDED.toughness, cards.toughness)'),
-      );
-      expect(source, contains('scryfallNormalImageUrlFromPayload(p)'));
-      expect(
-        source,
-        contains('image_url = COALESCE(EXCLUDED.image_url, cards.image_url)'),
-      );
-      expect(source, contains('INSERT INTO sets'));
+      expect(source, contains("'is_reserved': m['is_reserved'] == true"));
     });
 
-    test('resolve route preserves reserved-list metadata', () {
+    // BT-CAT-02 (D-35): o resolve só lê; a prova de comportamento está em
+    // `cards_resolve_read_only_test.dart`.
+    test('resolve route reads reserved-list metadata and never writes', () {
       final source = File('routes/cards/resolve/index.dart').readAsStringSync();
+      final dml = RegExp(
+        r'\b(INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|TRUNCATE|ON\s+CONFLICT)\b',
+        caseSensitive: false,
+      );
 
       expect(source, contains("'is_reserved': m['is_reserved'] == true"));
-      expect(source, contains("card['reserved']"));
-      expect(source, contains('is_reserved = COALESCE'));
-      expect(source, contains('power = COALESCE(EXCLUDED.power, cards.power)'));
-      expect(
-        source,
-        contains('toughness = COALESCE(EXCLUDED.toughness, cards.toughness)'),
-      );
-      expect(source, contains('scryfallNormalImageUrlFromPayload(card)'));
-      expect(
-        source,
-        contains('image_url = COALESCE(EXCLUDED.image_url, cards.image_url)'),
-      );
+      expect(source, contains("'power': m['power']"));
+      expect(source, contains("'toughness': m['toughness']"));
+      expect(source, contains('return cardNotInCatalogResponse(name);'));
+      expect(source, isNot(contains('package:http/')));
+      expect(source, isNot(contains('api.scryfall.com')));
+      expect(source, isNot(matches(dml)));
     });
 
     test(

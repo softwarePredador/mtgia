@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../lib/card_identity_support.dart';
 import '../../lib/card_query_contract.dart';
+import '../../lib/catalog_search_rate_limit.dart';
 import '../../lib/commander_eligibility.dart';
 import '../../lib/endpoint_cache.dart';
 import '../../lib/scryfall_image_url.dart';
@@ -12,12 +13,19 @@ Future<Response> onRequest(RequestContext context) async {
     return Response(statusCode: 405, body: 'Method Not Allowed');
   }
 
+  final params = context.request.uri.queryParameters;
+  // A busca textual sem filtro é a leitura cara do catálogo: limite por IP
+  // antes de tocar o banco (BT-CAT-03, decisão D-36 do dono).
+  if (isExpensiveCatalogSearch(params)) {
+    final limited = await catalogTextSearchRateLimitResponse(context);
+    if (limited != null) return limited;
+  }
+
   // Acessa a conexão do banco de dados fornecida pelo middleware
   final conn = context.read<Pool>();
   final hasSets = await _hasTable(conn, 'sets');
   final hasIdentityColumns = await hasCardIdentityColumns(conn);
 
-  final params = context.request.uri.queryParameters;
   final idFilter = params['id']?.trim();
   final nameFilter = params['name'];
   final setFilter = normalizeCardSetFilter(params['set']);

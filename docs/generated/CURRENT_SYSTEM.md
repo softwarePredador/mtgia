@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `231f3761da23d33b6ebc95f4d28c735e0b000eaa9b7b9c387f9a50c712c5d53c`
+**Digest das fontes:** `276b0d053d13be6911956806e1869ed2c9051a6ee16016f2ad2a4971c28f9059`
 
 ## Fontes de verdade
 
@@ -15,25 +15,25 @@
 
 | Superfície | Quantidade |
 |---|---:|
-| `dart_source_files` | 691 |
+| `dart_source_files` | 693 |
 | `non_dart_product_files` | 50 |
 | `battle_sidecar_source_files` | 34 |
-| `dart_symbols` | 5243 |
-| `semantic_resolved_files` | 691 |
+| `dart_symbols` | 5249 |
+| `semantic_resolved_files` | 693 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 42922 |
-| `semantic_resolved_call_sites` | 68418 |
-| `semantic_resolved_type_references` | 16168 |
-| `modules` | 156 |
+| `semantic_resolved_call_edges` | 42885 |
+| `semantic_resolved_call_sites` | 68333 |
+| `semantic_resolved_type_references` | 16175 |
+| `modules` | 158 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
 | `api_routes` | 121 |
 | `database_tables` | 79 |
 | `database_views` | 6 |
 | `migrations` | 58 |
-| `scripts_and_jobs` | 690 |
-| `environment_variables` | 720 |
-| `tests` | 1235 |
+| `scripts_and_jobs` | 691 |
+| `environment_variables` | 718 |
+| `tests` | 1241 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
 | `tasks` | 244 |
@@ -57,7 +57,7 @@
 | Build, migração, deploy, observabilidade e rollback | `guarded_no_implicit_live_write` | same-SHA release contract, artifact digests, migration ledger and health/readiness |
 | Plano, cota de IA e comércio (beta gratuita, sem cobrança) | `free_beta_no_commerce` | user_plans and ai_logs in PostgreSQL under PlanService; offer_mode free_beta_no_commerce in server/config/release_capabilities.json; no payment provider exists |
 | Site público (brewtact.com) e relatório compartilhável | `active_release_scope` | web-public/src/lib/product-data.ts and routes.ts under the free-beta offer contract; shared_deck_reports in PostgreSQL for GET /reports/{id}; no product capability is served |
-| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (16 jobs) reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report runs (safe_housekeeping_only) |
+| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (17 jobs) and REFERENCE_DATA_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only) and manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) run; an invalid policy keeps only the governor |
 
 ## Como validar
 

@@ -156,8 +156,9 @@ void main() {
       );
       final printings = _contractRowFor(
         contracts,
-        'GET /cards/printings?name=&limit=&sync=&dedupe=',
+        'GET /cards/printings?name=&limit=&dedupe=',
       );
+      final resolve = _contractRowFor(contracts, 'POST /cards/resolve');
       final batchResolve = _contractRowFor(
         contracts,
         'POST /cards/resolve/batch',
@@ -193,11 +194,27 @@ void main() {
       expect(cards, contains('`dedupe=false`'));
       expect(cards, contains('`commander_format=commander\\|brawl`'));
       expect(cards, contains('final commander eligibility'));
+      expect(cards, contains('limited per IP (BT-CAT-03'));
+      expect(cards, contains('429 `catalog_search_rate_limited`'));
+      expect(cards, contains('503 `rate_limit_unavailable` (fail-closed)'));
 
-      expect(printings, contains('sync=true'));
-      expect(printings, contains('write-capable'));
-      expect(printings, contains('upserts `cards` plus `sets`'));
-      expect(printings, contains('Treat `sync=true` as non-read-only'));
+      expect(printings, contains('Read-only since BT-CAT-04'));
+      expect(
+        printings,
+        contains('never writes to the database and never calls Scryfall'),
+      );
+      expect(
+        printings,
+        contains('A legacy `sync=true` is accepted and ignored'),
+      );
+      expect(printings, contains('cards_printings_read_only_test.dart'));
+      expect(printings, isNot(contains('write-capable')));
+
+      expect(resolve, contains('Read-only since BT-CAT-02'));
+      expect(resolve, contains('404 `{error: card_not_in_catalog'));
+      expect(resolve, contains('never calls Scryfall and never writes'));
+      expect(resolve, contains('cards_resolve_read_only_test.dart'));
+      expect(resolve, isNot(contains('Scryfall fallback')));
 
       expect(batchResolve, contains('card_identity_bridge` first'));
       expect(batchResolve, contains('bridge `match_priority`'));

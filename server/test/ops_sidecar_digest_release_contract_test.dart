@@ -106,7 +106,7 @@ void main() {
         ]) {
           expect(ops, contains(marker), reason: marker);
         }
-        expect(ops, contains("['hermes_cron_governor_report']"));
+        expect(ops, contains("['manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']"));
         expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));
         expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1')));
         expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1')));
