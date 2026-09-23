@@ -30,7 +30,7 @@ Data: 2026-06-02
 | `bin/cron_sync_cards.sh` | `sync_cards.dart` | diária | Sync incremental de cartas (Scryfall) |
 | `bin/cron_sync_prices.sh` | `sync_prices.dart` | diária | Preços via Scryfall (limit/stale-hours) |
 | `bin/cron_sync_prices_mtgjson.sh` | `sync_prices_mtgjson_fast.dart` | diária (04:00) | Preços via MTGJSON (bulk + UPDATE join) |
-| `bin/cron_cleanup_optimize_telemetry.sh` | `cleanup_optimize_telemetry.dart` | diária/semanal | Limpeza de telemetria do optimize |
+| `bin/cron_cleanup_optimize_telemetry.sh` | `cleanup_optimize_telemetry.dart` | diária (04:10, daemon de ops) | Limpeza por prazo do inventário de retenção (D-70), sem capability; só apaga depois da ativação supervisionada |
 
 ### 1.2 Crons CRIADAS nesta auditoria (lacuna de coerência do aprendizado)
 

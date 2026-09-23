@@ -295,7 +295,7 @@ Gates: `scripts/quality_gate.sh`, `scripts/manaloom_public_web_smoke.sh`.
 ## Scheduler operacional (manaloom-ops) e sincronizações
 
 Estado: `guarded_no_implicit_live_write`
-Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (17 jobs) and REFERENCE_DATA_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only) and manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) run; an invalid policy keeps only the governor
+Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor
 
 ```mermaid
 sequenceDiagram
@@ -315,6 +315,6 @@ sequenceDiagram
     Ops_Daemon->>Operator: GET /health próprio e relatório do governor
 ```
 
-Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`.
+Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/cron_account_deletion_outbox.sh`, `server/bin/account_deletion_outbox_worker.dart`, `server/lib/privacy/account_deletion_outbox.dart`, `server/bin/cleanup_optimize_telemetry.dart`, `server/lib/privacy/retention_cleanup.dart`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`.
 Testes: `server/test/manaloom_ops_daemon_test.py`, `server/test/sync_catalog_reference_from_scryfall_test.py`.
 Gates: `scripts/manaloom_battle_product_gate.sh`.

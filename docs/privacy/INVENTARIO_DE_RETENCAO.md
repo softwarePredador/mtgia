@@ -8,7 +8,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 - `server/test/privacy_data_inventory_test.dart` roda na suíte do servidor e compara o JSON com
   `project_logic_manifest.json#/database`, que o gerador de project logic extrai do baseline, das
-  58 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
+  60 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
   Ele também confere os prazos decididos pelo dono e se o modo de exclusão declarado bate com
   `server/lib/user_data_privacy_service.dart`.
 - `server/test/privacy_data_inventory_db_live_test.dart` confere o mesmo JSON contra o
@@ -20,8 +20,8 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## O que está no inventário
 
-- **79 tabelas** do schema versionado. **44 têm dado pessoal**: 42 de titulares de conta, 1 da
-  equipe de moderação e 1 com nome público de jogador de torneio externo. As outras 35 são
+- **80 tabelas** do schema versionado. **44 têm dado pessoal**: 42 de titulares de conta, 1 da
+  equipe de moderação e 1 com nome público de jogador de torneio externo. As outras 36 são
   catálogo, referência, controle ou operação.
 - Para cada tabela: finalidade, dono no código, prazo, quem apaga, se entra na exportação e como
   sai na exclusão, e a exceção legal quando há.
@@ -53,31 +53,44 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | IA em execução | `ai_logs`, `ai_generate_jobs`, `ai_optimize_jobs`, `ai_optimize_cache` | 180 dias; 24 h decidido para jobs; 6 h no cache | job de limpeza e o próprio serviço | sim, sem hashes | apagado |
 | Battle e replays | `battle_simulations`, `battle_simulation_attempts`, `battle_jobs`, `battle_job_live_records`, `interactive_battle_sessions`, `interactive_battle_records`, `battle_replay_annotations` | sem prazo | exclusão de conta | sim, sem hashes nem payload interno | apagado; as simulações de outras pessoas contra o deck do titular ficam com elas, anonimizadas (D-23) |
 | Social | `user_follows`, `user_blocks`, `user_block_events`, `conversations`, `direct_messages`, `notifications` | enquanto as contas existirem | exclusão de conta | sim, com pseudônimo para a outra pessoa | seguir, bloqueios e notificações apagados; mensagens do titular substituídas; trilha de bloqueios sem a pessoa |
-| Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão | ninguém | sim | anonimizadas, porque são registro entre duas partes |
+| Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão, menos os itens do titular em oferta aberta | exclusão de conta, para esses itens | sim | oferta aberta (`pending`) cancelada e sem os itens do titular (D-66); o resto anonimizado, porque é registro entre duas partes, e o item do titular sem o vínculo com o fichário |
 | Moderação | `content_reports`, `content_report_appeals`, `moderation_actions` | mantidas depois da exclusão | ninguém | denúncias e recursos do titular | denúncia, recurso e ação do moderador anonimizados |
 | Segurança | `password_reset_tokens`, `email_verification_tokens`, `rate_limit_events` | 20 min, 24 h e 24 h de validade | job de limpeza só para `rate_limit_events` | não | apagados |
-| Controle de privacidade | `account_deletion_receipts`, `privacy_deleted_deck_tombstones`, `privacy_keyring` | sem prazo | ninguém | não | mantidos, sem identificar a pessoa |
+| Controle de privacidade | `account_deletion_receipts`, `account_deletion_outbox`, `privacy_deleted_deck_tombstones`, `privacy_keyring` | sem prazo; o outbox esvazia os tokens de deck quando o consumidor conclui | ninguém | não | mantidos, sem identificar a pessoa |
 
 ## Lacunas que o inventário expõe
 
-1. **Nenhum prazo automático roda em produção hoje.** O job `manaloom_ai_runtime_cleanup`
-   (`ai_logs`, telemetria, `rate_limit_events`, jobs de IA) exige a capability
-   `ai_analyze_optimize_advisory`, que está OFF (`server/bin/manaloom_ops_daemon.py:726`).
+1. **Nenhum prazo automático roda em produção hoje.** Desde a D-70, o job
+   `manaloom_ai_runtime_cleanup` (`ai_logs`, telemetria, `rate_limit_events`, jobs de IA) não
+   depende mais de `ai_analyze_optimize_advisory`: roda sob o contrato
+   `retention_cleanup_apply_v1` e apaga só os prazos da seção `retention_cleanup` do JSON (jobs
+   de IA em 24 h, pela D-32). Fica desligado até a ativação supervisionada (`--mode activate` com
+   `MANALOOM_CONFIRM_POSTGRES_WRITES`); até lá, conta o que apagaria e deixa o recibo
+   `MANALOOM_RETENTION_CLEANUP`.
 2. **Exportação** (corrigida no `BT-PRIV-001`, 2026-09-23): em `47dc3b698`, 25 relações saíam
    pela linha inteira (`to_jsonb`), com `request_fingerprint`, `request_key`, `cache_key` e
    hashes de deck, e IDs de outras pessoas saíam crus. Agora cada seção sai só com as colunas
    deste inventário, IDs de terceiros viram pseudônimos válidos só no arquivo, e as cinco
-   tabelas que ficavam de fora entraram.
+   tabelas que ficavam de fora entraram. Desde a D-71, cada pedido deixa uma linha de log
+   `MANALOOM_PRIVACY_EXPORT_REQUEST` com horário, resultado e referência pseudônima de quem
+   pediu, sem o ID nem o conteúdo.
 3. **Exclusão** (parte corrigida no `BT-PRIV-002`, 2026-09-23): bloqueios e tokens do titular
    agora saem; eventos de bloqueio, recursos, ações de moderação e a evidência da denúncia ficam sem a
    pessoa; as simulações de outras pessoas contra o deck público do titular ficam com elas,
-   anonimizadas (D-23); relação ausente para a exclusão. Segue aberto: o outbox da D-23 exige
-   tabela nova (proposta de DDL com a coordenação), e jobs e sessões de Jogar contra IA de outras
+   anonimizadas (D-23); relação ausente para a exclusão. Desde a D-66, a oferta de troca aberta
+   do titular é cancelada, com uma linha no histórico, e perde os itens dele; nas outras trocas o
+   item dele fica, sem o vínculo com o fichário. A chave `trade_items.owner_id` passa a `RESTRICT`
+   nos dois bancos (migration 059, não aplicada na produção). O outbox da D-23 (D-68, migration
+   060, não aplicada na produção) grava uma linha por consumidor fora do banco na transação do
+   recibo; o job `manaloom_account_deletion_outbox`, sem capability, conclui o EndpointCache
+   depois do teto de 24 h e o Sentry do servidor na hora, e deixa o Hermes, o sidecar e os
+   backups abertos com o motivo. Segue aberto: jobs e sessões de Jogar contra IA de outras
    pessoas guardam o hash e a lista do deck de quem saiu (`BT-BAT-002`).
 4. **Fora do banco**: o EndpointCache passou a ter teto de 24 h e a limpar as entradas vencidas,
    e o Sentry do servidor não recebe mais o ID do usuário (`BT-PRIV-002`). Seguem abertos: o
    Sentry do app ainda identifica o usuário (raia do app); o SQLite do Hermes guarda decklists de
-   contas excluídas (contido por `learning_writes` OFF, `BT-AI-030`); logs têm `user_id` cru
+   contas excluídas (contido por `learning_writes` OFF, `BT-AI-030`; o outbox guarda a obrigação
+   com os tokens HMAC dos decks até existir o consumidor); logs têm `user_id` cru
    (`BT-SEC-AI-002`); a exclusão não limpa o aparelho.
 5. **Sem prazo definido**: eventos de ativação, replays e simulações, notificações, feedback de
    IA, relatórios compartilhados vencidos, notas pós-jogo apagadas, sessões expiradas e tokens
@@ -85,9 +98,15 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## Pendente de decisão do dono
 
-- Tabela nova para o outbox da exclusão (D-23): migration nova é decisão; a proposta de DDL foi
-  relatada à coordenação e não está aplicada.
+- Se o sidecar de Jogar contra IA pode ser dado como limpo pelo teto de vida da sessão (7200 s,
+  mais 10 s e 10 min de retenção terminal), como o EndpointCache, sem confirmação do próprio
+  sidecar. Hoje a linha do outbox fica aberta.
 - Prazo de rotação dos backups (D-23 manda registrá-lo na política).
+- Ligar a limpeza por prazo em produção (D-70): é exclusão em produção. Os prazos de partida da
+  D-69 (notificações, feedback de IA, replays, analytics) só entram no job depois do advogado.
+- Trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) quando uma das partes
+  exclui a conta: seguem com a outra pessoa, como as concluídas. A D-66 manda apagar só os itens
+  de oferta aberta.
 - Prazo de retenção de analytics (`activation_funnel_events`), replays e simulações,
   notificações e feedback de IA.
 - Prazo de retenção de trocas e registros de moderação mantidos depois da exclusão, e base legal

@@ -229,6 +229,11 @@ void main() {
           ...(artifact['decisions'] as List).cast<String>(),
         for (final rule in (inventory['decided_retention'] as List).cast<Map>())
           rule['decision'] as String,
+        if (inventory['retention_cleanup'] case final Map cleanup) ...[
+          cleanup['decision'] as String,
+          for (final rule in (cleanup['rules'] as List).cast<Map>())
+            if (rule['decision'] case final String id) id,
+        ],
       };
       expect(decisions.keys.toSet(), containsAll(cited));
     });
@@ -293,6 +298,14 @@ void main() {
           case 'anonymize':
             expect(updates(name), isTrue, reason: '$name declarada anonymize');
             expect(deletes(name), isFalse, reason: name);
+          case 'partial_delete':
+            expect(
+              deletes(name) && updates(name),
+              isTrue,
+              reason:
+                  '$name declarada partial_delete: apaga parte e trata '
+                  'o resto',
+            );
           case 'keep_legal':
             expect(deletes(name), isFalse, reason: name);
           case 'gap':

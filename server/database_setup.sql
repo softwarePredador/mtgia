@@ -1969,7 +1969,8 @@ CREATE TABLE IF NOT EXISTS trade_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
     binder_item_id UUID REFERENCES user_binder_items(id) ON DELETE SET NULL,
-    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- D-66 (migration 059): RESTRICT, alinhado com a produção.
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     direction TEXT NOT NULL CHECK (direction IN ('offering', 'requesting')),
     quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
     agreed_price DECIMAL(10,2),
@@ -2399,6 +2400,43 @@ CREATE TABLE IF NOT EXISTS privacy_deleted_deck_tombstones (
 );
 CREATE INDEX IF NOT EXISTS idx_privacy_deleted_deck_token
     ON privacy_deleted_deck_tombstones (deck_token);
+
+-- D-68 (migration 060): outbox da exclusão. Uma linha por consumidor fora do
+-- PostgreSQL, gravada na transação do recibo; sem identificador do titular.
+CREATE TABLE IF NOT EXISTS account_deletion_outbox (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    receipt_id UUID NOT NULL
+        REFERENCES account_deletion_receipts(id) ON DELETE RESTRICT,
+    consumer TEXT NOT NULL CHECK (consumer IN (
+        'hermes_learning_sqlite',
+        'interactive_battle_sidecar',
+        'endpoint_cache',
+        'sentry',
+        'backups'
+    )),
+    key_version SMALLINT NOT NULL
+        REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+    deck_tokens TEXT[] NOT NULL DEFAULT '{}',
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'processing', 'done', 'failed')),
+    attempts INTEGER NOT NULL DEFAULT 0 CHECK (attempts BETWEEN 0 AND 100),
+    next_attempt_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lease_owner TEXT,
+    lease_expires_at TIMESTAMP WITH TIME ZONE,
+    last_error_code TEXT,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_account_deletion_outbox_consumer UNIQUE (receipt_id, consumer),
+    CONSTRAINT chk_account_deletion_outbox_done
+        CHECK ((status = 'done') = (completed_at IS NOT NULL)),
+    CONSTRAINT chk_account_deletion_outbox_lease
+        CHECK ((status = 'processing') = (lease_owner IS NOT NULL AND lease_expires_at IS NOT NULL))
+);
+
+CREATE INDEX IF NOT EXISTS idx_account_deletion_outbox_due
+    ON account_deletion_outbox (next_attempt_at)
+    WHERE status IN ('pending', 'failed');
 
 -- ============================================================
 -- GROWTH: Relatorios compartilhaveis

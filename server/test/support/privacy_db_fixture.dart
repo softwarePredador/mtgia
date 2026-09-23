@@ -50,8 +50,16 @@ class PrivacyDbFixture {
   late final String jobByA;
   late final String jobByBAgainstA;
   late final String sessionByA;
+  late final String binderItemA;
   late final String tradeFromA;
   late final String tradeFromB;
+  late final String tradeCompletedAB;
+  late final String itemOfAInOpenOfferFromA;
+  late final String itemOfBInOpenOfferFromA;
+  late final String itemOfAInOpenOfferFromB;
+  late final String itemOfBInOpenOfferFromB;
+  late final String itemOfAInCompletedTrade;
+  late final String itemOfBInCompletedTrade;
   late final String conversationAB;
   late final String reportByA;
   late final String reportByB;
@@ -445,12 +453,14 @@ class PrivacyDbFixture {
         },
       );
 
-      await tx.execute(
-        Sql.named('''
+      binderItemA = await _one(
+        tx,
+        '''
           INSERT INTO user_binder_items (user_id, card_id, quantity, notes)
           VALUES (CAST(@owner AS uuid), CAST(@card AS uuid), 2, 'nota do fichario de A')
-        '''),
-        parameters: {'owner': userA, 'card': cardId},
+          RETURNING id::text
+        ''',
+        {'owner': userA, 'card': cardId},
       );
       await tx.execute(
         Sql.named('''
@@ -647,16 +657,25 @@ class PrivacyDbFixture {
         },
       );
 
-      Future<String> trade(String sender, String receiver, String message) =>
-          _one(
-            tx,
-            '''
-            INSERT INTO trade_offers (sender_id, receiver_id, message, tracking_code)
-            VALUES (CAST(@sender AS uuid), CAST(@receiver AS uuid), @message, 'BR123')
+      Future<String> trade(
+        String sender,
+        String receiver,
+        String message, {
+        String status = 'pending',
+      }) => _one(
+        tx,
+        '''
+            INSERT INTO trade_offers (sender_id, receiver_id, message, tracking_code, status)
+            VALUES (CAST(@sender AS uuid), CAST(@receiver AS uuid), @message, 'BR123', @status)
             RETURNING id::text
             ''',
-            {'sender': sender, 'receiver': receiver, 'message': message},
-          );
+        {
+          'sender': sender,
+          'receiver': receiver,
+          'message': message,
+          'status': status,
+        },
+      );
       tradeFromA = await trade(
         userA,
         userB,
@@ -667,21 +686,83 @@ class PrivacyDbFixture {
         userA,
         'mensagem da proposta de B $suffix',
       );
-      await tx.execute(
-        Sql.named('''
+      tradeCompletedAB = await trade(
+        userA,
+        userB,
+        'mensagem da troca concluida de A $suffix',
+        status: 'completed',
+      );
+
+      Future<String> item(
+        String trade,
+        String owner,
+        String direction,
+        String cardName, {
+        String? binderItem,
+      }) => _one(
+        tx,
+        '''
           INSERT INTO trade_items (
-            trade_offer_id, owner_id, direction, snapshot_status,
-            item_snapshot, snapshot_captured_at
+            trade_offer_id, owner_id, direction, binder_item_id,
+            snapshot_status, item_snapshot, snapshot_captured_at
           )
-          VALUES
-            (CAST(@trade AS uuid), CAST(@a AS uuid), 'offering', 'captured',
-             '{"schema_version": "trade_item_snapshot_v1", "card": {"name": "Carta de A"}, "physical": {"condition": "NM"}}'::jsonb,
-             NOW()),
-            (CAST(@trade AS uuid), CAST(@b AS uuid), 'requesting', 'captured',
-             '{"schema_version": "trade_item_snapshot_v1", "card": {"name": "Carta de B"}, "physical": {"condition": "NM"}}'::jsonb,
-             NOW())
-        '''),
-        parameters: {'trade': tradeFromA, 'a': userA, 'b': userB},
+          VALUES (
+            CAST(@trade AS uuid), CAST(@owner AS uuid), @direction,
+            CAST(@binder AS uuid), 'captured', CAST(@snapshot AS jsonb), NOW()
+          )
+          RETURNING id::text
+        ''',
+        {
+          'trade': trade,
+          'owner': owner,
+          'direction': direction,
+          'binder': binderItem,
+          'snapshot': jsonEncode({
+            'schema_version': 'trade_item_snapshot_v1',
+            'card': {'name': cardName},
+            'physical': {'condition': 'NM'},
+          }),
+        },
+      );
+      // Oferta aberta de A para B: um item de cada lado.
+      itemOfAInOpenOfferFromA = await item(
+        tradeFromA,
+        userA,
+        'offering',
+        'Carta de A',
+      );
+      itemOfBInOpenOfferFromA = await item(
+        tradeFromA,
+        userB,
+        'requesting',
+        'Carta de B',
+      );
+      // Oferta aberta de B para A: A é quem recebe e tem o item pedido.
+      itemOfAInOpenOfferFromB = await item(
+        tradeFromB,
+        userA,
+        'requesting',
+        'Carta pedida de A',
+      );
+      itemOfBInOpenOfferFromB = await item(
+        tradeFromB,
+        userB,
+        'offering',
+        'Carta oferecida por B',
+      );
+      // Troca concluída de A com B: o item de A vem do fichário dele.
+      itemOfAInCompletedTrade = await item(
+        tradeCompletedAB,
+        userA,
+        'offering',
+        'Carta trocada por A',
+        binderItem: binderItemA,
+      );
+      itemOfBInCompletedTrade = await item(
+        tradeCompletedAB,
+        userB,
+        'requesting',
+        'Carta trocada por B',
       );
       await tx.execute(
         Sql.named('''

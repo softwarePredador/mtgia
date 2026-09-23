@@ -17,7 +17,10 @@
     "D-26": "Testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono.",
     "D-29": "Prompt bruto do Generate retido por 30 dias e fora de decks.description.",
     "D-30": "Lixeira de decks com purge em 30 dias; deck na lixeira entra na exportação.",
-    "D-32": "Jobs de IA retidos por 24 h."
+    "D-32": "Jobs de IA retidos por 24 h.",
+    "D-68": "Outbox da exclusão (D-23) aprovado: tabela account_deletion_outbox e job de consumo sem capability; a migration pede a palavra do dono na execução.",
+    "D-70": "Limpeza por prazo separada da capability ai_analyze_optimize_advisory, com recibo por execução; ligar em produção só com a palavra do dono.",
+    "D-71": "Registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo."
   },
   "vocabulary": {
     "category": [
@@ -51,6 +54,7 @@
     "deletion_mode": [
       "delete",
       "anonymize",
+      "partial_delete",
       "cascade",
       "keep_legal",
       "gap",
@@ -132,7 +136,7 @@
         "ai_generate_jobs",
         "ai_optimize_jobs"
       ],
-      "status": "o código ainda apaga em 30 min (ai_generate_job.dart:12, optimize_job.dart:23, AI_JOB_RETENTION_MINUTES=30): BT-AI-032"
+      "status": "o job de limpeza (D-70) aplica 24 h quando ativado; o serviço ainda apaga em 30 min (ai_generate_job.dart:12, optimize_job.dart:23): BT-AI-032"
     },
     {
       "decision": "D-23",
@@ -143,7 +147,82 @@
       "status": "prazo de rotação ainda não decidido; backup local sem cifra e sem cópia fora da máquina (BT-DR-001)"
     }
   ],
+  "retention_cleanup": {
+    "job": "manaloom_ai_runtime_cleanup",
+    "contract": "retention_cleanup_apply_v1",
+    "decision": "D-70",
+    "activation": "desligada por padrão: o agendado só apaga depois de uma execução supervisionada com MANALOOM_CONFIRM_POSTGRES_WRITES (--mode activate), registrada em sync_state; até lá conta e deixa o recibo MANALOOM_RETENTION_CLEANUP. Ligar em produção é decisão do dono",
+    "rules": [
+      {
+        "id": "ai_optimize_fallback_telemetry_180d",
+        "table": "ai_optimize_fallback_telemetry",
+        "max_age_minutes": 259200,
+        "scope": "todas as linhas",
+        "decision": null
+      },
+      {
+        "id": "ai_logs_180d",
+        "table": "ai_logs",
+        "max_age_minutes": 259200,
+        "scope": "fora as reservas de cota (endpoint plan-reservation:*)",
+        "decision": null
+      },
+      {
+        "id": "ai_logs_unconfirmed_plan_reservation_10min",
+        "table": "ai_logs",
+        "max_age_minutes": 10,
+        "scope": "reservas de cota não confirmadas (plan-reservation:*, success falso); igual ao TTL do PlanService",
+        "decision": null
+      },
+      {
+        "id": "rate_limit_events_24h",
+        "table": "rate_limit_events",
+        "max_age_minutes": 1440,
+        "scope": "todas as linhas",
+        "decision": null
+      },
+      {
+        "id": "ai_generate_jobs_24h",
+        "table": "ai_generate_jobs",
+        "max_age_minutes": 1440,
+        "scope": "todas as linhas",
+        "decision": "D-32"
+      },
+      {
+        "id": "ai_optimize_jobs_24h",
+        "table": "ai_optimize_jobs",
+        "max_age_minutes": 1440,
+        "scope": "todas as linhas",
+        "decision": "D-32"
+      }
+    ]
+  },
   "tables": {
+    "account_deletion_outbox": {
+      "category": "privacy_control",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Outbox da exclusão (D-68): uma linha por consumidor fora do PostgreSQL (SQLite do Hermes, sidecar de Jogar contra IA, EndpointCache, Sentry, backups), com lease, nova tentativa e recibo por consumidor.",
+      "owner": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo; os tokens de deck saem da linha quando o consumidor conclui",
+        "decision": "D-68",
+        "enforced_by": "job manaloom_account_deletion_outbox (server/bin/account_deletion_outbox_worker.dart via server/bin/manaloom_ops_daemon.py), sem capability, contrato account_deletion_outbox_v1",
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "não tem vínculo com o titular: aponta para o recibo e leva decks só como HMAC"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "Gravado na exclusão, na transação do recibo; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes e o sidecar."
+      },
+      "legal_exception": "Prova, por consumidor, de que a exclusão chegou aos lugares fora do banco; não guarda identificador da pessoa."
+    },
     "account_deletion_receipts": {
       "category": "privacy_control",
       "subject_kind": "none",
@@ -214,8 +293,8 @@
         "class": "ttl",
         "period": "decidido: 24 h; hoje: 30 min",
         "decision": "D-32",
-        "enforced_by": "limpeza no próprio serviço a cada job novo (ai_generate_job.dart:12 e :345, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o código ainda apaga em 30 min; subir para 24 h é o BT-AI-032. O prompt bruto retido por 30 dias (D-29) depende do DCK-P0-04"
+        "enforced_by": "limpeza no próprio serviço a cada job novo (ai_generate_job.dart:12 e :345, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "o serviço ainda apaga em 30 min; subir para 24 h é o BT-AI-032. A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70). O prompt bruto retido por 30 dias (D-29) depende do DCK-P0-04"
       },
       "export": {
         "section": "data.ai_activity.generate_jobs"
@@ -256,8 +335,8 @@
         "class": "ttl",
         "period": "180 dias (AI_LOG_RETENTION_DAYS); reservas de cota não confirmadas em 10 min",
         "decision": null,
-        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": "data.ai_activity.logs"
@@ -329,8 +408,8 @@
         "class": "ttl",
         "period": "180 dias (TELEMETRY_RETENTION_DAYS)",
         "decision": null,
-        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": "data.ai_activity.fallback_telemetry"
@@ -368,8 +447,8 @@
         "class": "ttl",
         "period": "decidido: 24 h; hoje: 30 min",
         "decision": "D-32",
-        "enforced_by": "limpeza no próprio serviço a cada job novo (optimize_job.dart:23 e :450, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o código ainda apaga em 30 min; subir para 24 h é o BT-AI-032"
+        "enforced_by": "limpeza no próprio serviço a cada job novo (optimize_job.dart:23 e :450, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "o serviço ainda apaga em 30 min; subir para 24 h é o BT-AI-032. A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": "data.ai_activity.optimize_jobs"
@@ -2143,8 +2222,8 @@
         "class": "ttl",
         "period": "24 h (RATE_LIMIT_EVENT_RETENTION_HOURS); cada acerto também apaga as linhas do mesmo balde e identidade mais velhas que duas janelas",
         "decision": null,
-        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory; e distributed_rate_limiter.dart:32",
-        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); e distributed_rate_limiter.dart:32",
+        "gap": "A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": null,
@@ -2327,9 +2406,9 @@
       "owner": "server/routes/trades/index.dart",
       "retention": {
         "class": "legal_hold",
-        "period": "mantido com a troca",
+        "period": "o item de oferta aberta sai na exclusão da conta; o de troca em andamento ou encerrada fica com a troca",
         "decision": null,
-        "enforced_by": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
         "gap": null
       },
       "export": {
@@ -2337,11 +2416,11 @@
         "reason": "só os itens do titular"
       },
       "deletion": {
-        "mode": "keep_legal",
-        "by": null,
-        "notes": "Fica com a troca; o snapshot é só da carta (sem texto do usuário) e é imutável (trigger manaloom_trade_item_snapshot_immutable)."
+        "mode": "partial_delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "D-66: na oferta aberta (pending) do titular, a oferta é cancelada e os itens dele saem; os da outra pessoa ficam. Nas demais trocas o item do titular fica, sem o vínculo com o fichário (binder_item_id nulo), e owner_id aponta para a conta pseudonimizada. O snapshot é só da carta e é imutável. A chave owner_id é RESTRICT desde a migration 059: apagar a linha de users de quem tem item de troca é recusado."
       },
-      "legal_exception": "Parte do registro da troca.",
+      "legal_exception": "Parte do registro da troca da outra pessoa (trocas e disputas); confirmar o prazo com o advogado (D-69, BT-LEGAL-001).",
       "columns": {
         "agreed_price": "include",
         "binder_item_id": "include",
@@ -2412,7 +2491,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte."
+        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte. D-66: a oferta aberta (pending) do titular é cancelada, com uma linha no histórico."
       },
       "legal_exception": "Registro de negociação entre duas partes (trocas e disputas); confirmar o prazo com o advogado (BT-LEGAL-001).",
       "columns": {
@@ -2452,7 +2531,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'."
+        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'. D-66: o cancelamento da oferta aberta entra com a nota 'Oferta cancelada: a conta foi excluída.'."
       },
       "legal_exception": "Parte do registro da troca.",
       "columns": {
@@ -2853,9 +2932,10 @@
       "personal_data": true,
       "retention": "teto de 24 h em qualquer entrada; a vencida sai da memória na primeira leitura ou gravação depois de 1 min, mesmo que a chave não volte a ser lida",
       "export": "fora da exportação: cópia derivada e passageira",
-      "deletion": "não há invalidação na exclusão; vale o TTL de até 24 h (D-23)",
+      "deletion": "não há invalidação direta; vale o teto de 24 h (D-23). O outbox (D-68) conclui a obrigação 24 h 5 min depois da exclusão (endpoint_cache: expired_by_24h_cache_cap)",
       "decisions": [
-        "D-23"
+        "D-23",
+        "D-68"
       ],
       "gap": "sem nenhum acesso ao cache, a entrada vencida espera o próximo acesso ou o reinício, sem ser servida"
     },
@@ -2875,9 +2955,11 @@
       "personal_data": true,
       "retention": "até o TTL da sessão",
       "export": "fora da exportação; a sessão persistida entra por interactive_battle_sessions",
-      "deletion": "não recebe aviso da exclusão",
-      "decisions": [],
-      "gap": "sem sinal de cancelamento para o sidecar (BT-PRIV-002, BT-BAT-002)"
+      "deletion": "a sessão sai da memória até 7200 s + 10 s + 10 min depois de criada, na varredura a cada chamada ao sidecar; o outbox (D-68) guarda a obrigação (blocked_sidecar_expiry_not_confirmable)",
+      "decisions": [
+        "D-68"
+      ],
+      "gap": "o job de ops não tem rota nem credencial para confirmar a varredura no sidecar; o Battle está desligado em produção (D-57) (BT-PRIV-002, BT-BAT-002)"
     },
     "hermes_sqlite_learning": {
       "kind": "sidecar_store",
@@ -2885,18 +2967,22 @@
       "personal_data": true,
       "retention": "sem prazo",
       "export": "fora da exportação",
-      "deletion": "não é apagado na exclusão; hoje contido porque learning_writes está OFF",
-      "decisions": [],
-      "gap": "purga por sujeito no BT-AI-030"
+      "deletion": "não é apagado na exclusão; o outbox (D-68) guarda a obrigação com os tokens HMAC dos decks (blocked_hermes_purge_not_implemented); contido porque learning_writes está OFF",
+      "decisions": [
+        "D-68"
+      ],
+      "gap": "falta o consumidor na imagem de ops: abrir o knowledge.db, calcular no PostgreSQL o HMAC de cada deck_id de user_learning_events com a chave da linha e apagar os que baterem (BT-AI-030)"
     },
     "server_logs": {
       "kind": "logs",
-      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais.",
+      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais. Cada pedido de exportação deixa uma linha MANALOOM_PRIVACY_EXPORT_REQUEST (server/lib/privacy/privacy_export_request_log.dart) só com horário, resultado e uma referência de quem pediu: HMAC-SHA256 do ID com chave derivada do JWT_SECRET, truncado em 16 hexadecimais; nunca o ID, a senha ou o conteúdo (D-71).",
       "personal_data": true,
       "retention": "rotação do host, não configurada no repositório",
       "export": "fora da exportação",
       "deletion": "não há limpeza na exclusão",
-      "decisions": [],
+      "decisions": [
+        "D-71"
+      ],
       "gap": "prazo de rotação dos logs não documentado; pseudonimização é o BT-SEC-AI-002"
     },
     "sentry_server": {
@@ -2905,9 +2991,10 @@
       "personal_data": true,
       "retention": "retenção do plano da conta Sentry; conferir no painel do Sentry e registrar aqui",
       "export": "fora da exportação",
-      "deletion": "não há exclusão por titular no provedor",
+      "deletion": "não há exclusão por titular no provedor; o outbox (D-68) conclui na hora, porque os eventos do servidor não levam o usuário (sentry: server_events_carry_no_user_id). Eventos de antes de 2026-09-23 14:49 UTC seguem a retenção do plano",
       "decisions": [
-        "D-23"
+        "D-23",
+        "D-68"
       ],
       "gap": "a retenção do plano Sentry ainda não foi conferida no painel (dono)"
     },
@@ -2959,10 +3046,11 @@
       "personal_data": true,
       "retention": "backups não são reescritos na exclusão; o prazo de rotação entra na política (D-23)",
       "export": "fora da exportação",
-      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação",
+      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação. O outbox (D-68) guarda a obrigação (blocked_backup_rotation_not_applied) até a rotação de 30 dias da D-69",
       "decisions": [
         "D-23",
-        "D-26"
+        "D-26",
+        "D-68"
       ],
       "gap": "prazo de rotação não decidido; cópia fora da máquina e cifra em aberto (BT-DR-001); limpeza do manaloom_deploy_audit no BT-DB-006"
     },

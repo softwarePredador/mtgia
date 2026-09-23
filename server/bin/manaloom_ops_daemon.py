@@ -330,6 +330,12 @@ def _base_env(policy: ReleasePolicy | None = None) -> dict[str, str]:
             "MANALOOM_CATALOG_REFERENCE_OUTPUT_DIR": str(
                 ARTIFACT_DIR / "catalog_reference_refresh"
             ),
+            "MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR": str(
+                ARTIFACT_DIR / "account_deletion_outbox"
+            ),
+            "MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR": str(
+                ARTIFACT_DIR / "retention_cleanup"
+            ),
         }
     )
     return env
@@ -570,18 +576,22 @@ JOBS = [
         name="manaloom_ai_runtime_cleanup",
         schedule=os.environ.get("MANALOOM_AI_RUNTIME_CLEANUP_CRON", "10 4 * * *"),
         lockfile=LOCK_DIR / "manaloom_ai_runtime_cleanup.lock",
+        # D-70: the periods come from the retention inventory, never from the
+        # environment; the job deletes only after a supervised activation.
         command=(
             'cd "$MTGIA_HOME/server" && '
-            './bin/cron_cleanup_optimize_telemetry.sh '
-            '--retention-days=' '"${TELEMETRY_RETENTION_DAYS:-180}" '
-            '--ai-log-retention-days=' '"${AI_LOG_RETENTION_DAYS:-180}" '
-            '--job-retention-minutes=' '"${AI_JOB_RETENTION_MINUTES:-30}" '
-            '--reservation-ttl-minutes='
-            '"${AI_PLAN_RESERVATION_TTL_MINUTES:-10}" '
-            '--rate-limit-retention-hours='
-            '"${RATE_LIMIT_EVENT_RETENTION_HOURS:-24}"'
+            './bin/cron_cleanup_optimize_telemetry.sh --mode scheduled'
         ),
         script_name="cron_cleanup_optimize_telemetry.sh",
+    ),
+    Job(
+        name="manaloom_account_deletion_outbox",
+        schedule=os.environ.get(
+            "MANALOOM_ACCOUNT_DELETION_OUTBOX_CRON", "*/15 * * * *"
+        ),
+        lockfile=LOCK_DIR / "manaloom_account_deletion_outbox.lock",
+        command='cd "$MTGIA_HOME" && ./server/bin/cron_account_deletion_outbox.sh',
+        script_name="cron_account_deletion_outbox.sh",
     ),
     Job(
         name="pull_learning_events",
@@ -723,7 +733,9 @@ JOBS = [
 ]
 
 JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
-    "manaloom_ai_runtime_cleanup": ("ai_analyze_optimize_advisory",),
+    # Retention cleanup (D-70): no capability, only under the contract listed
+    # in PRIVACY_CONTROL_JOBS.
+    "manaloom_ai_runtime_cleanup": (),
     "pull_learning_events": ("learning_writes",),
     "auto_sync_learned_decks": ("learning_writes",),
     "manaloom_sync_card_legalities_from_scryfall": ("catalog_private",),
@@ -745,6 +757,9 @@ JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
     # in cards). It needs no release capability, so it runs with all 29 off,
     # but only under the apply contract listed in REFERENCE_DATA_JOBS.
     "manaloom_catalog_reference_refresh": (),
+    # Privacy obligation that runs whatever the product capabilities are, but
+    # only under the contract listed in PRIVACY_CONTROL_JOBS (D-68).
+    "manaloom_account_deletion_outbox": (),
     # This report only summarizes the local scheduler manifest/log status. It
     # is the liveness/housekeeping job that also runs on an invalid policy.
     "hermes_cron_governor_report": (),
@@ -761,13 +776,33 @@ REFERENCE_DATA_JOBS: dict[str, str] = {
     "manaloom_catalog_reference_refresh": "catalog_reference_apply_v1",
 }
 
+# Privacy obligations (owner decisions D-68 and D-70). They need no release
+# capability, because deletion and retention are not product surfaces that can
+# be switched off, and each runs under the versioned contract named here, which
+# lives in the job and leaves a receipt per run without identifiers:
+# account_deletion_outbox_v1 only touches account_deletion_outbox;
+# retention_cleanup_apply_v1 deletes only the periods of the retention
+# inventory, and only after a supervised activation recorded in sync_state.
+# Like the reference-data jobs, they stop on an invalid or unauthorized policy
+# file (fail closed).
+PRIVACY_CONTROL_JOBS: dict[str, str] = {
+    "manaloom_ai_runtime_cleanup": "retention_cleanup_apply_v1",
+    "manaloom_account_deletion_outbox": "account_deletion_outbox_v1",
+}
+
 
 def _jobs_for_release_policy(policy: ReleasePolicy) -> list[Job]:
     return [
         job
         for job in JOBS
         if job.name in JOB_REQUIRED_CAPABILITIES
-        and (job.name not in REFERENCE_DATA_JOBS or policy.valid)
+        and (
+            (
+                job.name not in REFERENCE_DATA_JOBS
+                and job.name not in PRIVACY_CONTROL_JOBS
+            )
+            or policy.valid
+        )
         and all(
             policy.allowed(capability)
             for capability in JOB_REQUIRED_CAPABILITIES[job.name]

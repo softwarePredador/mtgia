@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "8cf842ce0d8ae0bd7867aeea9ed4afd3ef57abd1ad2248d467cc1699b77f0770",
+  "source_digest_sha256": "8958454899c817b4839ff028720a359585c2135d9f8d60e0fe98a6887e506c53",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 696,
+    "dart_source_files": 700,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5260,
-    "semantic_resolved_files": 696,
+    "dart_symbols": 5290,
+    "semantic_resolved_files": 700,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42955,
-    "semantic_resolved_call_sites": 68434,
-    "semantic_resolved_type_references": 16211,
+    "semantic_resolved_call_edges": 43077,
+    "semantic_resolved_call_sites": 68531,
+    "semantic_resolved_type_references": 16296,
     "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
-    "database_tables": 79,
+    "database_tables": 80,
     "database_views": 6,
-    "migrations": 58,
-    "scripts_and_jobs": 691,
-    "environment_variables": 718,
-    "tests": 1250,
+    "migrations": 60,
+    "scripts_and_jobs": 693,
+    "environment_variables": 716,
+    "tests": 1256,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -571,6 +571,7 @@
       "id": "server/bin",
       "layer": "server",
       "files": [
+        "server/bin/account_deletion_outbox_worker.dart",
         "server/bin/analyze_unused.dart",
         "server/bin/audit_data_model_links.dart",
         "server/bin/auth_runtime_preflight.dart",
@@ -636,8 +637,8 @@
         "server/bin/update_schema.dart",
         "server/bin/verify_schema.dart"
       ],
-      "file_count": 64,
-      "symbol_count": 690,
+      "file_count": 65,
+      "symbol_count": 695,
       "providers": [],
       "services": []
     },
@@ -1900,12 +1901,15 @@
       "id": "server/lib/privacy",
       "layer": "server",
       "files": [
+        "server/lib/privacy/account_deletion_outbox.dart",
         "server/lib/privacy/deleted_deck_anonymizer.dart",
         "server/lib/privacy/privacy_export_allowlist.dart",
-        "server/lib/privacy/privacy_export_pseudonymizer.dart"
+        "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "server/lib/privacy/privacy_export_request_log.dart",
+        "server/lib/privacy/retention_cleanup.dart"
       ],
-      "file_count": 3,
-      "symbol_count": 9,
+      "file_count": 6,
+      "symbol_count": 33,
       "providers": [],
       "services": []
     },
@@ -2481,7 +2485,7 @@
         "server/routes/users/me/plan/index.dart"
       ],
       "file_count": 12,
-      "symbol_count": 31,
+      "symbol_count": 32,
       "providers": [],
       "services": []
     }
@@ -18085,6 +18089,30 @@
       "line": 111
     },
     {
+      "name": "_option",
+      "kind": "function",
+      "source": "server/bin/account_deletion_outbox_worker.dart",
+      "line": 62
+    },
+    {
+      "name": "_runId",
+      "kind": "function",
+      "source": "server/bin/account_deletion_outbox_worker.dart",
+      "line": 71
+    },
+    {
+      "name": "_stopped",
+      "kind": "function",
+      "source": "server/bin/account_deletion_outbox_worker.dart",
+      "line": 54
+    },
+    {
+      "name": "main",
+      "kind": "function",
+      "source": "server/bin/account_deletion_outbox_worker.dart",
+      "line": 10
+    },
+    {
       "name": "_findWorkspaceRoot",
       "kind": "function",
       "source": "server/bin/analyze_unused.dart",
@@ -19066,16 +19094,22 @@
       "line": 9
     },
     {
-      "name": "_toInt",
+      "name": "_runId",
       "kind": "function",
       "source": "server/bin/cleanup_optimize_telemetry.dart",
-      "line": 304
+      "line": 92
+    },
+    {
+      "name": "_stopped",
+      "kind": "function",
+      "source": "server/bin/cleanup_optimize_telemetry.dart",
+      "line": 77
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/cleanup_optimize_telemetry.dart",
-      "line": 9
+      "line": 10
     },
     {
       "name": "_failureCodes",
@@ -19817,7 +19851,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 4007,
+      "line": 4151,
       "members": [
         "fullName"
       ]
@@ -19826,49 +19860,49 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 4071
+      "line": 4215
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4104
+      "line": 4254
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4027
+      "line": 4171
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4023
+      "line": 4167
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4031
+      "line": 4175
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4143
+      "line": 4298
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4038
+      "line": 4182
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4073
+      "line": 4217
     },
     {
       "name": "_assertPostMigration",
@@ -34451,13 +34485,13 @@
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 452
+      "line": 832
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 832
+      "line": 452
     },
     {
       "name": "AiJobSchemaReadiness",
@@ -34529,115 +34563,115 @@
       "name": "_validBattleLiveHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 994
+      "line": 998
     },
     {
       "name": "_validInteractiveBattleHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1260
+      "line": 1264
     },
     {
       "name": "buildReadinessResponseBody",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1731
+      "line": 1735
     },
     {
       "name": "disabledReleaseCapabilityReadinessCheck",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1718
+      "line": 1722
     },
     {
       "name": "evaluateAiJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 710
+      "line": 714
     },
     {
       "name": "evaluateAiRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1630
+      "line": 1634
     },
     {
       "name": "evaluateBattleJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 805
+      "line": 809
     },
     {
       "name": "evaluateBattleJobWorkerReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1294
+      "line": 1298
     },
     {
       "name": "evaluateBattleLiveSpectatorReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 908
+      "line": 912
     },
     {
       "name": "evaluateBattleRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1493
+      "line": 1497
     },
     {
       "name": "evaluateCollectionAvailabilitySchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1361
+      "line": 1365
     },
     {
       "name": "evaluateDeckValidationSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1463
+      "line": 1467
     },
     {
       "name": "evaluateInteractiveBattleReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1171
+      "line": 1175
     },
     {
       "name": "evaluateReleaseCapabilityRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1650
+      "line": 1654
     },
     {
       "name": "evaluateReleaseSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 635
+      "line": 639
     },
     {
       "name": "probeBattleLiveSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 899
+      "line": 903
     },
     {
       "name": "probeBattleSidecarHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1601
+      "line": 1605
     },
     {
       "name": "probeInteractiveBattleSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1162
+      "line": 1166
     },
     {
       "name": "readinessStatusCode",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1749
+      "line": 1753
     },
     {
       "name": "apiError",
@@ -36728,6 +36762,85 @@
       "line": 7
     },
     {
+      "name": "AccountDeletionOutboxConsumer",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 36
+    },
+    {
+      "name": "AccountDeletionOutboxHandling",
+      "kind": "enum",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 21
+    },
+    {
+      "name": "AccountDeletionOutboxMissing",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 460,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "AccountDeletionOutboxOutcome",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 175
+    },
+    {
+      "name": "AccountDeletionOutboxRow",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 162
+    },
+    {
+      "name": "AccountDeletionOutboxWorker",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 241,
+      "members": [
+        "retryDelay",
+        "runOnce"
+      ]
+    },
+    {
+      "name": "OutboxDone",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 180
+    },
+    {
+      "name": "OutboxFailed",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 193
+    },
+    {
+      "name": "OutboxNotYet",
+      "kind": "class",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 186
+    },
+    {
+      "name": "accountDeletionOutboxReceiptLine",
+      "kind": "function",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 469
+    },
+    {
+      "name": "defaultAccountDeletionOutboxHandlers",
+      "kind": "function",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 207
+    },
+    {
+      "name": "enqueueAccountDeletionOutbox",
+      "kind": "function",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 109
+    },
+    {
       "name": "anonymizeDeletedDeckReferences",
       "kind": "function",
       "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
@@ -36790,6 +36903,94 @@
       "kind": "function",
       "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "line": 31
+    },
+    {
+      "name": "PrivacyExportRequestResult",
+      "kind": "enum",
+      "source": "server/lib/privacy/privacy_export_request_log.dart",
+      "line": 23
+    },
+    {
+      "name": "derivePrivacyExportRequesterKey",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_request_log.dart",
+      "line": 37
+    },
+    {
+      "name": "overridePrivacyExportRequesterSecretForTesting",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_request_log.dart",
+      "line": 81
+    },
+    {
+      "name": "privacyExportRequestLogLine",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_request_log.dart",
+      "line": 56
+    },
+    {
+      "name": "privacyExportRequesterReference",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_request_log.dart",
+      "line": 45
+    },
+    {
+      "name": "privacyExportRequesterSecret",
+      "kind": "function",
+      "source": "server/lib/privacy/privacy_export_request_log.dart",
+      "line": 76
+    },
+    {
+      "name": "RetentionCleanupMode",
+      "kind": "enum",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 28
+    },
+    {
+      "name": "RetentionCleanupRefused",
+      "kind": "class",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 154,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "RetentionCleanupRule",
+      "kind": "class",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 56,
+      "members": [
+        "_where",
+        "countSql",
+        "deleteSql"
+      ]
+    },
+    {
+      "name": "RetentionCleanupRunner",
+      "kind": "class",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 166,
+      "members": [
+        "_apply",
+        "_count",
+        "_deactivate",
+        "_isActive",
+        "_ruleReceipt",
+        "run"
+      ]
+    },
+    {
+      "name": "parseRetentionCleanupArguments",
+      "kind": "function",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 117
+    },
+    {
+      "name": "retentionCleanupReceiptLine",
+      "kind": "function",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 319
     },
     {
       "name": "_isLoopbackHost",
@@ -37636,19 +37837,19 @@
       "name": "InvalidAccountPasswordException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 78
+      "line": 88
     },
     {
       "name": "UserDataNotFoundException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 76
+      "line": 86
     },
     {
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 80,
+      "line": 90,
       "members": [
         "_anonymizeThirdPartySimulations",
         "_anonymizedReplayJson",
@@ -40767,16 +40968,22 @@
       "line": 8
     },
     {
+      "name": "_export",
+      "kind": "function",
+      "source": "server/routes/users/me/export/index.dart",
+      "line": 39
+    },
+    {
       "name": "_readPassword",
       "kind": "function",
       "source": "server/routes/users/me/export/index.dart",
-      "line": 68
+      "line": 109
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/users/me/export/index.dart",
-      "line": 11
+      "line": 12
     },
     {
       "name": "_deleteToken",
@@ -40836,7 +41043,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 696,
+    "resolved_file_count": 700,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41074,6 +41281,7 @@
       "app/lib/features/trades/widgets/trade_safety_notice.dart",
       "app/lib/firebase_options.dart",
       "app/lib/main.dart",
+      "server/bin/account_deletion_outbox_worker.dart",
       "server/bin/analyze_unused.dart",
       "server/bin/audit_data_model_links.dart",
       "server/bin/auth_runtime_preflight.dart",
@@ -41378,9 +41586,12 @@
       "server/lib/plan_middleware.dart",
       "server/lib/plan_service.dart",
       "server/lib/pricing_contract.dart",
+      "server/lib/privacy/account_deletion_outbox.dart",
       "server/lib/privacy/deleted_deck_anonymizer.dart",
       "server/lib/privacy/privacy_export_allowlist.dart",
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
+      "server/lib/privacy/privacy_export_request_log.dart",
+      "server/lib/privacy/retention_cleanup.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -41541,11 +41752,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42955,
-    "resolved_call_site_count": 68434,
-    "workspace_call_edge_count": 13441,
-    "unresolved_call_edge_count": 557,
-    "unresolved_call_site_count": 768,
+    "resolved_call_edge_count": 43077,
+    "resolved_call_site_count": 68531,
+    "workspace_call_edge_count": 13483,
+    "unresolved_call_edge_count": 558,
+    "unresolved_call_site_count": 769,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -107769,6 +107980,105 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 22,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_option",
+        "target": "_option",
+        "target_library": "workspace:server/bin/account_deletion_outbox_worker.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 24,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_runId",
+        "target": "_runId",
+        "target_library": "workspace:server/bin/account_deletion_outbox_worker.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 25,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 28,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "connect",
+        "target": "Database.connect",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 29,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "AccountDeletionOutboxWorker",
+        "target": "AccountDeletionOutboxWorker.AccountDeletionOutboxWorker",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 29,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "runOnce",
+        "target": "AccountDeletionOutboxWorker.runOnce",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 34,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_stopped",
+        "target": "_stopped",
+        "target_library": "workspace:server/bin/account_deletion_outbox_worker.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 41,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "close",
+        "target": "Database.close",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 43,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "accountDeletionOutboxReceiptLine",
+        "target": "accountDeletionOutboxReceiptLine",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/analyze_unused.dart",
         "line": 11,
         "caller": "main",
@@ -110718,25 +111028,113 @@
       },
       {
         "source": "server/bin/cleanup_optimize_telemetry.dart",
-        "line": 10,
+        "line": 29,
         "caller": "main",
         "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
+        "lexical_target": "parseRetentionCleanupArguments",
+        "target": "parseRetentionCleanupArguments",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/bin/cleanup_optimize_telemetry.dart",
-        "line": 145,
+        "line": 43,
         "caller": "main",
         "kind": "method",
-        "lexical_target": "_toInt",
-        "target": "_toInt",
+        "lexical_target": "_runId",
+        "target": "_runId",
         "target_library": "workspace:server/bin/cleanup_optimize_telemetry.dart",
         "target_scope": "workspace",
-        "occurrences": 6
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 44,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 50,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused.RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 52,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "connect",
+        "target": "Database.connect",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 53,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRunner",
+        "target": "RetentionCleanupRunner.RetentionCleanupRunner",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 53,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "run",
+        "target": "RetentionCleanupRunner.run",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 59,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_stopped",
+        "target": "_stopped",
+        "target_library": "workspace:server/bin/cleanup_optimize_telemetry.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 66,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "close",
+        "target": "Database.close",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 68,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "retentionCleanupReceiptLine",
+        "target": "retentionCleanupReceiptLine",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/bin/commander_ai_live_model_eval.dart",
@@ -113508,11 +113906,11 @@
         "target": "Migration.Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 58
+        "occurrences": 60
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4052,
+        "line": 4196,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -113523,7 +113921,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4105,
+        "line": 4255,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -113534,7 +113932,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4162,
+        "line": 4317,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -113545,7 +113943,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4163,
+        "line": 4318,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -113556,7 +113954,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4174,
+        "line": 4329,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -113567,7 +113965,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4177,
+        "line": 4332,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -113578,7 +113976,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4276,
+        "line": 4431,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -113589,7 +113987,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4277,
+        "line": 4432,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -160372,7 +160770,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1184,
+        "line": 1188,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleReadiness",
@@ -160383,7 +160781,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1214,
+        "line": 1218,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleConfiguration.fromEnvironment",
@@ -160394,7 +160792,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1223,
+        "line": 1227,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160405,7 +160803,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1232,
+        "line": 1236,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "_validInteractiveBattleHealth",
@@ -160416,7 +160814,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1305,
+        "line": 1309,
         "caller": "evaluateBattleJobWorkerReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobWorkerReadiness",
@@ -160427,7 +160825,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1370,
+        "line": 1374,
         "caller": "evaluateCollectionAvailabilitySchemaReadiness",
         "kind": "constructor",
         "lexical_target": "CollectionAvailabilitySchemaReadiness",
@@ -160438,7 +160836,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1473,
+        "line": 1477,
         "caller": "evaluateDeckValidationSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "DeckValidationSchemaReadiness",
@@ -160449,7 +160847,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1503,
+        "line": 1507,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -160460,7 +160858,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1519,
+        "line": 1523,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleRuntimeReadiness",
@@ -160471,7 +160869,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1564,
+        "line": 1568,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160482,7 +160880,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1631,
+        "line": 1635,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "OpenAiRuntimeConfig",
@@ -160493,7 +160891,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1637,
+        "line": 1641,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "AiRuntimeReadiness",
@@ -160504,7 +160902,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1662,
+        "line": 1666,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -160515,7 +160913,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1663,
+        "line": 1667,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleJobWorkerReadiness",
@@ -160526,7 +160924,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1667,
+        "line": 1671,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleRuntimeReadiness",
@@ -160537,7 +160935,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1671,
+        "line": 1675,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "disabledReleaseCapabilityReadinessCheck",
@@ -160548,7 +160946,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1683,
+        "line": 1687,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateAiRuntimeReadiness",
@@ -160559,7 +160957,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1694,
+        "line": 1698,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleLiveSpectatorReadiness",
@@ -160570,7 +160968,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1705,
+        "line": 1709,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateInteractiveBattleReadiness",
@@ -160581,7 +160979,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1715,
+        "line": 1719,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityRuntimeReadiness",
@@ -160592,7 +160990,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1722,
+        "line": 1726,
         "caller": "disabledReleaseCapabilityReadinessCheck",
         "kind": "method",
         "lexical_target": "entry",
@@ -160603,7 +161001,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 643,
+        "line": 647,
         "caller": "evaluateReleaseSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseSchemaReadiness",
@@ -160614,7 +161012,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 718,
+        "line": 722,
         "caller": "evaluateAiJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "AiJobSchemaReadiness",
@@ -160625,7 +161023,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 815,
+        "line": 819,
         "caller": "evaluateBattleJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobSchemaReadiness",
@@ -160636,7 +161034,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 915,
+        "line": 919,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "battleLiveSpectatorEnabledValue",
@@ -160647,7 +161045,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 921,
+        "line": 925,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleLiveSpectatorReadiness",
@@ -160658,7 +161056,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 945,
+        "line": 949,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -160669,7 +161067,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 962,
+        "line": 966,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160680,7 +161078,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 969,
+        "line": 973,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "_validBattleLiveHealth",
@@ -165486,6 +165884,94 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 228,
+        "caller": "defaultAccountDeletionOutboxHandlers",
+        "kind": "constructor",
+        "lexical_target": "OutboxDone",
+        "target": "OutboxDone.OutboxDone",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 229,
+        "caller": "defaultAccountDeletionOutboxHandlers",
+        "kind": "constructor",
+        "lexical_target": "OutboxNotYet",
+        "target": "OutboxNotYet.OutboxNotYet",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 251,
+        "caller": "AccountDeletionOutboxWorker.<constructor>",
+        "kind": "method",
+        "lexical_target": "defaultAccountDeletionOutboxHandlers",
+        "target": "defaultAccountDeletionOutboxHandlers",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 273,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "constructor",
+        "lexical_target": "AccountDeletionOutboxMissing",
+        "target": "AccountDeletionOutboxMissing.AccountDeletionOutboxMissing",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 343,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "constructor",
+        "lexical_target": "AccountDeletionOutboxRow",
+        "target": "AccountDeletionOutboxRow.AccountDeletionOutboxRow",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 359,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "constructor",
+        "lexical_target": "OutboxFailed",
+        "target": "OutboxFailed.OutboxFailed",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 408,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "method",
+        "lexical_target": "retryDelay",
+        "target": "AccountDeletionOutboxWorker.retryDelay",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 72,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "AccountDeletionOutboxConsumer",
+        "target": "AccountDeletionOutboxConsumer.AccountDeletionOutboxConsumer",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
         "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
         "line": 38,
         "caller": "walk",
@@ -165616,6 +166102,149 @@
         "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
         "target_scope": "workspace",
         "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_request_log.dart",
+        "line": 51,
+        "caller": "privacyExportRequesterReference",
+        "kind": "method",
+        "lexical_target": "derivePrivacyExportRequesterKey",
+        "target": "derivePrivacyExportRequesterKey",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_request_log.dart",
+        "line": 68,
+        "caller": "privacyExportRequestLogLine",
+        "kind": "method",
+        "lexical_target": "privacyExportRequesterReference",
+        "target": "privacyExportRequesterReference",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_request_log.dart",
+        "line": 79,
+        "caller": "privacyExportRequesterSecret",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 142,
+        "caller": "parseRetentionCleanupArguments",
+        "kind": "method",
+        "lexical_target": "parse",
+        "target": "RetentionCleanupMode.parse",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 182,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused.RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 186,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_count",
+        "target": "RetentionCleanupRunner._count",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 187,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_deactivate",
+        "target": "RetentionCleanupRunner._deactivate",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 188,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_apply",
+        "target": "RetentionCleanupRunner._apply",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 190,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_isActive",
+        "target": "RetentionCleanupRunner._isActive",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 220,
+        "caller": "RetentionCleanupRunner._count",
+        "kind": "method",
+        "lexical_target": "_isActive",
+        "target": "RetentionCleanupRunner._isActive",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 224,
+        "caller": "RetentionCleanupRunner._count",
+        "kind": "method",
+        "lexical_target": "_ruleReceipt",
+        "target": "RetentionCleanupRunner._ruleReceipt",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 278,
+        "caller": "RetentionCleanupRunner._apply",
+        "kind": "method",
+        "lexical_target": "_ruleReceipt",
+        "target": "RetentionCleanupRunner._ruleReceipt",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 83,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRule",
+        "target": "RetentionCleanupRule.RetentionCleanupRule",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
       },
       {
         "source": "server/lib/public_site_url.dart",
@@ -168358,7 +168987,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 104,
+        "line": 114,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168369,7 +168998,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 106,
+        "line": 116,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "method",
         "lexical_target": "_passwordMatches",
@@ -168380,7 +169009,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 107,
+        "line": 117,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -168391,7 +169020,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 113,
+        "line": 123,
         "caller": "UserDataPrivacyService._passwordMatches",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -168402,7 +169031,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 134,
+        "line": 144,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "privacyExportSectionSql",
@@ -168413,7 +169042,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 138,
+        "line": 148,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "_jsonObject",
@@ -168424,7 +169053,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 141,
+        "line": 151,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168435,7 +169064,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 145,
+        "line": 155,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "_assembleExport",
@@ -168446,7 +169075,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 158,
+        "line": 168,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "constructor",
         "lexical_target": "PrivacyExportPseudonymizer",
@@ -168457,7 +169086,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 172,
+        "line": 182,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "method",
         "lexical_target": "_pseudonymizeRow",
@@ -168468,7 +169097,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 181,
+        "line": 191,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "method",
         "lexical_target": "_putExportPath",
@@ -168479,7 +169108,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 191,
+        "line": 201,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "method",
         "lexical_target": "scrub",
@@ -168490,7 +169119,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 201,
+        "line": 211,
         "caller": "UserDataPrivacyService._pseudonymizeRow",
         "kind": "method",
         "lexical_target": "person",
@@ -168501,7 +169130,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 202,
+        "line": 212,
         "caller": "UserDataPrivacyService._pseudonymizeRow",
         "kind": "method",
         "lexical_target": "deck",
@@ -168512,7 +169141,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 203,
+        "line": 213,
         "caller": "UserDataPrivacyService._pseudonymizeRow",
         "kind": "method",
         "lexical_target": "entity",
@@ -168523,7 +169152,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 241,
+        "line": 251,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168534,7 +169163,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 245,
+        "line": 255,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_passwordMatches",
@@ -168545,7 +169174,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 246,
+        "line": 256,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -168556,7 +169185,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 248,
+        "line": 258,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_requireRelations",
@@ -168567,7 +169196,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 249,
+        "line": 259,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_ownDeckIds",
@@ -168578,7 +169207,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 252,
+        "line": 262,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_secureRandomToken",
@@ -168589,7 +169218,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 259,
+        "line": 269,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -168600,18 +169229,18 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 262,
+        "line": 272,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_executeOn",
         "target": "UserDataPrivacyService._executeOn",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 37
+        "occurrences": 39
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 358,
+        "line": 368,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_executeOnAll",
@@ -168622,7 +169251,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 504,
+        "line": 580,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_anonymizeThirdPartySimulations",
@@ -168633,7 +169262,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 561,
+        "line": 637,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitIdentifier",
@@ -168644,7 +169273,18 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 746,
+        "line": 736,
+        "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
+        "kind": "method",
+        "lexical_target": "enqueueAccountDeletionOutbox",
+        "target": "enqueueAccountDeletionOutbox",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/user_data_privacy_service.dart",
+        "line": 832,
         "caller": "UserDataPrivacyService._anonymizeThirdPartySimulations",
         "kind": "method",
         "lexical_target": "_anonymizedReplayJson",
@@ -168655,7 +169295,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 775,
+        "line": 861,
         "caller": "UserDataPrivacyService._anonymizedReplayJson",
         "kind": "method",
         "lexical_target": "anonymizeDeletedDeckReferences",
@@ -168666,7 +169306,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 82,
+        "line": 92,
         "caller": "UserDataPrivacyService.<constructor>",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -188939,18 +189579,18 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 20,
-        "caller": "onRequest",
+        "line": 103,
+        "caller": "_export",
         "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
         "target_library": "package:server/http_responses.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 22,
+        "line": 24,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "getUserId",
@@ -188961,8 +189601,52 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 23,
+        "line": 25,
         "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_export",
+        "target": "_export",
+        "target_library": "workspace:server/routes/users/me/export/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 30,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "privacyExportRequestLogLine",
+        "target": "privacyExportRequestLogLine",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 33,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "privacyExportRequesterSecret",
+        "target": "privacyExportRequesterSecret",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 44,
+        "caller": "_export",
+        "kind": "method",
+        "lexical_target": "methodNotAllowed",
+        "target": "methodNotAllowed",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 47,
+        "caller": "_export",
         "kind": "method",
         "lexical_target": "_readPassword",
         "target": "_readPassword",
@@ -188972,8 +189656,8 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 35,
-        "caller": "onRequest",
+        "line": 62,
+        "caller": "_export",
         "kind": "method",
         "lexical_target": "accountReverificationRateLimitResponse",
         "target": "accountReverificationRateLimitResponse",
@@ -188983,8 +189667,8 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 41,
-        "caller": "onRequest",
+        "line": 70,
+        "caller": "_export",
         "kind": "constructor",
         "lexical_target": "UserDataPrivacyService",
         "target": "UserDataPrivacyService.UserDataPrivacyService",
@@ -188994,8 +189678,8 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 42,
-        "caller": "onRequest",
+        "line": 71,
+        "caller": "_export",
         "kind": "method",
         "lexical_target": "verifyCurrentPassword",
         "target": "UserDataPrivacyService.verifyCurrentPassword",
@@ -189005,8 +189689,8 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 43,
-        "caller": "onRequest",
+        "line": 72,
+        "caller": "_export",
         "kind": "method",
         "lexical_target": "exportUserData",
         "target": "UserDataPrivacyService.exportUserData",
@@ -189016,22 +189700,11 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 62,
-        "caller": "onRequest",
+        "line": 98,
+        "caller": "_export",
         "kind": "method",
         "lexical_target": "notFound",
         "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/users/me/export/index.dart",
-        "line": 64,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
         "target_library": "package:server/http_responses.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -189422,14 +190095,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 584,
-        "occurrences": 729
+        "unique_references": 593,
+        "occurrences": 739
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14302,
-        "occurrences": 24903
+        "unique_references": 14346,
+        "occurrences": 24926
       },
       {
         "target_scope": "dart_sdk",
@@ -189440,8 +190113,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 397,
-        "occurrences": 648
+        "unique_references": 406,
+        "occurrences": 654
       },
       {
         "target_scope": "dart_sdk",
@@ -189452,8 +190125,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 94,
-        "occurrences": 125
+        "unique_references": 98,
+        "occurrences": 129
       },
       {
         "target_scope": "dart_sdk",
@@ -189518,8 +190191,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/digest.dart",
-        "unique_references": 38,
-        "occurrences": 41
+        "unique_references": 39,
+        "occurrences": 42
       },
       {
         "target_scope": "dependency",
@@ -189530,8 +190203,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hmac.dart",
-        "unique_references": 11,
-        "occurrences": 11
+        "unique_references": 15,
+        "occurrences": 15
       },
       {
         "target_scope": "dependency",
@@ -190790,14 +191463,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1207,
-        "occurrences": 1992
+        "unique_references": 1213,
+        "occurrences": 1982
       },
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 83,
-        "occurrences": 85
+        "unique_references": 86,
+        "occurrences": 88
       },
       {
         "target_scope": "dependency",
@@ -193292,8 +193965,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/database.dart",
-        "unique_references": 138,
-        "occurrences": 145
+        "unique_references": 144,
+        "occurrences": 151
       },
       {
         "target_scope": "workspace",
@@ -193699,6 +194372,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "unique_references": 12,
+        "occurrences": 17
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
         "unique_references": 4,
         "occurrences": 5
@@ -193714,6 +194393,18 @@
         "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
         "unique_references": 12,
         "occurrences": 13
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "unique_references": 4,
+        "occurrences": 4
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "unique_references": 15,
+        "occurrences": 23
       },
       {
         "target_scope": "workspace",
@@ -193815,13 +194506,19 @@
         "target_scope": "workspace",
         "target_library": "package:server/user_data_privacy_service.dart",
         "unique_references": 23,
-        "occurrences": 64
+        "occurrences": 66
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/verified_email_middleware.dart",
         "unique_references": 9,
         "occurrences": 9
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/bin/account_deletion_outbox_worker.dart",
+        "unique_references": 3,
+        "occurrences": 4
       },
       {
         "target_scope": "workspace",
@@ -193868,8 +194565,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/cleanup_optimize_telemetry.dart",
-        "unique_references": 1,
-        "occurrences": 6
+        "unique_references": 2,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -193977,7 +194674,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 8,
-        "occurrences": 65
+        "occurrences": 67
       },
       {
         "target_scope": "workspace",
@@ -194588,8 +195285,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/routes/users/me/export/index.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "workspace",
@@ -198631,7 +199328,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1219,
+        "line": 1223,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -198639,7 +199336,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1221,
+        "line": 1225,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -198647,7 +199344,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1551,
+        "line": 1555,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -198655,7 +199352,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 936,
+        "line": 940,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -198663,7 +199360,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 960,
+        "line": 964,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -198852,6 +199549,14 @@
         "kind": "function_expression",
         "lexical_target": "handler",
         "occurrences": 3
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 356,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "function_expression",
+        "lexical_target": "handlers[row.consumer]!",
+        "occurrences": 1
       },
       {
         "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
@@ -199062,9 +199767,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16211,
-    "workspace_type_reference_count": 3420,
-    "unresolved_type_reference_count": 352,
+    "resolved_type_reference_count": 16296,
+    "workspace_type_reference_count": 3442,
+    "unresolved_type_reference_count": 355,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -220488,6 +221193,36 @@
         "occurrences": 4
       },
       {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 25,
+        "lexical_type": "Database",
+        "resolved_type": "Database",
+        "target": "Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 29,
+        "lexical_type": "AccountDeletionOutboxWorker",
+        "resolved_type": "AccountDeletionOutboxWorker",
+        "target": "AccountDeletionOutboxWorker",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 32,
+        "lexical_type": "AccountDeletionOutboxMissing",
+        "resolved_type": "AccountDeletionOutboxMissing",
+        "target": "AccountDeletionOutboxMissing",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/analyze_unused.dart",
         "line": 11,
         "lexical_type": "SourceReachabilityAudit",
@@ -220764,6 +221499,46 @@
         "resolved_type": "Database",
         "target": "Database",
         "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 44,
+        "lexical_type": "Database",
+        "resolved_type": "Database",
+        "target": "Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 50,
+        "lexical_type": "RetentionCleanupRefused",
+        "resolved_type": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 53,
+        "lexical_type": "RetentionCleanupRunner",
+        "resolved_type": "RetentionCleanupRunner",
+        "target": "RetentionCleanupRunner",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 79,
+        "lexical_type": "RetentionCleanupMode",
+        "resolved_type": "RetentionCleanupMode",
+        "target": "RetentionCleanupMode",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -221205,11 +221980,11 @@
         "target": "Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 61
+        "occurrences": 63
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4073,
+        "line": 4217,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
@@ -228869,7 +229644,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1171,
+        "line": 1175,
         "lexical_type": "InteractiveBattleReadiness",
         "resolved_type": "InteractiveBattleReadiness",
         "target": "InteractiveBattleReadiness",
@@ -228879,7 +229654,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1175,
+        "line": 1179,
         "lexical_type": "InteractiveBattleSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "InteractiveBattleSchemaProbe",
@@ -228889,7 +229664,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1214,
+        "line": 1218,
         "lexical_type": "InteractiveBattleConfiguration",
         "resolved_type": "InteractiveBattleConfiguration",
         "target": "InteractiveBattleConfiguration",
@@ -228899,7 +229674,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1294,
+        "line": 1298,
         "lexical_type": "BattleJobWorkerReadiness",
         "resolved_type": "BattleJobWorkerReadiness",
         "target": "BattleJobWorkerReadiness",
@@ -228909,7 +229684,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1361,
+        "line": 1365,
         "lexical_type": "CollectionAvailabilitySchemaReadiness",
         "resolved_type": "CollectionAvailabilitySchemaReadiness",
         "target": "CollectionAvailabilitySchemaReadiness",
@@ -228919,7 +229694,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1463,
+        "line": 1467,
         "lexical_type": "DeckValidationSchemaReadiness",
         "resolved_type": "DeckValidationSchemaReadiness",
         "target": "DeckValidationSchemaReadiness",
@@ -228929,7 +229704,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1497,
+        "line": 1501,
         "lexical_type": "BattleRuntimeReadiness",
         "resolved_type": "BattleRuntimeReadiness",
         "target": "BattleRuntimeReadiness",
@@ -228939,7 +229714,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1518,
+        "line": 1522,
         "lexical_type": "BattleEngineConfigurationException",
         "resolved_type": "BattleEngineConfigurationException",
         "target": "BattleEngineConfigurationException",
@@ -228949,7 +229724,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1630,
+        "line": 1634,
         "lexical_type": "AiRuntimeReadiness",
         "resolved_type": "AiRuntimeReadiness",
         "target": "AiRuntimeReadiness",
@@ -228959,7 +229734,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1631,
+        "line": 1635,
         "lexical_type": "OpenAiRuntimeConfig",
         "resolved_type": "OpenAiRuntimeConfig",
         "target": "OpenAiRuntimeConfig",
@@ -228969,7 +229744,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1653,
+        "line": 1657,
         "lexical_type": "ReleaseCapabilityRuntimeReadiness",
         "resolved_type": "ReleaseCapabilityRuntimeReadiness",
         "target": "ReleaseCapabilityRuntimeReadiness",
@@ -228979,7 +229754,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1655,
+        "line": 1659,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -228989,7 +229764,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 635,
+        "line": 639,
         "lexical_type": "ReleaseSchemaReadiness",
         "resolved_type": "ReleaseSchemaReadiness",
         "target": "ReleaseSchemaReadiness",
@@ -228999,7 +229774,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 710,
+        "line": 714,
         "lexical_type": "AiJobSchemaReadiness",
         "resolved_type": "AiJobSchemaReadiness",
         "target": "AiJobSchemaReadiness",
@@ -229009,7 +229784,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 805,
+        "line": 809,
         "lexical_type": "BattleJobSchemaReadiness",
         "resolved_type": "BattleJobSchemaReadiness",
         "target": "BattleJobSchemaReadiness",
@@ -229019,7 +229794,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 908,
+        "line": 912,
         "lexical_type": "BattleLiveSpectatorReadiness",
         "resolved_type": "BattleLiveSpectatorReadiness",
         "target": "BattleLiveSpectatorReadiness",
@@ -229029,7 +229804,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 911,
+        "line": 915,
         "lexical_type": "BattleSidecarProbe",
         "resolved_type": "Future<Map<String, dynamic>?> Function(String, Uri)",
         "target": "BattleSidecarProbe",
@@ -229039,7 +229814,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 912,
+        "line": 916,
         "lexical_type": "BattleLiveSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "BattleLiveSchemaProbe",
@@ -229049,7 +229824,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 945,
+        "line": 949,
         "lexical_type": "BattleEngineConfig",
         "resolved_type": "BattleEngineConfig",
         "target": "BattleEngineConfig",
@@ -229968,6 +230743,96 @@
         "occurrences": 5
       },
       {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 181,
+        "lexical_type": "AccountDeletionOutboxOutcome",
+        "resolved_type": "AccountDeletionOutboxOutcome",
+        "target": "AccountDeletionOutboxOutcome",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 204,
+        "lexical_type": "AccountDeletionOutboxRow",
+        "resolved_type": "AccountDeletionOutboxRow",
+        "target": "AccountDeletionOutboxRow",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 208,
+        "lexical_type": "AccountDeletionOutboxHandler",
+        "resolved_type": "Future<AccountDeletionOutboxOutcome> Function(Session, AccountDeletionOutboxRow)",
+        "target": "AccountDeletionOutboxHandler",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 228,
+        "lexical_type": "OutboxDone",
+        "resolved_type": "OutboxDone",
+        "target": "OutboxDone",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 229,
+        "lexical_type": "OutboxNotYet",
+        "resolved_type": "OutboxNotYet",
+        "target": "OutboxNotYet",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 273,
+        "lexical_type": "AccountDeletionOutboxMissing",
+        "resolved_type": "AccountDeletionOutboxMissing",
+        "target": "AccountDeletionOutboxMissing",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 359,
+        "lexical_type": "OutboxFailed",
+        "resolved_type": "OutboxFailed",
+        "target": "OutboxFailed",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 48,
+        "lexical_type": "AccountDeletionOutboxHandling",
+        "resolved_type": "AccountDeletionOutboxHandling",
+        "target": "AccountDeletionOutboxHandling",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 67,
+        "lexical_type": "AccountDeletionOutboxConsumer",
+        "resolved_type": "AccountDeletionOutboxConsumer",
+        "target": "AccountDeletionOutboxConsumer",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
         "source": "server/lib/privacy/privacy_export_allowlist.dart",
         "line": 101,
         "lexical_type": "PrivacyExportSection",
@@ -229986,6 +230851,56 @@
         "target_library": "package:server/privacy/privacy_export_allowlist.dart",
         "target_scope": "workspace",
         "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_request_log.dart",
+        "line": 60,
+        "lexical_type": "PrivacyExportRequestResult",
+        "resolved_type": "PrivacyExportRequestResult",
+        "target": "PrivacyExportRequestResult",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 121,
+        "lexical_type": "RetentionCleanupMode",
+        "resolved_type": "RetentionCleanupMode",
+        "target": "RetentionCleanupMode",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 182,
+        "lexical_type": "RetentionCleanupRefused",
+        "resolved_type": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 44,
+        "lexical_type": "RetentionCleanupMode?",
+        "resolved_type": "RetentionCleanupMode?",
+        "target": "RetentionCleanupMode",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 82,
+        "lexical_type": "RetentionCleanupRule",
+        "resolved_type": "RetentionCleanupRule",
+        "target": "RetentionCleanupRule",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
       },
       {
         "source": "server/lib/push_notification_service.dart",
@@ -230319,7 +231234,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 104,
+        "line": 114,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
@@ -230329,7 +231244,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 107,
+        "line": 117,
         "lexical_type": "InvalidAccountPasswordException",
         "resolved_type": "InvalidAccountPasswordException",
         "target": "InvalidAccountPasswordException",
@@ -230339,7 +231254,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 158,
+        "line": 168,
         "lexical_type": "PrivacyExportPseudonymizer",
         "resolved_type": "PrivacyExportPseudonymizer",
         "target": "PrivacyExportPseudonymizer",
@@ -230349,7 +231264,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 195,
+        "line": 205,
         "lexical_type": "PrivacyExportSection",
         "resolved_type": "PrivacyExportSection",
         "target": "PrivacyExportSection",
@@ -230359,7 +231274,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 81,
+        "line": 91,
         "lexical_type": "AuthService?",
         "resolved_type": "AuthService?",
         "target": "AuthService",
@@ -230369,7 +231284,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 82,
+        "line": 92,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -233179,7 +234094,17 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 41,
+        "line": 39,
+        "lexical_type": "PrivacyExportRequestResult",
+        "resolved_type": "PrivacyExportRequestResult",
+        "target": "PrivacyExportRequestResult",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/export/index.dart",
+        "line": 70,
         "lexical_type": "UserDataPrivacyService",
         "resolved_type": "UserDataPrivacyService",
         "target": "UserDataPrivacyService",
@@ -233189,7 +234114,7 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 53,
+        "line": 85,
         "lexical_type": "InvalidAccountPasswordException",
         "resolved_type": "InvalidAccountPasswordException",
         "target": "InvalidAccountPasswordException",
@@ -233199,7 +234124,7 @@
       },
       {
         "source": "server/routes/users/me/export/index.dart",
-        "line": 61,
+        "line": 96,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
@@ -233278,8 +234203,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1082,
-        "occurrences": 2199
+        "unique_references": 1090,
+        "occurrences": 2210
       },
       {
         "target_scope": "dart_sdk",
@@ -233290,26 +234215,26 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 41,
-        "occurrences": 53
+        "unique_references": 43,
+        "occurrences": 55
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6245,
-        "occurrences": 39727
+        "unique_references": 6285,
+        "occurrences": 39879
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 83,
-        "occurrences": 186
+        "unique_references": 87,
+        "occurrences": 190
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 31,
-        "occurrences": 51
+        "unique_references": 33,
+        "occurrences": 53
       },
       {
         "target_scope": "dart_sdk",
@@ -233374,14 +234299,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hmac.dart",
-        "unique_references": 4,
-        "occurrences": 6
+        "unique_references": 5,
+        "occurrences": 8
       },
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 275,
-        "occurrences": 1100
+        "occurrences": 1102
       },
       {
         "target_scope": "dependency",
@@ -234616,8 +235541,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 255,
-        "occurrences": 950
+        "unique_references": 256,
+        "occurrences": 948
       },
       {
         "target_scope": "dependency",
@@ -234628,8 +235553,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 199,
-        "occurrences": 482
+        "unique_references": 201,
+        "occurrences": 484
       },
       {
         "target_scope": "dependency",
@@ -234766,8 +235691,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 407,
-        "occurrences": 4760
+        "unique_references": 410,
+        "occurrences": 4774
       },
       {
         "target_scope": "workspace",
@@ -236698,8 +237623,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/database.dart",
-        "unique_references": 48,
-        "occurrences": 58
+        "unique_references": 50,
+        "occurrences": 60
       },
       {
         "target_scope": "workspace",
@@ -236973,6 +237898,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "unique_references": 11,
+        "occurrences": 33
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/privacy/privacy_export_allowlist.dart",
         "unique_references": 3,
         "occurrences": 45
@@ -236982,6 +237913,18 @@
         "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
         "unique_references": 1,
         "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/privacy_export_request_log.dart",
+        "unique_references": 2,
+        "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "unique_references": 7,
+        "occurrences": 17
       },
       {
         "target_scope": "workspace",
@@ -237125,7 +238068,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 2,
-        "occurrences": 62
+        "occurrences": 64
       },
       {
         "target_scope": "workspace",
@@ -238246,6 +239189,12 @@
         "occurrences": 16
       },
       {
+        "source": "server/bin/account_deletion_outbox_worker.dart",
+        "line": 20,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/analyze_unused.dart",
         "line": 6,
         "lexical_type": "void",
@@ -238295,7 +239244,7 @@
       },
       {
         "source": "server/bin/cleanup_optimize_telemetry.dart",
-        "line": 9,
+        "line": 28,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -238439,7 +239388,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4104,
+        "line": 4254,
         "lexical_type": "void",
         "occurrences": 2
       },
@@ -239254,6 +240203,18 @@
         "occurrences": 3
       },
       {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 111,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/privacy_export_request_log.dart",
+        "line": 82,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/push_notification_service.dart",
         "line": 195,
         "lexical_type": "void",
@@ -239285,7 +240246,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 90,
+        "line": 100,
         "lexical_type": "void",
         "occurrences": 6
       },
@@ -240761,7 +241722,7 @@
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 80,
+      "line": 90,
       "members": [
         "_anonymizeThirdPartySimulations",
         "_anonymizedReplayJson",
@@ -252974,8 +253935,8 @@
       "server/lib/collection_availability_contract.dart",
       "server/lib/import_card_lookup_service.dart"
     ],
-    "migration_count": 58,
-    "latest_migration": "058",
+    "migration_count": 60,
+    "latest_migration": "060",
     "migrations": [
       {
         "version": "001",
@@ -253266,9 +254227,108 @@
         "version": "058",
         "name": "snapshot_trade_item_identity",
         "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "059",
+        "name": "align_trade_items_owner_fk",
+        "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "060",
+        "name": "create_account_deletion_outbox",
+        "source": "server/bin/migrate.dart"
       }
     ],
     "tables": [
+      {
+        "name": "account_deletion_outbox",
+        "columns": [
+          {
+            "name": "attempts",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "completed_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "consumer",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "deck_tokens",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "key_version",
+            "type": "SMALLINT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "last_error_code",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "lease_expires_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "lease_owner",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "next_attempt_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "receipt_id",
+            "type": "UUID",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "status",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": false
+          }
+        ]
+      },
       {
         "name": "account_deletion_receipts",
         "columns": [
@@ -259105,6 +260165,30 @@
     ],
     "relations": [
       {
+        "from_table": "account_deletion_outbox",
+        "from_columns": [
+          "key_version"
+        ],
+        "from_column": "key_version",
+        "to_table": "privacy_keyring",
+        "to_columns": [
+          "key_version"
+        ],
+        "to_column": "key_version"
+      },
+      {
+        "from_table": "account_deletion_outbox",
+        "from_columns": [
+          "receipt_id"
+        ],
+        "from_column": "receipt_id",
+        "to_table": "account_deletion_receipts",
+        "to_columns": [
+          "id"
+        ],
+        "to_column": "id"
+      },
+      {
         "from_table": "activation_funnel_events",
         "from_columns": [
           "deck_id"
@@ -264642,6 +265726,14 @@
       ]
     },
     {
+      "path": "server/bin/account_deletion_outbox_worker.dart",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR"
+      ]
+    },
+    {
       "path": "server/bin/analyze_unused.dart",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -264834,7 +265926,9 @@
       "path": "server/bin/cleanup_optimize_telemetry.dart",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
-      "environment_variables": []
+      "environment_variables": [
+        "MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR"
+      ]
     },
     {
       "path": "server/bin/commander_ai_live_model_eval.dart",
@@ -264880,6 +265974,12 @@
     },
     {
       "path": "server/bin/commander_reference_readiness_scorecard.dart",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "server/bin/cron_account_deletion_outbox.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": []
@@ -265422,15 +266522,13 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
-        "AI_JOB_RETENTION_MINUTES",
-        "AI_LOG_RETENTION_DAYS",
-        "AI_PLAN_RESERVATION_TTL_MINUTES",
         "AUTO_PROMOTE_LEARNED_DECKS_CRON",
         "AUTO_SYNC_LEARNED_DECKS_CRON",
         "GIT_SHA",
         "HERMES_CRON_GOVERNOR_REPORT_CRON",
         "HERMES_KNOWLEDGE_DB",
         "HERMES_MANA_BASE_VALIDATOR_CRON",
+        "MANALOOM_ACCOUNT_DELETION_OUTBOX_CRON",
         "MANALOOM_AI_RUNTIME_CLEANUP_CRON",
         "MANALOOM_BATTLE_RULE_FOCUSED_EVIDENCE_CRON",
         "MANALOOM_BATTLE_RULE_PROMOTION_GATE_CRON",
@@ -265463,9 +266561,7 @@
         "MASTER_OPTIMIZER_PREFLIGHT_CRON",
         "MTGIA_ENV_FILE",
         "PULL_LEARNING_EVENTS_CRON",
-        "PYTHON_BIN",
-        "RATE_LIMIT_EVENT_RETENTION_HOURS",
-        "TELEMETRY_RETENTION_DAYS"
+        "PYTHON_BIN"
       ]
     },
     {
@@ -266247,34 +267343,10 @@
       "value_captured": false
     },
     {
-      "name": "AI_JOB_RETENTION_MINUTES",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
-      ],
-      "value_captured": false
-    },
-    {
-      "name": "AI_LOG_RETENTION_DAYS",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
-      ],
-      "value_captured": false
-    },
-    {
       "name": "AI_OPTIMIZE_INTERNAL_BASE_URL",
       "classification": "configuration",
       "sources": [
         "server/lib/ai/optimize_route_internal.dart"
-      ],
-      "value_captured": false
-    },
-    {
-      "name": "AI_PLAN_RESERVATION_TTL_MINUTES",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
       ],
       "value_captured": false
     },
@@ -267807,6 +268879,22 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_verify_android_release_artifacts.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_ACCOUNT_DELETION_OUTBOX_CRON",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/manaloom_ops_daemon.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/account_deletion_outbox_worker.dart"
       ],
       "value_captured": false
     },
@@ -270930,6 +272018,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/cleanup_optimize_telemetry.dart"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_RUN_BACKUP_NOW",
       "classification": "configuration",
       "sources": [
@@ -271860,14 +272956,6 @@
       "value_captured": false
     },
     {
-      "name": "RATE_LIMIT_EVENT_RETENTION_HOURS",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
-      ],
-      "value_captured": false
-    },
-    {
       "name": "RELEASE_GIT_SHA",
       "classification": "configuration",
       "sources": [
@@ -272367,14 +273455,6 @@
       "classification": "sensitive_name_only",
       "sources": [
         "scripts/manaloom_tbls_readonly.sh"
-      ],
-      "value_captured": false
-    },
-    {
-      "name": "TELEMETRY_RETENTION_DAYS",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
       ],
       "value_captured": false
     },
@@ -273619,6 +274699,7 @@
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_zirda_runtime.py",
     "server/bin/test_auto_promote_battle_rules.py",
     "server/bin/test_battle_runtime_cli_paths.py",
+    "server/test/account_deletion_outbox_test.dart",
     "server/test/account_email_delivery_transport_test.dart",
     "server/test/account_reverification_test.dart",
     "server/test/account_security_full_user_test.dart",
@@ -273979,9 +275060,12 @@
     "server/test/privacy_account_live_test.dart",
     "server/test/privacy_data_inventory_db_live_test.dart",
     "server/test/privacy_data_inventory_test.dart",
+    "server/test/privacy_deletion_outbox_db_live_test.dart",
     "server/test/privacy_export_allowlist_test.dart",
     "server/test/privacy_export_db_live_test.dart",
+    "server/test/privacy_export_request_log_test.dart",
     "server/test/privacy_migration_sql_regression_test.dart",
+    "server/test/privacy_trade_items_db_live_test.dart",
     "server/test/product_retention_report_contract_test.dart",
     "server/test/product_shape_live_test.dart",
     "server/test/production_ai_mock_fallback_policy_test.dart",
@@ -274007,6 +275091,8 @@
     "server/test/release_sbom_scope_test.py",
     "server/test/request_trace_test.dart",
     "server/test/resolution_corpus_preflight_source_test.dart",
+    "server/test/retention_cleanup_db_live_test.dart",
+    "server/test/retention_cleanup_test.dart",
     "server/test/ronin_pg876_reconciliation_source_test.dart",
     "server/test/root_error_logging_contract_test.dart",
     "server/test/root_liveness_contract_test.dart",
@@ -275070,7 +276156,7 @@
       "id": "ops_scheduler",
       "name": "Scheduler operacional (manaloom-ops) e sincronizações",
       "status": "guarded_no_implicit_live_write",
-      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (17 jobs) and REFERENCE_DATA_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only) and manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) run; an invalid policy keeps only the governor",
+      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor",
       "entrypoints": [
         "server/bin/manaloom_ops_daemon.py",
         "scripts/manaloom_deploy_ops_image.sh",
@@ -275081,6 +276167,11 @@
         "scripts/manaloom_deploy_ops_image.sh",
         "server/bin/hermes_cron_governor_report.sh",
         "server/bin/cron_cleanup_optimize_telemetry.sh",
+        "server/bin/cron_account_deletion_outbox.sh",
+        "server/bin/account_deletion_outbox_worker.dart",
+        "server/lib/privacy/account_deletion_outbox.dart",
+        "server/bin/cleanup_optimize_telemetry.dart",
+        "server/lib/privacy/retention_cleanup.dart",
         "server/bin/sync_card_legalities_from_scryfall.sh",
         "server/bin/cron_sync_cards.sh",
         "server/bin/sync_catalog_reference_from_scryfall.py",
@@ -275329,7 +276420,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "810d588d9be60a8628e86764e9ee3b852724f75a6bebc6a451b388c88892fefe"
+      "sha256": "587f16e963f340208dd2f403692a9b8268c4d240d3f20732e4cff4b5897209d8"
     },
     "required_task_fields": [
       "id",
@@ -275620,7 +276711,7 @@
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sobre o inventário do `BT-PRIV-003`: a exportação segue gerada sob demanda numa transação somente leitura e entregue como anexo `no-store`, sem cópia no servidor; cada uma das 39 seções sai por `jsonb_build_object` só com as colunas que o inventário marca para sair (`server/lib/privacy/privacy_export_allowlist.dart`), sem nenhum `to_jsonb`; UUIDs de outras pessoas e de decks de outras pessoas viram pseudônimos HMAC com chave aleatória por arquivo; `request_fingerprint`, `request_key`, `cache_key`, hashes de deck e chaves de idempotência e de lease saem de qualquer profundidade do JSON; entraram bloqueios, eventos de bloqueio, recursos de moderação, confrontos e fraquezas de deck e o registro de consentimento da conta; saíram as simulações que outra pessoa rodou contra o deck público do titular; relação ausente derruba a exportação; formato `schema_version` 2. Evidência: `server/test/privacy_export_allowlist_test.dart` (13 testes; falha se a allowlist e o inventário divergirem) e `server/test/privacy_export_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável com três contas e dado nas 39 tabelas exportadas: nenhum ID cru nem texto de outra pessoa, nenhum hash ou fingerprint, nada gravado no banco); 8 mutações falham como esperado. O job, a expiração e o download auditado do aceite original saíram com a D-22 (nada é guardado); a auditoria do pedido de exportação não foi decidida. O app ainda chama `GET /users/me/export` e precisa pedir a senha, usar `POST` e entregar o arquivo (raia do app). No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisão do dono em 2026-09-23: D-71, registrar cada pedido de exportação, sem o conteúdo.",
+        "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sobre o inventário do `BT-PRIV-003`: a exportação segue gerada sob demanda numa transação somente leitura e entregue como anexo `no-store`, sem cópia no servidor; cada uma das 39 seções sai por `jsonb_build_object` só com as colunas que o inventário marca para sair (`server/lib/privacy/privacy_export_allowlist.dart`), sem nenhum `to_jsonb`; UUIDs de outras pessoas e de decks de outras pessoas viram pseudônimos HMAC com chave aleatória por arquivo; `request_fingerprint`, `request_key`, `cache_key`, hashes de deck e chaves de idempotência e de lease saem de qualquer profundidade do JSON; entraram bloqueios, eventos de bloqueio, recursos de moderação, confrontos e fraquezas de deck e o registro de consentimento da conta; saíram as simulações que outra pessoa rodou contra o deck público do titular; relação ausente derruba a exportação; formato `schema_version` 2. Evidência: `server/test/privacy_export_allowlist_test.dart` (13 testes; falha se a allowlist e o inventário divergirem) e `server/test/privacy_export_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável com três contas e dado nas 39 tabelas exportadas: nenhum ID cru nem texto de outra pessoa, nenhum hash ou fingerprint, nada gravado no banco); 8 mutações falham como esperado. O job, a expiração e o download auditado do aceite original saíram com a D-22 (nada é guardado); a auditoria do pedido de exportação não foi decidida. O app ainda chama `GET /users/me/export` e precisa pedir a senha, usar `POST` e entregar o arquivo (raia do app). No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisão do dono em 2026-09-23: D-71, registrar cada pedido de exportação, sem o conteúdo. D-71 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, sem tabela: cada pedido que chega a `POST /users/me/export` deixa uma linha `MANALOOM_PRIVACY_EXPORT_REQUEST` no stdout, no formato da de demanda do catálogo (D-63), com evento, horário, resultado (`ok`, `method_not_allowed`, `password_required`, `invalid_password`, `rate_limited`, `not_found` ou `error`) e uma referência pseudônima de quem pediu (HMAC-SHA256 do ID com chave derivada do `JWT_SECRET`, truncado em 16 hexadecimais); nunca o ID cru, a senha nem o conteúdo. Pedidos barrados pela autenticação ou pelo balde por IP do middleware de `/users` não chegam à rota e não entram na contagem. Evidência: `server/test/privacy_export_request_log_test.dart` (11 testes: formato, referência estável e derivada, uma linha por pedido em cada saída da rota); 8 mutações falham como esperado. Pendente de decisão: o prazo desses logs segue a rotação do host, ainda não documentada.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 322
       },
@@ -275633,7 +276724,7 @@
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono).",
+        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar, e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (falta rota e credencial do job para confirmar a varredura do sidecar; o Battle está desligado) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Pendente de decisão: se o sidecar pode ser dado como limpo pelo teto de vida da sessão, como o EndpointCache; aplicar a 060 na produção pede a palavra do dono. D-70 feita em 2026-09-23, na mesma branch, sem migration: o job `manaloom_ai_runtime_cleanup` saiu de `ai_analyze_optimize_advisory` e roda sem capability, sob o contrato `retention_cleanup_apply_v1` (em `PRIVACY_CONTROL_JOBS`, fechado com política inválida); apaga só os prazos da nova seção `retention_cleanup` do inventário (telemetria do Optimize e `ai_logs` em 180 dias, reservas de cota não confirmadas em 10 min, igual ao TTL do `PlanService`, `rate_limit_events` em 24 h e jobs de IA em 24 h, pela D-32), sem variável de ambiente nem flag de prazo, e deixa um recibo por execução (`MANALOOM_RETENTION_CLEANUP`, só contagens). Desligado por padrão: o agendado só conta até uma execução supervisionada com `MANALOOM_CONFIRM_POSTGRES_WRITES` (`--mode activate`) registrar a ativação em `sync_state`; `--mode deactivate` pausa, e outra execução em andamento faz a atual parar sem apagar. O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/retention_cleanup_test.dart` (10 testes; cruza as regras com o inventário nos dois sentidos), `server/test/retention_cleanup_db_live_test.dart` (6 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 16 mutações falham como esperado. Pendente de decisão: ligar em produção (`--mode activate`) é exclusão em produção e pede a palavra do dono; os prazos de partida da D-69 só entram no job depois do advogado.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 323
       },
@@ -284688,6 +285779,9 @@
         "entrypoint": "GET /health (daemon, porta MANALOOM_NATIVE_BATTLE_PORT)",
         "flow_producers": [
           "scripts/manaloom_deploy_ops_image.sh",
+          "server/bin/account_deletion_outbox_worker.dart",
+          "server/bin/cleanup_optimize_telemetry.dart",
+          "server/bin/cron_account_deletion_outbox.sh",
           "server/bin/cron_cleanup_optimize_telemetry.sh",
           "server/bin/cron_sync_cards.sh",
           "server/bin/hermes_cron_governor_report.sh",
@@ -284696,7 +285790,9 @@
           "server/bin/sync_cards.dart",
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
-          "server/bin/sync_status.dart"
+          "server/bin/sync_status.dart",
+          "server/lib/privacy/account_deletion_outbox.dart",
+          "server/lib/privacy/retention_cleanup.dart"
         ],
         "flow_consumers": []
       },
@@ -284705,6 +285801,9 @@
         "entrypoint": "scripts/manaloom_deploy_ops_image.sh",
         "flow_producers": [
           "scripts/manaloom_deploy_ops_image.sh",
+          "server/bin/account_deletion_outbox_worker.dart",
+          "server/bin/cleanup_optimize_telemetry.dart",
+          "server/bin/cron_account_deletion_outbox.sh",
           "server/bin/cron_cleanup_optimize_telemetry.sh",
           "server/bin/cron_sync_cards.sh",
           "server/bin/hermes_cron_governor_report.sh",
@@ -284713,7 +285812,9 @@
           "server/bin/sync_cards.dart",
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
-          "server/bin/sync_status.dart"
+          "server/bin/sync_status.dart",
+          "server/lib/privacy/account_deletion_outbox.dart",
+          "server/lib/privacy/retention_cleanup.dart"
         ],
         "flow_consumers": []
       },
@@ -284722,6 +285823,9 @@
         "entrypoint": "server/bin/manaloom_ops_daemon.py",
         "flow_producers": [
           "scripts/manaloom_deploy_ops_image.sh",
+          "server/bin/account_deletion_outbox_worker.dart",
+          "server/bin/cleanup_optimize_telemetry.dart",
+          "server/bin/cron_account_deletion_outbox.sh",
           "server/bin/cron_cleanup_optimize_telemetry.sh",
           "server/bin/cron_sync_cards.sh",
           "server/bin/hermes_cron_governor_report.sh",
@@ -284730,7 +285834,9 @@
           "server/bin/sync_cards.dart",
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
-          "server/bin/sync_status.dart"
+          "server/bin/sync_status.dart",
+          "server/lib/privacy/account_deletion_outbox.dart",
+          "server/lib/privacy/retention_cleanup.dart"
         ],
         "flow_consumers": []
       },
@@ -285196,7 +286302,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "8cf842ce0d8ae0bd7867aeea9ed4afd3ef57abd1ad2248d467cc1699b77f0770"
+    "project_logic_source_digest_sha256": "8958454899c817b4839ff028720a359585c2135d9f8d60e0fe98a6887e506c53"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -287408,6 +288514,7 @@
       "scripts/validate_sentry_mobile_ingestion.sh",
       "scripts/validate_sentry_mobile_local.sh",
       "server/Dockerfile",
+      "server/bin/account_deletion_outbox_worker.dart",
       "server/bin/analyze_unused.dart",
       "server/bin/api_with_battle_worker.sh",
       "server/bin/audit_data_model_links.dart",
@@ -287439,6 +288546,7 @@
       "server/bin/commander_reference_profile.dart",
       "server/bin/commander_reference_profile_lorehold.dart",
       "server/bin/commander_reference_readiness_scorecard.dart",
+      "server/bin/cron_account_deletion_outbox.sh",
       "server/bin/cron_cleanup_optimize_telemetry.ps1",
       "server/bin/cron_cleanup_optimize_telemetry.sh",
       "server/bin/cron_snapshot_edhrec.sh",
@@ -287794,9 +288902,12 @@
       "server/lib/plan_middleware.dart",
       "server/lib/plan_service.dart",
       "server/lib/pricing_contract.dart",
+      "server/lib/privacy/account_deletion_outbox.dart",
       "server/lib/privacy/deleted_deck_anonymizer.dart",
       "server/lib/privacy/privacy_export_allowlist.dart",
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
+      "server/lib/privacy/privacy_export_request_log.dart",
+      "server/lib/privacy/retention_cleanup.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -287953,6 +289064,7 @@
       "server/routes/users/me/index.dart",
       "server/routes/users/me/plan/checkout/index.dart",
       "server/routes/users/me/plan/index.dart",
+      "server/test/account_deletion_outbox_test.dart",
       "server/test/account_email_delivery_transport_test.dart",
       "server/test/account_reverification_test.dart",
       "server/test/account_security_full_user_test.dart",
@@ -288313,9 +289425,12 @@
       "server/test/privacy_account_live_test.dart",
       "server/test/privacy_data_inventory_db_live_test.dart",
       "server/test/privacy_data_inventory_test.dart",
+      "server/test/privacy_deletion_outbox_db_live_test.dart",
       "server/test/privacy_export_allowlist_test.dart",
       "server/test/privacy_export_db_live_test.dart",
+      "server/test/privacy_export_request_log_test.dart",
       "server/test/privacy_migration_sql_regression_test.dart",
+      "server/test/privacy_trade_items_db_live_test.dart",
       "server/test/product_retention_report_contract_test.dart",
       "server/test/product_shape_live_test.dart",
       "server/test/production_ai_mock_fallback_policy_test.dart",
@@ -288341,6 +289456,8 @@
       "server/test/release_sbom_scope_test.py",
       "server/test/request_trace_test.dart",
       "server/test/resolution_corpus_preflight_source_test.dart",
+      "server/test/retention_cleanup_db_live_test.dart",
+      "server/test/retention_cleanup_test.dart",
       "server/test/ronin_pg876_reconciliation_source_test.dart",
       "server/test/root_error_logging_contract_test.dart",
       "server/test/root_liveness_contract_test.dart",
