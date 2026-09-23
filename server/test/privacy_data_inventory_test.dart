@@ -229,6 +229,11 @@ void main() {
           ...(artifact['decisions'] as List).cast<String>(),
         for (final rule in (inventory['decided_retention'] as List).cast<Map>())
           rule['decision'] as String,
+        if (inventory['retention_cleanup'] case final Map cleanup) ...[
+          cleanup['decision'] as String,
+          for (final rule in (cleanup['rules'] as List).cast<Map>())
+            if (rule['decision'] case final String id) id,
+        ],
       };
       expect(decisions.keys.toSet(), containsAll(cited));
     });

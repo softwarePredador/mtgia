@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "8063d3e326d475e8798d1f084ceaaf9bddc1e48f60c8d5c76cd116f7c4a5b9c5",
+  "source_digest_sha256": "74b0676c652c75b808fc76d6e93b694cd8d3cc149585e8722fccf5287bdaaabd",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,15 +63,15 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 698,
+    "dart_source_files": 699,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5276,
-    "semantic_resolved_files": 698,
+    "dart_symbols": 5283,
+    "semantic_resolved_files": 699,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43016,
-    "semantic_resolved_call_sites": 68519,
-    "semantic_resolved_type_references": 16257,
+    "semantic_resolved_call_edges": 43056,
+    "semantic_resolved_call_sites": 68508,
+    "semantic_resolved_type_references": 16285,
     "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
@@ -80,8 +80,8 @@
     "database_views": 6,
     "migrations": 60,
     "scripts_and_jobs": 693,
-    "environment_variables": 720,
-    "tests": 1253,
+    "environment_variables": 716,
+    "tests": 1255,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -638,7 +638,7 @@
         "server/bin/verify_schema.dart"
       ],
       "file_count": 65,
-      "symbol_count": 694,
+      "symbol_count": 695,
       "providers": [],
       "services": []
     },
@@ -1904,10 +1904,11 @@
         "server/lib/privacy/account_deletion_outbox.dart",
         "server/lib/privacy/deleted_deck_anonymizer.dart",
         "server/lib/privacy/privacy_export_allowlist.dart",
-        "server/lib/privacy/privacy_export_pseudonymizer.dart"
+        "server/lib/privacy/privacy_export_pseudonymizer.dart",
+        "server/lib/privacy/retention_cleanup.dart"
       ],
-      "file_count": 4,
-      "symbol_count": 21,
+      "file_count": 5,
+      "symbol_count": 27,
       "providers": [],
       "services": []
     },
@@ -19092,16 +19093,22 @@
       "line": 9
     },
     {
-      "name": "_toInt",
+      "name": "_runId",
       "kind": "function",
       "source": "server/bin/cleanup_optimize_telemetry.dart",
-      "line": 304
+      "line": 92
+    },
+    {
+      "name": "_stopped",
+      "kind": "function",
+      "source": "server/bin/cleanup_optimize_telemetry.dart",
+      "line": 77
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/cleanup_optimize_telemetry.dart",
-      "line": 9
+      "line": 10
     },
     {
       "name": "_failureCodes",
@@ -36897,6 +36904,58 @@
       "line": 31
     },
     {
+      "name": "RetentionCleanupMode",
+      "kind": "enum",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 28
+    },
+    {
+      "name": "RetentionCleanupRefused",
+      "kind": "class",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 154,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "RetentionCleanupRule",
+      "kind": "class",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 56,
+      "members": [
+        "_where",
+        "countSql",
+        "deleteSql"
+      ]
+    },
+    {
+      "name": "RetentionCleanupRunner",
+      "kind": "class",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 166,
+      "members": [
+        "_apply",
+        "_count",
+        "_deactivate",
+        "_isActive",
+        "_ruleReceipt",
+        "run"
+      ]
+    },
+    {
+      "name": "parseRetentionCleanupArguments",
+      "kind": "function",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 117
+    },
+    {
+      "name": "retentionCleanupReceiptLine",
+      "kind": "function",
+      "source": "server/lib/privacy/retention_cleanup.dart",
+      "line": 319
+    },
+    {
       "name": "_isLoopbackHost",
       "kind": "function",
       "source": "server/lib/public_site_url.dart",
@@ -40941,7 +41000,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 698,
+    "resolved_file_count": 699,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41488,6 +41547,7 @@
       "server/lib/privacy/deleted_deck_anonymizer.dart",
       "server/lib/privacy/privacy_export_allowlist.dart",
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
+      "server/lib/privacy/retention_cleanup.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -41648,9 +41708,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43016,
-    "resolved_call_site_count": 68519,
-    "workspace_call_edge_count": 13459,
+    "resolved_call_edge_count": 43056,
+    "resolved_call_site_count": 68508,
+    "workspace_call_edge_count": 13477,
     "unresolved_call_edge_count": 558,
     "unresolved_call_site_count": 769,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -110924,25 +110984,113 @@
       },
       {
         "source": "server/bin/cleanup_optimize_telemetry.dart",
-        "line": 10,
+        "line": 29,
         "caller": "main",
         "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
+        "lexical_target": "parseRetentionCleanupArguments",
+        "target": "parseRetentionCleanupArguments",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/bin/cleanup_optimize_telemetry.dart",
-        "line": 145,
+        "line": 43,
         "caller": "main",
         "kind": "method",
-        "lexical_target": "_toInt",
-        "target": "_toInt",
+        "lexical_target": "_runId",
+        "target": "_runId",
         "target_library": "workspace:server/bin/cleanup_optimize_telemetry.dart",
         "target_scope": "workspace",
-        "occurrences": 6
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 44,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 50,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused.RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 52,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "connect",
+        "target": "Database.connect",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 53,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRunner",
+        "target": "RetentionCleanupRunner.RetentionCleanupRunner",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 53,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "run",
+        "target": "RetentionCleanupRunner.run",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 59,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_stopped",
+        "target": "_stopped",
+        "target_library": "workspace:server/bin/cleanup_optimize_telemetry.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 66,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "close",
+        "target": "Database.close",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 68,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "retentionCleanupReceiptLine",
+        "target": "retentionCleanupReceiptLine",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/bin/commander_ai_live_model_eval.dart",
@@ -165912,6 +166060,116 @@
         "occurrences": 2
       },
       {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 142,
+        "caller": "parseRetentionCleanupArguments",
+        "kind": "method",
+        "lexical_target": "parse",
+        "target": "RetentionCleanupMode.parse",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 182,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused.RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 186,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_count",
+        "target": "RetentionCleanupRunner._count",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 187,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_deactivate",
+        "target": "RetentionCleanupRunner._deactivate",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 188,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_apply",
+        "target": "RetentionCleanupRunner._apply",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 190,
+        "caller": "RetentionCleanupRunner.run",
+        "kind": "method",
+        "lexical_target": "_isActive",
+        "target": "RetentionCleanupRunner._isActive",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 220,
+        "caller": "RetentionCleanupRunner._count",
+        "kind": "method",
+        "lexical_target": "_isActive",
+        "target": "RetentionCleanupRunner._isActive",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 224,
+        "caller": "RetentionCleanupRunner._count",
+        "kind": "method",
+        "lexical_target": "_ruleReceipt",
+        "target": "RetentionCleanupRunner._ruleReceipt",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 278,
+        "caller": "RetentionCleanupRunner._apply",
+        "kind": "method",
+        "lexical_target": "_ruleReceipt",
+        "target": "RetentionCleanupRunner._ruleReceipt",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 83,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "RetentionCleanupRule",
+        "target": "RetentionCleanupRule.RetentionCleanupRule",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
         "source": "server/lib/public_site_url.dart",
         "line": 15,
         "caller": "resolvePublicSiteBaseUrl",
@@ -189727,14 +189985,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 587,
-        "occurrences": 732
+        "unique_references": 590,
+        "occurrences": 735
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14328,
-        "occurrences": 24934
+        "unique_references": 14339,
+        "occurrences": 24918
       },
       {
         "target_scope": "dart_sdk",
@@ -189745,7 +190003,7 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 402,
+        "unique_references": 406,
         "occurrences": 654
       },
       {
@@ -189757,8 +190015,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 96,
-        "occurrences": 127
+        "unique_references": 98,
+        "occurrences": 129
       },
       {
         "target_scope": "dart_sdk",
@@ -191096,13 +191354,13 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 1213,
-        "occurrences": 2006
+        "occurrences": 1982
       },
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 84,
-        "occurrences": 86
+        "unique_references": 86,
+        "occurrences": 88
       },
       {
         "target_scope": "dependency",
@@ -193597,8 +193855,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/database.dart",
-        "unique_references": 141,
-        "occurrences": 148
+        "unique_references": 144,
+        "occurrences": 151
       },
       {
         "target_scope": "workspace",
@@ -194028,6 +194286,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "unique_references": 15,
+        "occurrences": 23
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/public_site_url.dart",
         "unique_references": 4,
         "occurrences": 4
@@ -194077,8 +194341,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/runtime_environment.dart",
-        "unique_references": 43,
-        "occurrences": 44
+        "unique_references": 42,
+        "occurrences": 43
       },
       {
         "target_scope": "workspace",
@@ -194185,8 +194449,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/cleanup_optimize_telemetry.dart",
-        "unique_references": 1,
-        "occurrences": 6
+        "unique_references": 2,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -199387,8 +199651,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16257,
-    "workspace_type_reference_count": 3432,
+    "resolved_type_reference_count": 16285,
+    "workspace_type_reference_count": 3440,
     "unresolved_type_reference_count": 354,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -221123,6 +221387,46 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 44,
+        "lexical_type": "Database",
+        "resolved_type": "Database",
+        "target": "Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 50,
+        "lexical_type": "RetentionCleanupRefused",
+        "resolved_type": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 53,
+        "lexical_type": "RetentionCleanupRunner",
+        "resolved_type": "RetentionCleanupRunner",
+        "target": "RetentionCleanupRunner",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/cleanup_optimize_telemetry.dart",
+        "line": 79,
+        "lexical_type": "RetentionCleanupMode",
+        "resolved_type": "RetentionCleanupMode",
+        "target": "RetentionCleanupMode",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/commander_generate_provenance_audit.dart",
         "line": 121,
         "lexical_type": "DeterministicDeckSourceEntry",
@@ -230433,6 +230737,46 @@
         "occurrences": 2
       },
       {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 121,
+        "lexical_type": "RetentionCleanupMode",
+        "resolved_type": "RetentionCleanupMode",
+        "target": "RetentionCleanupMode",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 182,
+        "lexical_type": "RetentionCleanupRefused",
+        "resolved_type": "RetentionCleanupRefused",
+        "target": "RetentionCleanupRefused",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 44,
+        "lexical_type": "RetentionCleanupMode?",
+        "resolved_type": "RetentionCleanupMode?",
+        "target": "RetentionCleanupMode",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/retention_cleanup.dart",
+        "line": 82,
+        "lexical_type": "RetentionCleanupRule",
+        "resolved_type": "RetentionCleanupRule",
+        "target": "RetentionCleanupRule",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
         "source": "server/lib/push_notification_service.dart",
         "line": 11,
         "lexical_type": "FcmDeliveryOutcome",
@@ -233723,8 +234067,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1086,
-        "occurrences": 2203
+        "unique_references": 1089,
+        "occurrences": 2209
       },
       {
         "target_scope": "dart_sdk",
@@ -233735,26 +234079,26 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 42,
-        "occurrences": 54
+        "unique_references": 43,
+        "occurrences": 55
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6266,
-        "occurrences": 39798
+        "unique_references": 6278,
+        "occurrences": 39860
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 85,
-        "occurrences": 188
+        "unique_references": 87,
+        "occurrences": 190
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 32,
-        "occurrences": 52
+        "unique_references": 33,
+        "occurrences": 53
       },
       {
         "target_scope": "dart_sdk",
@@ -235061,8 +235405,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 257,
-        "occurrences": 958
+        "unique_references": 256,
+        "occurrences": 948
       },
       {
         "target_scope": "dependency",
@@ -235073,8 +235417,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 200,
-        "occurrences": 483
+        "unique_references": 201,
+        "occurrences": 484
       },
       {
         "target_scope": "dependency",
@@ -235211,8 +235555,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 409,
-        "occurrences": 4764
+        "unique_references": 410,
+        "occurrences": 4774
       },
       {
         "target_scope": "workspace",
@@ -237143,8 +237487,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/database.dart",
-        "unique_references": 49,
-        "occurrences": 59
+        "unique_references": 50,
+        "occurrences": 60
       },
       {
         "target_scope": "workspace",
@@ -237433,6 +237777,12 @@
         "target_library": "package:server/privacy/privacy_export_pseudonymizer.dart",
         "unique_references": 1,
         "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/retention_cleanup.dart",
+        "unique_references": 7,
+        "occurrences": 17
       },
       {
         "target_scope": "workspace",
@@ -238752,7 +239102,7 @@
       },
       {
         "source": "server/bin/cleanup_optimize_telemetry.dart",
-        "line": 9,
+        "line": 28,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -265428,7 +265778,9 @@
       "path": "server/bin/cleanup_optimize_telemetry.dart",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
-      "environment_variables": []
+      "environment_variables": [
+        "MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR"
+      ]
     },
     {
       "path": "server/bin/commander_ai_live_model_eval.dart",
@@ -266022,9 +266374,6 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
-        "AI_JOB_RETENTION_MINUTES",
-        "AI_LOG_RETENTION_DAYS",
-        "AI_PLAN_RESERVATION_TTL_MINUTES",
         "AUTO_PROMOTE_LEARNED_DECKS_CRON",
         "AUTO_SYNC_LEARNED_DECKS_CRON",
         "GIT_SHA",
@@ -266064,9 +266413,7 @@
         "MASTER_OPTIMIZER_PREFLIGHT_CRON",
         "MTGIA_ENV_FILE",
         "PULL_LEARNING_EVENTS_CRON",
-        "PYTHON_BIN",
-        "RATE_LIMIT_EVENT_RETENTION_HOURS",
-        "TELEMETRY_RETENTION_DAYS"
+        "PYTHON_BIN"
       ]
     },
     {
@@ -266848,34 +267195,10 @@
       "value_captured": false
     },
     {
-      "name": "AI_JOB_RETENTION_MINUTES",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
-      ],
-      "value_captured": false
-    },
-    {
-      "name": "AI_LOG_RETENTION_DAYS",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
-      ],
-      "value_captured": false
-    },
-    {
       "name": "AI_OPTIMIZE_INTERNAL_BASE_URL",
       "classification": "configuration",
       "sources": [
         "server/lib/ai/optimize_route_internal.dart"
-      ],
-      "value_captured": false
-    },
-    {
-      "name": "AI_PLAN_RESERVATION_TTL_MINUTES",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
       ],
       "value_captured": false
     },
@@ -271547,6 +271870,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/cleanup_optimize_telemetry.dart"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_RUN_BACKUP_NOW",
       "classification": "configuration",
       "sources": [
@@ -272477,14 +272808,6 @@
       "value_captured": false
     },
     {
-      "name": "RATE_LIMIT_EVENT_RETENTION_HOURS",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
-      ],
-      "value_captured": false
-    },
-    {
       "name": "RELEASE_GIT_SHA",
       "classification": "configuration",
       "sources": [
@@ -272984,14 +273307,6 @@
       "classification": "sensitive_name_only",
       "sources": [
         "scripts/manaloom_tbls_readonly.sh"
-      ],
-      "value_captured": false
-    },
-    {
-      "name": "TELEMETRY_RETENTION_DAYS",
-      "classification": "configuration",
-      "sources": [
-        "server/bin/manaloom_ops_daemon.py"
       ],
       "value_captured": false
     },
@@ -274627,6 +274942,8 @@
     "server/test/release_sbom_scope_test.py",
     "server/test/request_trace_test.dart",
     "server/test/resolution_corpus_preflight_source_test.dart",
+    "server/test/retention_cleanup_db_live_test.dart",
+    "server/test/retention_cleanup_test.dart",
     "server/test/ronin_pg876_reconciliation_source_test.dart",
     "server/test/root_error_logging_contract_test.dart",
     "server/test/root_liveness_contract_test.dart",
@@ -275690,7 +276007,7 @@
       "id": "ops_scheduler",
       "name": "Scheduler operacional (manaloom-ops) e sincronizações",
       "status": "guarded_no_implicit_live_write",
-      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) and manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) run; an invalid policy keeps only the governor",
+      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor",
       "entrypoints": [
         "server/bin/manaloom_ops_daemon.py",
         "scripts/manaloom_deploy_ops_image.sh",
@@ -275704,6 +276021,8 @@
         "server/bin/cron_account_deletion_outbox.sh",
         "server/bin/account_deletion_outbox_worker.dart",
         "server/lib/privacy/account_deletion_outbox.dart",
+        "server/bin/cleanup_optimize_telemetry.dart",
+        "server/lib/privacy/retention_cleanup.dart",
         "server/bin/sync_card_legalities_from_scryfall.sh",
         "server/bin/cron_sync_cards.sh",
         "server/bin/sync_catalog_reference_from_scryfall.py",
@@ -275952,7 +276271,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "3dee585d7729f3c4224e76dea3bfd8bf2cfa5bae7f048806ad01c0950ccf8753"
+      "sha256": "d716a5bf8746769c87f971c1d43876b7c811efacefd1a0a7cb5ca5d511f42708"
     },
     "required_task_fields": [
       "id",
@@ -276256,7 +276575,7 @@
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar, e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (falta rota e credencial do job para confirmar a varredura do sidecar; o Battle está desligado) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Pendente de decisão: se o sidecar pode ser dado como limpo pelo teto de vida da sessão, como o EndpointCache; aplicar a 060 na produção pede a palavra do dono.",
+        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar, e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (falta rota e credencial do job para confirmar a varredura do sidecar; o Battle está desligado) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Pendente de decisão: se o sidecar pode ser dado como limpo pelo teto de vida da sessão, como o EndpointCache; aplicar a 060 na produção pede a palavra do dono. D-70 feita em 2026-09-23, na mesma branch, sem migration: o job `manaloom_ai_runtime_cleanup` saiu de `ai_analyze_optimize_advisory` e roda sem capability, sob o contrato `retention_cleanup_apply_v1` (em `PRIVACY_CONTROL_JOBS`, fechado com política inválida); apaga só os prazos da nova seção `retention_cleanup` do inventário (telemetria do Optimize e `ai_logs` em 180 dias, reservas de cota não confirmadas em 10 min, igual ao TTL do `PlanService`, `rate_limit_events` em 24 h e jobs de IA em 24 h, pela D-32), sem variável de ambiente nem flag de prazo, e deixa um recibo por execução (`MANALOOM_RETENTION_CLEANUP`, só contagens). Desligado por padrão: o agendado só conta até uma execução supervisionada com `MANALOOM_CONFIRM_POSTGRES_WRITES` (`--mode activate`) registrar a ativação em `sync_state`; `--mode deactivate` pausa, e outra execução em andamento faz a atual parar sem apagar. O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/retention_cleanup_test.dart` (10 testes; cruza as regras com o inventário nos dois sentidos), `server/test/retention_cleanup_db_live_test.dart` (6 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 16 mutações falham como esperado. Pendente de decisão: ligar em produção (`--mode activate`) é exclusão em produção e pede a palavra do dono; os prazos de partida da D-69 só entram no job depois do advogado.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 323
       },
@@ -285312,6 +285631,7 @@
         "flow_producers": [
           "scripts/manaloom_deploy_ops_image.sh",
           "server/bin/account_deletion_outbox_worker.dart",
+          "server/bin/cleanup_optimize_telemetry.dart",
           "server/bin/cron_account_deletion_outbox.sh",
           "server/bin/cron_cleanup_optimize_telemetry.sh",
           "server/bin/cron_sync_cards.sh",
@@ -285322,7 +285642,8 @@
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
           "server/bin/sync_status.dart",
-          "server/lib/privacy/account_deletion_outbox.dart"
+          "server/lib/privacy/account_deletion_outbox.dart",
+          "server/lib/privacy/retention_cleanup.dart"
         ],
         "flow_consumers": []
       },
@@ -285332,6 +285653,7 @@
         "flow_producers": [
           "scripts/manaloom_deploy_ops_image.sh",
           "server/bin/account_deletion_outbox_worker.dart",
+          "server/bin/cleanup_optimize_telemetry.dart",
           "server/bin/cron_account_deletion_outbox.sh",
           "server/bin/cron_cleanup_optimize_telemetry.sh",
           "server/bin/cron_sync_cards.sh",
@@ -285342,7 +285664,8 @@
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
           "server/bin/sync_status.dart",
-          "server/lib/privacy/account_deletion_outbox.dart"
+          "server/lib/privacy/account_deletion_outbox.dart",
+          "server/lib/privacy/retention_cleanup.dart"
         ],
         "flow_consumers": []
       },
@@ -285352,6 +285675,7 @@
         "flow_producers": [
           "scripts/manaloom_deploy_ops_image.sh",
           "server/bin/account_deletion_outbox_worker.dart",
+          "server/bin/cleanup_optimize_telemetry.dart",
           "server/bin/cron_account_deletion_outbox.sh",
           "server/bin/cron_cleanup_optimize_telemetry.sh",
           "server/bin/cron_sync_cards.sh",
@@ -285362,7 +285686,8 @@
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
           "server/bin/sync_status.dart",
-          "server/lib/privacy/account_deletion_outbox.dart"
+          "server/lib/privacy/account_deletion_outbox.dart",
+          "server/lib/privacy/retention_cleanup.dart"
         ],
         "flow_consumers": []
       },
@@ -285828,7 +286153,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "8063d3e326d475e8798d1f084ceaaf9bddc1e48f60c8d5c76cd116f7c4a5b9c5"
+    "project_logic_source_digest_sha256": "74b0676c652c75b808fc76d6e93b694cd8d3cc149585e8722fccf5287bdaaabd"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288432,6 +288757,7 @@
       "server/lib/privacy/deleted_deck_anonymizer.dart",
       "server/lib/privacy/privacy_export_allowlist.dart",
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
+      "server/lib/privacy/retention_cleanup.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -288979,6 +289305,8 @@
       "server/test/release_sbom_scope_test.py",
       "server/test/request_trace_test.dart",
       "server/test/resolution_corpus_preflight_source_test.dart",
+      "server/test/retention_cleanup_db_live_test.dart",
+      "server/test/retention_cleanup_test.dart",
       "server/test/ronin_pg876_reconciliation_source_test.dart",
       "server/test/root_error_logging_contract_test.dart",
       "server/test/root_liveness_contract_test.dart",

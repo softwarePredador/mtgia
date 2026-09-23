@@ -107,7 +107,7 @@ void main() {
       expect(
         ops,
         contains(
-          "['manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
+          "['manaloom_ai_runtime_cleanup', 'manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
         ),
       );
       expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));

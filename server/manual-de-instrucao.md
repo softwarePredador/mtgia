@@ -14529,15 +14529,17 @@ Fechamento operacional aplicado para evitar hardcode e manter governança por am
 Retenção automática de telemetria adicionada:
 
 - script Dart: `bin/cleanup_optimize_telemetry.dart`
-  - remove registros antigos de `ai_optimize_fallback_telemetry`
-  - retention default via `TELEMETRY_RETENTION_DAYS` (default 180)
-  - suporte a `--retention-days=<N>` e `--dry-run`
+  - desde a D-70 (2026-09-23), apaga só os prazos do inventário de retenção
+    (`docs/privacy/data_retention_inventory.json`, seção `retention_cleanup`);
+    não há variável nem flag de prazo
+  - modos: `--mode scheduled` (padrão; só apaga depois da ativação), `--mode dry-run`,
+    `--mode activate` e `--mode deactivate` (estes dois exigem
+    `MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL`)
 
 - wrapper para cron: `bin/cron_cleanup_optimize_telemetry.sh`
 
 Exemplos:
-- `dart run bin/cleanup_optimize_telemetry.dart --dry-run`
-- `dart run bin/cleanup_optimize_telemetry.dart --retention-days=120`
+- `dart run bin/cleanup_optimize_telemetry.dart --mode dry-run`
 
 Agendamento automático:
 
@@ -14551,8 +14553,8 @@ Agendamento automático:
   - ação (programa): `powershell.exe`
   - argumentos:
     - `-NoProfile -ExecutionPolicy Bypass -File "C:\Users\rafae\Documents\project\mtgia\server\bin\cron_cleanup_optimize_telemetry.ps1"`
-  - opcional (forçar retenção específica):
-    - `-NoProfile -ExecutionPolicy Bypass -File "C:\Users\rafae\Documents\project\mtgia\server\bin\cron_cleanup_optimize_telemetry.ps1" -RetentionDays 180`
+  - só contar, sem apagar:
+    - `-NoProfile -ExecutionPolicy Bypass -File "C:\Users\rafae\Documents\project\mtgia\server\bin\cron_cleanup_optimize_telemetry.ps1" -DryRun`
 
 Benefício:
 - remove dependência de hardcode para privilégio administrativo;

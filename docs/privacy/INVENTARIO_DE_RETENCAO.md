@@ -60,9 +60,13 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## Lacunas que o inventário expõe
 
-1. **Nenhum prazo automático roda em produção hoje.** O job `manaloom_ai_runtime_cleanup`
-   (`ai_logs`, telemetria, `rate_limit_events`, jobs de IA) exige a capability
-   `ai_analyze_optimize_advisory`, que está OFF (`server/bin/manaloom_ops_daemon.py:726`).
+1. **Nenhum prazo automático roda em produção hoje.** Desde a D-70, o job
+   `manaloom_ai_runtime_cleanup` (`ai_logs`, telemetria, `rate_limit_events`, jobs de IA) não
+   depende mais de `ai_analyze_optimize_advisory`: roda sob o contrato
+   `retention_cleanup_apply_v1` e apaga só os prazos da seção `retention_cleanup` do JSON (jobs
+   de IA em 24 h, pela D-32). Fica desligado até a ativação supervisionada (`--mode activate` com
+   `MANALOOM_CONFIRM_POSTGRES_WRITES`); até lá, conta o que apagaria e deixa o recibo
+   `MANALOOM_RETENTION_CLEANUP`.
 2. **Exportação** (corrigida no `BT-PRIV-001`, 2026-09-23): em `47dc3b698`, 25 relações saíam
    pela linha inteira (`to_jsonb`), com `request_fingerprint`, `request_key`, `cache_key` e
    hashes de deck, e IDs de outras pessoas saíam crus. Agora cada seção sai só com as colunas
@@ -96,6 +100,8 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
   mais 10 s e 10 min de retenção terminal), como o EndpointCache, sem confirmação do próprio
   sidecar. Hoje a linha do outbox fica aberta.
 - Prazo de rotação dos backups (D-23 manda registrá-lo na política).
+- Ligar a limpeza por prazo em produção (D-70): é exclusão em produção. Os prazos de partida da
+  D-69 (notificações, feedback de IA, replays, analytics) só entram no job depois do advogado.
 - Trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) quando uma das partes
   exclui a conta: seguem com a outra pessoa, como as concluídas. A D-66 manda apagar só os itens
   de oferta aberta.

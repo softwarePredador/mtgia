@@ -69,7 +69,7 @@ for required_ops_marker in \
   'MANALOOM_IMPORT_APPLY=0' \
   'MANALOOM_BATTLE_RULES_APPLY_PG=0' \
   'disabled_by_release_capability' \
-  "['manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']"; do
+  "['manaloom_ai_runtime_cleanup', 'manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']"; do
   if ! grep -Fq "$required_ops_marker" "$OPS_DEPLOY_SOURCE"; then
     echo "deploy manaloom-ops sem contencao all-OFF: $required_ops_marker" >&2
     exit 1

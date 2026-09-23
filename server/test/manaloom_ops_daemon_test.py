@@ -203,6 +203,7 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(all_off)],
             [
+                "manaloom_ai_runtime_cleanup",
                 "manaloom_account_deletion_outbox",
                 "manaloom_catalog_reference_refresh",
                 "hermes_cron_governor_report",
@@ -237,6 +238,7 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                 "hermes_cron_governor_report",
                 "manaloom_catalog_reference_refresh",
                 "manaloom_account_deletion_outbox",
+                "manaloom_ai_runtime_cleanup",
             },
         )
         self.assertEqual(
@@ -245,7 +247,10 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         )
         self.assertEqual(
             module.PRIVACY_CONTROL_JOBS,
-            {"manaloom_account_deletion_outbox": "account_deletion_outbox_v1"},
+            {
+                "manaloom_ai_runtime_cleanup": "retention_cleanup_apply_v1",
+                "manaloom_account_deletion_outbox": "account_deletion_outbox_v1",
+            },
         )
         # No other job was opened: each keeps the capabilities it required
         # before BT-CAT-01.
@@ -256,7 +261,6 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                 if name not in capability_free
             },
             {
-                "manaloom_ai_runtime_cleanup": ("ai_analyze_optimize_advisory",),
                 "pull_learning_events": ("learning_writes",),
                 "auto_sync_learned_decks": ("learning_writes",),
                 "manaloom_sync_card_legalities_from_scryfall": ("catalog_private",),
@@ -663,22 +667,46 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertEqual(job.schedule, "30 */6 * * *")
         self.assertIn("sync_card_legalities_from_scryfall.sh", job.command)
 
-    def test_ai_runtime_cleanup_is_scheduled_with_reservation_ttl(self) -> None:
+    def test_retention_cleanup_runs_its_contract_without_period_overrides(
+        self,
+    ) -> None:
         module = _load_module()
         jobs = {job.name: job for job in module.JOBS}
 
         job = jobs["manaloom_ai_runtime_cleanup"]
         self.assertEqual(job.schedule, "10 4 * * *")
-        self.assertIn("cron_cleanup_optimize_telemetry.sh", job.command)
-        self.assertIn("--ai-log-retention-days=", job.command)
-        self.assertIn("AI_LOG_RETENTION_DAYS", job.command)
-        self.assertIn("--job-retention-minutes=", job.command)
-        self.assertIn("AI_JOB_RETENTION_MINUTES", job.command)
-        self.assertIn("--reservation-ttl-minutes=", job.command)
-        self.assertIn("AI_PLAN_RESERVATION_TTL_MINUTES", job.command)
-        self.assertIn("--rate-limit-retention-hours=", job.command)
-        self.assertIn("RATE_LIMIT_EVENT_RETENTION_HOURS", job.command)
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME/server" && '
+            "./bin/cron_cleanup_optimize_telemetry.sh --mode scheduled",
+        )
+        # D-70: the periods come only from the retention inventory.
+        for knob in (
+            "RETENTION_DAYS",
+            "RETENTION_MINUTES",
+            "RETENTION_HOURS",
+            "TTL_MINUTES",
+            "--retention",
+        ):
+            self.assertNotIn(knob, job.command)
         self.assertFalse(job.background)
+        contract_source = (
+            module.REPO_ROOT / "server/lib/privacy/retention_cleanup.dart"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "const retentionCleanupContract = "
+            f"'{module.PRIVACY_CONTROL_JOBS[job.name]}';",
+            contract_source,
+        )
+        self.assertIn(
+            f"const retentionCleanupJobName = '{job.name}';",
+            contract_source,
+        )
+        env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        self.assertEqual(
+            env["MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR"],
+            str(module.ARTIFACT_DIR / "retention_cleanup"),
+        )
 
     def test_battle_strategy_jobs_produce_gate_evidence_in_background(self) -> None:
         module = _load_module()
