@@ -53,6 +53,11 @@ O_PRICE_A = "7a1b0000-1111-4a1a-8a1a-00000000000a"
 O_PRICE_B = "7a1b0000-1111-4a1a-8a1a-00000000000b"
 O_PRICE_C = "7a1b0000-1111-4a1a-8a1a-00000000000c"
 O_PRICE_D = "7a1b0000-1111-4a1a-8a1a-00000000000d"
+# D-73: E tem borda dourada mais barata; F só existe oversized; G tem oversized
+# mais caro que a impressão normal.
+O_PRICE_E = "7a1b0000-1111-4a1a-8a1a-00000000000e"
+O_PRICE_F = "7a1b0000-1111-4a1a-8a1a-00000000000f"
+O_PRICE_G = "7a1b0000-1111-4a1a-8a1a-000000000010"
 # Metadados no formato de 2026-09-23 (jsonl_download_uri e compressed_size, sem
 # download_uri, size, content_type e content_encoding). object, id, type,
 # updated_at, jsonl_download_uri e compressed_size são os valores relatados pela
@@ -473,17 +478,21 @@ class BulkMetadataFormatTest(unittest.TestCase):
 
 class AliasPriceRuleTest(unittest.TestCase):
     """D-62: a linha-alias Oracle leva o menor `prices.usd` entre as impressões
-    em papel da carta no bulk; digital e foil não contam."""
+    em papel da carta no bulk; digital e foil não contam. D-73: oversized e
+    borda dourada também não, e só esses dois critérios."""
+
+    ALIASES = {O_PRICE_A, O_PRICE_B, O_PRICE_C, O_PRICE_E, O_PRICE_F, O_PRICE_G}
 
     def snapshot(self) -> "job.CatalogSnapshot":
-        # A, B e C têm linha-alias; nenhuma impressão da fixture está no catálogo.
+        # A, B, C, E, F e G têm linha-alias; nenhuma impressão da fixture está
+        # no catálogo.
         return job.CatalogSnapshot(
-            scryfall_ids={O_PRICE_A, O_PRICE_B, O_PRICE_C},
-            oracle_ids={O_PRICE_A, O_PRICE_B, O_PRICE_C},
-            alias_rows=3,
+            scryfall_ids=set(self.ALIASES),
+            oracle_ids=set(self.ALIASES),
+            alias_rows=len(self.ALIASES),
             set_codes=set(),
             state={job.STATE_CARDS_LAST_SYNC_AT: "2026-09-20T12:00:00Z"},
-            alias_oracle_ids={O_PRICE_A, O_PRICE_B, O_PRICE_C},
+            alias_oracle_ids=set(self.ALIASES),
         )
 
     def plan(self, fixture: Path, bulk_format: str = job.BULK_FORMAT_JSON_ARRAY):
@@ -500,15 +509,63 @@ class AliasPriceRuleTest(unittest.TestCase):
     def test_cheapest_paper_non_foil_usd_across_every_printing(self) -> None:
         plan = self.plan(PRICES_FIXTURE)
 
-        # A: 3.00 (foil 1.00), 2.50, digital 0.10, só foil 0.05 e 2.75 -> 2.50.
-        self.assertEqual(plan.alias_prices, {O_PRICE_A: Decimal("2.50")})
-        self.assertEqual(plan.counts["alias_price_found"], 1)
-        # B só tem foil em papel e preço em versão digital: fica como está.
-        self.assertEqual(plan.counts["alias_price_kept_no_paper_usd"], 1)
+        self.assertEqual(
+            plan.alias_prices,
+            {
+                # A: 3.00 (foil 1.00), 2.50, digital 0.10, só foil 0.05, 2.75
+                # e oversized 0.20 -> 2.50.
+                O_PRICE_A: Decimal("2.50"),
+                # E: 1.20, borda dourada 0.30 e memorabilia de borda preta 0.90
+                # -> 0.90.
+                O_PRICE_E: Decimal("0.90"),
+                # G: 0.60 e oversized 1.50 -> 0.60.
+                O_PRICE_G: Decimal("0.60"),
+            },
+        )
+        self.assertEqual(plan.counts["alias_price_found"], 3)
+        # B só tem foil em papel e preço em versão digital; F só existe
+        # oversized: os dois ficam como estão.
+        self.assertEqual(plan.counts["alias_price_kept_no_paper_usd"], 2)
         # C não está no bulk: fica como está.
         self.assertEqual(plan.counts["alias_price_kept_not_in_bulk"], 1)
         # D tem preço, mas não tem linha-alias no catálogo: nada a gravar.
         self.assertNotIn(O_PRICE_D, plan.alias_prices)
+
+    def test_d73_oversized_and_gold_border_printings_leave_the_price(self) -> None:
+        plan = self.plan(PRICES_FIXTURE)
+
+        # Sem o refino, A levaria 0.20 (oversized), E 0.30 (borda dourada) e F
+        # 3.00 (só oversized).
+        self.assertEqual(plan.alias_prices[O_PRICE_A], Decimal("2.50"))
+        self.assertEqual(plan.alias_prices[O_PRICE_E], Decimal("0.90"))
+        self.assertNotIn(O_PRICE_F, plan.alias_prices)
+        # Impressões com preço que o refino tirou: A, F e G oversized; E dourada.
+        self.assertEqual(plan.counts["alias_price_excluded_oversized_printings"], 3)
+        self.assertEqual(plan.counts["alias_price_excluded_gold_border_printings"], 1)
+        # Linhas-alias em que o refino muda o resultado: A, E e F. G não muda:
+        # o oversized dele é mais caro que a impressão normal.
+        self.assertEqual(plan.counts["alias_price_changed_by_refinement"], 3)
+
+    def test_d73_marks_only_oversized_and_gold_border(self) -> None:
+        raw = json.loads(PRICES_FIXTURE.read_text(encoding="utf-8"))
+        by_id = {item["id"]: job.normalize_printing(item) for item in raw}
+
+        def exclusion(suffix: str) -> str | None:
+            return by_id[f"7a1b0000-2222-4b2b-9b2b-{suffix}"].alias_price_exclusion
+
+        self.assertEqual(exclusion("00000000a006"), job.ALIAS_PRICE_EXCLUDED_OVERSIZED)
+        self.assertEqual(exclusion("00000000f001"), job.ALIAS_PRICE_EXCLUDED_OVERSIZED)
+        self.assertEqual(exclusion("000000010002"), job.ALIAS_PRICE_EXCLUDED_OVERSIZED)
+        self.assertEqual(exclusion("00000000e002"), job.ALIAS_PRICE_EXCLUDED_GOLD_BORDER)
+        # Memorabilia de borda preta e impressões comuns continuam valendo.
+        self.assertIsNone(exclusion("00000000e003"))
+        self.assertIsNone(exclusion("00000000e001"))
+        self.assertIsNone(exclusion("00000000a002"))
+        self.assertEqual(
+            job.normalize_printing({**raw[0], "border_color": " Gold "}).alias_price_exclusion,
+            job.ALIAS_PRICE_EXCLUDED_GOLD_BORDER,
+        )
+        self.assertIsNone(job.normalize_printing({**raw[0], "oversized": None}).alias_price_exclusion)
 
     def test_the_rule_reads_the_jsonl_the_same_way(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1051,6 +1108,7 @@ class RunModesTest(unittest.TestCase):
         self.assertEqual(counts["card_legalities"]["oracle_ids"], 5)
         self.assertEqual(counts["catalog_before"]["alias_rows"], 1)
         # D-62: a linha-alias do Sol Ring leva o menor preço em papel (1.99).
+        # A fixture principal não tem impressão oversized nem dourada (D-73).
         self.assertEqual(
             counts["alias_prices"],
             {
@@ -1059,6 +1117,9 @@ class RunModesTest(unittest.TestCase):
                 "unchanged": 0,
                 "kept_no_paper_usd": 0,
                 "kept_not_in_bulk": 0,
+                "excluded_oversized_printings": 0,
+                "excluded_gold_border_printings": 0,
+                "changed_by_refinement": 0,
             },
         )
         alias_calls = [rows for sql, rows in self.db.values_calls if sql is job.UPDATE_ALIAS_PRICES_SQL]
@@ -1282,12 +1343,13 @@ class RunModesTest(unittest.TestCase):
         self.assertEqual(self.db.writes(), [])
         self.assertEqual(receipt["counts"]["planned"]["cards_insert_candidates"], 4)
 
+    PRICE_ALIASES = [
+        (oracle_id, oracle_id)
+        for oracle_id in (O_PRICE_A, O_PRICE_B, O_PRICE_C, O_PRICE_E, O_PRICE_F, O_PRICE_G)
+    ]
+
     def test_activation_writes_the_d62_alias_prices(self) -> None:
-        self.db.cards = [
-            (O_PRICE_A, O_PRICE_A),
-            (O_PRICE_B, O_PRICE_B),
-            (O_PRICE_C, O_PRICE_C),
-        ]
+        self.db.cards = list(self.PRICE_ALIASES)
 
         code, receipt, _ = self.run_job(
             [
@@ -1303,22 +1365,58 @@ class RunModesTest(unittest.TestCase):
 
         self.assertEqual(code, 0, receipt)
         alias_calls = [rows for sql, rows in self.db.values_calls if sql is job.UPDATE_ALIAS_PRICES_SQL]
+        updated_at = job.parse_timestamp(SOURCE_UPDATED_AT)
         self.assertEqual(
             alias_calls,
-            [[(O_PRICE_A, Decimal("2.50"), job.parse_timestamp(SOURCE_UPDATED_AT))]],
+            [
+                [
+                    (O_PRICE_A, Decimal("2.50"), updated_at),
+                    (O_PRICE_E, Decimal("0.90"), updated_at),
+                    (O_PRICE_G, Decimal("0.60"), updated_at),
+                ]
+            ],
         )
         self.assertEqual(
             receipt["counts"]["alias_prices"],
             {
-                "found": 1,
-                "updated": 1,
+                "found": 3,
+                "updated": 3,
                 "unchanged": 0,
-                "kept_no_paper_usd": 1,
+                "kept_no_paper_usd": 2,
                 "kept_not_in_bulk": 1,
+                "excluded_oversized_printings": 3,
+                "excluded_gold_border_printings": 1,
+                "changed_by_refinement": 3,
             },
         )
         logged = [params for sql, params in self.db.statements if sql is job.INSERT_SYNC_LOG_SQL]
-        self.assertIn((job.SYNC_LOG_ALIAS_PRICES, 0, 1), [row[:3] for row in logged])
+        self.assertIn((job.SYNC_LOG_ALIAS_PRICES, 0, 3), [row[:3] for row in logged])
+
+    def test_dry_run_shows_what_the_d73_refinement_changes(self) -> None:
+        self.db.cards = list(self.PRICE_ALIASES)
+
+        code, receipt, _ = self.run_job(
+            [
+                "--mode",
+                "dry-run",
+                "--bulk-json",
+                str(PRICES_FIXTURE),
+                "--source-updated-at",
+                SOURCE_UPDATED_AT,
+            ]
+        )
+
+        self.assertEqual((code, receipt["status"]), (0, "dry_run"), receipt)
+        self.assertFalse(receipt["database_writes"])
+        self.assertEqual(self.db.values_calls, [])
+        planned = receipt["counts"]["planned"]
+        self.assertEqual(planned["alias_prices_found"], 3)
+        self.assertEqual(planned["alias_prices_excluded_oversized_printings"], 3)
+        self.assertEqual(planned["alias_prices_excluded_gold_border_printings"], 1)
+        self.assertEqual(planned["alias_prices_changed_by_refinement"], 3)
+        bulk = receipt["counts"]["bulk"]
+        self.assertEqual(bulk["alias_price_kept_no_paper_usd"], 2)
+        self.assertEqual(bulk["alias_price_changed_by_refinement"], 3)
 
     def test_metadata_without_any_uri_fails_with_its_own_error(self) -> None:
         self.db.state[job.STATE_ACTIVE_CONTRACT] = job.APPLY_CONTRACT

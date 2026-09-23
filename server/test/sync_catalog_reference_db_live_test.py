@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """BT-CAT-01 em PostgreSQL descartável: duas execuções, delta zero, usuário intacto.
 
+Depois, o preço das linhas-alias com o refino da D-73, conferido num dry-run e
+numa ativação com a fixture de preços.
+
 Exige RUN_CATALOG_REFERENCE_DB_TESTS=1 e os DB_* de um banco descartável já
 montado com server/database_setup.sql e server/bin/migrate.dart. Nunca aponte
 para banco compartilhado nem de produção: o teste semeia linhas e recusa um
@@ -41,6 +44,13 @@ BULK_FIXTURES = {
     "json": (FIXTURES / "scryfall_default_cards_sample.json", "json_array"),
 }
 FIXTURE, BULK_FORMAT = BULK_FIXTURES[os.environ.get("CATALOG_REFERENCE_DB_BULK", "jsonl")]
+# D-73: a fixture de preços (várias impressões da mesma carta, oversized e borda
+# dourada), no mesmo formato escolhido acima.
+PRICES_FIXTURE = {
+    "jsonl": FIXTURES / "scryfall_alias_prices_sample.jsonl.gz",
+    "json": FIXTURES / "scryfall_alias_prices_sample.json",
+}[os.environ.get("CATALOG_REFERENCE_DB_BULK", "jsonl")]
+PRICES_SOURCE_UPDATED_AT = "2026-09-23T09:00:00+00:00"
 SOURCE_UPDATED_AT = "2026-09-22T09:00:00+00:00"
 # Relógio fixo: o alerta de frescor (7 dias) não pode depender da data do teste.
 NOW = datetime(2026, 9, 23, 10, 0, tzinfo=timezone.utc)
@@ -54,6 +64,11 @@ P_BOLT = "5c8e7c9e-2222-4b2b-9b2b-000000000003"
 P_DRAKE = "5c8e7c9e-2222-4b2b-9b2b-000000000004"
 P_ADEPT = "5c8e7c9e-2222-4b2b-9b2b-000000000006"
 P_GLEEMAX = "5c8e7c9e-2222-4b2b-9b2b-000000000008"
+O_PRICE_A = "7a1b0000-1111-4a1a-8a1a-00000000000a"
+O_PRICE_B = "7a1b0000-1111-4a1a-8a1a-00000000000b"
+O_PRICE_E = "7a1b0000-1111-4a1a-8a1a-00000000000e"
+O_PRICE_F = "7a1b0000-1111-4a1a-8a1a-00000000000f"
+O_PRICE_G = "7a1b0000-1111-4a1a-8a1a-000000000010"
 
 USER_TABLES = ("users", "decks", "deck_cards", "user_binder_items")
 
@@ -261,6 +276,9 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
                 "unchanged": 0,
                 "kept_no_paper_usd": 1,
                 "kept_not_in_bulk": 0,
+                "excluded_oversized_printings": 0,
+                "excluded_gold_border_printings": 0,
+                "changed_by_refinement": 0,
             },
         )
 
@@ -383,6 +401,92 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
         code, receipt = self.run_job("--mode", "scheduled", "--force", *bulk)
         self.assertEqual((code, receipt["status"]), (0, "contract_inactive"), receipt)
 
+        self.assertEqual(self.user_tables_fingerprint(), before_user_tables)
+
+    def test_refined_alias_prices_after_a_dry_run(self) -> None:
+        # D-73. O unittest roda os métodos em ordem alfabética: este vem depois
+        # do teste acima e semeia as próprias linhas-alias; as contas daqui não
+        # dependem dele (as linhas-alias do Sol Ring e do Drake, da semente da
+        # classe, ficam fora deste bulk).
+        seeded = {
+            O_PRICE_A: Decimal("5.00"),
+            O_PRICE_B: Decimal("0.80"),
+            O_PRICE_E: Decimal("2.00"),
+            O_PRICE_F: Decimal("7.00"),
+            O_PRICE_G: Decimal("0.70"),
+        }
+        with self.conn.cursor() as cur:
+            for oracle_id, price in seeded.items():
+                cur.execute(
+                    """
+                    INSERT INTO cards (scryfall_id, oracle_id, name, type_line, set_code,
+                      rarity, is_reserved, price, price_usd, price_source, price_updated_at)
+                    VALUES (%s::uuid, %s::uuid, %s, 'Artifact', 'lea', 'rare', FALSE,
+                      %s, %s, 'mtgjson', '2026-06-27T00:00:00Z')
+                    """,
+                    (oracle_id, oracle_id, f"Alias {oracle_id[-2:]}", price, price),
+                )
+        before_user_tables = self.user_tables_fingerprint()
+        bulk = [
+            "--bulk-json",
+            str(PRICES_FIXTURE),
+            "--source-updated-at",
+            PRICES_SOURCE_UPDATED_AT,
+        ]
+
+        code, receipt = self.run_job("--mode", "dry-run", *bulk)
+        self.assertEqual((code, receipt["status"]), (0, "dry_run"), receipt)
+        self.assertFalse(receipt["database_writes"])
+        planned = receipt["counts"]["planned"]
+        self.assertEqual(
+            {key: value for key, value in planned.items() if key.startswith("alias_prices_")},
+            {
+                "alias_prices_found": 3,
+                "alias_prices_excluded_oversized_printings": 3,
+                "alias_prices_excluded_gold_border_printings": 1,
+                "alias_prices_changed_by_refinement": 3,
+            },
+        )
+        self.assertEqual(self.fetch_card(O_PRICE_A)["price_usd"], Decimal("5.00"))
+
+        code, receipt = self.run_job("--mode", "activate", *bulk, approval=True)
+        self.assertEqual((code, receipt["status"]), (0, "activated"), receipt)
+        self.assertEqual(
+            receipt["counts"]["alias_prices"],
+            {
+                "found": 3,
+                "updated": 3,
+                "unchanged": 0,
+                "kept_no_paper_usd": 2,
+                "kept_not_in_bulk": 2,
+                "excluded_oversized_printings": 3,
+                "excluded_gold_border_printings": 1,
+                "changed_by_refinement": 3,
+            },
+        )
+        cards = {oracle_id: self.fetch_card(oracle_id) for oracle_id in seeded}
+        prices_updated_at = datetime(2026, 9, 23, 9, 0, tzinfo=timezone.utc)
+        # A: 2.50, não o oversized 0.20; E: 0.90 (memorabilia de borda preta),
+        # não a borda dourada 0.30; G: 0.60, o oversized de 1.50 não muda nada.
+        for oracle_id, expected in (
+            (O_PRICE_A, Decimal("2.50")),
+            (O_PRICE_E, Decimal("0.90")),
+            (O_PRICE_G, Decimal("0.60")),
+        ):
+            card = cards[oracle_id]
+            self.assertEqual(
+                (card["price_usd"], card["price"], card["price_source"], card["price_updated_at"]),
+                (expected, expected, "scryfall", prices_updated_at),
+                oracle_id,
+            )
+        # F só existe oversized e B só tem foil e digital: ficam como estavam.
+        for oracle_id in (O_PRICE_F, O_PRICE_B):
+            card = cards[oracle_id]
+            self.assertEqual(
+                (card["price_usd"], card["price_source"]),
+                (seeded[oracle_id], "mtgjson"),
+                oracle_id,
+            )
         self.assertEqual(self.user_tables_fingerprint(), before_user_tables)
 
 

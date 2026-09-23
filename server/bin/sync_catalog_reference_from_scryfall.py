@@ -41,6 +41,15 @@ tem, e o receipt conta. Impressões antigas de cartas que já estão no catálog
 contadas e puladas: levar a base ao grão de impressão e migrar as linhas-alias
 Oracle é a fase 2.
 
+Refino da D-62 (D-73): impressões `oversized` e de borda dourada
+(`border_color` gold, como as World Championship Decks) não servem para montar
+deck de torneio e costumam custar menos; ficam fora do menor preço. Só esses
+dois critérios. O receipt conta as impressões com preço que o refino tirou
+(`excluded_oversized_printings`, `excluded_gold_border_printings`) e as
+linhas-alias cujo resultado ele mudou (`changed_by_refinement`): as que
+levariam um preço menor de uma impressão excluída, ou que só tinham preço
+nelas e agora ficam com o valor que têm.
+
 Frescor (BT-CAT-03, D-36): toda execução mede a idade do catálogo pela data da
 fonte já aplicada (ou, sem ela, pelo último sync). Com mais de 7 dias, o
 receipt marca `catalog_stale`, o stderr leva MANALOOM_CATALOG_FRESHNESS_ALERT
@@ -136,6 +145,10 @@ FRESHNESS_ALERT_EXIT_CODE = 3
 
 # Impressões que não são carta de jogo nunca entram no catálogo.
 NON_GAME_LAYOUTS = frozenset({"token", "double_faced_token", "emblem", "art_series"})
+
+# D-73: impressões que ficam fora do preço da linha-alias.
+ALIAS_PRICE_EXCLUDED_OVERSIZED = "oversized"
+ALIAS_PRICE_EXCLUDED_GOLD_BORDER = "gold_border"
 LEGALITY_STATUSES = frozenset({"legal", "not_legal", "banned", "restricted"})
 MAX_PRICE = Decimal("99999999.99")
 UUID_PATTERN = re.compile(
@@ -854,6 +867,9 @@ class BulkPrinting:
     insertable: bool
     # Impressão em papel: `games` tem `paper` e não é digital (D-62).
     paper: bool = False
+    # D-73: por que a impressão fica fora do preço da linha-alias
+    # (ALIAS_PRICE_EXCLUDED_*), ou None.
+    alias_price_exclusion: str | None = None
 
     def card_row(self, *, price_updated_at: datetime, for_insert: bool) -> tuple[Any, ...]:
         is_reserved = self.is_reserved
@@ -929,6 +945,13 @@ def normalize_printing(raw: Any) -> BulkPrinting | None:
     layout = _text(raw.get("layout"))
     prices = raw.get("prices") if isinstance(raw.get("prices"), dict) else {}
     paper = "paper" in games and raw.get("digital") is not True
+    # D-73: só estes dois critérios tiram a impressão do preço da linha-alias.
+    if raw.get("oversized") is True:
+        alias_price_exclusion: str | None = ALIAS_PRICE_EXCLUDED_OVERSIZED
+    elif (_text(raw.get("border_color")) or "").strip().lower() == "gold":
+        alias_price_exclusion = ALIAS_PRICE_EXCLUDED_GOLD_BORDER
+    else:
+        alias_price_exclusion = None
     insertable = (
         oracle_id is not None
         and paper
@@ -968,6 +991,7 @@ def normalize_printing(raw: Any) -> BulkPrinting | None:
         legalities=tuple(sorted(legalities)),
         insertable=insertable,
         paper=paper,
+        alias_price_exclusion=alias_price_exclusion,
     )
 
 
@@ -1048,6 +1072,9 @@ def plan_refresh(
     legalities_seen: dict[str, tuple[tuple[str, str], ...]] = {}
     inserted_oracle_ids: set[str] = set()
     cheapest_paper_usd: dict[str, Decimal] = {}
+    # D-73: o menor preço entre as impressões que o refino tira, só para contar
+    # as linhas-alias em que ele muda o resultado.
+    cheapest_excluded_usd: dict[str, Decimal] = {}
     oracle_ids_in_bulk: set[str] = set()
     for index, raw in enumerate(raw_objects):
         if index % 5000 == 0:
@@ -1062,11 +1089,17 @@ def plan_refresh(
         if printing.oracle_id:
             oracle_ids_in_bulk.add(printing.oracle_id)
             # D-62: toda impressão em papel com preço não foil em USD conta,
-            # esteja ou não no catálogo.
+            # esteja ou não no catálogo; menos as que a D-73 tira.
             if printing.paper and printing.price_usd is not None:
-                cheapest = cheapest_paper_usd.get(printing.oracle_id)
+                exclusion = printing.alias_price_exclusion
+                if exclusion == ALIAS_PRICE_EXCLUDED_OVERSIZED:
+                    counts["alias_price_excluded_oversized_printings"] += 1
+                elif exclusion == ALIAS_PRICE_EXCLUDED_GOLD_BORDER:
+                    counts["alias_price_excluded_gold_border_printings"] += 1
+                pool = cheapest_paper_usd if exclusion is None else cheapest_excluded_usd
+                cheapest = pool.get(printing.oracle_id)
                 if cheapest is None or printing.price_usd < cheapest:
-                    cheapest_paper_usd[printing.oracle_id] = printing.price_usd
+                    pool[printing.oracle_id] = printing.price_usd
         if printing.scryfall_id in snapshot.scryfall_ids:
             plan.updates.append(
                 printing.card_row(price_updated_at=price_updated_at, for_insert=False)
@@ -1109,6 +1142,9 @@ def plan_refresh(
             plan.legalities[oracle_id] = legalities
     for oracle_id in sorted(snapshot.alias_oracle_ids):
         cheapest = cheapest_paper_usd.get(oracle_id)
+        excluded = cheapest_excluded_usd.get(oracle_id)
+        if excluded is not None and (cheapest is None or excluded < cheapest):
+            counts["alias_price_changed_by_refinement"] += 1
         if cheapest is not None:
             plan.alias_prices[oracle_id] = cheapest
         elif oracle_id in oracle_ids_in_bulk:
@@ -1251,6 +1287,18 @@ def _chunks(rows: list[Any], size: int) -> Iterator[list[Any]]:
         yield rows[index : index + size]
 
 
+def alias_price_refinement_counts(plan: RefreshPlan) -> dict[str, int]:
+    """O que o refino da D-73 fez: impressões com preço que ele tirou e
+    linhas-alias cujo resultado ele mudou. Sempre presentes no receipt."""
+    return {
+        "excluded_oversized_printings": plan.counts["alias_price_excluded_oversized_printings"],
+        "excluded_gold_border_printings": plan.counts[
+            "alias_price_excluded_gold_border_printings"
+        ],
+        "changed_by_refinement": plan.counts["alias_price_changed_by_refinement"],
+    }
+
+
 def apply_plan(
     cur: Any,
     plan: RefreshPlan,
@@ -1317,6 +1365,7 @@ def apply_plan(
             "unchanged": len(alias_rows) - alias_updated,
             "kept_no_paper_usd": plan.counts["alias_price_kept_no_paper_usd"],
             "kept_not_in_bulk": plan.counts["alias_price_kept_not_in_bulk"],
+            **alias_price_refinement_counts(plan),
         },
         "card_legalities": {
             "oracle_ids": len(plan.legalities),
@@ -1718,6 +1767,10 @@ def _run(
                     "sets_insert_candidates": len(plan.sets),
                     "legalities_oracle_ids": len(plan.legalities),
                     "alias_prices_found": len(plan.alias_prices),
+                    **{
+                        f"alias_prices_{key}": value
+                        for key, value in alias_price_refinement_counts(plan).items()
+                    },
                 }
                 receipt["counts"] = counts
                 receipt["status"] = "dry_run"
