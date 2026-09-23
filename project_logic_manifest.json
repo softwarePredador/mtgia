@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "ba1911c35f7acf322f2079a6b5c606c2712651c6fef4bb7f3f8310ff489f9082",
+  "source_digest_sha256": "83f1e6925914a9af7f64c8cc02de67f8aecf1422a6733de8c5f6adcb08633a6d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,11 +66,11 @@
     "dart_source_files": 687,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5206,
+    "dart_symbols": 5207,
     "semantic_resolved_files": 687,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42768,
-    "semantic_resolved_call_sites": 68158,
+    "semantic_resolved_call_edges": 42771,
+    "semantic_resolved_call_sites": 68162,
     "semantic_resolved_type_references": 16086,
     "modules": 153,
     "app_routes": 46,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1228,
+    "tests": 1229,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -973,7 +973,7 @@
         "server/lib/auth_service.dart"
       ],
       "file_count": 1,
-      "symbol_count": 7,
+      "symbol_count": 8,
       "providers": [],
       "services": [
         "AuthService"
@@ -30136,7 +30136,7 @@
       "name": "AccountSecurityException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 844,
+      "line": 878,
       "members": [
         "toString"
       ]
@@ -30145,7 +30145,7 @@
       "name": "AccountSecurityResult",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 814,
+      "line": 824,
       "members": [
         "toJson"
       ]
@@ -30187,13 +30187,13 @@
       "name": "EmailVerificationRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 802
+      "line": 812
     },
     {
       "name": "InvalidCredentialsException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 833,
+      "line": 867,
       "members": [
         "toString"
       ]
@@ -30202,13 +30202,19 @@
       "name": "PasswordResetRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 790
+      "line": 800
     },
     {
       "name": "_PasswordPreparation",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 783
+      "line": 793
+    },
+    {
+      "name": "accountProfileJson",
+      "kind": "function",
+      "source": "server/lib/auth_service.dart",
+      "line": 844
     },
     {
       "name": "isBasicLandCard",
@@ -41087,9 +41093,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42768,
-    "resolved_call_site_count": 68158,
-    "workspace_call_edge_count": 13339,
+    "resolved_call_edge_count": 42771,
+    "resolved_call_site_count": 68162,
+    "workspace_call_edge_count": 13340,
     "unresolved_call_edge_count": 542,
     "unresolved_call_site_count": 751,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -145717,17 +145723,6 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 703,
-        "caller": "AuthService._rotateAuthenticationVersion",
-        "kind": "method",
-        "lexical_target": "hashPassword",
-        "target": "AuthService.hashPassword",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
         "line": 71,
         "caller": "<top-level>",
         "kind": "method",
@@ -145739,22 +145734,11 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 716,
-        "caller": "AuthService._rotateAuthenticationVersion",
-        "kind": "constructor",
-        "lexical_target": "AccountSecurityResult",
-        "target": "AccountSecurityResult.AccountSecurityResult",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 717,
+        "line": 712,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
-        "lexical_target": "generateToken",
-        "target": "AuthService.generateToken",
+        "lexical_target": "hashPassword",
+        "target": "AuthService.hashPassword",
         "target_library": "package:server/auth_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -145772,7 +145756,40 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 731,
+        "line": 725,
+        "caller": "AuthService._rotateAuthenticationVersion",
+        "kind": "constructor",
+        "lexical_target": "AccountSecurityResult",
+        "target": "AccountSecurityResult.AccountSecurityResult",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 726,
+        "caller": "AuthService._rotateAuthenticationVersion",
+        "kind": "method",
+        "lexical_target": "generateToken",
+        "target": "AuthService.generateToken",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 730,
+        "caller": "AuthService._rotateAuthenticationVersion",
+        "kind": "method",
+        "lexical_target": "accountProfileJson",
+        "target": "accountProfileJson",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 741,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "validate",
@@ -145783,7 +145800,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 737,
+        "line": 747,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -145794,7 +145811,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 742,
+        "line": 752,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -145805,7 +145822,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 767,
+        "line": 777,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "method",
         "lexical_target": "_preparePassword",
@@ -145816,7 +145833,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 768,
+        "line": 778,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "constructor",
         "lexical_target": "_PasswordPreparation",
@@ -187852,8 +187869,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14215,
-        "occurrences": 24802
+        "unique_references": 14216,
+        "occurrences": 24804
       },
       {
         "target_scope": "dart_sdk",
@@ -189214,8 +189231,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1206,
-        "occurrences": 1981
+        "unique_references": 1207,
+        "occurrences": 1982
       },
       {
         "target_scope": "dependency",
@@ -191404,8 +191421,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/auth_service.dart",
-        "unique_references": 84,
-        "occurrences": 90
+        "unique_references": 85,
+        "occurrences": 91
       },
       {
         "target_scope": "workspace",
@@ -223589,7 +223606,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 766,
+        "line": 776,
         "lexical_type": "_PasswordPreparation",
         "resolved_type": "_PasswordPreparation",
         "target": "_PasswordPreparation",
@@ -231257,7 +231274,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6170,
-        "occurrences": 39417
+        "occurrences": 39425
       },
       {
         "target_scope": "dart_sdk",
@@ -232727,7 +232744,7 @@
         "target_scope": "unknown",
         "target_library": "<unresolved>",
         "unique_references": 405,
-        "occurrences": 4774
+        "occurrences": 4777
       },
       {
         "target_scope": "workspace",
@@ -271463,6 +271480,7 @@
     "server/bin/test_battle_runtime_cli_paths.py",
     "server/test/account_email_delivery_transport_test.dart",
     "server/test/account_reverification_test.dart",
+    "server/test/account_security_full_user_test.dart",
     "server/test/account_security_live_test.dart",
     "server/test/account_security_schema_contract_test.dart",
     "server/test/activation_events_contract_test.dart",
@@ -273138,7 +273156,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "b637d766c16900c52c88c5ff61933408501e59c339c0ff19a4ba471a8f0a67fb"
+      "sha256": "d95276fd81e7642c854d0fb139f29460612c0ef340bd4cf688ec28c69f7b5c54"
     },
     "required_task_fields": [
       "id",
@@ -273371,10 +273389,10 @@
       {
         "id": "BT-AUTH-007",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Trocar a senha não sobrescreve o usuário completo com um `user` truncado (achado 6 dos fluxos; alcançável hoje).",
         "depends_on": [],
-        "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app.",
+        "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app. Corrigido no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `POST /auth/change-password` e `POST /auth/revoke-sessions` devolvem o usuário completo, no formato de `GET /users/me`, lido do próprio `UPDATE ... RETURNING`; o app, que já troca o usuário guardado pelo da resposta, deixa de perder os campos sem mudar código. Evidência: `server/test/account_security_full_user_test.dart` (4 testes; a volta do `user` truncado falha em 2). Falta o teste de app pedido no aceite, na raia do app.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 301
       },
@@ -282961,7 +282979,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "ba1911c35f7acf322f2079a6b5c606c2712651c6fef4bb7f3f8310ff489f9082"
+    "project_logic_source_digest_sha256": "83f1e6925914a9af7f64c8cc02de67f8aecf1422a6733de8c5f6adcb08633a6d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285709,6 +285727,7 @@
       "server/routes/users/me/plan/index.dart",
       "server/test/account_email_delivery_transport_test.dart",
       "server/test/account_reverification_test.dart",
+      "server/test/account_security_full_user_test.dart",
       "server/test/account_security_live_test.dart",
       "server/test/account_security_schema_contract_test.dart",
       "server/test/activation_events_contract_test.dart",

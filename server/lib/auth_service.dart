@@ -684,7 +684,10 @@ class AuthService {
         );
       }
       final nextVersion = _readInteger(row[3]) + 1;
-      await session.execute(
+      // RETURNING traz o perfil inteiro: o app troca o usuário guardado pelo
+      // desta resposta, e um usuário truncado apagava e-mail verificado, nome
+      // e avatar (BT-AUTH-007).
+      final updated = await session.execute(
         Sql.named('''
           UPDATE users
           SET auth_version = @authVersion,
@@ -695,6 +698,12 @@ class AuthService {
               END,
               updated_at = CURRENT_TIMESTAMP
           WHERE id = CAST(@userId AS uuid)
+          RETURNING id, username, email, display_name, avatar_url,
+                    location_state, location_city, trade_notes,
+                    profile_visibility, binder_visibility,
+                    location_visibility, message_visibility,
+                    trade_visibility, trade_notes_visibility,
+                    created_at, updated_at, email_verified_at
         '''),
         parameters: {
           'userId': userId,
@@ -718,6 +727,7 @@ class AuthService {
         userId: userId,
         username: username,
         email: email,
+        user: accountProfileJson(updated.first.toColumnMap()),
       );
     });
   }
@@ -817,6 +827,7 @@ class AccountSecurityResult {
     required this.userId,
     required this.username,
     required this.email,
+    required this.user,
   });
 
   final String token;
@@ -824,11 +835,34 @@ class AccountSecurityResult {
   final String username;
   final String email;
 
-  Map<String, dynamic> toJson() => {
-    'token': token,
-    'user': {'id': userId, 'username': username, 'email': email},
-  };
+  /// Perfil completo, no mesmo formato de `GET /users/me`.
+  final Map<String, dynamic> user;
+
+  Map<String, dynamic> toJson() => {'token': token, 'user': user};
 }
+
+/// Perfil da conta no formato de `GET /users/me`, a partir das colunas de
+/// `users`. Quem devolve `user` depois de mexer na conta devolve este objeto
+/// inteiro, porque o app substitui o usuário guardado pelo da resposta.
+Map<String, dynamic> accountProfileJson(Map<String, dynamic> row) => {
+  'id': row['id'],
+  'username': row['username'],
+  'email': row['email'],
+  'display_name': row['display_name'],
+  'avatar_url': row['avatar_url'],
+  'location_state': row['location_state'],
+  'location_city': row['location_city'],
+  'trade_notes': row['trade_notes'],
+  'profile_visibility': row['profile_visibility'],
+  'binder_visibility': row['binder_visibility'],
+  'location_visibility': row['location_visibility'],
+  'message_visibility': row['message_visibility'],
+  'trade_visibility': row['trade_visibility'],
+  'trade_notes_visibility': row['trade_notes_visibility'],
+  'email_verified': row['email_verified_at'] != null,
+  'created_at': (row['created_at'] as DateTime?)?.toIso8601String(),
+  'updated_at': (row['updated_at'] as DateTime?)?.toIso8601String(),
+};
 
 /// Login recusado. Vale igual para conta inexistente e senha errada, para a
 /// resposta não denunciar quais e-mails têm conta.

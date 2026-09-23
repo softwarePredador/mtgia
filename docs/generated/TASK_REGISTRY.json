@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "b637d766c16900c52c88c5ff61933408501e59c339c0ff19a4ba471a8f0a67fb"
+    "sha256": "d95276fd81e7642c854d0fb139f29460612c0ef340bd4cf688ec28c69f7b5c54"
   },
   "required_task_fields": [
     "id",
@@ -235,10 +235,10 @@
     {
       "id": "BT-AUTH-007",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Trocar a senha não sobrescreve o usuário completo com um `user` truncado (achado 6 dos fluxos; alcançável hoje).",
       "depends_on": [],
-      "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app.",
+      "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app. Corrigido no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `POST /auth/change-password` e `POST /auth/revoke-sessions` devolvem o usuário completo, no formato de `GET /users/me`, lido do próprio `UPDATE ... RETURNING`; o app, que já troca o usuário guardado pelo da resposta, deixa de perder os campos sem mudar código. Evidência: `server/test/account_security_full_user_test.dart` (4 testes; a volta do `user` truncado falha em 2). Falta o teste de app pedido no aceite, na raia do app.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 301
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "ba1911c35f7acf322f2079a6b5c606c2712651c6fef4bb7f3f8310ff489f9082"
+  "project_logic_source_digest_sha256": "83f1e6925914a9af7f64c8cc02de67f8aecf1422a6733de8c5f6adcb08633a6d"
 }
