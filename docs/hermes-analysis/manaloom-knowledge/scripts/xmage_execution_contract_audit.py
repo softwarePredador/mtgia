@@ -442,7 +442,8 @@ def build_report() -> dict[str, object]:
                 "class BattleSimulationPersistenceService",
                 "RETURNING id::text",
                 "'turns_played'",
-                "_simulationMetrics(",
+                # renomeada em f6f791098 e compartilhada com interactive_battle_store.dart
+                "battleSimulationMetricsForStorage(",
                 "canonicalBattleWinnerDeckId(",
                 "BattleSimulationPersistenceOutcome.failed(",
             ],
