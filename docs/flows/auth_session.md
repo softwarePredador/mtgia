@@ -99,7 +99,7 @@ Para este fluxo:
 | `POST /auth/revoke-sessions` | — | `:606` |
 | `POST /auth/verify-email` | — | `:607` |
 | `GET /auth/me` | — | `:608` |
-| `GET /users/me`, `PATCH /users/me`, `DELETE /users/me`, `GET /users/me/export`, `GET /users/me/plan`, `GET /users/me/blocks` | — | `:609-614` |
+| `GET /users/me`, `PATCH /users/me`, `DELETE /users/me`, `POST /users/me/export` (era GET até 2026-09-23; agora exige a senha no corpo), `GET /users/me/plan`, `GET /users/me/blocks` | — | `:609-614` |
 | `GET /capabilities` | — | `:592` (corrigido: `:593` é `GET /ready`) |
 
 O allowlist é **exato por método e caminho**: `GET /auth/future` ou `POST /auth/me` caem em 404 `capability_route_unclassified`, não em 405 (testado em `server/test/release_capability_policy_test.dart:340-360`).

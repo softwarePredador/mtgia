@@ -12,9 +12,9 @@
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic source digest de abertura:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Registry `generated_from.sha256` corrente: `f4f5405db033cf7342c5f3edf0397199db4ce57349a75cffb05b1a9352ae9b81`, do registro do deploy de 2026-09-23 (antes, `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…`; o aceite desta task
+- Registry `generated_from.sha256` corrente: `7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245`, do registro do deploy de segurança de 2026-09-23 (antes, `f4f5405d…` no primeiro deploy; `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…`; o aceite desta task
   foi ampliado em `f6f791098`)
-- Linha canônica: `260` (em `f973f81c5`)
+- Linha canônica: `263` (no registro do deploy de segurança)
 - Decisão corrente: `docs/status/CURRENT_PRODUCT_DECISION.md`
 - Dependência canônica: `BT-GOV-001=PASS`
 

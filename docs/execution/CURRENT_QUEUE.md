@@ -15,9 +15,9 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (registro do deploy de 2026-09-23, branch
-  `coord/2026-09-23-linha-de-base-no-ar`): `f4f5405db033cf7342c5f3edf0397199db4ce57349a75cffb05b1a9352ae9b81`
-  (244 tasks; antes, `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
+- Backlog/registry SHA-256 corrente (registro do deploy de segurança de 2026-09-23, branch
+  `seguranca/d19-buracos-2026-09-23`): `7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245`
+  (244 tasks; antes, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
   `d15beb05b`, `333b6c0b…` com 220 tasks e 402 arestas, valor de `f6f791098`)
 - Project logic digest em HEAD `d15beb05b`: `556ba631…`. O digest da árvore de trabalho
   não é copiado aqui, porque este arquivo entra no próprio digest: ver
@@ -63,13 +63,13 @@ aceita um só slot `NOW`; a raia do app abre quando `BT-UIEV-001` fechar e o
 | 1b | `BT-UIEV-001` | recaptura em lote (23/23 e `latest.json`) depois das correções da D-04 |
 | 2 | `BT-GOV-002` | fila com duas raias (D-02); abre a raia do app |
 | 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`) |
-| 4 | `BT-AUTH-003` | buraco do login que denuncia contas (D-19, D-21) |
-| 5 | `BT-AUTH-004` | buracos da exportação e da exclusão (D-19, D-20) |
-| 6 | `BT-AUTH-007` | trocar a senha trunca o usuário; alcançável hoje |
-| 7 | `BT-AUTH-010` | import sem e-mail verificado (assimetria de gate, D-53) |
+| 4 | `BT-AUTH-003` | login fechado e no ar em 2026-09-23 (`166aaed57`); falta o tempo da recuperação de senha |
+| 5 | `BT-AUTH-004` | feito e no ar em 2026-09-23 (`166aaed57`); falta a tela de senha no app (lote da sessão do gate) |
+| 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); falta o teste de app |
+| 7 | `BT-AUTH-010` | import no ar em 2026-09-23 (`166aaed57`); escrita de deck com e-mail verificado (D-56) em `bedafe8bf`, ainda não implantada |
 | 8 | `BT-DB-001` | baseline PostgreSQL fresco; cabeça da corrente mais longa |
 | 9 | `BT-DB-004` | só migrations alteram schema (D-48) |
-| 10 | `DCK-P0-06` | lixeira e invalidação do `/reports/:id` de deck apagado (D-19, D-30) |
+| 10 | `DCK-P0-06` | relatório de deck apagado fechado e no ar em 2026-09-23; falta a lixeira (D-30) |
 | 11 | `BT-OFFER-001` | prova uma única oferta pública, sem comércio ou paywall |
 | 12 | `BT-GATE-001` | SKIP inventariado, nunca silêncio (D-17) |
 | 13 | `BT-GATE-002` | receipts fortes por SHA/digest/target (D-17) |
@@ -148,6 +148,8 @@ contador de vida.
   worker de Battle saudáveis (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`).
   Em 2026-09-23 a linha de base contida foi implantada: `/health` com `87fd5a2e6`,
   readiness com 058 e 29/29 off (`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`).
+  Às 08:08 UTC do mesmo dia o backend subiu `166aaed57`, com os quatro buracos da D-19
+  fechados (`docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`); `origin/master` = `166aaed57`.
 - Em 2026-09-22 o dono autorizou subir o que fosse preciso ("o que tiver de subir
   no servidor pode subir", sem criar bucket), e a linha de base contida foi ao ar em
   2026-09-23, antes de o `BT-SCP-001` fechar. `origin/master` = `87fd5a2e6`,

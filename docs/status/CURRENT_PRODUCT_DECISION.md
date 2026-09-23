@@ -127,7 +127,12 @@ Decidido em 2026-09-22:
   imagem antiga. Cada passo em produção pede a aprovação do dono (regra 6).
 - Os quatro buracos do plano de controle de conta (exportação sem
   reautenticação, exclusão sem limite de tentativas, login que denuncia contas e
-  relatório de deck apagado) fecham antes de qualquer capability abrir (D-19).
+  relatório de deck apagado) foram fechados em produção em 2026-09-23
+  (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Resta o tempo da recuperação
+  de senha (`BT-AUTH-003`), que fecha antes de qualquer capability abrir (D-19).
+- Escrever deck, importar e mexer no fichário exigem e-mail verificado (D-56,
+  decidida em 2026-09-23). Na coorte por convite, aceitar o convite enviado ao
+  e-mail conta como verificação (`BT-AUTH-006`).
 - O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
   linha de base contida com a 058, catálogo com menos de 7 dias, rollback
   treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`).

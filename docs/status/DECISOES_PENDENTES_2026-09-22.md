@@ -50,7 +50,23 @@ Executado pela sessão coordenadora:
   que fosse preciso. Backup local e ensaio de restauração, `master` promovido, 058 aplicada, e
   backend, site e agendador em `87fd5a2e6` com tudo desligado (`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`);
 - D-12 mudou: o dono vetou criar bucket. O backup ficou local e sem cifra, e a cópia fora desta
-  máquina continua em aberto (`BT-DR-001`).
+  máquina continua em aberto (`BT-DR-001`);
+- D-19: os quatro buracos foram fechados por uma segunda frente, só de servidor, aberta com a
+  autorização do dono como exceção ao WIP-1 da raia. Subiram em 2026-09-23 às 08:08 UTC (`166aaed57`),
+  com nova promoção do `master` por `--no-verify` autorizada (`docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`).
+  Resta o tempo da recuperação de senha (`BT-AUTH-003`).
+
+## Decidido em 2026-09-23
+
+**D-56 · Escrever deck exige e-mail verificado.** O import e o fichário passaram a exigir; criar
+deck à mão não exigia. Recomendação aprovada: regra única para tudo que grava conteúdo de deck.
+Ler e apagar o próprio deck seguem livres. Validar, preço, análise por IA, notas de pós-jogo e
+anotações de replay ficam fora, porque não mudam o deck nem publicam nada. Na coorte por convite,
+aceitar o convite enviado ao e-mail conta como verificação (`BT-AUTH-006`).
+- Implementado em `bedafe8bf` (linha do `BT-AUTH-010`), ainda não implantado. Em produção,
+  `decks_private` está desligada e as rotas de deck nem respondem.
+- **Consequência:** a produção tem 1.144 contas ativas e só 7 com e-mail verificado. As demais só
+  voltam a escrever deck depois de verificar o e-mail.
 
 O andamento das demais está no backlog e na fila.
 
