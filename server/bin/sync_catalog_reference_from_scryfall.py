@@ -87,7 +87,9 @@ RECEIPT_VERSION = 1
 BULK_METADATA_URL = "https://api.scryfall.com/bulk-data/default-cards"
 BULK_TYPE = "default_cards"
 BULK_DOWNLOAD_HOSTS = frozenset({"data.scryfall.io"})
-USER_AGENT = "BrewTact/1.0 (catalog-reference-refresh)"
+# D-64: a Scryfall pede um User-Agent que identifique o app; vai o endereço do
+# site, sem e-mail pessoal.
+USER_AGENT = "BrewTact/1.0 (+https://brewtact.com)"
 WRITE_APPROVAL_ENV = "MANALOOM_CONFIRM_POSTGRES_WRITES"
 WRITE_APPROVAL_VALUE = "I_HAVE_EXPLICIT_APPROVAL"
 RECEIPT_MARKER = "MANALOOM_CATALOG_REFERENCE_REFRESH"

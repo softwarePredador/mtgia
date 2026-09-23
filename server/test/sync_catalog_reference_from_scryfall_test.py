@@ -63,6 +63,8 @@ METADATA_2026_09_23 = json.loads(
     )
 )
 SOURCE_UPDATED_AT = "2026-09-22T09:00:00+00:00"
+# D-64: o User-Agent que a Scryfall recebe, com o endereço do site.
+BREWTACT_USER_AGENT = "BrewTact/1.0 (+https://brewtact.com)"
 
 O_SOL = "5c8e7c9e-1111-4a1a-8a1a-000000000001"
 O_BOLT = "5c8e7c9e-1111-4a1a-8a1a-000000000002"
@@ -175,7 +177,8 @@ class HttpMatrixTest(unittest.TestCase):
         self.assertEqual(sleeps, [])
         request = opener.requests[0]
         self.assertEqual(request.full_url, job.BULK_METADATA_URL)
-        self.assertTrue(request.get_header("User-agent").startswith("BrewTact/1.0"))
+        # D-64: o endereço do site, sem e-mail. O literal, não a constante.
+        self.assertEqual(request.get_header("User-agent"), BREWTACT_USER_AGENT)
         self.assertEqual(request.get_header("Accept"), "application/json")
 
     def test_404_fails_at_once_without_retry(self) -> None:
@@ -1248,6 +1251,11 @@ class RunModesTest(unittest.TestCase):
         self.assertEqual(
             [request.full_url for request in opener.requests],
             [job.BULK_METADATA_URL, METADATA_2026_09_23["jsonl_download_uri"]],
+        )
+        # D-64: metadados e download levam o mesmo User-Agent.
+        self.assertEqual(
+            [request.get_header("User-agent") for request in opener.requests],
+            [BREWTACT_USER_AGENT, BREWTACT_USER_AGENT],
         )
         self.assertEqual(receipt["counts"]["cards"]["inserted"], 4)
         self.assertEqual(leftovers, [])
