@@ -47,6 +47,7 @@ NOW = datetime(2026, 9, 23, 10, 0, tzinfo=timezone.utc)
 
 O_SOL = "5c8e7c9e-1111-4a1a-8a1a-000000000001"
 O_BOLT = "5c8e7c9e-1111-4a1a-8a1a-000000000002"
+O_DRAKE = "5c8e7c9e-1111-4a1a-8a1a-000000000003"
 P_SOL_CMM = "5c8e7c9e-2222-4b2b-9b2b-000000000001"
 P_SOL_BRT = "5c8e7c9e-2222-4b2b-9b2b-000000000002"
 P_BOLT = "5c8e7c9e-2222-4b2b-9b2b-000000000003"
@@ -120,6 +121,19 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
                   '2026-06-01T00:00:00Z')
                 """,
                 (P_BOLT, O_BOLT),
+            )
+            # Linha-alias do Drake: no bulk ele só tem preço foil e uma versão
+            # digital, então o preço atual fica (D-62).
+            cur.execute(
+                """
+                INSERT INTO cards (scryfall_id, oracle_id, name, mana_cost, type_line,
+                  oracle_text, colors, color_identity, set_code, rarity,
+                  is_reserved, price, price_usd, price_source, price_updated_at)
+                VALUES (%s::uuid, %s::uuid, 'BrewTact Test Drake', '{2}{U}',
+                  'Creature — Drake', 'Flying', '{U}', '{U}', 'brt', 'common',
+                  FALSE, 0.30, 0.30, 'mtgjson', '2026-06-27T00:00:00Z')
+                """,
+                (O_DRAKE, O_DRAKE),
             )
             cur.execute(
                 """
@@ -239,6 +253,16 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
         self.assertEqual(counts["sets"]["inserted"], 2)
         self.assertGreater(counts["card_legalities"]["inserted"], 0)
         self.assertEqual(counts["card_legalities"]["updated"], 1)
+        self.assertEqual(
+            counts["alias_prices"],
+            {
+                "found": 1,
+                "updated": 1,
+                "unchanged": 0,
+                "kept_no_paper_usd": 1,
+                "kept_not_in_bulk": 0,
+            },
+        )
 
         bolt = self.fetch_card(P_BOLT)
         self.assertEqual(bolt["price_usd"], Decimal("1.50"))
@@ -262,9 +286,18 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
             },
         )
 
+        # D-62: a linha-alias leva o menor preço em papel, não foil, em USD, entre
+        # todas as impressões do bulk: 1.99 (cmm, que nem está no catálogo)
+        # contra 2.25 (brt).
         alias = self.fetch_card(O_SOL)
-        self.assertEqual(alias["price_usd"], Decimal("1.00"))
-        self.assertEqual(alias["price_source"], "mtgjson")
+        self.assertEqual(alias["price_usd"], Decimal("1.99"))
+        self.assertEqual(alias["price"], Decimal("1.99"))
+        self.assertEqual(alias["price_source"], "scryfall")
+        self.assertEqual(alias["price_updated_at"], datetime(2026, 9, 22, 9, 0, tzinfo=timezone.utc))
+        self.assertIsNone(alias["price_usd_foil"])
+        drake_alias = self.fetch_card(O_DRAKE)
+        self.assertEqual(drake_alias["price_usd"], Decimal("0.30"))
+        self.assertEqual(drake_alias["price_source"], "mtgjson")
         self.assertIn("api.scryfall.com/cards/named", alias["image_url"])
         self.assertEqual(
             self.legalities(O_SOL),
@@ -314,6 +347,7 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
             self.assertEqual(
                 cur.fetchall(),
                 [
+                    ("catalog_reference:alias_prices", "success"),
                     ("catalog_reference:card_legalities", "success"),
                     ("catalog_reference:cards", "success"),
                     ("catalog_reference:sets", "success"),
@@ -336,6 +370,8 @@ class CatalogReferenceRefreshDbTest(unittest.TestCase):
         self.assertEqual(counts["sets"]["inserted"], 0)
         self.assertEqual(counts["card_legalities"]["inserted"], 0)
         self.assertEqual(counts["card_legalities"]["updated"], 0)
+        self.assertEqual(counts["alias_prices"]["updated"], 0)
+        self.assertEqual(counts["alias_prices"]["unchanged"], 1)
         with self.conn.cursor() as cur:
             cur.execute("SELECT count(*) FROM cards")
             self.assertEqual(cur.fetchone()[0], cards_after_first)

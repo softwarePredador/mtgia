@@ -29,9 +29,15 @@ tempo de execução e número de cartas novas limitados. Estourar qualquer limit
 desfaz a transação.
 
 Fase 1 da D-35: as linhas que já estão no catálogo são atualizadas (as de
-impressão exata em todos os campos e no preço; as linhas-alias Oracle só nas
-legalidades), e entram as cartas novas e as impressões dos sets lançados desde
-o último sync. Impressões antigas de cartas que já estão no catálogo são
+impressão exata em todos os campos e no preço; as linhas-alias Oracle nas
+legalidades e no preço da D-62), e entram as cartas novas e as impressões dos
+sets lançados desde o último sync.
+
+Preço da linha-alias Oracle (D-62): o menor `prices.usd` entre as impressões
+em papel da mesma carta no bulk, contando todas as impressões do arquivo e não
+só as que estão no catálogo. Digital e foil não entram (`prices.usd` já é o
+preço não foil). Sem nenhum preço desses, a linha-alias fica com o valor que
+tem, e o receipt conta. Impressões antigas de cartas que já estão no catálogo são
 contadas e puladas: levar a base ao grão de impressão e migrar as linhas-alias
 Oracle é a fase 2.
 
@@ -118,6 +124,7 @@ SYNC_LOG_RUN = "catalog_reference"
 SYNC_LOG_CARDS = "catalog_reference:cards"
 SYNC_LOG_SETS = "catalog_reference:sets"
 SYNC_LOG_LEGALITIES = "catalog_reference:card_legalities"
+SYNC_LOG_ALIAS_PRICES = "catalog_reference:alias_prices"
 SYNC_LOG_CONTRACT = "catalog_reference:contract"
 
 # Catálogo com mais de 7 dias dispara alerta, sem bloquear a leitura (D-36).
@@ -843,6 +850,8 @@ class BulkPrinting:
     price_usd_foil: Decimal | None
     legalities: tuple[tuple[str, str], ...]
     insertable: bool
+    # Impressão em papel: `games` tem `paper` e não é digital (D-62).
+    paper: bool = False
 
     def card_row(self, *, price_updated_at: datetime, for_insert: bool) -> tuple[Any, ...]:
         is_reserved = self.is_reserved
@@ -917,10 +926,10 @@ def normalize_printing(raw: Any) -> BulkPrinting | None:
     games = raw.get("games") if isinstance(raw.get("games"), list) else []
     layout = _text(raw.get("layout"))
     prices = raw.get("prices") if isinstance(raw.get("prices"), dict) else {}
+    paper = "paper" in games and raw.get("digital") is not True
     insertable = (
         oracle_id is not None
-        and "paper" in games
-        and raw.get("digital") is not True
+        and paper
         and raw.get("oversized") is not True
         and (layout or "") not in NON_GAME_LAYOUTS
     )
@@ -956,6 +965,7 @@ def normalize_printing(raw: Any) -> BulkPrinting | None:
         price_usd_foil=parse_price(prices.get("usd_foil")),
         legalities=tuple(sorted(legalities)),
         insertable=insertable,
+        paper=paper,
     )
 
 
@@ -969,6 +979,9 @@ class CatalogSnapshot:
     alias_rows: int
     set_codes: set[str]
     state: dict[str, str]
+    # oracle_ids das linhas-alias (scryfall_id = oracle_id), que recebem o
+    # preço da D-62.
+    alias_oracle_ids: set[str] = field(default_factory=set)
 
 
 def catalog_freshness(state: dict[str, str], now: datetime) -> dict[str, Any]:
@@ -1016,6 +1029,7 @@ class RefreshPlan:
     inserts: list[tuple[Any, ...]] = field(default_factory=list)
     legalities: dict[str, tuple[tuple[str, str], ...]] = field(default_factory=dict)
     sets: dict[str, tuple[str, str, date | None, str | None]] = field(default_factory=dict)
+    alias_prices: dict[str, Decimal] = field(default_factory=dict)
     counts: Counter = field(default_factory=Counter)
 
 
@@ -1031,6 +1045,8 @@ def plan_refresh(
     counts = plan.counts
     legalities_seen: dict[str, tuple[tuple[str, str], ...]] = {}
     inserted_oracle_ids: set[str] = set()
+    cheapest_paper_usd: dict[str, Decimal] = {}
+    oracle_ids_in_bulk: set[str] = set()
     for index, raw in enumerate(raw_objects):
         if index % 5000 == 0:
             ctx.check_runtime()
@@ -1041,6 +1057,14 @@ def plan_refresh(
             continue
         if printing.oracle_id and printing.legalities:
             legalities_seen.setdefault(printing.oracle_id, printing.legalities)
+        if printing.oracle_id:
+            oracle_ids_in_bulk.add(printing.oracle_id)
+            # D-62: toda impressão em papel com preço não foil em USD conta,
+            # esteja ou não no catálogo.
+            if printing.paper and printing.price_usd is not None:
+                cheapest = cheapest_paper_usd.get(printing.oracle_id)
+                if cheapest is None or printing.price_usd < cheapest:
+                    cheapest_paper_usd[printing.oracle_id] = printing.price_usd
         if printing.scryfall_id in snapshot.scryfall_ids:
             plan.updates.append(
                 printing.card_row(price_updated_at=price_updated_at, for_insert=False)
@@ -1081,6 +1105,15 @@ def plan_refresh(
     for oracle_id, legalities in legalities_seen.items():
         if oracle_id in snapshot.oracle_ids or oracle_id in inserted_oracle_ids:
             plan.legalities[oracle_id] = legalities
+    for oracle_id in sorted(snapshot.alias_oracle_ids):
+        cheapest = cheapest_paper_usd.get(oracle_id)
+        if cheapest is not None:
+            plan.alias_prices[oracle_id] = cheapest
+        elif oracle_id in oracle_ids_in_bulk:
+            counts["alias_price_kept_no_paper_usd"] += 1
+        else:
+            counts["alias_price_kept_not_in_bulk"] += 1
+    counts["alias_price_found"] = len(plan.alias_prices)
     plan.sets = {
         code: row
         for code, row in plan.sets.items()
@@ -1168,6 +1201,19 @@ UPSERT_LEGALITIES_SQL = (
 )
 LEGALITIES_TEMPLATE = "(%s::uuid, %s::text, %s::text)"
 
+# D-62: preço da linha-alias Oracle (scryfall_id = oracle_id). Só as colunas
+# de preço não foil; o foil da linha-alias fica como está.
+UPDATE_ALIAS_PRICES_SQL = (
+    "UPDATE cards AS c SET price_usd = v.price, price = v.price, "
+    "price_source = 'scryfall', price_updated_at = v.updated_at "
+    "FROM (VALUES %s) AS v(oracle_id, price, updated_at) "
+    "WHERE c.oracle_id = v.oracle_id AND c.scryfall_id = c.oracle_id "
+    "AND (c.price_usd, c.price, c.price_source, c.price_updated_at) "
+    "IS DISTINCT FROM (v.price, v.price, 'scryfall', v.updated_at) "
+    "RETURNING c.id::text"
+)
+ALIAS_PRICES_TEMPLATE = "(%s::uuid, %s::numeric, %s::timestamptz)"
+
 UPSERT_STATE_SQL = (
     "INSERT INTO sync_state (key, value, updated_at) VALUES %s "
     "ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, "
@@ -1183,6 +1229,7 @@ INSERT_SYNC_LOG_SQL = (
 
 WRITE_STATEMENTS = (
     UPDATE_CARDS_SQL,
+    UPDATE_ALIAS_PRICES_SQL,
     INSERT_CARDS_SQL,
     INSERT_SETS_SQL,
     UPSERT_LEGALITIES_SQL,
@@ -1202,7 +1249,13 @@ def _chunks(rows: list[Any], size: int) -> Iterator[list[Any]]:
         yield rows[index : index + size]
 
 
-def apply_plan(cur: Any, plan: RefreshPlan, ctx: RunContext) -> dict[str, dict[str, int]]:
+def apply_plan(
+    cur: Any,
+    plan: RefreshPlan,
+    ctx: RunContext,
+    *,
+    price_updated_at: datetime | None = None,
+) -> dict[str, dict[str, int]]:
     batch = ctx.budget.batch_size
     sets_inserted = 0
     set_rows = sorted(plan.sets.values(), key=lambda row: row[0])
@@ -1219,6 +1272,17 @@ def apply_plan(cur: Any, plan: RefreshPlan, ctx: RunContext) -> dict[str, dict[s
     for chunk in _chunks(plan.inserts, batch):
         ctx.check_runtime()
         cards_inserted += len(_execute_values(cur, INSERT_CARDS_SQL, chunk, template, batch))
+
+    alias_rows = [
+        (oracle_id, price, price_updated_at)
+        for oracle_id, price in sorted(plan.alias_prices.items())
+    ]
+    alias_updated = 0
+    for chunk in _chunks(alias_rows, batch):
+        ctx.check_runtime()
+        alias_updated += len(
+            _execute_values(cur, UPDATE_ALIAS_PRICES_SQL, chunk, ALIAS_PRICES_TEMPLATE, batch)
+        )
 
     legality_rows = [
         (oracle_id, fmt, status)
@@ -1245,6 +1309,13 @@ def apply_plan(cur: Any, plan: RefreshPlan, ctx: RunContext) -> dict[str, dict[s
             "inserted": cards_inserted,
         },
         "sets": {"insert_candidates": len(set_rows), "inserted": sets_inserted},
+        "alias_prices": {
+            "found": len(alias_rows),
+            "updated": alias_updated,
+            "unchanged": len(alias_rows) - alias_updated,
+            "kept_no_paper_usd": plan.counts["alias_price_kept_no_paper_usd"],
+            "kept_not_in_bulk": plan.counts["alias_price_kept_not_in_bulk"],
+        },
         "card_legalities": {
             "oracle_ids": len(plan.legalities),
             "rows_sent": len(legality_rows),
@@ -1353,6 +1424,7 @@ def load_snapshot(cur: Any, state: dict[str, str]) -> CatalogSnapshot:
     scryfall_ids: set[str] = set()
     oracle_ids: set[str] = set()
     alias_rows = 0
+    alias_oracle_ids: set[str] = set()
     for scryfall_id, oracle_id in cur.fetchall():
         if scryfall_id:
             scryfall_ids.add(str(scryfall_id))
@@ -1360,12 +1432,14 @@ def load_snapshot(cur: Any, state: dict[str, str]) -> CatalogSnapshot:
             oracle_ids.add(str(oracle_id))
         if scryfall_id and oracle_id and scryfall_id == oracle_id:
             alias_rows += 1
+            alias_oracle_ids.add(str(oracle_id))
     cur.execute("SELECT LOWER(code) FROM sets")
     set_codes = {str(row[0]) for row in cur.fetchall() if row[0]}
     return CatalogSnapshot(
         scryfall_ids=scryfall_ids,
         oracle_ids=oracle_ids,
         alias_rows=alias_rows,
+        alias_oracle_ids=alias_oracle_ids,
         set_codes=set_codes,
         state=state,
     )
@@ -1630,7 +1704,7 @@ def _run(
                 "catalog_before": {
                     "rows": len(snapshot.scryfall_ids),
                     "oracle_ids": len(snapshot.oracle_ids),
-                    "alias_rows_prices_not_refreshed": snapshot.alias_rows,
+                    "alias_rows": snapshot.alias_rows,
                     "sets": len(snapshot.set_codes),
                 },
                 "new_set_cutoff": cutoff.isoformat() if cutoff else None,
@@ -1641,13 +1715,14 @@ def _run(
                     "cards_insert_candidates": len(plan.inserts),
                     "sets_insert_candidates": len(plan.sets),
                     "legalities_oracle_ids": len(plan.legalities),
+                    "alias_prices_found": len(plan.alias_prices),
                 }
                 receipt["counts"] = counts
                 receipt["status"] = "dry_run"
                 conn.rollback()
                 return exit_code, receipt
 
-            applied = apply_plan(cur, plan, ctx)
+            applied = apply_plan(cur, plan, ctx, price_updated_at=price_updated_at)
             counts.update(applied)
             finished_at = ctx.now()
             finished = _iso(finished_at)
@@ -1674,6 +1749,7 @@ def _run(
                     applied["card_legalities"]["inserted"],
                     applied["card_legalities"]["updated"],
                 ),
+                (SYNC_LOG_ALIAS_PRICES, 0, applied["alias_prices"]["updated"]),
             ):
                 insert_sync_log(
                     cur,

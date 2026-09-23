@@ -46,6 +46,13 @@ FIXTURE = FIXTURES / "scryfall_default_cards_sample.json"
 # Os mesmos 9 objetos da lista acima, no formato atual da Scryfall: JSON Lines
 # com gzip, um card por linha.
 FIXTURE_JSONL_GZ = FIXTURES / "scryfall_default_cards_sample.jsonl.gz"
+# D-62: várias impressões da mesma carta, com foil, digital e sem preço.
+PRICES_FIXTURE = FIXTURES / "scryfall_alias_prices_sample.json"
+PRICES_FIXTURE_JSONL_GZ = FIXTURES / "scryfall_alias_prices_sample.jsonl.gz"
+O_PRICE_A = "7a1b0000-1111-4a1a-8a1a-00000000000a"
+O_PRICE_B = "7a1b0000-1111-4a1a-8a1a-00000000000b"
+O_PRICE_C = "7a1b0000-1111-4a1a-8a1a-00000000000c"
+O_PRICE_D = "7a1b0000-1111-4a1a-8a1a-00000000000d"
 # Metadados no formato de 2026-09-23 (jsonl_download_uri e compressed_size, sem
 # download_uri, size, content_type e content_encoding). object, id, type,
 # updated_at, jsonl_download_uri e compressed_size são os valores relatados pela
@@ -327,6 +334,7 @@ def fixture_snapshot(**state) -> "job.CatalogSnapshot":
         alias_rows=1,
         set_codes={"lea", "2xm"},
         state=state or {job.STATE_CARDS_LAST_SYNC_AT: "2026-06-06T12:00:00"},
+        alias_oracle_ids={O_SOL},
     )
 
 
@@ -458,6 +466,67 @@ class BulkMetadataFormatTest(unittest.TestCase):
         self.assertEqual(job.bulk_format_for_name("x/DEFAULT.JSONL"), jsonl)
         self.assertEqual(job.bulk_format_for_name("x/default-cards.json"), array)
         self.assertEqual(job.bulk_format_for_name("x/default-cards.json.gz"), array)
+
+
+class AliasPriceRuleTest(unittest.TestCase):
+    """D-62: a linha-alias Oracle leva o menor `prices.usd` entre as impressões
+    em papel da carta no bulk; digital e foil não contam."""
+
+    def snapshot(self) -> "job.CatalogSnapshot":
+        # A, B e C têm linha-alias; nenhuma impressão da fixture está no catálogo.
+        return job.CatalogSnapshot(
+            scryfall_ids={O_PRICE_A, O_PRICE_B, O_PRICE_C},
+            oracle_ids={O_PRICE_A, O_PRICE_B, O_PRICE_C},
+            alias_rows=3,
+            set_codes=set(),
+            state={job.STATE_CARDS_LAST_SYNC_AT: "2026-09-20T12:00:00Z"},
+            alias_oracle_ids={O_PRICE_A, O_PRICE_B, O_PRICE_C},
+        )
+
+    def plan(self, fixture: Path, bulk_format: str = job.BULK_FORMAT_JSON_ARRAY):
+        ctx, _ = make_ctx()
+        snapshot = self.snapshot()
+        return job.plan_refresh(
+            job.iter_bulk_objects(fixture, bulk_format),
+            snapshot,
+            price_updated_at=job.parse_timestamp(SOURCE_UPDATED_AT),
+            cutoff=job.new_set_cutoff(snapshot.state, ctx.budget.new_set_margin_days),
+            ctx=ctx,
+        )
+
+    def test_cheapest_paper_non_foil_usd_across_every_printing(self) -> None:
+        plan = self.plan(PRICES_FIXTURE)
+
+        # A: 3.00 (foil 1.00), 2.50, digital 0.10, só foil 0.05 e 2.75 -> 2.50.
+        self.assertEqual(plan.alias_prices, {O_PRICE_A: Decimal("2.50")})
+        self.assertEqual(plan.counts["alias_price_found"], 1)
+        # B só tem foil em papel e preço em versão digital: fica como está.
+        self.assertEqual(plan.counts["alias_price_kept_no_paper_usd"], 1)
+        # C não está no bulk: fica como está.
+        self.assertEqual(plan.counts["alias_price_kept_not_in_bulk"], 1)
+        # D tem preço, mas não tem linha-alias no catálogo: nada a gravar.
+        self.assertNotIn(O_PRICE_D, plan.alias_prices)
+
+    def test_the_rule_reads_the_jsonl_the_same_way(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prices.jsonl"
+            path.write_bytes(gzip.decompress(PRICES_FIXTURE_JSONL_GZ.read_bytes()))
+            jsonl_plan = self.plan(path, job.BULK_FORMAT_JSONL)
+
+        self.assertEqual(jsonl_plan.alias_prices, self.plan(PRICES_FIXTURE).alias_prices)
+        self.assertEqual(jsonl_plan.counts, self.plan(PRICES_FIXTURE).counts)
+
+    def test_paper_flag_excludes_digital_printings(self) -> None:
+        raw = json.loads(PRICES_FIXTURE.read_text(encoding="utf-8"))
+        by_id = {item["id"]: job.normalize_printing(item) for item in raw}
+
+        self.assertTrue(by_id["7a1b0000-2222-4b2b-9b2b-00000000a002"].paper)
+        self.assertFalse(by_id["7a1b0000-2222-4b2b-9b2b-00000000a003"].paper)
+        self.assertFalse(by_id["7a1b0000-2222-4b2b-9b2b-00000000b002"].paper)
+        # prices.usd é o preço não foil; o foil fica em outro campo.
+        foil_only = by_id["7a1b0000-2222-4b2b-9b2b-00000000a004"]
+        self.assertIsNone(foil_only.price_usd)
+        self.assertEqual(foil_only.price_usd_foil, Decimal("0.05"))
 
 
 class JsonlDownloadAndParseTest(unittest.TestCase):
@@ -657,6 +726,7 @@ class ParseAndPlanTest(unittest.TestCase):
                 "skipped_older_printing_phase2": 1,
                 "skipped_not_a_paper_game_card": 2,
                 "skipped_invalid_object": 1,
+                "alias_price_found": 1,
             },
         )
         self.assertEqual([row[0] for row in plan.updates], [P_BOLT])
@@ -762,6 +832,15 @@ class ApplyContractTest(unittest.TestCase):
             frozenset({"cards", "sets", "card_legalities", "sync_log", "sync_state"}),
         )
 
+    def test_alias_price_update_touches_only_alias_rows_and_non_foil_price(self) -> None:
+        sql = job.UPDATE_ALIAS_PRICES_SQL
+        self.assertIn(sql, job.WRITE_STATEMENTS)
+        self.assertIn("c.scryfall_id = c.oracle_id", sql)
+        self.assertIn("price_usd = v.price, price = v.price", sql)
+        self.assertIn("price_source = 'scryfall'", sql)
+        self.assertNotIn("price_usd_foil", sql)
+        self.assertIn(") IS DISTINCT FROM (", sql)
+
     def test_updates_only_touch_rows_that_change(self) -> None:
         self.assertIn(") IS DISTINCT FROM (", job.UPDATE_CARDS_SQL)
         self.assertIn(
@@ -791,7 +870,7 @@ class FakeCursor:
         elif text.startswith("SELECT key, value FROM sync_state"):
             self._rows = sorted(self.db.state.items())
         elif text.startswith("SELECT scryfall_id::text, oracle_id::text FROM cards"):
-            self._rows = [(O_SOL, O_SOL), (P_BOLT, O_BOLT)]
+            self._rows = list(self.db.cards)
         elif text.startswith("SELECT LOWER(code) FROM sets"):
             self._rows = [("lea",), ("2xm",)]
         elif text.startswith("SELECT pg_try_advisory_xact_lock"):
@@ -820,6 +899,8 @@ class FakeDatabase:
             else {job.STATE_CARDS_LAST_SYNC_AT: "2026-06-06T12:00:00"}
         )
         self.lock_available = lock_available
+        # (scryfall_id, oracle_id) das linhas de cards; O_SOL é linha-alias.
+        self.cards = [(O_SOL, O_SOL), (P_BOLT, O_BOLT)]
         self.statements: list[tuple[str, object]] = []
         self.values_calls: list[tuple[str, list]] = []
         self.commits = 0
@@ -965,14 +1046,35 @@ class RunModesTest(unittest.TestCase):
         self.assertEqual(counts["cards"]["updated"], 1)
         self.assertEqual(counts["sets"]["inserted"], 2)
         self.assertEqual(counts["card_legalities"]["oracle_ids"], 5)
-        self.assertEqual(counts["catalog_before"]["alias_rows_prices_not_refreshed"], 1)
+        self.assertEqual(counts["catalog_before"]["alias_rows"], 1)
+        # D-62: a linha-alias do Sol Ring leva o menor preço em papel (1.99).
+        self.assertEqual(
+            counts["alias_prices"],
+            {
+                "found": 1,
+                "updated": 1,
+                "unchanged": 0,
+                "kept_no_paper_usd": 0,
+                "kept_not_in_bulk": 0,
+            },
+        )
+        alias_calls = [rows for sql, rows in self.db.values_calls if sql is job.UPDATE_ALIAS_PRICES_SQL]
+        self.assertEqual(
+            alias_calls,
+            [[(O_SOL, Decimal("1.99"), job.parse_timestamp(SOURCE_UPDATED_AT))]],
+        )
         targets = {target for sql in self.db.writes() for _, target in written_tables(sql)}
         self.assertLessEqual(targets, set(job.WRITABLE_TABLES))
         self.assertTrue(any("pg_try_advisory_xact_lock" in sql for sql, _ in self.db.statements))
         sync_types = [params[0] for sql, params in self.db.statements if sql is job.INSERT_SYNC_LOG_SQL]
         self.assertEqual(
             sync_types,
-            [job.SYNC_LOG_CARDS, job.SYNC_LOG_SETS, job.SYNC_LOG_LEGALITIES],
+            [
+                job.SYNC_LOG_CARDS,
+                job.SYNC_LOG_SETS,
+                job.SYNC_LOG_LEGALITIES,
+                job.SYNC_LOG_ALIAS_PRICES,
+            ],
         )
 
     def test_busy_lock_fails_without_writing_the_plan(self) -> None:
@@ -1171,6 +1273,44 @@ class RunModesTest(unittest.TestCase):
         self.assertFalse(receipt["database_writes"])
         self.assertEqual(self.db.writes(), [])
         self.assertEqual(receipt["counts"]["planned"]["cards_insert_candidates"], 4)
+
+    def test_activation_writes_the_d62_alias_prices(self) -> None:
+        self.db.cards = [
+            (O_PRICE_A, O_PRICE_A),
+            (O_PRICE_B, O_PRICE_B),
+            (O_PRICE_C, O_PRICE_C),
+        ]
+
+        code, receipt, _ = self.run_job(
+            [
+                "--mode",
+                "activate",
+                "--bulk-json",
+                str(PRICES_FIXTURE_JSONL_GZ),
+                "--source-updated-at",
+                SOURCE_UPDATED_AT,
+            ],
+            environment={job.WRITE_APPROVAL_ENV: job.WRITE_APPROVAL_VALUE},
+        )
+
+        self.assertEqual(code, 0, receipt)
+        alias_calls = [rows for sql, rows in self.db.values_calls if sql is job.UPDATE_ALIAS_PRICES_SQL]
+        self.assertEqual(
+            alias_calls,
+            [[(O_PRICE_A, Decimal("2.50"), job.parse_timestamp(SOURCE_UPDATED_AT))]],
+        )
+        self.assertEqual(
+            receipt["counts"]["alias_prices"],
+            {
+                "found": 1,
+                "updated": 1,
+                "unchanged": 0,
+                "kept_no_paper_usd": 1,
+                "kept_not_in_bulk": 1,
+            },
+        )
+        logged = [params for sql, params in self.db.statements if sql is job.INSERT_SYNC_LOG_SQL]
+        self.assertIn((job.SYNC_LOG_ALIAS_PRICES, 0, 1), [row[:3] for row in logged])
 
     def test_metadata_without_any_uri_fails_with_its_own_error(self) -> None:
         self.db.state[job.STATE_ACTIVE_CONTRACT] = job.APPLY_CONTRACT
