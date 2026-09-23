@@ -72,7 +72,7 @@
   },
   "export_policy": {
     "decision": "D-22",
-    "state": "Política da D-22, ainda não implementada: em 47dc3b698, 25 relações saem por to_jsonb da linha inteira (inclusive request_fingerprint, request_key, cache_key e hashes de deck), battle_jobs sai por denylist e IDs de outras pessoas saem crus. A implementação é o BT-PRIV-001.",
+    "state": "Implementada: server/lib/privacy/privacy_export_allowlist.dart espelha as colunas desta allowlist e o teste server/test/privacy_export_allowlist_test.dart falha se as duas divergirem.",
     "delivery": "POST /users/me/export com a senha atual; gerado sob demanda numa transação somente leitura e devolvido como anexo com Cache-Control no-store; nada é guardado no servidor",
     "pseudonym": "HMAC-SHA256 com chave aleatória por exportação: a mesma pessoa ou deck de terceiro recebe o mesmo pseudônimo dentro do arquivo e outro em cada exportação",
     "nested_forbidden_keys": {
@@ -1200,8 +1200,7 @@
       },
       "export": {
         "section": "data.content_report_appeals",
-        "reason": "só os recursos do titular",
-        "gap": "fora da exportação atual"
+        "reason": "só os recursos do titular"
       },
       "deletion": {
         "mode": "gap",
@@ -1436,8 +1435,7 @@
         "gap": null
       },
       "export": {
-        "section": "data.deck_matchups",
-        "gap": "fora da exportação atual"
+        "section": "data.deck_matchups"
       },
       "deletion": {
         "mode": "cascade",
@@ -1514,8 +1512,7 @@
         "gap": null
       },
       "export": {
-        "section": "data.deck_weakness_reports",
-        "gap": "fora da exportação atual"
+        "section": "data.deck_weakness_reports"
       },
       "deletion": {
         "mode": "cascade",
@@ -2525,8 +2522,7 @@
       },
       "export": {
         "section": "data.block_events",
-        "reason": "só os eventos em que o titular agiu",
-        "gap": "fora da exportação atual"
+        "reason": "só os eventos em que o titular agiu"
       },
       "deletion": {
         "mode": "gap",
@@ -2560,8 +2556,7 @@
       },
       "export": {
         "section": "data.blocks",
-        "reason": "só os bloqueios feitos pelo titular",
-        "gap": "fora da exportação atual"
+        "reason": "só os bloqueios feitos pelo titular"
       },
       "deletion": {
         "mode": "gap",

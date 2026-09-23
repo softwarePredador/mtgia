@@ -179,7 +179,8 @@ void main() {
         contains('brewtact-user-data-'),
       );
       final exported = objectBody(export);
-      expect(exported['schema_version'], 1);
+      // BT-PRIV-001: formato 2, com allowlist por coluna e pseudônimos.
+      expect(exported['schema_version'], 2);
       expect((exported['account'] as Map)['username'], username);
       expect((exported['account'] as Map)['email'], email);
       final data = exported['data'] as Map<String, dynamic>;

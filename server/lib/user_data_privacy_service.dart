@@ -5,6 +5,8 @@ import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
 import 'auth_service.dart';
+import 'privacy/privacy_export_allowlist.dart';
+import 'privacy/privacy_export_pseudonymizer.dart';
 import 'rate_limit_middleware.dart' show credentialEmailRateLimitIdentifier;
 
 const accountDeletionConfirmation = 'EXCLUIR MINHA CONTA';
@@ -53,579 +55,111 @@ class UserDataPrivacyService {
     }
   }
 
+  /// Exportação dos dados da conta (BT-PRIV-001, D-22).
+  ///
+  /// Gerada sob demanda numa transação somente leitura e devolvida ao
+  /// cliente; o servidor não guarda cópia. Cada seção sai só com as colunas da
+  /// allowlist (`lib/privacy/privacy_export_allowlist.dart`, espelho do
+  /// inventário do BT-PRIV-003). IDs de outras pessoas viram pseudônimos que
+  /// só valem neste arquivo, e hashes, fingerprints e chaves internas saem de
+  /// qualquer profundidade do JSON. Relação ausente derruba a exportação em
+  /// vez de devolver uma seção vazia.
   Future<Map<String, dynamic>> exportUserData(String userId) {
     return pool.runTx(
       (session) async {
-        final accountResult = await session.execute(
-          Sql.named('''
-          SELECT jsonb_build_object(
-            'id', id,
-            'username', username,
-            'email', email,
-            'display_name', display_name,
-            'avatar_url', avatar_url,
-            'location_state', location_state,
-            'location_city', location_city,
-            'trade_notes', trade_notes,
-            'created_at', created_at,
-            'updated_at', updated_at
-          )
-          FROM users
-          WHERE id = CAST(@userId AS uuid)
-            AND deleted_at IS NULL
-          LIMIT 1
-        '''),
-          parameters: {'userId': userId},
-        );
-        if (accountResult.isEmpty) throw UserDataNotFoundException();
-
-        final plan = await _optionalJsonRows(
-          session,
-          relation: 'user_plans',
-          query:
-              'SELECT to_jsonb(p) FROM user_plans p '
-              'WHERE p.user_id = CAST(@userId AS uuid)',
-          userId: userId,
-        );
-        final decks = await _optionalJsonRows(
-          session,
-          relation: 'decks',
-          query:
-              'SELECT to_jsonb(d) FROM decks d '
-              'WHERE d.user_id = CAST(@userId AS uuid) '
-              'ORDER BY d.created_at, d.id',
-          userId: userId,
-        );
-        final deckCards = await _optionalJsonRows(
-          session,
-          relation: 'deck_cards',
-          query: '''
-          SELECT jsonb_build_object(
-            'deck_card', to_jsonb(dc),
-            'card_identity', jsonb_build_object(
-              'name', c.name,
-              'scryfall_id', c.scryfall_id,
-              'oracle_id', c.oracle_id,
-              'set_code', c.set_code,
-              'collector_number', c.collector_number
-            )
-          )
-          FROM deck_cards dc
-          JOIN decks d ON d.id = dc.deck_id
-          JOIN cards c ON c.id = dc.card_id
-          WHERE d.user_id = CAST(@userId AS uuid)
-          ORDER BY dc.deck_id, dc.id
-        ''',
-          userId: userId,
-        );
-        final deckLearningEvents = await _optionalJsonRows(
-          session,
-          relation: 'deck_learning_events',
-          query: '''
-          SELECT to_jsonb(learning_event)
-          FROM deck_learning_events learning_event
-          WHERE learning_event.deck_id IN (
-            SELECT deck.id
-            FROM decks deck
-            WHERE deck.user_id = CAST(@userId AS uuid)
-          )
-          ORDER BY learning_event.created_at, learning_event.id
-        ''',
-          userId: userId,
-        );
-        final battleSimulations = await _optionalJsonRows(
-          session,
-          relation: 'battle_simulations',
-          query: '''
-          SELECT to_jsonb(simulation)
-          FROM battle_simulations simulation
-          WHERE EXISTS (
-            SELECT 1
-            FROM decks deck
-            WHERE deck.user_id = CAST(@userId AS uuid)
-              AND deck.id IN (
-                simulation.deck_a_id,
-                simulation.deck_b_id,
-                simulation.winner_deck_id
-              )
-          )
-          ORDER BY simulation.created_at, simulation.id
-        ''',
-          userId: userId,
-        );
-        final binderItems = await _optionalJsonRows(
-          session,
-          relation: 'user_binder_items',
-          query: '''
-          SELECT jsonb_build_object(
-            'binder_item', to_jsonb(bi),
-            'card_identity', jsonb_build_object(
-              'name', c.name,
-              'scryfall_id', c.scryfall_id,
-              'oracle_id', c.oracle_id,
-              'set_code', c.set_code,
-              'collector_number', c.collector_number
-            )
-          )
-          FROM user_binder_items bi
-          JOIN cards c ON c.id = bi.card_id
-          WHERE bi.user_id = CAST(@userId AS uuid)
-          ORDER BY bi.created_at, bi.id
-        ''',
-          userId: userId,
-        );
-        final postGameNotes = await _optionalJsonRows(
-          session,
-          relation: 'post_game_notes',
-          query:
-              'SELECT to_jsonb(n) FROM post_game_notes n '
-              'WHERE n.user_id = CAST(@userId AS uuid) '
-              'ORDER BY n.created_at, n.id',
-          userId: userId,
-        );
-        final sharedDeckReports = await _optionalJsonRows(
-          session,
-          relation: 'shared_deck_reports',
-          query:
-              'SELECT to_jsonb(r) FROM shared_deck_reports r '
-              'WHERE r.user_id = CAST(@userId AS uuid) '
-              'ORDER BY r.created_at, r.id',
-          userId: userId,
-        );
-        final comments = await _optionalJsonRows(
-          session,
-          relation: 'deck_comments',
-          query:
-              'SELECT to_jsonb(c) FROM deck_comments c '
-              'WHERE c.user_id = CAST(@userId AS uuid) '
-              'ORDER BY c.created_at, c.id',
-          userId: userId,
-        );
-        final follows = await _optionalJsonRows(
-          session,
-          relation: 'user_follows',
-          query:
-              'SELECT to_jsonb(f) FROM user_follows f '
-              'WHERE f.follower_id = CAST(@userId AS uuid) '
-              'OR f.following_id = CAST(@userId AS uuid) '
-              'ORDER BY f.created_at, f.id',
-          userId: userId,
-        );
-        final activationEvents = await _optionalJsonRows(
-          session,
-          relation: 'activation_funnel_events',
-          query:
-              'SELECT to_jsonb(e) FROM activation_funnel_events e '
-              'WHERE e.user_id = CAST(@userId AS uuid) '
-              'ORDER BY e.created_at, e.id',
-          userId: userId,
-        );
-        final optimizationEvents = await _optionalJsonRows(
-          session,
-          relation: 'deck_optimization_events',
-          query:
-              'SELECT to_jsonb(e) FROM deck_optimization_events e '
-              'WHERE e.user_id = CAST(@userId AS uuid) '
-              'ORDER BY e.created_at, e.id',
-          userId: userId,
-        );
-        final aiPreferences = await _optionalJsonRows(
-          session,
-          relation: 'ai_user_preferences',
-          query:
-              'SELECT to_jsonb(p) FROM ai_user_preferences p '
-              'WHERE p.user_id = CAST(@userId AS uuid)',
-          userId: userId,
-        );
-        final aiLogs = await _optionalJsonRows(
-          session,
-          relation: 'ai_logs',
-          query:
-              'SELECT to_jsonb(l) FROM ai_logs l '
-              'WHERE l.user_id = CAST(@userId AS uuid) '
-              'ORDER BY l.created_at, l.id',
-          userId: userId,
-        );
-        final aiFeedback = await _optionalJsonRows(
-          session,
-          relation: 'ml_prompt_feedback',
-          query:
-              'SELECT to_jsonb(f) FROM ml_prompt_feedback f '
-              'WHERE f.user_id = CAST(@userId AS uuid) '
-              'ORDER BY f.created_at, f.id',
-          userId: userId,
-        );
-        final aiFallbackTelemetry = await _optionalJsonRows(
-          session,
-          relation: 'ai_optimize_fallback_telemetry',
-          query:
-              'SELECT to_jsonb(t) FROM ai_optimize_fallback_telemetry t '
-              'WHERE t.user_id = CAST(@userId AS uuid) '
-              'ORDER BY t.created_at, t.id',
-          userId: userId,
-        );
-        final aiOptimizeCache = await _optionalJsonRows(
-          session,
-          relation: 'ai_optimize_cache',
-          query:
-              'SELECT to_jsonb(c) FROM ai_optimize_cache c '
-              'WHERE c.user_id = CAST(@userId AS uuid) '
-              'ORDER BY c.created_at, c.id',
-          userId: userId,
-        );
-        final aiGenerateJobs = await _optionalJsonRows(
-          session,
-          relation: 'ai_generate_jobs',
-          query:
-              'SELECT to_jsonb(j) FROM ai_generate_jobs j '
-              'WHERE j.user_id = CAST(@userId AS uuid) '
-              'ORDER BY j.created_at, j.id',
-          userId: userId,
-        );
-        final aiOptimizeJobs = await _optionalJsonRows(
-          session,
-          relation: 'ai_optimize_jobs',
-          query:
-              'SELECT to_jsonb(j) FROM ai_optimize_jobs j '
-              'WHERE j.user_id = CAST(@userId AS uuid) '
-              'ORDER BY j.created_at, j.id',
-          userId: userId,
-        );
-        final trades = await _optionalJsonRows(
-          session,
-          relation: 'trade_offers',
-          query: '''
-          SELECT jsonb_build_object(
-            'id', t.id,
-            'sender_id', t.sender_id,
-            'receiver_id', t.receiver_id,
-            'status', t.status,
-            'type', t.type,
-            'message', CASE
-              WHEN t.sender_id = CAST(@userId AS uuid) THEN t.message
-              ELSE NULL
-            END,
-            'payment_amount', t.payment_amount,
-            'payment_currency', t.payment_currency,
-            'payment_method', t.payment_method,
-            'delivery_method', t.delivery_method,
-            'tracking_code', t.tracking_code,
-            'created_at', t.created_at,
-            'updated_at', t.updated_at
-          )
-          FROM trade_offers t
-          WHERE t.sender_id = CAST(@userId AS uuid)
-             OR t.receiver_id = CAST(@userId AS uuid)
-          ORDER BY t.created_at, t.id
-        ''',
-          userId: userId,
-        );
-        final tradeItems = await _optionalJsonRows(
-          session,
-          relation: 'trade_items',
-          query:
-              'SELECT to_jsonb(i) FROM trade_items i '
-              'WHERE i.owner_id = CAST(@userId AS uuid) '
-              'ORDER BY i.id',
-          userId: userId,
-        );
-        final tradeMessages = await _optionalJsonRows(
-          session,
-          relation: 'trade_messages',
-          query:
-              'SELECT to_jsonb(m) FROM trade_messages m '
-              'WHERE m.sender_id = CAST(@userId AS uuid) '
-              'ORDER BY m.created_at, m.id',
-          userId: userId,
-        );
-        final tradeStatusHistory = await _optionalJsonRows(
-          session,
-          relation: 'trade_status_history',
-          query:
-              'SELECT to_jsonb(h) FROM trade_status_history h '
-              'WHERE h.changed_by = CAST(@userId AS uuid) '
-              'ORDER BY h.created_at, h.id',
-          userId: userId,
-        );
-        final directMessagesSent = await _optionalJsonRows(
-          session,
-          relation: 'direct_messages',
-          query:
-              'SELECT to_jsonb(m) FROM direct_messages m '
-              'WHERE m.sender_id = CAST(@userId AS uuid) '
-              'ORDER BY m.created_at, m.id',
-          userId: userId,
-        );
-        final conversations = await _optionalJsonRows(
-          session,
-          relation: 'conversations',
-          query:
-              'SELECT to_jsonb(c) FROM conversations c '
-              'WHERE c.user_a_id = CAST(@userId AS uuid) '
-              'OR c.user_b_id = CAST(@userId AS uuid) '
-              'ORDER BY c.created_at, c.id',
-          userId: userId,
-        );
-        final notifications = await _optionalJsonRows(
-          session,
-          relation: 'notifications',
-          query: '''
-            SELECT jsonb_build_object(
-              'id', n.id,
-              'type', n.type,
-              'reference_id', n.reference_id,
-              'title', n.title,
-              'body', NULL,
-              'read_at', n.read_at,
-              'created_at', n.created_at
-            )
-            FROM notifications n
-            WHERE n.user_id = CAST(@userId AS uuid)
-            ORDER BY n.created_at, n.id
-          ''',
-          userId: userId,
-        );
-        final battleSimulationAttempts = await _optionalJsonRows(
-          session,
-          relation: 'battle_simulation_attempts',
-          query: '''
-          SELECT jsonb_build_object(
-            'id', attempt.id,
-            'deck_a_id', attempt.deck_a_id,
-            'deck_b_id', attempt.deck_b_id,
-            'replay_id', attempt.replay_id,
-            'simulation_type', attempt.simulation_type,
-            'test_objective', attempt.test_objective,
-            'outcome', attempt.outcome,
-            'request_schema_version', attempt.request_schema_version,
-            'deck_hash_schema', attempt.deck_hash_schema,
-            'deck_a_hash', attempt.deck_a_hash,
-            'deck_b_hash', attempt.deck_b_hash,
-            'engine', attempt.engine,
-            'engine_version', attempt.engine_version,
-            'engine_commit', attempt.engine_commit,
-            'engine_build', attempt.engine_build,
-            'timeout_ms', attempt.timeout_ms,
-            'events_truncated', attempt.events_truncated,
-            'snapshots_truncated', attempt.snapshots_truncated,
-            'outcome_reason', attempt.outcome_reason,
-            'error_code', attempt.error_code,
-            'provenance', attempt.provenance,
-            'started_at', attempt.started_at,
-            'finished_at', attempt.finished_at,
-            'updated_at', attempt.updated_at
-          )
-          FROM battle_simulation_attempts attempt
-          WHERE attempt.user_id = CAST(@userId AS uuid)
-          ORDER BY attempt.started_at, attempt.id
-        ''',
-          userId: userId,
-        );
-        final battleJobs = await _optionalJsonRows(
-          session,
-          relation: 'battle_jobs',
-          query: '''
-          SELECT
-            to_jsonb(job)
-              - 'request_payload'
-              - 'lease_owner'
-              - 'lease_token'
-          FROM battle_jobs job
-          WHERE job.user_id = CAST(@userId AS uuid)
-          ORDER BY job.created_at, job.id
-        ''',
-          userId: userId,
-        );
-        final battleLiveRecords = await _optionalJsonRows(
-          session,
-          relation: 'battle_job_live_records',
-          query: '''
-          SELECT jsonb_build_object(
-            'job_id', record.job_id,
-            'sequence', record.sequence,
-            'record_id', record.record_id,
-            'kind', record.kind,
-            'payload', record.payload,
-            'content_truncated', record.content_truncated,
-            'source_truncated', record.source_truncated,
-            'created_at', record.created_at
-          )
-          FROM battle_job_live_records record
-          JOIN battle_jobs job ON job.id = record.job_id
-          WHERE job.user_id = CAST(@userId AS uuid)
-            AND record.public_visible
-          ORDER BY record.job_id, record.sequence
-        ''',
-          userId: userId,
-        );
-        final interactiveBattleSessions = await _optionalJsonRows(
-          session,
-          relation: 'interactive_battle_sessions',
-          query: '''
-          SELECT jsonb_build_object(
-            'id', battle_session.id,
-            'schema_version', battle_session.schema_version,
-            'deck_a_id', battle_session.deck_a_id,
-            'deck_b_id', battle_session.deck_b_id,
-            'deck_hash_schema', battle_session.deck_hash_schema,
-            'deck_a_hash', battle_session.deck_a_hash,
-            'deck_b_hash', battle_session.deck_b_hash,
-            'request_schema_version', battle_session.request_schema_version,
-            'engine', battle_session.engine,
-            'engine_version', battle_session.engine_version,
-            'engine_commit', battle_session.engine_commit,
-            'engine_build', battle_session.engine_build,
-            'status', battle_session.status,
-            'state_version', battle_session.state_version,
-            'active_prompt', battle_session.active_prompt,
-            'private_state', battle_session.private_state,
-            'ttl_seconds', battle_session.ttl_seconds,
-            'prompt_deadline_at', battle_session.prompt_deadline_at,
-            'expires_at', battle_session.expires_at,
-            'last_activity_at', battle_session.last_activity_at,
-            'attempt_id', battle_session.attempt_id,
-            'replay_id', battle_session.replay_id,
-            'terminal_reason', battle_session.terminal_reason,
-            'error_code', battle_session.error_code,
-            'started_at', battle_session.started_at,
-            'finished_at', battle_session.finished_at,
-            'created_at', battle_session.created_at,
-            'updated_at', battle_session.updated_at
-          )
-          FROM interactive_battle_sessions battle_session
-          WHERE battle_session.user_id = CAST(@userId AS uuid)
-          ORDER BY battle_session.created_at, battle_session.id
-        ''',
-          userId: userId,
-        );
-        final interactiveBattleRecords = await _optionalJsonRows(
-          session,
-          relation: 'interactive_battle_records',
-          query: '''
-          SELECT jsonb_build_object(
-            'id', record.id,
-            'schema_version', record.schema_version,
-            'session_id', record.session_id,
-            'sequence', record.sequence,
-            'record_kind', record.record_kind,
-            'visibility', record.visibility,
-            'state_version', record.state_version,
-            'prompt_id', record.prompt_id,
-            'option_id', record.option_id,
-            'payload', record.payload,
-            'created_at', record.created_at
-          )
-          FROM interactive_battle_records record
-          JOIN interactive_battle_sessions battle_session
-            ON battle_session.id = record.session_id
-          WHERE battle_session.user_id = CAST(@userId AS uuid)
-            AND record.visibility IN ('private_user', 'public_replay_ref')
-          ORDER BY record.session_id, record.sequence
-        ''',
-          userId: userId,
-        );
-        final battleReplayAnnotations = await _optionalJsonRows(
-          session,
-          relation: 'battle_replay_annotations',
-          query: '''
-          SELECT jsonb_build_object(
-            'id', annotation.id,
-            'replay_id', annotation.replay_id,
-            'attempt_id', annotation.attempt_id,
-            'subject_deck_id', annotation.subject_deck_id,
-            'subject_deck_key', annotation.subject_deck_key,
-            'deck_hash_schema', annotation.deck_hash_schema,
-            'subject_deck_hash', annotation.subject_deck_hash,
-            'subject_deck_revision', annotation.subject_deck_revision,
-            'event_ref', annotation.event_ref,
-            'snapshot_ref', annotation.snapshot_ref,
-            'kind', annotation.kind,
-            'payload', annotation.payload,
-            'created_at', annotation.created_at,
-            'updated_at', annotation.updated_at
-          )
-          FROM battle_replay_annotations annotation
-          WHERE annotation.user_id = CAST(@userId AS uuid)
-          ORDER BY annotation.created_at, annotation.id
-        ''',
-          userId: userId,
-        );
-        final contentReports = await _optionalJsonRows(
-          session,
-          relation: 'content_reports',
-          query:
-              'SELECT to_jsonb(r) FROM content_reports r '
-              'WHERE r.reporter_user_id = CAST(@userId AS uuid) '
-              'ORDER BY r.created_at, r.id',
-          userId: userId,
-        );
-
-        return <String, dynamic>{
-          'schema_version': 1,
-          'exported_at': DateTime.now().toUtc().toIso8601String(),
-          'account': _jsonObject(accountResult.first[0]),
-          'data': {
-            'plan': plan.isEmpty ? null : plan.first,
-            'decks': decks,
-            'deck_cards': deckCards,
-            'deck_learning_events': deckLearningEvents,
-            'battle_simulations': battleSimulations,
-            'battle_simulation_attempts': battleSimulationAttempts,
-            'battle_jobs': battleJobs,
-            'battle_live_records': battleLiveRecords,
-            'interactive_battle_sessions': interactiveBattleSessions,
-            'interactive_battle_records': interactiveBattleRecords,
-            'battle_replay_annotations': battleReplayAnnotations,
-            'binder_items': binderItems,
-            'post_game_notes': postGameNotes,
-            'shared_deck_reports': sharedDeckReports,
-            'comments': comments,
-            'follows': follows,
-            'activation_events': activationEvents,
-            'optimization_events': optimizationEvents,
-            'ai_preferences':
-                aiPreferences.isEmpty ? null : aiPreferences.first,
-            'ai_activity': {
-              'logs': aiLogs,
-              'feedback': aiFeedback,
-              'fallback_telemetry': aiFallbackTelemetry,
-              'optimize_cache': aiOptimizeCache,
-              'generate_jobs': aiGenerateJobs,
-              'optimize_jobs': aiOptimizeJobs,
-            },
-            'trades': trades,
-            'trade_items': tradeItems,
-            'trade_messages': tradeMessages,
-            'trade_status_history': tradeStatusHistory,
-            'conversations': conversations,
-            'direct_messages_sent': directMessagesSent,
-            'notifications': notifications,
-            'content_reports': contentReports,
-          },
-          'portability': {
-            'format': 'application/json',
-            'scope': 'data supplied by or directly associated with the account',
-            'omitted_secrets': const [
-              'password_hash',
-              'jwt',
-              'fcm_token',
-              'server_credentials',
-              'messages_authored_by_other_users',
-              'notification_message_bodies',
-              'battle_job_internal_request_payload',
-              'battle_job_lease_credentials',
-              'interactive_battle_internal_records',
-              'interactive_battle_request_payload',
-              'interactive_battle_request_fingerprints',
-            ],
-          },
-        };
+        final rows = <String, List<Map<String, dynamic>>>{};
+        for (final section in privacyExportSections) {
+          final result = await session.execute(
+            Sql.named(privacyExportSectionSql(section)),
+            parameters: {'userId': userId},
+          );
+          final sectionRows = result
+              .map((row) => _jsonObject(row[0]))
+              .toList(growable: false);
+          if (section.path == privacyExportAccountPath && sectionRows.isEmpty) {
+            throw UserDataNotFoundException();
+          }
+          rows[section.path] = sectionRows;
+        }
+        return _assembleExport(userId, rows);
       },
       settings: TransactionSettings(
         isolationLevel: IsolationLevel.repeatableRead,
         accessMode: AccessMode.readOnly,
       ),
     );
+  }
+
+  Map<String, dynamic> _assembleExport(
+    String userId,
+    Map<String, List<Map<String, dynamic>>> rows,
+  ) {
+    final pseudonymizer = PrivacyExportPseudonymizer(
+      subjectUserId: userId,
+      ownDeckIds: [for (final deck in rows['data.decks']!) '${deck['id']}'],
+      sharedEntityIds: [
+        for (final trade in rows['data.trades']!) '${trade['id']}',
+        for (final conversation in rows['data.conversations']!)
+          '${conversation['id']}',
+      ],
+    );
+    Object? account;
+    final data = <String, dynamic>{};
+    for (final section in privacyExportSections) {
+      final sectionRows = [
+        for (final row in rows[section.path]!)
+          _pseudonymizeRow(section, row, pseudonymizer),
+      ];
+      final Object? value =
+          section.single
+              ? (sectionRows.isEmpty ? null : sectionRows.first)
+              : sectionRows;
+      if (section.path == privacyExportAccountPath) {
+        account = value;
+      } else {
+        _putExportPath(data, section.path, value);
+      }
+    }
+    final export = <String, dynamic>{
+      'schema_version': privacyExportSchemaVersion,
+      'exported_at': DateTime.now().toUtc().toIso8601String(),
+      'account': account,
+      'data': data,
+      'portability': privacyExportPortability,
+    };
+    return pseudonymizer.scrub(export)! as Map<String, dynamic>;
+  }
+
+  static Map<String, dynamic> _pseudonymizeRow(
+    PrivacyExportSection section,
+    Map<String, dynamic> row,
+    PrivacyExportPseudonymizer pseudonymizer,
+  ) => {
+    for (final MapEntry(key: column, value: value) in row.entries)
+      column: switch (section.fields[column]) {
+        PrivacyExportField.personRef => pseudonymizer.person(value),
+        PrivacyExportField.deckRef => pseudonymizer.deck(value),
+        PrivacyExportField.entityRef => pseudonymizer.entity(value),
+        _ => value,
+      },
+  };
+
+  static void _putExportPath(
+    Map<String, dynamic> data,
+    String path,
+    Object? value,
+  ) {
+    final parts = path.split('.');
+    if (parts.length < 2 || parts.first != 'data') {
+      throw StateError('Seção de exportação fora de data: $path');
+    }
+    var node = data;
+    for (final part in parts.sublist(1, parts.length - 1)) {
+      node =
+          node.putIfAbsent(part, () => <String, dynamic>{})
+              as Map<String, dynamic>;
+    }
+    node[parts.last] = value;
   }
 
   Future<Map<String, dynamic>> deleteAndAnonymizeAccount({
@@ -1026,20 +560,6 @@ class UserDataPrivacyService {
         'retention': retention,
       };
     });
-  }
-
-  Future<List<Map<String, dynamic>>> _optionalJsonRows(
-    Session session, {
-    required String relation,
-    required String query,
-    required String userId,
-  }) async {
-    if (!await _relationExists(session, relation)) return const [];
-    final result = await session.execute(
-      Sql.named(query),
-      parameters: {'userId': userId},
-    );
-    return result.map((row) => _jsonObject(row[0])).toList(growable: false);
   }
 
   Future<void> _deleteIfPresent(

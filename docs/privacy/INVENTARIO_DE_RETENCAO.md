@@ -14,6 +14,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 - `server/test/privacy_data_inventory_db_live_test.dart` confere o mesmo JSON contra o
   `information_schema` e as FKs de um PostgreSQL descartável migrado
   (`RUN_PRIVACY_DB_TESTS=1` e `DB_*`).
+- A exportação (`BT-PRIV-001`) usa este inventário como allowlist:
+  `server/lib/privacy/privacy_export_allowlist.dart` espelha as colunas marcadas para sair, e
+  `server/test/privacy_export_allowlist_test.dart` falha se os dois divergirem.
 
 ## O que está no inventário
 
@@ -60,10 +63,11 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 1. **Nenhum prazo automático roda em produção hoje.** O job `manaloom_ai_runtime_cleanup`
    (`ai_logs`, telemetria, `rate_limit_events`, jobs de IA) exige a capability
    `ai_analyze_optimize_advisory`, que está OFF (`server/bin/manaloom_ops_daemon.py:712`).
-2. **Exportação**: 25 relações saem pela linha inteira (`to_jsonb`), com `request_fingerprint`,
-   `request_key`, `cache_key` e hashes de deck; IDs de outras pessoas saem crus; `user_blocks`,
-   `user_block_events`, `content_report_appeals`, `deck_matchups` e `deck_weakness_reports`
-   ficam de fora. Correção: `BT-PRIV-001`.
+2. **Exportação** (corrigida no `BT-PRIV-001`, 2026-09-23): em `47dc3b698`, 25 relações saíam
+   pela linha inteira (`to_jsonb`), com `request_fingerprint`, `request_key`, `cache_key` e
+   hashes de deck, e IDs de outras pessoas saíam crus. Agora cada seção sai só com as colunas
+   deste inventário, IDs de terceiros viram pseudônimos válidos só no arquivo, e as cinco
+   tabelas que ficavam de fora entraram.
 3. **Exclusão**: bloqueios, eventos de bloqueio, recursos, tokens e o ID do moderador ficam;
    `content_reports.evidence` não é limpa; simulações de outras pessoas contra o deck do titular
    são apagadas em vez de anonimizadas. Correção: `BT-PRIV-002`.

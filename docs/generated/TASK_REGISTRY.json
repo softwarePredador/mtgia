@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "5a90f7661d752f06b4d148bc9bad21643ea30ce5dfa3c00249050e7530db7323"
+    "sha256": "70a084f1ed365aa9ca85881605b91f1b693d56d9401c7b545d6ed0579c122d0f"
   },
   "required_task_fields": [
     "id",
@@ -287,13 +287,13 @@
     {
       "id": "BT-PRIV-001",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Tornar export de dados um job allowlisted, sem fingerprints/IDs internos indevidos.",
       "depends_on": [
         "BT-AUTH-004",
         "BT-PRIV-003"
       ],
-      "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`.",
+      "acceptance": "Export completo e mínimo; isolamento A/B; expiração e download auditados. Decisão do dono em 2026-09-22: D-22, gerar sob demanda e entregar como download no app, sem guardar; só dados do próprio usuário, com IDs de terceiros anonimizados; sem hashes nem fingerprints internos. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sobre o inventário do `BT-PRIV-003`: a exportação segue gerada sob demanda numa transação somente leitura e entregue como anexo `no-store`, sem cópia no servidor; cada uma das 39 seções sai por `jsonb_build_object` só com as colunas que o inventário marca para sair (`server/lib/privacy/privacy_export_allowlist.dart`), sem nenhum `to_jsonb`; UUIDs de outras pessoas e de decks de outras pessoas viram pseudônimos HMAC com chave aleatória por arquivo; `request_fingerprint`, `request_key`, `cache_key`, hashes de deck e chaves de idempotência e de lease saem de qualquer profundidade do JSON; entraram bloqueios, eventos de bloqueio, recursos de moderação, confrontos e fraquezas de deck e o registro de consentimento da conta; saíram as simulações que outra pessoa rodou contra o deck público do titular; relação ausente derruba a exportação; formato `schema_version` 2. Evidência: `server/test/privacy_export_allowlist_test.dart` (13 testes; falha se a allowlist e o inventário divergirem) e `server/test/privacy_export_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável com três contas e dado nas 39 tabelas exportadas: nenhum ID cru nem texto de outra pessoa, nenhum hash ou fingerprint, nada gravado no banco); 8 mutações falham como esperado. O job, a expiração e o download auditado do aceite original saíram com a D-22 (nada é guardado); a auditoria do pedido de exportação não foi decidida. O app ainda chama `GET /users/me/export` e precisa pedir a senha, usar `POST` e entregar o arquivo (raia do app).",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 309
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "1f25ded9d6c38a8c8e7b7cea2ca2daeeabe337fe653761f840da9fba5b76373b"
+  "project_logic_source_digest_sha256": "6870f68f5e2a5e472a982224e2982ea1aa4f8c39c89e0e077442f7a7294863c1"
 }
