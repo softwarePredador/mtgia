@@ -26,11 +26,16 @@ readonly MANALOOM_PRODUCTION_TRAEFIK_SERVICE="easypanel-traefik"
 # A Swarm task address is ephemeral and can change whenever Traefik is
 # rescheduled. The deploy gate therefore proves that the running task belongs
 # to the approved service and network instead of pinning that task address.
-# Connections received by backend tasks originate from the stable overlay
+# Connections received by backend tasks originate from the overlay
 # load-balancer endpoint below. Keep that transport trust boundary exact:
 # widening this value to the overlay subnet would allow an unrelated service
 # on the shared network to forge X-Forwarded-For.
-readonly MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.4"
+# The endpoint is stable while the host runs, but Swarm may allocate a new one
+# when the host reboots (2026-09-23: 10.11.0.4 became 10.11.0.14 and every
+# rate-limited route failed closed with untrusted_proxy_peer). After a reboot,
+# read `lb-easypanel` on the `easypanel` network, update this value and
+# redeploy the backend; the deploy gate refuses a stale value.
+readonly MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.14"
 readonly MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS="${MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4}/32"
 readonly MANALOOM_PRODUCTION_SENTRY_DSN_SHA256="2e1cc23c01e5b7d989edc2f1d046c3e7de34a3fa57e995c0f2e6252902153e49" # gitleaks:allow -- one-way DSN fingerprint, not a credential
 readonly MANALOOM_PRODUCTION_SENTRY_ORG_SLUG="rafa-pz"

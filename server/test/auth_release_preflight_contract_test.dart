@@ -72,7 +72,7 @@ void main() {
     );
     expect(
       releaseContract,
-      contains('MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.4"'),
+      contains('MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4="10.11.0.14"'),
     );
     expect(
       releaseContract,

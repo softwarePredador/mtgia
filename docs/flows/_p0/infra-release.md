@@ -187,7 +187,7 @@ tarefas tem receipt em `docs/qa/execution/`.
     - receipt v2 com raiz durável fora de `/tmp`
       (`scripts/manaloom_deck_ai_learning_release_receipt.sh:12,51-53`);
     - pin da chave SSH do host
-      (`scripts/lib/manaloom_release_runtime_contract.sh:155-162`);
+      (`scripts/lib/manaloom_release_runtime_contract.sh:160-167`);
     - leitura do registry com checagem de dependências
       (`tools/project_logic/lib/project_logic_generator.dart:1692-1711`).
 
@@ -209,7 +209,7 @@ tarefas tem receipt em `docs/qa/execution/`.
 | 4 | PostgreSQL medido: tamanho, maiores relações, `max_connections`, `shared_buffers`, conexões ativas, pool | PARC | `pg_database_size` só em cópia restaurada (`scripts/manaloom_full_restore_drill.sh:181-182`, `scripts/manaloom_install_remote_backup_cron.sh:239`); pool configurável em `server/lib/database.dart:148-156` (padrão 10, `server/.env.example:26`); os números de banco do MAPA vêm de um backup local de 2026-08-03 (`docs/MAPA_OPERACIONAL_DO_PROJETO.md:457-458,486-487`). O wrapper read-only já existe (`server/bin/with_new_server_pg.sh:19-25`) e o deploy do backend já o usa em produção (`scripts/manaloom_deploy_backend_image.sh:1179`) | nenhum | Medir o PG vivo em modo read-only |
 | 5 | Resources atuais de cada serviço (backend, ops, web público, app Web, postgres, release host, sidecars) | NE | nenhum script lê `.Spec.TaskTemplate.Resources`. Os únicos números são defaults de configuração dos sidecars (`scripts/manaloom_deploy_battle_sidecars.sh:104-105,966-969,1037-1040`), não medições. Resources podem estar configurados no EasyPanel, fora do repositório; nada aqui permite saber | nenhum | Inventário por serviço |
 | 6 | Política versionada com thresholds e headroom | NE | só `server/doc/CAPACITY_PLAN_10K_MAU.md:1-42`, que traz suposições de MAU e nenhum número de host, e cita um script de carga apagado (`:25,31`) | nenhum | Arquivo de política versionado e marcar o plano de 2026-02 como histórico |
-| 7 | Procedência que impeça "números de worktree temporário": host fingerprint, `measured_at`, SHA | NE | nenhum validador. O pin da chave SSH do host (`scripts/lib/manaloom_release_runtime_contract.sh:155-162`) serve de âncora de procedência, mas nenhuma medição o usa | nenhum | Validador que recuse medição sem procedência de host de produção |
+| 7 | Procedência que impeça "números de worktree temporário": host fingerprint, `measured_at`, SHA | NE | nenhum validador. O pin da chave SSH do host (`scripts/lib/manaloom_release_runtime_contract.sh:160-167`) serve de âncora de procedência, mas nenhuma medição o usa | nenhum | Validador que recuse medição sem procedência de host de produção |
 | 8 | Preflight reproduzível (critério da onda 01) | NE | nada (compartilhado com `BT-CAP-002` e `BT-GATE-006`) | nenhum | Função de preflight que leia a política |
 
 **O que realmente falta.** Não existe nenhuma medição. É preciso construir:

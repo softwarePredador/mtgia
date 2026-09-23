@@ -17,8 +17,8 @@ resolve_manaloom_release_flutter
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 
 if [[ "$MANALOOM_PRODUCTION_TRAEFIK_SERVICE" != "easypanel-traefik" ||
-      "$MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4" != "10.11.0.4" ||
-      "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" != "10.11.0.4/32" ]]; then
+      "$MANALOOM_PRODUCTION_PROXY_TRANSPORT_PEER_IPV4" != "10.11.0.14" ||
+      "$MANALOOM_PRODUCTION_TRUSTED_PROXY_PEERS" != "10.11.0.14/32" ]]; then
   echo "contrato de proxy de producao misturou identidade do servico e peer de transporte" >&2
   exit 1
 fi
