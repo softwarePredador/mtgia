@@ -372,6 +372,14 @@ def http_get(
 
 # ─── Metadados e download do bulk ────────────────────────────────────────────
 
+# Desde 2026-09-23 a Scryfall publica o bulk como JSON Lines com gzip
+# (`jsonl_download_uri`, `compressed_size`): um card por linha. A lista JSON
+# antiga (`download_uri`, `size`) continua aceita quando só ela vier.
+BULK_FORMAT_JSONL = "jsonl"
+BULK_FORMAT_JSON_ARRAY = "json_array"
+GZIP_MAGIC = b"\x1f\x8b"
+_DECOMPRESS_PIECE = 1024 * 1024
+
 
 @dataclass(frozen=True)
 class BulkSource:
@@ -379,7 +387,9 @@ class BulkSource:
     updated_at: str
     bulk_id: str | None = None
     download_uri: str | None = None
+    format: str = BULK_FORMAT_JSONL
     declared_size: int | None = None
+    declared_compressed_size: int | None = None
 
     def to_json(self) -> dict[str, Any]:
         return asdict(self)
@@ -395,7 +405,29 @@ def parse_timestamp(value: Any) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
+def _declared_bytes(value: Any) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        return None
+    return value
+
+
+def _allowed_download_uri(field_name: str, value: str) -> str:
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or parsed.hostname not in BULK_DOWNLOAD_HOSTS:
+        raise RefreshError(
+            "unexpected_download_host",
+            f"{field_name} fora de {sorted(BULK_DOWNLOAD_HOSTS)}: {value!r}",
+        )
+    return value
+
+
 def parse_bulk_metadata(payload: Any, budget: Budget) -> BulkSource:
+    """Escolhe o arquivo do bulk: JSONL primeiro, a lista JSON só como alternativa.
+
+    O host permitido vale para as duas URIs. Um `jsonl_download_uri` fora dele
+    é recusado, sem cair para o `download_uri`. Sem nenhuma das duas, o erro é
+    `bulk_download_uri_missing`.
+    """
     if not isinstance(payload, dict):
         raise RefreshError("invalid_metadata", "metadados do bulk não são um objeto")
     if payload.get("object") != "bulk_data" or payload.get("type") != BULK_TYPE:
@@ -404,19 +436,34 @@ def parse_bulk_metadata(payload: Any, budget: Budget) -> BulkSource:
             f"metadados não são do bulk {BULK_TYPE}: "
             f"object={payload.get('object')!r} type={payload.get('type')!r}",
         )
-    download_uri = str(payload.get("download_uri") or "").strip()
-    parsed = urlparse(download_uri)
-    if parsed.scheme != "https" or parsed.hostname not in BULK_DOWNLOAD_HOSTS:
+    jsonl_uri = str(payload.get("jsonl_download_uri") or "").strip()
+    array_uri = str(payload.get("download_uri") or "").strip()
+    if jsonl_uri:
+        download_uri = _allowed_download_uri("jsonl_download_uri", jsonl_uri)
+        bulk_format = BULK_FORMAT_JSONL
+    elif array_uri:
+        download_uri = _allowed_download_uri("download_uri", array_uri)
+        bulk_format = BULK_FORMAT_JSON_ARRAY
+    else:
         raise RefreshError(
-            "unexpected_download_host",
-            f"download_uri fora de {sorted(BULK_DOWNLOAD_HOSTS)}: {download_uri!r}",
+            "bulk_download_uri_missing",
+            "os metadados do bulk não trazem jsonl_download_uri nem download_uri",
         )
     try:
         updated_at = parse_timestamp(payload.get("updated_at"))
     except ValueError as exc:
         raise RefreshError("invalid_metadata", f"updated_at inválido: {exc}") from exc
-    size = payload.get("size")
-    declared_size = size if isinstance(size, int) and size >= 0 else None
+    declared_compressed_size = _declared_bytes(payload.get("compressed_size"))
+    if (
+        declared_compressed_size is not None
+        and declared_compressed_size > budget.max_compressed_bytes
+    ):
+        raise BudgetExceeded(
+            "compressed_bytes",
+            f"o bulk declara {declared_compressed_size} bytes compactados, acima de "
+            f"{budget.max_compressed_bytes}",
+        )
+    declared_size = _declared_bytes(payload.get("size"))
     if declared_size is not None and declared_size > budget.max_download_bytes:
         raise BudgetExceeded(
             "download_bytes",
@@ -427,8 +474,18 @@ def parse_bulk_metadata(payload: Any, budget: Budget) -> BulkSource:
         updated_at=updated_at.isoformat(),
         bulk_id=str(payload.get("id") or "") or None,
         download_uri=download_uri,
+        format=bulk_format,
         declared_size=declared_size,
+        declared_compressed_size=declared_compressed_size,
     )
+
+
+def bulk_format_for_name(name: str) -> str:
+    """Formato de um bulk local pelo nome: `.jsonl` e `.jsonl.gz` são JSON Lines."""
+    lowered = name.lower()
+    if lowered.endswith((".jsonl", ".jsonl.gz", ".ndjson", ".ndjson.gz")):
+        return BULK_FORMAT_JSONL
+    return BULK_FORMAT_JSON_ARRAY
 
 
 def fetch_bulk_metadata(ctx: RunContext) -> BulkSource:
@@ -450,30 +507,59 @@ class DownloadedBulk:
     compressed_bytes: int
     bytes: int
     sha256: str
+    gzip: bool = False
 
 
-def download_bulk(ctx: RunContext, source: BulkSource, work_dir: Path) -> DownloadedBulk:
-    assert source.download_uri is not None
-    response = http_get(
-        ctx,
-        source.download_uri,
-        accept="application/json",
-        accept_encoding="gzip",
-    )
-    encoding = ""
-    try:
-        encoding = str(response.headers.get("Content-Encoding") or "").lower()
-    except Exception:
-        encoding = ""
-    decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS) if encoding == "gzip" else None
+class _Gunzip:
+    """Descompacta gzip em pedaços de até 1 MiB, inclusive com vários membros."""
+
+    def __init__(self) -> None:
+        self._decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS)
+
+    def feed(self, data: bytes) -> Iterator[bytes]:
+        while data:
+            if self._decompressor.eof:
+                self._decompressor = zlib.decompressobj(16 + zlib.MAX_WBITS)
+            try:
+                piece = self._decompressor.decompress(data, _DECOMPRESS_PIECE)
+            except zlib.error as exc:
+                raise UpstreamError("download_corrupt", f"gzip inválido: {exc}") from exc
+            if piece:
+                yield piece
+            if self._decompressor.eof:
+                data = self._decompressor.unused_data
+            else:
+                data = self._decompressor.unconsumed_tail
+
+    def finish(self) -> bytes:
+        tail = self._decompressor.flush()
+        if not self._decompressor.eof:
+            raise UpstreamError("download_truncated", "gzip terminou no meio")
+        return tail
+
+
+def materialize_bulk(
+    read: Callable[[int], bytes], ctx: RunContext, work_dir: Path
+) -> DownloadedBulk:
+    """Grava o bulk descompactado num arquivo temporário, dentro do budget.
+
+    O gzip é reconhecido pelo conteúdo (1f 8b), não pelo cabeçalho: o JSONL
+    vem como arquivo `.jsonl.gz`, e a lista antiga vinha com
+    `Content-Encoding: gzip`. Os dois tetos valem para qualquer formato:
+    `max_compressed_bytes` sobre o que chega e `max_download_bytes` sobre o que
+    é gravado.
+    """
     digest = hashlib.sha256()
     work_dir.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(
-        prefix="catalog_reference_default_cards_", suffix=".json", dir=work_dir
+        prefix="catalog_reference_default_cards_", suffix=".bulk", dir=work_dir
     )
     path = Path(name)
     compressed = 0
     written = 0
+    gunzip: _Gunzip | None = None
+    head = b""
+    decided = False
 
     def emit(data: bytes, out: Any) -> None:
         nonlocal written
@@ -483,21 +569,23 @@ def download_bulk(ctx: RunContext, source: BulkSource, work_dir: Path) -> Downlo
         if written > ctx.budget.max_download_bytes:
             raise BudgetExceeded(
                 "download_bytes",
-                f"download passou de {ctx.budget.max_download_bytes} bytes",
+                f"bulk descompactado passou de {ctx.budget.max_download_bytes} bytes",
             )
         digest.update(data)
         out.write(data)
 
+    def consume(data: bytes, out: Any) -> None:
+        if gunzip is None:
+            emit(data, out)
+            return
+        for piece in gunzip.feed(data):
+            emit(piece, out)
+
     try:
-        with os.fdopen(fd, "wb") as out, response:
+        with os.fdopen(fd, "wb") as out:
             while True:
                 ctx.check_runtime()
-                try:
-                    chunk = response.read(64 * 1024)
-                except (TimeoutError, socket.timeout, OSError) as exc:
-                    raise UpstreamError(
-                        "download_interrupted", f"download interrompido: {exc}"
-                    ) from exc
+                chunk = read(64 * 1024)
                 if not chunk:
                     break
                 compressed += len(chunk)
@@ -506,23 +594,55 @@ def download_bulk(ctx: RunContext, source: BulkSource, work_dir: Path) -> Downlo
                         "compressed_bytes",
                         f"download passou de {ctx.budget.max_compressed_bytes} bytes",
                     )
-                if decompressor is None:
-                    emit(chunk, out)
-                else:
-                    try:
-                        emit(decompressor.decompress(chunk), out)
-                    except zlib.error as exc:
-                        raise UpstreamError(
-                            "download_corrupt", f"gzip inválido: {exc}"
-                        ) from exc
-            if decompressor is not None:
-                emit(decompressor.flush(), out)
-                if not decompressor.eof:
-                    raise UpstreamError("download_truncated", "gzip terminou no meio")
+                if not decided:
+                    head += chunk
+                    if len(head) < len(GZIP_MAGIC):
+                        continue
+                    decided = True
+                    if head.startswith(GZIP_MAGIC):
+                        gunzip = _Gunzip()
+                    chunk, head = head, b""
+                consume(chunk, out)
+            if not decided and head:
+                consume(head, out)
+            if gunzip is not None:
+                emit(gunzip.finish(), out)
     except BaseException:
         path.unlink(missing_ok=True)
         raise
-    return DownloadedBulk(path=path, compressed_bytes=compressed, bytes=written, sha256=digest.hexdigest())
+    return DownloadedBulk(
+        path=path,
+        compressed_bytes=compressed,
+        bytes=written,
+        sha256=digest.hexdigest(),
+        gzip=gunzip is not None,
+    )
+
+
+def download_bulk(ctx: RunContext, source: BulkSource, work_dir: Path) -> DownloadedBulk:
+    assert source.download_uri is not None
+    response = http_get(
+        ctx,
+        source.download_uri,
+        accept="*/*",
+        accept_encoding="gzip",
+    )
+
+    def read(size: int) -> bytes:
+        try:
+            return response.read(size)
+        except (TimeoutError, socket.timeout, OSError) as exc:
+            raise UpstreamError(
+                "download_interrupted", f"download interrompido: {exc}"
+            ) from exc
+
+    with response:
+        return materialize_bulk(read, ctx, work_dir)
+
+
+def is_gzip_file(path: Path) -> bool:
+    with path.open("rb") as source:
+        return source.read(len(GZIP_MAGIC)) == GZIP_MAGIC
 
 
 def sha256_file(path: Path) -> tuple[int, str]:
@@ -535,11 +655,43 @@ def sha256_file(path: Path) -> tuple[int, str]:
     return size, digest.hexdigest()
 
 
-# ─── Leitura em fluxo da lista do bulk ───────────────────────────────────────
+# ─── Leitura em fluxo do bulk ────────────────────────────────────────────────
 
 
-def iter_bulk_objects(path: Path) -> Iterator[Any]:
-    """Entrega cada elemento da lista JSON sem carregar o arquivo inteiro."""
+def iter_bulk_objects(
+    path: Path, bulk_format: str = BULK_FORMAT_JSON_ARRAY
+) -> Iterator[Any]:
+    """Entrega cada card do bulk sem carregar o arquivo inteiro."""
+    if bulk_format == BULK_FORMAT_JSONL:
+        yield from _iter_jsonl_objects(path)
+    elif bulk_format == BULK_FORMAT_JSON_ARRAY:
+        yield from _iter_json_array_objects(path)
+    else:
+        raise RefreshError("invalid_bulk", f"formato de bulk desconhecido: {bulk_format!r}")
+
+
+def _iter_jsonl_objects(path: Path) -> Iterator[Any]:
+    """JSON Lines: um valor JSON por linha; linha em branco é ignorada."""
+    seen = 0
+    with path.open(encoding="utf-8") as source:
+        for number, line in enumerate(source, start=1):
+            text = line.strip()
+            if not text:
+                continue
+            try:
+                value = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise RefreshError(
+                    "invalid_bulk", f"linha {number} do bulk JSONL ilegível: {exc.msg}"
+                ) from exc
+            seen += 1
+            yield value
+    if not seen:
+        raise RefreshError("invalid_bulk", "o bulk está vazio")
+
+
+def _iter_json_array_objects(path: Path) -> Iterator[Any]:
+    """Lista JSON (formato antigo do bulk)."""
     decoder = json.JSONDecoder()
     with path.open(encoding="utf-8") as source:
         buffer = ""
@@ -1390,7 +1542,11 @@ def _run(
                 updated_at = parse_timestamp(args.source_updated_at)
             except ValueError as exc:
                 raise ContractRefusal("invalid_source", f"--source-updated-at inválido: {exc}") from exc
-            source = BulkSource(kind="local_file", updated_at=updated_at.isoformat())
+            source = BulkSource(
+                kind="local_file",
+                updated_at=updated_at.isoformat(),
+                format=bulk_format_for_name(str(args.bulk_json)),
+            )
         else:
             source = fetch_bulk_metadata(ctx)
         receipt["source"] = source.to_json()
@@ -1417,19 +1573,28 @@ def _run(
             receipt["status"] = "noop_same_source"
             return exit_code, receipt
 
-        if args.bulk_json is not None:
-            bulk_path = Path(args.bulk_json)
+        work_dir = args.work_dir or Path(tempfile.gettempdir())
+        local_file = Path(args.bulk_json) if args.bulk_json is not None else None
+        if local_file is not None and not is_gzip_file(local_file):
+            bulk_path = local_file
             size, digest = sha256_file(bulk_path)
             receipt["source"].update({"bytes": size, "sha256": digest, "path": str(bulk_path)})
             source_sha256 = digest
         else:
-            work_dir = args.work_dir or Path(tempfile.gettempdir())
-            downloaded = download_bulk(ctx, source, work_dir)
+            if local_file is not None:
+                # Bulk local compactado (como o `.jsonl.gz` da Scryfall): passa
+                # pelos mesmos tetos do download.
+                with local_file.open("rb") as handle:
+                    downloaded = materialize_bulk(handle.read, ctx, work_dir)
+                receipt["source"]["path"] = str(local_file)
+            else:
+                downloaded = download_bulk(ctx, source, work_dir)
             bulk_path = downloaded.path
             receipt["source"].update(
                 {
                     "compressed_bytes": downloaded.compressed_bytes,
                     "bytes": downloaded.bytes,
+                    "gzip": downloaded.gzip,
                     "sha256": downloaded.sha256,
                 }
             )
@@ -1454,7 +1619,7 @@ def _run(
             snapshot = load_snapshot(cur, read_state(cur))
             cutoff = new_set_cutoff(snapshot.state, ctx.budget.new_set_margin_days)
             plan = plan_refresh(
-                iter_bulk_objects(bulk_path),
+                iter_bulk_objects(bulk_path, source.format),
                 snapshot,
                 price_updated_at=price_updated_at,
                 cutoff=cutoff,

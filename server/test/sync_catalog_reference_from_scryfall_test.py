@@ -41,7 +41,20 @@ def _load_module():
 
 
 job = _load_module()
-FIXTURE = Path(__file__).resolve().parent / "fixtures" / "scryfall_default_cards_sample.json"
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+FIXTURE = FIXTURES / "scryfall_default_cards_sample.json"
+# Os mesmos 9 objetos da lista acima, no formato atual da Scryfall: JSON Lines
+# com gzip, um card por linha.
+FIXTURE_JSONL_GZ = FIXTURES / "scryfall_default_cards_sample.jsonl.gz"
+# Metadados no formato de 2026-09-23 (jsonl_download_uri e compressed_size, sem
+# download_uri, size, content_type e content_encoding). object, id, type,
+# updated_at, jsonl_download_uri e compressed_size são os valores relatados pela
+# coordenação; uri, name e description são ilustrativos.
+METADATA_2026_09_23 = json.loads(
+    (FIXTURES / "scryfall_bulk_metadata_default_cards_2026-09-23.json").read_text(
+        encoding="utf-8"
+    )
+)
 SOURCE_UPDATED_AT = "2026-09-22T09:00:00+00:00"
 
 O_SOL = "5c8e7c9e-1111-4a1a-8a1a-000000000001"
@@ -56,6 +69,7 @@ P_DRAKE = "5c8e7c9e-2222-4b2b-9b2b-000000000004"
 P_ADEPT = "5c8e7c9e-2222-4b2b-9b2b-000000000006"
 P_GLEEMAX = "5c8e7c9e-2222-4b2b-9b2b-000000000008"
 
+# Formato antigo (lista JSON): continua aceito quando só ele vier.
 METADATA = {
     "object": "bulk_data",
     "id": "e2ef41e3-5778-4bc2-af3f-78eca4dd9c23",
@@ -334,6 +348,240 @@ def row_by_id(rows, scryfall_id):
         if row[0] == scryfall_id:
             return dict(zip(job.CARD_COLUMN_NAMES, row))
     raise AssertionError(f"{scryfall_id} ausente")
+
+
+class BulkMetadataFormatTest(unittest.TestCase):
+    """Bulk de 2026-09-23: JSONL com gzip; a lista JSON fica como alternativa."""
+
+    def parse(self, payload, **budget):
+        return job.parse_bulk_metadata(payload, job.Budget(**budget))
+
+    def test_real_2026_09_23_metadata_selects_the_jsonl(self) -> None:
+        opener = ScriptedOpener([metadata_response(METADATA_2026_09_23)])
+        ctx, _ = make_ctx(opener)
+
+        source = job.fetch_bulk_metadata(ctx)
+
+        for gone in ("download_uri", "size", "content_type", "content_encoding"):
+            self.assertNotIn(gone, METADATA_2026_09_23)
+        self.assertEqual(source.format, job.BULK_FORMAT_JSONL)
+        self.assertEqual(
+            source.download_uri,
+            "https://data.scryfall.io/default-cards/"
+            "default-cards-20260923090535.jsonl.gz",
+        )
+        self.assertEqual(source.declared_compressed_size, 78591937)
+        self.assertIsNone(source.declared_size)
+        self.assertEqual(source.updated_at, "2026-09-23T09:05:35.986000+00:00")
+        self.assertEqual(source.bulk_id, "e2ef41e3-5778-4bc2-af3f-78eca4dd9c23")
+        self.assertEqual(ctx.upstream_requests, 1)
+
+    def test_jsonl_is_preferred_when_both_uris_come(self) -> None:
+        payload = {
+            **METADATA_2026_09_23,
+            "download_uri": METADATA["download_uri"],
+            "size": 1024,
+        }
+
+        source = self.parse(payload)
+
+        self.assertEqual(source.format, job.BULK_FORMAT_JSONL)
+        self.assertEqual(source.download_uri, METADATA_2026_09_23["jsonl_download_uri"])
+
+    def test_legacy_list_is_used_when_only_download_uri_comes(self) -> None:
+        source = self.parse(METADATA)
+
+        self.assertEqual(source.format, job.BULK_FORMAT_JSON_ARRAY)
+        self.assertEqual(source.download_uri, METADATA["download_uri"])
+        self.assertEqual(source.declared_size, 512 * 1024 * 1024)
+        self.assertIsNone(source.declared_compressed_size)
+
+    def test_missing_both_uris_has_its_own_error(self) -> None:
+        payload = {
+            key: value
+            for key, value in METADATA_2026_09_23.items()
+            if key != "jsonl_download_uri"
+        }
+
+        with self.assertRaises(job.RefreshError) as raised:
+            self.parse(payload)
+
+        self.assertEqual(raised.exception.kind, "bulk_download_uri_missing")
+        self.assertIn("jsonl_download_uri", str(raised.exception))
+        self.assertIn("download_uri", str(raised.exception))
+
+    def test_blank_uris_count_as_missing(self) -> None:
+        payload = {**METADATA_2026_09_23, "jsonl_download_uri": "  ", "download_uri": ""}
+
+        with self.assertRaises(job.RefreshError) as raised:
+            self.parse(payload)
+
+        self.assertEqual(raised.exception.kind, "bulk_download_uri_missing")
+
+    def test_forbidden_host_in_jsonl_uri_is_refused_without_fallback(self) -> None:
+        payload = {
+            **METADATA_2026_09_23,
+            "jsonl_download_uri": "https://evil.example/default-cards.jsonl.gz",
+            "download_uri": METADATA["download_uri"],
+        }
+
+        with self.assertRaises(job.RefreshError) as raised:
+            self.parse(payload)
+
+        self.assertEqual(raised.exception.kind, "unexpected_download_host")
+        self.assertIn("jsonl_download_uri", str(raised.exception))
+
+    def test_plain_http_jsonl_uri_is_refused(self) -> None:
+        payload = {
+            **METADATA_2026_09_23,
+            "jsonl_download_uri": "http://data.scryfall.io/default-cards/x.jsonl.gz",
+        }
+
+        with self.assertRaises(job.RefreshError) as raised:
+            self.parse(payload)
+
+        self.assertEqual(raised.exception.kind, "unexpected_download_host")
+
+    def test_compressed_size_over_budget_stops_before_download(self) -> None:
+        with self.assertRaises(job.BudgetExceeded) as raised:
+            self.parse(METADATA_2026_09_23, max_compressed_bytes=78591936)
+
+        self.assertEqual(raised.exception.kind, "budget_exceeded:compressed_bytes")
+        self.assertEqual(
+            self.parse(METADATA_2026_09_23).declared_compressed_size, 78591937
+        )
+
+    def test_local_file_format_follows_the_name(self) -> None:
+        jsonl = job.BULK_FORMAT_JSONL
+        array = job.BULK_FORMAT_JSON_ARRAY
+        self.assertEqual(job.bulk_format_for_name("x/default-cards.jsonl.gz"), jsonl)
+        self.assertEqual(job.bulk_format_for_name("x/DEFAULT.JSONL"), jsonl)
+        self.assertEqual(job.bulk_format_for_name("x/default-cards.json"), array)
+        self.assertEqual(job.bulk_format_for_name("x/default-cards.json.gz"), array)
+
+
+class JsonlDownloadAndParseTest(unittest.TestCase):
+    """O `.jsonl.gz` é descompactado pelo conteúdo e lido linha a linha."""
+
+    PLAIN = gzip.decompress(FIXTURE_JSONL_GZ.read_bytes())
+
+    def source(self) -> "job.BulkSource":
+        return job.BulkSource(
+            kind="scryfall_bulk",
+            updated_at="2026-09-23T09:05:35.986000+00:00",
+            download_uri=METADATA_2026_09_23["jsonl_download_uri"],
+            format=job.BULK_FORMAT_JSONL,
+            declared_compressed_size=78591937,
+        )
+
+    def download(self, body: bytes, headers=None, **budget):
+        opener = ScriptedOpener([FakeResponse(body, headers=headers or {})])
+        ctx, _ = make_ctx(opener, **budget)
+        return opener, ctx
+
+    def test_jsonl_gz_without_content_encoding_is_decompressed_by_content(self) -> None:
+        body = FIXTURE_JSONL_GZ.read_bytes()
+        opener, ctx = self.download(body, {"Content-Type": "application/gzip"})
+
+        with tempfile.TemporaryDirectory() as tmp:
+            downloaded = job.download_bulk(ctx, self.source(), Path(tmp))
+            content = downloaded.path.read_bytes()
+            values = list(job.iter_bulk_objects(downloaded.path, job.BULK_FORMAT_JSONL))
+
+        self.assertEqual(content, self.PLAIN)
+        self.assertTrue(downloaded.gzip)
+        self.assertEqual(downloaded.compressed_bytes, len(body))
+        self.assertEqual(downloaded.bytes, len(self.PLAIN))
+        self.assertEqual(downloaded.sha256, hashlib.sha256(self.PLAIN).hexdigest())
+        self.assertEqual(values, json.loads(FIXTURE.read_text(encoding="utf-8")))
+        self.assertEqual(
+            opener.requests[0].full_url, METADATA_2026_09_23["jsonl_download_uri"]
+        )
+
+    def test_plain_body_is_kept_as_is(self) -> None:
+        _, ctx = self.download(self.PLAIN)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            downloaded = job.download_bulk(ctx, self.source(), Path(tmp))
+            content = downloaded.path.read_bytes()
+
+        self.assertEqual(content, self.PLAIN)
+        self.assertFalse(downloaded.gzip)
+
+    def test_multi_member_gzip_is_read_whole(self) -> None:
+        half = len(self.PLAIN) // 2
+        body = gzip.compress(self.PLAIN[:half]) + gzip.compress(self.PLAIN[half:])
+        _, ctx = self.download(body)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            downloaded = job.download_bulk(ctx, self.source(), Path(tmp))
+            content = downloaded.path.read_bytes()
+
+        self.assertEqual(content, self.PLAIN)
+
+    def test_decompressed_jsonl_over_budget_removes_the_file(self) -> None:
+        _, ctx = self.download(FIXTURE_JSONL_GZ.read_bytes(), max_download_bytes=1000)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(job.BudgetExceeded) as raised:
+                job.download_bulk(ctx, self.source(), Path(tmp))
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+
+        self.assertEqual(raised.exception.kind, "budget_exceeded:download_bytes")
+
+    def test_compressed_jsonl_over_budget_stops_the_download(self) -> None:
+        _, ctx = self.download(FIXTURE_JSONL_GZ.read_bytes(), max_compressed_bytes=100)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(job.BudgetExceeded) as raised:
+                job.download_bulk(ctx, self.source(), Path(tmp))
+            self.assertEqual(list(Path(tmp).iterdir()), [])
+
+        self.assertEqual(raised.exception.kind, "budget_exceeded:compressed_bytes")
+
+    def test_jsonl_parser_rejects_a_malformed_line(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bulk.jsonl"
+            path.write_text('{"object": "card"}\n{quebrado\n', encoding="utf-8")
+            with self.assertRaises(job.RefreshError) as raised:
+                list(job.iter_bulk_objects(path, job.BULK_FORMAT_JSONL))
+
+        self.assertEqual(raised.exception.kind, "invalid_bulk")
+        self.assertIn("linha 2", str(raised.exception))
+
+    def test_jsonl_parser_skips_blank_lines_and_rejects_an_empty_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bulk.jsonl"
+            path.write_text('\n{"a": 1}\r\n\n', encoding="utf-8")
+            self.assertEqual(
+                list(job.iter_bulk_objects(path, job.BULK_FORMAT_JSONL)), [{"a": 1}]
+            )
+            path.write_text("\n\n", encoding="utf-8")
+            with self.assertRaises(job.RefreshError) as raised:
+                list(job.iter_bulk_objects(path, job.BULK_FORMAT_JSONL))
+
+        self.assertEqual(raised.exception.kind, "invalid_bulk")
+
+    def test_jsonl_plan_is_identical_to_the_json_list_plan(self) -> None:
+        snapshot = fixture_snapshot()
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "bulk.jsonl"
+            path.write_bytes(self.PLAIN)
+            ctx, _ = make_ctx()
+            jsonl_plan = job.plan_refresh(
+                job.iter_bulk_objects(path, job.BULK_FORMAT_JSONL),
+                snapshot,
+                price_updated_at=job.parse_timestamp(SOURCE_UPDATED_AT),
+                cutoff=job.new_set_cutoff(snapshot.state, ctx.budget.new_set_margin_days),
+                ctx=ctx,
+            )
+        array_plan = fixture_plan(fixture_snapshot())
+
+        self.assertEqual(jsonl_plan.counts, array_plan.counts)
+        self.assertEqual(jsonl_plan.updates, array_plan.updates)
+        self.assertEqual(jsonl_plan.inserts, array_plan.inserts)
+        self.assertEqual(jsonl_plan.legalities, array_plan.legalities)
+        self.assertEqual(jsonl_plan.sets, array_plan.sets)
 
 
 class ParseAndPlanTest(unittest.TestCase):
@@ -847,6 +1095,100 @@ class RunModesTest(unittest.TestCase):
 
         self.assertEqual(code, 0)
         self.assertEqual(receipt["alerts"], [job.FRESHNESS_ALERT])
+
+
+    def test_activation_from_the_jsonl_gz_file(self) -> None:
+        code, receipt, ctx = self.run_job(
+            [
+                "--mode",
+                "activate",
+                "--bulk-json",
+                str(FIXTURE_JSONL_GZ),
+                "--source-updated-at",
+                SOURCE_UPDATED_AT,
+            ],
+            environment={job.WRITE_APPROVAL_ENV: job.WRITE_APPROVAL_VALUE},
+        )
+
+        self.assertEqual(code, 0, receipt)
+        self.assertEqual(receipt["status"], "activated")
+        self.assertEqual(receipt["source"]["format"], job.BULK_FORMAT_JSONL)
+        self.assertTrue(receipt["source"]["gzip"])
+        self.assertEqual(
+            receipt["source"]["sha256"],
+            hashlib.sha256(gzip.decompress(FIXTURE_JSONL_GZ.read_bytes())).hexdigest(),
+        )
+        self.assertEqual(ctx.upstream_requests, 0)
+        counts = receipt["counts"]
+        self.assertEqual(counts["cards"]["inserted"], 4)
+        self.assertEqual(counts["cards"]["updated"], 1)
+        self.assertEqual(counts["sets"]["inserted"], 2)
+        self.assertEqual(counts["card_legalities"]["oracle_ids"], 5)
+
+    def test_scheduled_run_downloads_the_jsonl_of_the_current_metadata(self) -> None:
+        self.db.state[job.STATE_ACTIVE_CONTRACT] = job.APPLY_CONTRACT
+        opener = ScriptedOpener(
+            [
+                metadata_response(METADATA_2026_09_23),
+                FakeResponse(FIXTURE_JSONL_GZ.read_bytes()),
+            ]
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            code, receipt, ctx = self.run_job(["--work-dir", tmp], opener=opener)
+            leftovers = list(Path(tmp).iterdir())
+
+        self.assertEqual(code, 0, receipt)
+        self.assertEqual(receipt["status"], "applied")
+        self.assertEqual(receipt["source"]["format"], job.BULK_FORMAT_JSONL)
+        self.assertEqual(receipt["source"]["declared_compressed_size"], 78591937)
+        self.assertEqual(ctx.upstream_requests, 2)
+        self.assertEqual(
+            [request.full_url for request in opener.requests],
+            [job.BULK_METADATA_URL, METADATA_2026_09_23["jsonl_download_uri"]],
+        )
+        self.assertEqual(receipt["counts"]["cards"]["inserted"], 4)
+        self.assertEqual(leftovers, [])
+
+    def test_dry_run_with_the_production_metadata_of_2026_09_23(self) -> None:
+        # Reproduz o dry-run de produção de 2026-09-23 14:53:41Z, que falhava com
+        # unexpected_download_host antes do suporte ao JSONL.
+        opener = ScriptedOpener(
+            [
+                metadata_response(METADATA_2026_09_23),
+                FakeResponse(FIXTURE_JSONL_GZ.read_bytes()),
+            ]
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            code, receipt, _ = self.run_job(
+                ["--mode", "dry-run", "--work-dir", tmp], opener=opener
+            )
+
+        self.assertEqual(code, 0, receipt)
+        self.assertEqual(receipt["status"], "dry_run")
+        self.assertIsNone(receipt["error"])
+        self.assertFalse(receipt["database_writes"])
+        self.assertEqual(self.db.writes(), [])
+        self.assertEqual(receipt["counts"]["planned"]["cards_insert_candidates"], 4)
+
+    def test_metadata_without_any_uri_fails_with_its_own_error(self) -> None:
+        self.db.state[job.STATE_ACTIVE_CONTRACT] = job.APPLY_CONTRACT
+        payload = {
+            key: value
+            for key, value in METADATA_2026_09_23.items()
+            if key != "jsonl_download_uri"
+        }
+        opener = ScriptedOpener([metadata_response(payload)])
+
+        code, receipt, ctx = self.run_job([], opener=opener)
+
+        self.assertEqual(code, 1)
+        self.assertEqual(receipt["status"], "failed")
+        self.assertEqual(receipt["error"]["kind"], "bulk_download_uri_missing")
+        self.assertEqual(ctx.upstream_requests, 1)
+        self.assertEqual(self.db.values_calls, [])
+        self.assertTrue(receipt["failure_logged"])
 
 
 class FreshnessTest(unittest.TestCase):
