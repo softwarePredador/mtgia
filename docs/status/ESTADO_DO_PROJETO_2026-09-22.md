@@ -4,11 +4,11 @@ Lifecycle: `CURRENT_CONTEXT · VERIFIED_STATE · NO_PRIORITY_AUTHORITY`. Este do
 **onde o projeto está de verdade** e **o que falta para a beta controlada**. Não define prioridade
 (isso é da decisão e do backlog) e não autoriza mutação. Toda afirmação aqui foi verificada na
 fonte primária em 2026-09-22; a evidência linha a linha está em
-[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (147 fatos: 129 da auditoria e 18 do adendo pós-medição, pós-leitura da produção e da observação pública de 2026-09-22) e a origem de cada correção em
+[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (148 fatos: 129 da auditoria e 19 do adendo, com a medição, a leitura da produção de 2026-09-22 e o deploy de 2026-09-23) e a origem de cada correção em
 [`docs/verdade/PLANO_DE_CORRECAO.md`](../verdade/PLANO_DE_CORRECAO.md).
 
-- Checkout: `codex/free-beta-release-candidate-2026-07-17` @ `d15beb05b` (= `origin`), com a
-  correção documental de 2026-09-22 **na árvore de trabalho, sem commit**.
+- Checkout: `codex/free-beta-release-candidate-2026-07-17`. A correção documental e as decisões de
+  2026-09-22 estão commitadas de `ac70f3d98` a `b86df8a20` e publicadas no `origin`.
 - Pedido que originou este documento: "não pode haver mais divergência de dados; 100% de noção do
   projeto num todo; docs errados → corrigir ou remover; deixar só o verdadeiro".
 - Método: 7 auditores conferiram 1.913 afirmações de 66 documentos ativos contra código, registry
@@ -19,14 +19,14 @@ fonte primária em 2026-09-22; a evidência linha a linha está em
 
 ## 1. Em uma frase
 
-O BrewTact está **construído e trancado no repositório, mas não em produção**.
+O BrewTact está **construído e trancado, no repositório e, desde 2026-09-23, em produção**.
 
 - **No repositório:** as 11 jornadas existem em código, mas **0 das 29 capabilities está ligada**.
   Só o plano de controle de conta responde, e ele tem **quatro buracos de segurança**.
-- **Em produção:** roda uma versão de 2026-08-03, anterior à tranca, com cadastro aberto, IA e
-  Battle ligados e os mesmos quatro buracos. A contenção de capabilities nunca chegou a `master`.
-  O banco está parado desde 2026-08-03, sem a migration 058, e cartas e legalidades não se atualizam
-  desde 2026-06-06.
+- **Em produção:** desde 2026-09-23 roda a linha de base contida (`87fd5a2e6`). Backend, site
+  público e agendador estão com as 29 capabilities desligadas; cadastro, IA e Battle estão fechados;
+  a migration 058 foi aplicada. Os quatro buracos do plano de controle continuam, e o `/app` segue
+  numa imagem antiga. Cartas e legalidades não se atualizam desde 2026-06-06.
 - **As tarefas:** **nenhuma das 49 P0 CORE medidas está atendida.** O slot `NOW` (`BT-SCP-001`) está
   aberto há quatro semanas. Um dos dois pontos que o travavam, o `npm audit` do site público, foi resolvido em 2026-09-22 (`BT-WEB-003`, falta o receipt); o outro é o último pack de
   evidência de UI.
@@ -63,11 +63,11 @@ O que a abertura exige, por camada (`docs/MANALOOM_E2E_RELEASE_CONTRACT.md` §Cr
 | Rotas do servidor | 120 arquivos de handler; **29 pares** método+path no plano de controle (sem capability) | 3.9, 2.5 |
 | Coerência app↔servidor | 142 chamadas HTTP, **0 quebradas**, 0 rotas não classificadas | `docs/flows/_coerencia_transversal.md` |
 | Jornadas documentadas | **11 de 11**, todas implementadas; alcançável hoje: plataforma (sim), auth e comercial (parcial), as outras 8 **não** | `docs/flows/README.md` |
-| Tarefas no índice canônico | **244** depois das decisões do dono de 2026-09-22 (227 da correção documental + 17 criadas pelas decisões): PASS 3 · IN_PROGRESS_CONTAINED 2 · IMPLEMENTED_LOCAL 7 · **EVIDENCE_REQUIRED 12** · TODO 103 · BLOCKED_BY_P0 80 · DEFERRED 33 · WAITING_EXTERNAL 4 | 11.1 |
-| P0 que bloqueiam a primeira coorte | **64 `P0 CORE` + 6 `P0 LIFE` abertas = 70** (escopo decidido em 2026-09-22, D-07). As 64 são as 55 da correção documental, mais 9 criadas pelas decisões, mais o `BT-PRIV-003` promovido, menos o `BT-UX-SWAP-001`, que passou a `P0 AI`. Das 146 P0 abertas, as 26 `P0 AI` ficam para a segunda onda e as demais bloqueiam só a própria capability | 11.2 |
+| Tarefas no índice canônico | **244** depois das decisões do dono de 2026-09-22 (227 da correção documental + 17 criadas pelas decisões) e do deploy de 2026-09-23: PASS 4 · IN_PROGRESS_CONTAINED 2 · IMPLEMENTED_LOCAL 7 · **EVIDENCE_REQUIRED 12** · TODO 103 · BLOCKED_BY_P0 79 · DEFERRED 33 · WAITING_EXTERNAL 4 | 11.1 |
+| P0 que bloqueiam a primeira coorte | **63 `P0 CORE` + 6 `P0 LIFE` abertas = 69** (escopo decidido em 2026-09-22, D-07). As 63 são as 55 da correção documental, mais 9 criadas pelas decisões, mais o `BT-PRIV-003` promovido, menos o `BT-UX-SWAP-001`, que passou a `P0 AI`, e o `BT-REL-000`, fechado em 2026-09-23. Das 145 P0 abertas, as 26 `P0 AI` ficam para a segunda onda e as demais bloqueiam só a própria capability | 11.2 |
 | P0 CORE medidas contra o código | 49 de 55: **nenhuma atendida**; 433 asserções, 16% provadas | §5 |
-| Produção — código (observada em 2026-09-22) | `a6ee09c8f` (2026-08-03): **39 commits atrás** da branch de trabalho e 10 atrás de `origin/master`; **sem a política de capabilities** (`/capabilities` 404); IA e worker de Battle ligados; cadastro sem trava. A contenção (`b2d3fc04f`) **não está em `master`**; a branch de trabalho tem 29 commits fora dela | 11.4, 11.16, 11.17 |
-| Produção — banco (lido em 2026-09-22) | Ledger em **057** (a 058 não foi aplicada); 99 tabelas em `public` (20 fora do repositório, 7 delas usadas pelo código sem migration); 1.033 tabelas de backup em `manaloom_deploy_audit`; **nenhuma atividade desde 2026-08-03**; catálogo parado desde 2026-06-06 | 11.10–11.15 |
+| Produção — código (implantada em 2026-09-23) | `87fd5a2e6` = `origin/master` no backend, no site público e no agendador, com as **29 capabilities off**; cadastro, IA, Battle e marketplace respondem `capability_unavailable`; o `/app` segue na imagem antiga. Até 2026-09-22 rodava `a6ee09c8f` (2026-08-03), sem a política de capabilities | 11.16, 11.17, 11.19 |
+| Produção — banco (lido em 2026-09-22) | Ledger em **058** desde 2026-09-23, aplicada depois de backup e ensaio de restauração; 99 tabelas em `public` (20 fora do repositório, 7 delas usadas pelo código sem migration); 1.033 tabelas de backup em `manaloom_deploy_audit`; **nenhuma atividade desde 2026-08-03**; catálogo parado desde 2026-06-06 | 11.10–11.15, 11.19 |
 | Trabalho não commitado fora da árvore | Triado em 2026-09-22 (D-52): 6 worktrees removidos (5 limpos e o `cold-repro-fix`, superado pelo `BT-CI-001`), 2 registros mortos podados e o classificador do cleanroom trazido para a branch (D-03). Ficam 3 worktrees com trabalho não commitado, todos com backup local em `refs/backup/2026-09-22/`; nenhum no remoto, porque o `pre-push` roda o `full`, vermelho até o `BT-UIEV-001` fechar | §7, 11.6 |
 | Testes do produto | ~797 arquivos (server 401 · app 237 · integration 147); a suíte do app deu **1604 verdes, 0 falhas** com o Flutter pinado | 5.11 |
 | `integration_test/` no gate | **Nenhum gate executa** os 147 arquivos de integração | `docs/flows/card_catalog.md` |
@@ -102,7 +102,7 @@ Depois disso, nunca foram alcançados — e podem revelar vermelho — os quatro
 schema.
 
 Só com `BT-SCP-001` fechado a fila anda, agora em duas raias (D-02): na de servidor vêm o
-`BT-GOV-002` e o `BT-REL-000` (pôr a contenção no ar); na do app, o **`BT-UX-KIT-001`** (kit visual
+`BT-GOV-002` e os buracos da D-19 (o `BT-REL-000` foi antecipado e está feito); na do app, o **`BT-UX-KIT-001`** (kit visual
 em `app/lib`), decidido pelo dono em 2026-09-21 e mantido pela D-06 em 2026-09-22.
 
 ---
@@ -144,9 +144,10 @@ existem só no caminho Web, guardas ausentes. Os números abaixo são os finais.
 
 ### O escopo foi decidido em 2026-09-22 (D-07)
 
-- **Primeira coorte:** núcleo + contador de vida = **64 P0 CORE + 6 P0 LIFE = 70**. Das 64, 48
-  foram medidas (as 49 de HEAD menos o `BT-UX-SWAP-001`); as outras 16 (as 6 registradas antes da
-  medição, o `BT-PRIV-003` e as 9 criadas pelas decisões) e as 6 P0 LIFE não foram.
+- **Primeira coorte:** núcleo + contador de vida = **63 P0 CORE + 6 P0 LIFE = 69**. Das 63, 48
+  foram medidas (as 49 de HEAD menos o `BT-UX-SWAP-001`); as outras 15 (as 6 registradas antes da
+  medição, o `BT-PRIV-003` e 8 das 9 criadas pelas decisões, porque o `BT-REL-000` fechou em
+  2026-09-23) e as 6 P0 LIFE não foram.
 - **Segunda onda:** Analyze/Optimize, com as 26 P0 AI (24 + `BT-UX-SWAP-001` + `BT-AI-033`).
 
 Antes da decisão, as opções eram a beta mínima (55 P0 CORE) e a pretendida pelo §2.2 do backlog
@@ -228,15 +229,12 @@ buracos. Todos foram confirmados no código:
 4. **`GET /reports/:id` continua servindo o snapshot de um deck depois de o deck ser apagado**
    (`server/lib/release_capability_policy.dart:584-585`).
 
-**E a produção não roda este código.** A contenção de capabilities (`b2d3fc04f`, 2026-08-13)
-**não está em `master`**, e a branch de trabalho tem 29 commits fora dela. Observada em 2026-09-22
-por `GET` público, a produção roda `a6ee09c8f` (2026-08-03):
-- sem a política de capabilities (`/capabilities` 404);
-- com a IA e o worker de Battle ligados;
-- com o cadastro sem trava, e cada conta nova ganha 120 chamadas de IA por mês.
-
-Os quatro buracos acima existem também nessa versão. O marketplace dela não filtra nem visibilidade
-nem bloqueio (FATOS 11.16–11.17). O "tudo desligado" descreve o repositório, não o que está no ar.
+**Desde 2026-09-23 a produção roda este código.** A linha de base contida (`87fd5a2e6`) foi
+implantada no backend, no site público e no agendador (`BT-REL-000`, receipt em
+`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`). Até então a produção rodava `a6ee09c8f`
+(2026-08-03), sem a política de capabilities, com cadastro aberto, IA e Battle ligados e o
+marketplace sem filtro de privacidade (FATOS 11.16–11.17). Os quatro buracos acima continuam no
+ar até `BT-AUTH-003`, `BT-AUTH-004` e `DCK-P0-06`.
 
 ### Quebram a jornada quando as capabilities abrirem
 
@@ -260,7 +258,7 @@ entram como tarefas quando o dono priorizar (D-53 do registro de decisões, §9)
 | 12 | Um cron apaga em 30 min os jobs de IA cuja retomada o app implementa | job perdido para quem fecha o app | `cleanup_optimize_telemetry.dart`; `AI_JOB_RETENTION_MINUTES=30` → **`BT-AI-032`** |
 | 13 | 4 eventos de ativação do onboarding rejeitados pelo allowlist do servidor, em silêncio | esses passos não existem no funil | `activation-events/index.dart:10` |
 | 14 | Segunda nota do mesmo pós-jogo dá 409 engolido; `deleteNote` trata 404 como sucesso | nota que nunca sincroniza; nota apagada que ressuscita | `post_game_note_store.dart:83,174` |
-| 15 | `GET /community/marketplace` expunha fichário ignorando privacidade e bloqueios | **corrigido na árvore** (não commitado), com teste por mutação | `server/routes/community/marketplace/index.dart` |
+| 15 | `GET /community/marketplace` expunha fichário ignorando privacidade e bloqueios | **corrigido em `c4d55db19`**, com teste por mutação; no ar desde 2026-09-23, com a rota desligada | `server/routes/community/marketplace/index.dart` |
 
 ---
 
@@ -272,9 +270,9 @@ exceção não autorizada). O que cada uma produziu, e onde isso entra no backlo
 | Frente | Produziu | Estado | Entra no backlog como |
 | --- | --- | --- | --- |
 | **Gate de evidência** (`BT-UIEV-001`) | ChromeDriver pinado em um lugar; 22/23 packs recapturados; perfil Android capturado (AVD consertado com `-wipe-data`); E2E do play-vs-ai corrigido | 5 commits no origin; falta 1 pack + `latest.json` | `BT-UIEV-001` (Épico J, criado hoje) · `BT-CI-001` (fechado, receipt pendente) |
-| **Contador de vida** | Protótipo HTML com a linguagem nova (azulejos, numerais, vidro escuro); 13 telas secundárias convertidas e provadas no iPhone (18 provas); suíte própria 83/83; regra ΔE ≥ 25 para cor de estado | `docs/design/life-counter-prototype/`, untracked; ondas 9–10 não começaram | Insumo de `BT-UX-KIT-001` e do Épico H (`LC-P0-*`); **a porta do protótipo para Flutter ainda não tem ID** |
-| **Consistência visual** | Auditoria de 85 telas (4–5/10 contra o contador; 213 cheiros de formulário; errata de 12/92 linhas); kit CSS + 114 tokens; spec de 1.635 linhas; packet `BT-UX-KIT-001`; mockups de onboarding (6,5/10) e gerador (júri fechado: "Bancada do comandante") | `docs/design/`, untracked | `BT-UX-KIT-001` (Épico D, criado hoje, próximo do horizonte) · alimenta `BT-UX-IMG/FIX/SWAP/A11Y/PROOF-001` |
-| **Fluxos** (esta) | 11 fluxos documentados com cético; coerência app↔servidor; superfícies não cobertas; correção do marketplace; tabela de fatos; correção documental | `docs/flows/`, `docs/verdade/`, árvore de trabalho | `TRD-P0-01` (marketplace como evidência de contenção) · achados de §6 → IDs a criar · `BT-DOC-006` (3º portão, criado hoje) |
+| **Contador de vida** | Protótipo HTML com a linguagem nova (azulejos, numerais, vidro escuro); 13 telas secundárias convertidas e provadas no iPhone (18 provas); suíte própria 83/83; regra ΔE ≥ 25 para cor de estado | `docs/design/life-counter-prototype/`, commitado em `15a5ad489`; ondas 9–10 não começaram | Insumo de `BT-UX-KIT-001` e do Épico H (`LC-P0-*`); **a porta do protótipo para Flutter ainda não tem ID** |
+| **Consistência visual** | Auditoria de 85 telas (4–5/10 contra o contador; 213 cheiros de formulário; errata de 12/92 linhas); kit CSS + 114 tokens; spec de 1.635 linhas; packet `BT-UX-KIT-001`; mockups de onboarding (6,5/10) e gerador (júri fechado: "Bancada do comandante") | `docs/design/`, commitado em `15a5ad489` | `BT-UX-KIT-001` (Épico D, criado hoje, próximo do horizonte) · alimenta `BT-UX-IMG/FIX/SWAP/A11Y/PROOF-001` |
+| **Fluxos** (esta) | 11 fluxos documentados com cético; coerência app↔servidor; superfícies não cobertas; correção do marketplace; tabela de fatos; correção documental | `docs/flows/`, `docs/verdade/`, commitados em `f973f81c5` | `TRD-P0-01` (marketplace como evidência de contenção) · achados de §6 → IDs a criar · `BT-DOC-006` (3º portão, criado hoje) |
 
 ### Trabalho fora da árvore principal
 
@@ -334,9 +332,9 @@ pedem a palavra dele na hora da execução.
 
 As que destravavam primeiro:
 
-1. **Pôr a contenção no ar** (item 0 do registro). A produção roda uma versão sem a política de
-   capabilities, com cadastro aberto e IA ligada. A sequência: backup cifrado → merge → 058 →
-   deploy com tudo off → same-SHA.
+1. **Pôr a contenção no ar** (item 0 do registro): **feito em 2026-09-23** (`BT-REL-000`). Backup
+   local com ensaio de restauração, `master` promovido, 058, backend, site e agendador com tudo off,
+   e observação same-SHA.
 2. **Bump do `npm audit`** (D-01), confirmado direto com quem for executar.
 3. **Raias paralelas e prova de UI em lote** (D-02, D-03).
 4. **Escopo da beta** (D-07): com ou sem Analyze/Optimize e contador de vida.

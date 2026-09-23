@@ -7,17 +7,17 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 - SHA baseline na abertura de `BT-SCP-001`:
   `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`
 - Upstream observado na abertura: `c1bd186633a479f62eae0ba4db6eb29463e94419`
-- Divergência observada em 2026-09-22: até `d15beb05b` tudo estava no origin. Os commits de
-  2026-09-22 (`ac70f3d98` a `8f9427bb4` e seguintes) estão só locais: o `pre-push` roda o `full`,
-  vermelho até o `BT-UIEV-001` fechar
+- Divergência observada em 2026-09-22: os commits `ac70f3d98` a `b86df8a20` passaram pelo
+  `pre-commit` sem bypass e foram publicados no mesmo dia com `git push --no-verify`, autorizado
+  pelo dono na hora, porque o `pre-push` roda o `full`, vermelho até o `BT-UIEV-001` fechar
 - Observado em UTC: `2026-08-24T21:14:27Z`
 - Backlog/registry SHA-256 de abertura:
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (commit `f973f81c5`, decisões do dono de 2026-09-22):
-  `5b60b6cea15442538b52e40bdccbf92b81f587580c8634a3bddac32976ce5b4f`
-  (244 tasks e 436 arestas; antes das decisões, na árvore de trabalho, `dd1fe8ff…` com 227; em
+- Backlog/registry SHA-256 corrente (registro do deploy de 2026-09-23, branch
+  `coord/2026-09-23-linha-de-base-no-ar`): `f4f5405db033cf7342c5f3edf0397199db4ce57349a75cffb05b1a9352ae9b81`
+  (244 tasks; antes, `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
   `d15beb05b`, `333b6c0b…` com 220 tasks e 402 arestas, valor de `f6f791098`)
 - Project logic digest em HEAD `d15beb05b`: `556ba631…`. O digest da árvore de trabalho
   não é copiado aqui, porque este arquivo entra no próprio digest: ver
@@ -62,7 +62,7 @@ aceita um só slot `NOW`; a raia do app abre quando `BT-UIEV-001` fechar e o
 | 1a | `BT-WEB-003` | bump feito em 2026-09-22 (D-01): `npm audit` com 0 vulnerabilidades; falta o receipt same-SHA |
 | 1b | `BT-UIEV-001` | recaptura em lote (23/23 e `latest.json`) depois das correções da D-04 |
 | 2 | `BT-GOV-002` | fila com duas raias (D-02); abre a raia do app |
-| 3 | `BT-REL-000` | item 0: pôr a linha de base contida no ar; cada passo em produção com aprovação do dono na hora |
+| 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`) |
 | 4 | `BT-AUTH-003` | buraco do login que denuncia contas (D-19, D-21) |
 | 5 | `BT-AUTH-004` | buracos da exportação e da exclusão (D-19, D-20) |
 | 6 | `BT-AUTH-007` | trocar a senha trunca o usuário; alcançável hoje |
@@ -146,10 +146,13 @@ contador de vida.
   `SERVER_BEHIND`; `/capabilities` ainda retornava `404` e readiness anunciava
   migration `057`. Reobservado em 2026-09-22 19:49 UTC: o mesmo SHA, com IA e
   worker de Battle saudáveis (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`).
-- Em 2026-09-22 o dono decidiu pôr a linha de base contida no ar (`BT-REL-000`)
-  depois do `BT-SCP-001`. Isso não é autorização de deploy agora: cada passo em
-  produção pede a aprovação dele na hora da execução. Divergência live continua
-  sendo observação, não ação.
+  Em 2026-09-23 a linha de base contida foi implantada: `/health` com `87fd5a2e6`,
+  readiness com 058 e 29/29 off (`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`).
+- Em 2026-09-22 o dono autorizou subir o que fosse preciso ("o que tiver de subir
+  no servidor pode subir", sem criar bucket), e a linha de base contida foi ao ar em
+  2026-09-23, antes de o `BT-SCP-001` fechar. `origin/master` = `87fd5a2e6`,
+  promovido com `--no-verify` autorizado. Os próximos deploys continuam pedindo a
+  palavra dele. Divergência live continua sendo observação, não ação.
 - `BT-GOV-001` fechou em `PASS` local no commit
   `fd0397a5a97742bcb5127c7b2d08d80aca4bf738`; o gate `full` passou, e a
   evidência UI daquela rodada contém 456 capturas no digest `d517adb65b…`, incluindo

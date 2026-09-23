@@ -12,7 +12,7 @@
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic source digest de abertura:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Registry `generated_from.sha256` corrente: `5b60b6cea15442538b52e40bdccbf92b81f587580c8634a3bddac32976ce5b4f`, do commit `f973f81c5`, com as decisões do dono de 2026-09-22 (antes delas, `dd1fe8ff…`; o aceite desta task
+- Registry `generated_from.sha256` corrente: `f4f5405db033cf7342c5f3edf0397199db4ce57349a75cffb05b1a9352ae9b81`, do registro do deploy de 2026-09-23 (antes, `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…`; o aceite desta task
   foi ampliado em `f6f791098`)
 - Linha canônica: `260` (em `f973f81c5`)
 - Decisão corrente: `docs/status/CURRENT_PRODUCT_DECISION.md`

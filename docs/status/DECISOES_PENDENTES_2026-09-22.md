@@ -28,7 +28,8 @@ Mudanças de classe: `BT-PRIV-003` subiu a P0 CORE (D-25); `BT-UX-SWAP-001` pass
 
 Com isso o índice tem 244 tarefas e 146 P0 abertas: 64 P0 CORE, 26 P0 AI e 6 P0 LIFE. A primeira
 coorte (núcleo + contador de vida, D-07) exige as 70 P0 CORE e P0 LIFE, todas agora ancestrais do
-GO/NO-GO (`BT-DEC-001`, D-18).
+GO/NO-GO (`BT-DEC-001`, D-18). Depois do deploy de 2026-09-23, com o `BT-REL-000` fechado, são
+145 P0 abertas, 63 P0 CORE, e a primeira coorte exige 69.
 
 Continuam pedindo a palavra do dono na hora da execução:
 - toda escrita, migração, deploy ou exclusão em produção (item 0, D-10, D-11, D-49, D-50);
@@ -37,14 +38,19 @@ Continuam pedindo a palavra do dono na hora da execução:
 - o parecer do advogado (D-12, D-24);
 - o aparelho físico, direto com quem executar (D-15).
 
-Executado no mesmo dia pela sessão coordenadora:
+Executado pela sessão coordenadora:
 - D-01: `BT-WEB-003`, com `npm audit` zerado; falta o receipt same-SHA;
 - D-03: o classificador de escopo staged entrou na branch, com um conserto no parser;
 - D-52: 6 worktrees removidos, 2 registros podados e backup local dos 4 que tinham trabalho;
-- D-54: a correção e as decisões foram commitadas pelos hooks, sem `--no-verify`. O push espera o
-  `pre-push`, que roda o `full`, vermelho até o `BT-UIEV-001` fechar; publicar antes disso
-  exigiria bypass, o que o `.hermes.md` proíbe, e está com o dono;
-- D-55: a sessão do gate retoma logo depois destes commits, com a sequência do `BT-SCP-001`.
+- D-54: a correção e as decisões foram commitadas pelos hooks, sem `--no-verify` (`ac70f3d98` a
+  `b86df8a20`), e publicadas no mesmo dia com `git push --no-verify`, que o dono autorizou na hora,
+  porque o `pre-push` roda o `full`, vermelho até o `BT-UIEV-001` fechar;
+- D-55: a sessão do gate retomou logo depois destes commits, com a sequência do `BT-SCP-001`;
+- item 0 (`BT-REL-000`), D-09, D-10 e D-11: feitos em 2026-09-23, com a autorização do dono de subir o
+  que fosse preciso. Backup local e ensaio de restauração, `master` promovido, 058 aplicada, e
+  backend, site e agendador em `87fd5a2e6` com tudo desligado (`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`);
+- D-12 mudou: o dono vetou criar bucket. O backup ficou local e sem cifra, e a cópia fora desta
+  máquina continua em aberto (`BT-DR-001`).
 
 O andamento das demais está no backlog e na fila.
 

@@ -27,7 +27,9 @@ receipts continuam sendo necessários para provar implementação e release.
 - API aprovada pelo contrato de release:
   `https://evolution-cartinhas.2ta7qx.easypanel.host`.
 - Nenhum desses destinos prova que a revisão corrente foi implantada. A prova
-  live exige SHA, digest, health/readiness e receipt frescos.
+  live exige SHA, digest, health/readiness e receipt frescos. Em 2026-09-23, API,
+  site público e agendador foram implantados em `87fd5a2e6`, com receipt
+  (`docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`); o `/app` não.
 
 ## Oferta única da beta
 
@@ -117,11 +119,12 @@ gates. Somente receipts da mesma revisão podem mover uma linha de
 
 Decidido em 2026-09-22:
 
-- Depois do `BT-SCP-001`, a linha de base contida vai ao ar (`BT-REL-000`):
-  backup cifrado, merge, migration 058, deploy do backend com tudo `OFF` e
-  observação same-SHA. Em 2026-09-22 a API aprovada rodava `a6ee09c8f`
-  (2026-08-03), sem a política de capabilities, com cadastro aberto e IA e Battle
-  ligados. Cada passo em produção pede a aprovação do dono na hora (regra 6).
+- A linha de base contida foi ao ar em 2026-09-23 (`BT-REL-000`), antecipada por
+  decisão do dono: backup local (ele vetou bucket) com ensaio de restauração,
+  `master` promovido, migration 058, e backend, site público e agendador em
+  `87fd5a2e6` com tudo `OFF` e observação same-SHA. Até então a API aprovada rodava
+  `a6ee09c8f` (2026-08-03), sem a política de capabilities. O `/app` segue na
+  imagem antiga. Cada passo em produção pede a aprovação do dono (regra 6).
 - Os quatro buracos do plano de controle de conta (exportação sem
   reautenticação, exclusão sem limite de tentativas, login que denuncia contas e
   relatório de deck apagado) fecham antes de qualquer capability abrir (D-19).

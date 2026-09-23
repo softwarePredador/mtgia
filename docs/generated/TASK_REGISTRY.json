@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "5b60b6cea15442538b52e40bdccbf92b81f587580c8634a3bddac32976ce5b4f"
+    "sha256": "f4f5405db033cf7342c5f3edf0397199db4ce57349a75cffb05b1a9352ae9b81"
   },
   "required_task_fields": [
     "id",
@@ -44,7 +44,7 @@
         "BT-UIEV-001",
         "BT-WEB-003"
       ],
-      "acceptance": "Flag ausente/inválida fica OFF; API nega antes de PG; app só apresenta o permitido; nenhuma rota espectador fica pública e a implementação interativa guardada usa a direção Jogar contra IA; cadastro novo tem capability própria e fica OFF, enquanto login/recuperação/privacidade de contas existentes permanecem control-plane; same-SHA registra a matriz; `implementation_status`, `release_capability` e `live_verified_as_of` são eixos distintos. Evidência parcial: receipts docs/qa/execution/2026-09-21/btscp001-gate-amplo.md e btuiev001-chromedriver-e-recaptura.md; commits d83e9b1e1, 07014b431, d26f23a16. Aceite ampliado em f6f791098 durante a execução. Dependências explicitadas em 2026-09-22: `BT-UIEV-001` (evidência de UI) e `BT-WEB-003` (`npm audit`) bloqueiam o gate amplo que o `PASS` exige (§5.2); o slot segue como contenção fail-closed, com o marcador declarado na fila. Decisão do dono em 2026-09-22: D-03 (o classificador de escopo staged do worktree `manaloom-bt-scp-001-cleanroom` entra na árvore: o commit roda a evidência de UI só quando há UI no commit; a prova completa sai em lote no `BT-UX-PROOF-001`); D-04 (as correções de UI da contenção social, de trade e do scanner entram neste slot, antes da recaptura do `BT-UIEV-001`); D-05 (prova de mecanismo aceita; a observação de produção passa para o `BT-REL-000`; sem reescrever histórico; o próximo commit passa pelos hooks e o receipt lista os 16 commits que citam `--no-verify`); D-52 (o que faltar do commit `0779595e2` entra aqui).",
+      "acceptance": "Flag ausente/inválida fica OFF; API nega antes de PG; app só apresenta o permitido; nenhuma rota espectador fica pública e a implementação interativa guardada usa a direção Jogar contra IA; cadastro novo tem capability própria e fica OFF, enquanto login/recuperação/privacidade de contas existentes permanecem control-plane; same-SHA registra a matriz; `implementation_status`, `release_capability` e `live_verified_as_of` são eixos distintos. Evidência parcial: receipts docs/qa/execution/2026-09-21/btscp001-gate-amplo.md e btuiev001-chromedriver-e-recaptura.md; commits d83e9b1e1, 07014b431, d26f23a16. Aceite ampliado em f6f791098 durante a execução. Dependências explicitadas em 2026-09-22: `BT-UIEV-001` (evidência de UI) e `BT-WEB-003` (`npm audit`) bloqueiam o gate amplo que o `PASS` exige (§5.2); o slot segue como contenção fail-closed, com o marcador declarado na fila. Decisão do dono em 2026-09-22: D-03 (o classificador de escopo staged do worktree `manaloom-bt-scp-001-cleanroom` entra na árvore: o commit roda a evidência de UI só quando há UI no commit; a prova completa sai em lote no `BT-UX-PROOF-001`); D-04 (as correções de UI da contenção social, de trade e do scanner entram neste slot, antes da recaptura do `BT-UIEV-001`); D-05 (prova de mecanismo aceita; a observação de produção passa para o `BT-REL-000`; sem reescrever histórico; o próximo commit passa pelos hooks e o receipt lista os 16 commits que citam `--no-verify`); D-52 (o que faltar do commit `0779595e2` entra aqui). A observação de produção (D-05) foi feita no `BT-REL-000` em 2026-09-23.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 260
     },
@@ -2741,19 +2741,17 @@
       "depends_on": [
         "BT-DB-001"
       ],
-      "acceptance": "Manifest/checksum/object version; RPO/RTO medidos; dados e schema validados. Decisão do dono em 2026-09-22: D-12, dump cifrado com `age` e chave sob custódia do dono; bucket S3-compatível em região no Brasil, com contrato de tratamento de dados (confirmar com advogado); RPO de 24 h e RTO de 4 h; o primeiro backup sai antes da 058, no `BT-REL-000`. D-26: testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono na hora.",
+      "acceptance": "Manifest/checksum/object version; RPO/RTO medidos; dados e schema validados. Decisão do dono em 2026-09-22: D-12, dump cifrado com `age` e chave sob custódia do dono; bucket S3-compatível em região no Brasil, com contrato de tratamento de dados (confirmar com advogado); RPO de 24 h e RTO de 4 h; o primeiro backup sai antes da 058, no `BT-REL-000`. D-26: testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono na hora. Em 2026-09-23 (`BT-REL-000`): primeiro backup com ensaio de restauração completo aprovado (99 tabelas, 1.181 contas, 51 s); sem cifra e sem cópia fora da máquina, porque o dono vetou criar bucket.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 660
     },
     {
       "id": "BT-REL-000",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "PASS",
       "delivery": "Implantar a linha de base contida (item 0 das decisões de 2026-09-22): backup cifrado, merge em `master`, migration 058, deploy do backend com as 29 capabilities off e observação same-SHA.",
-      "depends_on": [
-        "BT-SCP-001"
-      ],
-      "acceptance": "Backup cifrado verificado antes da 058; `GET /capabilities` responde a política com 29/29 off no SHA implantado; cadastro, IA e Battle respondem `capability_unavailable`; receipt same-SHA; cada passo em produção com aprovação do dono na hora da execução.",
+      "depends_on": [],
+      "acceptance": "Backup verificado por ensaio de restauração antes da 058 (a cifra saiu do escopo: o dono vetou bucket em 2026-09-22); `GET /capabilities` responde a política com 29/29 off no SHA implantado; cadastro, IA e Battle respondem `capability_unavailable`; receipt same-SHA; cada passo em produção com aprovação do dono na hora da execução. Feito em 2026-09-23, antecipado por decisão do dono antes do `BT-SCP-001` (dependência dispensada): backup local e ensaio de restauração aprovado; `master` = `87fd5a2e6`; 058 aplicada; backend, site público e ops implantados com 29/29 off; observação same-SHA externa com cadastro, IA, Battle e marketplace em `capability_unavailable`. Receipt: `docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md`.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 661
     },
@@ -2768,7 +2766,7 @@
         "BT-DR-001",
         "BT-OBS-001"
       ],
-      "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível. Decisão do dono em 2026-09-22: D-13, `/app` implantável com as 29 capabilities off como release de plano de controle (a regra de ao menos uma on vale só quando uma capability abrir); ordem backend, site público, `/app` e Android; Android da primeira coorte por APK no release host, sem Play Store por enquanto.",
+      "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível. Decisão do dono em 2026-09-22: D-13, `/app` implantável com as 29 capabilities off como release de plano de controle (a regra de ao menos uma on vale só quando uma capability abrir); ordem backend, site público, `/app` e Android; Android da primeira coorte por APK no release host, sem Play Store por enquanto. Em 2026-09-23 o `/app` seguia na imagem antiga (`app-web@sha256:f94930bc…`); o deploy do Flutter Web com tudo off continua bloqueado pela contradição entre o loader e o gate.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 662
     },
@@ -2990,7 +2988,7 @@
       "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Corrigir o `npm audit` do site público: `next` 15.5.21 → 15.5.25 (RCE crítico), `eslint-config-next` acompanhando, `overrides.sharp` 0.35.3 → 0.35.4.",
       "depends_on": [],
-      "acceptance": "`npm audit` sem `critical`/`high`; `lint`, `build` e `scripts/manaloom_public_web_surface_contract_test.sh` verdes; `scripts/manaloom_local_ci.sh full` passa do estágio `npm audit`. Bump autorizado pelo dono em 2026-09-21; linha registrada em 2026-09-22. Decisão do dono em 2026-09-22: D-01, bump confirmado direto pelo dono. Implementado em 2026-09-22 pela sessão coordenadora: `next` e `eslint-config-next` 15.5.25, `overrides.sharp` 0.35.4 e `npm audit fix` sem `--force` nas ferramentas de build; `npm audit` com 0 vulnerabilidades (completo e `--omit=dev`); lint, build, `free-beta-offer-contract`, `manaloom_public_web_surface_contract_test.sh` e `manaloom_public_web_smoke.sh` verdes na árvore de trabalho; falta o receipt same-SHA.",
+      "acceptance": "`npm audit` sem `critical`/`high`; `lint`, `build` e `scripts/manaloom_public_web_surface_contract_test.sh` verdes; `scripts/manaloom_local_ci.sh full` passa do estágio `npm audit`. Bump autorizado pelo dono em 2026-09-21; linha registrada em 2026-09-22. Decisão do dono em 2026-09-22: D-01, bump confirmado direto pelo dono. Implementado em 2026-09-22 pela sessão coordenadora: `next` e `eslint-config-next` 15.5.25, `overrides.sharp` 0.35.4 e `npm audit fix` sem `--force` nas ferramentas de build; `npm audit` com 0 vulnerabilidades (completo e `--omit=dev`); lint, build, `free-beta-offer-contract`, `manaloom_public_web_surface_contract_test.sh` e `manaloom_public_web_smoke.sh` verdes na árvore de trabalho; falta o receipt same-SHA. No ar no site público desde 2026-09-23 (`87fd5a2e6`).",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
       "source_line": 683
     },
@@ -4079,10 +4077,6 @@
     },
     {
       "from": "BT-SCP-001",
-      "to": "BT-REL-000"
-    },
-    {
-      "from": "BT-SCP-001",
       "to": "BT-REL-001"
     },
     {
@@ -4942,6 +4936,8 @@
     "BT-PRIV-001",
     "BT-PRIV-002",
     "BT-BAT-002",
+    "BT-REL-000",
+    "BT-DB-006",
     "BT-SCN-01",
     "BT-SCN-02",
     "BT-SCN-03",
@@ -4970,8 +4966,6 @@
     "BT-COM-003",
     "BT-GATE-004",
     "BT-PLAY-001",
-    "BT-REL-000",
-    "BT-DB-006",
     "BT-REL-001",
     "BT-REL-002",
     "BT-OBS-003",
@@ -5100,7 +5094,7 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/execution/CURRENT_QUEUE.md",
-      "sha256": "192d926462e3497d08a3c0e0474aae2c85f9e80b568009f5baed5a114732beb8"
+      "sha256": "db8f0fc5261e158bc5430e5ff944bcf6ce10b7498f87b34f861805dbfeffe234"
     },
     "wip_limit": 1,
     "active_slot_count": 1,
@@ -9831,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "50c9c0dab035bcc578ba802c221334997b8f9da3db67f5ce670d661a75963408"
+  "project_logic_source_digest_sha256": "9c90de90b77709282ad046348c4ab76eac6b1425e49d0e0324d3d9fabc6907d5"
 }
