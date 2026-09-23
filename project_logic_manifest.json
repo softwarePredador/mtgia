@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "83f1e6925914a9af7f64c8cc02de67f8aecf1422a6733de8c5f6adcb08633a6d",
+  "source_digest_sha256": "ef897e1fd121a9dae277faf400b9795b439a6500b27175bcdc8addddef016b29",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 687,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5207,
+    "dart_symbols": 5208,
     "semantic_resolved_files": 687,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42771,
-    "semantic_resolved_call_sites": 68162,
-    "semantic_resolved_type_references": 16086,
+    "semantic_resolved_call_edges": 42772,
+    "semantic_resolved_call_sites": 68164,
+    "semantic_resolved_type_references": 16087,
     "modules": 153,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 688,
     "environment_variables": 717,
-    "tests": 1229,
+    "tests": 1230,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -2046,7 +2046,7 @@
         "server/lib/verified_email_middleware.dart"
       ],
       "file_count": 1,
-      "symbol_count": 1,
+      "symbol_count": 2,
       "providers": [],
       "services": []
     },
@@ -26809,13 +26809,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -37181,10 +37181,16 @@
       ]
     },
     {
+      "name": "overrideVerifiedEmailRequirementForTesting",
+      "kind": "function",
+      "source": "server/lib/verified_email_middleware.dart",
+      "line": 11
+    },
+    {
       "name": "verifiedEmailForMutations",
       "kind": "function",
       "source": "server/lib/verified_email_middleware.dart",
-      "line": 8
+      "line": 18
     },
     {
       "name": "_header",
@@ -39803,7 +39809,7 @@
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/import/_middleware.dart",
-      "line": 4
+      "line": 5
     },
     {
       "name": "_consolidateCardsById",
@@ -41093,9 +41099,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42771,
-    "resolved_call_site_count": 68162,
-    "workspace_call_edge_count": 13340,
+    "resolved_call_edge_count": 42772,
+    "resolved_call_site_count": 68164,
+    "workspace_call_edge_count": 13341,
     "unresolved_call_edge_count": 542,
     "unresolved_call_site_count": 751,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -166986,7 +166992,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 12,
+        "line": 22,
         "caller": "verifiedEmailForMutations",
         "kind": "method",
         "lexical_target": "isVerifiedEmailRequired",
@@ -166997,7 +167003,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 29,
+        "line": 39,
         "caller": "verifiedEmailForMutations",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -167008,7 +167014,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 29,
+        "line": 39,
         "caller": "verifiedEmailForMutations",
         "kind": "method",
         "lexical_target": "getUserFromToken",
@@ -184949,12 +184955,23 @@
       },
       {
         "source": "server/routes/import/_middleware.dart",
-        "line": 8,
+        "line": 11,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "authMiddleware",
         "target": "authMiddleware",
         "target_library": "package:server/auth_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/import/_middleware.dart",
+        "line": 11,
+        "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "verifiedEmailForMutations",
+        "target": "verifiedEmailForMutations",
+        "target_library": "package:server/verified_email_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -187984,7 +188001,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
         "unique_references": 17,
-        "occurrences": 37
+        "occurrences": 38
       },
       {
         "target_scope": "dependency",
@@ -192213,8 +192230,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/verified_email_middleware.dart",
-        "unique_references": 5,
-        "occurrences": 5
+        "unique_references": 6,
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -197194,7 +197211,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 16,
+        "line": 26,
         "caller": "verifiedEmailForMutations",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -197329,9 +197346,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16086,
+    "resolved_type_reference_count": 16087,
     "workspace_type_reference_count": 3391,
-    "unresolved_type_reference_count": 347,
+    "unresolved_type_reference_count": 348,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -228336,7 +228353,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 29,
+        "line": 39,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -231273,8 +231290,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6170,
-        "occurrences": 39425
+        "unique_references": 6171,
+        "occurrences": 39427
       },
       {
         "target_scope": "dart_sdk",
@@ -237199,6 +237216,12 @@
         "line": 27,
         "lexical_type": "void",
         "occurrences": 4
+      },
+      {
+        "source": "server/lib/verified_email_middleware.dart",
+        "line": 14,
+        "lexical_type": "void",
+        "occurrences": 1
       },
       {
         "source": "server/routes/_middleware.dart",
@@ -271700,6 +271723,7 @@
     "server/test/import_parser_test.dart",
     "server/test/import_to_deck_flow_test.dart",
     "server/test/import_to_deck_merge_support_test.dart",
+    "server/test/import_verified_email_test.dart",
     "server/test/interactive_battle_contract_test.dart",
     "server/test/interactive_battle_coverage_probe_test.dart",
     "server/test/interactive_battle_metrics_service_test.dart",
@@ -273156,7 +273180,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "d95276fd81e7642c854d0fb139f29460612c0ef340bd4cf688ec28c69f7b5c54"
+      "sha256": "0cfc3f27159387201e868902c4d1e11392b3e9670efa3730ac11465a6f5591e8"
     },
     "required_task_fields": [
       "id",
@@ -273419,10 +273443,10 @@
       {
         "id": "BT-AUTH-010",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "O import exige e-mail verificado, como o fichário (achado 11 dos fluxos).",
         "depends_on": [],
-        "acceptance": "`/import` e `/import/*` passam pela mesma verificação de e-mail do fichário; teste negativo com conta não verificada.",
+        "acceptance": "`/import` e `/import/*` passam pela mesma verificação de e-mail do fichário; teste negativo com conta não verificada. Feito em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `server/routes/import/_middleware.dart` instala `verifiedEmailForMutations()` por dentro do `authMiddleware`, igual ao fichário. Evidência: `server/test/import_verified_email_test.dart` (conta não verificada recebe 403 `email_verification_required` em `/import`, `/import/to-deck` e `/import/validate` sem o handler rodar; conta verificada passa) e a lista estrutural de `server/test/email_verification_contract_test.dart`; a versão da base falha nos dois. `/decks` continua sem o portão: conta não verificada ainda cria deck pela rota de decks.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 304
       },
@@ -282979,7 +283003,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "83f1e6925914a9af7f64c8cc02de67f8aecf1422a6733de8c5f6adcb08633a6d"
+    "project_logic_source_digest_sha256": "ef897e1fd121a9dae277faf400b9795b439a6500b27175bcdc8addddef016b29"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285947,6 +285971,7 @@
       "server/test/import_parser_test.dart",
       "server/test/import_to_deck_flow_test.dart",
       "server/test/import_to_deck_merge_support_test.dart",
+      "server/test/import_verified_email_test.dart",
       "server/test/interactive_battle_contract_test.dart",
       "server/test/interactive_battle_coverage_probe_test.dart",
       "server/test/interactive_battle_metrics_service_test.dart",

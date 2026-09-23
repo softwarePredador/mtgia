@@ -58,6 +58,8 @@ void main() {
         'routes/trades/_middleware.dart',
         'routes/conversations/_middleware.dart',
         'routes/binder/_middleware.dart',
+        // BT-AUTH-010: importar cria deck, como o fichário cria item.
+        'routes/import/_middleware.dart',
       ]) {
         expect(
           File(path).readAsStringSync(),

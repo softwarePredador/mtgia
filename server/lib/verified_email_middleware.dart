@@ -1,15 +1,25 @@
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:meta/meta.dart' show visibleForTesting;
 
 import 'auth_service.dart';
 import 'email_verification_policy.dart';
+
+bool? _verifiedEmailRequiredOverride;
+
+/// Liga ou desliga a exigência nos testes, sem depender do ambiente do
+/// processo (em produção ela é sempre exigida). `null` volta ao ambiente.
+@visibleForTesting
+void overrideVerifiedEmailRequirementForTesting(bool? required) {
+  _verifiedEmailRequiredOverride = required;
+}
 
 Middleware verifiedEmailForMutations() {
   return (handler) {
     return (context) async {
       final method = context.request.method;
-      if (!isVerifiedEmailRequired() ||
+      if (!(_verifiedEmailRequiredOverride ?? isVerifiedEmailRequired()) ||
           method == HttpMethod.get ||
           method == HttpMethod.head ||
           method == HttpMethod.options) {

@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `83f1e6925914a9af7f64c8cc02de67f8aecf1422a6733de8c5f6adcb08633a6d`
+**Digest das fontes:** `ef897e1fd121a9dae277faf400b9795b439a6500b27175bcdc8addddef016b29`
 
 ## Fontes de verdade
 
@@ -18,12 +18,12 @@
 | `dart_source_files` | 687 |
 | `non_dart_product_files` | 50 |
 | `battle_sidecar_source_files` | 34 |
-| `dart_symbols` | 5207 |
+| `dart_symbols` | 5208 |
 | `semantic_resolved_files` | 687 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 42771 |
-| `semantic_resolved_call_sites` | 68162 |
-| `semantic_resolved_type_references` | 16086 |
+| `semantic_resolved_call_edges` | 42772 |
+| `semantic_resolved_call_sites` | 68164 |
+| `semantic_resolved_type_references` | 16087 |
 | `modules` | 153 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
@@ -33,7 +33,7 @@
 | `migrations` | 58 |
 | `scripts_and_jobs` | 688 |
 | `environment_variables` | 717 |
-| `tests` | 1229 |
+| `tests` | 1230 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
 | `tasks` | 244 |
