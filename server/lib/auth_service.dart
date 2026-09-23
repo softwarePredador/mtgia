@@ -520,7 +520,21 @@ class AuthService {
     final userId = users.first[0] as String;
     final deliveryEmail = users.first[1] as String;
     final expiresAt = DateTime.now().toUtc().add(validFor);
-    await conn.runTx((session) async {
+    final created = await conn.runTx((session) async {
+      // Trava a conta antes de trocar o token. A recuperação roda depois da
+      // resposta, então pedidos seguidos se sobrepõem; com a trava eles
+      // entram em fila e cada um consome o token do anterior, e sobra no
+      // máximo um token vivo por conta.
+      final locked = await session.execute(
+        Sql.named('''
+          SELECT id
+          FROM users
+          WHERE id = CAST(@userId AS uuid) AND deleted_at IS NULL
+          FOR UPDATE
+        '''),
+        parameters: {'userId': userId},
+      );
+      if (locked.isEmpty) return false;
       await session.execute(
         Sql.named('''
           UPDATE password_reset_tokens
@@ -540,7 +554,9 @@ class AuthService {
           'expiresAt': expiresAt,
         },
       );
+      return true;
     });
+    if (!created) return null;
     return PasswordResetRequest(
       email: deliveryEmail,
       token: rawToken,

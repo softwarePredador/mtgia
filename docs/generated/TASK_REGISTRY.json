@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "7fcb70098ae0eddd75f6fef39286d762fd9841738754a0ec29c713f6c58dd245"
+    "sha256": "c36f4b611a6452798e0008c0e128e7aa50f40f46aae96a62bd3eea6e3dd82d64"
   },
   "required_task_fields": [
     "id",
@@ -187,10 +187,10 @@
     {
       "id": "BT-AUTH-003",
       "priority": "P0 CORE",
-      "status": "IN_PROGRESS_CONTAINED",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Recuperação de senha não enumerável, rate-limited e com invalidação de sessões/tokens.",
       "depends_on": [],
-      "acceptance": "Conta existente/inexistente indistinguível em status, shape e timing aceitável; replay de token falha. Decisão do dono em 2026-09-22: D-19 e D-21, inclui o oráculo de enumeração do login (conta inexistente lança antes do bcrypt, e a resposta devolve o texto da exceção): bcrypt fictício com diferença de mediana abaixo de 20 ms em 50 tentativas, limite por e-mail e por IP, resposta sem texto de exceção. Buraco 3 da D-19 fechado localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: o login verifica a senha também para conta inexistente, contra um hash bcrypt fictício de mesmo custo, e responde 401 idêntico nos dois casos; nenhuma resposta do login repete texto de exceção; login e recuperação ganharam limite por e-mail (buckets `auth_login_email` e `auth_recovery_email`, 10 tentativas por 15 min em produção), somado ao limite por IP que já existia. Evidência: `server/test/auth_login_enumeration_test.dart` (12 testes; 4 mutações falham como esperado) e medição ponta a ponta em API e PostgreSQL locais, 50 tentativas intercaladas por caso: diferença de mediana de 0,1 ms, contra 94,2 ms na base `519b7e021`; `server/test/auth_login_timing_live_test.dart` repete a medição no harness vivo. Continua aberto na recuperação: a entrega do e-mail de reset ainda é aguardada dentro da rota, então o tempo de `POST /auth/forgot-password` ainda difere entre conta existente e inexistente. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). O tempo da recuperação de senha segue aberto.",
+      "acceptance": "Conta existente/inexistente indistinguível em status, shape e timing aceitável; replay de token falha. Decisão do dono em 2026-09-22: D-19 e D-21, inclui o oráculo de enumeração do login (conta inexistente lança antes do bcrypt, e a resposta devolve o texto da exceção): bcrypt fictício com diferença de mediana abaixo de 20 ms em 50 tentativas, limite por e-mail e por IP, resposta sem texto de exceção. Buraco 3 da D-19 fechado localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: o login verifica a senha também para conta inexistente, contra um hash bcrypt fictício de mesmo custo, e responde 401 idêntico nos dois casos; nenhuma resposta do login repete texto de exceção; login e recuperação ganharam limite por e-mail (buckets `auth_login_email` e `auth_recovery_email`, 10 tentativas por 15 min em produção), somado ao limite por IP que já existia. Evidência: `server/test/auth_login_enumeration_test.dart` (12 testes; 4 mutações falham como esperado) e medição ponta a ponta em API e PostgreSQL locais, 50 tentativas intercaladas por caso: diferença de mediana de 0,1 ms, contra 94,2 ms na base `519b7e021`; `server/test/auth_login_timing_live_test.dart` repete a medição no harness vivo. A parte do login está no ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Recuperação de senha fechada localmente em 2026-09-23, na branch `servidor/raia-2026-09-23`: `POST /auth/forgot-password` responde sem esperar nada que dependa da conta, porque achar a conta, criar o token e entregar o e-mail rodam depois da resposta (`server/lib/password_recovery_dispatcher.dart`, sem fila persistente e sem migração); a falha desse trabalho vai para o log e para a observabilidade, e o texto da resposta não mudou. A troca de token agora trava a conta, para pedidos seguidos deixarem um único token vivo. Evidência: `server/test/password_recovery_async_test.dart` (8 testes; 4 mutações falham como esperado), `server/test/password_reset_token_race_db_live_test.dart` (20 pedidos simultâneos, 1 token vivo, em PostgreSQL descartável) e medição ponta a ponta com entrega de 300 ms: diferença de mediana de 0,05 ms em 50 tentativas, contra 313,6 ms na base `47dc3b698`; `server/test/auth_forgot_password_timing_live_test.dart` repete a medição no modo de produção.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 300
     },
@@ -9825,5 +9825,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "5db6c75c08f7ca89771c7f01a356c07e11aa1716191e5c34520a074a70674c78"
+  "project_logic_source_digest_sha256": "66f1c7fbd34f23e61e9bf45272fdb384921e726cb5f2554f349e8d8e9032356d"
 }
