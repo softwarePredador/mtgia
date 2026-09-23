@@ -14,12 +14,17 @@ const accountDeletionConfirmation = 'EXCLUIR MINHA CONTA';
 
 /// Versão da política gravada em cada recibo. A v2 anonimiza as simulações
 /// de outras pessoas contra o deck público de quem saiu (D-23), fecha as
-/// lacunas do inventário (BT-PRIV-003) e para quando falta uma relação.
-const accountDeletionPolicyVersion = 'brewtact-beta-privacy-v2';
+/// lacunas do inventário (BT-PRIV-003) e para quando falta uma relação. A v3
+/// cancela as ofertas de troca abertas e trata os itens de troca (D-66).
+const accountDeletionPolicyVersion = 'brewtact-beta-privacy-v3';
+
+/// Nota gravada no histórico da oferta aberta que a exclusão cancela (D-66).
+const openTradeOfferCancelledNote = 'Oferta cancelada: a conta foi excluída.';
 
 /// O que a exclusão faz com cada classe de dado; vai no recibo e na resposta.
 const accountDeletionRetentionSummary = <String, String>{
   'trades_and_disputes': 'anonymized',
+  'open_trade_offers': 'cancelled',
   'moderation_records': 'anonymized',
   'operational_aggregates': 'deidentified',
   'deck_learning_and_battle_rows': 'deleted',
@@ -62,6 +67,7 @@ const accountDeletionRelations = <String>[
   'privacy_keyring',
   'rate_limit_events',
   'shared_deck_reports',
+  'trade_items',
   'trade_messages',
   'trade_offers',
   'trade_status_history',
@@ -428,6 +434,57 @@ class UserDataPrivacyService {
               updated_at = CURRENT_TIMESTAMP
           WHERE sender_id = CAST(@userId AS uuid)
              OR receiver_id = CAST(@userId AS uuid)
+        ''', userId);
+      // D-66: os itens de troca são tratados aqui, sem depender da ação da
+      // chave trade_items.owner_id. Oferta aberta (pending) é cancelada e
+      // perde os itens do titular; nas demais a troca fica para a outra
+      // pessoa, e os itens do titular perdem o vínculo com o fichário dele.
+      await _executeOn(
+        session,
+        'trade_offers',
+        '''
+          WITH open_offers AS (
+            SELECT offer.id
+            FROM trade_offers offer
+            WHERE offer.status = 'pending'
+              AND (
+                offer.sender_id = CAST(@userId AS uuid)
+                OR offer.receiver_id = CAST(@userId AS uuid)
+              )
+            FOR UPDATE
+          ), removed_items AS (
+            DELETE FROM trade_items item
+            USING open_offers
+            WHERE item.trade_offer_id = open_offers.id
+              AND item.owner_id = CAST(@userId AS uuid)
+            RETURNING item.id
+          ), cancelled AS (
+            UPDATE trade_offers offer
+            SET status = 'cancelled',
+                updated_at = CURRENT_TIMESTAMP
+            FROM open_offers
+            WHERE offer.id = open_offers.id
+            RETURNING offer.id
+          )
+          INSERT INTO trade_status_history (
+            trade_offer_id, old_status, new_status, changed_by, notes
+          )
+          SELECT
+            cancelled.id,
+            'pending',
+            'cancelled',
+            CAST(@userId AS uuid),
+            @cancelNote
+          FROM cancelled
+        ''',
+        userId,
+        extraParameters: {'cancelNote': openTradeOfferCancelledNote},
+      );
+      await _executeOn(session, 'trade_items', '''
+          UPDATE trade_items
+          SET binder_item_id = NULL
+          WHERE owner_id = CAST(@userId AS uuid)
+            AND binder_item_id IS NOT NULL
         ''', userId);
       await _executeOn(
         session,

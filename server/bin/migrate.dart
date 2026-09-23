@@ -4002,6 +4002,96 @@ final migrations = <Migration>[
       ALTER TABLE trade_items DROP COLUMN IF EXISTS snapshot_schema_version;
     ''',
   ),
+  Migration(
+    version: '059',
+    name: 'align_trade_items_owner_fk',
+    // D-66 (BT-PRIV-002): a chave de trade_items.owner_id vinha com
+    // ON DELETE CASCADE da 041 e está sem ação na produção (BT-DB-001).
+    // Nos dois bancos ela passa a RESTRICT, como as outras chaves de troca e
+    // mensagem para users: apagar a linha de users de quem tem item de troca
+    // é recusado, em vez de levar em silêncio o histórico da outra parte. A
+    // exclusão de conta do produto não apaga users (ela pseudonimiza) e trata
+    // os itens antes (UserDataPrivacyService.deleteAndAnonymizeAccount).
+    up: '''
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_owner_id_fkey;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT trade_items_owner_id_fkey
+      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT;
+
+      DO \$trade_items_owner_trigger\$
+      DECLARE
+        stale RECORD;
+        owner_constraint_oid OID;
+      BEGIN
+        -- O trigger de conta ativa leva o OID da chave no nome
+        -- (manaloom_active_user_<oid>, migration 038). A chave nova tem
+        -- outro OID: sai o trigger antigo e entra um com o nome novo.
+        FOR stale IN
+          SELECT tgname
+          FROM pg_trigger
+          WHERE tgrelid = 'public.trade_items'::regclass
+            AND NOT tgisinternal
+            AND left(tgname, 21) = 'manaloom_active_user_'
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.trade_items',
+            stale.tgname
+          );
+        END LOOP;
+        SELECT oid INTO owner_constraint_oid
+        FROM pg_constraint
+        WHERE conrelid = 'public.trade_items'::regclass
+          AND conname = 'trade_items_owner_id_fkey';
+        EXECUTE format(
+          'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF owner_id '
+          'ON public.trade_items FOR EACH ROW '
+          'EXECUTE FUNCTION manaloom_require_active_user(%L)',
+          'manaloom_active_user_' || owner_constraint_oid,
+          'owner_id'
+        );
+      END;
+      \$trade_items_owner_trigger\$;
+    ''',
+    down: '''
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_owner_id_fkey;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT trade_items_owner_id_fkey
+      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE;
+
+      DO \$trade_items_owner_trigger\$
+      DECLARE
+        stale RECORD;
+        owner_constraint_oid OID;
+      BEGIN
+        FOR stale IN
+          SELECT tgname
+          FROM pg_trigger
+          WHERE tgrelid = 'public.trade_items'::regclass
+            AND NOT tgisinternal
+            AND left(tgname, 21) = 'manaloom_active_user_'
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.trade_items',
+            stale.tgname
+          );
+        END LOOP;
+        SELECT oid INTO owner_constraint_oid
+        FROM pg_constraint
+        WHERE conrelid = 'public.trade_items'::regclass
+          AND conname = 'trade_items_owner_id_fkey';
+        EXECUTE format(
+          'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF owner_id '
+          'ON public.trade_items FOR EACH ROW '
+          'EXECUTE FUNCTION manaloom_require_active_user(%L)',
+          'manaloom_active_user_' || owner_constraint_oid,
+          'owner_id'
+        );
+      END;
+      \$trade_items_owner_trigger\$;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4097,7 +4187,11 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '055' ||
       '056' ||
       '057' ||
-      '058' => MigrationRollbackPolicy.manualOnly,
+      '058' ||
+      // A 059 alinha a chave de trade_items.owner_id: o down volta ao
+      // CASCADE da 041, mas a produção estava sem ação antes dela. Voltar no
+      // automático mudaria o comportamento da produção.
+      '059' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

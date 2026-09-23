@@ -1969,7 +1969,8 @@ CREATE TABLE IF NOT EXISTS trade_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
     binder_item_id UUID REFERENCES user_binder_items(id) ON DELETE SET NULL,
-    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- D-66 (migration 059): RESTRICT, alinhado com a produção.
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     direction TEXT NOT NULL CHECK (direction IN ('offering', 'requesting')),
     quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
     agreed_price DECIMAL(10,2),

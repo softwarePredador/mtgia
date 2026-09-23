@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "6cfde257326c33979e7e0cfd2388ca651e837d29e4c3d47985ba9944a880b5a1",
+  "source_digest_sha256": "b1e8ab5f8900cba2ab7117de2e1f8e1e3aba525d57d8a1fee2e88ee01143adfc",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -70,7 +70,7 @@
     "semantic_resolved_files": 696,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 42955,
-    "semantic_resolved_call_sites": 68434,
+    "semantic_resolved_call_sites": 68437,
     "semantic_resolved_type_references": 16211,
     "modules": 159,
     "app_routes": 46,
@@ -78,10 +78,10 @@
     "api_routes": 121,
     "database_tables": 79,
     "database_views": 6,
-    "migrations": 58,
+    "migrations": 59,
     "scripts_and_jobs": 691,
     "environment_variables": 718,
-    "tests": 1250,
+    "tests": 1251,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -19817,7 +19817,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 4007,
+      "line": 4097,
       "members": [
         "fullName"
       ]
@@ -19826,49 +19826,49 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 4071
+      "line": 4161
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4104
+      "line": 4198
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4027
+      "line": 4117
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4023
+      "line": 4113
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4031
+      "line": 4121
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4143
+      "line": 4237
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4038
+      "line": 4128
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4073
+      "line": 4163
     },
     {
       "name": "_assertPostMigration",
@@ -34529,115 +34529,115 @@
       "name": "_validBattleLiveHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 994
+      "line": 996
     },
     {
       "name": "_validInteractiveBattleHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1260
+      "line": 1262
     },
     {
       "name": "buildReadinessResponseBody",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1731
+      "line": 1733
     },
     {
       "name": "disabledReleaseCapabilityReadinessCheck",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1718
+      "line": 1720
     },
     {
       "name": "evaluateAiJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 710
+      "line": 712
     },
     {
       "name": "evaluateAiRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1630
+      "line": 1632
     },
     {
       "name": "evaluateBattleJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 805
+      "line": 807
     },
     {
       "name": "evaluateBattleJobWorkerReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1294
+      "line": 1296
     },
     {
       "name": "evaluateBattleLiveSpectatorReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 908
+      "line": 910
     },
     {
       "name": "evaluateBattleRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1493
+      "line": 1495
     },
     {
       "name": "evaluateCollectionAvailabilitySchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1361
+      "line": 1363
     },
     {
       "name": "evaluateDeckValidationSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1463
+      "line": 1465
     },
     {
       "name": "evaluateInteractiveBattleReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1171
+      "line": 1173
     },
     {
       "name": "evaluateReleaseCapabilityRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1650
+      "line": 1652
     },
     {
       "name": "evaluateReleaseSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 635
+      "line": 637
     },
     {
       "name": "probeBattleLiveSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 899
+      "line": 901
     },
     {
       "name": "probeBattleSidecarHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1601
+      "line": 1603
     },
     {
       "name": "probeInteractiveBattleSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1162
+      "line": 1164
     },
     {
       "name": "readinessStatusCode",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1749
+      "line": 1751
     },
     {
       "name": "apiError",
@@ -37636,19 +37636,19 @@
       "name": "InvalidAccountPasswordException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 78
+      "line": 84
     },
     {
       "name": "UserDataNotFoundException",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 76
+      "line": 82
     },
     {
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 80,
+      "line": 86,
       "members": [
         "_anonymizeThirdPartySimulations",
         "_anonymizedReplayJson",
@@ -41542,7 +41542,7 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 42955,
-    "resolved_call_site_count": 68434,
+    "resolved_call_site_count": 68437,
     "workspace_call_edge_count": 13441,
     "unresolved_call_edge_count": 557,
     "unresolved_call_site_count": 768,
@@ -113508,11 +113508,11 @@
         "target": "Migration.Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 58
+        "occurrences": 59
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4052,
+        "line": 4142,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -113523,7 +113523,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4105,
+        "line": 4199,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -113534,7 +113534,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4162,
+        "line": 4256,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -113545,7 +113545,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4163,
+        "line": 4257,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -113556,7 +113556,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4174,
+        "line": 4268,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -113567,7 +113567,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4177,
+        "line": 4271,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -113578,7 +113578,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4276,
+        "line": 4370,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -113589,7 +113589,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4277,
+        "line": 4371,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -160372,7 +160372,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1184,
+        "line": 1186,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleReadiness",
@@ -160383,7 +160383,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1214,
+        "line": 1216,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleConfiguration.fromEnvironment",
@@ -160394,7 +160394,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1223,
+        "line": 1225,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160405,7 +160405,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1232,
+        "line": 1234,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "_validInteractiveBattleHealth",
@@ -160416,7 +160416,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1305,
+        "line": 1307,
         "caller": "evaluateBattleJobWorkerReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobWorkerReadiness",
@@ -160427,7 +160427,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1370,
+        "line": 1372,
         "caller": "evaluateCollectionAvailabilitySchemaReadiness",
         "kind": "constructor",
         "lexical_target": "CollectionAvailabilitySchemaReadiness",
@@ -160438,7 +160438,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1473,
+        "line": 1475,
         "caller": "evaluateDeckValidationSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "DeckValidationSchemaReadiness",
@@ -160449,7 +160449,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1503,
+        "line": 1505,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -160460,7 +160460,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1519,
+        "line": 1521,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleRuntimeReadiness",
@@ -160471,7 +160471,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1564,
+        "line": 1566,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160482,7 +160482,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1631,
+        "line": 1633,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "OpenAiRuntimeConfig",
@@ -160493,7 +160493,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1637,
+        "line": 1639,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "AiRuntimeReadiness",
@@ -160504,7 +160504,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1662,
+        "line": 1664,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -160515,7 +160515,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1663,
+        "line": 1665,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleJobWorkerReadiness",
@@ -160526,7 +160526,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1667,
+        "line": 1669,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleRuntimeReadiness",
@@ -160537,7 +160537,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1671,
+        "line": 1673,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "disabledReleaseCapabilityReadinessCheck",
@@ -160548,7 +160548,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1683,
+        "line": 1685,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateAiRuntimeReadiness",
@@ -160559,7 +160559,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1694,
+        "line": 1696,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleLiveSpectatorReadiness",
@@ -160570,7 +160570,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1705,
+        "line": 1707,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateInteractiveBattleReadiness",
@@ -160581,7 +160581,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1715,
+        "line": 1717,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityRuntimeReadiness",
@@ -160592,7 +160592,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1722,
+        "line": 1724,
         "caller": "disabledReleaseCapabilityReadinessCheck",
         "kind": "method",
         "lexical_target": "entry",
@@ -160603,7 +160603,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 643,
+        "line": 645,
         "caller": "evaluateReleaseSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseSchemaReadiness",
@@ -160614,7 +160614,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 718,
+        "line": 720,
         "caller": "evaluateAiJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "AiJobSchemaReadiness",
@@ -160625,7 +160625,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 815,
+        "line": 817,
         "caller": "evaluateBattleJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobSchemaReadiness",
@@ -160636,7 +160636,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 915,
+        "line": 917,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "battleLiveSpectatorEnabledValue",
@@ -160647,7 +160647,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 921,
+        "line": 923,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleLiveSpectatorReadiness",
@@ -160658,7 +160658,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 945,
+        "line": 947,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -160669,7 +160669,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 962,
+        "line": 964,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160680,7 +160680,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 969,
+        "line": 971,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "_validBattleLiveHealth",
@@ -168358,7 +168358,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 104,
+        "line": 110,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168369,7 +168369,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 106,
+        "line": 112,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "method",
         "lexical_target": "_passwordMatches",
@@ -168380,7 +168380,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 107,
+        "line": 113,
         "caller": "UserDataPrivacyService.verifyCurrentPassword",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -168391,7 +168391,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 113,
+        "line": 119,
         "caller": "UserDataPrivacyService._passwordMatches",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -168402,7 +168402,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 134,
+        "line": 140,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "privacyExportSectionSql",
@@ -168413,7 +168413,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 138,
+        "line": 144,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "_jsonObject",
@@ -168424,7 +168424,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 141,
+        "line": 147,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168435,7 +168435,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 145,
+        "line": 151,
         "caller": "UserDataPrivacyService.exportUserData",
         "kind": "method",
         "lexical_target": "_assembleExport",
@@ -168446,7 +168446,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 158,
+        "line": 164,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "constructor",
         "lexical_target": "PrivacyExportPseudonymizer",
@@ -168457,7 +168457,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 172,
+        "line": 178,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "method",
         "lexical_target": "_pseudonymizeRow",
@@ -168468,7 +168468,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 181,
+        "line": 187,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "method",
         "lexical_target": "_putExportPath",
@@ -168479,7 +168479,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 191,
+        "line": 197,
         "caller": "UserDataPrivacyService._assembleExport",
         "kind": "method",
         "lexical_target": "scrub",
@@ -168490,7 +168490,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 201,
+        "line": 207,
         "caller": "UserDataPrivacyService._pseudonymizeRow",
         "kind": "method",
         "lexical_target": "person",
@@ -168501,7 +168501,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 202,
+        "line": 208,
         "caller": "UserDataPrivacyService._pseudonymizeRow",
         "kind": "method",
         "lexical_target": "deck",
@@ -168512,7 +168512,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 203,
+        "line": 209,
         "caller": "UserDataPrivacyService._pseudonymizeRow",
         "kind": "method",
         "lexical_target": "entity",
@@ -168523,7 +168523,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 241,
+        "line": 247,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "UserDataNotFoundException",
@@ -168534,7 +168534,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 245,
+        "line": 251,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_passwordMatches",
@@ -168545,7 +168545,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 246,
+        "line": 252,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "constructor",
         "lexical_target": "InvalidAccountPasswordException",
@@ -168556,7 +168556,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 248,
+        "line": 254,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_requireRelations",
@@ -168567,7 +168567,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 249,
+        "line": 255,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_ownDeckIds",
@@ -168578,7 +168578,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 252,
+        "line": 258,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_secureRandomToken",
@@ -168589,7 +168589,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 259,
+        "line": 265,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -168600,18 +168600,18 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 262,
+        "line": 268,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_executeOn",
         "target": "UserDataPrivacyService._executeOn",
         "target_library": "package:server/user_data_privacy_service.dart",
         "target_scope": "workspace",
-        "occurrences": 37
+        "occurrences": 39
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 358,
+        "line": 364,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_executeOnAll",
@@ -168622,7 +168622,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 504,
+        "line": 561,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "_anonymizeThirdPartySimulations",
@@ -168633,7 +168633,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 561,
+        "line": 618,
         "caller": "UserDataPrivacyService.deleteAndAnonymizeAccount",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitIdentifier",
@@ -168644,7 +168644,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 746,
+        "line": 803,
         "caller": "UserDataPrivacyService._anonymizeThirdPartySimulations",
         "kind": "method",
         "lexical_target": "_anonymizedReplayJson",
@@ -168655,7 +168655,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 775,
+        "line": 832,
         "caller": "UserDataPrivacyService._anonymizedReplayJson",
         "kind": "method",
         "lexical_target": "anonymizeDeletedDeckReferences",
@@ -168666,7 +168666,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 82,
+        "line": 88,
         "caller": "UserDataPrivacyService.<constructor>",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -193815,7 +193815,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/user_data_privacy_service.dart",
         "unique_references": 23,
-        "occurrences": 64
+        "occurrences": 66
       },
       {
         "target_scope": "workspace",
@@ -193977,7 +193977,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 8,
-        "occurrences": 65
+        "occurrences": 66
       },
       {
         "target_scope": "workspace",
@@ -198631,7 +198631,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1219,
+        "line": 1221,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -198639,7 +198639,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1221,
+        "line": 1223,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -198647,7 +198647,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1551,
+        "line": 1553,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -198655,7 +198655,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 936,
+        "line": 938,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -198663,7 +198663,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 960,
+        "line": 962,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -221205,11 +221205,11 @@
         "target": "Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 61
+        "occurrences": 62
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4073,
+        "line": 4163,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
@@ -228869,7 +228869,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1171,
+        "line": 1173,
         "lexical_type": "InteractiveBattleReadiness",
         "resolved_type": "InteractiveBattleReadiness",
         "target": "InteractiveBattleReadiness",
@@ -228879,7 +228879,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1175,
+        "line": 1177,
         "lexical_type": "InteractiveBattleSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "InteractiveBattleSchemaProbe",
@@ -228889,7 +228889,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1214,
+        "line": 1216,
         "lexical_type": "InteractiveBattleConfiguration",
         "resolved_type": "InteractiveBattleConfiguration",
         "target": "InteractiveBattleConfiguration",
@@ -228899,7 +228899,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1294,
+        "line": 1296,
         "lexical_type": "BattleJobWorkerReadiness",
         "resolved_type": "BattleJobWorkerReadiness",
         "target": "BattleJobWorkerReadiness",
@@ -228909,7 +228909,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1361,
+        "line": 1363,
         "lexical_type": "CollectionAvailabilitySchemaReadiness",
         "resolved_type": "CollectionAvailabilitySchemaReadiness",
         "target": "CollectionAvailabilitySchemaReadiness",
@@ -228919,7 +228919,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1463,
+        "line": 1465,
         "lexical_type": "DeckValidationSchemaReadiness",
         "resolved_type": "DeckValidationSchemaReadiness",
         "target": "DeckValidationSchemaReadiness",
@@ -228929,7 +228929,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1497,
+        "line": 1499,
         "lexical_type": "BattleRuntimeReadiness",
         "resolved_type": "BattleRuntimeReadiness",
         "target": "BattleRuntimeReadiness",
@@ -228939,7 +228939,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1518,
+        "line": 1520,
         "lexical_type": "BattleEngineConfigurationException",
         "resolved_type": "BattleEngineConfigurationException",
         "target": "BattleEngineConfigurationException",
@@ -228949,7 +228949,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1630,
+        "line": 1632,
         "lexical_type": "AiRuntimeReadiness",
         "resolved_type": "AiRuntimeReadiness",
         "target": "AiRuntimeReadiness",
@@ -228959,7 +228959,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1631,
+        "line": 1633,
         "lexical_type": "OpenAiRuntimeConfig",
         "resolved_type": "OpenAiRuntimeConfig",
         "target": "OpenAiRuntimeConfig",
@@ -228969,7 +228969,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1653,
+        "line": 1655,
         "lexical_type": "ReleaseCapabilityRuntimeReadiness",
         "resolved_type": "ReleaseCapabilityRuntimeReadiness",
         "target": "ReleaseCapabilityRuntimeReadiness",
@@ -228979,7 +228979,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1655,
+        "line": 1657,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -228989,7 +228989,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 635,
+        "line": 637,
         "lexical_type": "ReleaseSchemaReadiness",
         "resolved_type": "ReleaseSchemaReadiness",
         "target": "ReleaseSchemaReadiness",
@@ -228999,7 +228999,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 710,
+        "line": 712,
         "lexical_type": "AiJobSchemaReadiness",
         "resolved_type": "AiJobSchemaReadiness",
         "target": "AiJobSchemaReadiness",
@@ -229009,7 +229009,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 805,
+        "line": 807,
         "lexical_type": "BattleJobSchemaReadiness",
         "resolved_type": "BattleJobSchemaReadiness",
         "target": "BattleJobSchemaReadiness",
@@ -229019,7 +229019,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 908,
+        "line": 910,
         "lexical_type": "BattleLiveSpectatorReadiness",
         "resolved_type": "BattleLiveSpectatorReadiness",
         "target": "BattleLiveSpectatorReadiness",
@@ -229029,7 +229029,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 911,
+        "line": 913,
         "lexical_type": "BattleSidecarProbe",
         "resolved_type": "Future<Map<String, dynamic>?> Function(String, Uri)",
         "target": "BattleSidecarProbe",
@@ -229039,7 +229039,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 912,
+        "line": 914,
         "lexical_type": "BattleLiveSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "BattleLiveSchemaProbe",
@@ -229049,7 +229049,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 945,
+        "line": 947,
         "lexical_type": "BattleEngineConfig",
         "resolved_type": "BattleEngineConfig",
         "target": "BattleEngineConfig",
@@ -230319,7 +230319,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 104,
+        "line": 110,
         "lexical_type": "UserDataNotFoundException",
         "resolved_type": "UserDataNotFoundException",
         "target": "UserDataNotFoundException",
@@ -230329,7 +230329,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 107,
+        "line": 113,
         "lexical_type": "InvalidAccountPasswordException",
         "resolved_type": "InvalidAccountPasswordException",
         "target": "InvalidAccountPasswordException",
@@ -230339,7 +230339,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 158,
+        "line": 164,
         "lexical_type": "PrivacyExportPseudonymizer",
         "resolved_type": "PrivacyExportPseudonymizer",
         "target": "PrivacyExportPseudonymizer",
@@ -230349,7 +230349,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 195,
+        "line": 201,
         "lexical_type": "PrivacyExportSection",
         "resolved_type": "PrivacyExportSection",
         "target": "PrivacyExportSection",
@@ -230359,7 +230359,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 81,
+        "line": 87,
         "lexical_type": "AuthService?",
         "resolved_type": "AuthService?",
         "target": "AuthService",
@@ -230369,7 +230369,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 82,
+        "line": 88,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -237125,7 +237125,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 2,
-        "occurrences": 62
+        "occurrences": 63
       },
       {
         "target_scope": "workspace",
@@ -238439,7 +238439,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4104,
+        "line": 4198,
         "lexical_type": "void",
         "occurrences": 2
       },
@@ -239285,7 +239285,7 @@
       },
       {
         "source": "server/lib/user_data_privacy_service.dart",
-        "line": 90,
+        "line": 96,
         "lexical_type": "void",
         "occurrences": 6
       },
@@ -240761,7 +240761,7 @@
       "name": "UserDataPrivacyService",
       "kind": "class",
       "source": "server/lib/user_data_privacy_service.dart",
-      "line": 80,
+      "line": 86,
       "members": [
         "_anonymizeThirdPartySimulations",
         "_anonymizedReplayJson",
@@ -252974,8 +252974,8 @@
       "server/lib/collection_availability_contract.dart",
       "server/lib/import_card_lookup_service.dart"
     ],
-    "migration_count": 58,
-    "latest_migration": "058",
+    "migration_count": 59,
+    "latest_migration": "059",
     "migrations": [
       {
         "version": "001",
@@ -253265,6 +253265,11 @@
       {
         "version": "058",
         "name": "snapshot_trade_item_identity",
+        "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "059",
+        "name": "align_trade_items_owner_fk",
         "source": "server/bin/migrate.dart"
       }
     ],
@@ -273982,6 +273987,7 @@
     "server/test/privacy_export_allowlist_test.dart",
     "server/test/privacy_export_db_live_test.dart",
     "server/test/privacy_migration_sql_regression_test.dart",
+    "server/test/privacy_trade_items_db_live_test.dart",
     "server/test/product_retention_report_contract_test.dart",
     "server/test/product_shape_live_test.dart",
     "server/test/production_ai_mock_fallback_policy_test.dart",
@@ -275329,7 +275335,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "320ebd9d320afed86f472e962e7369fe139e1c957fdaec2faaf44df54d9cff96"
+      "sha256": "542423b3178979913a785c6a6a0d6f8f9b0a70d1b6818fc4dcc7c16d4bd26c99"
     },
     "required_task_fields": [
       "id",
@@ -275633,7 +275639,7 @@
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono).",
+        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 323
       },
@@ -285196,7 +285202,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "6cfde257326c33979e7e0cfd2388ca651e837d29e4c3d47985ba9944a880b5a1"
+    "project_logic_source_digest_sha256": "b1e8ab5f8900cba2ab7117de2e1f8e1e3aba525d57d8a1fee2e88ee01143adfc"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288316,6 +288322,7 @@
       "server/test/privacy_export_allowlist_test.dart",
       "server/test/privacy_export_db_live_test.dart",
       "server/test/privacy_migration_sql_regression_test.dart",
+      "server/test/privacy_trade_items_db_live_test.dart",
       "server/test/product_retention_report_contract_test.dart",
       "server/test/product_shape_live_test.dart",
       "server/test/production_ai_mock_fallback_policy_test.dart",

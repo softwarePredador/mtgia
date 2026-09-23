@@ -8,7 +8,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 - `server/test/privacy_data_inventory_test.dart` roda na suíte do servidor e compara o JSON com
   `project_logic_manifest.json#/database`, que o gerador de project logic extrai do baseline, das
-  58 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
+  59 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
   Ele também confere os prazos decididos pelo dono e se o modo de exclusão declarado bate com
   `server/lib/user_data_privacy_service.dart`.
 - `server/test/privacy_data_inventory_db_live_test.dart` confere o mesmo JSON contra o
@@ -53,7 +53,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | IA em execução | `ai_logs`, `ai_generate_jobs`, `ai_optimize_jobs`, `ai_optimize_cache` | 180 dias; 24 h decidido para jobs; 6 h no cache | job de limpeza e o próprio serviço | sim, sem hashes | apagado |
 | Battle e replays | `battle_simulations`, `battle_simulation_attempts`, `battle_jobs`, `battle_job_live_records`, `interactive_battle_sessions`, `interactive_battle_records`, `battle_replay_annotations` | sem prazo | exclusão de conta | sim, sem hashes nem payload interno | apagado; as simulações de outras pessoas contra o deck do titular ficam com elas, anonimizadas (D-23) |
 | Social | `user_follows`, `user_blocks`, `user_block_events`, `conversations`, `direct_messages`, `notifications` | enquanto as contas existirem | exclusão de conta | sim, com pseudônimo para a outra pessoa | seguir, bloqueios e notificações apagados; mensagens do titular substituídas; trilha de bloqueios sem a pessoa |
-| Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão | ninguém | sim | anonimizadas, porque são registro entre duas partes |
+| Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão, menos os itens do titular em oferta aberta | exclusão de conta, para esses itens | sim | oferta aberta (`pending`) cancelada e sem os itens do titular (D-66); o resto anonimizado, porque é registro entre duas partes, e o item do titular sem o vínculo com o fichário |
 | Moderação | `content_reports`, `content_report_appeals`, `moderation_actions` | mantidas depois da exclusão | ninguém | denúncias e recursos do titular | denúncia, recurso e ação do moderador anonimizados |
 | Segurança | `password_reset_tokens`, `email_verification_tokens`, `rate_limit_events` | 20 min, 24 h e 24 h de validade | job de limpeza só para `rate_limit_events` | não | apagados |
 | Controle de privacidade | `account_deletion_receipts`, `privacy_deleted_deck_tombstones`, `privacy_keyring` | sem prazo | ninguém | não | mantidos, sem identificar a pessoa |
@@ -71,7 +71,10 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 3. **Exclusão** (parte corrigida no `BT-PRIV-002`, 2026-09-23): bloqueios e tokens do titular
    agora saem; eventos de bloqueio, recursos, ações de moderação e a evidência da denúncia ficam sem a
    pessoa; as simulações de outras pessoas contra o deck público do titular ficam com elas,
-   anonimizadas (D-23); relação ausente para a exclusão. Segue aberto: o outbox da D-23 exige
+   anonimizadas (D-23); relação ausente para a exclusão. Desde a D-66, a oferta de troca aberta
+   do titular é cancelada, com uma linha no histórico, e perde os itens dele; nas outras trocas o
+   item dele fica, sem o vínculo com o fichário. A chave `trade_items.owner_id` passa a `RESTRICT`
+   nos dois bancos (migration 059, não aplicada na produção). Segue aberto: o outbox da D-23 exige
    tabela nova (proposta de DDL com a coordenação), e jobs e sessões de Jogar contra IA de outras
    pessoas guardam o hash e a lista do deck de quem saiu (`BT-BAT-002`).
 4. **Fora do banco**: o EndpointCache passou a ter teto de 24 h e a limpar as entradas vencidas,
@@ -88,6 +91,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 - Tabela nova para o outbox da exclusão (D-23): migration nova é decisão; a proposta de DDL foi
   relatada à coordenação e não está aplicada.
 - Prazo de rotação dos backups (D-23 manda registrá-lo na política).
+- Trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) quando uma das partes
+  exclui a conta: seguem com a outra pessoa, como as concluídas. A D-66 manda apagar só os itens
+  de oferta aberta.
 - Prazo de retenção de analytics (`activation_funnel_events`), replays e simulações,
   notificações e feedback de IA.
 - Prazo de retenção de trocas e registros de moderação mantidos depois da exclusão, e base legal

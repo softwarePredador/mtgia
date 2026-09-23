@@ -293,6 +293,14 @@ void main() {
           case 'anonymize':
             expect(updates(name), isTrue, reason: '$name declarada anonymize');
             expect(deletes(name), isFalse, reason: name);
+          case 'partial_delete':
+            expect(
+              deletes(name) && updates(name),
+              isTrue,
+              reason:
+                  '$name declarada partial_delete: apaga parte e trata '
+                  'o resto',
+            );
           case 'keep_legal':
             expect(deletes(name), isFalse, reason: name);
           case 'gap':

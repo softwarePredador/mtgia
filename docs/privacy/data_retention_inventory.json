@@ -51,6 +51,7 @@
     "deletion_mode": [
       "delete",
       "anonymize",
+      "partial_delete",
       "cascade",
       "keep_legal",
       "gap",
@@ -2327,9 +2328,9 @@
       "owner": "server/routes/trades/index.dart",
       "retention": {
         "class": "legal_hold",
-        "period": "mantido com a troca",
+        "period": "o item de oferta aberta sai na exclusão da conta; o de troca em andamento ou encerrada fica com a troca",
         "decision": null,
-        "enforced_by": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
         "gap": null
       },
       "export": {
@@ -2337,11 +2338,11 @@
         "reason": "só os itens do titular"
       },
       "deletion": {
-        "mode": "keep_legal",
-        "by": null,
-        "notes": "Fica com a troca; o snapshot é só da carta (sem texto do usuário) e é imutável (trigger manaloom_trade_item_snapshot_immutable)."
+        "mode": "partial_delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "D-66: na oferta aberta (pending) do titular, a oferta é cancelada e os itens dele saem; os da outra pessoa ficam. Nas demais trocas o item do titular fica, sem o vínculo com o fichário (binder_item_id nulo), e owner_id aponta para a conta pseudonimizada. O snapshot é só da carta e é imutável. A chave owner_id é RESTRICT desde a migration 059: apagar a linha de users de quem tem item de troca é recusado."
       },
-      "legal_exception": "Parte do registro da troca.",
+      "legal_exception": "Parte do registro da troca da outra pessoa (trocas e disputas); confirmar o prazo com o advogado (D-69, BT-LEGAL-001).",
       "columns": {
         "agreed_price": "include",
         "binder_item_id": "include",
@@ -2412,7 +2413,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte."
+        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte. D-66: a oferta aberta (pending) do titular é cancelada, com uma linha no histórico."
       },
       "legal_exception": "Registro de negociação entre duas partes (trocas e disputas); confirmar o prazo com o advogado (BT-LEGAL-001).",
       "columns": {
@@ -2452,7 +2453,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'."
+        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'. D-66: o cancelamento da oferta aberta entra com a nota 'Oferta cancelada: a conta foi excluída.'."
       },
       "legal_exception": "Parte do registro da troca.",
       "columns": {

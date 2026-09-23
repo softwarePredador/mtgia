@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import '../bin/migrate.dart' as migrate;
 import '../lib/auth_service.dart';
 import '../lib/privacy/deleted_deck_anonymizer.dart';
 import '../lib/user_data_privacy_service.dart';
@@ -148,10 +149,58 @@ void main() {
     });
   });
 
+  group('itens de troca (D-66)', () {
+    final migration059 = migrate.migrations.singleWhere(
+      (migration) => migration.version == '059',
+    );
+    final bootstrap = File('database_setup.sql').readAsStringSync();
+
+    test('a 059 deixa a chave de owner_id em RESTRICT e reinstala o trigger '
+        'de conta ativa', () {
+      expect(migration059.name, 'align_trade_items_owner_fk');
+      expect(
+        migration059.up,
+        contains(
+          'FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT',
+        ),
+      );
+      expect(migration059.up, contains("'manaloom_active_user_' ||"));
+      expect(migration059.up, contains('manaloom_require_active_user(%L)'));
+      expect(
+        migration059.down,
+        contains(
+          'FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE',
+        ),
+      );
+      expect(
+        migrate.migrationRollbackPolicy('059'),
+        migrate.MigrationRollbackPolicy.manualOnly,
+      );
+    });
+
+    test('o banco novo sai igual: o baseline também declara RESTRICT', () {
+      expect(
+        bootstrap,
+        contains(
+          'owner_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT',
+        ),
+      );
+      expect(
+        bootstrap,
+        isNot(
+          contains(
+            'owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE',
+          ),
+        ),
+      );
+    });
+  });
+
   test('o recibo diz o que a exclusão faz', () {
-    expect(accountDeletionPolicyVersion, 'brewtact-beta-privacy-v2');
+    expect(accountDeletionPolicyVersion, 'brewtact-beta-privacy-v3');
     expect(accountDeletionRetentionSummary, {
       'trades_and_disputes': 'anonymized',
+      'open_trade_offers': 'cancelled',
       'moderation_records': 'anonymized',
       'operational_aggregates': 'deidentified',
       'deck_learning_and_battle_rows': 'deleted',
