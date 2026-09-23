@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "85eddf5750f0f8974dd9d6dd7c3fa41d2905b77e2df60c78ce28ca68ccc384aa"
+    "sha256": "76d92263af18a721e89e9ff8f26458b49ee19c82dd9007e7a6ae33bae8913209"
   },
   "required_task_fields": [
     "id",
@@ -27,10 +27,10 @@
     {
       "id": "BT-GOV-002",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Fila com duas raias (D-02): servidor, banco e gates numa; app na outra; WIP-1 por raia.",
       "depends_on": [],
-      "acceptance": "O gerador aceita no máximo dois slots `NOW`, um por raia, cada um com ficha e contenção próprias; o teste do gerador cobre um e dois slots e rejeita três ou raia repetida; `CURRENT_QUEUE.md` declara a raia do app quando o `BT-UIEV-001` fechar.",
+      "acceptance": "O gerador aceita no máximo dois slots `NOW`, um por raia, cada um com ficha e contenção próprias; o teste do gerador cobre um e dois slots e rejeita três ou raia repetida; `CURRENT_QUEUE.md` declara a raia do app quando o `BT-UIEV-001` fechar. Feito em 2026-09-23, na branch `servidor/raia-2026-09-23`: `tools/project_logic/lib/project_logic_generator.dart` lê a coluna `Raia` da tabela \"Slot atual\" (`servidor` ou `app`), aceita até dois slots `NOW`, um por raia, valida ficha e linha de contenção de cada um com as regras do slot único (a linha de contenção leva a raia entre parênteses) e publica `active_slots` no registry, mantendo `active_slot` para quem já lia um slot só; o formato antigo, sem a coluna, continua aceito. `CURRENT_QUEUE.md` passou a usar a coluna com o slot da raia de servidor e documenta a sintaxe em \"Como mover o slot\". Evidência: o teste do gerador cobre um e dois slots e rejeita três slots, raia repetida, raia desconhecida, o mesmo ID nas duas raias, raia sem linha de contenção, contenção de raia sem slot, contenção repetida, ficha ausente, dois slots sem a coluna, a coluna fora do lugar e slots com e sem a coluna; uma mutação que aceita raia repetida falha no teste. A raia do app não foi aberta: isso fica para a coordenação, quando o `BT-UIEV-001` fechar.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 267
     },
@@ -187,10 +187,10 @@
     {
       "id": "BT-AUTH-003",
       "priority": "P0 CORE",
-      "status": "IN_PROGRESS_CONTAINED",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Recuperação de senha não enumerável, rate-limited e com invalidação de sessões/tokens.",
       "depends_on": [],
-      "acceptance": "Conta existente/inexistente indistinguível em status, shape e timing aceitável; replay de token falha. Decisão do dono em 2026-09-22: D-19 e D-21, inclui o oráculo de enumeração do login (conta inexistente lança antes do bcrypt, e a resposta devolve o texto da exceção): bcrypt fictício com diferença de mediana abaixo de 20 ms em 50 tentativas, limite por e-mail e por IP, resposta sem texto de exceção. Buraco 3 da D-19 fechado localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: o login verifica a senha também para conta inexistente, contra um hash bcrypt fictício de mesmo custo, e responde 401 idêntico nos dois casos; nenhuma resposta do login repete texto de exceção; login e recuperação ganharam limite por e-mail (buckets `auth_login_email` e `auth_recovery_email`, 10 tentativas por 15 min em produção), somado ao limite por IP que já existia. Evidência: `server/test/auth_login_enumeration_test.dart` (12 testes; 4 mutações falham como esperado) e medição ponta a ponta em API e PostgreSQL locais, 50 tentativas intercaladas por caso: diferença de mediana de 0,1 ms, contra 94,2 ms na base `519b7e021`; `server/test/auth_login_timing_live_test.dart` repete a medição no harness vivo. Continua aberto na recuperação: a entrega do e-mail de reset ainda é aguardada dentro da rota, então o tempo de `POST /auth/forgot-password` ainda difere entre conta existente e inexistente. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). O tempo da recuperação de senha segue aberto.",
+      "acceptance": "Conta existente/inexistente indistinguível em status, shape e timing aceitável; replay de token falha. Decisão do dono em 2026-09-22: D-19 e D-21, inclui o oráculo de enumeração do login (conta inexistente lança antes do bcrypt, e a resposta devolve o texto da exceção): bcrypt fictício com diferença de mediana abaixo de 20 ms em 50 tentativas, limite por e-mail e por IP, resposta sem texto de exceção. Buraco 3 da D-19 fechado localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: o login verifica a senha também para conta inexistente, contra um hash bcrypt fictício de mesmo custo, e responde 401 idêntico nos dois casos; nenhuma resposta do login repete texto de exceção; login e recuperação ganharam limite por e-mail (buckets `auth_login_email` e `auth_recovery_email`, 10 tentativas por 15 min em produção), somado ao limite por IP que já existia. Evidência: `server/test/auth_login_enumeration_test.dart` (12 testes; 4 mutações falham como esperado) e medição ponta a ponta em API e PostgreSQL locais, 50 tentativas intercaladas por caso: diferença de mediana de 0,1 ms, contra 94,2 ms na base `519b7e021`; `server/test/auth_login_timing_live_test.dart` repete a medição no harness vivo. A parte do login está no ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Recuperação de senha fechada localmente em 2026-09-23, na branch `servidor/raia-2026-09-23`: `POST /auth/forgot-password` responde sem esperar nada que dependa da conta, porque achar a conta, criar o token e entregar o e-mail rodam depois da resposta (`server/lib/password_recovery_dispatcher.dart`, sem fila persistente e sem migração); a falha desse trabalho vai para o log e para a observabilidade, e o texto da resposta não mudou. A troca de token agora trava a conta, para pedidos seguidos deixarem um único token vivo. Evidência: `server/test/password_recovery_async_test.dart` (8 testes; 4 mutações falham como esperado), `server/test/password_reset_token_race_db_live_test.dart` (20 pedidos simultâneos, 1 token vivo, em PostgreSQL descartável) e medição ponta a ponta com entrega de 300 ms: diferença de mediana de 0,05 ms em 50 tentativas, contra 313,6 ms na base `47dc3b698`; `server/test/auth_forgot_password_timing_live_test.dart` repete a medição no modo de produção.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 305
     },
@@ -2605,10 +2605,10 @@
     {
       "id": "BT-DB-001",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Auditar schema real fresh contra baseline 058 antes de desenhar próximo DDL.",
       "depends_on": [],
-      "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”. Leitura read-only da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): inventário e diff feitos — 99 tabelas em `public` (as 79 do baseline e mais 20), 4 com colunas divergentes, 2 chaves estrangeiras ausentes e 1 a mais, schema `manaloom_deploy_audit` com 1.033 tabelas, ledger em 057; falta ferramenta reproduzível e o receipt da tarefa. Decisão do dono em 2026-09-22: D-48, comparar produção com ambiente fresco (a leitura de 2026-09-22 já cobriu o lado da produção); D-06, raia de servidor.",
+      "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”. Leitura read-only da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): inventário e diff feitos — 99 tabelas em `public` (as 79 do baseline e mais 20), 4 com colunas divergentes, 2 chaves estrangeiras ausentes e 1 a mais, schema `manaloom_deploy_audit` com 1.033 tabelas, ledger em 057; a ferramenta reproduzível e o receipt vieram em 2026-09-23 (abaixo). Decisão do dono em 2026-09-22: D-48, comparar produção com ambiente fresco (a leitura de 2026-09-22 já cobriu o lado da produção); D-06, raia de servidor. Feito em 2026-09-23, na branch `servidor/raia-2026-09-23`: `scripts/manaloom_schema_audit.sh` sobe um PostgreSQL 17 descartável sem rede, cria a base do zero pelas migrations, monta o alvo de um dump só com a estrutura e o ledger (e para se outra tabela tiver linhas) e roda `server/bin/schema_audit.dart`, que lê os dois catálogos em transação `READ ONLY` e classifica tabelas, views, colunas (tipo, nulidade e default), chaves estrangeiras, índices e o ledger em faltando, sobrando e divergente, em JSON e Markdown, sem apagar nada. Rodado contra o backup de 2026-09-23 00:51 UTC; receipt `docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.md`, com as saídas da ferramenta ao lado. Confirma as diferenças de 2026-09-22 e acrescenta 32 colunas divergentes em 12 tabelas, 3 views com texto diferente (a `commander_learning_snapshot` com lógica diferente, porque as migrations 023 e 024 interpolam uma constante que mudou depois), 4 chaves estrangeiras com outra ação de `ON DELETE` (em `trade_items.owner_id`, `CASCADE` no repositório e nenhuma na produção) e 87 índices a mais, 6 deles `UNIQUE` em tabelas comuns. Evidência: `server/test/schema_audit_test.dart` (12 testes; três mutações falham) e o receipt.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 657
     },
@@ -5094,12 +5094,19 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/execution/CURRENT_QUEUE.md",
-      "sha256": "8394979f5659830859e8827d332f51ee8bc6a7751c2b5353fd04eaa751bb7d30"
+      "sha256": "2941b81ec2ca6bc9922d734a6859fd89a0c4071de85e3d72b0150f3b3045e595"
     },
     "wip_limit": 1,
+    "wip_scope": "per_lane",
+    "lanes": [
+      "servidor",
+      "app"
+    ],
+    "lanes_declared": true,
     "active_slot_count": 1,
     "active_slot": {
       "label": "NOW",
+      "lane": "servidor",
       "task_id": "BT-SCP-001",
       "packet_path": "docs/execution/tasks/BT-SCP-001.md",
       "packet_identity_validated": true,
@@ -5125,6 +5132,36 @@
         "containment_reason": "o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham"
       }
     },
+    "active_slots": [
+      {
+        "label": "NOW",
+        "lane": "servidor",
+        "task_id": "BT-SCP-001",
+        "packet_path": "docs/execution/tasks/BT-SCP-001.md",
+        "packet_identity_validated": true,
+        "canonical_status": "IN_PROGRESS_CONTAINED",
+        "canonical_dependencies": [
+          {
+            "id": "BT-GOV-001",
+            "status": "PASS"
+          },
+          {
+            "id": "BT-UIEV-001",
+            "status": "IN_PROGRESS_CONTAINED"
+          },
+          {
+            "id": "BT-WEB-003",
+            "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE"
+          }
+        ],
+        "dependency_gate": {
+          "all_dependencies_pass": false,
+          "containment_exception": true,
+          "containment_task_id": "BT-SCP-001",
+          "containment_reason": "o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham"
+        }
+      }
+    ],
     "authority": {
       "priority": false,
       "status": false,
@@ -9814,6 +9851,7 @@
     "dependency_graph_acyclic": true,
     "out_of_table_task_definitions": 0,
     "execution_wip_limit": 1,
+    "execution_wip_scope": "per_lane",
     "execution_active_slots": 1,
     "execution_dependencies_closed_or_contained": true,
     "execution_ledger_priority_authority": false,
@@ -9825,5 +9863,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "bb774d00f7fd7d2aef69b4e011a8f3f2ef3807a1c4057cd960d26c06a3a4df39"
+  "project_logic_source_digest_sha256": "231f3761da23d33b6ebc95f4d28c735e0b000eaa9b7b9c387f9a50c712c5d53c"
 }

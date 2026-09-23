@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "bb774d00f7fd7d2aef69b4e011a8f3f2ef3807a1c4057cd960d26c06a3a4df39",
+  "source_digest_sha256": "231f3761da23d33b6ebc95f4d28c735e0b000eaa9b7b9c387f9a50c712c5d53c",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 688,
+    "dart_source_files": 691,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5212,
-    "semantic_resolved_files": 688,
+    "dart_symbols": 5243,
+    "semantic_resolved_files": 691,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42785,
-    "semantic_resolved_call_sites": 68186,
-    "semantic_resolved_type_references": 16096,
-    "modules": 154,
+    "semantic_resolved_call_edges": 42922,
+    "semantic_resolved_call_sites": 68418,
+    "semantic_resolved_type_references": 16168,
+    "modules": 156,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
     "database_tables": 79,
     "database_views": 6,
     "migrations": 58,
-    "scripts_and_jobs": 688,
-    "environment_variables": 717,
-    "tests": 1231,
+    "scripts_and_jobs": 690,
+    "environment_variables": 720,
+    "tests": 1235,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -613,6 +613,7 @@
         "server/bin/run_three_commander_optimization_validation.dart",
         "server/bin/run_three_commander_resolution_validation.dart",
         "server/bin/sacrifice_outlet_family_audit.dart",
+        "server/bin/schema_audit.dart",
         "server/bin/seed_database.dart",
         "server/bin/seed_legalities.dart",
         "server/bin/seed_legalities_optimized.dart",
@@ -635,8 +636,8 @@
         "server/bin/update_schema.dart",
         "server/bin/verify_schema.dart"
       ],
-      "file_count": 63,
-      "symbol_count": 682,
+      "file_count": 64,
+      "symbol_count": 690,
       "providers": [],
       "services": []
     },
@@ -1815,6 +1816,17 @@
       "services": []
     },
     {
+      "id": "server/lib/password_recovery_dispatcher",
+      "layer": "server",
+      "files": [
+        "server/lib/password_recovery_dispatcher.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 5,
+      "providers": [],
+      "services": []
+    },
+    {
       "id": "server/lib/password_reset_delivery_service",
       "layer": "server",
       "files": [
@@ -1966,6 +1978,17 @@
       ],
       "file_count": 1,
       "symbol_count": 1,
+      "providers": [],
+      "services": []
+    },
+    {
+      "id": "server/lib/schema_audit",
+      "layer": "server",
+      "files": [
+        "server/lib/schema_audit/schema_audit.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 18,
       "providers": [],
       "services": []
     },
@@ -21106,6 +21129,54 @@
       "line": 17
     },
     {
+      "name": "_InventoryRead",
+      "kind": "class",
+      "source": "server/bin/schema_audit.dart",
+      "line": 133
+    },
+    {
+      "name": "_Options",
+      "kind": "class",
+      "source": "server/bin/schema_audit.dart",
+      "line": 109
+    },
+    {
+      "name": "_inventory",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 227
+    },
+    {
+      "name": "_parseArgs",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 140
+    },
+    {
+      "name": "_readInventory",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 192
+    },
+    {
+      "name": "count",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 248
+    },
+    {
+      "name": "inScope",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 238
+    },
+    {
+      "name": "main",
+      "kind": "function",
+      "source": "server/bin/schema_audit.dart",
+      "line": 29
+    },
+    {
       "name": "_downloadJson",
       "kind": "function",
       "source": "server/bin/seed_database.dart",
@@ -26820,13 +26891,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -30147,7 +30218,7 @@
       "name": "AccountSecurityException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 878,
+      "line": 894,
       "members": [
         "toString"
       ]
@@ -30156,7 +30227,7 @@
       "name": "AccountSecurityResult",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 824,
+      "line": 840,
       "members": [
         "toJson"
       ]
@@ -30198,13 +30269,13 @@
       "name": "EmailVerificationRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 812
+      "line": 828
     },
     {
       "name": "InvalidCredentialsException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 867,
+      "line": 883,
       "members": [
         "toString"
       ]
@@ -30213,19 +30284,19 @@
       "name": "PasswordResetRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 800
+      "line": 816
     },
     {
       "name": "_PasswordPreparation",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 793
+      "line": 809
     },
     {
       "name": "accountProfileJson",
       "kind": "function",
       "source": "server/lib/auth_service.dart",
-      "line": 844
+      "line": 860
     },
     {
       "name": "isBasicLandCard",
@@ -36329,6 +36400,44 @@
       "line": 133
     },
     {
+      "name": "PasswordRecoveryDispatcher",
+      "kind": "class",
+      "source": "server/lib/password_recovery_dispatcher.dart",
+      "line": 12,
+      "members": [
+        "_afterResponse",
+        "_deliverSafely",
+        "_process",
+        "_safeReport",
+        "createNowAndDispatchDelivery",
+        "dispatch"
+      ]
+    },
+    {
+      "name": "overridePasswordRecoveryDispatcherForTesting",
+      "kind": "function",
+      "source": "server/lib/password_recovery_dispatcher.dart",
+      "line": 118
+    },
+    {
+      "name": "overridePasswordResetTokenExposureForTesting",
+      "kind": "function",
+      "source": "server/lib/password_recovery_dispatcher.dart",
+      "line": 125
+    },
+    {
+      "name": "passwordRecoveryDispatcherFor",
+      "kind": "function",
+      "source": "server/lib/password_recovery_dispatcher.dart",
+      "line": 130
+    },
+    {
+      "name": "passwordResetTokenExposureEnabled",
+      "kind": "function",
+      "source": "server/lib/password_recovery_dispatcher.dart",
+      "line": 148
+    },
+    {
       "name": "PasswordResetDeliveryService",
       "kind": "class",
       "source": "server/lib/password_reset_delivery_service.dart",
@@ -36931,6 +37040,141 @@
       "kind": "function",
       "source": "server/lib/runtime_environment.dart",
       "line": 5
+    },
+    {
+      "name": "AuditTarget",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 23
+    },
+    {
+      "name": "AuditUsageException",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 13,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "ColumnShape",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 123,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "DiffBucket",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 179,
+      "members": [
+        "counts",
+        "isEmpty",
+        "toJson"
+      ]
+    },
+    {
+      "name": "ForeignKeyShape",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 141,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "IndexShape",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 150,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "SchemaAuditReport",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 201,
+      "members": [
+        "_inventorySummary",
+        "_markdownItem",
+        "buckets",
+        "hasDifferences",
+        "latestMigration",
+        "toJson",
+        "toJsonText",
+        "toMarkdown"
+      ]
+    },
+    {
+      "name": "SchemaInventory",
+      "kind": "class",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 80
+    },
+    {
+      "name": "_compareIndexes",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 526
+    },
+    {
+      "name": "_compareMaps",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 505
+    },
+    {
+      "name": "_compareSets",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 500
+    },
+    {
+      "name": "_normalizeSql",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 577
+    },
+    {
+      "name": "compareSchemaInventories",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 371
+    },
+    {
+      "name": "foreignKeySignature",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 168
+    },
+    {
+      "name": "inCommonTable",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 423
+    },
+    {
+      "name": "inExtraSchema",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 386
+    },
+    {
+      "name": "normalizeIndexDefinition",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 162
+    },
+    {
+      "name": "parseAuditTarget",
+      "kind": "function",
+      "source": "server/lib/schema_audit/schema_audit.dart",
+      "line": 44
     },
     {
       "name": "_isDirectNormalImageForPrinting",
@@ -38521,7 +38765,7 @@
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/auth/forgot-password.dart",
-      "line": 14
+      "line": 13
     },
     {
       "name": "_invalidRequest",
@@ -40438,7 +40682,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 688,
+    "resolved_file_count": 691,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -40718,6 +40962,7 @@
       "server/bin/run_three_commander_optimization_validation.dart",
       "server/bin/run_three_commander_resolution_validation.dart",
       "server/bin/sacrifice_outlet_family_audit.dart",
+      "server/bin/schema_audit.dart",
       "server/bin/seed_database.dart",
       "server/bin/seed_legalities.dart",
       "server/bin/seed_legalities_optimized.dart",
@@ -40972,6 +41217,7 @@
       "server/lib/openai_structured_output_support.dart",
       "server/lib/operational_alerts.dart",
       "server/lib/password_policy.dart",
+      "server/lib/password_recovery_dispatcher.dart",
       "server/lib/password_reset_delivery_service.dart",
       "server/lib/plan_middleware.dart",
       "server/lib/plan_service.dart",
@@ -40985,6 +41231,7 @@
       "server/lib/request_trace.dart",
       "server/lib/retention/post_game_note_service.dart",
       "server/lib/runtime_environment.dart",
+      "server/lib/schema_audit/schema_audit.dart",
       "server/lib/scryfall_image_url.dart",
       "server/lib/sets_catalog_contract.dart",
       "server/lib/social_safety_service.dart",
@@ -41135,11 +41382,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42785,
-    "resolved_call_site_count": 68186,
-    "workspace_call_edge_count": 13347,
-    "unresolved_call_edge_count": 543,
-    "unresolved_call_site_count": 753,
+    "resolved_call_edge_count": 42922,
+    "resolved_call_site_count": 68418,
+    "workspace_call_edge_count": 13401,
+    "unresolved_call_edge_count": 552,
+    "unresolved_call_site_count": 763,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -116955,6 +117202,204 @@
         "occurrences": 3
       },
       {
+        "source": "server/bin/schema_audit.dart",
+        "line": 179,
+        "caller": "_parseArgs",
+        "kind": "constructor",
+        "lexical_target": "_Options",
+        "target": "_Options._Options",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 212,
+        "caller": "_readInventory",
+        "kind": "method",
+        "lexical_target": "_inventory",
+        "target": "_inventory",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 244,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "inScope",
+        "target": "inScope",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 262,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "count",
+        "target": "count",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 296,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "ColumnShape",
+        "target": "ColumnShape.ColumnShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 30,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_parseArgs",
+        "target": "_parseArgs",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 322,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "foreignKeySignature",
+        "target": "foreignKeySignature",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 324,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "ForeignKeyShape",
+        "target": "ForeignKeyShape.ForeignKeyShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 342,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "IndexShape",
+        "target": "IndexShape.IndexShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 344,
+        "caller": "_inventory",
+        "kind": "method",
+        "lexical_target": "normalizeIndexDefinition",
+        "target": "normalizeIndexDefinition",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 364,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "_InventoryRead",
+        "target": "_InventoryRead._InventoryRead",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 365,
+        "caller": "_inventory",
+        "kind": "constructor",
+        "lexical_target": "SchemaInventory",
+        "target": "SchemaInventory.SchemaInventory",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 41,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "parseAuditTarget",
+        "target": "parseAuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 60,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_readInventory",
+        "target": "_readInventory",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 80,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "compareSchemaInventories",
+        "target": "compareSchemaInventories",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 86,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "toJsonText",
+        "target": "SchemaAuditReport.toJsonText",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 87,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "toMarkdown",
+        "target": "SchemaAuditReport.toMarkdown",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 90,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "counts",
+        "target": "DiffBucket.counts",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/seed_database.dart",
         "line": 101,
         "caller": "_processAndInsertCards",
@@ -145622,7 +146067,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 544,
+        "line": 560,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "constructor",
         "lexical_target": "PasswordResetRequest",
@@ -145633,7 +146078,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 558,
+        "line": 574,
         "caller": "AuthService.resetPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -145644,7 +146089,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 563,
+        "line": 579,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -145655,7 +146100,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 564,
+        "line": 580,
         "caller": "AuthService.resetPassword",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -145666,7 +146111,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 595,
+        "line": 611,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "_validateReplacementPassword",
@@ -145677,7 +146122,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 613,
+        "line": 629,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -145688,7 +146133,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 634,
+        "line": 650,
         "caller": "AuthService.changePassword",
         "kind": "method",
         "lexical_target": "_rotateAuthenticationVersion",
@@ -145699,7 +146144,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 646,
+        "line": 662,
         "caller": "AuthService.revokeSessions",
         "kind": "method",
         "lexical_target": "_rotateAuthenticationVersion",
@@ -145710,7 +146155,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 657,
+        "line": 673,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -145721,7 +146166,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 669,
+        "line": 685,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -145732,7 +146177,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 670,
+        "line": 686,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -145743,7 +146188,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 679,
+        "line": 695,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "_validateReplacementPassword",
@@ -145754,7 +146199,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 686,
+        "line": 702,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "_readInteger",
@@ -145776,17 +146221,6 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 712,
-        "caller": "AuthService._rotateAuthenticationVersion",
-        "kind": "method",
-        "lexical_target": "hashPassword",
-        "target": "AuthService.hashPassword",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
         "line": 72,
         "caller": "<top-level>",
         "kind": "method",
@@ -145798,7 +146232,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 725,
+        "line": 728,
+        "caller": "AuthService._rotateAuthenticationVersion",
+        "kind": "method",
+        "lexical_target": "hashPassword",
+        "target": "AuthService.hashPassword",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 741,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "AccountSecurityResult",
@@ -145809,7 +146254,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 726,
+        "line": 742,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "generateToken",
@@ -145820,7 +146265,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 730,
+        "line": 746,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "accountProfileJson",
@@ -145831,7 +146276,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 741,
+        "line": 757,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "validate",
@@ -145842,7 +146287,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 747,
+        "line": 763,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -145853,7 +146298,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 752,
+        "line": 768,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -145864,7 +146309,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 777,
+        "line": 793,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "method",
         "lexical_target": "_preparePassword",
@@ -145875,7 +146320,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 778,
+        "line": 794,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "constructor",
         "lexical_target": "_PasswordPreparation",
@@ -163991,6 +164436,182 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 136,
+        "caller": "passwordRecoveryDispatcherFor",
+        "kind": "constructor",
+        "lexical_target": "PasswordRecoveryDispatcher.standard",
+        "target": "PasswordRecoveryDispatcher.PasswordRecoveryDispatcher.standard",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 138,
+        "caller": "passwordRecoveryDispatcherFor",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 139,
+        "caller": "passwordRecoveryDispatcherFor",
+        "kind": "method",
+        "lexical_target": "captureRouteException",
+        "target": "captureRouteException",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 151,
+        "caller": "passwordResetTokenExposureEnabled",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 152,
+        "caller": "passwordResetTokenExposureEnabled",
+        "kind": "method",
+        "lexical_target": "mayExposePasswordResetTokenForTesting",
+        "target": "mayExposePasswordResetTokenForTesting",
+        "target_library": "package:server/password_reset_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 39,
+        "caller": "PasswordRecoveryDispatcher.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "PasswordRecoveryDispatcher",
+        "target": "PasswordRecoveryDispatcher.PasswordRecoveryDispatcher",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 41,
+        "caller": "PasswordRecoveryDispatcher.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "AuthService",
+        "target": "AuthService.AuthService",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 41,
+        "caller": "PasswordRecoveryDispatcher.<constructor>",
+        "kind": "method",
+        "lexical_target": "createPasswordResetRequest",
+        "target": "AuthService.createPasswordResetRequest",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 43,
+        "caller": "PasswordRecoveryDispatcher.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "PasswordResetDeliveryService",
+        "target": "PasswordResetDeliveryService.PasswordResetDeliveryService",
+        "target_library": "package:server/password_reset_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 43,
+        "caller": "PasswordRecoveryDispatcher.<constructor>",
+        "kind": "method",
+        "lexical_target": "deliver",
+        "target": "PasswordResetDeliveryService.deliver",
+        "target_library": "package:server/password_reset_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 59,
+        "caller": "PasswordRecoveryDispatcher.dispatch",
+        "kind": "method",
+        "lexical_target": "_process",
+        "target": "PasswordRecoveryDispatcher._process",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 71,
+        "caller": "PasswordRecoveryDispatcher.createNowAndDispatchDelivery",
+        "kind": "method",
+        "lexical_target": "_safeReport",
+        "target": "PasswordRecoveryDispatcher._safeReport",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 75,
+        "caller": "PasswordRecoveryDispatcher.createNowAndDispatchDelivery",
+        "kind": "method",
+        "lexical_target": "_deliverSafely",
+        "target": "PasswordRecoveryDispatcher._deliverSafely",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 85,
+        "caller": "PasswordRecoveryDispatcher._process",
+        "kind": "method",
+        "lexical_target": "_safeReport",
+        "target": "PasswordRecoveryDispatcher._safeReport",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 88,
+        "caller": "PasswordRecoveryDispatcher._process",
+        "kind": "method",
+        "lexical_target": "_deliverSafely",
+        "target": "PasswordRecoveryDispatcher._deliverSafely",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 95,
+        "caller": "PasswordRecoveryDispatcher._deliverSafely",
+        "kind": "method",
+        "lexical_target": "_safeReport",
+        "target": "PasswordRecoveryDispatcher._safeReport",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/password_reset_delivery_service.dart",
         "line": 32,
         "caller": "PasswordResetDeliveryService.<constructor>",
@@ -166242,6 +166863,248 @@
         "lexical_target": "PostGameNotePage",
         "target": "PostGameNotePage.PostGameNotePage",
         "target_library": "package:server/retention/post_game_note_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 212,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "DiffBucket",
+        "target": "DiffBucket.DiffBucket",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 253,
+        "caller": "SchemaAuditReport.toJson",
+        "kind": "method",
+        "lexical_target": "_inventorySummary",
+        "target": "SchemaAuditReport._inventorySummary",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 256,
+        "caller": "SchemaAuditReport.toJson",
+        "kind": "method",
+        "lexical_target": "counts",
+        "target": "DiffBucket.counts",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 260,
+        "caller": "SchemaAuditReport.toJson",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DiffBucket.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 275,
+        "caller": "SchemaAuditReport._inventorySummary",
+        "kind": "method",
+        "lexical_target": "latestMigration",
+        "target": "SchemaAuditReport.latestMigration",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 279,
+        "caller": "SchemaAuditReport.toJsonText",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "SchemaAuditReport.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 296,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "_inventorySummary",
+        "target": "SchemaAuditReport._inventorySummary",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 319,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "counts",
+        "target": "DiffBucket.counts",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 346,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DiffBucket.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 353,
+        "caller": "SchemaAuditReport.toMarkdown",
+        "kind": "method",
+        "lexical_target": "_markdownItem",
+        "target": "SchemaAuditReport._markdownItem",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 378,
+        "caller": "compareSchemaInventories",
+        "kind": "constructor",
+        "lexical_target": "SchemaAuditReport",
+        "target": "SchemaAuditReport.SchemaAuditReport",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 399,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_compareSets",
+        "target": "_compareSets",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 401,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "inExtraSchema",
+        "target": "inExtraSchema",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 405,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_compareMaps",
+        "target": "_compareMaps",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 415,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_normalizeSql",
+        "target": "_normalizeSql",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 431,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "inCommonTable",
+        "target": "inCommonTable",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 438,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "ColumnShape.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 459,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "ForeignKeyShape.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 470,
+        "caller": "compareSchemaInventories",
+        "kind": "method",
+        "lexical_target": "_compareIndexes",
+        "target": "_compareIndexes",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 54,
+        "caller": "parseAuditTarget",
+        "kind": "constructor",
+        "lexical_target": "AuditUsageException",
+        "target": "AuditUsageException.AuditUsageException",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 561,
+        "caller": "_compareIndexes",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "IndexShape.toJson",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 71,
+        "caller": "parseAuditTarget",
+        "kind": "constructor",
+        "lexical_target": "AuditTarget",
+        "target": "AuditTarget.AuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -177280,7 +178143,18 @@
       },
       {
         "source": "server/routes/auth/forgot-password.dart",
-        "line": 31,
+        "line": 32,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "passwordResetTokenExposureEnabled",
+        "target": "passwordResetTokenExposureEnabled",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/forgot-password.dart",
+        "line": 37,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitResponse",
@@ -177291,78 +178165,45 @@
       },
       {
         "source": "server/routes/auth/forgot-password.dart",
-        "line": 37,
-        "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "AuthService",
-        "target": "AuthService.AuthService",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/forgot-password.dart",
-        "line": 37,
+        "line": 43,
         "caller": "onRequest",
         "kind": "method",
-        "lexical_target": "createPasswordResetRequest",
-        "target": "AuthService.createPasswordResetRequest",
-        "target_library": "package:server/auth_service.dart",
+        "lexical_target": "passwordRecoveryDispatcherFor",
+        "target": "passwordRecoveryDispatcherFor",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/auth/forgot-password.dart",
-        "line": 41,
-        "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "PasswordResetDeliveryService",
-        "target": "PasswordResetDeliveryService.PasswordResetDeliveryService",
-        "target_library": "package:server/password_reset_delivery_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/forgot-password.dart",
-        "line": 41,
+        "line": 45,
         "caller": "onRequest",
         "kind": "method",
-        "lexical_target": "deliver",
-        "target": "PasswordResetDeliveryService.deliver",
-        "target_library": "package:server/password_reset_delivery_service.dart",
+        "lexical_target": "createNowAndDispatchDelivery",
+        "target": "PasswordRecoveryDispatcher.createNowAndDispatchDelivery",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/auth/forgot-password.dart",
-        "line": 50,
+        "line": 47,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "dispatch",
+        "target": "PasswordRecoveryDispatcher.dispatch",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/forgot-password.dart",
+        "line": 52,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
         "target": "captureRouteException",
         "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/forgot-password.dart",
-        "line": 59,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/forgot-password.dart",
-        "line": 72,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "mayExposePasswordResetTokenForTesting",
-        "target": "mayExposePasswordResetTokenForTesting",
-        "target_library": "package:server/password_reset_delivery_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -187970,8 +188811,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 513,
-        "occurrences": 659
+        "unique_references": 515,
+        "occurrences": 661
       },
       {
         "target_scope": "dart_sdk",
@@ -187982,14 +188823,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 584,
-        "occurrences": 731
+        "unique_references": 587,
+        "occurrences": 735
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14223,
-        "occurrences": 24811
+        "unique_references": 14291,
+        "occurrences": 24922
       },
       {
         "target_scope": "dart_sdk",
@@ -188000,8 +188841,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 397,
-        "occurrences": 641
+        "unique_references": 400,
+        "occurrences": 651
       },
       {
         "target_scope": "dart_sdk",
@@ -189350,8 +190191,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1207,
-        "occurrences": 1982
+        "unique_references": 1214,
+        "occurrences": 2001
       },
       {
         "target_scope": "dependency",
@@ -192086,8 +192927,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 175,
-        "occurrences": 299
+        "unique_references": 176,
+        "occurrences": 300
       },
       {
         "target_scope": "workspace",
@@ -192188,8 +193029,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/observability.dart",
-        "unique_references": 120,
-        "occurrences": 135
+        "unique_references": 121,
+        "occurrences": 136
       },
       {
         "target_scope": "workspace",
@@ -192213,6 +193054,12 @@
         "target_scope": "workspace",
         "target_library": "package:server/password_policy.dart",
         "unique_references": 9,
+        "occurrences": 12
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "unique_references": 12,
         "occurrences": 12
       },
       {
@@ -192292,6 +193139,12 @@
         "target_library": "package:server/runtime_environment.dart",
         "unique_references": 42,
         "occurrences": 43
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "unique_references": 33,
+        "occurrences": 54
       },
       {
         "target_scope": "workspace",
@@ -192562,6 +193415,12 @@
         "target_library": "workspace:server/bin/sacrifice_outlet_family_audit.dart",
         "unique_references": 15,
         "occurrences": 22
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "unique_references": 7,
+        "occurrences": 18
       },
       {
         "target_scope": "workspace",
@@ -197270,6 +198129,62 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 101,
+        "caller": "PasswordRecoveryDispatcher._safeReport",
+        "kind": "function_expression",
+        "lexical_target": "_reportFailure",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 135,
+        "caller": "passwordRecoveryDispatcherFor",
+        "kind": "method",
+        "lexical_target": "call",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 59,
+        "caller": "PasswordRecoveryDispatcher.dispatch",
+        "kind": "function_expression",
+        "lexical_target": "_scheduler",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 69,
+        "caller": "PasswordRecoveryDispatcher.createNowAndDispatchDelivery",
+        "kind": "function_expression",
+        "lexical_target": "_createRequest",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 75,
+        "caller": "PasswordRecoveryDispatcher.createNowAndDispatchDelivery",
+        "kind": "function_expression",
+        "lexical_target": "_scheduler",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 83,
+        "caller": "PasswordRecoveryDispatcher._process",
+        "kind": "function_expression",
+        "lexical_target": "_createRequest",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 93,
+        "caller": "PasswordRecoveryDispatcher._deliverSafely",
+        "kind": "function_expression",
+        "lexical_target": "_deliver",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/plan_middleware.dart",
         "line": 46,
         "caller": "aiPlanLimitMiddleware",
@@ -197316,6 +198231,22 @@
         "kind": "function_expression",
         "lexical_target": "handler",
         "occurrences": 3
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 516,
+        "caller": "_compareMaps",
+        "kind": "function_expression",
+        "lexical_target": "describe",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 520,
+        "caller": "_compareMaps",
+        "kind": "function_expression",
+        "lexical_target": "difference",
+        "occurrences": 1
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
@@ -197462,9 +198393,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16096,
-    "workspace_type_reference_count": 3392,
-    "unresolved_type_reference_count": 348,
+    "resolved_type_reference_count": 16168,
+    "workspace_type_reference_count": 3413,
+    "unresolved_type_reference_count": 351,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -220098,6 +221029,96 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/schema_audit.dart",
+        "line": 136,
+        "lexical_type": "SchemaInventory",
+        "resolved_type": "SchemaInventory",
+        "target": "SchemaInventory",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 140,
+        "lexical_type": "_Options?",
+        "resolved_type": "_Options?",
+        "target": "_Options",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 179,
+        "lexical_type": "_Options",
+        "resolved_type": "_Options",
+        "target": "_Options",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 278,
+        "lexical_type": "ColumnShape",
+        "resolved_type": "ColumnShape",
+        "target": "ColumnShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 309,
+        "lexical_type": "ForeignKeyShape",
+        "resolved_type": "ForeignKeyShape",
+        "target": "ForeignKeyShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 331,
+        "lexical_type": "IndexShape",
+        "resolved_type": "IndexShape",
+        "target": "IndexShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 37,
+        "lexical_type": "AuditTarget",
+        "resolved_type": "AuditTarget",
+        "target": "AuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 51,
+        "lexical_type": "AuditUsageException",
+        "resolved_type": "AuditUsageException",
+        "target": "AuditUsageException",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/schema_audit.dart",
+        "line": 57,
+        "lexical_type": "_InventoryRead",
+        "resolved_type": "_InventoryRead",
+        "target": "_InventoryRead",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
         "source": "server/bin/seed_database.dart",
         "line": 12,
         "lexical_type": "Database",
@@ -223719,7 +224740,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 544,
+        "line": 560,
         "lexical_type": "PasswordResetRequest",
         "resolved_type": "PasswordResetRequest",
         "target": "PasswordResetRequest",
@@ -223729,7 +224750,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 629,
+        "line": 645,
         "lexical_type": "AccountSecurityResult",
         "resolved_type": "AccountSecurityResult",
         "target": "AccountSecurityResult",
@@ -223739,7 +224760,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 776,
+        "line": 792,
         "lexical_type": "_PasswordPreparation",
         "resolved_type": "_PasswordPreparation",
         "target": "_PasswordPreparation",
@@ -228078,6 +229099,56 @@
         "occurrences": 6
       },
       {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 25,
+        "lexical_type": "PasswordResetRequest?",
+        "resolved_type": "PasswordResetRequest?",
+        "target": "PasswordResetRequest",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 26,
+        "lexical_type": "PasswordResetRequest",
+        "resolved_type": "PasswordResetRequest",
+        "target": "PasswordResetRequest",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 39,
+        "lexical_type": "PasswordRecoveryDispatcher",
+        "resolved_type": "PasswordRecoveryDispatcher",
+        "target": "PasswordRecoveryDispatcher",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 41,
+        "lexical_type": "AuthService",
+        "resolved_type": "AuthService",
+        "target": "AuthService",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 43,
+        "lexical_type": "PasswordResetDeliveryService",
+        "resolved_type": "PasswordResetDeliveryService",
+        "target": "PasswordResetDeliveryService",
+        "target_library": "package:server/password_reset_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/password_reset_delivery_service.dart",
         "line": 30,
         "lexical_type": "AccountEmailHttpClientFactory?",
@@ -228396,6 +229467,96 @@
         "target_library": "package:server/retention/post_game_note_service.dart",
         "target_scope": "workspace",
         "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 109,
+        "lexical_type": "ColumnShape",
+        "resolved_type": "ColumnShape",
+        "target": "ColumnShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 113,
+        "lexical_type": "ForeignKeyShape",
+        "resolved_type": "ForeignKeyShape",
+        "target": "ForeignKeyShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 116,
+        "lexical_type": "IndexShape",
+        "resolved_type": "IndexShape",
+        "target": "IndexShape",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 208,
+        "lexical_type": "SchemaInventory",
+        "resolved_type": "SchemaInventory",
+        "target": "SchemaInventory",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 212,
+        "lexical_type": "DiffBucket",
+        "resolved_type": "DiffBucket",
+        "target": "DiffBucket",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 11
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 372,
+        "lexical_type": "SchemaAuditReport",
+        "resolved_type": "SchemaAuditReport",
+        "target": "SchemaAuditReport",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 47,
+        "lexical_type": "AuditTarget",
+        "resolved_type": "AuditTarget",
+        "target": "AuditTarget",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 506,
+        "lexical_type": "T",
+        "resolved_type": "T",
+        "target": "_compareMaps.T",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 54,
+        "lexical_type": "AuditUsageException",
+        "resolved_type": "AuditUsageException",
+        "target": "AuditUsageException",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
       },
       {
         "source": "server/lib/social_safety_service.dart",
@@ -229849,31 +231010,11 @@
       },
       {
         "source": "server/routes/auth/forgot-password.dart",
-        "line": 27,
+        "line": 33,
         "lexical_type": "PasswordResetRequest?",
         "resolved_type": "PasswordResetRequest?",
         "target": "PasswordResetRequest",
         "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/forgot-password.dart",
-        "line": 37,
-        "lexical_type": "AuthService",
-        "resolved_type": "AuthService",
-        "target": "AuthService",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/forgot-password.dart",
-        "line": 41,
-        "lexical_type": "PasswordResetDeliveryService",
-        "resolved_type": "PasswordResetDeliveryService",
-        "target": "PasswordResetDeliveryService",
-        "target_library": "package:server/password_reset_delivery_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -231398,8 +232539,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1080,
-        "occurrences": 2187
+        "unique_references": 1085,
+        "occurrences": 2205
       },
       {
         "target_scope": "dart_sdk",
@@ -231410,20 +232551,20 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 40,
-        "occurrences": 52
+        "unique_references": 41,
+        "occurrences": 53
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6175,
-        "occurrences": 39436
+        "unique_references": 6214,
+        "occurrences": 39652
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 82,
-        "occurrences": 184
+        "unique_references": 83,
+        "occurrences": 186
       },
       {
         "target_scope": "dart_sdk",
@@ -231500,8 +232641,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 270,
-        "occurrences": 1091
+        "unique_references": 271,
+        "occurrences": 1094
       },
       {
         "target_scope": "dependency",
@@ -232736,8 +233877,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 251,
-        "occurrences": 950
+        "unique_references": 255,
+        "occurrences": 955
       },
       {
         "target_scope": "dependency",
@@ -234560,8 +235701,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/auth_service.dart",
-        "unique_references": 32,
-        "occurrences": 49
+        "unique_references": 34,
+        "occurrences": 58
       },
       {
         "target_scope": "workspace",
@@ -235069,6 +236210,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/password_recovery_dispatcher.dart",
+        "unique_references": 1,
+        "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/password_reset_delivery_service.dart",
         "unique_references": 1,
         "occurrences": 1
@@ -235126,6 +236273,12 @@
         "target_library": "package:server/retention/post_game_note_service.dart",
         "unique_references": 14,
         "occurrences": 34
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/schema_audit/schema_audit.dart",
+        "unique_references": 15,
+        "occurrences": 53
       },
       {
         "target_scope": "workspace",
@@ -235258,6 +236411,12 @@
         "target_library": "workspace:server/bin/sacrifice_outlet_family_audit.dart",
         "unique_references": 3,
         "occurrences": 8
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/bin/schema_audit.dart",
+        "unique_references": 3,
+        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -236642,6 +237801,12 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/schema_audit.dart",
+        "line": 29,
+        "lexical_type": "void",
+        "occurrences": 2
+      },
+      {
         "source": "server/bin/seed_database.dart",
         "line": 11,
         "lexical_type": "void",
@@ -237314,6 +238479,12 @@
         "occurrences": 6
       },
       {
+        "source": "server/lib/password_recovery_dispatcher.dart",
+        "line": 27,
+        "lexical_type": "void",
+        "occurrences": 16
+      },
+      {
         "source": "server/lib/plan_service.dart",
         "line": 101,
         "lexical_type": "void",
@@ -237336,6 +238507,12 @@
         "line": 35,
         "lexical_type": "void",
         "occurrences": 2
+      },
+      {
+        "source": "server/lib/schema_audit/schema_audit.dart",
+        "line": 500,
+        "lexical_type": "void",
+        "occurrences": 3
       },
       {
         "source": "server/lib/sql_statement_splitter.dart",
@@ -262372,6 +263549,16 @@
       ]
     },
     {
+      "path": "scripts/manaloom_schema_audit.sh",
+      "role": "audit",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "MANALOOM_APPROVE_DISPOSABLE_POSTGRES",
+        "MANALOOM_PG17_BIN",
+        "TMPDIR"
+      ]
+    },
+    {
       "path": "scripts/manaloom_secret_scan.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -263809,6 +264996,15 @@
       "environment_variables": []
     },
     {
+      "path": "server/bin/schema_audit.dart",
+      "role": "audit",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "BASELINE_PGPASSWORD",
+        "TARGET_PGPASSWORD"
+      ]
+    },
+    {
       "path": "server/bin/seed_database.dart",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -264420,6 +265616,14 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_deploy_battle_sidecars.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "BASELINE_PGPASSWORD",
+      "classification": "sensitive_name_only",
+      "sources": [
+        "server/bin/schema_audit.dart"
       ],
       "value_captured": false
     },
@@ -265085,11 +266289,11 @@
         "server/lib/email_verification_policy.dart",
         "server/lib/health_readiness_support.dart",
         "server/lib/legal_policy.dart",
+        "server/lib/password_recovery_dispatcher.dart",
         "server/lib/password_reset_delivery_service.dart",
         "server/lib/public_site_url.dart",
         "server/lib/rate_limit_middleware.dart",
         "server/lib/release_capability_policy.dart",
-        "server/routes/auth/forgot-password.dart",
         "server/routes/health/index.dart"
       ],
       "value_captured": false
@@ -266056,6 +267260,7 @@
       "name": "MANALOOM_APPROVE_DISPOSABLE_POSTGRES",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_schema_audit.sh",
         "scripts/manaloom_tbls_local_gate.sh"
       ],
       "value_captured": false
@@ -268263,6 +269468,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_PG17_BIN",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_schema_audit.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_PG_DUMP_BIN",
       "classification": "configuration",
       "sources": [
@@ -270370,6 +271583,14 @@
       "value_captured": false
     },
     {
+      "name": "TARGET_PGPASSWORD",
+      "classification": "sensitive_name_only",
+      "sources": [
+        "server/bin/schema_audit.dart"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "TBLS_DSN",
       "classification": "sensitive_name_only",
       "sources": [
@@ -270422,6 +271643,7 @@
         "scripts/manaloom_p0_runtime_capture.sh",
         "scripts/manaloom_play_vs_ai_e2e.sh",
         "scripts/manaloom_project_logic.sh",
+        "scripts/manaloom_schema_audit.sh",
         "scripts/manaloom_server_contract_e2e_isolated.sh",
         "scripts/manaloom_social_trade_visual_qa.sh",
         "scripts/manaloom_tbls_local_gate.sh",
@@ -271678,6 +272900,7 @@
     "server/test/audit_easypanel_cron_runtime_test.py",
     "server/test/audit_easypanel_runtime_alignment_test.py",
     "server/test/auth_flow_integration_test.dart",
+    "server/test/auth_forgot_password_timing_live_test.dart",
     "server/test/auth_login_enumeration_test.dart",
     "server/test/auth_login_timing_live_test.dart",
     "server/test/auth_release_preflight_contract_test.dart",
@@ -271966,6 +273189,8 @@
     "server/test/optimize_wipe_floor_loader_live_test.dart",
     "server/test/optimizer_loop_tombstone_contract_test.py",
     "server/test/password_policy_test.dart",
+    "server/test/password_recovery_async_test.dart",
+    "server/test/password_reset_token_race_db_live_test.dart",
     "server/test/payment_provider_url_test.dart",
     "server/test/plan_checkout_contract_test.dart",
     "server/test/plan_learned_deck_partner_identity_backfill_test.py",
@@ -272014,6 +273239,7 @@
     "server/test/runtime_environment_test.dart",
     "server/test/runtime_schema_migration_contract_test.dart",
     "server/test/sacrifice_outlet_family_reconciliation_source_test.dart",
+    "server/test/schema_audit_test.dart",
     "server/test/scryfall_image_url_test.dart",
     "server/test/seed_database_image_selection_test.dart",
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
@@ -273313,7 +274539,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "85eddf5750f0f8974dd9d6dd7c3fa41d2905b77e2df60c78ce28ca68ccc384aa"
+      "sha256": "76d92263af18a721e89e9ff8f26458b49ee19c82dd9007e7a6ae33bae8913209"
     },
     "required_task_fields": [
       "id",
@@ -273338,10 +274564,10 @@
       {
         "id": "BT-GOV-002",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Fila com duas raias (D-02): servidor, banco e gates numa; app na outra; WIP-1 por raia.",
         "depends_on": [],
-        "acceptance": "O gerador aceita no máximo dois slots `NOW`, um por raia, cada um com ficha e contenção próprias; o teste do gerador cobre um e dois slots e rejeita três ou raia repetida; `CURRENT_QUEUE.md` declara a raia do app quando o `BT-UIEV-001` fechar.",
+        "acceptance": "O gerador aceita no máximo dois slots `NOW`, um por raia, cada um com ficha e contenção próprias; o teste do gerador cobre um e dois slots e rejeita três ou raia repetida; `CURRENT_QUEUE.md` declara a raia do app quando o `BT-UIEV-001` fechar. Feito em 2026-09-23, na branch `servidor/raia-2026-09-23`: `tools/project_logic/lib/project_logic_generator.dart` lê a coluna `Raia` da tabela \"Slot atual\" (`servidor` ou `app`), aceita até dois slots `NOW`, um por raia, valida ficha e linha de contenção de cada um com as regras do slot único (a linha de contenção leva a raia entre parênteses) e publica `active_slots` no registry, mantendo `active_slot` para quem já lia um slot só; o formato antigo, sem a coluna, continua aceito. `CURRENT_QUEUE.md` passou a usar a coluna com o slot da raia de servidor e documenta a sintaxe em \"Como mover o slot\". Evidência: o teste do gerador cobre um e dois slots e rejeita três slots, raia repetida, raia desconhecida, o mesmo ID nas duas raias, raia sem linha de contenção, contenção de raia sem slot, contenção repetida, ficha ausente, dois slots sem a coluna, a coluna fora do lugar e slots com e sem a coluna; uma mutação que aceita raia repetida falha no teste. A raia do app não foi aberta: isso fica para a coordenação, quando o `BT-UIEV-001` fechar.",
         "section": "Épico A — Verdade de produto, escopo e documentação",
         "source_line": 267
       },
@@ -273498,10 +274724,10 @@
       {
         "id": "BT-AUTH-003",
         "priority": "P0 CORE",
-        "status": "IN_PROGRESS_CONTAINED",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Recuperação de senha não enumerável, rate-limited e com invalidação de sessões/tokens.",
         "depends_on": [],
-        "acceptance": "Conta existente/inexistente indistinguível em status, shape e timing aceitável; replay de token falha. Decisão do dono em 2026-09-22: D-19 e D-21, inclui o oráculo de enumeração do login (conta inexistente lança antes do bcrypt, e a resposta devolve o texto da exceção): bcrypt fictício com diferença de mediana abaixo de 20 ms em 50 tentativas, limite por e-mail e por IP, resposta sem texto de exceção. Buraco 3 da D-19 fechado localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: o login verifica a senha também para conta inexistente, contra um hash bcrypt fictício de mesmo custo, e responde 401 idêntico nos dois casos; nenhuma resposta do login repete texto de exceção; login e recuperação ganharam limite por e-mail (buckets `auth_login_email` e `auth_recovery_email`, 10 tentativas por 15 min em produção), somado ao limite por IP que já existia. Evidência: `server/test/auth_login_enumeration_test.dart` (12 testes; 4 mutações falham como esperado) e medição ponta a ponta em API e PostgreSQL locais, 50 tentativas intercaladas por caso: diferença de mediana de 0,1 ms, contra 94,2 ms na base `519b7e021`; `server/test/auth_login_timing_live_test.dart` repete a medição no harness vivo. Continua aberto na recuperação: a entrega do e-mail de reset ainda é aguardada dentro da rota, então o tempo de `POST /auth/forgot-password` ainda difere entre conta existente e inexistente. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). O tempo da recuperação de senha segue aberto.",
+        "acceptance": "Conta existente/inexistente indistinguível em status, shape e timing aceitável; replay de token falha. Decisão do dono em 2026-09-22: D-19 e D-21, inclui o oráculo de enumeração do login (conta inexistente lança antes do bcrypt, e a resposta devolve o texto da exceção): bcrypt fictício com diferença de mediana abaixo de 20 ms em 50 tentativas, limite por e-mail e por IP, resposta sem texto de exceção. Buraco 3 da D-19 fechado localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: o login verifica a senha também para conta inexistente, contra um hash bcrypt fictício de mesmo custo, e responde 401 idêntico nos dois casos; nenhuma resposta do login repete texto de exceção; login e recuperação ganharam limite por e-mail (buckets `auth_login_email` e `auth_recovery_email`, 10 tentativas por 15 min em produção), somado ao limite por IP que já existia. Evidência: `server/test/auth_login_enumeration_test.dart` (12 testes; 4 mutações falham como esperado) e medição ponta a ponta em API e PostgreSQL locais, 50 tentativas intercaladas por caso: diferença de mediana de 0,1 ms, contra 94,2 ms na base `519b7e021`; `server/test/auth_login_timing_live_test.dart` repete a medição no harness vivo. A parte do login está no ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Recuperação de senha fechada localmente em 2026-09-23, na branch `servidor/raia-2026-09-23`: `POST /auth/forgot-password` responde sem esperar nada que dependa da conta, porque achar a conta, criar o token e entregar o e-mail rodam depois da resposta (`server/lib/password_recovery_dispatcher.dart`, sem fila persistente e sem migração); a falha desse trabalho vai para o log e para a observabilidade, e o texto da resposta não mudou. A troca de token agora trava a conta, para pedidos seguidos deixarem um único token vivo. Evidência: `server/test/password_recovery_async_test.dart` (8 testes; 4 mutações falham como esperado), `server/test/password_reset_token_race_db_live_test.dart` (20 pedidos simultâneos, 1 token vivo, em PostgreSQL descartável) e medição ponta a ponta com entrega de 300 ms: diferença de mediana de 0,05 ms em 50 tentativas, contra 313,6 ms na base `47dc3b698`; `server/test/auth_forgot_password_timing_live_test.dart` repete a medição no modo de produção.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 305
       },
@@ -275916,10 +277142,10 @@
       {
         "id": "BT-DB-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Auditar schema real fresh contra baseline 058 antes de desenhar próximo DDL.",
         "depends_on": [],
-        "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”. Leitura read-only da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): inventário e diff feitos — 99 tabelas em `public` (as 79 do baseline e mais 20), 4 com colunas divergentes, 2 chaves estrangeiras ausentes e 1 a mais, schema `manaloom_deploy_audit` com 1.033 tabelas, ledger em 057; falta ferramenta reproduzível e o receipt da tarefa. Decisão do dono em 2026-09-22: D-48, comparar produção com ambiente fresco (a leitura de 2026-09-22 já cobriu o lado da produção); D-06, raia de servidor.",
+        "acceptance": "Inventário de tabelas/views/colunas/FKs/ledger; diferenças classificadas, sem deletar “extras”. Leitura read-only da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): inventário e diff feitos — 99 tabelas em `public` (as 79 do baseline e mais 20), 4 com colunas divergentes, 2 chaves estrangeiras ausentes e 1 a mais, schema `manaloom_deploy_audit` com 1.033 tabelas, ledger em 057; a ferramenta reproduzível e o receipt vieram em 2026-09-23 (abaixo). Decisão do dono em 2026-09-22: D-48, comparar produção com ambiente fresco (a leitura de 2026-09-22 já cobriu o lado da produção); D-06, raia de servidor. Feito em 2026-09-23, na branch `servidor/raia-2026-09-23`: `scripts/manaloom_schema_audit.sh` sobe um PostgreSQL 17 descartável sem rede, cria a base do zero pelas migrations, monta o alvo de um dump só com a estrutura e o ledger (e para se outra tabela tiver linhas) e roda `server/bin/schema_audit.dart`, que lê os dois catálogos em transação `READ ONLY` e classifica tabelas, views, colunas (tipo, nulidade e default), chaves estrangeiras, índices e o ledger em faltando, sobrando e divergente, em JSON e Markdown, sem apagar nada. Rodado contra o backup de 2026-09-23 00:51 UTC; receipt `docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.md`, com as saídas da ferramenta ao lado. Confirma as diferenças de 2026-09-22 e acrescenta 32 colunas divergentes em 12 tabelas, 3 views com texto diferente (a `commander_learning_snapshot` com lógica diferente, porque as migrations 023 e 024 interpolam uma constante que mudou depois), 4 chaves estrangeiras com outra ação de `ON DELETE` (em `trade_items.owner_id`, `CASCADE` no repositório e nenhuma na produção) e 87 índices a mais, 6 deles `UNIQUE` em tabelas comuns. Evidência: `server/test/schema_audit_test.dart` (12 testes; três mutações falham) e o receipt.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 657
       },
@@ -278405,12 +279631,19 @@
       "schema_version": 1,
       "generated_from": {
         "path": "docs/execution/CURRENT_QUEUE.md",
-        "sha256": "8394979f5659830859e8827d332f51ee8bc6a7751c2b5353fd04eaa751bb7d30"
+        "sha256": "2941b81ec2ca6bc9922d734a6859fd89a0c4071de85e3d72b0150f3b3045e595"
       },
       "wip_limit": 1,
+      "wip_scope": "per_lane",
+      "lanes": [
+        "servidor",
+        "app"
+      ],
+      "lanes_declared": true,
       "active_slot_count": 1,
       "active_slot": {
         "label": "NOW",
+        "lane": "servidor",
         "task_id": "BT-SCP-001",
         "packet_path": "docs/execution/tasks/BT-SCP-001.md",
         "packet_identity_validated": true,
@@ -278436,6 +279669,36 @@
           "containment_reason": "o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham"
         }
       },
+      "active_slots": [
+        {
+          "label": "NOW",
+          "lane": "servidor",
+          "task_id": "BT-SCP-001",
+          "packet_path": "docs/execution/tasks/BT-SCP-001.md",
+          "packet_identity_validated": true,
+          "canonical_status": "IN_PROGRESS_CONTAINED",
+          "canonical_dependencies": [
+            {
+              "id": "BT-GOV-001",
+              "status": "PASS"
+            },
+            {
+              "id": "BT-UIEV-001",
+              "status": "IN_PROGRESS_CONTAINED"
+            },
+            {
+              "id": "BT-WEB-003",
+              "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE"
+            }
+          ],
+          "dependency_gate": {
+            "all_dependencies_pass": false,
+            "containment_exception": true,
+            "containment_task_id": "BT-SCP-001",
+            "containment_reason": "o gate amplo depende de BT-UIEV-001 (evidência de UI), ainda aberto, e do receipt same-SHA de BT-WEB-003 (bump feito em 2026-09-22); o manifesto segue fail-closed com 29/29 capabilities off enquanto eles fecham"
+          }
+        }
+      ],
       "authority": {
         "priority": false,
         "status": false,
@@ -283125,6 +284388,7 @@
       "dependency_graph_acyclic": true,
       "out_of_table_task_definitions": 0,
       "execution_wip_limit": 1,
+      "execution_wip_scope": "per_lane",
       "execution_active_slots": 1,
       "execution_dependencies_closed_or_contained": true,
       "execution_ledger_priority_authority": false,
@@ -283136,7 +284400,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "bb774d00f7fd7d2aef69b4e011a8f3f2ef3807a1c4057cd960d26c06a3a4df39"
+    "project_logic_source_digest_sha256": "231f3761da23d33b6ebc95f4d28c735e0b000eaa9b7b9c387f9a50c712c5d53c"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285320,6 +286584,7 @@
       "scripts/manaloom_release_observability_gate.sh",
       "scripts/manaloom_release_ops_contract_test.sh",
       "scripts/manaloom_report_retention_audit.sh",
+      "scripts/manaloom_schema_audit.sh",
       "scripts/manaloom_secret_scan.sh",
       "scripts/manaloom_server_contract_e2e_isolated.sh",
       "scripts/manaloom_social_trade_visual_qa.sh",
@@ -285459,6 +286724,7 @@
       "server/bin/run_three_commander_optimization_validation.dart",
       "server/bin/run_three_commander_resolution_validation.dart",
       "server/bin/sacrifice_outlet_family_audit.dart",
+      "server/bin/schema_audit.dart",
       "server/bin/seed_database.dart",
       "server/bin/seed_legalities.dart",
       "server/bin/seed_legalities_optimized.dart",
@@ -285724,6 +286990,7 @@
       "server/lib/openai_structured_output_support.dart",
       "server/lib/operational_alerts.dart",
       "server/lib/password_policy.dart",
+      "server/lib/password_recovery_dispatcher.dart",
       "server/lib/password_reset_delivery_service.dart",
       "server/lib/plan_middleware.dart",
       "server/lib/plan_service.dart",
@@ -285737,6 +287004,7 @@
       "server/lib/request_trace.dart",
       "server/lib/retention/post_game_note_service.dart",
       "server/lib/runtime_environment.dart",
+      "server/lib/schema_audit/schema_audit.dart",
       "server/lib/scryfall_image_url.dart",
       "server/lib/sets_catalog_contract.dart",
       "server/lib/social_safety_service.dart",
@@ -285928,6 +287196,7 @@
       "server/test/audit_easypanel_cron_runtime_test.py",
       "server/test/audit_easypanel_runtime_alignment_test.py",
       "server/test/auth_flow_integration_test.dart",
+      "server/test/auth_forgot_password_timing_live_test.dart",
       "server/test/auth_login_enumeration_test.dart",
       "server/test/auth_login_timing_live_test.dart",
       "server/test/auth_release_preflight_contract_test.dart",
@@ -286216,6 +287485,8 @@
       "server/test/optimize_wipe_floor_loader_live_test.dart",
       "server/test/optimizer_loop_tombstone_contract_test.py",
       "server/test/password_policy_test.dart",
+      "server/test/password_recovery_async_test.dart",
+      "server/test/password_reset_token_race_db_live_test.dart",
       "server/test/payment_provider_url_test.dart",
       "server/test/plan_checkout_contract_test.dart",
       "server/test/plan_learned_deck_partner_identity_backfill_test.py",
@@ -286264,6 +287535,7 @@
       "server/test/runtime_environment_test.dart",
       "server/test/runtime_schema_migration_contract_test.dart",
       "server/test/sacrifice_outlet_family_reconciliation_source_test.dart",
+      "server/test/schema_audit_test.dart",
       "server/test/scryfall_image_url_test.dart",
       "server/test/seed_database_image_selection_test.dart",
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
