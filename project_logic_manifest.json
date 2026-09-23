@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c272dc9e8b1d8ada21cab3c406a402a1844c1322b2b00dd06e9392473e95eb66",
+  "source_digest_sha256": "f3adc22cdddc7c939759ca8fd7abfa50e623563b5ddb123202dac169c571243e",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,16 +63,16 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 688,
+    "dart_source_files": 689,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5211,
-    "semantic_resolved_files": 688,
+    "dart_symbols": 5207,
+    "semantic_resolved_files": 689,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 42763,
-    "semantic_resolved_call_sites": 68142,
-    "semantic_resolved_type_references": 16092,
-    "modules": 154,
+    "semantic_resolved_call_edges": 42721,
+    "semantic_resolved_call_sites": 68068,
+    "semantic_resolved_type_references": 16089,
+    "modules": 155,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
@@ -81,7 +81,7 @@
     "migrations": 58,
     "scripts_and_jobs": 689,
     "environment_variables": 714,
-    "tests": 1234,
+    "tests": 1236,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1132,6 +1132,17 @@
       ]
     },
     {
+      "id": "server/lib/catalog_read_contract",
+      "layer": "server",
+      "files": [
+        "server/lib/catalog_read_contract.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 3,
+      "providers": [],
+      "services": []
+    },
+    {
       "id": "server/lib/collection_availability_contract",
       "layer": "server",
       "files": [
@@ -2172,7 +2183,7 @@
         "server/routes/cards/resolve/index.dart"
       ],
       "file_count": 5,
-      "symbol_count": 21,
+      "symbol_count": 14,
       "providers": [],
       "services": []
     },
@@ -32802,6 +32813,24 @@
       ]
     },
     {
+      "name": "_shownName",
+      "kind": "function",
+      "source": "server/lib/catalog_read_contract.dart",
+      "line": 33
+    },
+    {
+      "name": "cardNotInCatalogMessage",
+      "kind": "function",
+      "source": "server/lib/catalog_read_contract.dart",
+      "line": 16
+    },
+    {
+      "name": "cardNotInCatalogResponse",
+      "kind": "function",
+      "source": "server/lib/catalog_read_contract.dart",
+      "line": 22
+    },
+    {
       "name": "collectionQuantity",
       "kind": "function",
       "source": "server/lib/collection_availability_contract.dart",
@@ -38791,19 +38820,19 @@
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/cards/printings/index.dart",
-      "line": 287
+      "line": 292
     },
     {
       "name": "_queryPrintings",
       "kind": "function",
       "source": "server/routes/cards/printings/index.dart",
-      "line": 50
+      "line": 55
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/cards/printings/index.dart",
-      "line": 8
+      "line": 9
     },
     {
       "name": "onRequest",
@@ -38812,70 +38841,28 @@
       "line": 10
     },
     {
-      "name": "_ensureSet",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 690
-    },
-    {
-      "name": "_fetchAllPrintings",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 591
-    },
-    {
-      "name": "_fetchFromScryfall",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 340
-    },
-    {
-      "name": "_fetchFromScryfallSearch",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 418
-    },
-    {
-      "name": "_fetchTokenFromScryfallSearch",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 378
-    },
-    {
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 729
-    },
-    {
-      "name": "_insertLegalities",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 644
-    },
-    {
-      "name": "_insertScryfallCard",
-      "kind": "function",
-      "source": "server/routes/cards/resolve/index.dart",
-      "line": 450
+      "line": 275
     },
     {
       "name": "_parseBool",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 638
+      "line": 265
     },
     {
       "name": "_resolveLocalCandidate",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 302
+      "line": 231
     },
     {
       "name": "_searchLocal",
       "kind": "function",
       "source": "server/routes/cards/resolve/index.dart",
-      "line": 205
+      "line": 134
     },
     {
       "name": "onRequest",
@@ -40432,7 +40419,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 688,
+    "resolved_file_count": 689,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -40891,6 +40878,7 @@
       "server/lib/card_query_contract.dart",
       "server/lib/card_resolution_support.dart",
       "server/lib/card_validation_service.dart",
+      "server/lib/catalog_read_contract.dart",
       "server/lib/collection_availability_contract.dart",
       "server/lib/color_identity.dart",
       "server/lib/commander_bracket.dart",
@@ -41129,9 +41117,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 42763,
-    "resolved_call_site_count": 68142,
-    "workspace_call_edge_count": 13343,
+    "resolved_call_edge_count": 42721,
+    "resolved_call_site_count": 68068,
+    "workspace_call_edge_count": 13337,
     "unresolved_call_edge_count": 543,
     "unresolved_call_site_count": 753,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -155350,6 +155338,39 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/catalog_read_contract.dart",
+        "line": 17,
+        "caller": "cardNotInCatalogMessage",
+        "kind": "method",
+        "lexical_target": "_shownName",
+        "target": "_shownName",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/catalog_read_contract.dart",
+        "line": 27,
+        "caller": "cardNotInCatalogResponse",
+        "kind": "method",
+        "lexical_target": "cardNotInCatalogMessage",
+        "target": "cardNotInCatalogMessage",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/catalog_read_contract.dart",
+        "line": 28,
+        "caller": "cardNotInCatalogResponse",
+        "kind": "method",
+        "lexical_target": "_shownName",
+        "target": "_shownName",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/color_identity.dart",
         "line": 23,
         "caller": "extractColorIdentityFromText",
@@ -178770,7 +178791,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 20,
+        "line": 22,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -178781,7 +178802,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 21,
+        "line": 23,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -178792,7 +178813,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 243,
+        "line": 248,
         "caller": "_queryPrintings",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -178803,7 +178824,7 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 36,
+        "line": 38,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_queryPrintings",
@@ -178814,7 +178835,18 @@
       },
       {
         "source": "server/routes/cards/printings/index.dart",
-        "line": 63,
+        "line": 47,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "cardNotInCatalogResponse",
+        "target": "cardNotInCatalogResponse",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/cards/printings/index.dart",
+        "line": 68,
         "caller": "_queryPrintings",
         "kind": "method",
         "lexical_target": "cardIdentitySelectSql",
@@ -178847,18 +178879,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 117,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_resolveLocalCandidate",
-        "target": "_resolveLocalCandidate",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 212,
+        "line": 141,
         "caller": "_searchLocal",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -178869,7 +178890,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 213,
+        "line": 142,
         "caller": "_searchLocal",
         "kind": "method",
         "lexical_target": "cardIdentitySelectSql",
@@ -178880,7 +178901,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 275,
+        "line": 204,
         "caller": "_searchLocal",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -178891,7 +178912,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 333,
+        "line": 262,
         "caller": "_resolveLocalCandidate",
         "kind": "method",
         "lexical_target": "resolveCardCandidateNames",
@@ -178902,73 +178923,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 347,
-        "caller": "_fetchFromScryfall",
-        "kind": "method",
-        "lexical_target": "_fetchTokenFromScryfallSearch",
-        "target": "_fetchTokenFromScryfallSearch",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 369,
-        "caller": "_fetchFromScryfall",
-        "kind": "method",
-        "lexical_target": "_fetchFromScryfallSearch",
-        "target": "_fetchFromScryfallSearch",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 465,
-        "caller": "_insertScryfallCard",
-        "kind": "method",
-        "lexical_target": "_fetchAllPrintings",
-        "target": "_fetchAllPrintings",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 473,
-        "caller": "_insertScryfallCard",
-        "kind": "method",
-        "lexical_target": "scryfallIdentityPayload",
-        "target": "scryfallIdentityPayload",
-        "target_library": "package:server/card_identity_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 507,
-        "caller": "_insertScryfallCard",
-        "kind": "method",
-        "lexical_target": "scryfallNormalImageUrlFromPayload",
-        "target": "scryfallNormalImageUrlFromPayload",
-        "target_library": "package:server/scryfall_image_url.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 508,
-        "caller": "_insertScryfallCard",
-        "kind": "method",
-        "lexical_target": "scryfallNamedImageFallback",
-        "target": "scryfallNamedImageFallback",
-        "target_library": "package:server/scryfall_image_url.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 55,
+        "line": 56,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_parseBool",
@@ -178979,7 +178934,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 56,
+        "line": 57,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -178990,69 +178945,36 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 585,
-        "caller": "_insertScryfallCard",
-        "kind": "method",
-        "lexical_target": "_ensureSet",
-        "target": "_ensureSet",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 60,
+        "line": 61,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_searchLocal",
         "target": "_searchLocal",
         "target_library": "workspace:server/routes/cards/resolve/index.dart",
         "target_scope": "workspace",
-        "occurrences": 4
+        "occurrences": 2
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 696,
-        "caller": "_ensureSet",
+        "line": 81,
+        "caller": "onRequest",
         "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
+        "lexical_target": "cardNotInCatalogResponse",
+        "target": "cardNotInCatalogResponse",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/cards/resolve/index.dart",
+        "line": 85,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_resolveLocalCandidate",
+        "target": "_resolveLocalCandidate",
         "target_library": "workspace:server/routes/cards/resolve/index.dart",
         "target_scope": "workspace",
         "occurrences": 1
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 80,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_fetchFromScryfall",
-        "target": "_fetchFromScryfall",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 90,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_insertScryfallCard",
-        "target": "_insertScryfallCard",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 96,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_insertLegalities",
-        "target": "_insertLegalities",
-        "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
       },
       {
         "source": "server/routes/community/_middleware.dart",
@@ -187932,14 +187854,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 583,
-        "occurrences": 729
+        "unique_references": 579,
+        "occurrences": 725
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14211,
-        "occurrences": 24782
+        "unique_references": 14189,
+        "occurrences": 24738
       },
       {
         "target_scope": "dart_sdk",
@@ -187950,8 +187872,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 395,
-        "occurrences": 639
+        "unique_references": 394,
+        "occurrences": 638
       },
       {
         "target_scope": "dart_sdk",
@@ -188046,8 +187968,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 485,
-        "occurrences": 953
+        "unique_references": 486,
+        "occurrences": 950
       },
       {
         "target_scope": "dependency",
@@ -189204,8 +189126,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:http/http.dart",
-        "unique_references": 57,
-        "occurrences": 63
+        "unique_references": 53,
+        "occurrences": 59
       },
       {
         "target_scope": "dependency",
@@ -189300,8 +189222,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1205,
-        "occurrences": 1978
+        "unique_references": 1199,
+        "occurrences": 1970
       },
       {
         "target_scope": "dependency",
@@ -191694,8 +191616,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/card_identity_support.dart",
-        "unique_references": 23,
-        "occurrences": 23
+        "unique_references": 22,
+        "occurrences": 22
       },
       {
         "target_scope": "workspace",
@@ -191714,6 +191636,12 @@
         "target_library": "package:server/card_validation_service.dart",
         "unique_references": 14,
         "occurrences": 16
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/catalog_read_contract.dart",
+        "unique_references": 5,
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -192246,8 +192174,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/scryfall_image_url.dart",
-        "unique_references": 32,
-        "occurrences": 32
+        "unique_references": 30,
+        "occurrences": 30
       },
       {
         "target_scope": "workspace",
@@ -192786,8 +192714,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/routes/cards/resolve/index.dart",
-        "unique_references": 12,
-        "occurrences": 18
+        "unique_references": 4,
+        "occurrences": 5
       },
       {
         "target_scope": "workspace",
@@ -197412,9 +197340,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16092,
+    "resolved_type_reference_count": 16089,
     "workspace_type_reference_count": 3392,
-    "unresolved_type_reference_count": 348,
+    "unresolved_type_reference_count": 347,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -230069,7 +229997,7 @@
       },
       {
         "source": "server/routes/cards/resolve/index.dart",
-        "line": 302,
+        "line": 231,
         "lexical_type": "CardResolutionDecision",
         "resolved_type": "CardResolutionDecision",
         "target": "CardResolutionDecision",
@@ -231348,8 +231276,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1079,
-        "occurrences": 2186
+        "unique_references": 1077,
+        "occurrences": 2179
       },
       {
         "target_scope": "dart_sdk",
@@ -231366,8 +231294,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6172,
-        "occurrences": 39414
+        "unique_references": 6170,
+        "occurrences": 39351
       },
       {
         "target_scope": "dart_sdk",
@@ -231450,8 +231378,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 270,
-        "occurrences": 1091
+        "unique_references": 271,
+        "occurrences": 1089
       },
       {
         "target_scope": "dependency",
@@ -232687,7 +232615,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 251,
-        "occurrences": 948
+        "occurrences": 944
       },
       {
         "target_scope": "dependency",
@@ -232699,7 +232627,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
         "unique_references": 198,
-        "occurrences": 484
+        "occurrences": 481
       },
       {
         "target_scope": "dependency",
@@ -232837,7 +232765,7 @@
         "target_scope": "unknown",
         "target_library": "<unresolved>",
         "unique_references": 405,
-        "occurrences": 4774
+        "occurrences": 4755
       },
       {
         "target_scope": "workspace",
@@ -237350,12 +237278,6 @@
       {
         "source": "server/routes/ai/optimize/index.dart",
         "line": 395,
-        "lexical_type": "void",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/cards/resolve/index.dart",
-        "line": 645,
         "lexical_type": "void",
         "occurrences": 2
       },
@@ -271681,7 +271603,9 @@
     "server/test/card_resolution_support_test.dart",
     "server/test/cards_printings_read_only_test.dart",
     "server/test/cards_reserved_schema_contract_test.dart",
+    "server/test/cards_resolve_read_only_test.dart",
     "server/test/cards_route_test.dart",
+    "server/test/catalog_routes_read_only_guard_test.dart",
     "server/test/cmc_safety_test.dart",
     "server/test/collection_availability_contract_test.dart",
     "server/test/collection_availability_live_test.dart",
@@ -273271,7 +273195,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "de32f99caead146de65d2b31bf7a6b30e0f4f12dafd6a4321fa6daa656e2c77e"
+      "sha256": "ee6c8724b962230e570c3e367fb1bfff7dfdf16f8654d8b84ae5090f0aa5fbda"
     },
     "required_task_fields": [
       "id",
@@ -274154,12 +274078,12 @@
       {
         "id": "BT-CAT-02",
         "priority": "P0 CORE",
-        "status": "BLOCKED_BY_P0",
+        "status": "IN_PROGRESS_CONTAINED",
         "delivery": "`/cards`, `/resolve` e `/printings` estritamente read-only.",
         "depends_on": [
           "BT-CAT-01"
         ],
-        "acceptance": "Leitura causa 0 DML e 0 upstream calls; `sync=true` rejeitado; app não o envia. Decisão do dono em 2026-09-22: D-35, carta ausente responde 404 `card_not_in_catalog` com frase em português e soma num contador de demanda; nenhuma sincronização disparada por usuário; as linhas-alias Oracle ficam enquanto houver referência e migram numa correção de dados com receipt (escrita em produção com aprovação por execução).",
+        "acceptance": "Leitura causa 0 DML e 0 upstream calls; `sync=true` rejeitado; app não o envia. Decisão do dono em 2026-09-22: D-35, carta ausente responde 404 `card_not_in_catalog` com frase em português e soma num contador de demanda; nenhuma sincronização disparada por usuário; as linhas-alias Oracle ficam enquanto houver referência e migram numa correção de dados com receipt (escrita em produção com aprovação por execução). Feito em 2026-09-23, na branch `catalogo/2026-09-23`: as 7 rotas de catálogo só leem. `POST /cards/resolve` perdeu o fallback da Scryfall e a escrita em `cards`, `sets` e `card_legalities`, e `GET /cards/printings` (somente leitura desde o `BT-CAT-04`) responde 404 quando não há edição; carta ausente responde 404 `card_not_in_catalog` com frase em português (`server/lib/catalog_read_contract.dart`). Evidência: `server/test/cards_resolve_read_only_test.dart` (carta ausente, token ausente, carta local e nome ambíguo, sempre sem chamada externa e sem DML; a versão da base chama a Scryfall e cai em 500), `server/test/cards_printings_read_only_test.dart` e `server/test/catalog_routes_read_only_guard_test.dart` (as 7 rotas e as bibliotecas que elas importam, sem cliente HTTP nem DML). Falta: `sync=true` é ignorado, não rejeitado, porque o app ainda o envia (`app/lib/features/cards/providers/card_provider.dart:531`) e rejeitar agora quebraria o \"Escolher edição\"; o 400 depende da raia do app tirar o parâmetro e tratar o 404. O contador de demanda exige tabela nova e ficou como proposta de DDL (pendente de decisão). A migração das linhas-alias Oracle é a fase 2 da D-35.",
         "section": "P0",
         "source_line": 430
       },
@@ -274182,7 +274106,7 @@
         "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "`GET /cards/printings?sync=true` deixa de escrever no banco e de chamar a Scryfall por chamador anônimo (achado 9 dos fluxos).",
         "depends_on": [],
-        "acceptance": "Nenhuma rota anônima faz DML nem chama terceiro; a sincronização sai só pelo job do `BT-CAT-01` (D-35); teste negativo. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `server/routes/cards/printings/index.dart` só lê; o `sync` é ignorado, e saíram o cliente HTTP, as duas chamadas à Scryfall e os upserts em `cards` e `sets`. Evidência: `server/test/cards_printings_read_only_test.dart` sobe o handler com um pool roteirizado e um cliente HTTP que conta as chamadas; com `sync=true` e 0 ou 1 edição local (o gatilho antigo), e em 5 repetições, há 0 chamada externa e só as 3 leituras. A versão da base falha nos 3 casos (2 chamadas à Scryfall e `INSERT INTO cards`). A guarda de fonte de `server/test/cards_route_test.dart` foi invertida, e o contrato em `server/doc/API_CONTRACTS_AND_DATA_MAP.md` passou a dizer somente leitura. O app ainda envia `sync=true` (`app/lib/features/cards/providers/card_provider.dart:531`), que o servidor ignora; tirar o parâmetro é da raia do app. O `POST /cards/resolve`, a outra rota anônima que escreve e chama a Scryfall, fecha no `BT-CAT-02`.",
+        "acceptance": "Nenhuma rota anônima faz DML nem chama terceiro; a sincronização sai só pelo job do `BT-CAT-01` (D-35); teste negativo. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `server/routes/cards/printings/index.dart` só lê; o `sync` é ignorado, e saíram o cliente HTTP, as duas chamadas à Scryfall e os upserts em `cards` e `sets`. Evidência: `server/test/cards_printings_read_only_test.dart` sobe o handler com um pool roteirizado e um cliente HTTP que conta as chamadas; com `sync=true` e 0 ou 1 edição local (o gatilho antigo), e em 5 repetições, há 0 chamada externa e só as 3 leituras. A versão da base falha nos 3 casos (2 chamadas à Scryfall e `INSERT INTO cards`). A guarda de fonte de `server/test/cards_route_test.dart` foi invertida, e o contrato em `server/doc/API_CONTRACTS_AND_DATA_MAP.md` passou a dizer somente leitura. O app ainda envia `sync=true` (`app/lib/features/cards/providers/card_provider.dart:531`), que o servidor ignora; tirar o parâmetro é da raia do app. O `POST /cards/resolve`, a outra rota anônima que escrevia e chamava a Scryfall, fechou no `BT-CAT-02` no mesmo dia, e `server/test/catalog_routes_read_only_guard_test.dart` passou a cobrir as 7 rotas de catálogo.",
         "section": "P0",
         "source_line": 432
       },
@@ -283100,7 +283024,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c272dc9e8b1d8ada21cab3c406a402a1844c1322b2b00dd06e9392473e95eb66"
+    "project_logic_source_digest_sha256": "f3adc22cdddc7c939759ca8fd7abfa50e623563b5ddb123202dac169c571243e"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -285614,6 +285538,7 @@
       "server/lib/card_query_contract.dart",
       "server/lib/card_resolution_support.dart",
       "server/lib/card_validation_service.dart",
+      "server/lib/catalog_read_contract.dart",
       "server/lib/collection_availability_contract.dart",
       "server/lib/color_identity.dart",
       "server/lib/commander_bracket.dart",
@@ -285952,7 +285877,9 @@
       "server/test/card_resolution_support_test.dart",
       "server/test/cards_printings_read_only_test.dart",
       "server/test/cards_reserved_schema_contract_test.dart",
+      "server/test/cards_resolve_read_only_test.dart",
       "server/test/cards_route_test.dart",
+      "server/test/catalog_routes_read_only_guard_test.dart",
       "server/test/cmc_safety_test.dart",
       "server/test/collection_availability_contract_test.dart",
       "server/test/collection_availability_live_test.dart",

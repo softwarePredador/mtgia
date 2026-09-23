@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_identity_support.dart';
+import '../../../lib/catalog_read_contract.dart';
 import '../../../lib/scryfall_image_url.dart';
 
 /// GET /cards/printings?name=<nome>[&limit=N][&dedupe=false]
@@ -10,7 +11,8 @@ import '../../../lib/scryfall_image_url.dart';
 /// Somente leitura (BT-CAT-04, decisão D-35 do dono): a rota consulta o
 /// catálogo local e nunca escreve no banco nem chama a Scryfall. O antigo
 /// `sync=true` não dispara mais nada; o parâmetro é ignorado. O catálogo é
-/// atualizado só pelo job interno de dado de referência (BT-CAT-01).
+/// atualizado só pelo job interno de dado de referência (BT-CAT-01). Nome sem
+/// nenhuma edição no catálogo responde 404 `card_not_in_catalog` (BT-CAT-02).
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
@@ -41,6 +43,9 @@ Future<Response> onRequest(RequestContext context) async {
     hasIdentityColumns,
     deduplicate: deduplicate,
   );
+  if (data.isEmpty) {
+    return cardNotInCatalogResponse(name);
+  }
 
   return Response.json(
     body: {'name': name, 'total_returned': data.length, 'data': data},

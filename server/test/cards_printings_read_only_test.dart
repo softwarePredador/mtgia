@@ -175,20 +175,26 @@ void main() {
       },
     );
 
-    test('sync=true sem edição local não importa nada da Scryfall', () async {
-      final pool = poolReturning(const []);
+    test(
+      'sem edição local responde 404 card_not_in_catalog e não importa nada',
+      () async {
+        final pool = poolReturning(const []);
 
-      final result = await getPrintings(
-        pool,
-        'name=Sol+Ring&limit=50&dedupe=false&sync=true',
-      );
+        final result = await getPrintings(
+          pool,
+          'name=Sol+Ring&limit=50&dedupe=false&sync=true',
+        );
 
-      expect(result.response.statusCode, HttpStatus.ok);
-      expect(result.upstream, isEmpty);
-      expectOnlyTheThreeReads(pool);
-      final body = await result.response.json() as Map<String, dynamic>;
-      expect(body['data'], isEmpty);
-    });
+        // BT-CAT-02 (D-35): carta ausente é 404 com código estável.
+        expect(result.response.statusCode, HttpStatus.notFound);
+        expect(result.upstream, isEmpty);
+        expectOnlyTheThreeReads(pool);
+        final body = await result.response.json() as Map<String, dynamic>;
+        expect(body['error'], 'card_not_in_catalog');
+        expect(body['name'], 'Sol Ring');
+        expect(body['message'], contains('não está no catálogo do BrewTact'));
+      },
+    );
 
     test(
       'repetir a chamada de carta de impressão única não amplifica nada',

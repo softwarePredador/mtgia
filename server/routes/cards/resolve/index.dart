@@ -2,23 +2,24 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
-import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
 import '../../../lib/card_identity_support.dart';
 import '../../../lib/card_resolution_support.dart';
+import '../../../lib/catalog_read_contract.dart';
 import '../../../lib/scryfall_image_url.dart';
 
 /// POST /cards/resolve
 ///
-/// Busca uma carta pelo nome. Se não existir no banco local, consulta a
-/// Scryfall API (fuzzy search), insere a carta + legalities no banco e
-/// retorna o resultado. Isso torna o sistema "self-healing" — qualquer
-/// carta reconhecida pelo OCR que ainda não esteja na DB é importada
-/// automaticamente na hora.
+/// Resolve um nome de carta contra o catálogo local, somente leitura
+/// (BT-CAT-02, decisão D-35 do dono): nome exato, depois prefixo ou trecho
+/// único; nome ambíguo responde 409 com os candidatos. Carta ausente responde
+/// 404 `card_not_in_catalog` com frase em português. A rota nunca chama a
+/// Scryfall nem grava no banco; carta nova entra pelo job de dado de
+/// referência (BT-CAT-01).
 ///
 /// Body: { "name": "Lightning Bolt", "include_tokens": false }
-/// Response 200: { "source": "local"|"scryfall", "data": [...] }
-/// Response 404: { "error": "..." }
+/// Response 200: { "source": "local", "name": ..., "data": [...] }
+/// Response 404: { "error": "card_not_in_catalog", "message": ..., "name": ... }
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
@@ -77,40 +78,7 @@ Future<Response> onRequest(RequestContext context) async {
 
     // Token OCR must not resolve to a normal card with a similar name.
     if (includeTokens) {
-      final scryfallToken = await _fetchFromScryfall(name, includeTokens: true);
-      if (scryfallToken == null) {
-        return Response.json(
-          statusCode: HttpStatus.notFound,
-          body: {
-            'error': 'Token "$name" não encontrado localmente nem no Scryfall',
-          },
-        );
-      }
-
-      final insertedCards = await _insertScryfallCard(
-        pool,
-        scryfallToken,
-        includeTokens: true,
-        hasIdentityColumns: hasIdentityColumns,
-      );
-      await _insertLegalities(pool, insertedCards, scryfallToken);
-
-      final freshData = await _searchLocal(
-        pool,
-        scryfallToken['name'] as String,
-        exact: true,
-        includeTokens: true,
-        hasIdentityColumns: hasIdentityColumns,
-      );
-
-      return Response.json(
-        body: {
-          'source': 'scryfall',
-          'name': scryfallToken['name'],
-          'total_returned': freshData.length,
-          'data': freshData,
-        },
-      );
+      return cardNotInCatalogResponse(name);
     }
 
     // ─── 2) Busca local com resolução controlada (prefix/contains únicos) ───
@@ -148,47 +116,8 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
 
-    // ─── 3) Fallback: Scryfall fuzzy search ───
-    final scryfallCard = await _fetchFromScryfall(name, includeTokens: false);
-    if (scryfallCard == null) {
-      return Response.json(
-        statusCode: HttpStatus.notFound,
-        body: {
-          'error':
-              'Carta "$name" não encontrada nem localmente nem no Scryfall',
-        },
-      );
-    }
-
-    // ─── 4) Insere a carta no banco ───
-    final insertedCards = await _insertScryfallCard(
-      pool,
-      scryfallCard,
-      includeTokens: false,
-      hasIdentityColumns: hasIdentityColumns,
-    );
-
-    // ─── 5) Insere legalities ───
-    await _insertLegalities(pool, insertedCards, scryfallCard);
-
-    // ─── 6) Retorna as cartas inseridas ───
-    // Refaz a busca local para retornar com formato normalizado
-    final freshData = await _searchLocal(
-      pool,
-      scryfallCard['name'] as String,
-      exact: true,
-      includeTokens: false,
-      hasIdentityColumns: hasIdentityColumns,
-    );
-
-    return Response.json(
-      body: {
-        'source': 'scryfall',
-        'name': scryfallCard['name'],
-        'total_returned': freshData.length,
-        'data': freshData,
-      },
-    );
+    // ─── 3) Carta ausente: sem Scryfall e sem escrita (D-35) ───
+    return cardNotInCatalogResponse(name);
   } catch (e) {
     print('[ERROR] Erro ao resolver carta: $e');
     return Response.json(
@@ -333,393 +262,10 @@ Future<CardResolutionDecision> _resolveLocalCandidate(
   return resolveCardCandidateNames(inputName, candidateNames);
 }
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Scryfall API
-// ───────────────────────────────────────────────────────────────────────────────
-
-/// Busca a carta na Scryfall usando fuzzy search.
-/// Retorna o JSON completo da Scryfall ou null se não encontrou.
-Future<Map<String, dynamic>?> _fetchFromScryfall(
-  String name, {
-  required bool includeTokens,
-}) async {
-  if (includeTokens) {
-    return _fetchTokenFromScryfallSearch(name);
-  }
-
-  // Scryfall rate limit: max 10 req/s — uma chamada por resolve é ok.
-  final encoded = Uri.encodeQueryComponent(name);
-  final url = 'https://api.scryfall.com/cards/named?fuzzy=$encoded';
-
-  try {
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body) as Map<String, dynamic>;
-    }
-
-    // Se fuzzy não achou com 404, tenta search
-    if (response.statusCode == 404) {
-      return _fetchFromScryfallSearch(name);
-    }
-
-    return null;
-  } catch (_) {
-    return null;
-  }
-}
-
-/// Busca token exato na Scryfall, incluindo extras/tokens.
-Future<Map<String, dynamic>?> _fetchTokenFromScryfallSearch(String name) async {
-  final escapedName = name.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
-  final query = '!"$escapedName" type:token include:extras';
-  final encoded = Uri.encodeQueryComponent(query);
-  final url =
-      'https://api.scryfall.com/cards/search?q=$encoded&order=released&unique=prints';
-
-  try {
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0',
-      },
-    );
-
-    if (response.statusCode != 200) return null;
-
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = body['data'] as List?;
-    if (data == null || data.isEmpty) return null;
-
-    final lowerName = name.toLowerCase();
-    for (final card in data.whereType<Map<String, dynamic>>()) {
-      final cardName = card['name']?.toString().toLowerCase();
-      final typeLine = card['type_line']?.toString().toLowerCase() ?? '';
-      final layout = card['layout']?.toString().toLowerCase() ?? '';
-      if (cardName == lowerName &&
-          (layout == 'token' || typeLine.contains('token'))) {
-        return card;
-      }
-    }
-
-    return null;
-  } catch (_) {
-    return null;
-  }
-}
-
-/// Fallback: busca textual na Scryfall (para nomes parciais/com erro)
-Future<Map<String, dynamic>?> _fetchFromScryfallSearch(String name) async {
-  final encoded = Uri.encodeQueryComponent(name);
-  final url =
-      'https://api.scryfall.com/cards/search?q=$encoded&order=name&unique=cards';
-
-  try {
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0',
-      },
-    );
-
-    if (response.statusCode != 200) return null;
-
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = body['data'] as List?;
-    if (data == null || data.isEmpty) return null;
-
-    // Retorna o primeiro resultado (mais relevante)
-    return data.first as Map<String, dynamic>;
-  } catch (_) {
-    return null;
-  }
-}
-
-// ───────────────────────────────────────────────────────────────────────────────
-// Inserção no banco
-// ───────────────────────────────────────────────────────────────────────────────
-
-/// Insere a carta da Scryfall no banco local. Se a carta já existir
-/// (por oracle_id), faz um UPDATE nos campos para manter dados frescos.
-///
-/// A Scryfall retorna UMA printing específica. Também busca todas as
-/// printings da mesma carta (via prints_search_uri) para importar todas.
-Future<List<Map<String, dynamic>>> _insertScryfallCard(
-  Pool pool,
-  Map<String, dynamic> scryfallCard, {
-  required bool includeTokens,
-  required bool hasIdentityColumns,
-}) async {
-  final oracleId = scryfallCard['oracle_id'] as String?;
-  if (oracleId == null || oracleId.isEmpty) return [];
-
-  // Buscar todas as printings desta carta
-  final allPrintings = await _fetchAllPrintings(
-    scryfallCard,
-    includeTokens: includeTokens,
-  );
-
-  final inserted = <Map<String, dynamic>>[];
-
-  for (final card in allPrintings) {
-    final identity = scryfallIdentityPayload(card);
-
-    // Usar o ID único da printing (não oracle_id, que é igual para todas as edições)
-    final scryfallUniqueId = identity['scryfall_id'];
-    if (scryfallUniqueId == null || scryfallUniqueId.isEmpty) continue;
-
-    final cardName = card['name']?.toString() ?? '';
-    final manaCost = card['mana_cost']?.toString();
-    final typeLine = card['type_line']?.toString();
-    final oracleText = card['oracle_text']?.toString();
-    final power = card['power']?.toString();
-    final toughness = card['toughness']?.toString();
-    final setCode = card['set']?.toString();
-    final rarity = card['rarity']?.toString();
-    final isReserved =
-        card['reserved'] is bool ? card['reserved'] as bool : null;
-
-    // Colors
-    final colors = <String>[];
-    if (card['colors'] is List) {
-      for (final c in card['colors'] as List) {
-        colors.add(c.toString());
-      }
-    }
-
-    // Color identity
-    final colorIdentity = <String>[];
-    if (card['color_identity'] is List) {
-      for (final c in card['color_identity'] as List) {
-        colorIdentity.add(c.toString());
-      }
-    }
-
-    final imageUrl =
-        scryfallNormalImageUrlFromPayload(card) ??
-        scryfallNamedImageFallback(cardName, setCode: setCode);
-
-    // CMC
-    final cmc = card['cmc']?.toString();
-    final collectorNumber = card['collector_number']?.toString();
-    final foil = card['foil'] is bool ? card['foil'] as bool : null;
-
-    try {
-      final identityInsertColumns =
-          hasIdentityColumns ? ', oracle_id, layout, card_faces_json' : '';
-      final identityInsertValues =
-          hasIdentityColumns
-              ? ', @oracle_id::uuid, @layout, CAST(@card_faces_json AS jsonb)'
-              : '';
-      final identityUpdates =
-          hasIdentityColumns
-              ? '''
-            oracle_id = COALESCE(EXCLUDED.oracle_id, cards.oracle_id),
-            layout = COALESCE(EXCLUDED.layout, cards.layout),
-            card_faces_json = COALESCE(EXCLUDED.card_faces_json, cards.card_faces_json),
-'''
-              : '';
-      await pool.execute(
-        Sql.named('''
-          INSERT INTO cards (scryfall_id, name, mana_cost, type_line, oracle_text,
-                             power, toughness,
-                             colors, color_identity, image_url, set_code, rarity, cmc,
-                             is_reserved, collector_number, foil$identityInsertColumns)
-          VALUES (
-            @scryfall_id::uuid, @name, @mana_cost, @type_line, @oracle_text,
-            @power, @toughness,
-            @colors::text[], @color_identity::text[], @image_url, @set_code, @rarity,
-            @cmc::decimal, @is_reserved, @collector_number, @foil$identityInsertValues
-          )
-          ON CONFLICT (scryfall_id) DO UPDATE SET
-            image_url = COALESCE(EXCLUDED.image_url, cards.image_url),
-            power = COALESCE(EXCLUDED.power, cards.power),
-            toughness = COALESCE(EXCLUDED.toughness, cards.toughness),
-            is_reserved = COALESCE(EXCLUDED.is_reserved, cards.is_reserved),
-            collector_number = COALESCE(cards.collector_number, EXCLUDED.collector_number),
-            foil = COALESCE(cards.foil, EXCLUDED.foil),
-            $identityUpdates
-            created_at = cards.created_at
-        '''),
-        parameters: {
-          'scryfall_id': scryfallUniqueId,
-          'oracle_id': identity['oracle_id'],
-          'name': cardName,
-          'mana_cost': manaCost,
-          'type_line': typeLine,
-          'oracle_text': oracleText,
-          'power': power,
-          'toughness': toughness,
-          'colors': colors,
-          'color_identity': colorIdentity,
-          'image_url': imageUrl,
-          'set_code': setCode,
-          'rarity': rarity,
-          'is_reserved': isReserved,
-          'cmc': cmc != null ? double.tryParse(cmc) ?? 0.0 : 0.0,
-          'collector_number': collectorNumber,
-          'foil': foil,
-          'layout': identity['layout'],
-          'card_faces_json': identity['card_faces_json'],
-        },
-      );
-      inserted.add(card);
-    } catch (e) {
-      print('[ERROR] handler: $e');
-      // Se INSERT falhou (ex: constraint violation), ignora e continua
-      // Isso pode acontecer se dois resolves concorrentes tentam a mesma carta
-      stderr.writeln('[resolve] Erro ao inserir ${cardName} ($setCode): $e');
-    }
-  }
-
-  // Também insere/atualiza os sets de todas as printings
-  for (final card in allPrintings) {
-    await _ensureSet(pool, card);
-  }
-
-  return inserted;
-}
-
-/// Busca todas as printings de uma carta via Scryfall (prints_search_uri).
-/// Retorna no máximo 20 printings para não sobrecarregar.
-Future<List<Map<String, dynamic>>> _fetchAllPrintings(
-  Map<String, dynamic> scryfallCard, {
-  required bool includeTokens,
-}) async {
-  final printsUri = scryfallCard['prints_search_uri'] as String?;
-  if (printsUri == null) return [scryfallCard];
-
-  try {
-    final response = await http.get(
-      Uri.parse(printsUri),
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'MTGDeckBuilder/1.0',
-      },
-    );
-
-    if (response.statusCode != 200) return [scryfallCard];
-
-    final body = jsonDecode(response.body) as Map<String, dynamic>;
-    final data = body['data'] as List?;
-    if (data == null || data.isEmpty) return [scryfallCard];
-
-    // Filtra: apenas paper, não digital-only, não art-series
-    final filtered =
-        data
-            .whereType<Map<String, dynamic>>()
-            .where((card) {
-              final games = card['games'] as List?;
-              final isPaper = games?.contains('paper') ?? false;
-              final layout = card['layout']?.toString() ?? '';
-              final isArtSeries = layout == 'art_series';
-              final isToken = layout == 'token';
-              return isPaper &&
-                  !isArtSeries &&
-                  (includeTokens ? isToken : !isToken);
-            })
-            .take(30)
-            .toList();
-
-    return filtered.isEmpty ? [scryfallCard] : filtered;
-  } catch (_) {
-    return [scryfallCard];
-  }
-}
-
 bool _parseBool(Object? value) {
   if (value is bool) return value;
   final text = value?.toString().trim().toLowerCase();
   return text == 'true' || text == '1' || text == 'yes';
-}
-
-/// Insere as legalities da carta Scryfall
-Future<void> _insertLegalities(
-  Pool pool,
-  List<Map<String, dynamic>> insertedCards,
-  Map<String, dynamic> scryfallCard,
-) async {
-  final legalities = scryfallCard['legalities'] as Map<String, dynamic>?;
-  if (legalities == null || legalities.isEmpty) return;
-
-  // Busca o card_id pelo nome (scryfall_id agora é único por printing, não oracle_id)
-  final cardName = scryfallCard['name'] as String?;
-  if (cardName == null) return;
-
-  // Busca o card_id principal (primeiro match pelo nome)
-  final cardResult = await pool.execute(
-    Sql.named(
-      'SELECT id::text FROM cards WHERE LOWER(name) = LOWER(@name) LIMIT 1',
-    ),
-    parameters: {'name': cardName},
-  );
-  if (cardResult.isEmpty) return;
-
-  final cardId = cardResult.first[0] as String;
-
-  for (final entry in legalities.entries) {
-    final format = entry.key;
-    final status = entry.value?.toString() ?? 'not_legal';
-
-    // Só insere se for legal, banned ou restricted (ignora not_legal)
-    if (status == 'not_legal') continue;
-
-    try {
-      await pool.execute(
-        Sql.named('''
-          INSERT INTO card_legalities (card_id, format, status)
-          VALUES (@card_id::uuid, @format, @status)
-          ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status
-        '''),
-        parameters: {'card_id': cardId, 'format': format, 'status': status},
-      );
-    } catch (_) {
-      // Ignora erros em legalities individuais
-    }
-  }
-}
-
-/// Garante que o set da carta existe na tabela sets
-Future<void> _ensureSet(Pool pool, Map<String, dynamic> scryfallCard) async {
-  final setCode = scryfallCard['set']?.toString();
-  final setName = scryfallCard['set_name']?.toString();
-  if (setCode == null || setCode.isEmpty) return;
-
-  final hasSets = await _hasTable(pool, 'sets');
-  if (!hasSets) return;
-
-  try {
-    final releaseDate = scryfallCard['released_at']?.toString();
-    final setType = scryfallCard['set_type']?.toString();
-
-    await pool.execute(
-      Sql.named('''
-        INSERT INTO sets (code, name, release_date, type)
-        VALUES (@code, @name, @release_date::date, @type)
-        ON CONFLICT (code) DO UPDATE SET
-          name = COALESCE(EXCLUDED.name, sets.name),
-          release_date = COALESCE(EXCLUDED.release_date, sets.release_date),
-          type = COALESCE(EXCLUDED.type, sets.type),
-          updated_at = CURRENT_TIMESTAMP
-      '''),
-      parameters: {
-        'code': setCode,
-        'name': setName ?? setCode,
-        'release_date': releaseDate,
-        'type': setType,
-      },
-    );
-  } catch (_) {
-    // Ignora erro — set pode já existir ou tabela pode não ter colunas esperadas
-  }
 }
 
 // ───────────────────────────────────────────────────────────────────────────────

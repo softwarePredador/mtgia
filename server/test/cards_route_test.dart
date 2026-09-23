@@ -72,22 +72,22 @@ void main() {
       expect(source, contains("'is_reserved': m['is_reserved'] == true"));
     });
 
-    test('resolve route preserves reserved-list metadata', () {
+    // BT-CAT-02 (D-35): o resolve só lê; a prova de comportamento está em
+    // `cards_resolve_read_only_test.dart`.
+    test('resolve route reads reserved-list metadata and never writes', () {
       final source = File('routes/cards/resolve/index.dart').readAsStringSync();
+      final dml = RegExp(
+        r'\b(INSERT\s+INTO|UPDATE\s+\w+\s+SET|DELETE\s+FROM|TRUNCATE|ON\s+CONFLICT)\b',
+        caseSensitive: false,
+      );
 
       expect(source, contains("'is_reserved': m['is_reserved'] == true"));
-      expect(source, contains("card['reserved']"));
-      expect(source, contains('is_reserved = COALESCE'));
-      expect(source, contains('power = COALESCE(EXCLUDED.power, cards.power)'));
-      expect(
-        source,
-        contains('toughness = COALESCE(EXCLUDED.toughness, cards.toughness)'),
-      );
-      expect(source, contains('scryfallNormalImageUrlFromPayload(card)'));
-      expect(
-        source,
-        contains('image_url = COALESCE(EXCLUDED.image_url, cards.image_url)'),
-      );
+      expect(source, contains("'power': m['power']"));
+      expect(source, contains("'toughness': m['toughness']"));
+      expect(source, contains('return cardNotInCatalogResponse(name);'));
+      expect(source, isNot(contains('package:http/')));
+      expect(source, isNot(contains('api.scryfall.com')));
+      expect(source, isNot(matches(dml)));
     });
 
     test(

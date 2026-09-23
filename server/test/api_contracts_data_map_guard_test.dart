@@ -158,6 +158,7 @@ void main() {
         contracts,
         'GET /cards/printings?name=&limit=&dedupe=',
       );
+      final resolve = _contractRowFor(contracts, 'POST /cards/resolve');
       final batchResolve = _contractRowFor(
         contracts,
         'POST /cards/resolve/batch',
@@ -205,6 +206,12 @@ void main() {
       );
       expect(printings, contains('cards_printings_read_only_test.dart'));
       expect(printings, isNot(contains('write-capable')));
+
+      expect(resolve, contains('Read-only since BT-CAT-02'));
+      expect(resolve, contains('404 `{error: card_not_in_catalog'));
+      expect(resolve, contains('never calls Scryfall and never writes'));
+      expect(resolve, contains('cards_resolve_read_only_test.dart'));
+      expect(resolve, isNot(contains('Scryfall fallback')));
 
       expect(batchResolve, contains('card_identity_bridge` first'));
       expect(batchResolve, contains('bridge `match_priority`'));
