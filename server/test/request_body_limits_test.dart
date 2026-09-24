@@ -510,7 +510,8 @@ void main() {
           return chunk;
         });
 
-    test('corpo sem Content-Length: 411 no primeiro pedaço', () async {
+    test('corpo sem Content-Length: 411 no primeiro pedaço, o resto '
+        'descartado sem chegar ao handler', () async {
       Database.useConnectionForTesting(ScriptedPool(const []));
       var bytesRead = 0;
       var handlerCalled = false;
@@ -540,8 +541,45 @@ void main() {
       expect(body['request_id'], 'req-partes');
       expect(response.headers['connection'], 'close');
       expect(handlerCalled, isFalse);
-      expect(bytesRead, 1024, reason: 'para no primeiro pedaço');
+      // O resto é lido e descartado (para o 411 chegar a quem terminou de
+      // mandar), nunca guardado nem entregue ao handler.
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bytesRead, 10 * 1024);
     });
+
+    test(
+      'corpo em partes acima de 1 MiB: o descarte para e a conexão cai',
+      () async {
+        Database.useConnectionForTesting(ScriptedPool(const []));
+        var bytesRead = 0;
+        final handler = guardBodyWithoutLength(
+          root_middleware.middlewareWithReleaseCapabilityPolicy(
+            (_) => Response.json(body: const {'ok': true}),
+            releaseCapabilityPolicy: allOn,
+          ),
+        );
+        final response = await handler(
+          ScriptedRequestContext(
+            Request.post(
+              Uri.parse('http://localhost/decks'),
+              body: Stream<List<int>>.fromIterable(
+                List.generate(40, (_) => List<int>.filled(64 * 1024, 0x20)),
+              ).map((chunk) {
+                bytesRead += chunk.length;
+                return chunk;
+              }),
+            ),
+          ),
+        );
+        expect(response.statusCode, 411);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(
+          bytesRead,
+          lessThanOrEqualTo(chunkedBodyDrainLimitBytes + 64 * 1024),
+          reason: 'de 2,5 MiB, o descarte para logo depois de 1 MiB',
+        );
+      },
+    );
 
     test('pedido sem corpo e sem Content-Length segue', () async {
       Database.useConnectionForTesting(ScriptedPool(const []));
@@ -595,7 +633,8 @@ void main() {
         ),
       );
       expect(response.statusCode, 411);
-      expect(bytesRead, 1024);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bytesRead, 10 * 1024, reason: 'lido e descartado');
     });
   });
 
@@ -656,5 +695,24 @@ void main() {
         expect(handlerCalls, 0);
       },
     );
+
+    test('em partes com pausa entre os pedaços: o 411 chega ao cliente '
+        '(a conexão não cai no meio)', () async {
+      final request = http.StreamedRequest('POST', base.resolve('/auth/login'))
+        ..headers['content-type'] = 'application/json';
+      final responseFuture = request.send();
+      request.sink.add(utf8.encode('{"email": "a@example.invalid", '));
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      request.sink.add(utf8.encode('"password": "x"}'));
+      await request.sink.close();
+      final response = await http.Response.fromStream(await responseFuture);
+
+      expect(response.statusCode, 411, reason: response.body);
+      expect(
+        (jsonDecode(response.body) as Map)['error'],
+        'request_body_length_required',
+      );
+      expect(handlerCalls, 0);
+    });
   });
 }

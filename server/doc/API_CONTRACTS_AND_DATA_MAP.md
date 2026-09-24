@@ -70,7 +70,9 @@
       server entry (`guardBodyWithoutLength`, before the root middleware)
       replaces the body of a `POST`/`PUT`/`PATCH`/`DELETE` without
       `Content-Length` with a stream that fails on the first chunk; the body
-      check then answers 411 and nothing is buffered.
+      check then answers 411 and nothing is buffered. The rest of the body is
+      read and discarded so the client that finished sending gets the 411;
+      past 1 MiB discarded, the connection is cut.
     - An invalid `Content-Length` is 400 `request_body_length_invalid`.
     - A declared body above the path limit is 413 `request_body_too_large`,
       with `limit`.

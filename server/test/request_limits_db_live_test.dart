@@ -158,8 +158,8 @@ void main() {
     expect(await decks(), before);
   }, skip: skipReason);
 
-  test('em partes sem cabeçalho (como chega do shelf_io): 411, nada '
-      'gravado, só o primeiro pedaço lido', () async {
+  test('em partes sem cabeçalho (como chega do shelf_io): 411 e nada '
+      'gravado', () async {
     final before = await decks();
     var bytesRead = 0;
     final response = await handler(
@@ -185,7 +185,12 @@ void main() {
       (jsonDecode(await response.body()) as Map)['error'],
       'request_body_length_required',
     );
-    expect(bytesRead, utf8.encode('{"name": "Partes", ').length);
+    // O resto é lido e descartado, nunca entregue ao handler que grava.
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    expect(
+      bytesRead,
+      utf8.encode('{"name": "Partes", "format": "commander"}').length,
+    );
     expect(await decks(), before);
   }, skip: skipReason);
 

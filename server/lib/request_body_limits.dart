@@ -22,6 +22,7 @@
 /// fora do import (o import leva a lista inteira num campo).
 library;
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -167,10 +168,46 @@ Handler guardBodyWithoutLength(Handler inner) {
   };
 }
 
-Stream<List<int>> _failOnFirstByte(Stream<List<int>> source) async* {
-  await for (final chunk in source) {
-    if (chunk.isNotEmpty) throw const RequestBodyLengthRequired();
+/// Quanto do corpo em partes a guarda descarta antes de cortar a conexão.
+const chunkedBodyDrainLimitBytes = 1024 * 1024;
+
+/// Falha no primeiro pedaço com dados. O resto do corpo continua sendo lido e
+/// descartado (nada é guardado), para o servidor conseguir mandar o 411 ao
+/// cliente que terminou de enviar; passou de [chunkedBodyDrainLimitBytes], o
+/// stream do servidor é cancelado e a conexão cai.
+Stream<List<int>> _failOnFirstByte(Stream<List<int>> source) {
+  final controller = StreamController<List<int>>();
+  StreamSubscription<List<int>>? subscription;
+  var failed = false;
+  var discarded = 0;
+  void fail(Object error, [StackTrace? stackTrace]) {
+    if (failed) return;
+    failed = true;
+    controller
+      ..addError(error, stackTrace)
+      ..close();
   }
+
+  controller.onListen = () {
+    subscription = source.listen(
+      (chunk) {
+        if (chunk.isEmpty) return;
+        fail(const RequestBodyLengthRequired());
+        discarded += chunk.length;
+        if (discarded > chunkedBodyDrainLimitBytes) {
+          unawaited(subscription?.cancel());
+        }
+      },
+      onError: (Object error, StackTrace stackTrace) {
+        fail(error, stackTrace);
+      },
+      onDone: () {
+        if (!failed) unawaited(controller.close());
+      },
+    );
+  };
+  // Quem lê para no erro; o resto do corpo segue sendo descartado aqui.
+  return controller.stream;
 }
 
 /// Só carrega o pedido trocado até o Cascade, que cria o contexto real.

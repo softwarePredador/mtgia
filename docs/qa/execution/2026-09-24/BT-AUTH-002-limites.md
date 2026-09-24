@@ -90,6 +90,34 @@ Testes da correção:
   | M73 | a guarda deixa os pedaços passarem | falha, também no teste de banco |
   | M74 | a checagem sem tamanho declarado aceita corpo não vazio | falha |
 
+## Segunda correção (`f195ecde2` + descarte)
+
+O E2E com o build da primeira correção mostrou um problema. A guarda parava no primeiro
+pedaço cancelando o stream do `dart:io`, e o `dart:io` fechava a conexão antes de mandar o
+411: o cliente via "Connection closed before full header was received". O servidor
+registrava o 411, e nada era gravado, mas o cliente não recebia a resposta.
+
+Agora a guarda sinaliza o erro no primeiro pedaço, o que dá o mesmo 411 sem chegar ao
+handler, e continua lendo o resto só para descartar, sem guardar. Assim o 411 chega a quem
+terminou de mandar. Passou de 1 MiB descartado (`chunkedBodyDrainLimitBytes`), o stream é
+cancelado e a conexão cai, como antes.
+
+Testes:
+
+- `request_body_limits_test` passou a 31 casos. O caso novo pede, a um servidor HTTP de
+  verdade, um corpo em partes com pausa de 200 ms entre os pedaços: o cliente recebe o
+  411. Outro caso novo manda 2,5 MiB em partes, e o descarte para logo depois de 1 MiB.
+- `request_limits_db_live_test` (3/3) continua sem gravar nada.
+- Mutações:
+
+  | Mutação | O que muda | Resultado |
+  | --- | --- | --- |
+  | M75 | volta a cancelar no primeiro pedaço | 28/31, com o cliente do servidor de verdade sem resposta |
+  | M76 | descarte sem teto | 30/31 |
+
+O E2E com clientes de verdade roda de novo com o próximo build da API, junto do
+BT-LEGAL-ACCEPT-001.
+
 ## Evidência
 
 | Teste | Onde | Resultado |

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "1ad370c239ad2f863680ba787204b755ccb5b63be33f208f56bb1f497e05f1ae",
+  "source_digest_sha256": "653f2741e0accf5173091a24fb95546883b379bf71e51e5f55b4a5b7e379c978",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 709,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5367,
+    "dart_symbols": 5368,
     "semantic_resolved_files": 709,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43398,
-    "semantic_resolved_call_sites": 68978,
-    "semantic_resolved_type_references": 16472,
+    "semantic_resolved_call_edges": 43406,
+    "semantic_resolved_call_sites": 68988,
+    "semantic_resolved_type_references": 16476,
     "modules": 162,
     "app_routes": 46,
     "web_routes": 11,
@@ -2009,7 +2009,7 @@
         "server/lib/request_body_limits.dart"
       ],
       "file_count": 1,
-      "symbol_count": 21,
+      "symbol_count": 22,
       "providers": [],
       "services": []
     },
@@ -37732,7 +37732,7 @@
       "name": "RequestBodyLengthRequired",
       "kind": "class",
       "source": "server/lib/request_body_limits.dart",
-      "line": 123,
+      "line": 124,
       "members": [
         "toString"
       ]
@@ -37741,7 +37741,7 @@
       "name": "RequestLimitRejection",
       "kind": "class",
       "source": "server/lib/request_body_limits.dart",
-      "line": 94,
+      "line": 95,
       "members": [
         "toJson"
       ]
@@ -37750,7 +37750,7 @@
       "name": "_GuardedRequestContext",
       "kind": "class",
       "source": "server/lib/request_body_limits.dart",
-      "line": 176,
+      "line": 213,
       "members": [
         "mountedParams",
         "provide",
@@ -37761,109 +37761,115 @@
       "name": "_declaresLength",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 144
+      "line": 145
     },
     {
       "name": "_exceedsDepth",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 352
+      "line": 389
     },
     {
       "name": "_failOnFirstByte",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 170
+      "line": 174
     },
     {
       "name": "_firstNonSpace",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 342
+      "line": 379
     },
     {
       "name": "_header",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 116
+      "line": 117
     },
     {
       "name": "_humanBytes",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 380
+      "line": 417
     },
     {
       "name": "_normalize",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 70
+      "line": 71
     },
     {
       "name": "checkJsonBody",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 281
+      "line": 318
     },
     {
       "name": "checkRequestBody",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 249
+      "line": 286
     },
     {
       "name": "checkRequestHeaders",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 208
+      "line": 245
     },
     {
       "name": "checkRequestUri",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 197
+      "line": 234
     },
     {
       "name": "declaredContentLength",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 193
+      "line": 230
+    },
+    {
+      "name": "fail",
+      "kind": "function",
+      "source": "server/lib/request_body_limits.dart",
+      "line": 183
     },
     {
       "name": "guardBodyWithoutLength",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 147
+      "line": 148
     },
     {
       "name": "isAcceptableAccountEmail",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 55
+      "line": 56
     },
     {
       "name": "isImportRequestPath",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 75
+      "line": 76
     },
     {
       "name": "jsonFieldMaxCharsFor",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 88
+      "line": 89
     },
     {
       "name": "requestBodyLimitFor",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 78
+      "line": 79
     },
     {
       "name": "visit",
       "kind": "function",
       "source": "server/lib/request_body_limits.dart",
-      "line": 304
+      "line": 341
     },
     {
       "name": "EndpointMetricSnapshot",
@@ -42320,9 +42326,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43398,
-    "resolved_call_site_count": 68978,
-    "workspace_call_edge_count": 13654,
+    "resolved_call_edge_count": 43406,
+    "resolved_call_site_count": 68988,
+    "workspace_call_edge_count": 13655,
     "unresolved_call_edge_count": 562,
     "unresolved_call_site_count": 773,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -169115,7 +169121,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 131,
+        "line": 132,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "RequestLimitRejection",
@@ -169126,7 +169132,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 145,
+        "line": 146,
         "caller": "_declaresLength",
         "kind": "method",
         "lexical_target": "_header",
@@ -169137,7 +169143,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 159,
+        "line": 160,
         "caller": "guardBodyWithoutLength",
         "kind": "method",
         "lexical_target": "_declaresLength",
@@ -169148,7 +169154,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 163,
+        "line": 164,
         "caller": "guardBodyWithoutLength",
         "kind": "constructor",
         "lexical_target": "_GuardedRequestContext",
@@ -169159,7 +169165,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 164,
+        "line": 165,
         "caller": "guardBodyWithoutLength",
         "kind": "method",
         "lexical_target": "_failOnFirstByte",
@@ -169170,7 +169176,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 172,
+        "line": 195,
         "caller": "_failOnFirstByte",
         "kind": "constructor",
         "lexical_target": "RequestBodyLengthRequired",
@@ -169182,6 +169188,17 @@
       {
         "source": "server/lib/request_body_limits.dart",
         "line": 195,
+        "caller": "_failOnFirstByte",
+        "kind": "method",
+        "lexical_target": "fail",
+        "target": "fail",
+        "target_library": "package:server/request_body_limits.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/request_body_limits.dart",
+        "line": 232,
         "caller": "declaredContentLength",
         "kind": "method",
         "lexical_target": "_header",
@@ -169192,7 +169209,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 200,
+        "line": 237,
         "caller": "checkRequestUri",
         "kind": "constructor",
         "lexical_target": "RequestLimitRejection",
@@ -169203,7 +169220,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 213,
+        "line": 250,
         "caller": "checkRequestHeaders",
         "kind": "method",
         "lexical_target": "_header",
@@ -169214,7 +169231,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 215,
+        "line": 252,
         "caller": "checkRequestHeaders",
         "kind": "constructor",
         "lexical_target": "RequestLimitRejection",
@@ -169225,7 +169242,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 225,
+        "line": 262,
         "caller": "checkRequestHeaders",
         "kind": "method",
         "lexical_target": "requestBodyLimitFor",
@@ -169236,7 +169253,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 241,
+        "line": 278,
         "caller": "checkRequestHeaders",
         "kind": "method",
         "lexical_target": "_humanBytes",
@@ -169247,7 +169264,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 252,
+        "line": 289,
         "caller": "checkRequestBody",
         "kind": "method",
         "lexical_target": "_declaresLength",
@@ -169258,7 +169275,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 264,
+        "line": 301,
         "caller": "checkRequestBody",
         "kind": "method",
         "lexical_target": "declaredContentLength",
@@ -169269,7 +169286,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 272,
+        "line": 309,
         "caller": "checkRequestBody",
         "kind": "method",
         "lexical_target": "checkJsonBody",
@@ -169280,7 +169297,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 284,
+        "line": 321,
         "caller": "checkJsonBody",
         "kind": "method",
         "lexical_target": "_firstNonSpace",
@@ -169291,7 +169308,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 288,
+        "line": 325,
         "caller": "checkJsonBody",
         "kind": "method",
         "lexical_target": "_exceedsDepth",
@@ -169302,7 +169319,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 289,
+        "line": 326,
         "caller": "checkJsonBody",
         "kind": "constructor",
         "lexical_target": "RequestLimitRejection",
@@ -169313,7 +169330,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 302,
+        "line": 339,
         "caller": "checkJsonBody",
         "kind": "method",
         "lexical_target": "jsonFieldMaxCharsFor",
@@ -169324,7 +169341,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 306,
+        "line": 343,
         "caller": "visit",
         "kind": "constructor",
         "lexical_target": "RequestLimitRejection",
@@ -169335,7 +169352,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 325,
+        "line": 362,
         "caller": "visit",
         "kind": "method",
         "lexical_target": "visit",
@@ -169346,7 +169363,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 339,
+        "line": 376,
         "caller": "checkJsonBody",
         "kind": "method",
         "lexical_target": "visit",
@@ -169357,7 +169374,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 76,
+        "line": 77,
         "caller": "isImportRequestPath",
         "kind": "method",
         "lexical_target": "_normalize",
@@ -169368,7 +169385,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 80,
+        "line": 81,
         "caller": "requestBodyLimitFor",
         "kind": "method",
         "lexical_target": "_normalize",
@@ -169379,7 +169396,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 90,
+        "line": 91,
         "caller": "jsonFieldMaxCharsFor",
         "kind": "method",
         "lexical_target": "isImportRequestPath",
@@ -192532,8 +192549,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 512,
-        "occurrences": 657
+        "unique_references": 519,
+        "occurrences": 665
       },
       {
         "target_scope": "dart_sdk",
@@ -196930,8 +196947,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/request_body_limits.dart",
-        "unique_references": 31,
-        "occurrences": 39
+        "unique_references": 32,
+        "occurrences": 41
       },
       {
         "target_scope": "workspace",
@@ -202133,7 +202150,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 160,
+        "line": 161,
         "caller": "guardBodyWithoutLength",
         "kind": "function_expression",
         "lexical_target": "inner",
@@ -202141,7 +202158,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 162,
+        "line": 163,
         "caller": "guardBodyWithoutLength",
         "kind": "function_expression",
         "lexical_target": "guarded",
@@ -202308,9 +202325,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16472,
+    "resolved_type_reference_count": 16476,
     "workspace_type_reference_count": 3495,
-    "unresolved_type_reference_count": 361,
+    "unresolved_type_reference_count": 362,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -233905,7 +233922,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 131,
+        "line": 132,
         "lexical_type": "RequestLimitRejection",
         "resolved_type": "RequestLimitRejection",
         "target": "RequestLimitRejection",
@@ -233915,7 +233932,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 163,
+        "line": 164,
         "lexical_type": "_GuardedRequestContext",
         "resolved_type": "_GuardedRequestContext",
         "target": "_GuardedRequestContext",
@@ -233925,7 +233942,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 172,
+        "line": 195,
         "lexical_type": "RequestBodyLengthRequired",
         "resolved_type": "RequestBodyLengthRequired",
         "target": "RequestBodyLengthRequired",
@@ -233935,7 +233952,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 187,
+        "line": 224,
         "lexical_type": "T",
         "resolved_type": "T",
         "target": "_GuardedRequestContext.provide.T",
@@ -233945,7 +233962,7 @@
       },
       {
         "source": "server/lib/request_body_limits.dart",
-        "line": 198,
+        "line": 235,
         "lexical_type": "RequestLimitRejection?",
         "resolved_type": "RequestLimitRejection?",
         "target": "RequestLimitRejection",
@@ -237274,8 +237291,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1105,
-        "occurrences": 2232
+        "unique_references": 1107,
+        "occurrences": 2234
       },
       {
         "target_scope": "dart_sdk",
@@ -237292,8 +237309,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6373,
-        "occurrences": 40259
+        "unique_references": 6375,
+        "occurrences": 40267
       },
       {
         "target_scope": "dart_sdk",
@@ -243374,6 +243391,12 @@
         "line": 91,
         "lexical_type": "void",
         "occurrences": 6
+      },
+      {
+        "source": "server/lib/request_body_limits.dart",
+        "line": 183,
+        "lexical_type": "void",
+        "occurrences": 1
       },
       {
         "source": "server/lib/request_metrics_service.dart",
@@ -279753,7 +279776,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "7ec25cd58641b5fbc39913416cff9df882e0f507711174067e1c3100be3fa175"
+      "sha256": "e051089f3a09f4dace9ed5b3dced0ca59a24999445d9f535fb68b47e4b4a91fc"
     },
     "required_task_fields": [
       "id",
@@ -279931,7 +279954,7 @@
         "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Limites globais de body antes do parse e limites por campo/URL.",
         "depends_on": [],
-        "acceptance": "Oversize/chunked/compressed rejeitado antes de alocar/gravar; DB não cresce. Decisão do dono em 2026-09-22: D-21, teto de body de 1 MB, maior só no import. Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24` (`server/lib/request_body_limits.dart`): o middleware raiz confere a URL antes da capability (acima de 8 KiB, 414) e, depois dela, os cabeçalhos, antes da observabilidade, do banco e do handler: `Content-Encoding` diferente de `identity` dá 415 (nada é descomprimido), corpo em partes dá 411 (o `shelf_io` tira o `Transfer-Encoding` dos cabeçalhos, então a guarda de entrada `guardBodyWithoutLength` troca o corpo sem `Content-Length` por um stream que falha no primeiro pedaço; achado no E2E e corrigido depois do primeiro commit), `Content-Length` inválido dá 400 e acima do limite dá 413 sem ler o corpo (a conexão fecha). Tetos: 1 MiB por padrão, 5 MiB nas cinco rotas de import, 16 KiB em `/auth`. O corpo dentro do limite é lido uma vez (o handler recebe o mesmo texto) e o JSON é conferido: texto de campo ou chave acima de 32 K caracteres fora do import, mais de 32 níveis (varredura linear, antes de decodificar) ou mais de 50 mil itens dão 413; corpo que não é UTF-8 dá 400. No cadastro, campo de tipo errado é 400 (antes era 500), nome de usuário até 30 e e-mail com formato e até 254; no login, e-mail até 254 e senha até 1024. Todas as recusas têm código estável e `request_id`. Evidência: `server/test/request_body_limits_test.dart` (o corpo recusado pelos cabeçalhos não é lido), `server/test/request_limits_db_live_test.dart` (cadeia real de `POST /decks` em PostgreSQL descartável: o banco não cresce) e `server/test/request_limits_e2e_live_test.dart` (por HTTP com clientes de verdade: corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL; roda com o build da API da tarefa seguinte); 16 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-002-limites.md`.",
+        "acceptance": "Oversize/chunked/compressed rejeitado antes de alocar/gravar; DB não cresce. Decisão do dono em 2026-09-22: D-21, teto de body de 1 MB, maior só no import. Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24` (`server/lib/request_body_limits.dart`): o middleware raiz confere a URL antes da capability (acima de 8 KiB, 414) e, depois dela, os cabeçalhos, antes da observabilidade, do banco e do handler: `Content-Encoding` diferente de `identity` dá 415 (nada é descomprimido), corpo em partes dá 411 (o `shelf_io` tira o `Transfer-Encoding` dos cabeçalhos, então a guarda de entrada `guardBodyWithoutLength` troca o corpo sem `Content-Length` por um stream que falha no primeiro pedaço e descarta o resto sem guardar, até 1 MiB, para o 411 chegar ao cliente; achado no E2E e corrigido depois do primeiro commit), `Content-Length` inválido dá 400 e acima do limite dá 413 sem ler o corpo (a conexão fecha). Tetos: 1 MiB por padrão, 5 MiB nas cinco rotas de import, 16 KiB em `/auth`. O corpo dentro do limite é lido uma vez (o handler recebe o mesmo texto) e o JSON é conferido: texto de campo ou chave acima de 32 K caracteres fora do import, mais de 32 níveis (varredura linear, antes de decodificar) ou mais de 50 mil itens dão 413; corpo que não é UTF-8 dá 400. No cadastro, campo de tipo errado é 400 (antes era 500), nome de usuário até 30 e e-mail com formato e até 254; no login, e-mail até 254 e senha até 1024. Todas as recusas têm código estável e `request_id`. Evidência: `server/test/request_body_limits_test.dart` (o corpo recusado pelos cabeçalhos não é lido), `server/test/request_limits_db_live_test.dart` (cadeia real de `POST /decks` em PostgreSQL descartável: o banco não cresce) e `server/test/request_limits_e2e_live_test.dart` (por HTTP com clientes de verdade: corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL; roda com o build da API da tarefa seguinte); 18 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-002-limites.md`.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 312
       },
@@ -289635,7 +289658,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "1ad370c239ad2f863680ba787204b755ccb5b63be33f208f56bb1f497e05f1ae"
+    "project_logic_source_digest_sha256": "653f2741e0accf5173091a24fb95546883b379bf71e51e5f55b4a5b7e379c978"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
