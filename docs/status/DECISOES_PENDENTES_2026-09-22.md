@@ -280,6 +280,25 @@ O dono decidiu na conversa de coordenação. Aceitou as recomendações da D-76 
 **D-78 · Prazo dos logs de pedido de exportação.**
 - **Recomendação aprovada:** 90 dias, escritos na política de retenção.
 
+### Decididas em 2026-09-24, levantadas pela sessão do gate (`BT-UIEV-001`)
+
+Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/lib`, e o digest de UI mudou. Os 34 pacotes de evidência ficaram defasados. O dono escolheu consertar tudo o que o app precisa e recapturar os 34 de uma vez. A coordenação decidiu sem relaxar contrato: `card-details-navigation-web` e `optimization-card-reader-web` seguem exigindo navegador real (WebDriver), porque o histórico do navegador e os eventos de ponteiro e teclado sobre platform view são exatamente o que esses pacotes provam.
+
+**D-79 · Evidência de teclado do Battle no ambiente local.**
+- **Problema:** o contrato de `battle-coach-web-keyboard` exigia a API implantada, uma conta de QA de janela de release e sessões reais de Battle em produção. Isso é impossível com o Battle desligado e o XMage de produção em 0 réplicas (D-57), e seria escrita em produção.
+- **Recomendação aprovada:** as exigências de teclado continuam todas:
+  - build Web real a 1280x720;
+  - Tab, Shift+Tab, Enter, Espaço e Escape no nível do navegador;
+  - digitação física;
+  - decks validados;
+  - sessões interativas reais e replay terminal.
+
+  Só o alvo muda: API, banco e XMage locais descartáveis, como nos outros pacotes de Battle. Entra antes do congelamento.
+
+**D-80 · Procedência das capturas.**
+- **Problema:** dois contratos fixavam "Codex in-app browser" como quem captura. Recapturar em outra sessão deixaria a procedência falsa.
+- **Recomendação aprovada:** o campo registra o agente e o navegador de cada corrida, como dado da captura. O contrato não nomeia agente, e a exigência de navegador real continua.
+
 O andamento das demais está no backlog e na fila.
 
 ---

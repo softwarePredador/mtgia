@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "606017e9a9ee5709d6d678faac038e377565f48309d7a7377973596ec7d7503a",
+  "source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -276420,7 +276420,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "811f5409034b647c4bcbc38f5156fd7cece6f50ebd86b16dc3d2fc4201d3fc5e"
+      "sha256": "8a73ebe6a8d3a0cfb4e6e4c7ce86dc01dbd3d60d0957ef3503d8f4960de06f9b"
     },
     "required_task_fields": [
       "id",
@@ -279369,7 +279369,7 @@
         "status": "IN_PROGRESS_CONTAINED",
         "delivery": "Restabelecer a prova de UI viva após mudança de fonte, com pin único de ChromeDriver.",
         "depends_on": [],
-        "acceptance": "`manaloom_local_ci.sh quick` passa sem --no-verify; os 23 manifests de docs/qa/ui-live/latest.json no digest corrente e latest.json reescrito. Evidência: b397f477b, 9a9ba66de, d08c18717; receipt docs/qa/execution/2026-09-21/btuiev001-chromedriver-e-recaptura.md (22/23 em 8bba809c). Não depende de `BT-SCP-001` — é o inverso: o gate amplo de `BT-SCP-001` depende deste ID (dependência invertida corrigida em 2026-09-22; ela criava impasse). Decisão do dono em 2026-09-22: D-03 (recaptura em lote, depois das correções de UI da D-04); D-40 (o pack 05 fica rotulado como evidência de capability futura, fora da contagem da beta).",
+        "acceptance": "`manaloom_local_ci.sh quick` passa sem --no-verify; os 23 manifests de docs/qa/ui-live/latest.json no digest corrente e latest.json reescrito. Evidência: b397f477b, 9a9ba66de, d08c18717; receipt docs/qa/execution/2026-09-21/btuiev001-chromedriver-e-recaptura.md (22/23 em 8bba809c). Não depende de `BT-SCP-001` — é o inverso: o gate amplo de `BT-SCP-001` depende deste ID (dependência invertida corrigida em 2026-09-22; ela criava impasse). Decisão do dono em 2026-09-22: D-03 (recaptura em lote, depois das correções de UI da D-04); D-40 (o pack 05 fica rotulado como evidência de capability futura, fora da contagem da beta). Decisões de 2026-09-24: o dono escolheu consertar o que o app precisa e recapturar os 34 pacotes de uma vez. D-79: `battle-coach-web-keyboard` roda no ambiente local. D-80: a procedência de cada captura registra o agente e o navegador da corrida. `card-details-navigation-web` e `optimization-card-reader-web` seguem exigindo navegador real (WebDriver).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 691
       },
@@ -281512,7 +281512,7 @@
       "schema_version": 1,
       "generated_from": {
         "path": "docs/execution/CURRENT_QUEUE.md",
-        "sha256": "9805f42cb15ed3e42b2c7f3ec7a9972d4da0ef76c24048c85e2173106c98df49"
+        "sha256": "895a7e0f5cb8caa9651eab8ed6edf176e427e1cc3e4b1288665c0809cf50cf85"
       },
       "wip_limit": 1,
       "wip_scope": "per_lane",
@@ -286302,7 +286302,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "606017e9a9ee5709d6d678faac038e377565f48309d7a7377973596ec7d7503a"
+    "project_logic_source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
