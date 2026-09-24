@@ -190,6 +190,12 @@ void main() {
         'GET /sets': 'catalog_private',
         'GET /binder': 'collection_private',
         'GET /decks': 'decks_private',
+        // DCK-P0-00: criar, adicionar e a edição incremental (D-27) ficam em
+        // decks_private; só o replace-all tem capability própria.
+        'POST /decks': 'decks_private',
+        'POST /decks/deck/cards': 'decks_private',
+        'POST /decks/deck/cards/remove': 'decks_private',
+        'PATCH /decks/deck': 'decks_private',
         'POST /decks/deck/cards/bulk': 'decks_private',
         'POST /decks/deck/cards/set': 'decks_private',
         'PUT /decks/deck': 'deck_replace_all',

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "44d09cab876e90301225d20ceaaf1853e49b4329b43c50c766f314b4160b4f2a"
+    "sha256": "6247f6e3af6f357a0f676c98983598c1c99f08e55e398dc14bcc7f64cc4ca1e7"
   },
   "required_task_fields": [
     "id",
@@ -360,12 +360,12 @@
     {
       "id": "DCK-P0-00",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Conter fluxos perigosos: replace-all OFF, deck novo privado e IA advisory.",
       "depends_on": [
         "BT-SCP-001"
       ],
-      "acceptance": "Add-only continua; replace direto/API consumer nega; deck vazio não nasce público. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade — o portão `deck_replace_all` já está provado (`b2d3fc04f`; `release_capability_policy_test.dart:195-197`); um teste ainda afirma que deck vazio nasce público (`decks_crud_test.dart:184-212`). Decisão do dono em 2026-09-22: D-27, criar edição incremental (remoção e PATCH) sob `decks_private`; `deck_replace_all` segue off.",
+      "acceptance": "Add-only continua; replace direto/API consumer nega; deck vazio não nasce público. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade — o portão `deck_replace_all` já está provado (`b2d3fc04f`; `release_capability_policy_test.dart:195-197`); um teste ainda afirma que deck vazio nasce público (`decks_crud_test.dart:184-212`). Decisão do dono em 2026-09-22: D-27, criar edição incremental (remoção e PATCH) sob `decks_private`; `deck_replace_all` segue off. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `PATCH /decks/:id` (nome, descrição, arquétipo, bracket e visibilidade; cartas, formato e outros campos dão 400 `deck_patch_field_unsupported`) e `POST /decks/:id/cards/remove` abriram sob `decks_private`; `PUT /decks/:id`, a troca de edição e o import sobre deck existente seguem em `deck_replace_all`. Deck novo nasce privado; `is_public: true` exige `gallery_public` aberta e cartas, com 422 `deck_publication_unavailable` ou `deck_public_requires_cards` antes de gravar (`server/lib/deck_visibility_policy.dart`), e um deck público que fica vazio (remoção ou `PUT` com lista vazia) vira privado na mesma transação. IA consultiva: `POST /ai/rebuild` sem `save_mode` passou a ser só prévia. Evidência: `server/test/deck_containment_test.dart` (portão na matriz da beta, recusas antes do banco), `server/test/deck_incremental_edit_db_live_test.dart` (PostgreSQL descartável, 9 casos), o teste antigo que fixava deck vazio público invertido (`decks_crud_test.dart`) e 12 mutações derrubadas. Falta: o app usar as rotas novas, esconder as ações de replace-all e traduzir os códigos (raia do app). Recomendação registrada no diário da frente: levar a troca de edição (`cards/replace`) para `decks_private`, porque troca a impressão da mesma carta sem refazer a lista.",
       "section": "P0 do ciclo",
       "source_line": 335
     },
@@ -7886,6 +7886,7 @@
       "methods": [
         "DELETE",
         "GET",
+        "PATCH",
         "PUT"
       ],
       "sources": [
@@ -7896,6 +7897,7 @@
           "methods": [
             "DELETE",
             "GET",
+            "PATCH",
             "PUT"
           ]
         },
@@ -9884,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691"
+  "project_logic_source_digest_sha256": "929bfa88f6bf5ce7c4504e4b6c42218ff6b45e03e014176ed1d889e290fda587"
 }

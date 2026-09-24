@@ -60,6 +60,31 @@ void main() {
       );
     });
 
+    test('documents the incremental deck editing of the beta', () {
+      // DCK-P0-00 (D-27): PATCH e remoção sob decks_private; deck vazio
+      // nunca público; o rebuild sem save_mode é só prévia.
+      final patch = _contractRowFor(contracts, 'PATCH /decks/:id');
+      final remove = _contractRowFor(contracts, 'POST /decks/:id/cards/remove');
+      final create = _contractRowFor(contracts, 'POST /decks');
+      final replace = _contractRowFor(contracts, 'PUT /decks/:id');
+      final rebuild = _contractRowFor(contracts, 'POST /ai/rebuild');
+
+      for (final row in [patch, remove]) {
+        expect(row, contains('decks_private'));
+        expect(row, contains('D-27'));
+        expect(row, contains('deck_incremental_edit_db_live_test.dart'));
+      }
+      expect(patch, contains('deck_patch_field_unsupported'));
+      expect(remove, contains('unpublished_because_empty'));
+      for (final row in [create, replace, patch]) {
+        expect(row, contains('deck_publication_unavailable'));
+        expect(row, contains('deck_public_requires_cards'));
+      }
+      expect(create, contains('`is_public` defaults to `false`'));
+      expect(replace, contains('`deck_replace_all`, off in the beta'));
+      expect(rebuild, contains('defaults to `preview_only`'));
+    });
+
     test('does not document a generic GET binder item route', () {
       expect(
         contracts,

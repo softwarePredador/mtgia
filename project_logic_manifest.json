@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691",
+  "source_digest_sha256": "929bfa88f6bf5ce7c4504e4b6c42218ff6b45e03e014176ed1d889e290fda587",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 700,
+    "dart_source_files": 702,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5293,
-    "semantic_resolved_files": 700,
+    "dart_symbols": 5301,
+    "semantic_resolved_files": 702,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43082,
-    "semantic_resolved_call_sites": 68542,
-    "semantic_resolved_type_references": 16305,
-    "modules": 159,
+    "semantic_resolved_call_edges": 43133,
+    "semantic_resolved_call_sites": 68629,
+    "semantic_resolved_type_references": 16333,
+    "modules": 160,
     "app_routes": 46,
     "web_routes": 11,
-    "api_routes": 121,
+    "api_routes": 122,
     "database_tables": 80,
     "database_views": 6,
     "migrations": 60,
     "scripts_and_jobs": 693,
     "environment_variables": 716,
-    "tests": 1258,
+    "tests": 1260,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1494,6 +1494,17 @@
       "services": []
     },
     {
+      "id": "server/lib/deck_visibility_policy",
+      "layer": "server",
+      "files": [
+        "server/lib/deck_visibility_policy.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 3,
+      "providers": [],
+      "services": []
+    },
+    {
       "id": "server/lib/deck_write_verification_policy",
       "layer": "server",
       "files": [
@@ -2301,6 +2312,7 @@
         "server/routes/decks/[id]/battle-replays/index.dart",
         "server/routes/decks/[id]/cards/bulk/index.dart",
         "server/routes/decks/[id]/cards/index.dart",
+        "server/routes/decks/[id]/cards/remove/index.dart",
         "server/routes/decks/[id]/cards/replace/index.dart",
         "server/routes/decks/[id]/cards/set/index.dart",
         "server/routes/decks/[id]/export/index.dart",
@@ -2319,8 +2331,8 @@
         "server/routes/decks/_middleware.dart",
         "server/routes/decks/index.dart"
       ],
-      "file_count": 27,
-      "symbol_count": 99,
+      "file_count": 28,
+      "symbol_count": 104,
       "providers": [],
       "services": []
     },
@@ -29514,13 +29526,13 @@
       "name": "_readCardNameList",
       "kind": "function",
       "source": "server/lib/ai/rebuild_route_request_support.dart",
-      "line": 113
+      "line": 115
     },
     {
       "name": "_readString",
       "kind": "function",
       "source": "server/lib/ai/rebuild_route_request_support.dart",
-      "line": 94
+      "line": 96
     },
     {
       "name": "parseRebuildRouteRequest",
@@ -33963,6 +33975,28 @@
       "kind": "function",
       "source": "server/lib/deck_validation_state_support.dart",
       "line": 14
+    },
+    {
+      "name": "DeckVisibilityException",
+      "kind": "class",
+      "source": "server/lib/deck_visibility_policy.dart",
+      "line": 15,
+      "members": [
+        "responseBody",
+        "toString"
+      ]
+    },
+    {
+      "name": "deckVisibilityAfterCardChange",
+      "kind": "function",
+      "source": "server/lib/deck_visibility_policy.dart",
+      "line": 53
+    },
+    {
+      "name": "ensureDeckPublicationAllowed",
+      "kind": "function",
+      "source": "server/lib/deck_visibility_policy.dart",
+      "line": 30
     },
     {
       "name": "DeckWriteVerificationExemption",
@@ -40029,6 +40063,24 @@
       "line": 11
     },
     {
+      "name": "_RemoveOutcome",
+      "kind": "class",
+      "source": "server/routes/decks/[id]/cards/remove/index.dart",
+      "line": 145
+    },
+    {
+      "name": "_badRequest",
+      "kind": "function",
+      "source": "server/routes/decks/[id]/cards/remove/index.dart",
+      "line": 140
+    },
+    {
+      "name": "onRequest",
+      "kind": "function",
+      "source": "server/routes/decks/[id]/cards/remove/index.dart",
+      "line": 14
+    },
+    {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/replace/index.dart",
@@ -40053,52 +40105,64 @@
       "line": 5
     },
     {
+      "name": "_deckCardCount",
+      "kind": "function",
+      "source": "server/routes/decks/[id]/index.dart",
+      "line": 789
+    },
+    {
       "name": "_deleteDeck",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 42
+      "line": 48
     },
     {
       "name": "_getDeckById",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 598
+      "line": 800
     },
     {
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 863
+      "line": 1065
+    },
+    {
+      "name": "_patchDeck",
+      "kind": "function",
+      "source": "server/routes/decks/[id]/index.dart",
+      "line": 639
     },
     {
       "name": "_updateDeck",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 76
+      "line": 82
     },
     {
       "name": "_validateCardCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 855
+      "line": 1057
     },
     {
       "name": "calculateCmc",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 747
+      "line": 949
     },
     {
       "name": "getMainType",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 733
+      "line": 935
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 25
+      "line": 27
     },
     {
       "name": "_RollbackRequestException",
@@ -40362,31 +40426,31 @@
       "name": "_createDeck",
       "kind": "function",
       "source": "server/routes/decks/index.dart",
-      "line": 304
+      "line": 306
     },
     {
       "name": "_listDecks",
       "kind": "function",
       "source": "server/routes/decks/index.dart",
-      "line": 36
+      "line": 38
     },
     {
       "name": "_logDeckCreateLearning",
       "kind": "function",
       "source": "server/routes/decks/index.dart",
-      "line": 599
+      "line": 618
     },
     {
       "name": "_resolveLearningCardsForEvents",
       "kind": "function",
       "source": "server/routes/decks/index.dart",
-      "line": 660
+      "line": 679
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/index.dart",
-      "line": 22
+      "line": 24
     },
     {
       "name": "middleware",
@@ -41064,7 +41128,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 700,
+    "resolved_file_count": 702,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41557,6 +41621,7 @@
       "server/lib/deck_snapshot_contract.dart",
       "server/lib/deck_validation_route_support.dart",
       "server/lib/deck_validation_state_support.dart",
+      "server/lib/deck_visibility_policy.dart",
       "server/lib/deck_write_verification_policy.dart",
       "server/lib/decks/deck_applied_analysis_support.dart",
       "server/lib/decks/deck_optimization_history_service.dart",
@@ -41705,6 +41770,7 @@
       "server/routes/decks/[id]/battle-replays/index.dart",
       "server/routes/decks/[id]/cards/bulk/index.dart",
       "server/routes/decks/[id]/cards/index.dart",
+      "server/routes/decks/[id]/cards/remove/index.dart",
       "server/routes/decks/[id]/cards/replace/index.dart",
       "server/routes/decks/[id]/cards/set/index.dart",
       "server/routes/decks/[id]/export/index.dart",
@@ -41773,9 +41839,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43082,
-    "resolved_call_site_count": 68542,
-    "workspace_call_edge_count": 13488,
+    "resolved_call_edge_count": 43133,
+    "resolved_call_site_count": 68629,
+    "workspace_call_edge_count": 13511,
     "unresolved_call_edge_count": 559,
     "unresolved_call_site_count": 772,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -144654,7 +144720,7 @@
       },
       {
         "source": "server/lib/ai/rebuild_route_request_support.dart",
-        "line": 66,
+        "line": 68,
         "caller": "parseRebuildRouteRequest",
         "kind": "method",
         "lexical_target": "parseCommanderBracket",
@@ -144665,7 +144731,7 @@
       },
       {
         "source": "server/lib/ai/rebuild_route_request_support.dart",
-        "line": 68,
+        "line": 70,
         "caller": "parseRebuildRouteRequest",
         "kind": "method",
         "lexical_target": "report",
@@ -144676,7 +144742,7 @@
       },
       {
         "source": "server/lib/ai/rebuild_route_request_support.dart",
-        "line": 70,
+        "line": 72,
         "caller": "parseRebuildRouteRequest",
         "kind": "method",
         "lexical_target": "_readCardNameList",
@@ -144687,7 +144753,7 @@
       },
       {
         "source": "server/lib/ai/rebuild_route_request_support.dart",
-        "line": 81,
+        "line": 83,
         "caller": "parseRebuildRouteRequest",
         "kind": "constructor",
         "lexical_target": "RebuildRouteRequestData",
@@ -158984,6 +159050,17 @@
         "target_library": "package:server/deck_validation_state_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
+      },
+      {
+        "source": "server/lib/deck_visibility_policy.dart",
+        "line": 40,
+        "caller": "ensureDeckPublicationAllowed",
+        "kind": "constructor",
+        "lexical_target": "DeckVisibilityException",
+        "target": "DeckVisibilityException.DeckVisibilityException",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
       },
       {
         "source": "server/lib/deck_write_verification_policy.dart",
@@ -184231,6 +184308,61 @@
         "occurrences": 1
       },
       {
+        "source": "server/routes/decks/[id]/cards/remove/index.dart",
+        "line": 109,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "_RemoveOutcome.removed",
+        "target": "_RemoveOutcome._RemoveOutcome.removed",
+        "target_library": "workspace:server/routes/decks/[id]/cards/remove/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/remove/index.dart",
+        "line": 129,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "e",
+        "target": "Log.e",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/remove/index.dart",
+        "line": 41,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_badRequest",
+        "target": "_badRequest",
+        "target_library": "workspace:server/routes/decks/[id]/cards/remove/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/remove/index.dart",
+        "line": 67,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "_RemoveOutcome.notFound",
+        "target": "_RemoveOutcome._RemoveOutcome.notFound",
+        "target_library": "workspace:server/routes/decks/[id]/cards/remove/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/remove/index.dart",
+        "line": 98,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "deckVisibilityAfterCardChange",
+        "target": "deckVisibilityAfterCardChange",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
         "line": 164,
         "caller": "onRequest",
@@ -184320,601 +184452,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 101,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "normalizeSupportedDeckFormat",
-        "target": "normalizeSupportedDeckFormat",
-        "target_library": "package:server/deck_format_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 103,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "unsupportedDeckFormatMessage",
-        "target": "unsupportedDeckFormatMessage",
-        "target_library": "package:server/deck_format_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 111,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "parseCommanderBracket",
-        "target": "parseCommanderBracket",
-        "target_library": "package:server/commander_bracket.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 116,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "readOptionalBool",
-        "target": "readOptionalBool",
-        "target_library": "package:server/deck_request_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 117,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "readOptionalList",
-        "target": "readOptionalList",
-        "target_library": "package:server/deck_request_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 118,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "requireObjectList",
-        "target": "requireObjectList",
-        "target_library": "package:server/deck_request_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 120,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "readOptionalObject",
-        "target": "readOptionalObject",
-        "target_library": "package:server/deck_request_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 123,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "badRequest",
-        "target": "badRequest",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 159,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "deckValidationTimestampToJson",
-        "target": "deckValidationTimestampToJson",
-        "target_library": "package:server/deck_validation_state_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 168,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "DeckRulesException",
-        "target": "DeckRulesException.DeckRulesException",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 177,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "normalizeMutationContext",
-        "target": "DeckOptimizationHistoryService.normalizeMutationContext",
-        "target_library": "package:server/decks/deck_optimization_history_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 210,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "validateNoUnsupportedDeckSections",
-        "target": "validateNoUnsupportedDeckSections",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 241,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "buildDeckSignature",
-        "target": "DeckOptimizationHistoryService.buildDeckSignature",
-        "target_library": "package:server/decks/deck_optimization_history_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 258,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "requirePositiveInteger",
-        "target": "requirePositiveInteger",
-        "target_library": "package:server/deck_request_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 269,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "resolveDeckCardIdByName",
-        "target": "resolveDeckCardIdByName",
-        "target_library": "package:server/deck_card_name_resolution_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 27,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_getDeckById",
-        "target": "_getDeckById",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 283,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "_validateCardCondition",
-        "target": "_validateCardCondition",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 31,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_updateDeck",
-        "target": "_updateDeck",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 324,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "validateOptimizationApplyAuthorization",
-        "target": "validateOptimizationApplyAuthorization",
-        "target_library": "package:server/decks/optimization_apply_authorization_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 336,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "optimizationApplyAuthorizedBracket",
-        "target": "optimizationApplyAuthorizedBracket",
-        "target_library": "package:server/decks/optimization_apply_authorization_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 341,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "DeckRulesService",
-        "target": "DeckRulesService.DeckRulesService",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 341,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "validateAndThrow",
-        "target": "DeckRulesService.validateAndThrow",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 348,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
-        "target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
-        "target_library": "package:server/decks/optimization_functional_role_floor_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 35,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_deleteDeck",
-        "target": "_deleteDeck",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 358,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "OptimizationFunctionalRoleFloorViolation",
-        "target": "OptimizationFunctionalRoleFloorViolation.OptimizationFunctionalRoleFloorViolation",
-        "target_library": "package:server/decks/optimization_functional_role_floor_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 364,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "assessOptimizationCommanderManaFloor",
-        "target": "assessOptimizationCommanderManaFloor",
-        "target_library": "package:server/decks/optimization_mana_floor_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 371,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "OptimizationLandFloorViolation",
-        "target": "OptimizationLandFloorViolation.OptimizationLandFloorViolation",
-        "target_library": "package:server/decks/optimization_mana_floor_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 373,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "assessOptimizationCommanderBracket",
-        "target": "assessOptimizationCommanderBracket",
-        "target_library": "package:server/decks/optimization_bracket_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 381,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "OptimizationBracketViolation",
-        "target": "OptimizationBracketViolation.OptimizationBracketViolation",
-        "target_library": "package:server/decks/optimization_bracket_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 39,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 477,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "loadAppliedDeckPostAnalysis",
-        "target": "loadAppliedDeckPostAnalysis",
-        "target_library": "package:server/decks/deck_applied_analysis_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 48,
-        "caller": "_deleteDeck",
-        "kind": "method",
-        "lexical_target": "deleteDeckAfterBattleGuard",
-        "target": "deleteDeckAfterBattleGuard",
-        "target_library": "package:server/battle/interactive_battle_deck_lifecycle.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 482,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "DeckOptimizationHistoryService",
-        "target": "DeckOptimizationHistoryService.DeckOptimizationHistoryService",
-        "target_library": "package:server/decks/deck_optimization_history_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 482,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "recordAppliedOptimization",
-        "target": "DeckOptimizationHistoryService.recordAppliedOptimization",
-        "target_library": "package:server/decks/deck_optimization_history_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 554,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "exposeDeckValidationState",
-        "target": "exposeDeckValidationState",
-        "target_library": "package:server/deck_validation_state_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 57,
-        "caller": "_deleteDeck",
-        "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 592,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 594,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 602,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "hasDeckMetaColumns",
-        "target": "hasDeckMetaColumns",
-        "target_library": "package:server/deck_schema_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 603,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "hasDeckPricingColumns",
-        "target": "hasDeckPricingColumns",
-        "target_library": "package:server/deck_schema_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 604,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "hasDeckPricingSourceColumn",
-        "target": "hasDeckPricingSourceColumn",
-        "target_library": "package:server/deck_schema_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 605,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "hasDeckValidationStateColumns",
-        "target": "hasDeckValidationStateColumns",
-        "target_library": "package:server/deck_schema_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 606,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 607,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "hasCardIdentityColumns",
-        "target": "hasCardIdentityColumns",
-        "target_library": "package:server/card_identity_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 634,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 652,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "exposeDeckValidationState",
-        "target": "exposeDeckValidationState",
-        "target_library": "package:server/deck_validation_state_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 705,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "normalizeScryfallImageUrl",
-        "target": "normalizeScryfallImageUrl",
-        "target_library": "package:server/scryfall_image_url.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 72,
-        "caller": "_deleteDeck",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 735,
-        "caller": "getMainType",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 780,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "getMainType",
-        "target": "getMainType",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 791,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 792,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "calculateCmc",
-        "target": "calculateCmc",
-        "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 80,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "hasDeckMetaColumns",
-        "target": "hasDeckMetaColumns",
-        "target_library": "package:server/deck_schema_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 81,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "hasDeckValidationStateColumns",
-        "target": "hasDeckValidationStateColumns",
-        "target_library": "package:server/deck_schema_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 826,
+        "line": 1028,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -184925,18 +184463,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 851,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 94,
+        "line": 103,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "requireJsonObject",
@@ -184947,7 +184474,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 95,
+        "line": 104,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "readOptionalString",
@@ -184958,7 +184485,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 97,
+        "line": 1053,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 106,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -184966,6 +184504,776 @@
         "target_library": "package:server/deck_request_support.dart",
         "target_scope": "workspace",
         "occurrences": 8
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 110,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "normalizeSupportedDeckFormat",
+        "target": "normalizeSupportedDeckFormat",
+        "target_library": "package:server/deck_format_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 112,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "unsupportedDeckFormatMessage",
+        "target": "unsupportedDeckFormatMessage",
+        "target_library": "package:server/deck_format_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 120,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "parseCommanderBracket",
+        "target": "parseCommanderBracket",
+        "target_library": "package:server/commander_bracket.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 125,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "readOptionalBool",
+        "target": "readOptionalBool",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 126,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "readOptionalList",
+        "target": "readOptionalList",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 127,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "requireObjectList",
+        "target": "requireObjectList",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 129,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "readOptionalObject",
+        "target": "readOptionalObject",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 132,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "badRequest",
+        "target": "badRequest",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 168,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "deckValidationTimestampToJson",
+        "target": "deckValidationTimestampToJson",
+        "target_library": "package:server/deck_validation_state_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 177,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckRulesException",
+        "target": "DeckRulesException.DeckRulesException",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 185,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "ensureDeckPublicationAllowed",
+        "target": "ensureDeckPublicationAllowed",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 190,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "_deckCardCount",
+        "target": "_deckCardCount",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 203,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "normalizeMutationContext",
+        "target": "DeckOptimizationHistoryService.normalizeMutationContext",
+        "target_library": "package:server/decks/deck_optimization_history_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 237,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "validateNoUnsupportedDeckSections",
+        "target": "validateNoUnsupportedDeckSections",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 268,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "buildDeckSignature",
+        "target": "DeckOptimizationHistoryService.buildDeckSignature",
+        "target_library": "package:server/decks/deck_optimization_history_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 285,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "requirePositiveInteger",
+        "target": "requirePositiveInteger",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 29,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_getDeckById",
+        "target": "_getDeckById",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 296,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "resolveDeckCardIdByName",
+        "target": "resolveDeckCardIdByName",
+        "target_library": "package:server/deck_card_name_resolution_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 310,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "_validateCardCondition",
+        "target": "_validateCardCondition",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 33,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_updateDeck",
+        "target": "_updateDeck",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 351,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "validateOptimizationApplyAuthorization",
+        "target": "validateOptimizationApplyAuthorization",
+        "target_library": "package:server/decks/optimization_apply_authorization_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 363,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "optimizationApplyAuthorizedBracket",
+        "target": "optimizationApplyAuthorizedBracket",
+        "target_library": "package:server/decks/optimization_apply_authorization_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 368,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckRulesService",
+        "target": "DeckRulesService.DeckRulesService",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 368,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "validateAndThrow",
+        "target": "DeckRulesService.validateAndThrow",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 37,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_patchDeck",
+        "target": "_patchDeck",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 375,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
+        "target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
+        "target_library": "package:server/decks/optimization_functional_role_floor_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 385,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "OptimizationFunctionalRoleFloorViolation",
+        "target": "OptimizationFunctionalRoleFloorViolation.OptimizationFunctionalRoleFloorViolation",
+        "target_library": "package:server/decks/optimization_functional_role_floor_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 391,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "assessOptimizationCommanderManaFloor",
+        "target": "assessOptimizationCommanderManaFloor",
+        "target_library": "package:server/decks/optimization_mana_floor_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 398,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "OptimizationLandFloorViolation",
+        "target": "OptimizationLandFloorViolation.OptimizationLandFloorViolation",
+        "target_library": "package:server/decks/optimization_mana_floor_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 400,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "assessOptimizationCommanderBracket",
+        "target": "assessOptimizationCommanderBracket",
+        "target_library": "package:server/decks/optimization_bracket_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 408,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "OptimizationBracketViolation",
+        "target": "OptimizationBracketViolation.OptimizationBracketViolation",
+        "target_library": "package:server/decks/optimization_bracket_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 41,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_deleteDeck",
+        "target": "_deleteDeck",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 45,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "methodNotAllowed",
+        "target": "methodNotAllowed",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 504,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "loadAppliedDeckPostAnalysis",
+        "target": "loadAppliedDeckPostAnalysis",
+        "target_library": "package:server/decks/deck_applied_analysis_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 509,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckOptimizationHistoryService",
+        "target": "DeckOptimizationHistoryService.DeckOptimizationHistoryService",
+        "target_library": "package:server/decks/deck_optimization_history_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 509,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "recordAppliedOptimization",
+        "target": "DeckOptimizationHistoryService.recordAppliedOptimization",
+        "target_library": "package:server/decks/deck_optimization_history_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 54,
+        "caller": "_deleteDeck",
+        "kind": "method",
+        "lexical_target": "deleteDeckAfterBattleGuard",
+        "target": "deleteDeckAfterBattleGuard",
+        "target_library": "package:server/battle/interactive_battle_deck_lifecycle.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 581,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "exposeDeckValidationState",
+        "target": "exposeDeckValidationState",
+        "target_library": "package:server/deck_validation_state_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 624,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "notFound",
+        "target": "notFound",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 626,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 63,
+        "caller": "_deleteDeck",
+        "kind": "method",
+        "lexical_target": "notFound",
+        "target": "notFound",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 650,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilityPolicy.isAllowed",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 660,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "requireJsonObject",
+        "target": "requireJsonObject",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 685,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "readOptionalString",
+        "target": "readOptionalString",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 687,
+        "caller": "_patchDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckRequestException",
+        "target": "DeckRequestException.DeckRequestException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 691,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "parseCommanderBracket",
+        "target": "parseCommanderBracket",
+        "target_library": "package:server/commander_bracket.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 696,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "readOptionalBool",
+        "target": "readOptionalBool",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 699,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "ensureDeckPublicationAllowed",
+        "target": "ensureDeckPublicationAllowed",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 706,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "badRequest",
+        "target": "badRequest",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 717,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "hasDeckMetaColumns",
+        "target": "hasDeckMetaColumns",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 731,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "_deckCardCount",
+        "target": "_deckCardCount",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 775,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "notFound",
+        "target": "notFound",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 78,
+        "caller": "_deleteDeck",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 785,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 804,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "hasDeckMetaColumns",
+        "target": "hasDeckMetaColumns",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 805,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "hasDeckPricingColumns",
+        "target": "hasDeckPricingColumns",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 806,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "hasDeckPricingSourceColumn",
+        "target": "hasDeckPricingSourceColumn",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 807,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "hasDeckValidationStateColumns",
+        "target": "hasDeckValidationStateColumns",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 808,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "_hasTable",
+        "target": "_hasTable",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 809,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "hasCardIdentityColumns",
+        "target": "hasCardIdentityColumns",
+        "target_library": "package:server/card_identity_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 836,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "notFound",
+        "target": "notFound",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 854,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "exposeDeckValidationState",
+        "target": "exposeDeckValidationState",
+        "target_library": "package:server/deck_validation_state_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 86,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilityPolicy.isAllowed",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 89,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "hasDeckMetaColumns",
+        "target": "hasDeckMetaColumns",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 90,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "hasDeckValidationStateColumns",
+        "target": "hasDeckValidationStateColumns",
+        "target_library": "package:server/deck_schema_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 907,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "normalizeScryfallImageUrl",
+        "target": "normalizeScryfallImageUrl",
+        "target_library": "package:server/scryfall_image_url.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 937,
+        "caller": "getMainType",
+        "kind": "method",
+        "lexical_target": "isLandTypeLine",
+        "target": "isLandTypeLine",
+        "target_library": "package:server/basic_land_utils.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 982,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "getMainType",
+        "target": "getMainType",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 993,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "isLandTypeLine",
+        "target": "isLandTypeLine",
+        "target_library": "package:server/basic_land_utils.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 994,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "calculateCmc",
+        "target": "calculateCmc",
+        "target_library": "workspace:server/routes/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart",
@@ -186223,7 +186531,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 234,
+        "line": 236,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -186234,7 +186542,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 244,
+        "line": 246,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -186245,7 +186553,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 25,
+        "line": 27,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_createDeck",
@@ -186256,7 +186564,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 280,
+        "line": 282,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "e",
@@ -186267,7 +186575,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 294,
+        "line": 296,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -186278,7 +186586,18 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 30,
+        "line": 302,
+        "caller": "_listDecks",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/index.dart",
+        "line": 32,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_listDecks",
@@ -186289,18 +186608,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 300,
-        "caller": "_listDecks",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/index.dart",
-        "line": 320,
+        "line": 322,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "requireJsonObject",
@@ -186311,7 +186619,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 321,
+        "line": 323,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "requireNonEmptyString",
@@ -186322,7 +186630,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 323,
+        "line": 325,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "normalizeSupportedDeckFormat",
@@ -186333,7 +186641,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 325,
+        "line": 327,
         "caller": "_createDeck",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -186344,7 +186652,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 325,
+        "line": 327,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "unsupportedDeckFormatMessage",
@@ -186355,7 +186663,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 328,
+        "line": 330,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "readOptionalString",
@@ -186366,18 +186674,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 33,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/index.dart",
-        "line": 330,
+        "line": 332,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "parseCommanderBracket",
@@ -186388,7 +186685,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 335,
+        "line": 337,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "readOptionalBool",
@@ -186399,7 +186696,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 336,
+        "line": 338,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "readOptionalList",
@@ -186410,7 +186707,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 337,
+        "line": 339,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "requireObjectList",
@@ -186421,7 +186718,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 338,
+        "line": 340,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "validateNoUnsupportedDeckSections",
@@ -186432,7 +186729,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 340,
+        "line": 342,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -186443,7 +186740,40 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 348,
+        "line": 35,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "methodNotAllowed",
+        "target": "methodNotAllowed",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/index.dart",
+        "line": 352,
+        "caller": "_createDeck",
+        "kind": "method",
+        "lexical_target": "ensureDeckPublicationAllowed",
+        "target": "ensureDeckPublicationAllowed",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/index.dart",
+        "line": 355,
+        "caller": "_createDeck",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilityPolicy.isAllowed",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/index.dart",
+        "line": 367,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -186454,7 +186784,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 349,
+        "line": 368,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "hasDeckValidationStateColumns",
@@ -186465,7 +186795,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 38,
+        "line": 40,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "d",
@@ -186476,7 +186806,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 394,
+        "line": 413,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "resolveDeckCardIdsByName",
@@ -186487,7 +186817,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 403,
+        "line": 422,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "requirePositiveInteger",
@@ -186498,7 +186828,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 453,
+        "line": 472,
         "caller": "_createDeck",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -186509,7 +186839,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 453,
+        "line": 472,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -186520,7 +186850,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 468,
+        "line": 487,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "buildDeckReadinessContract",
@@ -186531,7 +186861,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 48,
+        "line": 50,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -186542,7 +186872,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 49,
+        "line": 51,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "hasDeckPricingColumns",
@@ -186553,7 +186883,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 50,
+        "line": 52,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "hasDeckPricingSourceColumn",
@@ -186564,7 +186894,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 51,
+        "line": 53,
         "caller": "_listDecks",
         "kind": "method",
         "lexical_target": "hasDeckValidationStateColumns",
@@ -186575,7 +186905,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 526,
+        "line": 545,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "encodeDeckValidationReasons",
@@ -186586,7 +186916,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 542,
+        "line": 561,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -186597,7 +186927,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 545,
+        "line": 564,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "isManaloomE2eIsolatedRuntime",
@@ -186608,18 +186938,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 547,
-        "caller": "_createDeck",
-        "kind": "method",
-        "lexical_target": "isAllowed",
-        "target": "ReleaseCapabilityPolicy.isAllowed",
-        "target_library": "package:server/release_capability_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/index.dart",
-        "line": 548,
+        "line": 567,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "shouldWriteProductLearning",
@@ -186630,7 +186949,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 551,
+        "line": 570,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "_logDeckCreateLearning",
@@ -186641,7 +186960,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 564,
+        "line": 583,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "d",
@@ -186652,7 +186971,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 588,
+        "line": 607,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -186663,7 +186982,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 595,
+        "line": 614,
         "caller": "_createDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -186674,7 +186993,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 607,
+        "line": 626,
         "caller": "_logDeckCreateLearning",
         "kind": "method",
         "lexical_target": "_resolveLearningCardsForEvents",
@@ -186685,7 +187004,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 613,
+        "line": 632,
         "caller": "_logDeckCreateLearning",
         "kind": "method",
         "lexical_target": "learningCardQuantityTotal",
@@ -186696,7 +187015,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 636,
+        "line": 655,
         "caller": "_logDeckCreateLearning",
         "kind": "method",
         "lexical_target": "recordUserCreatedDeckLearning",
@@ -186707,7 +187026,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 646,
+        "line": 665,
         "caller": "_logDeckCreateLearning",
         "kind": "method",
         "lexical_target": "logDeckLearningEvent",
@@ -186718,7 +187037,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 656,
+        "line": 675,
         "caller": "_logDeckCreateLearning",
         "kind": "method",
         "lexical_target": "e",
@@ -190177,8 +190496,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14346,
-        "occurrences": 24926
+        "unique_references": 14357,
+        "occurrences": 24942
       },
       {
         "target_scope": "dart_sdk",
@@ -190285,8 +190604,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 488,
-        "occurrences": 955
+        "unique_references": 496,
+        "occurrences": 976
       },
       {
         "target_scope": "dependency",
@@ -191539,14 +191858,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1213,
-        "occurrences": 1982
+        "unique_references": 1220,
+        "occurrences": 1997
       },
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 86,
-        "occurrences": 88
+        "unique_references": 88,
+        "occurrences": 90
       },
       {
         "target_scope": "dependency",
@@ -193981,8 +194300,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/commander_bracket.dart",
-        "unique_references": 6,
-        "occurrences": 9
+        "unique_references": 7,
+        "occurrences": 10
       },
       {
         "target_scope": "workspace",
@@ -194107,8 +194426,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/deck_request_support.dart",
-        "unique_references": 36,
-        "occurrences": 61
+        "unique_references": 40,
+        "occurrences": 68
       },
       {
         "target_scope": "workspace",
@@ -194119,8 +194438,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/deck_schema_support.dart",
-        "unique_references": 14,
-        "occurrences": 14
+        "unique_references": 15,
+        "occurrences": 15
       },
       {
         "target_scope": "workspace",
@@ -194145,6 +194464,12 @@
         "target_library": "package:server/deck_validation_state_support.dart",
         "unique_references": 28,
         "occurrences": 31
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "unique_references": 5,
+        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -194239,8 +194564,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/http_responses.dart",
-        "unique_references": 166,
-        "occurrences": 251
+        "unique_references": 169,
+        "occurrences": 255
       },
       {
         "target_scope": "workspace",
@@ -194287,8 +194612,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 177,
-        "occurrences": 302
+        "unique_references": 178,
+        "occurrences": 303
       },
       {
         "target_scope": "workspace",
@@ -194503,8 +194828,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/release_capability_policy.dart",
-        "unique_references": 32,
-        "occurrences": 53
+        "unique_references": 34,
+        "occurrences": 56
       },
       {
         "target_scope": "workspace",
@@ -195192,6 +195517,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "workspace:server/routes/decks/[id]/cards/remove/index.dart",
+        "unique_references": 3,
+        "occurrences": 6
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "workspace:server/routes/decks/[id]/cards/set/index.dart",
         "unique_references": 1,
         "occurrences": 1
@@ -195199,8 +195530,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/routes/decks/[id]/index.dart",
-        "unique_references": 7,
-        "occurrences": 7
+        "unique_references": 10,
+        "occurrences": 10
       },
       {
         "target_scope": "workspace",
@@ -199068,7 +199399,7 @@
       },
       {
         "source": "server/lib/ai/rebuild_route_request_support.dart",
-        "line": 102,
+        "line": 104,
         "caller": "_readString",
         "kind": "function_expression",
         "lexical_target": "report",
@@ -199076,7 +199407,7 @@
       },
       {
         "source": "server/lib/ai/rebuild_route_request_support.dart",
-        "line": 120,
+        "line": 122,
         "caller": "_readCardNameList",
         "kind": "function_expression",
         "lexical_target": "report",
@@ -199851,9 +200182,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16305,
-    "workspace_type_reference_count": 3447,
-    "unresolved_type_reference_count": 356,
+    "resolved_type_reference_count": 16333,
+    "workspace_type_reference_count": 3452,
+    "unresolved_type_reference_count": 357,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -229467,6 +229798,16 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/deck_visibility_policy.dart",
+        "line": 40,
+        "lexical_type": "DeckVisibilityException",
+        "resolved_type": "DeckVisibilityException",
+        "target": "DeckVisibilityException",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
         "source": "server/lib/deck_write_verification_policy.dart",
         "line": 42,
         "lexical_type": "DeckWriteVerificationExemption",
@@ -233517,6 +233858,16 @@
         "occurrences": 14
       },
       {
+        "source": "server/routes/decks/[id]/cards/remove/index.dart",
+        "line": 67,
+        "lexical_type": "_RemoveOutcome",
+        "resolved_type": "_RemoveOutcome",
+        "target": "_RemoveOutcome",
+        "target_library": "workspace:server/routes/decks/[id]/cards/remove/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
         "line": 164,
         "lexical_type": "DeckRulesService",
@@ -233558,7 +233909,17 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 168,
+        "line": 106,
+        "lexical_type": "DeckRequestException",
+        "resolved_type": "DeckRequestException",
+        "target": "DeckRequestException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 13
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 177,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -233568,7 +233929,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 341,
+        "line": 368,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -233578,7 +233939,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 358,
+        "line": 385,
         "lexical_type": "OptimizationFunctionalRoleFloorViolation",
         "resolved_type": "OptimizationFunctionalRoleFloorViolation",
         "target": "OptimizationFunctionalRoleFloorViolation",
@@ -233588,7 +233949,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 371,
+        "line": 398,
         "lexical_type": "OptimizationLandFloorViolation",
         "resolved_type": "OptimizationLandFloorViolation",
         "target": "OptimizationLandFloorViolation",
@@ -233598,7 +233959,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 381,
+        "line": 408,
         "lexical_type": "OptimizationBracketViolation",
         "resolved_type": "OptimizationBracketViolation",
         "target": "OptimizationBracketViolation",
@@ -233608,7 +233969,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 482,
+        "line": 509,
         "lexical_type": "DeckOptimizationHistoryService",
         "resolved_type": "DeckOptimizationHistoryService",
         "target": "DeckOptimizationHistoryService",
@@ -233618,7 +233979,17 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 580,
+        "line": 598,
+        "lexical_type": "DeckVisibilityException",
+        "resolved_type": "DeckVisibilityException",
+        "target": "DeckVisibilityException",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 612,
         "lexical_type": "OptimizationApplyAuthorizationViolation",
         "resolved_type": "OptimizationApplyAuthorizationViolation",
         "target": "OptimizationApplyAuthorizationViolation",
@@ -233628,13 +233999,13 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 97,
-        "lexical_type": "DeckRequestException",
-        "resolved_type": "DeckRequestException",
-        "target": "DeckRequestException",
-        "target_library": "package:server/deck_request_support.dart",
+        "line": 86,
+        "lexical_type": "ReleaseCapabilityPolicy",
+        "resolved_type": "ReleaseCapabilityPolicy",
+        "target": "ReleaseCapabilityPolicy",
+        "target_library": "package:server/release_capability_policy.dart",
         "target_scope": "workspace",
-        "occurrences": 10
+        "occurrences": 2
       },
       {
         "source": "server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart",
@@ -233838,7 +234209,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 325,
+        "line": 327,
         "lexical_type": "DeckRequestException",
         "resolved_type": "DeckRequestException",
         "target": "DeckRequestException",
@@ -233848,7 +234219,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 343,
+        "line": 345,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -233858,23 +234229,33 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 453,
+        "line": 355,
+        "lexical_type": "ReleaseCapabilityPolicy",
+        "resolved_type": "ReleaseCapabilityPolicy",
+        "target": "ReleaseCapabilityPolicy",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/index.dart",
+        "line": 359,
+        "lexical_type": "DeckVisibilityException",
+        "resolved_type": "DeckVisibilityException",
+        "target": "DeckVisibilityException",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/index.dart",
+        "line": 472,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
         "target_library": "package:server/deck_rules_service.dart",
         "target_scope": "workspace",
         "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/index.dart",
-        "line": 547,
-        "lexical_type": "ReleaseCapabilityPolicy",
-        "resolved_type": "ReleaseCapabilityPolicy",
-        "target": "ReleaseCapabilityPolicy",
-        "target_library": "package:server/release_capability_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
       },
       {
         "source": "server/routes/health/ai-history/index.dart",
@@ -234337,8 +234718,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1090,
-        "occurrences": 2210
+        "unique_references": 1092,
+        "occurrences": 2213
       },
       {
         "target_scope": "dart_sdk",
@@ -234355,8 +234736,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6289,
-        "occurrences": 39894
+        "unique_references": 6305,
+        "occurrences": 39944
       },
       {
         "target_scope": "dart_sdk",
@@ -234439,8 +234820,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 275,
-        "occurrences": 1104
+        "unique_references": 277,
+        "occurrences": 1121
       },
       {
         "target_scope": "dependency",
@@ -235675,8 +236056,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 256,
-        "occurrences": 948
+        "unique_references": 258,
+        "occurrences": 956
       },
       {
         "target_scope": "dependency",
@@ -235687,8 +236068,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 201,
-        "occurrences": 484
+        "unique_references": 202,
+        "occurrences": 486
       },
       {
         "target_scope": "dependency",
@@ -235826,7 +236207,7 @@
         "target_scope": "unknown",
         "target_library": "<unresolved>",
         "unique_references": 410,
-        "occurrences": 4774
+        "occurrences": 4775
       },
       {
         "target_scope": "workspace",
@@ -237788,7 +238169,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/deck_request_support.dart",
         "unique_references": 6,
-        "occurrences": 32
+        "occurrences": 35
       },
       {
         "target_scope": "workspace",
@@ -237801,6 +238182,12 @@
         "target_library": "package:server/deck_snapshot_contract.dart",
         "unique_references": 1,
         "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/deck_visibility_policy.dart",
+        "unique_references": 3,
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -238075,8 +238462,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/release_capability_policy.dart",
-        "unique_references": 12,
-        "occurrences": 30
+        "unique_references": 13,
+        "occurrences": 33
       },
       {
         "target_scope": "workspace",
@@ -238329,6 +238716,12 @@
         "target_library": "workspace:server/routes/decks/[id]/analysis/index.dart",
         "unique_references": 1,
         "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/routes/decks/[id]/cards/remove/index.dart",
+        "unique_references": 1,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -240247,6 +240640,12 @@
         "occurrences": 4
       },
       {
+        "source": "server/lib/deck_visibility_policy.dart",
+        "line": 33,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/endpoint_cache.dart",
         "line": 16,
         "lexical_type": "DateTime",
@@ -240464,7 +240863,7 @@
       },
       {
         "source": "server/routes/decks/index.dart",
-        "line": 599,
+        "line": 618,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -253036,6 +253435,7 @@
       "methods": [
         "DELETE",
         "GET",
+        "PATCH",
         "PUT"
       ],
       "source": "server/routes/decks/[id]/index.dart",
@@ -253212,6 +253612,25 @@
         "POST"
       ],
       "source": "server/routes/decks/[id]/cards/bulk/index.dart",
+      "middleware": [
+        "server/routes/_middleware.dart",
+        "server/routes/decks/_middleware.dart"
+      ],
+      "tests": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+        "server/test/auto_promote_learned_decks_test.py",
+        "server/test/auto_sync_learned_decks_test.py",
+        "server/test/decks_crud_test.dart",
+        "server/test/decks_incremental_add_test.dart"
+      ],
+      "method_contract": "source"
+    },
+    {
+      "path": "/decks/{id}/cards/remove",
+      "methods": [
+        "POST"
+      ],
+      "source": "server/routes/decks/[id]/cards/remove/index.dart",
       "middleware": [
         "server/routes/_middleware.dart",
         "server/routes/decks/_middleware.dart"
@@ -275014,11 +275433,13 @@
     "server/test/deck_battle_learning_evidence_test.dart",
     "server/test/deck_card_eligibility_test.dart",
     "server/test/deck_cards_bulk_support_test.dart",
+    "server/test/deck_containment_test.dart",
     "server/test/deck_create_bulk_insert_contract_test.dart",
     "server/test/deck_crud_atomicity_live_test.dart",
     "server/test/deck_fetch_hydration_contract_test.dart",
     "server/test/deck_format_support_test.dart",
     "server/test/deck_import_review_contract_test.dart",
+    "server/test/deck_incremental_edit_db_live_test.dart",
     "server/test/deck_learning_event_support_test.dart",
     "server/test/deck_manual_mutation_route_contract_test.dart",
     "server/test/deck_optimization_apply_rollback_live_test.dart",
@@ -276577,7 +276998,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "44d09cab876e90301225d20ceaaf1853e49b4329b43c50c766f314b4160b4f2a"
+      "sha256": "6247f6e3af6f357a0f676c98983598c1c99f08e55e398dc14bcc7f64cc4ca1e7"
     },
     "required_task_fields": [
       "id",
@@ -276935,12 +277356,12 @@
       {
         "id": "DCK-P0-00",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IN_PROGRESS_CONTAINED",
         "delivery": "Conter fluxos perigosos: replace-all OFF, deck novo privado e IA advisory.",
         "depends_on": [
           "BT-SCP-001"
         ],
-        "acceptance": "Add-only continua; replace direto/API consumer nega; deck vazio não nasce público. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade — o portão `deck_replace_all` já está provado (`b2d3fc04f`; `release_capability_policy_test.dart:195-197`); um teste ainda afirma que deck vazio nasce público (`decks_crud_test.dart:184-212`). Decisão do dono em 2026-09-22: D-27, criar edição incremental (remoção e PATCH) sob `decks_private`; `deck_replace_all` segue off.",
+        "acceptance": "Add-only continua; replace direto/API consumer nega; deck vazio não nasce público. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade — o portão `deck_replace_all` já está provado (`b2d3fc04f`; `release_capability_policy_test.dart:195-197`); um teste ainda afirma que deck vazio nasce público (`decks_crud_test.dart:184-212`). Decisão do dono em 2026-09-22: D-27, criar edição incremental (remoção e PATCH) sob `decks_private`; `deck_replace_all` segue off. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `PATCH /decks/:id` (nome, descrição, arquétipo, bracket e visibilidade; cartas, formato e outros campos dão 400 `deck_patch_field_unsupported`) e `POST /decks/:id/cards/remove` abriram sob `decks_private`; `PUT /decks/:id`, a troca de edição e o import sobre deck existente seguem em `deck_replace_all`. Deck novo nasce privado; `is_public: true` exige `gallery_public` aberta e cartas, com 422 `deck_publication_unavailable` ou `deck_public_requires_cards` antes de gravar (`server/lib/deck_visibility_policy.dart`), e um deck público que fica vazio (remoção ou `PUT` com lista vazia) vira privado na mesma transação. IA consultiva: `POST /ai/rebuild` sem `save_mode` passou a ser só prévia. Evidência: `server/test/deck_containment_test.dart` (portão na matriz da beta, recusas antes do banco), `server/test/deck_incremental_edit_db_live_test.dart` (PostgreSQL descartável, 9 casos), o teste antigo que fixava deck vazio público invertido (`decks_crud_test.dart`) e 12 mutações derrubadas. Falta: o app usar as rotas novas, esconder as ações de replace-all e traduzir os códigos (raia do app). Recomendação registrada no diário da frente: levar a troca de edição (`cards/replace`) para `decks_private`, porque troca a impressão da mesma carta sem refazer a lista.",
         "section": "P0 do ciclo",
         "source_line": 335
       },
@@ -284461,6 +284882,7 @@
         "methods": [
           "DELETE",
           "GET",
+          "PATCH",
           "PUT"
         ],
         "sources": [
@@ -284471,6 +284893,7 @@
             "methods": [
               "DELETE",
               "GET",
+              "PATCH",
               "PUT"
             ]
           },
@@ -286459,7 +286882,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691"
+    "project_logic_source_digest_sha256": "929bfa88f6bf5ce7c4504e4b6c42218ff6b45e03e014176ed1d889e290fda587"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -289009,6 +289432,7 @@
       "server/lib/deck_snapshot_contract.dart",
       "server/lib/deck_validation_route_support.dart",
       "server/lib/deck_validation_state_support.dart",
+      "server/lib/deck_visibility_policy.dart",
       "server/lib/deck_write_verification_policy.dart",
       "server/lib/decks/deck_applied_analysis_support.dart",
       "server/lib/decks/deck_optimization_history_service.dart",
@@ -289159,6 +289583,7 @@
       "server/routes/decks/[id]/battle-replays/index.dart",
       "server/routes/decks/[id]/cards/bulk/index.dart",
       "server/routes/decks/[id]/cards/index.dart",
+      "server/routes/decks/[id]/cards/remove/index.dart",
       "server/routes/decks/[id]/cards/replace/index.dart",
       "server/routes/decks/[id]/cards/set/index.dart",
       "server/routes/decks/[id]/export/index.dart",
@@ -289381,11 +289806,13 @@
       "server/test/deck_battle_learning_evidence_test.dart",
       "server/test/deck_card_eligibility_test.dart",
       "server/test/deck_cards_bulk_support_test.dart",
+      "server/test/deck_containment_test.dart",
       "server/test/deck_create_bulk_insert_contract_test.dart",
       "server/test/deck_crud_atomicity_live_test.dart",
       "server/test/deck_fetch_hydration_contract_test.dart",
       "server/test/deck_format_support_test.dart",
       "server/test/deck_import_review_contract_test.dart",
+      "server/test/deck_incremental_edit_db_live_test.dart",
       "server/test/deck_learning_event_support_test.dart",
       "server/test/deck_manual_mutation_route_contract_test.dart",
       "server/test/deck_optimization_apply_rollback_live_test.dart",

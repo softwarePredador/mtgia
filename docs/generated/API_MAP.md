@@ -64,7 +64,7 @@
 | `/conversations/{id}/messages` | `GET, POST` | `server/routes/conversations/[id]/messages.dart` | 2 | `source` |
 | `/conversations/{id}/read` | `PUT` | `server/routes/conversations/[id]/read.dart` | 2 | `source` |
 | `/decks` | `GET, POST` | `server/routes/decks/index.dart` | 2 | `source` |
-| `/decks/{id}` | `DELETE, GET, PUT` | `server/routes/decks/[id]/index.dart` | 2 | `source` |
+| `/decks/{id}` | `DELETE, GET, PATCH, PUT` | `server/routes/decks/[id]/index.dart` | 2 | `source` |
 | `/decks/{id}/ai-analysis` | `POST` | `server/routes/decks/[id]/ai-analysis/index.dart` | 3 | `source` |
 | `/decks/{id}/analysis` | `GET` | `server/routes/decks/[id]/analysis/index.dart` | 2 | `source` |
 | `/decks/{id}/battle-preflight` | `GET` | `server/routes/decks/[id]/battle-preflight/index.dart` | 2 | `source` |
@@ -74,6 +74,7 @@
 | `/decks/{id}/battle-replays/{replayId}/annotations/{annotationId}` | `DELETE` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/[annotationId].dart` | 2 | `source` |
 | `/decks/{id}/cards` | `POST` | `server/routes/decks/[id]/cards/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/bulk` | `POST` | `server/routes/decks/[id]/cards/bulk/index.dart` | 2 | `source` |
+| `/decks/{id}/cards/remove` | `POST` | `server/routes/decks/[id]/cards/remove/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/replace` | `POST` | `server/routes/decks/[id]/cards/replace/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/set` | `POST` | `server/routes/decks/[id]/cards/set/index.dart` | 2 | `source` |
 | `/decks/{id}/export` | `GET` | `server/routes/decks/[id]/export/index.dart` | 2 | `source` |

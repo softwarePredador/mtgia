@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_schema_support.dart';
 import '../../lib/deck_validation_state_support.dart';
+import '../../lib/deck_visibility_policy.dart';
 import '../../lib/e2e_validation_policy.dart';
 import '../../lib/deck_card_name_resolution_support.dart';
 import '../../lib/deck_format_support.dart';
@@ -342,6 +344,23 @@ Future<Response> _createDeck(RequestContext context) async {
     return badRequest(e.message);
   } on DeckRulesException catch (e) {
     return badRequest(e.message);
+  }
+
+  // DCK-P0-00: deck novo nasce privado; publicar na criação exige a galeria
+  // aberta e cartas na lista. A recusa vem antes de qualquer acesso ao banco.
+  try {
+    ensureDeckPublicationAllowed(
+      requested: isPublic,
+      cardCountAfter: rawCardObjects.length,
+      galleryOpen: context.read<ReleaseCapabilityPolicy>().isAllowed(
+        'gallery_public',
+      ),
+    );
+  } on DeckVisibilityException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: e.responseBody,
+    );
   }
 
   final conn = context.read<Pool>();
