@@ -179,5 +179,69 @@ void main() {
         isNot(contains('must-not-leak')),
       );
     });
+
+    // BT-OBS-001: os valores andam junto com a versão. Mudar um limite sem
+    // subir operationalAlertThresholdsVersion quebra este teste.
+    test('thresholds are pinned to their version', () {
+      expect(operationalAlertThresholdsVersion, 3);
+      expect(operationalAlertThresholds, {
+        'minimum_request_sample': 20,
+        'minimum_endpoint_sample': 10,
+        'minimum_ai_sample': 5,
+        'warning_error_rate': 0.05,
+        'critical_error_rate': 0.15,
+        'warning_endpoint_p95_ms': 3000,
+        'critical_endpoint_p95_ms': 10000,
+        'warning_oldest_ai_job_seconds': 180,
+        'critical_oldest_ai_job_seconds': 360,
+        'warning_ai_failure_rate': 0.20,
+        'critical_ai_failure_rate': 0.50,
+        'warning_oldest_battle_job_seconds': 180,
+        'critical_oldest_battle_job_seconds': 360,
+        'warning_battle_queue_seconds': 120,
+        'critical_battle_queue_seconds': 300,
+        'minimum_battle_terminal_sample': 5,
+        'warning_battle_failure_rate': 0.20,
+        'critical_battle_failure_rate': 0.50,
+        'critical_coach_terminal_count': 3,
+      });
+    });
+
+    test('the 5xx rate comes from the 5-minute window when present', () {
+      Set<Object?> codes(Map<String, dynamic> requestMetrics) {
+        final result = evaluateOperationalAlerts(
+          requestMetrics: requestMetrics,
+          aiJobs: const {'status': 'not_initialized'},
+          aiCost: const {'status': 'not_initialized'},
+        );
+        return (result['alerts'] as List<Object?>)
+            .cast<Map<String, Object>>()
+            .map((alert) => alert['code'])
+            .toSet();
+      }
+
+      // Uma semana no ar dilui o apagão no total; a janela mostra.
+      expect(
+        codes({
+          'totals': {'request_count': 1000000, 'error_rate': 0.011},
+          'windows': {
+            '5m': {'request_count': 400, 'error_rate': 0.5},
+          },
+          'endpoints': <String, Object?>{},
+        }),
+        contains('http_5xx_rate_critical'),
+      );
+      // Janela sem amostra suficiente não alerta, nem com o total alto.
+      expect(
+        codes({
+          'totals': {'request_count': 1000, 'error_rate': 0.9},
+          'windows': {
+            '5m': {'request_count': 3, 'error_rate': 1.0},
+          },
+          'endpoints': <String, Object?>{},
+        }),
+        isEmpty,
+      );
+    });
   });
 }

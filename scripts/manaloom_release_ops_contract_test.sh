@@ -205,10 +205,12 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/manaloom_read_env.py" \
     "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
     "$ROOT_DIR/server/bin/audit_easypanel_runtime_alignment.py" \
+    "$ROOT_DIR/server/bin/manaloom_slo_alerts.py" \
     "$ROOT_DIR/server/test/card_cli_schema_guard_test.py" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
-    "$ROOT_DIR/server/test/release_sbom_scope_test.py"
+    "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
+    "$ROOT_DIR/server/test/slo_alerts_test.py"
 
 # BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
 # conferem o schema do PostgreSQL e param; não o alteram.
@@ -223,6 +225,9 @@ PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/release_sbom_scope_test.py"
+# BT-OBS-001: SLOs, regras de alerta, receptor humano e teste de alerta.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/slo_alerts_test.py"
 
 SAFE_ENV_FIXTURE="$TMP_DIR/safe.env"
 SAFE_ENV_MARKER="$TMP_DIR/env-code-executed"

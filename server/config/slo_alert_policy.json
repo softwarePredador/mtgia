@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-slo-alerts",
+  "version": "2026-09-24.1",
+  "task": "BT-OBS-001",
+  "decisions": [
+    "D-47",
+    "D-51"
+  ],
+  "scope": "API, PostgreSQL, jobs do daemon de ops, cache e catálogo. O alerta de release fica no BT-OBS-003 (D-51); a queda vista de fora, no BT-OBS-002.",
+  "evaluation": {
+    "job": "manaloom_slo_alerts",
+    "schedule": "*/5 * * * *",
+    "slot_minutes": 5,
+    "observation_retention_days": 35
+  },
+  "slos": {
+    "api_availability": {
+      "objective": 0.995,
+      "window_days": 30,
+      "evidence": "SLO de 99,5% de disponibilidade",
+      "bad_slot_error_rate": 0.05,
+      "min_requests": 20,
+      "sli": "fração das janelas de 5 minutos, com avaliação, em que /health/live e /health/ready responderam 200 e a taxa de 5xx do tráfego de produto ficou abaixo de 5% (janelas com menos de 20 requisições contam pela sondagem)"
+    },
+    "api_read_latency": {
+      "objective_p95_ms": 800,
+      "window_days": 30,
+      "evidence": "p95 abaixo de 800 ms em leitura",
+      "min_reads": 20,
+      "sli": "p95 das requisições GET e HEAD de produto em cada janela de 5 minutos com pelo menos 20 leituras"
+    }
+  },
+  "alerts": {
+    "api_down": {
+      "severity": "critical",
+      "source": "GET /health/live",
+      "consecutive": 2,
+      "summary": "A API não responde ao liveness.",
+      "runbook": "api_down"
+    },
+    "api_not_ready": {
+      "severity": "critical",
+      "source": "GET /health/ready",
+      "consecutive": 2,
+      "summary": "A API responde, mas não está pronta (banco, schema ou capabilities).",
+      "runbook": "api_not_ready"
+    },
+    "postgres_unavailable": {
+      "severity": "critical",
+      "source": "checks.database de /health/ready e conexão só de leitura do avaliador",
+      "consecutive": 2,
+      "summary": "O PostgreSQL não responde.",
+      "runbook": "postgres_unavailable"
+    },
+    "api_5xx_fast_burn": {
+      "severity": "critical",
+      "source": "janela de 5 min de /health/metrics",
+      "error_rate_min": 0.072,
+      "min_requests": 20,
+      "summary": "A taxa de 5xx queima o orçamento do SLO 14,4 vezes mais rápido que o permitido.",
+      "runbook": "api_5xx"
+    },
+    "api_5xx_slow_burn": {
+      "severity": "warning",
+      "source": "janela de 60 min de /health/metrics",
+      "error_rate_min": 0.03,
+      "min_requests": 100,
+      "summary": "A taxa de 5xx queima o orçamento do SLO 6 vezes mais rápido que o permitido.",
+      "runbook": "api_5xx"
+    },
+    "api_read_latency_p95": {
+      "severity": "warning",
+      "source": "janela de 5 min de /health/metrics",
+      "p95_ms_max": 800,
+      "min_reads": 20,
+      "consecutive": 2,
+      "summary": "O p95 das leituras passou de 800 ms.",
+      "runbook": "api_read_latency_p95"
+    },
+    "metrics_unavailable": {
+      "severity": "warning",
+      "source": "GET /health/metrics com a chave de ops",
+      "consecutive": 2,
+      "summary": "O avaliador não consegue ler as métricas da API: o SLO fica sem medição.",
+      "runbook": "metrics_unavailable"
+    },
+    "postgres_connections_high": {
+      "severity": "warning",
+      "source": "pg_stat_activity e max_connections, em transação READ ONLY",
+      "used_ratio_max": 0.8,
+      "summary": "As conexões ao PostgreSQL passaram de 80% do máximo.",
+      "runbook": "postgres_connections_high"
+    },
+    "job_failed": {
+      "severity": "warning",
+      "source": "manifesto de jobs do daemon de ops",
+      "summary": "Um job do daemon terminou com erro na última execução.",
+      "runbook": "job_failed"
+    },
+    "job_overdue": {
+      "severity": "warning",
+      "source": "manifesto de jobs do daemon de ops e o agendamento de cada job",
+      "grace_minutes": 30,
+      "summary": "Um job agendado não rodou no último horário previsto.",
+      "runbook": "job_overdue"
+    },
+    "catalog_stale": {
+      "severity": "warning",
+      "source": "sync_log (último sync com sucesso de cards e card_legalities), em transação READ ONLY",
+      "max_age_days": 7,
+      "summary": "O catálogo de cartas está com mais de 7 dias.",
+      "runbook": "catalog_stale"
+    },
+    "endpoint_cache_large": {
+      "severity": "warning",
+      "source": "cache.endpoint_cache_entries de /health/metrics",
+      "max_entries": 5000,
+      "summary": "O cache de rotas em memória passou de 5.000 entradas.",
+      "runbook": "endpoint_cache_large"
+    }
+  },
+  "thresholds_status": "proposta_pendente_do_dono",
+  "thresholds_rationale": {
+    "api_5xx_fast_burn": "Orçamento de 0,5% (D-47). 14,4 × 0,5% = 7,2% em 5 min gasta 2% do orçamento de 30 dias em 1 hora (regra de queima rápida do SRE).",
+    "api_5xx_slow_burn": "6 × 0,5% = 3% por 60 min gasta 5% do orçamento em 6 horas.",
+    "api_read_latency_p95": "O alvo da D-47; duas janelas seguidas evitam avisar por um pico isolado.",
+    "postgres_connections_high": "O mesmo limite da política de capacidade (BT-CAP-001).",
+    "job_overdue": "30 minutos de tolerância cobrem um job longo que ainda está rodando.",
+    "catalog_stale": "A D-18 exige cartas com menos de 7 dias para o GO.",
+    "endpoint_cache_large": "O cache é por réplica e sem teto de entradas; acima de 5.000 respostas guardadas ele passa a pesar na memória da API.",
+    "consecutive": "Duas avaliações seguidas (10 minutos) antes de acordar alguém por queda ou lentidão."
+  },
+  "receiver": {
+    "human": "o dono do projeto (D-47)",
+    "channels": {
+      "email": [
+        "MANALOOM_ALERT_EMAIL_TO",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL"
+      ],
+      "telegram": [
+        "MANALOOM_ALERT_TELEGRAM_BOT_TOKEN",
+        "MANALOOM_ALERT_TELEGRAM_CHAT_ID"
+      ]
+    },
+    "channel_env": "MANALOOM_ALERT_CHANNEL",
+    "repeat_after_minutes": 60,
+    "notify_resolved": true,
+    "note": "O destino e as credenciais ficam só no ambiente do serviço de ops, nunca no repositório."
+  },
+  "pii": "As mensagens levam só o código do alerta, a severidade, números e o template da rota. Nenhum e-mail, UUID, token ou caminho cru sai do avaliador."
+}

@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "af2a057250f2d03f86af410b5ece04c783a3d0bdd339c3d8619d087e65e40938"
+    "sha256": "560da81fa91bbce9aa018f253aa5d6830a4f5dee8c441ee25ca188cdc93d0848"
   },
   "required_task_fields": [
     "id",
@@ -2699,12 +2699,12 @@
     {
       "id": "BT-OBS-001",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "SLOs e alertas de API, PG, jobs, cache, catálogo e releases.",
       "depends_on": [
         "BT-KPI-001"
       ],
-      "acceptance": "Receiver humano, thresholds, alert test e runbook; PII excluída. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): ciclo — `BT-REL-001` depende deste ID, mas o alerta de release daqui precisa da identidade de `BT-REL-002`, que depende de `BT-REL-001`; é preciso partir este ID (decisão do dono). Decisão do dono em 2026-09-22: D-51, dividido: esta tarefa cobre SLOs e alertas de API, banco, jobs e catálogo, e o alerta de release vai para o `BT-OBS-003`; D-47, SLO de 99,5% de disponibilidade e p95 abaixo de 800 ms em leitura, alerta para o dono por e-mail ou Telegram, sem TSDB (PostgreSQL e `/health/metrics`).",
+      "acceptance": "Receiver humano, thresholds, alert test e runbook; PII excluída. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): ciclo — `BT-REL-001` depende deste ID, mas o alerta de release daqui precisa da identidade de `BT-REL-002`, que depende de `BT-REL-001`; é preciso partir este ID (decisão do dono). Decisão do dono em 2026-09-22: D-51, dividido: esta tarefa cobre SLOs e alertas de API, banco, jobs e catálogo, e o alerta de release vai para o `BT-OBS-003`; D-47, SLO de 99,5% de disponibilidade e p95 abaixo de 800 ms em leitura, alerta para o dono por e-mail ou Telegram, sem TSDB (PostgreSQL e `/health/metrics`). Feito em 2026-09-24, na branch `banco/rodada1-2026-09-24`, sem tocar a produção: `server/config/slo_alert_policy.json` versiona os dois SLOs da D-47 (disponibilidade de 99,5% em 30 dias, medida por janela de 5 minutos, e p95 de leitura abaixo de 800 ms), 12 regras de alerta de API, PostgreSQL, jobs do daemon, cache e catálogo, com limites justificados (proposta pendente de confirmação do dono), e o receptor humano (o dono, por e-mail pelo Resend ou Telegram, com destino e credenciais só no ambiente do ops). `RequestMetricsService` passou a guardar janelas de 5 e 60 minutos (um apagão depois de dias no ar agora dispara), a chave de métrica é o template da rota (nenhum UUID em chave, código de alerta ou mensagem) e o número de rotas tem teto; `/health/metrics` devolve as janelas e o tamanho do cache; o painel usa a janela de 5 minutos, e os limites dele ficaram presos à versão 3. `server/bin/manaloom_slo_alerts.py` é o avaliador, job `manaloom_slo_alerts` do daemon de ops a cada 5 minutos (roda até com política inválida): só lê (`/health/live`, `/health/ready`, `/health/metrics` com a chave de ops, PostgreSQL em READ ONLY e o manifesto de jobs), grava a observação de 5 minutos e o estado no volume do ops, manda uma mensagem por avaliação (novos, abertos há mais de 60 minutos e resolvidos) e, sem receptor configurado, grava a observação e termina com erro; `test-alert` é o teste de alerta e `report` calcula o SLO dos últimos 30 dias. Runbook: `docs/runbooks/SLO_E_ALERTAS.md`, uma seção por alerta. Evidência: `server/test/request_metrics_service_test.dart` (9), `operational_alerts_test.dart` (2 testes novos), `server/test/slo_alerts_test.py` (22, com HTTP, PostgreSQL e canal falsos), `server/test/slo_alerts_db_live_test.py` (1, `RUN_SCHEMA_DB_TESTS=1`) e o teste do daemon (26); 23 mutações falham como esperado. Segue aberto: configurar o serviço de ops (URL interna da API, chave de ops e receptor) e o teste de alerta reconhecido pelo dono, que são da coordenação e do dono; a queda vista de fora é o `BT-OBS-002`.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 673
     },
@@ -9368,11 +9368,13 @@
         "server/bin/cron_sync_cards.sh",
         "server/bin/hermes_cron_governor_report.sh",
         "server/bin/manaloom_ops_daemon.py",
+        "server/bin/manaloom_slo_alerts.py",
         "server/bin/sync_card_legalities_from_scryfall.sh",
         "server/bin/sync_cards.dart",
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_staples.dart",
         "server/bin/sync_status.dart",
+        "server/config/slo_alert_policy.json",
         "server/lib/privacy/account_deletion_outbox.dart",
         "server/lib/privacy/retention_cleanup.dart"
       ],
@@ -9390,11 +9392,13 @@
         "server/bin/cron_sync_cards.sh",
         "server/bin/hermes_cron_governor_report.sh",
         "server/bin/manaloom_ops_daemon.py",
+        "server/bin/manaloom_slo_alerts.py",
         "server/bin/sync_card_legalities_from_scryfall.sh",
         "server/bin/sync_cards.dart",
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_staples.dart",
         "server/bin/sync_status.dart",
+        "server/config/slo_alert_policy.json",
         "server/lib/privacy/account_deletion_outbox.dart",
         "server/lib/privacy/retention_cleanup.dart"
       ],
@@ -9412,11 +9416,13 @@
         "server/bin/cron_sync_cards.sh",
         "server/bin/hermes_cron_governor_report.sh",
         "server/bin/manaloom_ops_daemon.py",
+        "server/bin/manaloom_slo_alerts.py",
         "server/bin/sync_card_legalities_from_scryfall.sh",
         "server/bin/sync_cards.dart",
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_staples.dart",
         "server/bin/sync_status.dart",
+        "server/config/slo_alert_policy.json",
         "server/lib/privacy/account_deletion_outbox.dart",
         "server/lib/privacy/retention_cleanup.dart"
       ],
@@ -9884,5 +9890,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "5849c3239332896aac1e5f5a4c51355b1fa15cc4c7a32cecf2bbd9cc0405d758"
+  "project_logic_source_digest_sha256": "a0672006b9bb039e1f5ead0109500ecc5d844940f7054e478859399d5f151b8c"
 }

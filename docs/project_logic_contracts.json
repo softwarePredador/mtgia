@@ -950,7 +950,7 @@
       "id": "ops_scheduler",
       "name": "Scheduler operacional (manaloom-ops) e sincronizações",
       "status": "guarded_no_implicit_live_write",
-      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor",
+      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (19 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox), manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) and manaloom_slo_alerts (BT-OBS-001 read-only SLO and alert evaluator that notifies the owner by e-mail or Telegram, D-47) run; an invalid policy keeps only the governor and the SLO evaluator",
       "entrypoints": ["server/bin/manaloom_ops_daemon.py", "scripts/manaloom_deploy_ops_image.sh", "GET /health (daemon, porta MANALOOM_NATIVE_BATTLE_PORT)"],
       "implementation": [
         "server/bin/manaloom_ops_daemon.py",
@@ -967,12 +967,15 @@
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_cards.dart",
         "server/bin/sync_staples.dart",
-        "server/bin/sync_status.dart"
+        "server/bin/sync_status.dart",
+        "server/bin/manaloom_slo_alerts.py",
+        "server/config/slo_alert_policy.json"
       ],
       "storage": ["sync_log", "sync_state", "data_source_snapshots", "cards", "sets", "card_legalities"],
       "tests": [
         "server/test/manaloom_ops_daemon_test.py",
-        "server/test/sync_catalog_reference_from_scryfall_test.py"
+        "server/test/sync_catalog_reference_from_scryfall_test.py",
+        "server/test/slo_alerts_test.py"
       ],
       "gates": ["scripts/manaloom_battle_product_gate.sh"],
       "sequence": [
@@ -981,7 +984,8 @@
         {"from": "Ops Daemon", "to": "Job", "message": "agenda job cuja capability está on; com tudo off, só o governor e o refresh de dado de referência"},
         {"from": "Catalog Refresh", "to": "Scryfall", "message": "bulk default_cards, uma vez por dia, só com o contrato ativado"},
         {"from": "Job", "to": "PostgreSQL", "message": "sync_log, sync_state e data_source_snapshots"},
-        {"from": "Ops Daemon", "to": "Operator", "message": "GET /health próprio e relatório do governor"}
+        {"from": "Ops Daemon", "to": "Operator", "message": "GET /health próprio e relatório do governor"},
+        {"from": "SLO Evaluator", "to": "Owner", "message": "alerta de API, banco, jobs, cache e catálogo por e-mail ou Telegram (D-47)"}
       ]
     }
   ],

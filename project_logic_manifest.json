@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "5849c3239332896aac1e5f5a4c51355b1fa15cc4c7a32cecf2bbd9cc0405d758",
+  "source_digest_sha256": "a0672006b9bb039e1f5ead0109500ecc5d844940f7054e478859399d5f151b8c",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 700,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5285,
+    "dart_symbols": 5290,
     "semantic_resolved_files": 700,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43063,
-    "semantic_resolved_call_sites": 68474,
-    "semantic_resolved_type_references": 16311,
+    "semantic_resolved_call_edges": 43088,
+    "semantic_resolved_call_sites": 68507,
+    "semantic_resolved_type_references": 16317,
     "modules": 160,
     "app_routes": 46,
     "web_routes": 11,
@@ -79,9 +79,9 @@
     "database_tables": 80,
     "database_views": 6,
     "migrations": 63,
-    "scripts_and_jobs": 695,
-    "environment_variables": 716,
-    "tests": 1263,
+    "scripts_and_jobs": 696,
+    "environment_variables": 717,
+    "tests": 1266,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1978,7 +1978,7 @@
         "server/lib/request_metrics_service.dart"
       ],
       "file_count": 1,
-      "symbol_count": 3,
+      "symbol_count": 8,
       "providers": [],
       "services": [
         "RequestMetricsService"
@@ -36460,61 +36460,61 @@
       "name": "_aiJobAlerts",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 127
+      "line": 156
     },
     {
       "name": "_aiProviderAlerts",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 166
+      "line": 195
     },
     {
       "name": "_battleJobAlerts",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 192
+      "line": 221
     },
     {
       "name": "_coachTerminalCountAlert",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 338
+      "line": 367
     },
     {
       "name": "_decimal",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 376
+      "line": 405
     },
     {
       "name": "_integer",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 366
+      "line": 395
     },
     {
       "name": "_interactiveBattleAlerts",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 281
+      "line": 310
     },
     {
       "name": "_map",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 356
+      "line": 385
     },
     {
       "name": "_requestAlerts",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 87
+      "line": 113
     },
     {
       "name": "evaluateOperationalAlerts",
       "kind": "function",
       "source": "server/lib/operational_alerts.dart",
-      "line": 49
+      "line": 75
     },
     {
       "name": "PasswordPolicy",
@@ -37287,8 +37287,11 @@
       "name": "RequestMetricsService",
       "kind": "class",
       "source": "server/lib/request_metrics_service.dart",
-      "line": 62,
+      "line": 70,
       "members": [
+        "_minuteOf",
+        "_prune",
+        "_window",
         "record",
         "snapshot"
       ]
@@ -37302,6 +37305,36 @@
         "add",
         "snapshot"
       ]
+    },
+    {
+      "name": "_MinuteBucket",
+      "kind": "class",
+      "source": "server/lib/request_metrics_service.dart",
+      "line": 62
+    },
+    {
+      "name": "_countsForSlo",
+      "kind": "function",
+      "source": "server/lib/request_metrics_service.dart",
+      "line": 220
+    },
+    {
+      "name": "_isRead",
+      "kind": "function",
+      "source": "server/lib/request_metrics_service.dart",
+      "line": 233
+    },
+    {
+      "name": "_p95",
+      "kind": "function",
+      "source": "server/lib/request_metrics_service.dart",
+      "line": 236
+    },
+    {
+      "name": "routeTemplate",
+      "kind": "function",
+      "source": "server/lib/request_metrics_service.dart",
+      "line": 203
     },
     {
       "name": "RequestTrace",
@@ -40414,7 +40447,7 @@
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/health/metrics/index.dart",
-      "line": 8
+      "line": 9
     },
     {
       "name": "onRequest",
@@ -41735,11 +41768,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43063,
-    "resolved_call_site_count": 68474,
-    "workspace_call_edge_count": 13489,
-    "unresolved_call_edge_count": 558,
-    "unresolved_call_site_count": 769,
+    "resolved_call_edge_count": 43088,
+    "resolved_call_site_count": 68507,
+    "workspace_call_edge_count": 13501,
+    "unresolved_call_edge_count": 560,
+    "unresolved_call_site_count": 771,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -165098,194 +165131,7 @@
       },
       {
         "source": "server/lib/operational_alerts.dart",
-        "line": 131,
-        "caller": "_aiJobAlerts",
-        "kind": "method",
-        "lexical_target": "_integer",
-        "target": "_integer",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 135,
-        "caller": "_aiJobAlerts",
-        "kind": "constructor",
-        "lexical_target": "OperationalAlert",
-        "target": "OperationalAlert.OperationalAlert",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 172,
-        "caller": "_aiProviderAlerts",
-        "kind": "method",
-        "lexical_target": "_integer",
-        "target": "_integer",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 179,
-        "caller": "_aiProviderAlerts",
-        "kind": "constructor",
-        "lexical_target": "OperationalAlert",
-        "target": "OperationalAlert.OperationalAlert",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 197,
-        "caller": "_battleJobAlerts",
-        "kind": "method",
-        "lexical_target": "_map",
-        "target": "_map",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 198,
-        "caller": "_battleJobAlerts",
-        "kind": "method",
-        "lexical_target": "_integer",
-        "target": "_integer",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 11
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 202,
-        "caller": "_battleJobAlerts",
-        "kind": "constructor",
-        "lexical_target": "OperationalAlert",
-        "target": "OperationalAlert.OperationalAlert",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 286,
-        "caller": "_interactiveBattleAlerts",
-        "kind": "method",
-        "lexical_target": "_map",
-        "target": "_map",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 287,
-        "caller": "_interactiveBattleAlerts",
-        "kind": "method",
-        "lexical_target": "_integer",
-        "target": "_integer",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 289,
-        "caller": "_interactiveBattleAlerts",
-        "kind": "constructor",
-        "lexical_target": "OperationalAlert",
-        "target": "OperationalAlert.OperationalAlert",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 312,
-        "caller": "_interactiveBattleAlerts",
-        "kind": "method",
-        "lexical_target": "_coachTerminalCountAlert",
-        "target": "_coachTerminalCountAlert",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 346,
-        "caller": "_coachTerminalCountAlert",
-        "kind": "constructor",
-        "lexical_target": "OperationalAlert",
-        "target": "OperationalAlert.OperationalAlert",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 57,
-        "caller": "evaluateOperationalAlerts",
-        "kind": "method",
-        "lexical_target": "_requestAlerts",
-        "target": "_requestAlerts",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 58,
-        "caller": "evaluateOperationalAlerts",
-        "kind": "method",
-        "lexical_target": "_aiJobAlerts",
-        "target": "_aiJobAlerts",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 59,
-        "caller": "evaluateOperationalAlerts",
-        "kind": "method",
-        "lexical_target": "_aiProviderAlerts",
-        "target": "_aiProviderAlerts",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 60,
-        "caller": "evaluateOperationalAlerts",
-        "kind": "method",
-        "lexical_target": "_battleJobAlerts",
-        "target": "_battleJobAlerts",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 61,
-        "caller": "evaluateOperationalAlerts",
-        "kind": "method",
-        "lexical_target": "_interactiveBattleAlerts",
-        "target": "_interactiveBattleAlerts",
-        "target_library": "package:server/operational_alerts.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/operational_alerts.dart",
-        "line": 83,
+        "line": 109,
         "caller": "evaluateOperationalAlerts",
         "kind": "method",
         "lexical_target": "toJson",
@@ -165296,18 +165142,18 @@
       },
       {
         "source": "server/lib/operational_alerts.dart",
-        "line": 90,
+        "line": 118,
         "caller": "_requestAlerts",
         "kind": "method",
         "lexical_target": "_map",
         "target": "_map",
         "target_library": "package:server/operational_alerts.dart",
         "target_scope": "workspace",
-        "occurrences": 3
+        "occurrences": 5
       },
       {
         "source": "server/lib/operational_alerts.dart",
-        "line": 91,
+        "line": 120,
         "caller": "_requestAlerts",
         "kind": "method",
         "lexical_target": "_integer",
@@ -165318,7 +165164,7 @@
       },
       {
         "source": "server/lib/operational_alerts.dart",
-        "line": 92,
+        "line": 121,
         "caller": "_requestAlerts",
         "kind": "method",
         "lexical_target": "_decimal",
@@ -165329,7 +165175,7 @@
       },
       {
         "source": "server/lib/operational_alerts.dart",
-        "line": 95,
+        "line": 124,
         "caller": "_requestAlerts",
         "kind": "constructor",
         "lexical_target": "OperationalAlert",
@@ -165337,6 +165183,193 @@
         "target_library": "package:server/operational_alerts.dart",
         "target_scope": "workspace",
         "occurrences": 2
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 160,
+        "caller": "_aiJobAlerts",
+        "kind": "method",
+        "lexical_target": "_integer",
+        "target": "_integer",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 164,
+        "caller": "_aiJobAlerts",
+        "kind": "constructor",
+        "lexical_target": "OperationalAlert",
+        "target": "OperationalAlert.OperationalAlert",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 201,
+        "caller": "_aiProviderAlerts",
+        "kind": "method",
+        "lexical_target": "_integer",
+        "target": "_integer",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 208,
+        "caller": "_aiProviderAlerts",
+        "kind": "constructor",
+        "lexical_target": "OperationalAlert",
+        "target": "OperationalAlert.OperationalAlert",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 226,
+        "caller": "_battleJobAlerts",
+        "kind": "method",
+        "lexical_target": "_map",
+        "target": "_map",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 227,
+        "caller": "_battleJobAlerts",
+        "kind": "method",
+        "lexical_target": "_integer",
+        "target": "_integer",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 11
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 231,
+        "caller": "_battleJobAlerts",
+        "kind": "constructor",
+        "lexical_target": "OperationalAlert",
+        "target": "OperationalAlert.OperationalAlert",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 315,
+        "caller": "_interactiveBattleAlerts",
+        "kind": "method",
+        "lexical_target": "_map",
+        "target": "_map",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 316,
+        "caller": "_interactiveBattleAlerts",
+        "kind": "method",
+        "lexical_target": "_integer",
+        "target": "_integer",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 318,
+        "caller": "_interactiveBattleAlerts",
+        "kind": "constructor",
+        "lexical_target": "OperationalAlert",
+        "target": "OperationalAlert.OperationalAlert",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 341,
+        "caller": "_interactiveBattleAlerts",
+        "kind": "method",
+        "lexical_target": "_coachTerminalCountAlert",
+        "target": "_coachTerminalCountAlert",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 375,
+        "caller": "_coachTerminalCountAlert",
+        "kind": "constructor",
+        "lexical_target": "OperationalAlert",
+        "target": "OperationalAlert.OperationalAlert",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 83,
+        "caller": "evaluateOperationalAlerts",
+        "kind": "method",
+        "lexical_target": "_requestAlerts",
+        "target": "_requestAlerts",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 84,
+        "caller": "evaluateOperationalAlerts",
+        "kind": "method",
+        "lexical_target": "_aiJobAlerts",
+        "target": "_aiJobAlerts",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 85,
+        "caller": "evaluateOperationalAlerts",
+        "kind": "method",
+        "lexical_target": "_aiProviderAlerts",
+        "target": "_aiProviderAlerts",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 86,
+        "caller": "evaluateOperationalAlerts",
+        "kind": "method",
+        "lexical_target": "_battleJobAlerts",
+        "target": "_battleJobAlerts",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/operational_alerts.dart",
+        "line": 87,
+        "caller": "evaluateOperationalAlerts",
+        "kind": "method",
+        "lexical_target": "_interactiveBattleAlerts",
+        "target": "_interactiveBattleAlerts",
+        "target_library": "package:server/operational_alerts.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/lib/password_policy.dart",
@@ -167386,6 +167419,160 @@
       },
       {
         "source": "server/lib/request_metrics_service.dart",
+        "line": 108,
+        "caller": "RequestMetricsService.record",
+        "kind": "method",
+        "lexical_target": "routeTemplate",
+        "target": "routeTemplate",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 114,
+        "caller": "RequestMetricsService.record",
+        "kind": "method",
+        "lexical_target": "add",
+        "target": "_EndpointMetricBucket.add",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 115,
+        "caller": "RequestMetricsService.record",
+        "kind": "constructor",
+        "lexical_target": "_EndpointMetricBucket",
+        "target": "_EndpointMetricBucket._EndpointMetricBucket",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 118,
+        "caller": "RequestMetricsService.record",
+        "kind": "method",
+        "lexical_target": "_countsForSlo",
+        "target": "_countsForSlo",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 119,
+        "caller": "RequestMetricsService.record",
+        "kind": "method",
+        "lexical_target": "_minuteOf",
+        "target": "RequestMetricsService._minuteOf",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 120,
+        "caller": "RequestMetricsService.record",
+        "kind": "method",
+        "lexical_target": "_prune",
+        "target": "RequestMetricsService._prune",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 121,
+        "caller": "RequestMetricsService.record",
+        "kind": "constructor",
+        "lexical_target": "_MinuteBucket",
+        "target": "_MinuteBucket._MinuteBucket",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 124,
+        "caller": "RequestMetricsService.record",
+        "kind": "method",
+        "lexical_target": "_isRead",
+        "target": "_isRead",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 144,
+        "caller": "RequestMetricsService.snapshot",
+        "kind": "method",
+        "lexical_target": "snapshot",
+        "target": "_EndpointMetricBucket.snapshot",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 147,
+        "caller": "RequestMetricsService.snapshot",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "EndpointMetricSnapshot.toJson",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 150,
+        "caller": "RequestMetricsService.snapshot",
+        "kind": "method",
+        "lexical_target": "_minuteOf",
+        "target": "RequestMetricsService._minuteOf",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 151,
+        "caller": "RequestMetricsService.snapshot",
+        "kind": "method",
+        "lexical_target": "_prune",
+        "target": "RequestMetricsService._prune",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 159,
+        "caller": "RequestMetricsService.snapshot",
+        "kind": "method",
+        "lexical_target": "_window",
+        "target": "RequestMetricsService._window",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 182,
+        "caller": "RequestMetricsService._window",
+        "kind": "method",
+        "lexical_target": "_p95",
+        "target": "_p95",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
         "line": 52,
         "caller": "_EndpointMetricBucket.snapshot",
         "kind": "constructor",
@@ -167397,8 +167584,19 @@
       },
       {
         "source": "server/lib/request_metrics_service.dart",
-        "line": 64,
-        "caller": "<top-level>",
+        "line": 56,
+        "caller": "_EndpointMetricBucket.snapshot",
+        "kind": "method",
+        "lexical_target": "_p95",
+        "target": "_p95",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 88,
+        "caller": "RequestMetricsService.<constructor>",
         "kind": "constructor",
         "lexical_target": "RequestMetricsService._",
         "target": "RequestMetricsService.RequestMetricsService._",
@@ -167408,44 +167606,11 @@
       },
       {
         "source": "server/lib/request_metrics_service.dart",
-        "line": 74,
-        "caller": "RequestMetricsService.record",
-        "kind": "constructor",
-        "lexical_target": "_EndpointMetricBucket",
-        "target": "_EndpointMetricBucket._EndpointMetricBucket",
-        "target_library": "package:server/request_metrics_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/request_metrics_service.dart",
-        "line": 75,
-        "caller": "RequestMetricsService.record",
-        "kind": "method",
-        "lexical_target": "add",
-        "target": "_EndpointMetricBucket.add",
-        "target_library": "package:server/request_metrics_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/request_metrics_service.dart",
         "line": 90,
-        "caller": "RequestMetricsService.snapshot",
-        "kind": "method",
-        "lexical_target": "snapshot",
-        "target": "_EndpointMetricBucket.snapshot",
-        "target_library": "package:server/request_metrics_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/request_metrics_service.dart",
-        "line": 93,
-        "caller": "RequestMetricsService.snapshot",
-        "kind": "method",
-        "lexical_target": "toJson",
-        "target": "EndpointMetricSnapshot.toJson",
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "RequestMetricsService._",
+        "target": "RequestMetricsService.RequestMetricsService._",
         "target_library": "package:server/request_metrics_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -187032,7 +187197,7 @@
       },
       {
         "source": "server/routes/health/metrics/index.dart",
-        "line": 10,
+        "line": 14,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -187043,7 +187208,7 @@
       },
       {
         "source": "server/routes/health/metrics/index.dart",
-        "line": 13,
+        "line": 17,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "snapshot",
@@ -190150,8 +190315,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14346,
-        "occurrences": 24922
+        "unique_references": 14359,
+        "occurrences": 24940
       },
       {
         "target_scope": "dart_sdk",
@@ -194381,7 +194546,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/operational_alerts.dart",
         "unique_references": 23,
-        "occurrences": 56
+        "occurrences": 58
       },
       {
         "target_scope": "workspace",
@@ -194488,8 +194653,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/request_metrics_service.dart",
-        "unique_references": 9,
-        "occurrences": 11
+        "unique_references": 21,
+        "occurrences": 24
       },
       {
         "target_scope": "workspace",
@@ -199662,6 +199827,22 @@
         "occurrences": 3
       },
       {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 107,
+        "caller": "RequestMetricsService.record",
+        "kind": "function_expression",
+        "lexical_target": "_clock",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 133,
+        "caller": "RequestMetricsService.snapshot",
+        "kind": "function_expression",
+        "lexical_target": "_clock",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/schema_audit/schema_audit.dart",
         "line": 516,
         "caller": "_compareMaps",
@@ -199822,9 +200003,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16311,
-    "workspace_type_reference_count": 3450,
-    "unresolved_type_reference_count": 356,
+    "resolved_type_reference_count": 16317,
+    "workspace_type_reference_count": 3451,
+    "unresolved_type_reference_count": 357,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -230669,7 +230850,7 @@
       },
       {
         "source": "server/lib/operational_alerts.dart",
-        "line": 56,
+        "line": 82,
         "lexical_type": "OperationalAlert",
         "resolved_type": "OperationalAlert",
         "target": "OperationalAlert",
@@ -231129,7 +231310,17 @@
       },
       {
         "source": "server/lib/request_metrics_service.dart",
-        "line": 47,
+        "line": 100,
+        "lexical_type": "_MinuteBucket",
+        "resolved_type": "_MinuteBucket",
+        "target": "_MinuteBucket",
+        "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 51,
         "lexical_type": "EndpointMetricSnapshot",
         "resolved_type": "EndpointMetricSnapshot",
         "target": "EndpointMetricSnapshot",
@@ -231139,17 +231330,17 @@
       },
       {
         "source": "server/lib/request_metrics_service.dart",
-        "line": 64,
+        "line": 88,
         "lexical_type": "RequestMetricsService",
         "resolved_type": "RequestMetricsService",
         "target": "RequestMetricsService",
         "target_library": "package:server/request_metrics_service.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "source": "server/lib/request_metrics_service.dart",
-        "line": 66,
+        "line": 98,
         "lexical_type": "_EndpointMetricBucket",
         "resolved_type": "_EndpointMetricBucket",
         "target": "_EndpointMetricBucket",
@@ -234356,8 +234547,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6291,
-        "occurrences": 39900
+        "unique_references": 6296,
+        "occurrences": 39933
       },
       {
         "target_scope": "dart_sdk",
@@ -238088,8 +238279,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/request_metrics_service.dart",
-        "unique_references": 3,
-        "occurrences": 7
+        "unique_references": 4,
+        "occurrences": 11
       },
       {
         "target_scope": "workspace",
@@ -240371,7 +240562,13 @@
         "source": "server/lib/request_metrics_service.dart",
         "line": 35,
         "lexical_type": "void",
-        "occurrences": 2
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/request_metrics_service.dart",
+        "line": 83,
+        "lexical_type": "DateTime",
+        "occurrences": 1
       },
       {
         "source": "server/lib/schema_audit/schema_audit.dart",
@@ -241797,8 +241994,11 @@
       "name": "RequestMetricsService",
       "kind": "class",
       "source": "server/lib/request_metrics_service.dart",
-      "line": 62,
+      "line": 70,
       "members": [
+        "_minuteOf",
+        "_prune",
+        "_window",
         "record",
         "snapshot"
       ]
@@ -266726,6 +266926,7 @@
         "MANALOOM_RELEASE_CAPABILITIES_FILE",
         "MANALOOM_REPO",
         "MANALOOM_RUN_PREFLIGHT_ON_BOOT",
+        "MANALOOM_SLO_ALERTS_CRON",
         "MANALOOM_SYNC_CARD_LEGALITIES_CRON",
         "MASTER_OPTIMIZER_PREFLIGHT_CRON",
         "MTGIA_ENV_FILE",
@@ -266738,6 +266939,14 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": []
+    },
+    {
+      "path": "server/bin/manaloom_slo_alerts.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_REPO"
+      ]
     },
     {
       "path": "server/bin/master_optimizer_preflight.sh",
@@ -272007,6 +272216,7 @@
         "server/bin/hermes_mana_base_validator.py",
         "server/bin/manaloom_knowledge_import.sh",
         "server/bin/manaloom_ops_daemon.py",
+        "server/bin/manaloom_slo_alerts.py",
         "server/bin/master_optimizer_preflight.sh",
         "server/bin/run_local_battle_replay_audit.sh",
         "server/bin/sync_hermes_learned_deck.sh",
@@ -272390,6 +272600,14 @@
       "classification": "configuration",
       "sources": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/slot_optimizer.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_SLO_ALERTS_CRON",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/manaloom_ops_daemon.py"
       ],
       "value_captured": false
     },
@@ -275264,6 +275482,7 @@
     "server/test/register_password_contract_test.dart",
     "server/test/release_capability_policy_test.dart",
     "server/test/release_sbom_scope_test.py",
+    "server/test/request_metrics_service_test.dart",
     "server/test/request_trace_test.dart",
     "server/test/resolution_corpus_preflight_source_test.dart",
     "server/test/retention_cleanup_db_live_test.dart",
@@ -275290,6 +275509,8 @@
     "server/test/sets_route_test.dart",
     "server/test/shareable_report_deleted_deck_db_live_test.dart",
     "server/test/shareable_report_deleted_deck_test.dart",
+    "server/test/slo_alerts_db_live_test.py",
+    "server/test/slo_alerts_test.py",
     "server/test/social_runtime_schema_contract_test.dart",
     "server/test/social_safety_live_test.dart",
     "server/test/social_trading_live_test.dart",
@@ -276335,7 +276556,7 @@
       "id": "ops_scheduler",
       "name": "Scheduler operacional (manaloom-ops) e sincronizações",
       "status": "guarded_no_implicit_live_write",
-      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor",
+      "source_of_truth": "server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (19 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox), manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) and manaloom_slo_alerts (BT-OBS-001 read-only SLO and alert evaluator that notifies the owner by e-mail or Telegram, D-47) run; an invalid policy keeps only the governor and the SLO evaluator",
       "entrypoints": [
         "server/bin/manaloom_ops_daemon.py",
         "scripts/manaloom_deploy_ops_image.sh",
@@ -276356,7 +276577,9 @@
         "server/bin/sync_catalog_reference_from_scryfall.py",
         "server/bin/sync_cards.dart",
         "server/bin/sync_staples.dart",
-        "server/bin/sync_status.dart"
+        "server/bin/sync_status.dart",
+        "server/bin/manaloom_slo_alerts.py",
+        "server/config/slo_alert_policy.json"
       ],
       "storage": [
         "sync_log",
@@ -276368,7 +276591,8 @@
       ],
       "tests": [
         "server/test/manaloom_ops_daemon_test.py",
-        "server/test/sync_catalog_reference_from_scryfall_test.py"
+        "server/test/sync_catalog_reference_from_scryfall_test.py",
+        "server/test/slo_alerts_test.py"
       ],
       "gates": [
         "scripts/manaloom_battle_product_gate.sh"
@@ -276403,6 +276627,11 @@
           "from": "Ops Daemon",
           "to": "Operator",
           "message": "GET /health próprio e relatório do governor"
+        },
+        {
+          "from": "SLO Evaluator",
+          "to": "Owner",
+          "message": "alerta de API, banco, jobs, cache e catálogo por e-mail ou Telegram (D-47)"
         }
       ]
     }
@@ -276599,7 +276828,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "af2a057250f2d03f86af410b5ece04c783a3d0bdd339c3d8619d087e65e40938"
+      "sha256": "560da81fa91bbce9aa018f253aa5d6830a4f5dee8c441ee25ca188cdc93d0848"
     },
     "required_task_fields": [
       "id",
@@ -279296,12 +279525,12 @@
       {
         "id": "BT-OBS-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "SLOs e alertas de API, PG, jobs, cache, catálogo e releases.",
         "depends_on": [
           "BT-KPI-001"
         ],
-        "acceptance": "Receiver humano, thresholds, alert test e runbook; PII excluída. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): ciclo — `BT-REL-001` depende deste ID, mas o alerta de release daqui precisa da identidade de `BT-REL-002`, que depende de `BT-REL-001`; é preciso partir este ID (decisão do dono). Decisão do dono em 2026-09-22: D-51, dividido: esta tarefa cobre SLOs e alertas de API, banco, jobs e catálogo, e o alerta de release vai para o `BT-OBS-003`; D-47, SLO de 99,5% de disponibilidade e p95 abaixo de 800 ms em leitura, alerta para o dono por e-mail ou Telegram, sem TSDB (PostgreSQL e `/health/metrics`).",
+        "acceptance": "Receiver humano, thresholds, alert test e runbook; PII excluída. Medição de 2026-09-22 (`docs/flows/_p0/README.md`): ciclo — `BT-REL-001` depende deste ID, mas o alerta de release daqui precisa da identidade de `BT-REL-002`, que depende de `BT-REL-001`; é preciso partir este ID (decisão do dono). Decisão do dono em 2026-09-22: D-51, dividido: esta tarefa cobre SLOs e alertas de API, banco, jobs e catálogo, e o alerta de release vai para o `BT-OBS-003`; D-47, SLO de 99,5% de disponibilidade e p95 abaixo de 800 ms em leitura, alerta para o dono por e-mail ou Telegram, sem TSDB (PostgreSQL e `/health/metrics`). Feito em 2026-09-24, na branch `banco/rodada1-2026-09-24`, sem tocar a produção: `server/config/slo_alert_policy.json` versiona os dois SLOs da D-47 (disponibilidade de 99,5% em 30 dias, medida por janela de 5 minutos, e p95 de leitura abaixo de 800 ms), 12 regras de alerta de API, PostgreSQL, jobs do daemon, cache e catálogo, com limites justificados (proposta pendente de confirmação do dono), e o receptor humano (o dono, por e-mail pelo Resend ou Telegram, com destino e credenciais só no ambiente do ops). `RequestMetricsService` passou a guardar janelas de 5 e 60 minutos (um apagão depois de dias no ar agora dispara), a chave de métrica é o template da rota (nenhum UUID em chave, código de alerta ou mensagem) e o número de rotas tem teto; `/health/metrics` devolve as janelas e o tamanho do cache; o painel usa a janela de 5 minutos, e os limites dele ficaram presos à versão 3. `server/bin/manaloom_slo_alerts.py` é o avaliador, job `manaloom_slo_alerts` do daemon de ops a cada 5 minutos (roda até com política inválida): só lê (`/health/live`, `/health/ready`, `/health/metrics` com a chave de ops, PostgreSQL em READ ONLY e o manifesto de jobs), grava a observação de 5 minutos e o estado no volume do ops, manda uma mensagem por avaliação (novos, abertos há mais de 60 minutos e resolvidos) e, sem receptor configurado, grava a observação e termina com erro; `test-alert` é o teste de alerta e `report` calcula o SLO dos últimos 30 dias. Runbook: `docs/runbooks/SLO_E_ALERTAS.md`, uma seção por alerta. Evidência: `server/test/request_metrics_service_test.dart` (9), `operational_alerts_test.dart` (2 testes novos), `server/test/slo_alerts_test.py` (22, com HTTP, PostgreSQL e canal falsos), `server/test/slo_alerts_db_live_test.py` (1, `RUN_SCHEMA_DB_TESTS=1`) e o teste do daemon (26); 23 mutações falham como esperado. Segue aberto: configurar o serviço de ops (URL interna da API, chave de ops e receptor) e o teste de alerta reconhecido pelo dono, que são da coordenação e do dono; a queda vista de fora é o `BT-OBS-002`.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 673
       },
@@ -285965,11 +286194,13 @@
           "server/bin/cron_sync_cards.sh",
           "server/bin/hermes_cron_governor_report.sh",
           "server/bin/manaloom_ops_daemon.py",
+          "server/bin/manaloom_slo_alerts.py",
           "server/bin/sync_card_legalities_from_scryfall.sh",
           "server/bin/sync_cards.dart",
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
           "server/bin/sync_status.dart",
+          "server/config/slo_alert_policy.json",
           "server/lib/privacy/account_deletion_outbox.dart",
           "server/lib/privacy/retention_cleanup.dart"
         ],
@@ -285987,11 +286218,13 @@
           "server/bin/cron_sync_cards.sh",
           "server/bin/hermes_cron_governor_report.sh",
           "server/bin/manaloom_ops_daemon.py",
+          "server/bin/manaloom_slo_alerts.py",
           "server/bin/sync_card_legalities_from_scryfall.sh",
           "server/bin/sync_cards.dart",
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
           "server/bin/sync_status.dart",
+          "server/config/slo_alert_policy.json",
           "server/lib/privacy/account_deletion_outbox.dart",
           "server/lib/privacy/retention_cleanup.dart"
         ],
@@ -286009,11 +286242,13 @@
           "server/bin/cron_sync_cards.sh",
           "server/bin/hermes_cron_governor_report.sh",
           "server/bin/manaloom_ops_daemon.py",
+          "server/bin/manaloom_slo_alerts.py",
           "server/bin/sync_card_legalities_from_scryfall.sh",
           "server/bin/sync_cards.dart",
           "server/bin/sync_catalog_reference_from_scryfall.py",
           "server/bin/sync_staples.dart",
           "server/bin/sync_status.dart",
+          "server/config/slo_alert_policy.json",
           "server/lib/privacy/account_deletion_outbox.dart",
           "server/lib/privacy/retention_cleanup.dart"
         ],
@@ -286481,7 +286716,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "5849c3239332896aac1e5f5a4c51355b1fa15cc4c7a32cecf2bbd9cc0405d758"
+    "project_logic_source_digest_sha256": "a0672006b9bb039e1f5ead0109500ecc5d844940f7054e478859399d5f151b8c"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288778,6 +289013,7 @@
       "server/bin/manaloom_new_card_candidate_review.sh",
       "server/bin/manaloom_ops_daemon.py",
       "server/bin/manaloom_ops_entrypoint.sh",
+      "server/bin/manaloom_slo_alerts.py",
       "server/bin/master_optimizer_preflight.sh",
       "server/bin/meta_commander_color_identity_report.dart",
       "server/bin/meta_profile_report.dart",
@@ -289638,6 +289874,7 @@
       "server/test/register_password_contract_test.dart",
       "server/test/release_capability_policy_test.dart",
       "server/test/release_sbom_scope_test.py",
+      "server/test/request_metrics_service_test.dart",
       "server/test/request_trace_test.dart",
       "server/test/resolution_corpus_preflight_source_test.dart",
       "server/test/retention_cleanup_db_live_test.dart",
@@ -289664,6 +289901,8 @@
       "server/test/sets_route_test.dart",
       "server/test/shareable_report_deleted_deck_db_live_test.dart",
       "server/test/shareable_report_deleted_deck_test.dart",
+      "server/test/slo_alerts_db_live_test.py",
+      "server/test/slo_alerts_test.py",
       "server/test/social_runtime_schema_contract_test.dart",
       "server/test/social_safety_live_test.dart",
       "server/test/social_trading_live_test.dart",
