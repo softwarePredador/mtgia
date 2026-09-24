@@ -77,6 +77,8 @@
 | `/decks/{id}/cards/remove` | `POST` | `server/routes/decks/[id]/cards/remove/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/replace` | `POST` | `server/routes/decks/[id]/cards/replace/index.dart` | 2 | `source` |
 | `/decks/{id}/cards/set` | `POST` | `server/routes/decks/[id]/cards/set/index.dart` | 2 | `source` |
+| `/decks/{id}/changes` | `GET` | `server/routes/decks/[id]/changes/index.dart` | 2 | `source` |
+| `/decks/{id}/changes/{eventId}/undo` | `POST` | `server/routes/decks/[id]/changes/[eventId]/undo/index.dart` | 2 | `source` |
 | `/decks/{id}/export` | `GET` | `server/routes/decks/[id]/export/index.dart` | 2 | `source` |
 | `/decks/{id}/optimizations` | `GET` | `server/routes/decks/[id]/optimizations/index.dart` | 2 | `source` |
 | `/decks/{id}/optimizations/{eventId}/rollback` | `POST` | `server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart` | 2 | `source` |

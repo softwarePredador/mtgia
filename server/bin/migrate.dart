@@ -4146,6 +4146,93 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS account_deletion_outbox;
     ''',
   ),
+  Migration(
+    version: '067',
+    name: 'create_deck_revision_ledger',
+    // DCK-P0-01 (decisão D-29 do dono): revisão otimista do deck e ledger
+    // imutável de mudanças. Toda mudança de deck existente sobe
+    // `decks.revision` e grava uma linha em `deck_change_events` com o que
+    // mudou, antes e depois, na mesma transação
+    // (lib/decks/deck_revision_support.dart); a `Idempotency-Key` do pedido
+    // fica no evento para o repetido devolver o mesmo recibo. O ledger só
+    // recebe INSERT; DELETE só em cascata do deck ou da conta. 067 a 069 são
+    // da frente de deck; 061-062 e 063-066, das frentes A e C.
+    up: '''
+      ALTER TABLE decks ADD COLUMN IF NOT EXISTS revision BIGINT NOT NULL DEFAULT 1;
+      ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_revision_positive;
+      ALTER TABLE decks ADD CONSTRAINT chk_decks_revision_positive
+        CHECK (revision >= 1);
+
+      CREATE TABLE IF NOT EXISTS deck_change_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        revision_before BIGINT NOT NULL CHECK (revision_before >= 1),
+        revision_after BIGINT NOT NULL,
+        operation TEXT NOT NULL,
+        cards_before JSONB,
+        cards_after JSONB,
+        metadata_before JSONB NOT NULL DEFAULT '{}'::jsonb,
+        metadata_after JSONB NOT NULL DEFAULT '{}'::jsonb,
+        undo_of_event_id UUID REFERENCES deck_change_events(id) ON DELETE CASCADE,
+        idempotency_key TEXT,
+        request_fingerprint TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_deck_change_events_revision_step
+          CHECK (revision_after = revision_before + 1),
+        CONSTRAINT chk_deck_change_events_cards_pair
+          CHECK ((cards_before IS NULL) = (cards_after IS NULL)),
+        CONSTRAINT chk_deck_change_events_idempotency_pair
+          CHECK ((idempotency_key IS NULL) = (request_fingerprint IS NULL)),
+        CONSTRAINT chk_deck_change_events_idempotency_key
+          CHECK (
+            idempotency_key IS NULL
+            OR char_length(idempotency_key) BETWEEN 1 AND 200
+          ),
+        CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+          'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+          'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+          'optimization_rollback', 'undo'
+        )),
+        CONSTRAINT uq_deck_change_events_revision UNIQUE (deck_id, revision_after)
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_deck_change_events_idempotency
+        ON deck_change_events (deck_id, idempotency_key)
+        WHERE idempotency_key IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_deck_change_events_user
+        ON deck_change_events (user_id);
+      CREATE INDEX IF NOT EXISTS idx_deck_change_events_undo_of
+        ON deck_change_events (undo_of_event_id)
+        WHERE undo_of_event_id IS NOT NULL;
+
+      CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_change_events_append_only\$
+      BEGIN
+        -- UPDATE nunca. DELETE só em cascata (deck ou conta apagados), que chega
+        -- por um gatilho de integridade: profundidade 2 ou mais.
+        IF TG_OP = 'UPDATE' OR pg_trigger_depth() <= 1 THEN
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        RETURN OLD;
+      END;
+      \$deck_change_events_append_only\$;
+
+      DROP TRIGGER IF EXISTS manaloom_deck_change_events_append_only
+        ON deck_change_events;
+      CREATE TRIGGER manaloom_deck_change_events_append_only
+      BEFORE UPDATE OR DELETE ON deck_change_events
+      FOR EACH ROW EXECUTE FUNCTION manaloom_deck_change_events_append_only();
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS deck_change_events;
+      DROP FUNCTION IF EXISTS manaloom_deck_change_events_append_only();
+      ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_revision_positive;
+      ALTER TABLE decks DROP COLUMN IF EXISTS revision;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4218,7 +4305,9 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
     switch (version) {
       // A 060 cria o outbox da exclusão (D-68): o down só roda com a tabela
       // vazia, porque cada linha é a obrigação de um consumidor.
-      '033' || '035' || '060' => MigrationRollbackPolicy.emptyOnly,
+      // A 067 cria o ledger de mudanças do deck: o down só roda sem nenhum
+      // evento e com todo deck ainda na revisão 1.
+      '033' || '035' || '060' || '067' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
       '034' ||
@@ -4283,6 +4372,13 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
       (await tx.execute(
             'SELECT EXISTS (SELECT 1 FROM account_deletion_outbox)',
           )).first[0] ==
+          true,
+    '067' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM deck_change_events)
+          OR EXISTS (SELECT 1 FROM decks WHERE revision <> 1)
+      ''')).first[0] ==
           true,
     _ => false,
   };

@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/deck_visibility_policy.dart';
+import '../../../../../lib/decks/deck_revision_support.dart';
 import '../../../../../lib/logger.dart';
 
 final _uuidPattern = RegExp(
@@ -51,25 +52,28 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     return _badRequest('deck_remove_card_id_invalid', 'card_id inválido.');
   }
   final cardId = rawCardId.trim().toLowerCase();
+  final mutation = DeckMutationRequest.fromContext(
+    context,
+    operation: 'card_remove',
+    deckId: deckId,
+    body: {'card_id': cardId},
+  );
 
   try {
     final result = await pool.runTx((session) async {
-      final deck = await session.execute(
-        Sql.named('''
-          SELECT is_public
-          FROM decks
-          WHERE id = @deckId AND user_id = @userId
-          FOR UPDATE
-        '''),
-        parameters: {'deckId': deckId, 'userId': userId},
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
       );
-      if (deck.isEmpty) {
+      if (baseline == null) {
         return const _RemoveOutcome.notFound(
           'deck_not_found',
           'Deck não encontrado.',
         );
       }
-      final wasPublic = deck.first[0] as bool? ?? false;
+      final wasPublic = baseline.metadata['is_public'] == true;
 
       final removed = await session.execute(
         Sql.named('''
@@ -106,6 +110,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         );
       }
 
+      final receipt = await recordDeckMutation(session, baseline);
       return _RemoveOutcome.removed({
         'ok': true,
         'deck_id': deckId,
@@ -115,16 +120,20 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         'total_cards': totalCards,
         'is_public': isPublic,
         if (isPublic != wasPublic) 'unpublished_because_empty': true,
+        ...receipt.toJson(),
       });
     });
 
-    if (result.body != null) {
-      return Response.json(body: result.body);
+    final body = result.body;
+    if (body != null) {
+      return Response.json(body: body, headers: deckRevisionHeadersOf(body));
     }
     return Response.json(
       statusCode: HttpStatus.notFound,
       body: {'error': result.message, 'error_code': result.code},
     );
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
   } catch (error) {
     Log.e('[ERROR] remove deck card failed: ${error.runtimeType}');
     return Response.json(

@@ -1430,6 +1430,46 @@
         "quantity": "include"
       }
     },
+    "deck_change_events": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Ledger imutável das mudanças de cada deck (DCK-P0-01): revisão de antes e de depois, operação, só as cartas e os metadados que mudaram, o desfazer e a chave de idempotência do pedido.",
+      "owner": "server/lib/decks/deck_revision_support.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o deck existir",
+        "decision": null,
+        "enforced_by": "FK deck_change_events.deck_id ON DELETE CASCADE",
+        "gap": "quando a descrição do deck muda, o texto anterior fica no ledger enquanto o deck existir; se a descrição tiver o prompt bruto do Generate (hoje o app o grava ali), essa cópia não segue os 30 dias da D-29 até o DCK-P0-04 tirar o prompt da descrição"
+      },
+      "export": {
+        "section": "data.deck_change_events"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK deck_change_events.deck_id -> decks ON DELETE CASCADE",
+        "notes": "O ledger só recebe INSERT: o gatilho manaloom_deck_change_events_append_only recusa UPDATE e DELETE direto e deixa passar só a cascata do deck ou da conta."
+      },
+      "legal_exception": null,
+      "columns": {
+        "cards_after": "include",
+        "cards_before": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "id": "include",
+        "idempotency_key": "omit_hash",
+        "metadata_after": "include",
+        "metadata_before": "include",
+        "operation": "include",
+        "request_fingerprint": "omit_hash",
+        "revision_after": "include",
+        "revision_before": "include",
+        "undo_of_event_id": "include",
+        "user_id": "person_ref"
+      }
+    },
     "deck_comments": {
       "category": "user_content",
       "subject_kind": "account_holder",
@@ -1649,6 +1689,7 @@
         "pricing_source": "include",
         "pricing_total": "include",
         "pricing_updated_at": "include",
+        "revision": "include",
         "strengths": "include",
         "synergy_score": "include",
         "user_id": "person_ref",

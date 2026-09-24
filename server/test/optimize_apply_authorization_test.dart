@@ -466,6 +466,35 @@ void main() {
       },
     );
 
+    test('the artifact binds the deck revision when the preview knows it', () {
+      final authorization =
+          buildOptimizeApplyAuthorizationForResponse(
+            signingSecret: secret,
+            ownerId: 'owner-1',
+            deckId: 'deck-1',
+            deckSignature: 'signature-1',
+            deckRevision: 7,
+            responseBody: response,
+            issuedAt: issuedAt,
+          )!;
+      OptimizeApplyAuthorizationVerification verify(int? revision) =>
+          verifyOptimizeApplyAuthorization(
+            signingSecret: secret,
+            token: authorization['token'] as String,
+            ownerId: 'owner-1',
+            deckId: 'deck-1',
+            deckSignature: 'signature-1',
+            deckRevision: revision,
+            actualRemovals: const [],
+            actualAdditions: const [],
+            now: issuedAt,
+          );
+
+      expect(verify(7).valid, isTrue);
+      expect(verify(8).code, 'stale_deck_revision');
+      expect(verify(null).code, 'stale_deck_revision');
+    });
+
     test('an empty owner never receives an apply authorization', () {
       final body = Map<String, dynamic>.from(response);
       attachOptimizeApplyAuthorizationToResponse(

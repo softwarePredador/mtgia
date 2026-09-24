@@ -31,6 +31,9 @@ const _deckRouteClassification = <String, bool>{
   'POST /decks/sample/cards': true,
   'POST /decks/sample/cards/bulk': true,
   'POST /decks/sample/cards/remove': true,
+  // DCK-P0-01: histórico lido sem exigência; desfazer grava conteúdo.
+  'GET /decks/sample/changes': false,
+  'POST /decks/sample/changes/sample/undo': true,
   'POST /decks/sample/cards/replace': true,
   'POST /decks/sample/cards/set': true,
   'GET /decks/sample/optimizations': false,

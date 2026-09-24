@@ -12,6 +12,9 @@ import '../lib/ai/optimize_swap_integrity.dart';
 import '../lib/decks/deck_optimization_history_service.dart';
 import '../lib/release_capability_policy.dart';
 import '../routes/decks/[id]/cards/bulk/index.dart' as bulk_route;
+import '../routes/decks/[id]/index.dart' as deck_route;
+import '../routes/decks/[id]/optimizations/[eventId]/rollback/index.dart'
+    as rollback_route;
 import 'support/release_capability_matrix.dart';
 import 'support/scripted_pool.dart';
 
@@ -19,7 +22,9 @@ import 'support/scripted_pool.dart';
 /// `POST /decks/:id/cards/bulk` recusa, sem nenhuma escrita, o
 /// `DeckReviewArtifact v1` adulterado, expirado, de outro usuário, de outro
 /// deck ou de um estado velho do deck. Depois de cada recusa o teste relê as
-/// cartas, o estado de validação e o histórico de otimizações.
+/// cartas, a revisão, o estado de validação e o histórico de otimizações.
+/// Com o DCK-P0-01 o artefato liga também a revisão do deck, e aplicar e
+/// desfazer pelo Optimize entram no ledger de mudanças.
 ///
 /// Requer `RUN_DECK_DB_TESTS=1`, `JWT_SECRET` (o segredo do artefato cai nele)
 /// e as variáveis `DB_*` de um banco descartável já migrado.
@@ -149,6 +154,25 @@ void main() {
     ]);
   }
 
+  Future<int> revisionOf(String id) async {
+    final rows = await pool.execute(
+      Sql.named('SELECT revision FROM decks WHERE id = CAST(@id AS uuid)'),
+      parameters: {'id': id},
+    );
+    return (rows.single.single! as num).toInt();
+  }
+
+  Future<List<String>> ledgerOf(String id) async {
+    final rows = await pool.execute(
+      Sql.named('''
+        SELECT operation FROM deck_change_events
+        WHERE deck_id = CAST(@id AS uuid) ORDER BY revision_after
+      '''),
+      parameters: {'id': id},
+    );
+    return [for (final row in rows) row[0]! as String];
+  }
+
   Future<Map<String, Object?>> snapshot(String id) async {
     final cards = await pool.execute(
       Sql.named('''
@@ -159,7 +183,7 @@ void main() {
     );
     final deck = await pool.execute(
       Sql.named('''
-        SELECT validation_state, validation_updated_at
+        SELECT validation_state, validation_updated_at, revision
         FROM decks WHERE id = CAST(@id AS uuid)
       '''),
       parameters: {'id': id},
@@ -178,17 +202,19 @@ void main() {
     };
   }
 
-  Map<String, dynamic> authorization({
+  Future<Map<String, dynamic>> authorization({
     required String ownerId,
     required String forDeck,
     required String signature,
+    int? revision,
     DateTime? issuedAt,
-  }) =>
+  }) async =>
       buildOptimizeApplyAuthorizationForResponse(
         signingSecret: secret(),
         ownerId: ownerId,
         deckId: forDeck,
         deckSignature: signature,
+        deckRevision: revision ?? await revisionOf(forDeck),
         responseBody: {
           'mode': 'complete',
           'can_apply': true,
@@ -256,7 +282,7 @@ void main() {
 
     final response = await apply(
       asUser: owner,
-      applyAuthorization: authorization(
+      applyAuthorization: await authorization(
         ownerId: owner,
         forDeck: completeDeckId,
         signature: signature,
@@ -270,12 +296,108 @@ void main() {
     final after = await snapshot(completeDeckId);
     expect(after['cards'], contains('$elfId:1'));
     expect(after['events'], (before['events']! as int) + 1);
+    expect(body['change_operation'], 'optimization_apply');
+    expect(await ledgerOf(completeDeckId), ['optimization_apply']);
+
+    // Desfazer pelo rollback do Optimize também é mudança do ledger.
+    final eventId = (body['optimization_event'] as Map)['id'] as String;
+    final rollback = await rollback_route.onRequest(
+      ScriptedRequestContext(
+        Request.post(
+          Uri.parse(
+            'http://localhost/decks/$completeDeckId/optimizations/$eventId/rollback',
+          ),
+        ),
+        providers: {Pool: pool, String: owner},
+      ),
+      completeDeckId,
+      eventId,
+    );
+    final rollbackBody =
+        jsonDecode(await rollback.body()) as Map<String, dynamic>;
+    expect(rollback.statusCode, HttpStatus.ok, reason: '$rollbackBody');
+    expect(rollbackBody['change_operation'], 'optimization_rollback');
+    expect(await ledgerOf(completeDeckId), [
+      'optimization_apply',
+      'optimization_rollback',
+    ]);
+    expect((await snapshot(completeDeckId))['cards'], before['cards']);
+  }, skip: skipReason);
+
+  test(
+    'PUT com prévia velha do Optimize é conflito (409), sem escrita',
+    () async {
+      final before = await snapshot(deckId);
+      final response = await deck_route.onRequest(
+        ScriptedRequestContext(
+          Request.put(
+            Uri.parse('http://localhost/decks/$deckId'),
+            headers: const {'content-type': 'application/json'},
+            body: jsonEncode({
+              'cards': [
+                {'card_id': islandId, 'quantity': 20},
+                {'card_id': elfId, 'quantity': 4},
+              ],
+              'mutation_context': {
+                'type': 'optimization_apply',
+                'source': 'optimize_preview',
+                'mode': 'complete',
+                'expected_deck_signature': 'assinatura-velha',
+              },
+            }),
+          ),
+          providers: {
+            Pool: pool,
+            String: owner,
+            ReleaseCapabilityPolicy: releaseCapabilityPolicyWith(
+              betaCoreCapabilities,
+            ),
+          },
+        ),
+        deckId,
+      );
+      final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+
+      expect(response.statusCode, HttpStatus.conflict, reason: '$body');
+      expect(body['error_code'], 'optimization_preview_stale');
+      expect(await snapshot(deckId), before);
+    },
+    skip: skipReason,
+  );
+
+  test('artefato de outra revisão do deck falha sem escrita', () async {
+    final signature = await currentSignature(deckId);
+    final issuedFor = await revisionOf(deckId);
+    // Mudança só de metadados: a assinatura das cartas é a mesma.
+    await pool.execute(
+      Sql.named('''
+        UPDATE decks SET name = name || ' renomeado', revision = revision + 1
+        WHERE id = CAST(@id AS uuid)
+      '''),
+      parameters: {'id': deckId},
+    );
+    final before = await snapshot(deckId);
+
+    await expectRefusedWithoutWrites(
+      await apply(
+        asUser: owner,
+        applyAuthorization: await authorization(
+          ownerId: owner,
+          forDeck: deckId,
+          signature: signature,
+          revision: issuedFor,
+        ),
+        expectedSignature: signature,
+      ),
+      before,
+      code: 'stale_deck_revision',
+    );
   }, skip: skipReason);
 
   test('artefato adulterado falha sem escrita', () async {
     final signature = await currentSignature(deckId);
     final before = await snapshot(deckId);
-    final valid = authorization(
+    final valid = await authorization(
       ownerId: owner,
       forDeck: deckId,
       signature: signature,
@@ -304,7 +426,7 @@ void main() {
     await expectRefusedWithoutWrites(
       await apply(
         asUser: owner,
-        applyAuthorization: authorization(
+        applyAuthorization: await authorization(
           ownerId: owner,
           forDeck: deckId,
           signature: signature,
@@ -324,7 +446,7 @@ void main() {
     await expectRefusedWithoutWrites(
       await apply(
         asUser: owner,
-        applyAuthorization: authorization(
+        applyAuthorization: await authorization(
           ownerId: stranger,
           forDeck: deckId,
           signature: signature,
@@ -342,7 +464,7 @@ void main() {
 
     final response = await apply(
       asUser: stranger,
-      applyAuthorization: authorization(
+      applyAuthorization: await authorization(
         ownerId: owner,
         forDeck: deckId,
         signature: signature,
@@ -361,7 +483,7 @@ void main() {
     await expectRefusedWithoutWrites(
       await apply(
         asUser: owner,
-        applyAuthorization: authorization(
+        applyAuthorization: await authorization(
           ownerId: owner,
           forDeck: otherDeckId,
           signature: signature,
@@ -380,7 +502,7 @@ void main() {
     await expectRefusedWithoutWrites(
       await apply(
         asUser: owner,
-        applyAuthorization: authorization(
+        applyAuthorization: await authorization(
           ownerId: owner,
           forDeck: deckId,
           signature: '$signature|estado-antigo',

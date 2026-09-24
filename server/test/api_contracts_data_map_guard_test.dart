@@ -85,6 +85,42 @@ void main() {
       expect(rebuild, contains('defaults to `preview_only`'));
     });
 
+    test('documents the deck revision, change ledger and undo', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final detail = _contractRowFor(contracts, 'GET /decks/:id');
+      final changes = _contractRowFor(contracts, 'GET /decks/:id/changes');
+      final undo = _contractRowFor(
+        contracts,
+        'POST /decks/:id/changes/:eventId/undo',
+      );
+      final delete = _contractRowFor(contracts, 'DELETE /decks/:id');
+
+      expect(detail, contains('`revision` (also sent as the `ETag` header'));
+      expect(detail, contains('Requires migrations 039, 040, 047 and 067'));
+      expect(changes, contains('`can_undo`'));
+      expect(changes, contains('only the card rows that changed'));
+      expect(undo, contains('409 `deck_undo_conflict`'));
+      expect(undo, contains('409 `deck_undo_invalid`'));
+      expect(undo, contains('never publishes'));
+      expect(delete, contains('409 `deck_revision_conflict`'));
+      expect(
+        contracts,
+        contains('## Deck Revision, Change Ledger and Undo — 2026-09-24'),
+      );
+      for (final phrase in const [
+        '409\n  `deck_revision_conflict`',
+        '428\n  `deck_revision_required`',
+        '`revision_warning: if_match_missing`',
+        '`replayed: true`',
+        '422 `idempotency_key_reused`',
+        '`authorization_error: stale_deck_revision`',
+        'MANALOOM_DECK_IF_MATCH_REQUIRED=1',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
     test('does not document a generic GET binder item route', () {
       expect(
         contracts,

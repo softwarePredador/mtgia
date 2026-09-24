@@ -122,8 +122,18 @@ void main() {
         {'card_id': delta['card_id'], 'quantity': 1},
   ];
 
+  // DCK-P0-01: o artefato de apply liga a revisão do deck.
+  Future<int> deckRevision(String deckId) async {
+    final rows = await pool.execute(
+      Sql.named('SELECT revision FROM decks WHERE id = CAST(@id AS uuid)'),
+      parameters: {'id': deckId},
+    );
+    return (rows.single.single! as num).toInt();
+  }
+
   Map<String, dynamic> authorizedMutationContext({
     required String deckId,
+    required int revision,
     required String signature,
     required List<Map<String, dynamic>> beforeCards,
     required List<Map<String, dynamic>> afterCards,
@@ -188,6 +198,7 @@ void main() {
       signingSecret: applySigningSecret,
       deckId: deckId,
       deckSignature: signature,
+      deckRevision: revision,
       responseBody: responseBody,
       bracket: 2,
     );
@@ -601,6 +612,7 @@ void main() {
         'cards': [for (final id in spellIds) card(id, 1)],
         'mutation_context': authorizedMutationContext(
           deckId: deckId,
+          revision: await deckRevision(deckId),
           signature: sparseSignature,
           beforeCards: sparseCards,
           afterCards: unsafeCompleteCards,
@@ -630,6 +642,7 @@ void main() {
         ],
         'mutation_context': authorizedMutationContext(
           deckId: deckId,
+          revision: await deckRevision(deckId),
           signature: sparseSignature,
           beforeCards: sparseCards,
           afterCards: safeCards,
@@ -659,6 +672,7 @@ void main() {
         'cards': unsafeOptimizeCards,
         'mutation_context': authorizedMutationContext(
           deckId: deckId,
+          revision: await deckRevision(deckId),
           signature: safeSignature,
           beforeCards: safeCards,
           afterCards: unsafeOptimizeCards,
@@ -704,6 +718,7 @@ void main() {
         'cards': excessiveOptimizeCards,
         'mutation_context': authorizedMutationContext(
           deckId: highLandDeckId,
+          revision: await deckRevision(highLandDeckId),
           signature: highLandSignature,
           beforeCards: highLandSafeCards,
           afterCards: excessiveOptimizeCards,
