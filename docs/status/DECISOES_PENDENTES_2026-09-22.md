@@ -299,6 +299,14 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 - **Problema:** dois contratos fixavam "Codex in-app browser" como quem captura. Recapturar em outra sessão deixaria a procedência falsa.
 - **Recomendação aprovada:** o campo registra o agente e o navegador de cada corrida, como dado da captura. O contrato não nomeia agente, e a exigência de navegador real continua.
 
+### Decidida em 2026-09-24: backup fora do servidor
+
+**D-81 · Sem backup fora do servidor.**
+- **Contexto:** o único caminho de cifra e cópia externa do repositório exige um bucket, que o dono vetou em 2026-09-22.
+- **Decisão:** para o MVP, o dono respondeu "não precisa".
+- **O que o `BT-DR-001` passa a exigir:** o backup local em `backups/manaloom-postgres/` e o ensaio de restauração isolado (`scripts/manaloom_full_restore_drill.sh --execute`), com cadência e receipt. Os dois já foram feitos na `BT-REL-000`.
+- **Risco aceito:** se a máquina que guarda o backup e o servidor se perderem juntos, não há cópia fora deles.
+
 O andamento das demais está no backlog e na fila.
 
 ---

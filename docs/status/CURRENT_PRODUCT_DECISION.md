@@ -148,6 +148,8 @@ Decidido em 2026-09-22:
   de borda dourada) e aceitou a D-72 (o total do deck continua gravado), a D-74
   (códigos de set duplicados, com a palavra dele na hora de apagar) e a D-75
   (`price_history` desligada até depois da coorte).
+- Em 2026-09-24 o dono decidiu que o MVP não precisa de backup fora do servidor
+  (D-81). O `BT-DR-001` fica com o backup local e o ensaio de restauração.
 - O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
   linha de base contida com a 058, catálogo com menos de 7 dias, rollback
   treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`). O catálogo está
