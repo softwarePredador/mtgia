@@ -108,11 +108,9 @@ function resolveChrome() {
 
 function gitIdentity() {
   try {
-    const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: WEB_ROOT, encoding: "utf8" }).trim();
-    const changes = execFileSync("git", ["status", "--porcelain", "--", ...BUILD_INPUTS], {
-      cwd: WEB_ROOT,
-      encoding: "utf8"
-    });
+    const git = { cwd: WEB_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] };
+    const sha = execFileSync("git", ["rev-parse", "HEAD"], git).trim();
+    const changes = execFileSync("git", ["status", "--porcelain", "--", ...BUILD_INPUTS], git);
     return { git_sha: sha, build_inputs_dirty: changes.trim().length > 0 };
   } catch {
     return { git_sha: null, build_inputs_dirty: null };
