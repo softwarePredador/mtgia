@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
 import { BrandPageIntro } from "@/components/brand-page-intro";
-import { AccessPending, ButtonLink, Container } from "@/components/ui";
-import { freeBetaOffer, productCapabilities, waveLabels } from "@/lib/product-data";
+import { CapabilityWaves } from "@/components/product-waves";
+import { FactTile } from "@/components/tiles";
+import { AccessPending, ButtonLink, Container, SectionHeader } from "@/components/ui";
+import { freeBetaOffer } from "@/lib/product-data";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
@@ -18,37 +20,31 @@ export default function PricingPage() {
           <p>{freeBetaOffer.description}</p>
         </BrandPageIntro>
 
-        <section className="mt-12 grid gap-10 border-y border-mist-700 py-10 lg:grid-cols-[0.75fr_1.25fr]">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-brass-400">
-              Uma única oferta
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-ivory-100">
-              Sem cobrança durante a beta.
-            </h2>
-            <p className="mt-4 max-w-lg text-sm leading-6 text-mist-300">
-              A entrada é por convite, em lotes pequenos, para validar estabilidade, clareza e utilidade com segurança.
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-mist-500">
-              Experiência principal
-            </p>
-            <ul className="mt-4 grid gap-x-8 text-sm leading-6 text-mist-300 sm:grid-cols-2">
-              {productCapabilities.map((capability) => (
-                <li key={capability.surface} className="border-t border-mist-700 py-3">
-                  {capability.surface} · {waveLabels[capability.wave]}
-                </li>
-              ))}
-            </ul>
+        <section className="mt-16 grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <SectionHeader eyebrow="Uma única oferta" title="Sem cobrança durante a beta.">
+            <p>A entrada é por convite, em lotes pequenos, para validar estabilidade, clareza e utilidade com segurança.</p>
+          </SectionHeader>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <FactTile label="Beta" value="Gratuita">
+              Nenhum recurso da beta é cobrado.
+            </FactTile>
+            <FactTile label="Acesso" value="Por convite">
+              O cadastro não está aberto nesta fase.
+            </FactTile>
           </div>
         </section>
 
-        <section className="mt-10 grid gap-8 lg:grid-cols-[0.75fr_1.25fr]">
+        <section className="mt-16 grid gap-10 lg:grid-cols-[0.75fr_1.25fr]">
+          <SectionHeader eyebrow="Experiência principal" title="O núcleo e o contador de vida primeiro.">
+            <p>A análise com IA chega na segunda onda.</p>
+          </SectionHeader>
+          <CapabilityWaves compact />
+        </section>
+
+        <section className="mt-16 grid gap-10 border-t border-ivory-100/10 pt-10 lg:grid-cols-[0.75fr_1.25fr]">
           <h2 className="font-display text-2xl font-semibold text-ivory-100">Disponibilidade</h2>
           <div>
-            <ul className="grid gap-3 text-sm leading-6 text-mist-400">
+            <ul className="grid gap-3 text-sm leading-6 text-mist-300">
               {freeBetaOffer.availability.map((item) => (
                 <li key={item}>{item}</li>
               ))}

@@ -1,10 +1,12 @@
 export type Wave = "primeira-onda" | "segunda-onda";
 
 export type ProductCapability = {
+  id: "decks" | "colecao" | "catalogo" | "contador" | "analise";
   title: string;
   description: string;
   surface: string;
   wave: Wave;
+  numeral?: string;
 };
 
 export type FreeBetaOffer = {
@@ -24,30 +26,37 @@ export const waveLabels: Record<Wave, string> = {
 // comes in a second wave, after it (D-07). Public copy calls them waves.
 export const productCapabilities: ProductCapability[] = [
   {
+    id: "decks",
     title: "Monte listas Commander",
     description: "Crie ou importe listas e confira as 100 posições do deck em um espaço privado.",
     surface: "Deck builder",
-    wave: "primeira-onda"
+    wave: "primeira-onda",
+    numeral: "100"
   },
   {
+    id: "colecao",
     title: "Organize sua coleção",
     description: "Registre cartas e quantidades para consultar sua coleção no ambiente autenticado.",
     surface: "Coleção privada",
     wave: "primeira-onda"
   },
   {
+    id: "catalogo",
     title: "Consulte as cartas",
     description: "Use o catálogo de cartas como referência para montar e revisar suas listas.",
     surface: "Catálogo",
     wave: "primeira-onda"
   },
   {
+    id: "contador",
     title: "Leve o deck para a mesa",
     description: "Acompanhe a vida de cada jogador durante a partida.",
     surface: "Contador de vida",
-    wave: "primeira-onda"
+    wave: "primeira-onda",
+    numeral: "40"
   },
   {
+    id: "analise",
     title: "Revise sugestões",
     description:
       "Chega na segunda onda, depois da primeira. Quando a IA estiver habilitada, cada sugestão passa pela sua revisão antes de mudar o deck.",

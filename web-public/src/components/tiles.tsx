@@ -73,25 +73,49 @@ export function Azulejo({
       <div className="flex min-h-[34px] items-start gap-3">
         {icon}
         {state ? <StateWord {...state} /> : null}
+        {numeral && !state ? <Numeral value={numeral} className={`ml-auto ${numeralClassName}`} /> : null}
       </div>
       <div className="flex items-end justify-between gap-3">
         <TileLabel className="[text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{label}</TileLabel>
-        {numeral ? <Numeral value={numeral} className={numeralClassName} /> : null}
+        {numeral && state ? <Numeral value={numeral} className={numeralClassName} /> : null}
       </div>
     </div>
   );
 }
 
-export function HeroTile({ href, label, title, className = "" }: { href: string; label: string; title: string; className?: string }) {
+// A fact that holds for the whole beta, stated as a word, not a control.
+export function FactTile({ label, value, children }: { label: string; value: string; children?: ReactNode }) {
+  return (
+    <div className="flex min-w-0 flex-col justify-between gap-6 rounded-azulejo bg-azulejo px-5 pb-5 pt-4 shadow-azulejo">
+      <TileLabel className="text-mist-300">{label}</TileLabel>
+      <div>
+        <p className="font-display text-[30px] font-bold leading-none tracking-[-0.01em] text-ivory-100">{value}</p>
+        {children ? <div className="mt-3 text-sm leading-6 text-mist-300">{children}</div> : null}
+      </div>
+    </div>
+  );
+}
+
+type HeroTileProps = {
+  href: string;
+  label: string;
+  title: string;
+  accessibleName: string;
+  className?: string;
+};
+
+// The one brass piece of a screen: its main action.
+export function HeroTile({ href, label, title, accessibleName, className = "" }: HeroTileProps) {
   return (
     <Link
       href={href}
+      aria-label={accessibleName}
       className={`focus-ring relative flex min-w-0 items-center gap-3 overflow-hidden rounded-azulejo bg-latao py-2.5 pl-4 pr-3.5 text-obsidian-950 shadow-latao transition active:scale-[0.97] ${className}`}
     >
       <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-brilho" />
       <span className="relative min-w-0 flex-1">
         <TileLabel>{label}</TileLabel>
-        <span className="mt-2 block truncate font-display text-[30px] font-bold leading-none tracking-[-0.01em]">
+        <span className="mt-2 block truncate font-display text-[28px] font-bold leading-none tracking-[-0.01em]">
           {title}
         </span>
       </span>

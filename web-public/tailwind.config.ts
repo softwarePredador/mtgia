@@ -45,7 +45,6 @@ const config: Config = {
           "linear-gradient(115deg, rgba(255, 255, 255, 0.13) 0 34%, transparent 34.2%), linear-gradient(200deg, transparent 0 72%, rgba(0, 0, 0, 0.1) 72.2%)"
       },
       boxShadow: {
-        brass: "0 18px 70px rgba(224, 169, 59, 0.13)",
         panel: "0 24px 90px rgba(0, 0, 0, 0.32)",
         azulejo:
           "inset 0 0 0 1.5px rgba(243, 239, 227, 0.1), inset 0 1.5px 0 rgba(255, 255, 255, 0.1), 0 8px 18px rgba(0, 0, 0, 0.45)",
