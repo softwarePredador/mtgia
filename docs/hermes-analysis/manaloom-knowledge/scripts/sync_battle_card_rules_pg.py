@@ -74,51 +74,34 @@ DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", DEFAULT_DB))
 PG_WRITE_APPROVAL_ENV = "MANALOOM_CONFIRM_POSTGRES_WRITES"
 PG_WRITE_APPROVAL_PHRASE = "I_HAVE_EXPLICIT_APPROVAL"
 
-PG_SCHEMA = """
-CREATE TABLE IF NOT EXISTS card_battle_rules (
-  normalized_name TEXT NOT NULL,
-  logical_rule_key TEXT NOT NULL,
-  card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
-  card_name TEXT NOT NULL,
-  effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-  deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
-  source TEXT NOT NULL DEFAULT 'curated',
-  confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
-    CHECK (confidence >= 0 AND confidence <= 1),
-  review_status TEXT NOT NULL DEFAULT 'verified',
-  execution_status TEXT NOT NULL DEFAULT 'auto',
-  rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
-  oracle_hash TEXT,
-  notes TEXT,
-  reviewed_by TEXT,
-  reviewed_at TIMESTAMP WITH TIME ZONE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  last_seen_at TIMESTAMP WITH TIME ZONE,
-  CONSTRAINT chk_card_battle_rules_source CHECK (
-    source IN ('manual', 'curated', 'generated', 'heuristic', 'imported')
-  ),
-  CONSTRAINT chk_card_battle_rules_review_status CHECK (
-    review_status IN (
-      'verified',
-      'active',
-      'needs_review',
-      'rejected',
-      'deprecated'
-    )
-  ),
-  CONSTRAINT chk_card_battle_rules_execution_status CHECK (
-    execution_status IN (
-      'auto',
-      'executable',
-      'annotation_only',
-      'review_only',
-      'disabled'
-    )
-  ),
-  PRIMARY KEY (normalized_name, logical_rule_key)
-);
-"""
+# BT-DB-004 (D-48, D-67): o schema de card_battle_rules nasce das migrations
+# (019, 026 a 029 e 064) e do database_setup.sql. O sync só confere que as colunas e
+# os índices que ele usa existem e para se faltar algo; não cria, não altera e
+# não apaga nada de schema no PostgreSQL.
+PG_REQUIRED_COLUMNS = (
+    "normalized_name",
+    "logical_rule_key",
+    "card_id",
+    "card_name",
+    "effect_json",
+    "deck_role_json",
+    "source",
+    "confidence",
+    "review_status",
+    "execution_status",
+    "rule_version",
+    "oracle_hash",
+    "notes",
+    "reviewed_by",
+    "reviewed_at",
+    "created_at",
+    "updated_at",
+    "last_seen_at",
+)
+PG_REQUIRED_INDEXES = (
+    "idx_card_battle_rules_name_rule_key",
+    "idx_card_battle_rules_normalized_name",
+)
 
 
 def utc_now() -> str:
@@ -287,104 +270,38 @@ def row_normalized_name(row: dict[str, Any]) -> str:
     return normalize_card_name(str(row.get("normalized_name") or row.get("card_name") or ""))
 
 
-def ensure_pg_table(cur: Any) -> None:
+def require_pg_table(cur: Any) -> None:
     require_pg_write_approval()
-    for statement in [part.strip() for part in PG_SCHEMA.split(";") if part.strip()]:
-        cur.execute(statement)
-    cur.execute("ALTER TABLE card_battle_rules ADD COLUMN IF NOT EXISTS logical_rule_key TEXT")
-    cur.execute("ALTER TABLE card_battle_rules ADD COLUMN IF NOT EXISTS execution_status TEXT")
     cur.execute(
         """
-        UPDATE card_battle_rules
-        SET execution_status = CASE
-          WHEN review_status IN ('rejected', 'deprecated') THEN 'disabled'
-          WHEN review_status = 'needs_review' THEN 'review_only'
-          ELSE 'auto'
-        END
-        WHERE execution_status IS NULL OR execution_status = ''
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+          AND table_name = 'card_battle_rules'
         """
     )
+    columns = {str(row[0]) for row in cur.fetchall()}
     cur.execute(
         """
-        ALTER TABLE card_battle_rules
-        ALTER COLUMN execution_status SET DEFAULT 'auto'
+        SELECT indexname
+        FROM pg_indexes
+        WHERE schemaname = 'public'
+          AND tablename = 'card_battle_rules'
         """
     )
-    cur.execute(
-        """
-        ALTER TABLE card_battle_rules
-        ALTER COLUMN execution_status SET NOT NULL
-        """
-    )
-    cur.execute(
-        """
-        UPDATE card_battle_rules
-        SET logical_rule_key = 'battle_rule_v1:' || substring(md5(
-          jsonb_build_object(
-            'effect', COALESCE(effect_json, '{}'::jsonb),
-            'deck_role', COALESCE(deck_role_json, '{}'::jsonb),
-            'face_name', COALESCE(effect_json->>'face_name', deck_role_json->>'face_name'),
-            'face_index', COALESCE(effect_json->>'face_index', deck_role_json->>'face_index'),
-            'variant_kind', COALESCE(effect_json->>'variant_kind', deck_role_json->>'variant_kind'),
-            'ability_kind', COALESCE(effect_json->>'ability_kind', deck_role_json->>'ability_kind'),
-            'timing_window', COALESCE(effect_json->>'timing_window', deck_role_json->>'timing_window'),
-            'source_zone', COALESCE(effect_json->>'source_zone', deck_role_json->>'source_zone')
-          )::text
-        ) from 1 for 32)
-        WHERE logical_rule_key IS NULL OR logical_rule_key = ''
-        """
-    )
-    cur.execute(
-        """
-        CREATE UNIQUE INDEX IF NOT EXISTS idx_card_battle_rules_name_rule_key
-        ON card_battle_rules (normalized_name, logical_rule_key)
-        """
-    )
-    cur.execute(
-        """
-        ALTER TABLE card_battle_rules
-        ALTER COLUMN logical_rule_key SET NOT NULL
-        """
-    )
-    cur.execute(
-        """
-        DO $$
-        DECLARE
-          pk_name text;
-          pk_cols text[];
-        BEGIN
-          SELECT conname,
-                 array_agg(att.attname ORDER BY ord.ordinality)
-            INTO pk_name, pk_cols
-          FROM pg_constraint con
-          JOIN unnest(con.conkey) WITH ORDINALITY AS ord(attnum, ordinality)
-            ON true
-          JOIN pg_attribute att
-            ON att.attrelid = con.conrelid
-           AND att.attnum = ord.attnum
-          WHERE con.conrelid = 'card_battle_rules'::regclass
-            AND con.contype = 'p'
-          GROUP BY con.conname;
-
-          IF pk_name IS NOT NULL AND pk_cols <> ARRAY['normalized_name', 'logical_rule_key'] THEN
-            EXECUTE format('ALTER TABLE card_battle_rules DROP CONSTRAINT %I', pk_name);
-            pk_name := NULL;
-          END IF;
-
-          IF pk_name IS NULL THEN
-            ALTER TABLE card_battle_rules
-            ADD CONSTRAINT card_battle_rules_pkey
-            PRIMARY KEY (normalized_name, logical_rule_key);
-          END IF;
-        END $$;
-        """
-    )
-    cur.execute(
-        """
-        CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
-        ON card_battle_rules (normalized_name)
-        """
-    )
+    indexes = {str(row[0]) for row in cur.fetchall()}
+    missing = [
+        f"coluna card_battle_rules.{column}"
+        for column in PG_REQUIRED_COLUMNS
+        if column not in columns
+    ] + [f"índice {index}" for index in PG_REQUIRED_INDEXES if index not in indexes]
+    if missing:
+        raise SystemExit(
+            "Schema incompleto para sync_battle_card_rules_pg: falta "
+            + ", ".join(missing)
+            + ". O schema só muda por migration: aplique server/bin/migrate.dart "
+            "pelo fluxo aprovado."
+        )
 
 
 def resolve_card_id(cur: Any, card_name: str) -> str | None:
@@ -1286,7 +1203,7 @@ def main() -> int:
     if args.apply_pg:
         with connect() as conn:
             with conn.cursor() as cur:
-                ensure_pg_table(cur)
+                require_pg_table(cur)
                 changed, skipped = upsert_pg_rules(cur, seed_rows)
                 backfilled = backfill_trusted_oracle_hashes(cur)
                 report["pg_inserted_or_updated"] += changed

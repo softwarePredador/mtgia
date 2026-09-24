@@ -2785,3 +2785,33 @@ BEGIN
     END IF;
 END;
 $battle_simulation_trigger$;
+
+-- D-48 e D-67 (migrations 064 e 065): índices que só existiam na produção (auditoria
+-- BT-DB-001). O banco novo sai com os mesmos nomes e definições. Os de
+-- card_meta_insights e card_rulings ficam na 064, porque essas tabelas nascem
+-- de migration. uq_binder_user_card_cond_foil_list fica de fora, pendente de
+-- decisão: não tem o idioma e contradiz a identidade física da 049.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_card_battle_rules_name_rule_key ON card_battle_rules USING btree (normalized_name, logical_rule_key);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation ON conversations USING btree (user_a_id, user_b_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_pair ON conversations USING btree (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id));
+CREATE INDEX IF NOT EXISTS idx_cards_colors ON cards USING gin (colors);
+CREATE INDEX IF NOT EXISTS idx_cards_lower_name ON cards USING btree (lower(name));
+CREATE INDEX IF NOT EXISTS idx_conversations_user_a_last ON conversations USING btree (user_a_id, last_message_at DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_conversations_user_b_last ON conversations USING btree (user_b_id, last_message_at DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_deck_cards_card_id ON deck_cards USING btree (card_id);
+CREATE INDEX IF NOT EXISTS idx_decks_format ON decks USING btree (format);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_conversation_created ON direct_messages USING btree (conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_unread_by_conversation ON direct_messages USING btree (conversation_id, sender_id) WHERE (read_at IS NULL);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications USING btree (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread_created ON notifications USING btree (user_id, created_at DESC) WHERE (read_at IS NULL);
+CREATE INDEX IF NOT EXISTS idx_trade_items_offer_direction ON trade_items USING btree (trade_offer_id, direction);
+CREATE INDEX IF NOT EXISTS idx_trade_messages_offer_created ON trade_messages USING btree (trade_offer_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_status_updated ON trade_offers USING btree (receiver_id, status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_updated ON trade_offers USING btree (receiver_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_status_updated ON trade_offers USING btree (sender_id, status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_updated ON trade_offers USING btree (sender_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_history_offer_created ON trade_status_history USING btree (trade_offer_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_binder_marketplace_available_created ON user_binder_items USING btree (created_at DESC) WHERE ((for_trade = true) OR (for_sale = true));
+CREATE INDEX IF NOT EXISTS idx_binder_user_list_name_filters ON user_binder_items USING btree (user_id, list_type, condition, for_trade, for_sale);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users USING btree (email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users USING btree (username);

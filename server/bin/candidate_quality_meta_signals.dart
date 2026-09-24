@@ -9,6 +9,7 @@ import 'package:server/database.dart';
 import 'package:server/meta/meta_deck_analytics_support.dart';
 import 'package:server/meta/meta_deck_card_list_support.dart';
 import 'package:server/meta/meta_deck_format_support.dart';
+import 'package:server/schema_requirements.dart';
 
 const _defaultArtifactDir =
     'test/artifacts/aggressive_candidate_quality_2026-05-05';
@@ -47,7 +48,13 @@ Future<void> main(List<String> args) async {
 
   try {
     final preCounts = await _loadCounts(pool);
-    if (apply) await _ensureCandidateQualitySchema(pool);
+    if (apply) {
+      await requireSchemaObjects(
+        pool,
+        caller: 'candidate_quality_meta_signals',
+        requirements: candidateQualitySchemaRequirements,
+      );
+    }
 
     final cards = await _loadCards(pool);
     final roles = await _loadBestRoleRows(pool);
@@ -1276,16 +1283,6 @@ List<Map<String, dynamic>> _buildReferenceProfileArtifact({
   return output;
 }
 
-Future<void> _ensureCandidateQualitySchema(Pool pool) async {
-  for (final statement in candidateQualitySchemaStatements) {
-    await pool.execute(statement);
-  }
-  for (final statement in candidateQualityIndexStatements) {
-    await pool.execute(statement);
-  }
-  await pool.execute(optimizeCandidateQualitySummaryViewStatement);
-  await pool.execute(cardIntelligenceSnapshotViewStatement);
-}
 
 Future<int> _upsertCommanderSignalRows(
   Pool pool,

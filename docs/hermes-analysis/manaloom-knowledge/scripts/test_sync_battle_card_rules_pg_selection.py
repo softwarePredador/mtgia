@@ -51,16 +51,69 @@ class SyncBattleCardRulesPgSelectionTests(unittest.TestCase):
         ]
 
         self.assertIn("load_pg_rules", read_branch)
+        self.assertNotIn("require_pg_table", read_branch)
         self.assertNotIn("ensure_pg_table", read_branch)
 
-    def test_schema_ddl_guard_fails_before_touching_the_cursor(self) -> None:
+    def test_schema_guard_fails_before_touching_the_cursor(self) -> None:
         class RejectingCursor:
             def execute(self, *_args: object, **_kwargs: object) -> None:
                 raise AssertionError("cursor must not be touched without approval")
 
         with mock.patch.dict(os.environ, {}, clear=True):
             with self.assertRaisesRegex(SystemExit, "explicit approval"):
-                sync_pg.ensure_pg_table(RejectingCursor())
+                sync_pg.require_pg_table(RejectingCursor())
+
+    def test_schema_guard_only_reads_the_catalog(self) -> None:
+        """BT-DB-004: o sync confere o schema e para se faltar algo; não o altera."""
+
+        class CatalogCursor:
+            def __init__(self, columns: set[str], indexes: set[str]) -> None:
+                self.columns = columns
+                self.indexes = indexes
+                self.statements: list[str] = []
+                self.rows: list[tuple[str]] = []
+
+            def execute(self, sql: str, *_args: object) -> None:
+                self.statements.append(" ".join(sql.split()))
+                if "information_schema.columns" in sql:
+                    self.rows = [(column,) for column in self.columns]
+                else:
+                    self.rows = [(index,) for index in self.indexes]
+
+            def fetchall(self) -> list[tuple[str]]:
+                return self.rows
+
+        approved = {sync_pg.PG_WRITE_APPROVAL_ENV: sync_pg.PG_WRITE_APPROVAL_PHRASE}
+        with mock.patch.dict(os.environ, approved, clear=True):
+            complete = CatalogCursor(
+                set(sync_pg.PG_REQUIRED_COLUMNS), set(sync_pg.PG_REQUIRED_INDEXES)
+            )
+            sync_pg.require_pg_table(complete)
+            for statement in complete.statements:
+                self.assertTrue(statement.startswith("SELECT"), statement)
+
+            missing = CatalogCursor(
+                set(sync_pg.PG_REQUIRED_COLUMNS) - {"execution_status"},
+                {"idx_card_battle_rules_normalized_name"},
+            )
+            with self.assertRaises(SystemExit) as stopped:
+                sync_pg.require_pg_table(missing)
+            message = str(stopped.exception)
+            self.assertIn("coluna card_battle_rules.execution_status", message)
+            self.assertIn("índice idx_card_battle_rules_name_rule_key", message)
+            for statement in missing.statements:
+                self.assertTrue(statement.startswith("SELECT"), statement)
+
+    def test_postgres_path_has_no_schema_ddl(self) -> None:
+        source = MODULE_PATH.read_text(encoding="utf-8")
+        for ddl in (
+            "CREATE TABLE IF NOT EXISTS card_battle_rules",
+            "ALTER TABLE card_battle_rules",
+            "CREATE UNIQUE INDEX",
+            "CREATE INDEX IF NOT EXISTS idx_card_battle_rules",
+            "DROP CONSTRAINT",
+        ):
+            self.assertNotIn(ddl, source)
 
     def test_load_pg_rules_uses_oracle_hash_fallback_for_runtime_overlay(self) -> None:
         class FakeCursor:

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import 'package:server/schema_requirements.dart';
 
 import '../lib/database.dart';
 import '../lib/runtime_environment.dart';
@@ -35,6 +36,13 @@ const rulesFailureInjectionEnvironment =
 const rulesFailureInjectionPhrase = 'I_UNDERSTAND_THIS_MUST_ROLL_BACK';
 const _minimumComprehensiveRuleRows = 2500;
 const _rulesCachePath = 'magicrules.txt';
+
+/// O que o sync de regras usa e não cria mais (BT-DB-004): `rules`, os
+/// índices e `sync_state` nascem do `database_setup.sql`.
+const syncRulesSchemaRequirements = SchemaRequirements(
+  tables: {'rules', 'sync_state'},
+  indexes: {'idx_rules_title', 'idx_rules_category'},
+);
 
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
@@ -141,8 +149,11 @@ Opções:
       await session.execute(
         "SELECT pg_advisory_xact_lock(hashtext('manaloom_sync_rules'))",
       );
-      await _ensureSyncStateTable(session);
-      await _ensureRulesIndexes(session);
+      await requireSchemaObjects(
+        session,
+        caller: 'sync_rules',
+        requirements: syncRulesSchemaRequirements,
+      );
       await session.execute('LOCK TABLE rules IN SHARE ROW EXCLUSIVE MODE');
       await session.execute(
         'LOCK TABLE sync_state IN SHARE ROW EXCLUSIVE MODE',
@@ -661,29 +672,6 @@ RulesFreshnessReport evaluateRulesFreshness({
     databaseState: databaseState,
     cacheState: cacheState,
     failureReasons: failures,
-  );
-}
-
-Future<void> _ensureRulesIndexes(Session session) async {
-  await session.execute(
-    Sql.named('CREATE INDEX IF NOT EXISTS idx_rules_title ON rules (title)'),
-  );
-  await session.execute(
-    Sql.named(
-      'CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category)',
-    ),
-  );
-}
-
-Future<void> _ensureSyncStateTable(Session session) async {
-  await session.execute(
-    Sql.named('''
-      CREATE TABLE IF NOT EXISTS sync_state (
-        key TEXT PRIMARY KEY,
-        value TEXT NOT NULL,
-        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      )
-    '''),
   );
 }
 

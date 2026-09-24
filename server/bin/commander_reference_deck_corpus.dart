@@ -51,7 +51,7 @@ Future<void> main(List<String> args) async {
           '${rejected.map((a) => '${a.deck.sourceDeckKey}:${a.rejectionReasons.join('|')}').join(', ')}',
         );
       }
-      await ensureCommanderReferenceDeckCorpusTables(pool);
+      await requireCommanderReferenceDeckCorpusSchema(pool);
       await upsertCommanderReferenceDeckCorpus(pool, analyses);
     }
 

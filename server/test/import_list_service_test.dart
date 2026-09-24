@@ -2,6 +2,7 @@ import 'package:test/test.dart';
 
 import '../lib/import_card_lookup_service.dart';
 import '../lib/import_list_service.dart';
+import 'support/migration_sql.dart';
 
 void main() {
   group('parseImportLines', () {
@@ -168,7 +169,10 @@ void main() {
     test(
       'normalizes canonical and localized names without replacing card id',
       () {
-        final view = createCardIdentityBridgeViewSql.toLowerCase();
+        final view =
+            latestMigrationStatement(
+              'CREATE OR REPLACE VIEW card_identity_bridge',
+            ).toLowerCase();
 
         expect(view, contains('create or replace view card_identity_bridge'));
         expect(view, contains('c.id as card_id'));

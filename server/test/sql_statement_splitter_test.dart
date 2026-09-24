@@ -44,10 +44,9 @@ void main() {
     });
 
     test('all schema executors use the PostgreSQL-aware splitter', () {
-      for (final path in const [
-        'bin/migrate.dart',
-        'bin/setup_database.dart',
-      ]) {
+      // setup_database.dart virou tombstone (D-48, BT-DB-004): o runner de
+      // migrations é o único executor de schema.
+      for (final path in const ['bin/migrate.dart']) {
         final source = File(path).readAsStringSync();
         expect(source, contains('splitPostgresStatements('), reason: path);
         expect(source, isNot(contains(".split(';')")), reason: path);

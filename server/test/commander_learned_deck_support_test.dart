@@ -8,6 +8,7 @@ import 'package:server/ai/commander_reference_profile_support.dart';
 import 'package:test/test.dart';
 
 import '../routes/ai/commander-learning/index.dart' as commander_learning_route;
+import 'support/migration_sql.dart';
 
 void main() {
   group('Commander learned deck support', () {
@@ -678,10 +679,10 @@ void main() {
     test(
       'commander learning snapshot excludes partial active learned decks',
       () {
-        final support =
-            File(
-              'lib/ai/commander_learning_snapshot_support.dart',
-            ).readAsStringSync();
+        // D-65: o texto da view vive por extenso na migration 063.
+        final support = latestMigrationStatement(
+          'CREATE OR REPLACE VIEW commander_learning_snapshot',
+        );
 
         expect(support, contains('WHERE is_active = TRUE'));
         expect(support, contains('AND card_count = 100'));

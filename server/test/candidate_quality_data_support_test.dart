@@ -1,7 +1,8 @@
 import 'package:server/ai/commander_fallback_policy.dart';
-import 'package:server/ai/commander_learning_snapshot_support.dart';
 import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:test/test.dart';
+
+import 'support/migration_sql.dart';
 
 void main() {
   group('candidate quality deterministic tags', () {
@@ -201,12 +202,16 @@ void main() {
     });
 
     test('schema is additive and targets metadata tables only', () {
+      // BT-DB-004: o SQL vive nas migrations; cada objeto que os CLIs
+      // exigem tem de nascer de uma delas.
       final schema =
           [
-            ...candidateQualitySchemaStatements,
-            ...candidateQualityIndexStatements,
-            optimizeCandidateQualitySummaryViewStatement,
-            cardIntelligenceSnapshotViewStatement,
+            for (final table in candidateQualitySchemaRequirements.tables)
+              latestMigrationStatement('CREATE TABLE IF NOT EXISTS $table'),
+            for (final index in candidateQualitySchemaRequirements.indexes)
+              latestMigrationStatement('CREATE INDEX IF NOT EXISTS $index'),
+            for (final view in candidateQualitySchemaRequirements.views)
+              latestMigrationStatement('CREATE OR REPLACE VIEW $view'),
           ].join('\n').toLowerCase();
 
       expect(schema, contains('create table if not exists card_function_tags'));
@@ -231,7 +236,10 @@ void main() {
     });
 
     test('card intelligence snapshot aggregates sources before card joins', () {
-      final view = cardIntelligenceSnapshotViewStatement.toLowerCase();
+      final view =
+          latestMigrationStatement(
+            'CREATE OR REPLACE VIEW card_intelligence_snapshot',
+          ).toLowerCase();
 
       expect(
         view,
@@ -288,7 +296,10 @@ void main() {
     });
 
     test('candidate quality summary aggregates multi-row sources first', () {
-      final view = optimizeCandidateQualitySummaryViewStatement.toLowerCase();
+      final view =
+          latestMigrationStatement(
+            'CREATE OR REPLACE VIEW optimize_candidate_quality_summary',
+          ).toLowerCase();
 
       expect(
         view,
@@ -309,7 +320,10 @@ void main() {
     });
 
     test('commander learning snapshot aggregates safe learning signals', () {
-      final view = commanderLearningSnapshotViewStatement.toLowerCase();
+      final view =
+          latestMigrationStatement(
+            'CREATE OR REPLACE VIEW commander_learning_snapshot',
+          ).toLowerCase();
 
       expect(
         view,

@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:postgres/postgres.dart';
+import 'package:server/schema_requirements.dart';
 
 import '../lib/database.dart';
 import '../lib/card_identity_support.dart';
@@ -25,6 +26,23 @@ import '../lib/sync_cards_utils.dart';
 /// - Incremental: carrega APENAS card IDs do set (antes: todos 33k+)
 /// - Progresso com timing detalhado
 const _metaUrl = 'https://mtgjson.com/api/v5/Meta.json';
+
+/// O que o sync usa e não cria mais (BT-DB-004): tudo nasce do
+/// `database_setup.sql` e das migrations; `sync_state` tem um único DDL.
+const syncCardsSchemaRequirements = SchemaRequirements(
+  tables: {'cards', 'sets', 'sync_state'},
+  columns: {
+    'cards': {
+      'color_identity',
+      'power',
+      'toughness',
+      'keywords',
+      'is_reserved',
+    },
+  },
+  indexes: {'idx_cards_color_identity', 'idx_cards_keywords'},
+);
+
 const _setListUrl = 'https://mtgjson.com/api/v5/SetList.json';
 const _atomicCardsUrl = 'https://mtgjson.com/api/v5/AtomicCards.json';
 const _atomicCardsFileName = 'AtomicCards.json';
@@ -77,10 +95,11 @@ Opcoes:
 
   final startedAt = DateTime.now();
   try {
-    await _ensureSyncStateTable(pool);
-    await _ensureCardsColorIdentity(pool);
-    await _ensureCardsCombatMetadata(pool);
-    await _ensureSetsTable(pool);
+    await requireSchemaObjects(
+      pool,
+      caller: 'sync_cards',
+      requirements: syncCardsSchemaRequirements,
+    );
 
     // Baixa SetList.json UMA VEZ e reutiliza
     final setListData = await _fetchSetListData();
@@ -222,69 +241,6 @@ Opcoes:
 // ═══════════════════════════════════════════════════════════════════════
 // INFRAESTRUTURA
 // ═══════════════════════════════════════════════════════════════════════
-
-Future<void> _ensureSyncStateTable(Pool pool) async {
-  await pool.execute(
-    Sql.named('''
-    CREATE TABLE IF NOT EXISTS sync_state (
-      key TEXT PRIMARY KEY,
-      value TEXT,
-      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    )
-  '''),
-  );
-}
-
-Future<void> _ensureCardsColorIdentity(Pool pool) async {
-  await pool.execute(
-    Sql.named(
-      'ALTER TABLE cards ADD COLUMN IF NOT EXISTS color_identity TEXT[]',
-    ),
-  );
-  await pool.execute(
-    Sql.named(
-      'CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)',
-    ),
-  );
-}
-
-Future<void> _ensureCardsCombatMetadata(Pool pool) async {
-  await pool.execute(
-    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT'),
-  );
-  await pool.execute(
-    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT'),
-  );
-  await pool.execute(
-    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]'),
-  );
-  await pool.execute(
-    Sql.named('ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN'),
-  );
-  await pool.execute(
-    Sql.named(
-      'CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords)',
-    ),
-  );
-}
-
-Future<void> _ensureSetsTable(Pool pool) async {
-  await pool.execute(
-    Sql.named('''
-    CREATE TABLE IF NOT EXISTS sets (
-      code TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      release_date DATE,
-      type TEXT,
-      block TEXT,
-      is_online_only BOOLEAN,
-      is_foreign_only BOOLEAN,
-      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-    )
-  '''),
-  );
-}
 
 Future<String?> _getSyncState(Pool pool, String key) async {
   final result = await pool.execute(

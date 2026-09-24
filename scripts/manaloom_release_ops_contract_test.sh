@@ -196,15 +196,23 @@ elif PYTHONDONTWRITEBYTECODE=1 python3 "$XMAGE_TRANSITION_AUDITOR" \
 fi
 PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
   python3 -m py_compile \
+    "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_osv_scan_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_read_env.py" \
     "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
     "$ROOT_DIR/server/bin/audit_easypanel_runtime_alignment.py" \
+    "$ROOT_DIR/server/test/card_cli_schema_guard_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py"
 
+# BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
+# conferem o schema do PostgreSQL e param; não o alteram.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/card_cli_schema_guard_test.py"
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
@@ -566,12 +574,15 @@ grep -Fq "('057', 'expand_battle_job_async_timeout')" "$ROOT_DIR/scripts/manaloo
 grep -Fq "('058', 'snapshot_trade_item_identity')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('059', 'align_trade_items_owner_fk')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('060', 'create_account_deletion_outbox')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('063', 'recreate_commander_learning_snapshot_view')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('064', 'adopt_production_unique_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('065', 'adopt_production_indexes_from_database_indexes_sql')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_039_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_040_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq 'migrations_041_060_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'migrations_041_065_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.release_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.required_range == "038-060"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.latest_migration == "060"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.required_range == "038-065"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.latest_migration == "065"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_job_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'require_live_mutation_approval "deploy do backend ManaLoom"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

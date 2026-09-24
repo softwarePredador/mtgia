@@ -71,8 +71,8 @@ Future<void> main(List<String> args) async {
           '${cardStatsResolution.offColorCardNames.join(', ')}',
         );
       }
-      await ensureCommanderReferenceProfileTable(pool);
-      await ensureCommanderReferenceCardStatsTable(pool);
+      await requireCommanderReferenceProfileSchema(pool);
+      await requireCommanderReferenceCardStatsSchema(pool);
       await upsertCommanderReferenceProfile(pool, profile);
       await upsertCommanderReferenceCardStats(pool, cardStatsResolution.stats);
     }
