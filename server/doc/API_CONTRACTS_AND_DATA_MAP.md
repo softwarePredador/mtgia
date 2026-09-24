@@ -630,12 +630,21 @@ Commander optimize separates hard format policy from advisory deck intent:
   purchases.
 
 An actionable `POST /ai/optimize` result includes additive
-`apply_authorization.{version,algo,token,expires_at}`. The token is HMAC-SHA256,
-expires after 24 hours, and binds the deck id, current
-`swap_integrity.deck_signature`, target bracket, functional-role policy and
-the exact remove/add pairs. Cached previews are reusable only when bracket and
-functional-role policies remain internally satisfied, and receive a fresh
-token; tokens are not trusted from cache. The app returns this object unchanged inside
+`apply_authorization.{version,algo,token,expires_at}`. Since DCK-P0-02 the
+token is a `DeckReviewArtifact v1` (`server/lib/decks/deck_review_artifact.dart`;
+`version` `deck_review_artifact_v1`, token `drv1.<payload>.<signature>`) of
+kind `optimize_apply`: HMAC-SHA256 over prefix and payload, 24-hour expiry,
+reusable by the same user while valid (D-29). It binds the owner (`owner_id`,
+the authenticated user that requested the preview), the deck id, the deck
+state at preview time (`deck_signature`, equal to
+`swap_integrity.deck_signature`, and `deck_revision` when the flow knows it),
+`input_hash` (canonical SHA-256 of the signed removals, additions and swaps),
+`constraints_hash` (mode, target bracket and functional-role policy), and the
+exact remove/add pairs. Tokens of the former `v2` format are rejected as
+`malformed_token`; nothing is issued for an empty owner. Cached previews are
+reusable only when bracket and functional-role policies remain internally
+satisfied, and receive a fresh token; tokens are not trusted from cache. The
+app returns this object unchanged inside
 `mutation_context.apply_authorization`.
 
 `PUT /decks/:id` and `POST /decks/:id/cards/bulk` require and verify the
@@ -645,11 +654,16 @@ configuration follows the shared `.env` plus process-environment precedence.
 A selected subset must be an exact union of signed swap pairs; retained cards
 cannot change condition or commander/main role, and new cards use main/NM.
 The signed target bracket must equal `mutation_context.bracket` and is the
-authoritative value for final policy validation and persistence. Wrong
-deck/signature/bracket, expired/tampered tokens, unpaired changes or metadata
-changes return HTTP 409 with
-`error_code=optimization_apply_not_authorized` before `deck_cards` is
-replaced. Every deck-card writer locks the owner deck row, so signature
+authoritative value for final policy validation and persistence. Another
+owner, another deck, a stale deck state or revision, a wrong bracket,
+expired/tampered tokens, unpaired changes or metadata changes return HTTP 409
+with `error_code=optimization_apply_not_authorized` and the reason in
+`authorization_error` (`owner_binding_mismatch`, `deck_binding_mismatch`,
+`stale_deck_signature`, `stale_deck_revision`, `expired_token`,
+`invalid_signature`, among others) before `deck_cards` is replaced; the
+isolated PostgreSQL proof is `deck_review_artifact_db_live_test.dart`
+(`RUN_DECK_DB_TESTS=1`), which re-reads cards, validation state and
+optimization events after each refusal. Every deck-card writer locks the owner deck row, so signature
 verification and replacement serialize inside the same transaction.
 
 For Commander, apply recomputes the signed functional-role floor from the
@@ -668,7 +682,8 @@ Coverage:
 `optimize_functional_role_support_test.dart`,
 `optimize_swap_candidate_support_test.dart`,
 `optimization_bracket_support_test.dart`,
-`optimize_apply_authorization_test.dart`, and app
+`optimize_apply_authorization_test.dart`, `deck_review_artifact_test.dart`,
+`deck_review_artifact_db_live_test.dart`, and app
 `deck_optimize_flow_support_test.dart`.
 
 ## Update Checklist

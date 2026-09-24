@@ -349,6 +349,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
         final applyAuthorizationVerification =
             isOptimizationMutation
                 ? validateOptimizationApplyAuthorization(
+                  ownerId: userId,
                   deckId: deckId,
                   currentDeckSignature:
                       DeckOptimizationHistoryService.buildDeckSignature(

@@ -19,6 +19,7 @@ class OptimizationApplyAuthorizationViolation implements Exception {
 }
 
 OptimizeApplyAuthorizationVerification? validateOptimizationApplyAuthorization({
+  required String ownerId,
   required String deckId,
   required String currentDeckSignature,
   required List<Map<String, dynamic>> beforeCards,
@@ -62,6 +63,7 @@ OptimizeApplyAuthorizationVerification? validateOptimizationApplyAuthorization({
   final verification = verifyOptimizeApplyAuthorization(
     signingSecret: signingSecret,
     token: token,
+    ownerId: ownerId,
     deckId: deckId,
     deckSignature: currentDeckSignature,
     actualRemovals: actualRemovals,

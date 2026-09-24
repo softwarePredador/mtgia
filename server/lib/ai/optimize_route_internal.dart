@@ -605,6 +605,7 @@ Future<void> processCompleteModeAsync({
         );
       }
       attachOptimizeApplyAuthorizationToResponse(
+        ownerId: userId ?? '',
         deckId: deckId,
         deckSignature: deckSignature,
         responseBody: responseBody,

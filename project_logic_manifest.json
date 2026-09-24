@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "929bfa88f6bf5ce7c4504e4b6c42218ff6b45e03e014176ed1d889e290fda587",
+  "source_digest_sha256": "69e6cc23de3ea8bc3014b49afefc370fbb8acfea96780f86c01729d8cbb783f3",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,15 +63,15 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 702,
+    "dart_source_files": 703,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5301,
-    "semantic_resolved_files": 702,
+    "dart_symbols": 5309,
+    "semantic_resolved_files": 703,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43133,
-    "semantic_resolved_call_sites": 68629,
-    "semantic_resolved_type_references": 16333,
+    "semantic_resolved_call_edges": 43159,
+    "semantic_resolved_call_sites": 68667,
+    "semantic_resolved_type_references": 16351,
     "modules": 160,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 60,
     "scripts_and_jobs": 693,
     "environment_variables": 716,
-    "tests": 1260,
+    "tests": 1262,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -786,7 +786,7 @@
         "server/lib/ai/xmage_battle_client.dart"
       ],
       "file_count": 102,
-      "symbol_count": 1094,
+      "symbol_count": 1091,
       "providers": [],
       "services": [
         "CommanderSpellbookService",
@@ -1521,13 +1521,14 @@
       "files": [
         "server/lib/decks/deck_applied_analysis_support.dart",
         "server/lib/decks/deck_optimization_history_service.dart",
+        "server/lib/decks/deck_review_artifact.dart",
         "server/lib/decks/optimization_apply_authorization_support.dart",
         "server/lib/decks/optimization_bracket_support.dart",
         "server/lib/decks/optimization_functional_role_floor_support.dart",
         "server/lib/decks/optimization_mana_floor_support.dart"
       ],
-      "file_count": 6,
-      "symbol_count": 26,
+      "file_count": 7,
+      "symbol_count": 37,
       "providers": [],
       "services": [
         "DeckOptimizationHistoryService"
@@ -29101,22 +29102,16 @@
       "name": "OptimizeApplyAuthorizationVerification",
       "kind": "class",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 489
+      "line": 491
     },
     {
       "name": "SwapIntegrity",
       "kind": "class",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 27,
+      "line": 31,
       "members": [
         "toJson"
       ]
-    },
-    {
-      "name": "_base64UrlNoPadding",
-      "kind": "function",
-      "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 188
     },
     {
       "name": "_canonicalAuthorizationCard",
@@ -29134,7 +29129,7 @@
       "name": "_canonicalEntries",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 54
+      "line": 58
     },
     {
       "name": "_canonicalFunctionalRolePolicy",
@@ -29146,7 +29141,7 @@
       "name": "_canonicalQuantityMap",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 196
+      "line": 192
     },
     {
       "name": "_canonicalRoleCountMap",
@@ -29158,31 +29153,19 @@
       "name": "_canonicalString",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 69
-    },
-    {
-      "name": "_constantTimeBytesEqual",
-      "kind": "function",
-      "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 756
-    },
-    {
-      "name": "_decodeBase64UrlNoPadding",
-      "kind": "function",
-      "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 191
+      "line": 73
     },
     {
       "name": "_isAuthorizedSwapPairSubset",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 659
+      "line": 612
     },
     {
       "name": "_isQuantitySubset",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 748
+      "line": 701
     },
     {
       "name": "_isSatisfiedFunctionalRolePolicy",
@@ -29194,37 +29177,37 @@
       "name": "_markOptimizeApplySigningUnavailable",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 458
+      "line": 460
     },
     {
       "name": "_quantityMapKey",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 719
+      "line": 672
     },
     {
       "name": "_readAuthorizationQuantityMap",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 725
+      "line": 678
     },
     {
       "name": "_readAuthorizationSwapPairs",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 632
+      "line": 585
     },
     {
       "name": "_readNullableInt",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 741
+      "line": 694
     },
     {
       "name": "_subtractQuantity",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 710
+      "line": 663
     },
     {
       "name": "attachOptimizeApplyAuthorizationToResponse",
@@ -29236,49 +29219,49 @@
       "name": "buildOptimizationCardDelta",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 216
+      "line": 212
     },
     {
       "name": "buildOptimizeApplyAuthorizationForResponse",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 234
+      "line": 230
     },
     {
       "name": "buildSwapIntegrityForResponse",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 143
+      "line": 147
     },
     {
       "name": "computeSwapIntegrity",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 89
+      "line": 93
     },
     {
       "name": "resolveOptimizeApplySigningSecret",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 174
+      "line": 178
     },
     {
       "name": "search",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 666
+      "line": 619
     },
     {
       "name": "verifyOptimizeApplyAuthorization",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 501
+      "line": 503
     },
     {
       "name": "verifySwapIntegrity",
       "kind": "function",
       "source": "server/lib/ai/optimize_swap_integrity.dart",
-      "line": 116
+      "line": 120
     },
     {
       "name": "DeckOptimizerService",
@@ -34059,6 +34042,72 @@
       ]
     },
     {
+      "name": "DeckReviewArtifactVerification",
+      "kind": "class",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 43
+    },
+    {
+      "name": "_base64UrlNoPadding",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 240
+    },
+    {
+      "name": "_canonical",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 224
+    },
+    {
+      "name": "_constantTimeEquals",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 248
+    },
+    {
+      "name": "_decodeBase64UrlNoPadding",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 243
+    },
+    {
+      "name": "_readInt",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 257
+    },
+    {
+      "name": "_sign",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 237
+    },
+    {
+      "name": "canonicalDeckReviewHash",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 219
+    },
+    {
+      "name": "fail",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 173
+    },
+    {
+      "name": "issueDeckReviewArtifact",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 61
+    },
+    {
+      "name": "verifyDeckReviewArtifact",
+      "kind": "function",
+      "source": "server/lib/decks/deck_review_artifact.dart",
+      "line": 106
+    },
+    {
       "name": "OptimizationApplyAuthorizationViolation",
       "kind": "class",
       "source": "server/lib/decks/optimization_apply_authorization_support.dart",
@@ -34072,31 +34121,31 @@
       "name": "_cardId",
       "kind": "function",
       "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-      "line": 137
+      "line": 139
     },
     {
       "name": "_condition",
       "kind": "function",
       "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-      "line": 140
+      "line": 142
     },
     {
       "name": "_findUnauthorizedMetadataChange",
       "kind": "function",
       "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-      "line": 106
+      "line": 108
     },
     {
       "name": "_readBracket",
       "kind": "function",
       "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-      "line": 145
+      "line": 147
     },
     {
       "name": "optimizationApplyAuthorizedBracket",
       "kind": "function",
       "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-      "line": 99
+      "line": 101
     },
     {
       "name": "validateOptimizationApplyAuthorization",
@@ -38797,7 +38846,7 @@
       "name": "buildAggressiveCandidateQualityDiagnostics",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 935
+      "line": 936
     },
     {
       "name": "buildDeterministicOptimizeRemovalCandidates",
@@ -38833,19 +38882,19 @@
       "name": "buildRebuildGuidedOutcome",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 827
+      "line": 828
     },
     {
       "name": "buildSourceStructuralRebuildGuidedOutcome",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 888
+      "line": 889
     },
     {
       "name": "buildStructuralRebuildGuidedOutcome",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 846
+      "line": 847
     },
     {
       "name": "buildStructuralRecoveryFunctionalNeeds",
@@ -38887,7 +38936,7 @@
       "name": "mergeAggressiveRejectionBuckets",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 928
+      "line": 929
     },
     {
       "name": "onRequest",
@@ -38917,13 +38966,13 @@
       "name": "respondWithOptimizeTelemetry",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 946
+      "line": 947
     },
     {
       "name": "runAiOptimizeAttempt",
       "kind": "function",
       "source": "server/routes/ai/optimize/index.dart",
-      "line": 1462
+      "line": 1464
     },
     {
       "name": "scoreOptimizeReplacementCandidate",
@@ -40108,7 +40157,7 @@
       "name": "_deckCardCount",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 789
+      "line": 790
     },
     {
       "name": "_deleteDeck",
@@ -40120,19 +40169,19 @@
       "name": "_getDeckById",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 800
+      "line": 801
     },
     {
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1065
+      "line": 1066
     },
     {
       "name": "_patchDeck",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 639
+      "line": 640
     },
     {
       "name": "_updateDeck",
@@ -40144,19 +40193,19 @@
       "name": "_validateCardCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1057
+      "line": 1058
     },
     {
       "name": "calculateCmc",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 949
+      "line": 950
     },
     {
       "name": "getMainType",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 935
+      "line": 936
     },
     {
       "name": "onRequest",
@@ -41128,7 +41177,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 702,
+    "resolved_file_count": 703,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41625,6 +41674,7 @@
       "server/lib/deck_write_verification_policy.dart",
       "server/lib/decks/deck_applied_analysis_support.dart",
       "server/lib/decks/deck_optimization_history_service.dart",
+      "server/lib/decks/deck_review_artifact.dart",
       "server/lib/decks/optimization_apply_authorization_support.dart",
       "server/lib/decks/optimization_bracket_support.dart",
       "server/lib/decks/optimization_functional_role_floor_support.dart",
@@ -41839,9 +41889,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43133,
-    "resolved_call_site_count": 68629,
-    "workspace_call_edge_count": 13511,
+    "resolved_call_edge_count": 43159,
+    "resolved_call_site_count": 68667,
+    "workspace_call_edge_count": 13522,
     "unresolved_call_edge_count": 559,
     "unresolved_call_site_count": 772,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -139121,7 +139171,7 @@
       },
       {
         "source": "server/lib/ai/optimize_route_internal.dart",
-        "line": 613,
+        "line": 614,
         "caller": "processCompleteModeAsync",
         "kind": "method",
         "lexical_target": "complete",
@@ -139132,7 +139182,7 @@
       },
       {
         "source": "server/lib/ai/optimize_route_internal.dart",
-        "line": 615,
+        "line": 616,
         "caller": "processCompleteModeAsync",
         "kind": "method",
         "lexical_target": "buildUnexpectedCompleteAsyncPayloadQualityError",
@@ -139143,7 +139193,7 @@
       },
       {
         "source": "server/lib/ai/optimize_route_internal.dart",
-        "line": 628,
+        "line": 629,
         "caller": "processCompleteModeAsync",
         "kind": "method",
         "lexical_target": "captureObservedException",
@@ -139154,7 +139204,7 @@
       },
       {
         "source": "server/lib/ai/optimize_route_internal.dart",
-        "line": 640,
+        "line": 641,
         "caller": "processCompleteModeAsync",
         "kind": "method",
         "lexical_target": "w",
@@ -139165,7 +139215,7 @@
       },
       {
         "source": "server/lib/ai/optimize_route_internal.dart",
-        "line": 645,
+        "line": 646,
         "caller": "processCompleteModeAsync",
         "kind": "method",
         "lexical_target": "e",
@@ -141816,7 +141866,29 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 106,
+        "line": 101,
+        "caller": "computeSwapIntegrity",
+        "kind": "method",
+        "lexical_target": "_canonicalEntries",
+        "target": "_canonicalEntries",
+        "target_library": "package:server/ai/optimize_swap_integrity.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimize_swap_integrity.dart",
+        "line": 103,
+        "caller": "computeSwapIntegrity",
+        "kind": "method",
+        "lexical_target": "_canonicalString",
+        "target": "_canonicalString",
+        "target_library": "package:server/ai/optimize_swap_integrity.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimize_swap_integrity.dart",
+        "line": 110,
         "caller": "computeSwapIntegrity",
         "kind": "constructor",
         "lexical_target": "SwapIntegrity",
@@ -141827,7 +141899,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 126,
+        "line": 130,
         "caller": "verifySwapIntegrity",
         "kind": "method",
         "lexical_target": "computeSwapIntegrity",
@@ -141838,7 +141910,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 166,
+        "line": 170,
         "caller": "buildSwapIntegrityForResponse",
         "kind": "method",
         "lexical_target": "computeSwapIntegrity",
@@ -141849,7 +141921,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 166,
+        "line": 170,
         "caller": "buildSwapIntegrityForResponse",
         "kind": "method",
         "lexical_target": "toJson",
@@ -141860,7 +141932,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 182,
+        "line": 186,
         "caller": "resolveOptimizeApplySigningSecret",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -141871,7 +141943,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 221,
+        "line": 217,
         "caller": "buildOptimizationCardDelta",
         "kind": "method",
         "lexical_target": "_canonicalQuantityMap",
@@ -141882,7 +141954,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 264,
+        "line": 262,
         "caller": "buildOptimizeApplyAuthorizationForResponse",
         "kind": "method",
         "lexical_target": "_readNullableInt",
@@ -141893,7 +141965,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 265,
+        "line": 263,
         "caller": "buildOptimizeApplyAuthorizationForResponse",
         "kind": "method",
         "lexical_target": "_canonicalFunctionalRolePolicy",
@@ -141904,7 +141976,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 270,
+        "line": 268,
         "caller": "buildOptimizeApplyAuthorizationForResponse",
         "kind": "method",
         "lexical_target": "_canonicalAuthorizedSwapPairs",
@@ -141915,7 +141987,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 275,
+        "line": 273,
         "caller": "buildOptimizeApplyAuthorizationForResponse",
         "kind": "method",
         "lexical_target": "_isSatisfiedFunctionalRolePolicy",
@@ -141926,7 +141998,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 292,
+        "line": 283,
         "caller": "buildOptimizeApplyAuthorizationForResponse",
         "kind": "method",
         "lexical_target": "_canonicalQuantityMap",
@@ -141937,12 +142009,23 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 298,
+        "line": 293,
         "caller": "buildOptimizeApplyAuthorizationForResponse",
         "kind": "method",
-        "lexical_target": "_base64UrlNoPadding",
-        "target": "_base64UrlNoPadding",
-        "target_library": "package:server/ai/optimize_swap_integrity.dart",
+        "lexical_target": "issueDeckReviewArtifact",
+        "target": "issueDeckReviewArtifact",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimize_swap_integrity.dart",
+        "line": 299,
+        "caller": "buildOptimizeApplyAuthorizationForResponse",
+        "kind": "method",
+        "lexical_target": "canonicalDeckReviewHash",
+        "target": "canonicalDeckReviewHash",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
         "target_scope": "workspace",
         "occurrences": 2
       },
@@ -142036,7 +142119,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 437,
+        "line": 438,
         "caller": "attachOptimizeApplyAuthorizationToResponse",
         "kind": "method",
         "lexical_target": "resolveOptimizeApplySigningSecret",
@@ -142047,7 +142130,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 441,
+        "line": 442,
         "caller": "attachOptimizeApplyAuthorizationToResponse",
         "kind": "method",
         "lexical_target": "_markOptimizeApplySigningUnavailable",
@@ -142058,7 +142141,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 444,
+        "line": 445,
         "caller": "attachOptimizeApplyAuthorizationToResponse",
         "kind": "method",
         "lexical_target": "buildOptimizeApplyAuthorizationForResponse",
@@ -142069,40 +142152,29 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 512,
+        "line": 514,
+        "caller": "verifyOptimizeApplyAuthorization",
+        "kind": "method",
+        "lexical_target": "verifyDeckReviewArtifact",
+        "target": "verifyDeckReviewArtifact",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimize_swap_integrity.dart",
+        "line": 524,
         "caller": "verifyOptimizeApplyAuthorization",
         "kind": "constructor",
         "lexical_target": "OptimizeApplyAuthorizationVerification",
         "target": "OptimizeApplyAuthorizationVerification.OptimizeApplyAuthorizationVerification",
         "target_library": "package:server/ai/optimize_swap_integrity.dart",
         "target_scope": "workspace",
-        "occurrences": 11
+        "occurrences": 5
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 531,
-        "caller": "verifyOptimizeApplyAuthorization",
-        "kind": "method",
-        "lexical_target": "_decodeBase64UrlNoPadding",
-        "target": "_decodeBase64UrlNoPadding",
-        "target_library": "package:server/ai/optimize_swap_integrity.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 532,
-        "caller": "verifyOptimizeApplyAuthorization",
-        "kind": "method",
-        "lexical_target": "_constantTimeBytesEqual",
-        "target": "_constantTimeBytesEqual",
-        "target_library": "package:server/ai/optimize_swap_integrity.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 593,
+        "line": 546,
         "caller": "verifyOptimizeApplyAuthorization",
         "kind": "method",
         "lexical_target": "_readAuthorizationQuantityMap",
@@ -142113,7 +142185,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 597,
+        "line": 550,
         "caller": "verifyOptimizeApplyAuthorization",
         "kind": "method",
         "lexical_target": "_canonicalQuantityMap",
@@ -142124,7 +142196,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 599,
+        "line": 552,
         "caller": "verifyOptimizeApplyAuthorization",
         "kind": "method",
         "lexical_target": "_readAuthorizationSwapPairs",
@@ -142135,7 +142207,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 602,
+        "line": 555,
         "caller": "verifyOptimizeApplyAuthorization",
         "kind": "method",
         "lexical_target": "_isAuthorizedSwapPairSubset",
@@ -142146,7 +142218,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 607,
+        "line": 560,
         "caller": "verifyOptimizeApplyAuthorization",
         "kind": "method",
         "lexical_target": "_isQuantitySubset",
@@ -142157,7 +142229,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 641,
+        "line": 594,
         "caller": "_readAuthorizationSwapPairs",
         "kind": "method",
         "lexical_target": "_readNullableInt",
@@ -142168,7 +142240,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 674,
+        "line": 627,
         "caller": "search",
         "kind": "method",
         "lexical_target": "_quantityMapKey",
@@ -142179,7 +142251,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 679,
+        "line": 632,
         "caller": "search",
         "kind": "method",
         "lexical_target": "search",
@@ -142190,7 +142262,7 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 696,
+        "line": 649,
         "caller": "search",
         "kind": "method",
         "lexical_target": "_subtractQuantity",
@@ -142201,33 +142273,11 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 703,
+        "line": 656,
         "caller": "_isAuthorizedSwapPairSubset",
         "kind": "method",
         "lexical_target": "search",
         "target": "search",
-        "target_library": "package:server/ai/optimize_swap_integrity.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 97,
-        "caller": "computeSwapIntegrity",
-        "kind": "method",
-        "lexical_target": "_canonicalEntries",
-        "target": "_canonicalEntries",
-        "target_library": "package:server/ai/optimize_swap_integrity.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 99,
-        "caller": "computeSwapIntegrity",
-        "kind": "method",
-        "lexical_target": "_canonicalString",
-        "target": "_canonicalString",
         "target_library": "package:server/ai/optimize_swap_integrity.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -159404,8 +159454,129 @@
         "occurrences": 1
       },
       {
-        "source": "server/lib/decks/optimization_apply_authorization_support.dart",
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 102,
+        "caller": "issueDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "_base64UrlNoPadding",
+        "target": "_base64UrlNoPadding",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
         "line": 103,
+        "caller": "issueDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "_sign",
+        "target": "_sign",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 128,
+        "caller": "verifyDeckReviewArtifact",
+        "kind": "constructor",
+        "lexical_target": "DeckReviewArtifactVerification",
+        "target": "DeckReviewArtifactVerification.DeckReviewArtifactVerification",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 146,
+        "caller": "verifyDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "_decodeBase64UrlNoPadding",
+        "target": "_decodeBase64UrlNoPadding",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 147,
+        "caller": "verifyDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "_constantTimeEquals",
+        "target": "_constantTimeEquals",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 148,
+        "caller": "verifyDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "_sign",
+        "target": "_sign",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 174,
+        "caller": "fail",
+        "kind": "constructor",
+        "lexical_target": "DeckReviewArtifactVerification",
+        "target": "DeckReviewArtifactVerification.DeckReviewArtifactVerification",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 181,
+        "caller": "verifyDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "fail",
+        "target": "fail",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 190,
+        "caller": "verifyDeckReviewArtifact",
+        "kind": "method",
+        "lexical_target": "_readInt",
+        "target": "_readInt",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 222,
+        "caller": "canonicalDeckReviewHash",
+        "kind": "method",
+        "lexical_target": "_canonical",
+        "target": "_canonical",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 230,
+        "caller": "_canonical",
+        "kind": "method",
+        "lexical_target": "_canonical",
+        "target": "_canonical",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/decks/optimization_apply_authorization_support.dart",
+        "line": 105,
         "caller": "optimizationApplyAuthorizedBracket",
         "kind": "method",
         "lexical_target": "_readBracket",
@@ -159416,7 +159587,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 112,
+        "line": 114,
         "caller": "_findUnauthorizedMetadataChange",
         "kind": "method",
         "lexical_target": "_cardId",
@@ -159427,7 +159598,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 120,
+        "line": 122,
         "caller": "_findUnauthorizedMetadataChange",
         "kind": "method",
         "lexical_target": "_condition",
@@ -159438,7 +159609,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 31,
+        "line": 32,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "method",
         "lexical_target": "resolveOptimizeApplySigningSecret",
@@ -159449,7 +159620,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 35,
+        "line": 36,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "constructor",
         "lexical_target": "OptimizationApplyAuthorizationViolation",
@@ -159460,7 +159631,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 52,
+        "line": 53,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "method",
         "lexical_target": "buildOptimizationCardDelta",
@@ -159471,7 +159642,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 62,
+        "line": 63,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "method",
         "lexical_target": "verifyOptimizeApplyAuthorization",
@@ -159482,7 +159653,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 75,
+        "line": 77,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "method",
         "lexical_target": "_findUnauthorizedMetadataChange",
@@ -159493,7 +159664,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 82,
+        "line": 84,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "method",
         "lexical_target": "optimizationApplyAuthorizedBracket",
@@ -159504,7 +159675,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 84,
+        "line": 86,
         "caller": "validateOptimizationApplyAuthorization",
         "kind": "method",
         "lexical_target": "_readBracket",
@@ -175597,7 +175768,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1004,
+        "line": 1005,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "buildAggressiveCandidateQualityDiagnostics",
@@ -175608,7 +175779,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1021,
+        "line": 1022,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "withOptimizationSemanticV2EnforcementDiagnostics",
@@ -175619,7 +175790,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1029,
+        "line": 1030,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "enforceSuccessfulOptimizeOutcomeSafety",
@@ -175630,7 +175801,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1033,
+        "line": 1034,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "deriveOptimizeOutcomeCode",
@@ -175641,7 +175812,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1039,
+        "line": 1040,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "enforceFailedOptimizeOutcomeSafety",
@@ -175652,7 +175823,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1041,
+        "line": 1042,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "_enforceCommanderSameLanePreviewSafety",
@@ -175663,7 +175834,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1042,
+        "line": 1043,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "snapshot",
@@ -175685,7 +175856,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1068,
+        "line": 1069,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "buildSwapIntegrityForResponse",
@@ -175696,7 +175867,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1075,
+        "line": 1076,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "attachOptimizeApplyAuthorizationToResponse",
@@ -175707,23 +175878,12 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1083,
+        "line": 1085,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "recordOptimizeAnalysisOutcome",
         "target": "recordOptimizeAnalysisOutcome",
         "target_library": "package:server/ai/optimize_route_internal.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/index.dart",
-        "line": 1109,
-        "caller": "respondWithOptimizeTelemetry",
-        "kind": "method",
-        "lexical_target": "logSummary",
-        "target": "OptimizeStageTelemetry.logSummary",
-        "target_library": "package:server/ai/optimize_stage_telemetry.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -175740,7 +175900,18 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1114,
+        "line": 1111,
+        "caller": "respondWithOptimizeTelemetry",
+        "kind": "method",
+        "lexical_target": "logSummary",
+        "target": "OptimizeStageTelemetry.logSummary",
+        "target_library": "package:server/ai/optimize_stage_telemetry.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/index.dart",
+        "line": 1116,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "respondWithOptimizeTelemetry",
@@ -175751,7 +175922,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1116,
+        "line": 1118,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildRebuildGuidedOutcome",
@@ -175762,7 +175933,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1146,
+        "line": 1148,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckOptimizerService",
@@ -175773,7 +175944,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1156,
+        "line": 1158,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "resolveCommanderOptimizeMetaScope",
@@ -175784,7 +175955,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1162,
+        "line": 1164,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadCommanderReferenceProfileFromCache",
@@ -175795,7 +175966,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1170,
+        "line": 1172,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "emptyCommanderMetaReferenceSelection",
@@ -175806,7 +175977,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1176,
+        "line": 1178,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadCommanderMetaReferenceSelection",
@@ -175817,7 +175988,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1207,
+        "line": 1209,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildMetaDeckEvidenceText",
@@ -175828,23 +175999,12 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1212,
+        "line": 1214,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildMetaDeckEvidencePayload",
         "target": "buildMetaDeckEvidencePayload",
         "target_library": "package:server/meta/meta_deck_reference_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/index.dart",
-        "line": 1218,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "extractAverageDeckSeedNamesFromProfile",
-        "target": "extractAverageDeckSeedNamesFromProfile",
-        "target_library": "package:server/ai/optimize_runtime_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -175861,7 +176021,18 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1222,
+        "line": 1220,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "extractAverageDeckSeedNamesFromProfile",
+        "target": "extractAverageDeckSeedNamesFromProfile",
+        "target_library": "package:server/ai/optimize_runtime_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/index.dart",
+        "line": 1224,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "extractTopCardNamesFromProfile",
@@ -175872,7 +176043,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1242,
+        "line": 1244,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "EdhrecService",
@@ -175883,7 +176054,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1242,
+        "line": 1244,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "fetchCommanderData",
@@ -175894,7 +176065,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1269,
+        "line": 1271,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "d",
@@ -175905,7 +176076,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1295,
+        "line": 1297,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildDeterministicOptimizeSwapCandidates",
@@ -175927,7 +176098,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1380,
+        "line": 1382,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "startCompleteModeAsyncJob",
@@ -175938,7 +176109,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1410,
+        "line": 1412,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildCompleteModeAsyncAcceptedBody",
@@ -175949,7 +176120,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1445,
+        "line": 1447,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -175960,7 +176131,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1466,
+        "line": 1468,
         "caller": "runAiOptimizeAttempt",
         "kind": "method",
         "lexical_target": "trackAsync",
@@ -175971,7 +176142,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1468,
+        "line": 1470,
         "caller": "runAiOptimizeAttempt",
         "kind": "method",
         "lexical_target": "optimizeDeck",
@@ -175982,7 +176153,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1486,
+        "line": 1488,
         "caller": "runAiOptimizeAttempt",
         "kind": "method",
         "lexical_target": "attachAiOptimizeAttemptMetadata",
@@ -175993,23 +176164,12 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1492,
+        "line": 1494,
         "caller": "runAiOptimizeAttempt",
         "kind": "method",
         "lexical_target": "e",
         "target": "Log.e",
         "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/index.dart",
-        "line": 1498,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "buildDeterministicOptimizeResponse",
-        "target": "buildDeterministicOptimizeResponse",
-        "target_library": "workspace:server/routes/ai/optimize/index.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -176026,7 +176186,18 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1507,
+        "line": 1500,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "buildDeterministicOptimizeResponse",
+        "target": "buildDeterministicOptimizeResponse",
+        "target_library": "workspace:server/routes/ai/optimize/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/index.dart",
+        "line": 1509,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "runAiOptimizeAttempt",
@@ -176037,7 +176208,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1540,
+        "line": 1542,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "trackSync",
@@ -176048,7 +176219,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1542,
+        "line": 1544,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "normalizeOptimizePayload",
@@ -176059,7 +176230,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1563,
+        "line": 1565,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildCompleteFinalResponse",
@@ -176070,7 +176241,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1576,
+        "line": 1578,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "auditCompleteRecommendationConstraints",
@@ -176081,7 +176252,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1597,
+        "line": 1599,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -176092,7 +176263,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1598,
+        "line": 1600,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "countOptimizeResponseSwaps",
@@ -176103,7 +176274,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1616,
+        "line": 1618,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "CardValidationService",
@@ -176114,7 +176285,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1627,
+        "line": 1629,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "parseOptimizeSuggestions",
@@ -176136,7 +176307,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1650,
+        "line": 1652,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "selectEmptySuggestionFallbackRemovalCandidates",
@@ -176147,7 +176318,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1660,
+        "line": 1662,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "findSynergyReplacements",
@@ -176158,7 +176329,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1681,
+        "line": 1683,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildEmptySuggestionFallbackApplication",
@@ -176169,7 +176340,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1703,
+        "line": 1705,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildEmptySuggestionFallbackFailureReason",
@@ -176191,7 +176362,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1749,
+        "line": 1751,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildInitialOptimizeSuggestionFilters",
@@ -176202,7 +176373,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1765,
+        "line": 1767,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateCardNames",
@@ -176213,7 +176384,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1802,
+        "line": 1804,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "filterOptimizeCardNamesByKnownFormatLegality",
@@ -176224,7 +176395,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1836,
+        "line": 1838,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "resolvedCardIdentityFromParts",
@@ -176246,7 +176417,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1846,
+        "line": 1848,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "filterOptimizeAdditionsByCommanderIdentity",
@@ -176257,7 +176428,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1879,
+        "line": 1881,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeBracketAdditionCardData",
@@ -176268,7 +176439,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1888,
+        "line": 1890,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "filterOptimizeAdditionsByBracketPolicy",
@@ -176279,7 +176450,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1908,
+        "line": 1910,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "basicLandNamesForIdentity",
@@ -176290,7 +176461,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1909,
+        "line": 1911,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeCompleteTopUpSeed",
@@ -176301,7 +176472,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1919,
+        "line": 1921,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadBasicLandIds",
@@ -176312,7 +176483,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1922,
+        "line": 1924,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeCompleteTopUpResult",
@@ -176323,7 +176494,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1955,
+        "line": 1957,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "applyOptimizeLandRemovalProtection",
@@ -176334,7 +176505,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1992,
+        "line": 1994,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeRebalancePlan",
@@ -176356,7 +176527,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2033,
+        "line": 2035,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "applyOptimizeRebalanceReplacements",
@@ -176367,7 +176538,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2055,
+        "line": 2057,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "trimOptimizeRebalanceToPairs",
@@ -176378,7 +176549,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2098,
+        "line": 2100,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "applyOptimizeRecommendationConstraints",
@@ -176389,7 +176560,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2115,
+        "line": 2117,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "preserveOptimizePairsAfterConstraintFilter",
@@ -176400,7 +176571,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2127,
+        "line": 2129,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildSourceStructuralRebuildGuidedOutcome",
@@ -176411,7 +176582,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2185,
+        "line": 2187,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildColorIdentityValidationWarning",
@@ -176422,7 +176593,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2205,
+        "line": 2207,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "collectAdditionsNotInEdhrec",
@@ -176433,7 +176604,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2210,
+        "line": 2212,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "findCard",
@@ -176444,7 +176615,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2215,
+        "line": 2217,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildEdhrecValidationWarnings",
@@ -176455,7 +176626,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2234,
+        "line": 2236,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildThemeMismatchWarning",
@@ -176466,7 +176637,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2253,
+        "line": 2255,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "fetchOptimizeAdditionDataForQualityGate",
@@ -176477,7 +176648,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2262,
+        "line": 2264,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "filterUnsafeOptimizeSwapsByCardData",
@@ -176488,7 +176659,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2281,
+        "line": 2283,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "mergeAggressiveRejectionBuckets",
@@ -176499,7 +176670,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2282,
+        "line": 2284,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "bucketOptimizeQualityGateDroppedReasons",
@@ -176521,7 +176692,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2325,
+        "line": 2327,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeAiFallbackRetryPlan",
@@ -176532,7 +176703,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2360,
+        "line": 2362,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildNoSafeSwapsRejectedBody",
@@ -176543,7 +176714,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2388,
+        "line": 2390,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeVirtualPostAnalysis",
@@ -176554,7 +176725,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2409,
+        "line": 2411,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -176565,7 +176736,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2414,
+        "line": 2416,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildStructuralRebuildGuidedOutcome",
@@ -176576,7 +176747,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2437,
+        "line": 2439,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeBracketRejectedBody",
@@ -176587,7 +176758,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2472,
+        "line": 2474,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -176598,7 +176769,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2497,
+        "line": 2499,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeRoleFloorRejectedBody",
@@ -176609,7 +176780,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2525,
+        "line": 2527,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "ThemeContextualRulesService",
@@ -176620,7 +176791,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2526,
+        "line": 2528,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationValidator",
@@ -176631,7 +176802,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2534,
+        "line": 2536,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "runOptimizeRouteValidation",
@@ -176642,7 +176813,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2544,
+        "line": 2546,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validate",
@@ -176653,7 +176824,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2565,
+        "line": 2567,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "e",
@@ -176664,7 +176835,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2638,
+        "line": 2640,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "evaluateOptimizeRouteQualityGate",
@@ -176675,7 +176846,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2688,
+        "line": 2690,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildQualityRejectedBody",
@@ -176686,7 +176857,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2716,
+        "line": 2718,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "evaluateSerializedOptimizeValidation",
@@ -176708,7 +176879,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2772,
+        "line": 2774,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "evaluateOptimizeRouteSemanticV2Gate",
@@ -176719,7 +176890,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2780,
+        "line": 2782,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildSemanticV2OptimizeRejectedBody",
@@ -176730,7 +176901,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2784,
+        "line": 2786,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -176741,7 +176912,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2820,
+        "line": 2822,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "recordOptimizeFallbackTelemetry",
@@ -176752,7 +176923,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2839,
+        "line": 2841,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadPersistedEmptyFallbackAggregate",
@@ -176763,7 +176934,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2853,
+        "line": 2855,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "indexDeckRemovalPrintingsByName",
@@ -176774,7 +176945,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2875,
+        "line": 2877,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "normalizeOptimizeReasoning",
@@ -176785,7 +176956,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2887,
+        "line": 2889,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildEmptySuggestionFallbackDiagnostics",
@@ -176796,7 +176967,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2894,
+        "line": 2896,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_buildEmptyFallbackAggregate",
@@ -176807,7 +176978,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2918,
+        "line": 2920,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeRecommendationDetail",
@@ -176818,7 +176989,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2975,
+        "line": 2977,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "optimizationFunctionalRolesForCard",
@@ -176829,7 +177000,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2989,
+        "line": 2991,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "inferFunctionalRole",
@@ -176840,22 +177011,11 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3002,
+        "line": 3004,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "balanceOptimizeDetailedPayload",
         "target": "balanceOptimizeDetailedPayload",
-        "target_library": "package:server/ai/optimize_route_payload_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/index.dart",
-        "line": 3009,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "enforceOptimizeFinalPayloadIntegrity",
-        "target": "enforceOptimizeFinalPayloadIntegrity",
         "target_library": "package:server/ai/optimize_route_payload_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -176873,7 +177033,18 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3025,
+        "line": 3011,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "enforceOptimizeFinalPayloadIntegrity",
+        "target": "enforceOptimizeFinalPayloadIntegrity",
+        "target_library": "package:server/ai/optimize_route_payload_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/index.dart",
+        "line": 3027,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "selectOptimizeAdditionDataForProjection",
@@ -176884,7 +177055,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3031,
+        "line": 3033,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeProjectedDeckForBracket",
@@ -176906,7 +177077,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3160,
+        "line": 3162,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeDecisionContract",
@@ -176917,7 +177088,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3167,
+        "line": 3169,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "countOptimizeDetailedPhysicalCards",
@@ -176928,7 +177099,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3175,
+        "line": 3177,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "commanderManaFloorApplies",
@@ -176939,7 +177110,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3176,
+        "line": 3178,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizationManaFoundationContract",
@@ -176950,7 +177121,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3180,
+        "line": 3182,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "resolveOptimizeMinimumLandFloor",
@@ -176961,7 +177132,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3185,
+        "line": 3187,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "strategicMinimumLandCountForFormat",
@@ -176972,7 +177143,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3196,
+        "line": 3198,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "enforceSuccessfulOptimizeOutcomeSafety",
@@ -176983,7 +177154,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3211,
+        "line": 3213,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "attachOptimizeDiagnostic",
@@ -176994,7 +177165,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3214,
+        "line": 3216,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "withOptimizationSemanticV2EnforcementDiagnostics",
@@ -177005,7 +177176,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3226,
+        "line": 3228,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildAggressiveCandidateQualityDiagnostics",
@@ -177016,7 +177187,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3242,
+        "line": 3244,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "attachOptimizeBracketPolicyDiagnostics",
@@ -177027,7 +177198,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3248,
+        "line": 3250,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildOptimizeWarnings",
@@ -177038,7 +177209,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3270,
+        "line": 3272,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "augmentMetaDeckEvidencePayloadWithOutputMatches",
@@ -177049,7 +177220,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3289,
+        "line": 3291,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "saveOptimizeCache",
@@ -177060,7 +177231,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3298,
+        "line": 3300,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "saveUserAiPreferences",
@@ -177071,7 +177242,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 3329,
+        "line": 3331,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -177566,7 +177737,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 788,
+        "line": 789,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "i",
@@ -177577,7 +177748,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 801,
+        "line": 802,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckThemeProfile",
@@ -177588,7 +177759,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 807,
+        "line": 808,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildPostGameEvidencePrompt",
@@ -177599,7 +177770,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 809,
+        "line": 810,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "postGameEvidenceCardNames",
@@ -177610,7 +177781,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 815,
+        "line": 816,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckOptimizationState",
@@ -177621,7 +177792,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 832,
+        "line": 833,
         "caller": "buildRebuildGuidedOutcome",
         "kind": "method",
         "lexical_target": "buildOptimizeRebuildGuidedOutcome",
@@ -177632,7 +177803,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 853,
+        "line": 854,
         "caller": "buildStructuralRebuildGuidedOutcome",
         "kind": "method",
         "lexical_target": "buildOptimizeStructuralRebuildGuidedOutcome",
@@ -177643,7 +177814,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 872,
+        "line": 873,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizeProjectedDeckBracket",
@@ -177654,7 +177825,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 880,
+        "line": 881,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizeProjectedCommanderRoleFloors",
@@ -177665,7 +177836,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 890,
+        "line": 891,
         "caller": "buildSourceStructuralRebuildGuidedOutcome",
         "kind": "method",
         "lexical_target": "buildStructuralRebuildGuidedOutcome",
@@ -177676,7 +177847,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 897,
+        "line": 898,
         "caller": "buildSourceStructuralRebuildGuidedOutcome",
         "kind": "method",
         "lexical_target": "toJson",
@@ -177687,23 +177858,12 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 909,
+        "line": 910,
         "caller": "buildSourceStructuralRebuildGuidedOutcome",
         "kind": "method",
         "lexical_target": "toJson",
         "target": "CommanderFunctionalRoleFloorAssessment.toJson",
         "target_library": "package:server/ai/optimize_functional_role_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/index.dart",
-        "line": 929,
-        "caller": "mergeAggressiveRejectionBuckets",
-        "kind": "method",
-        "lexical_target": "mergeOptimizeReasonBuckets",
-        "target": "mergeOptimizeReasonBuckets",
-        "target_library": "package:server/ai/optimize_route_response_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -177720,7 +177880,18 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 938,
+        "line": 930,
+        "caller": "mergeAggressiveRejectionBuckets",
+        "kind": "method",
+        "lexical_target": "mergeOptimizeReasonBuckets",
+        "target": "mergeOptimizeReasonBuckets",
+        "target_library": "package:server/ai/optimize_route_response_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/index.dart",
+        "line": 939,
         "caller": "buildAggressiveCandidateQualityDiagnostics",
         "kind": "method",
         "lexical_target": "buildAggressiveCandidateQualityDiagnostics",
@@ -177731,7 +177902,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 959,
+        "line": 960,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "attachRecommendationContextToOptimizeResponse",
@@ -177742,7 +177913,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 963,
+        "line": 964,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "attachPostGameEvidenceToOptimizeResponse",
@@ -177753,7 +177924,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 967,
+        "line": 968,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "toJson",
@@ -177764,7 +177935,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 969,
+        "line": 970,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "toJson",
@@ -177775,7 +177946,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 971,
+        "line": 972,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "countOptimizeResponseSwaps",
@@ -177786,7 +177957,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 977,
+        "line": 978,
         "caller": "respondWithOptimizeTelemetry",
         "kind": "method",
         "lexical_target": "buildCommanderOptimizePlanningSummary",
@@ -184067,7 +184238,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 181,
+        "line": 182,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "optimizationApplyAuthorizedBracket",
@@ -184078,7 +184249,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 185,
+        "line": 186,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -184089,7 +184260,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 185,
+        "line": 186,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -184100,7 +184271,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 192,
+        "line": 193,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
@@ -184111,7 +184282,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 202,
+        "line": 203,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationFunctionalRoleFloorViolation",
@@ -184122,7 +184293,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 207,
+        "line": 208,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderManaFloor",
@@ -184133,7 +184304,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 214,
+        "line": 215,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationLandFloorViolation",
@@ -184144,7 +184315,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 216,
+        "line": 217,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderBracket",
@@ -184155,7 +184326,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 224,
+        "line": 225,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationBracketViolation",
@@ -184166,7 +184337,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 314,
+        "line": 315,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadAppliedDeckPostAnalysis",
@@ -184177,7 +184348,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 319,
+        "line": 320,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckOptimizationHistoryService",
@@ -184188,7 +184359,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 319,
+        "line": 320,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "recordAppliedOptimization",
@@ -184452,7 +184623,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1028,
+        "line": 1029,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -184485,7 +184656,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1053,
+        "line": 1054,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -184738,7 +184909,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 363,
+        "line": 364,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "optimizationApplyAuthorizedBracket",
@@ -184749,7 +184920,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 368,
+        "line": 369,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -184760,7 +184931,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 368,
+        "line": 369,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -184782,7 +184953,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 375,
+        "line": 376,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
@@ -184793,7 +184964,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 385,
+        "line": 386,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "OptimizationFunctionalRoleFloorViolation",
@@ -184804,7 +184975,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 391,
+        "line": 392,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderManaFloor",
@@ -184815,7 +184986,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 398,
+        "line": 399,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "OptimizationLandFloorViolation",
@@ -184826,7 +184997,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 400,
+        "line": 401,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderBracket",
@@ -184837,7 +185008,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 408,
+        "line": 409,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "OptimizationBracketViolation",
@@ -184870,7 +185041,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 504,
+        "line": 505,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "loadAppliedDeckPostAnalysis",
@@ -184881,7 +185052,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 509,
+        "line": 510,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckOptimizationHistoryService",
@@ -184892,7 +185063,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 509,
+        "line": 510,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "recordAppliedOptimization",
@@ -184914,7 +185085,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 581,
+        "line": 582,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -184925,7 +185096,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 624,
+        "line": 625,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "notFound",
@@ -184936,7 +185107,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 626,
+        "line": 627,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -184958,7 +185129,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 650,
+        "line": 651,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -184969,7 +185140,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 660,
+        "line": 661,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "requireJsonObject",
@@ -184980,7 +185151,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 685,
+        "line": 686,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "readOptionalString",
@@ -184991,7 +185162,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 687,
+        "line": 688,
         "caller": "_patchDeck",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -185002,7 +185173,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 691,
+        "line": 692,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "parseCommanderBracket",
@@ -185013,7 +185184,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 696,
+        "line": 697,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "readOptionalBool",
@@ -185024,7 +185195,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 699,
+        "line": 700,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "ensureDeckPublicationAllowed",
@@ -185035,7 +185206,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 706,
+        "line": 707,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -185046,7 +185217,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 717,
+        "line": 718,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -185057,7 +185228,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 731,
+        "line": 732,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "_deckCardCount",
@@ -185068,7 +185239,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 775,
+        "line": 776,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "notFound",
@@ -185090,7 +185261,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 785,
+        "line": 786,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -185101,7 +185272,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 804,
+        "line": 805,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -185112,7 +185283,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 805,
+        "line": 806,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckPricingColumns",
@@ -185123,7 +185294,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 806,
+        "line": 807,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckPricingSourceColumn",
@@ -185134,7 +185305,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 807,
+        "line": 808,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckValidationStateColumns",
@@ -185145,7 +185316,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 808,
+        "line": 809,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -185156,7 +185327,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 809,
+        "line": 810,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -185167,7 +185338,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 836,
+        "line": 837,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "notFound",
@@ -185178,7 +185349,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 854,
+        "line": 855,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -185222,7 +185393,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 907,
+        "line": 908,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -185233,7 +185404,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 937,
+        "line": 938,
         "caller": "getMainType",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -185244,7 +185415,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 982,
+        "line": 983,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "getMainType",
@@ -185255,7 +185426,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 993,
+        "line": 994,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -185266,7 +185437,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 994,
+        "line": 995,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "calculateCmc",
@@ -190490,14 +190661,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 593,
+        "unique_references": 595,
         "occurrences": 739
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14357,
-        "occurrences": 24942
+        "unique_references": 14370,
+        "occurrences": 24959
       },
       {
         "target_scope": "dart_sdk",
@@ -190586,20 +190757,20 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/digest.dart",
-        "unique_references": 39,
-        "occurrences": 42
+        "unique_references": 40,
+        "occurrences": 43
       },
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hash.dart",
-        "unique_references": 40,
-        "occurrences": 44
+        "unique_references": 41,
+        "occurrences": 45
       },
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hmac.dart",
-        "unique_references": 15,
-        "occurrences": 15
+        "unique_references": 13,
+        "occurrences": 13
       },
       {
         "target_scope": "dependency",
@@ -193904,8 +194075,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimize_swap_integrity.dart",
-        "unique_references": 44,
-        "occurrences": 74
+        "unique_references": 41,
+        "occurrences": 63
       },
       {
         "target_scope": "workspace",
@@ -194488,6 +194659,12 @@
         "target_library": "package:server/decks/deck_optimization_history_service.dart",
         "unique_references": 40,
         "occurrences": 83
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "unique_references": 14,
+        "occurrences": 32
       },
       {
         "target_scope": "workspace",
@@ -200182,8 +200359,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16333,
-    "workspace_type_reference_count": 3452,
+    "resolved_type_reference_count": 16351,
+    "workspace_type_reference_count": 3453,
     "unresolved_type_reference_count": 357,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -225739,17 +225916,17 @@
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 501,
+        "line": 503,
         "lexical_type": "OptimizeApplyAuthorizationVerification",
         "resolved_type": "OptimizeApplyAuthorizationVerification",
         "target": "OptimizeApplyAuthorizationVerification",
         "target_library": "package:server/ai/optimize_swap_integrity.dart",
         "target_scope": "workspace",
-        "occurrences": 12
+        "occurrences": 6
       },
       {
         "source": "server/lib/ai/optimize_swap_integrity.dart",
-        "line": 91,
+        "line": 95,
         "lexical_type": "SwapIntegrity",
         "resolved_type": "SwapIntegrity",
         "target": "SwapIntegrity",
@@ -229828,6 +230005,16 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/decks/deck_review_artifact.dart",
+        "line": 115,
+        "lexical_type": "DeckReviewArtifactVerification",
+        "resolved_type": "DeckReviewArtifactVerification",
+        "target": "DeckReviewArtifactVerification",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
         "line": 21,
         "lexical_type": "OptimizeApplyAuthorizationVerification?",
@@ -229839,7 +230026,7 @@
       },
       {
         "source": "server/lib/decks/optimization_apply_authorization_support.dart",
-        "line": 35,
+        "line": 36,
         "lexical_type": "OptimizationApplyAuthorizationViolation",
         "resolved_type": "OptimizationApplyAuthorizationViolation",
         "target": "OptimizationApplyAuthorizationViolation",
@@ -232589,7 +232776,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1146,
+        "line": 1148,
         "lexical_type": "DeckOptimizerService",
         "resolved_type": "DeckOptimizerService",
         "target": "DeckOptimizerService",
@@ -232599,7 +232786,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1192,
+        "line": 1194,
         "lexical_type": "MetaDeckReferenceSelectionResult",
         "resolved_type": "MetaDeckReferenceSelectionResult",
         "target": "MetaDeckReferenceSelectionResult",
@@ -232609,7 +232796,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1242,
+        "line": 1244,
         "lexical_type": "EdhrecService",
         "resolved_type": "EdhrecService",
         "target": "EdhrecService",
@@ -232619,7 +232806,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 1616,
+        "line": 1618,
         "lexical_type": "CardValidationService",
         "resolved_type": "CardValidationService",
         "target": "CardValidationService",
@@ -232629,7 +232816,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2192,
+        "line": 2194,
         "lexical_type": "EdhrecCommanderData?",
         "resolved_type": "EdhrecCommanderData?",
         "target": "EdhrecCommanderData",
@@ -232639,7 +232826,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2525,
+        "line": 2527,
         "lexical_type": "ThemeContextualRulesService",
         "resolved_type": "ThemeContextualRulesService",
         "target": "ThemeContextualRulesService",
@@ -232649,7 +232836,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 2526,
+        "line": 2528,
         "lexical_type": "OptimizationValidator",
         "resolved_type": "OptimizationValidator",
         "target": "OptimizationValidator",
@@ -232799,7 +232986,7 @@
       },
       {
         "source": "server/routes/ai/optimize/index.dart",
-        "line": 801,
+        "line": 802,
         "lexical_type": "DeckThemeProfile",
         "resolved_type": "DeckThemeProfile",
         "target": "DeckThemeProfile",
@@ -233759,7 +233946,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 185,
+        "line": 186,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -233769,7 +233956,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 202,
+        "line": 203,
         "lexical_type": "OptimizationFunctionalRoleFloorViolation",
         "resolved_type": "OptimizationFunctionalRoleFloorViolation",
         "target": "OptimizationFunctionalRoleFloorViolation",
@@ -233779,7 +233966,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 214,
+        "line": 215,
         "lexical_type": "OptimizationLandFloorViolation",
         "resolved_type": "OptimizationLandFloorViolation",
         "target": "OptimizationLandFloorViolation",
@@ -233789,7 +233976,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 224,
+        "line": 225,
         "lexical_type": "OptimizationBracketViolation",
         "resolved_type": "OptimizationBracketViolation",
         "target": "OptimizationBracketViolation",
@@ -233799,7 +233986,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 319,
+        "line": 320,
         "lexical_type": "DeckOptimizationHistoryService",
         "resolved_type": "DeckOptimizationHistoryService",
         "target": "DeckOptimizationHistoryService",
@@ -233809,7 +233996,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 378,
+        "line": 379,
         "lexical_type": "OptimizationApplyAuthorizationViolation",
         "resolved_type": "OptimizationApplyAuthorizationViolation",
         "target": "OptimizationApplyAuthorizationViolation",
@@ -233929,7 +234116,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 368,
+        "line": 369,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -233939,7 +234126,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 385,
+        "line": 386,
         "lexical_type": "OptimizationFunctionalRoleFloorViolation",
         "resolved_type": "OptimizationFunctionalRoleFloorViolation",
         "target": "OptimizationFunctionalRoleFloorViolation",
@@ -233949,7 +234136,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 398,
+        "line": 399,
         "lexical_type": "OptimizationLandFloorViolation",
         "resolved_type": "OptimizationLandFloorViolation",
         "target": "OptimizationLandFloorViolation",
@@ -233959,7 +234146,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 408,
+        "line": 409,
         "lexical_type": "OptimizationBracketViolation",
         "resolved_type": "OptimizationBracketViolation",
         "target": "OptimizationBracketViolation",
@@ -233969,7 +234156,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 509,
+        "line": 510,
         "lexical_type": "DeckOptimizationHistoryService",
         "resolved_type": "DeckOptimizationHistoryService",
         "target": "DeckOptimizationHistoryService",
@@ -233979,7 +234166,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 598,
+        "line": 599,
         "lexical_type": "DeckVisibilityException",
         "resolved_type": "DeckVisibilityException",
         "target": "DeckVisibilityException",
@@ -233989,7 +234176,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 612,
+        "line": 613,
         "lexical_type": "OptimizationApplyAuthorizationViolation",
         "resolved_type": "OptimizationApplyAuthorizationViolation",
         "target": "OptimizationApplyAuthorizationViolation",
@@ -234736,8 +234923,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6305,
-        "occurrences": 39944
+        "unique_references": 6321,
+        "occurrences": 40005
       },
       {
         "target_scope": "dart_sdk",
@@ -234815,7 +235002,7 @@
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hmac.dart",
         "unique_references": 5,
-        "occurrences": 8
+        "occurrences": 7
       },
       {
         "target_scope": "dependency",
@@ -236206,8 +236393,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 410,
-        "occurrences": 4775
+        "unique_references": 411,
+        "occurrences": 4777
       },
       {
         "target_scope": "workspace",
@@ -237767,7 +237954,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimize_swap_integrity.dart",
         "unique_references": 4,
-        "occurrences": 18
+        "occurrences": 12
       },
       {
         "target_scope": "workspace",
@@ -238200,6 +238387,12 @@
         "target_library": "package:server/decks/deck_optimization_history_service.dart",
         "unique_references": 3,
         "occurrences": 3
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/decks/deck_review_artifact.dart",
+        "unique_references": 1,
+        "occurrences": 9
       },
       {
         "target_scope": "workspace",
@@ -275456,6 +275649,8 @@
     "server/test/deck_recommendations_route_adapter_test.dart",
     "server/test/deck_recommendations_route_support_test.dart",
     "server/test/deck_request_support_test.dart",
+    "server/test/deck_review_artifact_db_live_test.dart",
+    "server/test/deck_review_artifact_test.dart",
     "server/test/deck_rules_service_identity_test.dart",
     "server/test/deck_rules_service_test.dart",
     "server/test/deck_simulate_route_adapter_test.dart",
@@ -276998,7 +277193,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "6247f6e3af6f357a0f676c98983598c1c99f08e55e398dc14bcc7f64cc4ca1e7"
+      "sha256": "a908af94414ceb700c99eb2ac494b317d6b58fa1cd84ee58aad109e234699e98"
     },
     "required_task_fields": [
       "id",
@@ -277380,12 +277575,12 @@
       {
         "id": "DCK-P0-02",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "`DeckReviewArtifact v1` único para preview/commit, com HMAC, revisão, hash, constraints e expiração.",
         "depends_on": [
           "DCK-P0-01"
         ],
-        "acceptance": "Qualquer mudança semântica invalida; outro usuário/tamper/stale/expired falha. Decisão do dono em 2026-09-22: D-29, artifact de preview com TTL de 24 h, reutilizável pelo mesmo usuário.",
+        "acceptance": "Qualquer mudança semântica invalida; outro usuário/tamper/stale/expired falha. Decisão do dono em 2026-09-22: D-29, artifact de preview com TTL de 24 h, reutilizável pelo mesmo usuário. Feito em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `server/lib/decks/deck_review_artifact.dart` é o `DeckReviewArtifact v1` (token com prefixo `drv1`, payload e assinatura em base64url; HMAC-SHA256 sobre prefixo e payload; 24 h, reutilizável pelo mesmo usuário enquanto vale, pela D-29). Ele liga dono, deck, revisão e assinatura do conteúdo do deck no preview, `input_hash` e `constraints_hash` canônicos (SHA-256 com as chaves em ordem) e o tipo do fluxo; revisão e assinatura do commit têm de ser as do preview, inclusive quando ausentes. A autorização de apply do Optimize passou a ser esse artefato, do tipo `optimize_apply`, emitido só para o usuário autenticado e verificado no `PUT /decks/:id` e no `POST /decks/:id/cards/bulk` antes de qualquer escrita, com o motivo em `authorization_error`; o token `v2` antigo é recusado, e o app segue devolvendo o objeto sem mexer. Evidência: `server/test/deck_review_artifact_test.dart` (cada recusa com seu código), `server/test/optimize_apply_authorization_test.dart` (dono e estado velho) e `server/test/deck_review_artifact_db_live_test.dart` (PostgreSQL descartável: controle positivo e, relendo cartas, validação e histórico de otimização, nenhuma escrita com artefato adulterado, expirado, de outro usuário, de outro deck ou de estado velho), com 14 mutações derrubadas. A revisão do deck entra no artefato com o `DCK-P0-01`. O mesmo artefato no import sobre deck existente, no import novo, no Generate e no Rebuild fica com o `DCK-P0-03`, o `DCK-P1-02`, o `DCK-P0-04` e o `DCK-P1-08`, como a medição de 2026-09-22 separou.",
         "section": "P0 do ciclo",
         "source_line": 337
       },
@@ -286882,7 +287077,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "929bfa88f6bf5ce7c4504e4b6c42218ff6b45e03e014176ed1d889e290fda587"
+    "project_logic_source_digest_sha256": "69e6cc23de3ea8bc3014b49afefc370fbb8acfea96780f86c01729d8cbb783f3"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -289436,6 +289631,7 @@
       "server/lib/deck_write_verification_policy.dart",
       "server/lib/decks/deck_applied_analysis_support.dart",
       "server/lib/decks/deck_optimization_history_service.dart",
+      "server/lib/decks/deck_review_artifact.dart",
       "server/lib/decks/optimization_apply_authorization_support.dart",
       "server/lib/decks/optimization_bracket_support.dart",
       "server/lib/decks/optimization_functional_role_floor_support.dart",
@@ -289829,6 +290025,8 @@
       "server/test/deck_recommendations_route_adapter_test.dart",
       "server/test/deck_recommendations_route_support_test.dart",
       "server/test/deck_request_support_test.dart",
+      "server/test/deck_review_artifact_db_live_test.dart",
+      "server/test/deck_review_artifact_test.dart",
       "server/test/deck_rules_service_identity_test.dart",
       "server/test/deck_rules_service_test.dart",
       "server/test/deck_simulate_route_adapter_test.dart",

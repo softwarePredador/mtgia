@@ -777,6 +777,7 @@ Future<Response> onRequest(RequestContext context) async {
               );
           _enforceCommanderSameLanePreviewSafety(responseBody);
           attachOptimizeApplyAuthorizationToResponse(
+            ownerId: authenticatedUserId,
             deckId: deckId,
             deckSignature: deckSignature,
             responseBody: responseBody,
@@ -1073,6 +1074,7 @@ Future<Response> onRequest(RequestContext context) async {
         if (integrity != null) responseBody['swap_integrity'] = integrity;
       }
       attachOptimizeApplyAuthorizationToResponse(
+        ownerId: authenticatedUserId,
         deckId: deckId,
         deckSignature: deckSignature,
         responseBody: responseBody,

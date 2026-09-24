@@ -41,6 +41,8 @@ void main() {
   final suffix = DateTime.now().microsecondsSinceEpoch;
   late final Pool pool;
   String? token;
+  // DCK-P0-02: o artefato de aplicação é do dono do deck.
+  String? ownerId;
   String? commanderId;
   String? plainsId;
   String? commanderOnlyFillerId;
@@ -182,6 +184,7 @@ void main() {
       if (optimizeLike) 'functional_role_policy': functionalRolePolicy,
     };
     final authorization = buildOptimizeApplyAuthorizationForResponse(
+      ownerId: ownerId!,
       signingSecret: applySigningSecret,
       deckId: deckId,
       deckSignature: signature,
@@ -383,6 +386,7 @@ void main() {
     });
     expect(register.statusCode, anyOf(200, 201), reason: register.body);
     token = decode(register)['token'] as String;
+    ownerId = (decode(register)['user'] as Map)['id'] as String;
   });
 
   tearDownAll(() async {

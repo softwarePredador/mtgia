@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "6247f6e3af6f357a0f676c98983598c1c99f08e55e398dc14bcc7f64cc4ca1e7"
+    "sha256": "a908af94414ceb700c99eb2ac494b317d6b58fa1cd84ee58aad109e234699e98"
   },
   "required_task_fields": [
     "id",
@@ -384,12 +384,12 @@
     {
       "id": "DCK-P0-02",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "`DeckReviewArtifact v1` único para preview/commit, com HMAC, revisão, hash, constraints e expiração.",
       "depends_on": [
         "DCK-P0-01"
       ],
-      "acceptance": "Qualquer mudança semântica invalida; outro usuário/tamper/stale/expired falha. Decisão do dono em 2026-09-22: D-29, artifact de preview com TTL de 24 h, reutilizável pelo mesmo usuário.",
+      "acceptance": "Qualquer mudança semântica invalida; outro usuário/tamper/stale/expired falha. Decisão do dono em 2026-09-22: D-29, artifact de preview com TTL de 24 h, reutilizável pelo mesmo usuário. Feito em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `server/lib/decks/deck_review_artifact.dart` é o `DeckReviewArtifact v1` (token com prefixo `drv1`, payload e assinatura em base64url; HMAC-SHA256 sobre prefixo e payload; 24 h, reutilizável pelo mesmo usuário enquanto vale, pela D-29). Ele liga dono, deck, revisão e assinatura do conteúdo do deck no preview, `input_hash` e `constraints_hash` canônicos (SHA-256 com as chaves em ordem) e o tipo do fluxo; revisão e assinatura do commit têm de ser as do preview, inclusive quando ausentes. A autorização de apply do Optimize passou a ser esse artefato, do tipo `optimize_apply`, emitido só para o usuário autenticado e verificado no `PUT /decks/:id` e no `POST /decks/:id/cards/bulk` antes de qualquer escrita, com o motivo em `authorization_error`; o token `v2` antigo é recusado, e o app segue devolvendo o objeto sem mexer. Evidência: `server/test/deck_review_artifact_test.dart` (cada recusa com seu código), `server/test/optimize_apply_authorization_test.dart` (dono e estado velho) e `server/test/deck_review_artifact_db_live_test.dart` (PostgreSQL descartável: controle positivo e, relendo cartas, validação e histórico de otimização, nenhuma escrita com artefato adulterado, expirado, de outro usuário, de outro deck ou de estado velho), com 14 mutações derrubadas. A revisão do deck entra no artefato com o `DCK-P0-01`. O mesmo artefato no import sobre deck existente, no import novo, no Generate e no Rebuild fica com o `DCK-P0-03`, o `DCK-P1-02`, o `DCK-P0-04` e o `DCK-P1-08`, como a medição de 2026-09-22 separou.",
       "section": "P0 do ciclo",
       "source_line": 337
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "929bfa88f6bf5ce7c4504e4b6c42218ff6b45e03e014176ed1d889e290fda587"
+  "project_logic_source_digest_sha256": "69e6cc23de3ea8bc3014b49afefc370fbb8acfea96780f86c01729d8cbb783f3"
 }
