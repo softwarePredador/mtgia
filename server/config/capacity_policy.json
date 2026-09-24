@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-capacity",
+  "version": "2026-09-24.1",
+  "task": "BT-CAP-001",
+  "decisions": [
+    "D-14"
+  ],
+  "production": {
+    "ssh_target": "root@evolution-cartinhas.2ta7qx.easypanel.host",
+    "host_key_sha256": null,
+    "host_key_note": "A âncora de host é a mesma do deploy (MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256). O primeiro snapshot da ferramenta registra o valor, e a coordenação o fixa aqui.",
+    "easypanel_project": "evolution",
+    "host_shared_with_other_projects": true,
+    "other_projects": "carmatch (com worker e redis), drivematchpost, jg-campanhas (3 serviços), revendas-web e mobile-web"
+  },
+  "baseline": {
+    "measured_at": "2026-09-23T09:13:00Z",
+    "provenance": {
+      "kind": "receipt",
+      "receipt": "docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md",
+      "section": "## Leitura de capacidade (D-14, 09:13 UTC, somente leitura)",
+      "authorization": "D-14",
+      "measured_by": "sessão coordenadora",
+      "method": "SSH somente leitura, com a mesma chave e a mesma âncora de host do deploy"
+    },
+    "host": {
+      "cpu_count": {
+        "value": 4,
+        "evidence": "4 vCPU"
+      },
+      "memory_total_mb": {
+        "value": 7941,
+        "evidence": "RAM de 7.941 MB"
+      },
+      "memory_available_mb": {
+        "value": 3694,
+        "evidence": "com 3.694 MB disponíveis"
+      },
+      "disk_root_used_percent": {
+        "value": 70,
+        "evidence": "disco `/` em 70%"
+      },
+      "disk_root_free_gib": {
+        "value": 48,
+        "evidence": "com 48 GB livres"
+      },
+      "uptime_days": {
+        "value": 81,
+        "evidence": "81 dias no ar"
+      }
+    },
+    "services": {
+      "evolution_xmage-interactive": {
+        "memory_gib": {
+          "value": 1.36,
+          "evidence": "o XMage interativo ocupava 1,36 GiB"
+        },
+        "memory_limit_gib": {
+          "value": 4,
+          "evidence": "com limite de 4 GiB cada"
+        }
+      },
+      "evolution_xmage-sidecar": {
+        "memory_gib": {
+          "value": 1.0,
+          "evidence": "o XMage batch 1,00 GiB"
+        },
+        "memory_limit_gib": {
+          "value": 4,
+          "evidence": "com limite de 4 GiB cada"
+        }
+      },
+      "evolution_manaloom-postgres": {
+        "memory_mib": {
+          "value": 212,
+          "evidence": "`manaloom-postgres` (212 MiB)"
+        }
+      },
+      "easypanel": {
+        "memory_mib": {
+          "value": 110,
+          "evidence": "`easypanel` (110 MiB)"
+        }
+      },
+      "backend, ops, site, /app e forge-sidecar": {
+        "memory_mib_below": {
+          "value": 50,
+          "evidence": "ficavam abaixo de 50 MiB cada"
+        }
+      }
+    },
+    "after_xmage_scaled_to_zero": {
+      "memory_used_mb": {
+        "value": 1851,
+        "evidence": "Memória usada caiu de 4.298 para 1.851 MB"
+      },
+      "memory_available_mb": {
+        "value": 6089,
+        "evidence": "disponível subiu de 3.642 para 6.089 MB"
+      },
+      "memory_available_mb_after_reboot_and_deploy": {
+        "value": 6484,
+        "evidence": "memória disponível 6.484 MB"
+      }
+    },
+    "not_measured": [
+      "swap",
+      "load",
+      "PostgreSQL (tamanho, maiores relações, max_connections, shared_buffers, conexões)",
+      "resources (limites e reservas) dos serviços além do XMage"
+    ]
+  },
+  "thresholds": {
+    "status": "proposta_pendente_do_dono",
+    "memory_available_min_mb": 2048,
+    "disk_root_used_max_percent": 85,
+    "disk_root_free_min_gib": 20,
+    "swap_used_max_percent": 50,
+    "load1_per_cpu_max": 1.5,
+    "postgres_connections_used_max_percent": 80,
+    "snapshot_max_age_minutes": 30,
+    "rationale": {
+      "memory_available_min_mb": "Com o XMage ligado sobravam 3.694 MB; desligado, de 6.089 a 6.484 MB. O deploy constrói imagem no próprio host e o host é dividido com outros projetos: abaixo de 2 GiB livres, um build ou o pg_dump do backup podem acionar o OOM killer.",
+      "disk_root_used_max_percent": "O disco estava em 70% com 48 GiB livres (cerca de 160 GiB no total). Em 85% ainda sobram cerca de 24 GiB para imagens, backup local e WAL.",
+      "disk_root_free_min_gib": "Um build de imagem e um dump de restauração cabem com folga em 20 GiB; abaixo disso, o deploy ou o backup falham no meio.",
+      "swap_used_max_percent": "Swap não foi medido em 2026-09-23. Se o host tiver swap, mais da metade em uso é sinal de pressão de memória.",
+      "load1_per_cpu_max": "Load não foi medido em 2026-09-23. Acima de 1,5 por vCPU, um build compete com a API pelo processador.",
+      "postgres_connections_used_max_percent": "O pool padrão é de 10 conexões por processo (server/.env.example). Acima de 80% de max_connections, a troca de réplica num deploy pode esgotar as conexões.",
+      "snapshot_max_age_minutes": "O preflight decide com uma leitura feita no máximo 30 minutos antes, o tempo de um deploy."
+    }
+  },
+  "reservations_and_limits": {
+    "owner_task": "BT-CAP-002",
+    "status": "não definidos nesta política",
+    "note": "D-14: limites e reservas por serviço saem da leitura do BT-CAP-001. Na leitura de 2026-09-23, só os dois XMage tinham limite (4 GiB cada)."
+  },
+  "how_to_measure": "A coordenação roda scripts/manaloom_capacity_snapshot.sh --execute --out <arquivo> (só leitura, D-14) e depois scripts/manaloom_capacity_policy.py preflight --snapshot <arquivo>."
+}

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "8e00b5b25ccfceeaccc34a5ebabecc4dedb22281ff67f848cc42ed4182134538",
+  "source_digest_sha256": "5849c3239332896aac1e5f5a4c51355b1fa15cc4c7a32cecf2bbd9cc0405d758",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,9 +79,9 @@
     "database_tables": 80,
     "database_views": 6,
     "migrations": 63,
-    "scripts_and_jobs": 693,
+    "scripts_and_jobs": 695,
     "environment_variables": 716,
-    "tests": 1262,
+    "tests": 1263,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -264788,6 +264788,22 @@
       ]
     },
     {
+      "path": "scripts/manaloom_capacity_policy.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/manaloom_capacity_snapshot.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "MANALOOM_EASYPANEL_SSH_HOST",
+        "MANALOOM_EASYPANEL_SSH_KEY",
+        "TMPDIR"
+      ]
+    },
+    {
       "path": "scripts/manaloom_capture_android_platform_view.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -270216,6 +270232,7 @@
       "sources": [
         "scripts/manaloom_ai_generation_benchmark.sh",
         "scripts/manaloom_ai_paywall_e2e.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_commercial_quality_gate.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -270236,6 +270253,7 @@
       "sources": [
         "scripts/manaloom_ai_generation_benchmark.sh",
         "scripts/manaloom_ai_paywall_e2e.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_commercial_quality_gate.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -273637,6 +273655,7 @@
         "scripts/manaloom_battle_learning_visual_qa.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_binder_import_visual_qa.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_capture_android_platform_view.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
         "scripts/manaloom_dart_doc.sh",
@@ -274952,6 +274971,7 @@
     "server/test/candidate_quality_data_foundation_source_test.dart",
     "server/test/candidate_quality_data_support_test.dart",
     "server/test/canonicalize_learned_deck_metadata_cli_test.dart",
+    "server/test/capacity_policy_test.py",
     "server/test/card_cli_schema_guard_test.py",
     "server/test/card_identity_backfill_support_test.dart",
     "server/test/card_identity_support_test.dart",
@@ -276579,7 +276599,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "aee0226e4f9a60c234ff9e7327e8efd1917283b2af65361e13a21046e5687b80"
+      "sha256": "af2a057250f2d03f86af410b5ece04c783a3d0bdd339c3d8619d087e65e40938"
     },
     "required_task_fields": [
       "id",
@@ -279252,12 +279272,12 @@
       {
         "id": "BT-CAP-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Medir host e criar política de capacidade atual versionada.",
         "depends_on": [
           "BT-GOV-001"
         ],
-        "acceptance": "Memória/CPU/swap/DB/resources por serviço; sem reutilizar números de worktree temporário. Decisão do dono em 2026-09-22: D-14, leitura SSH somente leitura do host autorizada (CPU, memória e disco por container); o repositório ainda não tem ferramenta para isso. Primeira leitura somente leitura em 2026-09-23 (4 vCPU, 7.941 MB de RAM, disco em 70%, consumo por serviço e retrato antes e depois do reinício do host) em `docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md`; faltam a política versionada e a ferramenta no repositório.",
+        "acceptance": "Memória/CPU/swap/DB/resources por serviço; sem reutilizar números de worktree temporário. Decisão do dono em 2026-09-22: D-14, leitura SSH somente leitura do host autorizada (CPU, memória e disco por container); o repositório ainda não tem ferramenta para isso. Primeira leitura somente leitura em 2026-09-23 (4 vCPU, 7.941 MB de RAM, disco em 70%, consumo por serviço e retrato antes e depois do reinício do host) em `docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md`; faltam a política versionada e a ferramenta no repositório. Feito em 2026-09-24, na branch `banco/rodada1-2026-09-24`, sem tocar a produção: `server/config/capacity_policy.json` é a política versionada, com a leitura de 2026-09-23 como linha de base e a procedência de cada número (o validador exige que o valor apareça no trecho citado do receipt, e o receipt tem de estar em `docs/qa/execution/`, nunca em `/tmp` ou worktree), os limites do preflight com a justificativa de cada um (proposta desta tarefa, pendente de confirmação do dono) e o que a leitura não cobriu (swap, load, PostgreSQL e resources além do XMage). `scripts/manaloom_capacity_snapshot.sh` é a ferramenta de leitura: sem `--execute` só descreve; com `--execute` usa a âncora de host do deploy (`MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256`), roda no host só leituras (`/proc`, `df`, `docker stats`, `docker service ls` e `inspect`) e no PostgreSQL `server/sql/readonly/capacity_postgres.sql` pelo wrapper em modo leitura, e grava um snapshot com procedência (alvo SSH, fingerprint do host e SHA da ferramenta). `scripts/manaloom_capacity_policy.py preflight` devolve PASS ou BLOCKED (memória, disco, swap, load, conexões e idade do snapshot) e é o que o `BT-CAP-002` e o `BT-GATE-006` vão chamar. `server/doc/CAPACITY_PLAN_10K_MAU.md` ficou marcado como histórico. Evidência: `server/test/capacity_policy_test.py` (21 testes, com shims de `ssh`, `git` e do wrapper: nenhuma conexão sai da máquina), ligado em `scripts/manaloom_release_ops_contract_test.sh`, e o inventário de chamadores do wrapper atualizado; 14 mutações falham como esperado. Segue aberto: a coordenação rodar a ferramenta na produção (D-14) e fixar na política a fingerprint do host; o dono confirmar os limites.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 671
       },
@@ -286461,7 +286481,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "8e00b5b25ccfceeaccc34a5ebabecc4dedb22281ff67f848cc42ed4182134538"
+    "project_logic_source_digest_sha256": "5849c3239332896aac1e5f5a4c51355b1fa15cc4c7a32cecf2bbd9cc0405d758"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288592,6 +288612,8 @@
       "scripts/manaloom_binder_import_visual_qa.sh",
       "scripts/manaloom_build_android_release.sh",
       "scripts/manaloom_build_beta_release.sh",
+      "scripts/manaloom_capacity_policy.py",
+      "scripts/manaloom_capacity_snapshot.sh",
       "scripts/manaloom_capture_android_platform_view.sh",
       "scripts/manaloom_chromedriver_bootstrap.sh",
       "scripts/manaloom_commercial_quality_gate.sh",
@@ -289323,6 +289345,7 @@
       "server/test/candidate_quality_data_foundation_source_test.dart",
       "server/test/candidate_quality_data_support_test.dart",
       "server/test/canonicalize_learned_deck_metadata_cli_test.dart",
+      "server/test/capacity_policy_test.py",
       "server/test/card_cli_schema_guard_test.py",
       "server/test/card_identity_backfill_support_test.dart",
       "server/test/card_identity_support_test.dart",

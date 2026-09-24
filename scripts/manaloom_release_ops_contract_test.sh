@@ -124,6 +124,7 @@ SHELL_SCRIPTS=(
   scripts/lib/manaloom_release_runtime_contract.sh
   scripts/lib/manaloom_safe_env.sh
   scripts/manaloom_build_android_release.sh
+  scripts/manaloom_capacity_snapshot.sh
   scripts/manaloom_build_beta_release.sh
   scripts/manaloom_battle_product_gate.sh
   scripts/manaloom_deploy_battle_sidecars.sh
@@ -197,6 +198,7 @@ fi
 PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
   python3 -m py_compile \
     "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py" \
+    "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_osv_scan_sbom.py" \
@@ -204,6 +206,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
     "$ROOT_DIR/server/bin/audit_easypanel_runtime_alignment.py" \
     "$ROOT_DIR/server/test/card_cli_schema_guard_test.py" \
+    "$ROOT_DIR/server/test/capacity_policy_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py"
 
@@ -213,6 +216,9 @@ PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/card_cli_schema_guard_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py"
+# BT-CAP-001: política de capacidade, snapshot só de leitura e preflight.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/capacity_policy_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \

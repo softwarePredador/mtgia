@@ -13,6 +13,11 @@ WRAPPER_NAME = "with_new_server_pg.sh"
 WRAPPER_PATH = REPO_ROOT / "server" / "bin" / WRAPPER_NAME
 
 EXPECTED_SHELL_MODES = {
+    # BT-CAP-001: a descrição do dry-run e a leitura de capacidade.
+    "scripts/manaloom_capacity_snapshot.sh": (
+        "--read-only",
+        "--read-only",
+    ),
     "scripts/manaloom_deep_ai_alignment_tester.sh": (
         "--read-only",
         "--read-only",

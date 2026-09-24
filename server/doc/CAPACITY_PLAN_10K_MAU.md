@@ -1,5 +1,11 @@
 # Capacity Plan — 10k MAU
 
+> **Histórico (2026-02).** As suposições abaixo não vêm de medição do host, e o
+> script de carga citado foi apagado. A política de capacidade que vale é
+> `server/config/capacity_policy.json` (`BT-CAP-001`, D-14), com a leitura do
+> host de 2026-09-23 e a procedência de cada número; a leitura nova sai de
+> `scripts/manaloom_capacity_snapshot.sh`.
+
 ## Objetivo
 Preparar backend para 10k usuários ativos mensais com foco no fluxo core (`criar -> analisar -> otimizar`).
 
