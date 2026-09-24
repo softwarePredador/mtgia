@@ -10,6 +10,7 @@ Map<String, dynamic> buildDeckImportReviewContract({
   required List<String> notFoundLines,
   required List<String> warnings,
   String? strictValidationError,
+  String? strictValidationReason,
 }) {
   final importComplete = notFoundLines.isEmpty && warnings.isEmpty;
   final prerequisiteReasons = <String>[];
@@ -28,6 +29,7 @@ Map<String, dynamic> buildDeckImportReviewContract({
     strictValidationPassed: strictValidationPassed,
     prerequisiteReviewReasons: prerequisiteReasons,
     strictValidationError: strictValidationError,
+    strictValidationReason: strictValidationReason,
   );
 
   return {

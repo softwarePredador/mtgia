@@ -259,6 +259,7 @@ Future<Response> _importDeck(RequestContext context) async {
 
   try {
     String? strictValidationError;
+    String? strictValidationReason;
     var strictValidationPassed = false;
     late Map<String, dynamic> validation;
     final newDeck = await pool.runTx((session) async {
@@ -289,6 +290,7 @@ Future<Response> _importDeck(RequestContext context) async {
         strictValidationPassed = true;
       } on DeckRulesException catch (error) {
         strictValidationError = error.message;
+        strictValidationReason = error.reason;
       }
 
       // 1. Criar o Deck
@@ -337,6 +339,7 @@ Future<Response> _importDeck(RequestContext context) async {
         notFoundLines: notFoundCards,
         warnings: warnings,
         strictValidationError: strictValidationError,
+        strictValidationReason: strictValidationReason,
       );
       final validationState = normalizeDeckValidationState(validation['state']);
       final validationReasons = normalizeDeckValidationReasons(

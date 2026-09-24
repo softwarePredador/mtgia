@@ -4233,6 +4233,139 @@ final migrations = <Migration>[
       ALTER TABLE decks DROP COLUMN IF EXISTS revision;
     ''',
   ),
+  Migration(
+    version: '068',
+    name: 'demote_decks_on_legality_change',
+    // DCK-P1-04 (decisão D-28 do dono): a validação estrita vale para a
+    // legalidade de hoje. Quando a legalidade de uma carta muda num formato
+    // (qualquer escritor de card_legalities: a sincronização do catálogo, os
+    // seeds e os scripts antigos), o deck `validated` desse formato que tem a
+    // carta volta a `draft` com `card_legality_changed`, na mesma transação.
+    // Gatilhos por comando, com tabelas de transição: a sincronização em lote
+    // roda uma atualização só, e regravar o mesmo status não rebaixa nada.
+    // 067 a 069 são da frente de deck.
+    up: '''
+      CREATE OR REPLACE FUNCTION manaloom_demote_decks_for_legalities(changed jsonb)
+      RETURNS void
+      LANGUAGE sql
+      AS \$demote_for_legalities\$
+        UPDATE decks d
+        SET validation_state = 'draft',
+            validation_reasons = CASE
+              WHEN COALESCE(d.validation_reasons, '[]'::jsonb) ? 'card_legality_changed'
+                THEN COALESCE(d.validation_reasons, '[]'::jsonb)
+              ELSE COALESCE(d.validation_reasons, '[]'::jsonb)
+                || '["card_legality_changed"]'::jsonb
+            END,
+            validation_updated_at = CURRENT_TIMESTAMP
+        WHERE d.validation_state = 'validated'
+          AND EXISTS (
+            SELECT 1
+            FROM jsonb_to_recordset(changed) AS c(card_id uuid, format text)
+            JOIN deck_cards dc ON dc.card_id = c.card_id
+            WHERE dc.deck_id = d.id
+              AND LOWER(c.format) = LOWER(d.format)
+          );
+      \$demote_for_legalities\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_inserted()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$legality_inserted\$
+      BEGIN
+        PERFORM manaloom_demote_decks_for_legalities((
+          SELECT COALESCE(
+            jsonb_agg(jsonb_build_object('card_id', card_id, 'format', format)),
+            '[]'::jsonb
+          )
+          FROM legality_new_rows
+        ));
+        RETURN NULL;
+      END;
+      \$legality_inserted\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_deleted()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$legality_deleted\$
+      BEGIN
+        PERFORM manaloom_demote_decks_for_legalities((
+          SELECT COALESCE(
+            jsonb_agg(jsonb_build_object('card_id', card_id, 'format', format)),
+            '[]'::jsonb
+          )
+          FROM legality_old_rows
+        ));
+        RETURN NULL;
+      END;
+      \$legality_deleted\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_updated()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$legality_updated\$
+      BEGIN
+        -- Só o que mudou de fato: a sincronização regrava a mesma linha sem
+        -- mudar o status, e isso não rebaixa nada.
+        PERFORM manaloom_demote_decks_for_legalities((
+          SELECT COALESCE(
+            jsonb_agg(jsonb_build_object('card_id', changed.card_id,
+                                         'format', changed.format)),
+            '[]'::jsonb
+          )
+          FROM (
+            SELECT n.card_id, n.format
+            FROM legality_new_rows n
+            WHERE NOT EXISTS (
+              SELECT 1 FROM legality_old_rows o
+              WHERE o.card_id = n.card_id AND o.format = n.format
+                AND o.status IS NOT DISTINCT FROM n.status
+            )
+            UNION
+            SELECT o.card_id, o.format
+            FROM legality_old_rows o
+            WHERE NOT EXISTS (
+              SELECT 1 FROM legality_new_rows n
+              WHERE n.card_id = o.card_id AND n.format = o.format
+                AND n.status IS NOT DISTINCT FROM o.status
+            )
+          ) changed
+        ));
+        RETURN NULL;
+      END;
+      \$legality_updated\$;
+
+      DROP TRIGGER IF EXISTS manaloom_card_legality_inserted ON card_legalities;
+      CREATE TRIGGER manaloom_card_legality_inserted
+      AFTER INSERT ON card_legalities
+      REFERENCING NEW TABLE AS legality_new_rows
+      FOR EACH STATEMENT
+      EXECUTE FUNCTION manaloom_mark_decks_legality_inserted();
+
+      DROP TRIGGER IF EXISTS manaloom_card_legality_updated ON card_legalities;
+      CREATE TRIGGER manaloom_card_legality_updated
+      AFTER UPDATE ON card_legalities
+      REFERENCING OLD TABLE AS legality_old_rows NEW TABLE AS legality_new_rows
+      FOR EACH STATEMENT
+      EXECUTE FUNCTION manaloom_mark_decks_legality_updated();
+
+      DROP TRIGGER IF EXISTS manaloom_card_legality_deleted ON card_legalities;
+      CREATE TRIGGER manaloom_card_legality_deleted
+      AFTER DELETE ON card_legalities
+      REFERENCING OLD TABLE AS legality_old_rows
+      FOR EACH STATEMENT
+      EXECUTE FUNCTION manaloom_mark_decks_legality_deleted();
+    ''',
+    down: '''
+      DROP TRIGGER IF EXISTS manaloom_card_legality_inserted ON card_legalities;
+      DROP TRIGGER IF EXISTS manaloom_card_legality_updated ON card_legalities;
+      DROP TRIGGER IF EXISTS manaloom_card_legality_deleted ON card_legalities;
+      DROP FUNCTION IF EXISTS manaloom_mark_decks_legality_inserted();
+      DROP FUNCTION IF EXISTS manaloom_mark_decks_legality_updated();
+      DROP FUNCTION IF EXISTS manaloom_mark_decks_legality_deleted();
+      DROP FUNCTION IF EXISTS manaloom_demote_decks_for_legalities(jsonb);
+    ''',
+  ),
 ];
 
 class Migration {

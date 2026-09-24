@@ -61,6 +61,28 @@ void main() {
       expect(body['validation_updated_at'], '2026-07-22T12:31:00.000Z');
     });
 
+    test('strict refusal persists the specific reason once (D-28)', () {
+      expect(
+        deckValidationFailureReasons(const [
+          'deck_cards_changed_since_validation',
+        ], DeckRulesException('Sem legalidade.', reason: 'legality_unknown')),
+        [
+          'deck_cards_changed_since_validation',
+          'strict_validation_failed',
+          'legality_unknown',
+        ],
+      );
+      expect(
+        deckValidationFailureReasons(
+          '["strict_validation_failed"]',
+          DeckRulesException('Carta ilegal.'),
+        ),
+        ['strict_validation_failed'],
+      );
+      expect(deckValidationOwnerScopeSql, contains('validation_reasons'));
+      expect(deckValidationMarkFailureSql, contains('@reasons'));
+    });
+
     test('internal error body never leaks exception or SQL details', () {
       const secret = 'password=prod-secret SELECT * FROM users';
       final body = buildDeckValidationHandlerErrorBody(Exception(secret));

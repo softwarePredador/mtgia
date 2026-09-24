@@ -473,6 +473,7 @@ Future<Response> _createDeck(RequestContext context) async {
         session,
       ).validateAndThrow(format: format, cards: normalizedCards, strict: false);
       String? strictValidationError;
+      String? strictValidationReason;
       var strictValidationPassed = false;
       try {
         await DeckRulesService(session).validateAndThrow(
@@ -483,6 +484,7 @@ Future<Response> _createDeck(RequestContext context) async {
         strictValidationPassed = true;
       } on DeckRulesException catch (error) {
         strictValidationError = error.message;
+        strictValidationReason = error.reason;
       }
       final readiness = buildDeckReadinessContract(
         format: format,
@@ -495,6 +497,7 @@ Future<Response> _createDeck(RequestContext context) async {
         ),
         strictValidationPassed: strictValidationPassed,
         strictValidationError: strictValidationError,
+        strictValidationReason: strictValidationReason,
       );
       print(
         '[DECK_CREATE_TIMING] validate_rules_done elapsed_ms=${stopwatch.elapsedMilliseconds}',

@@ -44,8 +44,7 @@ filterOptimizeCardNamesByKnownFormatLegality({
         ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE LOWER(c.name) = ANY(@names)
       GROUP BY LOWER(c.name)
-      HAVING COUNT(cl.status) = 0
-        OR BOOL_OR(cl.status IN ('legal', 'restricted'))
+      HAVING BOOL_OR(cl.status IN ('legal', 'restricted'))
     '''),
     parameters: {'legality_format': normalizedFormat, 'names': requestedLower},
   );

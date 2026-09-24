@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "cee87517ad0686763ee3a142f68c78ef9de259a274923a0d350df138c6f221f3"
+    "sha256": "e02d13c482ed2b00e5f4f1b27afa39498b5e363ce4b7d7c3f66715e5546d5b97"
   },
   "required_task_fields": [
     "id",
@@ -494,12 +494,12 @@
     {
       "id": "DCK-P1-04",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Uma única verdade de validação/readiness estrita por revisão.",
       "depends_on": [
         "DCK-P0-01"
       ],
-      "acceptance": "UI nunca diz “pronto” sem strict atual; ausência de legalidade não vira legal. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade pode andar hoje (H4/H7); tornar legalidade ausente bloqueante pode rebaixar decks validados e é decisão do dono. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 de 15 decks validados seriam rebaixados se legalidade ausente passasse a bloquear. Decisão do dono em 2026-09-22: D-28, tornar bloqueante agora; medido na produção, 0 de 15 decks validados seriam rebaixados.",
+      "acceptance": "UI nunca diz “pronto” sem strict atual; ausência de legalidade não vira legal. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade pode andar hoje (H4/H7); tornar legalidade ausente bloqueante pode rebaixar decks validados e é decisão do dono. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 de 15 decks validados seriam rebaixados se legalidade ausente passasse a bloquear. Decisão do dono em 2026-09-22: D-28, tornar bloqueante agora; medido na produção, 0 de 15 decks validados seriam rebaixados. Parte do servidor feita em 2026-09-24 na branch `deck/rodada2-2026-09-24`, ainda fora do ar, com a migration 068 proposta e não aplicada. D-28: na validação estrita, carta sem linha de legalidade no formato recusa com `legality_unknown` (o `/validate` persiste o motivo; criar deck e importar deck novo gravam `draft` com ele); montar o deck segue aceitando a carta. Strict atual: a 068 põe gatilhos por comando em `card_legalities` (inserir, mudar e apagar), e o deck `validated` do formato que tem a carta volta a `draft` com `card_legality_changed` na mesma transação, qualquer que seja o escritor; regravar o mesmo status não rebaixa. Mesma resposta: todo recibo de mudança de deck traz `readiness` lido na transação da mudança; troca 1 por 1 de edição e mudança de cartas ou formato voltam `draft` pelos gatilhos, e mudar só o nome mantém `validated`. A análise (`GET /decks/:id/analysis`) não diz válido sem o estado estrito (`awaiting_strict_validation`, `strict_validated`) e trata legalidade ausente e `not_legal` como erro. Os seletores de candidatos do Optimize (12 filtros em 3 arquivos e o filtro por nome) deixaram de admitir carta sem linha legal ou restrita, como a D-28 pediu. Evidência: `server/test/deck_strict_readiness_db_live_test.dart` (PostgreSQL descartável, 7 casos), `server/test/deck_readiness_contract_test.dart`, `server/test/deck_validation_route_support_test.dart` e `server/test/optimize_legality_selectors_contract_test.dart`, com as 8 mutações do grupo `dck104` e 5 mutações dos gatilhos da 068 (banco refeito de uma cópia mutada) derrubadas. Falta: o app não dizer pronto sem `deck_state=validated` (painel de diagnóstico, H3), rotular a lista pelo estado do servidor (H5), usar o `readiness` do recibo e traduzir os motivos novos (raia do app); o receipt do live histórico (`deck_validation_state_live_test.dart`) com política isolada fica para a sessão do gate; aplicar a 068 na produção pede a palavra do dono.",
       "section": "P1 do ciclo",
       "source_line": 351
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "6c4803a734612e9e5c8d11f632667ac01e7fa708576063a2fddd6db369a076e3"
+  "project_logic_source_digest_sha256": "c9e38855729d4f11afe3ce68640ab7756816bcdca0c1d96233edff9cf065e0bb"
 }

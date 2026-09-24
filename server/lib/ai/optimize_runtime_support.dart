@@ -204,7 +204,7 @@ Future<List<Map<String, dynamic>>> loadUniversalCommanderFallbacks({
       LEFT JOIN card_legalities cl
         ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE c.name = ANY(@names)
-        AND (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        AND (cl.status = 'legal' OR cl.status = 'restricted')
       ORDER BY LOWER(c.name), c.id
       LIMIT @limit
     '''),
@@ -281,7 +281,7 @@ Future<List<Map<String, dynamic>>> loadArchetypeCommanderFoundationFillers({
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
       LEFT JOIN card_legalities cl
         ON cl.card_id = c.id AND cl.format = @legality_format
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+      WHERE (cl.status = 'legal' OR cl.status = 'restricted')
         AND LOWER(c.name) IN (SELECT LOWER(unnest(@names::text[])))
         AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
       ORDER BY COALESCE(cmi.meta_deck_count, 0) DESC,

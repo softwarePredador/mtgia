@@ -82,7 +82,16 @@ void main() {
         '''),
         parameters: {'name': '$name $suffix', 'typeLine': typeLine},
       );
-      return result.single.single! as String;
+      final id = result.single.single! as String;
+      // D-28: sem legalidade conhecida a validação estrita do apply recusa.
+      await pool.execute(
+        Sql.named('''
+          INSERT INTO card_legalities (card_id, format, status)
+          VALUES (CAST(@id AS uuid), 'modern', 'legal')
+        '''),
+        parameters: {'id': id},
+      );
+      return id;
     }
 
     Future<String> deck(String userId, {int islands = 20}) async {

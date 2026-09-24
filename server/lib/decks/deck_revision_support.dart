@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../deck_validation_state_support.dart';
 import '../runtime_environment.dart';
 import 'deck_review_artifact.dart';
 
@@ -329,6 +330,7 @@ class DeckMutationReceipt {
     required this.eventId,
     required this.operation,
     required this.ifMatchMissing,
+    this.readiness,
   });
 
   final int revisionBefore;
@@ -339,6 +341,12 @@ class DeckMutationReceipt {
   final String operation;
   final bool ifMatchMissing;
 
+  /// O estado de validação do deck depois da mudança, lido na mesma
+  /// transação (DCK-P1-04): `deck_state`, `requires_review`,
+  /// `review_reasons` e `validation_updated_at`. O app não precisa pedir o
+  /// deck de novo para saber se ele segue validado.
+  final Map<String, Object?>? readiness;
+
   bool get changed => eventId != null;
 
   Map<String, Object?> toJson() => {
@@ -347,6 +355,7 @@ class DeckMutationReceipt {
     'change_event_id': eventId,
     'change_operation': operation,
     if (ifMatchMissing) 'revision_warning': deckIfMatchMissingWarning,
+    if (readiness != null) 'readiness': readiness,
   };
 
   Map<String, Object> get headers => {'ETag': deckRevisionEtag(revision)};
@@ -381,7 +390,8 @@ Future<DeckMutationBaseline?> lockDeckForMutation(
   if (!isDeckUuid(deckId)) return null;
   final deck = await session.execute(
     Sql.named('''
-      SELECT revision, ${deckLedgerMetadataFields.join(', ')}
+      SELECT revision, ${deckLedgerMetadataFields.join(', ')},
+             validation_state, validation_reasons, validation_updated_at
       FROM decks
       WHERE id = CAST(@deckId AS uuid) AND user_id = CAST(@userId AS uuid)
       FOR UPDATE
@@ -422,6 +432,7 @@ Future<DeckMutationBaseline?> lockDeckForMutation(
           eventId: event['id'] as String,
           operation: event['operation'] as String,
           ifMatchMissing: false,
+          readiness: deckReadinessOf(row),
         ),
       );
     }
@@ -468,12 +479,15 @@ Future<DeckMutationReceipt> recordDeckMutation(
   final cardsAfter = await readDeckCardsSnapshot(session, baseline.deckId);
   final metadataRow = await session.execute(
     Sql.named('''
-      SELECT ${deckLedgerMetadataFields.join(', ')}
+      SELECT ${deckLedgerMetadataFields.join(', ')},
+             validation_state, validation_reasons, validation_updated_at
       FROM decks WHERE id = CAST(@deckId AS uuid)
     '''),
     parameters: {'deckId': baseline.deckId},
   );
-  final metadataAfter = _metadata(metadataRow.first.toColumnMap());
+  final afterRow = metadataRow.first.toColumnMap();
+  final metadataAfter = _metadata(afterRow);
+  final readiness = deckReadinessOf(afterRow);
   final cards = diffDeckCards(baseline.cards, cardsAfter);
   final metadata = diffDeckMetadata(baseline.metadata, metadataAfter);
   final ifMatchMissing = !baseline.request.ifMatchPresent;
@@ -484,6 +498,7 @@ Future<DeckMutationReceipt> recordDeckMutation(
       eventId: null,
       operation: resolvedOperation,
       ifMatchMissing: ifMatchMissing,
+      readiness: readiness,
     );
   }
   final bumped = await session.execute(
@@ -531,7 +546,25 @@ Future<DeckMutationReceipt> recordDeckMutation(
     eventId: event.first[0] as String,
     operation: resolvedOperation,
     ifMatchMissing: ifMatchMissing,
+    readiness: readiness,
   );
+}
+
+/// A prontidão persistida do deck, no formato que as rotas expõem. Uma
+/// mudança de cartas ou de formato já voltou o deck a `draft` pelos
+/// gatilhos do banco; mudar só nome ou descrição mantém `validated`.
+Map<String, Object?> deckReadinessOf(Map<String, dynamic> row) {
+  final exposed = exposeDeckValidationState({
+    'validation_state': row['validation_state'],
+    'validation_reasons': row['validation_reasons'],
+    'validation_updated_at': row['validation_updated_at'],
+  });
+  return {
+    'deck_state': exposed['deck_state'],
+    'requires_review': exposed['requires_review'],
+    'review_reasons': exposed['review_reasons'],
+    'validation_updated_at': exposed['validation_updated_at'],
+  };
 }
 
 /// As linhas que mudaram entre dois retratos das cartas, por `card_id`

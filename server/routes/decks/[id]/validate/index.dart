@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../lib/deck_validation_route_support.dart';
 import '../../../../lib/deck_rules_service.dart';
+import '../../../../lib/deck_validation_state_support.dart';
 import '../../../../lib/http_responses.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -62,7 +63,13 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       } on DeckRulesException catch (error) {
         final stateResult = await session.execute(
           Sql.named(deckValidationMarkFailureSql),
-          parameters: {'deckId': deckId, 'userId': userId},
+          parameters: {
+            'deckId': deckId,
+            'userId': userId,
+            'reasons': encodeDeckValidationReasons(
+              deckValidationFailureReasons(deckResult.first[2], error),
+            ),
+          },
         );
         final state = stateResult.first.toColumnMap();
         return buildDeckValidationRuleErrorBody(

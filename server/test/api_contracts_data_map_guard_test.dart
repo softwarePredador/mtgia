@@ -85,6 +85,23 @@ void main() {
       expect(rebuild, contains('defaults to `preview_only`'));
     });
 
+    test('documents strict validation per revision and legality', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final validate = _contractRowFor(contracts, 'POST /decks/:id/validate');
+
+      expect(validate, contains('`legality_unknown`'));
+      for (final phrase in const [
+        '## Strict Validation per Revision and Legality — 2026-09-24',
+        '`card_legality_changed`',
+        'carries `readiness`',
+        '`awaiting_strict_validation`',
+        'no longer admit a card without a',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
     test('documents the two-phase import into an existing deck', () {
       final contracts =
           File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
