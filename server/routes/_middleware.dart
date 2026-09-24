@@ -45,9 +45,13 @@ const _securityHeaders = {
 };
 
 Handler middleware(Handler handler) {
-  return middlewareWithReleaseCapabilityPolicy(
-    handler,
-    releaseCapabilityPolicy: _releaseCapabilityPolicy,
+  // BT-AUTH-002: o corpo em partes (o shelf_io tira o Transfer-Encoding dos
+  // cabeçalhos) falha no primeiro byte, antes de qualquer alocação.
+  return guardBodyWithoutLength(
+    middlewareWithReleaseCapabilityPolicy(
+      handler,
+      releaseCapabilityPolicy: _releaseCapabilityPolicy,
+    ),
   );
 }
 
@@ -186,7 +190,8 @@ Handler middlewareWithReleaseCapabilityPolicy(
         endpoint: endpoint,
         startedAt: startedAt,
         responseHeaders: responseHeaders,
-        closeConnection: false,
+        // O corpo em partes para no primeiro byte: o resto não é lido.
+        closeConnection: bodyRejection.statusCode == HttpStatus.lengthRequired,
       );
     }
 

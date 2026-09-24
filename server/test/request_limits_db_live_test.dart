@@ -11,6 +11,7 @@ import 'package:test/test.dart';
 import '../lib/auth_service.dart';
 import '../lib/database.dart';
 import '../lib/release_capability_policy.dart';
+import '../lib/request_body_limits.dart';
 import '../routes/_middleware.dart' as root_middleware;
 import '../routes/decks/_middleware.dart' as decks_middleware;
 import '../routes/decks/index.dart' as decks_route;
@@ -62,17 +63,19 @@ void main() {
       ..writeAsStringSync(jsonEncode(manifest));
     final policy = ReleaseCapabilityPolicy.load(configPath: file.path);
 
-    // O Cascade cria um RequestContext de verdade: o que o middleware raiz e
-    // a autenticação põem no contexto chega ao handler.
-    handler =
-        Cascade()
-            .add(
-              root_middleware.middlewareWithReleaseCapabilityPolicy(
-                decks_middleware.middleware(decks_route.onRequest),
-                releaseCapabilityPolicy: policy,
-              ),
-            )
-            .handler;
+    // Como no servidor: a guarda de entrada antes do middleware raiz. O
+    // Cascade cria um RequestContext de verdade, então o que o middleware raiz
+    // e a autenticação põem no contexto chega ao handler.
+    handler = guardBodyWithoutLength(
+      Cascade()
+          .add(
+            root_middleware.middlewareWithReleaseCapabilityPolicy(
+              decks_middleware.middleware(decks_route.onRequest),
+              releaseCapabilityPolicy: policy,
+            ),
+          )
+          .handler,
+    );
 
     final stamp = DateTime.now().microsecondsSinceEpoch.toRadixString(36);
     final user = await pool.execute(
@@ -152,6 +155,37 @@ void main() {
       expect(body['error'], code, reason: '$headers');
       expect(bytesRead, 0, reason: 'recusado sem ler o corpo: $headers');
     }
+    expect(await decks(), before);
+  }, skip: skipReason);
+
+  test('em partes sem cabeçalho (como chega do shelf_io): 411, nada '
+      'gravado, só o primeiro pedaço lido', () async {
+    final before = await decks();
+    var bytesRead = 0;
+    final response = await handler(
+      ScriptedRequestContext(
+        Request.post(
+          Uri.parse('http://localhost/decks'),
+          headers: {
+            'content-type': 'application/json',
+            'authorization': 'Bearer $token',
+          },
+          body: Stream<List<int>>.fromIterable([
+            utf8.encode('{"name": "Partes", '),
+            utf8.encode('"format": "commander"}'),
+          ]).map((chunk) {
+            bytesRead += chunk.length;
+            return chunk;
+          }),
+        ),
+      ),
+    );
+    expect(response.statusCode, 411);
+    expect(
+      (jsonDecode(await response.body()) as Map)['error'],
+      'request_body_length_required',
+    );
+    expect(bytesRead, utf8.encode('{"name": "Partes", ').length);
     expect(await decks(), before);
   }, skip: skipReason);
 

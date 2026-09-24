@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import '../lib/auth_service.dart';
@@ -432,6 +433,19 @@ void main() {
       expect(await json(response), {'recebido': 2});
     });
 
+    test('sem a guarda de entrada, corpo sem tamanho ainda dá 411', () async {
+      // Defesa em profundidade: quem chama o middleware sem a guarda (o
+      // corpo chega inteiro) também não passa corpo sem Content-Length.
+      final (response, handlerCalled, _) = await send(
+        'POST',
+        '/decks',
+        body: utf8.encode('{"name": "Sem tamanho"}'),
+      );
+      expect(response.statusCode, 411);
+      expect(handlerCalled, isFalse);
+      expect((await json(response))['error'], 'request_body_length_required');
+    });
+
     test('corpo que não é UTF-8: 400 request_body_unreadable', () async {
       final (response, handlerCalled, _) = await send(
         'POST',
@@ -458,5 +472,189 @@ void main() {
       expect(handlerCalled, isTrue);
       expect(response.statusCode, 201);
     });
+  });
+
+  group('guarda do corpo em partes', () {
+    // O shelf_io tira o Transfer-Encoding dos cabeçalhos: no servidor de
+    // verdade, o corpo em partes chega só como um corpo sem Content-Length.
+    late Directory policyDir;
+    late ReleaseCapabilityPolicy allOn;
+
+    setUpAll(() {
+      policyDir = Directory.systemTemp.createTempSync('manaloom_guard_caps_');
+      final manifest =
+          jsonDecode(
+                File('config/release_capabilities.json').readAsStringSync(),
+              )
+              as Map<String, dynamic>;
+      for (final entry
+          in (manifest['capabilities'] as Map<String, dynamic>).values) {
+        (entry as Map<String, dynamic>)
+          ..['release_capability'] = 'on'
+          ..['allowed'] = true;
+      }
+      final file = File('${policyDir.path}/caps.json')
+        ..writeAsStringSync(jsonEncode(manifest));
+      allOn = ReleaseCapabilityPolicy.load(configPath: file.path);
+    });
+
+    tearDownAll(() => policyDir.deleteSync(recursive: true));
+    tearDown(Database.resetForTesting);
+
+    /// Dez pedaços de 1 KiB, contando o que foi lido.
+    Stream<List<int>> chunks(void Function(int) onRead) =>
+        Stream<List<int>>.fromIterable(
+          List.generate(10, (_) => List<int>.filled(1024, 0x20)),
+        ).map((chunk) {
+          onRead(chunk.length);
+          return chunk;
+        });
+
+    test('corpo sem Content-Length: 411 no primeiro pedaço', () async {
+      Database.useConnectionForTesting(ScriptedPool(const []));
+      var bytesRead = 0;
+      var handlerCalled = false;
+      final handler = guardBodyWithoutLength(
+        root_middleware.middlewareWithReleaseCapabilityPolicy((_) {
+          handlerCalled = true;
+          return Response.json(body: const {'ok': true});
+        }, releaseCapabilityPolicy: allOn),
+      );
+
+      final response = await handler(
+        ScriptedRequestContext(
+          Request.post(
+            Uri.parse('http://localhost/decks'),
+            headers: const {
+              'content-type': 'application/json',
+              'x-request-id': 'req-partes',
+            },
+            body: chunks((n) => bytesRead += n),
+          ),
+        ),
+      );
+
+      expect(response.statusCode, 411);
+      final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+      expect(body['error'], 'request_body_length_required');
+      expect(body['request_id'], 'req-partes');
+      expect(response.headers['connection'], 'close');
+      expect(handlerCalled, isFalse);
+      expect(bytesRead, 1024, reason: 'para no primeiro pedaço');
+    });
+
+    test('pedido sem corpo e sem Content-Length segue', () async {
+      Database.useConnectionForTesting(ScriptedPool(const []));
+      final handler = guardBodyWithoutLength(
+        root_middleware.middlewareWithReleaseCapabilityPolicy(
+          (context) async =>
+              Response.json(body: {'corpo': await context.request.body()}),
+          releaseCapabilityPolicy: allOn,
+        ),
+      );
+      final response = await handler(
+        ScriptedRequestContext(
+          Request.post(
+            Uri.parse('http://localhost/decks/d1/validate'),
+            body: const Stream<List<int>>.empty(),
+          ),
+        ),
+      );
+      expect(response.statusCode, 200);
+      expect(jsonDecode(await response.body()), {'corpo': ''});
+    });
+
+    test('com Content-Length a guarda não troca o contexto', () async {
+      final guarded = guardBodyWithoutLength(
+        (context) => Response.json(body: {'conta': context.read<String>()}),
+      );
+      final response = await guarded(
+        ScriptedRequestContext(
+          Request.post(
+            Uri.parse('http://localhost/decks'),
+            body: jsonEncode({'name': 'Deck'}),
+          ),
+          providers: {String: 'conta-1'},
+        ),
+      );
+      expect(jsonDecode(await response.body()), {'conta': 'conta-1'});
+    });
+
+    test('a entrada do servidor (middleware raiz) usa a guarda', () async {
+      Database.useConnectionForTesting(ScriptedPool(const []));
+      var bytesRead = 0;
+      final response = await root_middleware.middleware(
+        (_) => Response.json(body: const {'ok': true}),
+      )(
+        ScriptedRequestContext(
+          Request.post(
+            Uri.parse('http://localhost/auth/login'),
+            headers: const {'content-type': 'application/json'},
+            body: chunks((n) => bytesRead += n),
+          ),
+        ),
+      );
+      expect(response.statusCode, 411);
+      expect(bytesRead, 1024);
+    });
+  });
+
+  group('servidor HTTP de verdade (shelf_io)', () {
+    late HttpServer server;
+    late Uri base;
+    var handlerCalls = 0;
+
+    setUpAll(() async {
+      server = await serve(
+        root_middleware.middleware((context) async {
+          handlerCalls++;
+          await context.request.body();
+          return Response.json(body: const {'ok': true});
+        }),
+        InternetAddress.loopbackIPv4,
+        0,
+      );
+      base = Uri.parse('http://127.0.0.1:${server.port}');
+    });
+
+    tearDownAll(() => server.close(force: true));
+
+    test('em partes: o shelf_io tira o Transfer-Encoding e a guarda '
+        'responde 411', () async {
+      final request =
+          http.StreamedRequest('POST', base.resolve('/auth/login'))
+            ..headers['content-type'] = 'application/json'
+            ..headers['x-request-id'] = 'req-shelf-partes';
+      request.sink.add(utf8.encode('{"email": "a@example.invalid", '));
+      request.sink.add(utf8.encode('"password": "x"}'));
+      unawaited(request.sink.close());
+      final response = await http.Response.fromStream(await request.send());
+
+      expect(response.statusCode, 411, reason: response.body);
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(body['error'], 'request_body_length_required');
+      expect(body['request_id'], 'req-shelf-partes');
+      expect(handlerCalls, 0);
+    });
+
+    test(
+      'corpo real acima do teto de /auth: 413 sem chegar ao handler',
+      () async {
+        final response = await http.post(
+          base.resolve('/auth/login'),
+          headers: const {'content-type': 'application/json'},
+          body: jsonEncode({
+            'email': 'a@example.invalid',
+            'password': 'x' * 20000,
+          }),
+        );
+        expect(response.statusCode, 413, reason: response.body);
+        expect(
+          (jsonDecode(response.body) as Map)['error'],
+          'request_body_too_large',
+        );
+        expect(handlerCalls, 0);
+      },
+    );
   });
 }

@@ -15,8 +15,8 @@ import '../lib/legal_policy.dart';
 /// BT-AUTH-002 de ponta a ponta, por HTTP contra a API local (a mesma do E2E
 /// do convite). Corpo declarado acima do limite, em partes ou comprimido é
 /// recusado sem ser lido; campo, profundidade e URL acima do teto também; e
-/// o banco não cresce. Os pedidos com cabeçalho mentiroso vão por socket
-/// cru, porque o cliente HTTP calcula o Content-Length sozinho.
+/// o banco não cresce. O corpo em partes vai pelo cliente HTTP sem
+/// Content-Length (Transfer-Encoding: chunked).
 ///
 /// Requer `RUN_REQUEST_LIMITS_E2E_TESTS=1`, `TEST_API_BASE_URL` e as
 /// variáveis `DB_*` do mesmo banco da API.
@@ -87,94 +87,60 @@ void main() {
   Future<int> deckCount() async =>
       (await pool.execute('SELECT COUNT(*)::int FROM decks')).single[0]! as int;
 
-  /// Pedido por socket cru: manda só o que o teste escreve e lê até a API
-  /// fechar a conexão (ou até o corpo declarado da resposta chegar).
-  Future<(int, Map<String, String>, Map<String, dynamic>)> raw(
-    String head, {
-    List<int> body = const [],
-  }) async {
-    final uri = Uri.parse(baseUrl);
-    final socket = await Socket.connect(uri.host, uri.port);
-    socket.add(utf8.encode(head));
-    if (body.isNotEmpty) socket.add(body);
-    await socket.flush();
-    final received = <int>[];
-    final done = Completer<void>();
-    final subscription = socket.listen(
-      received.addAll,
-      onDone: () {
-        if (!done.isCompleted) done.complete();
-      },
-      onError: (Object _) {
-        if (!done.isCompleted) done.complete();
-      },
-    );
-    await done.future.timeout(const Duration(seconds: 10), onTimeout: () {});
-    await subscription.cancel();
-    socket.destroy();
-    final text = utf8.decode(received, allowMalformed: true);
-    final split = text.indexOf('\r\n\r\n');
-    final lines = text.substring(0, split).split('\r\n');
-    final status = int.parse(lines.first.split(' ')[1]);
-    final headers = {
-      for (final line in lines.skip(1))
-        line.substring(0, line.indexOf(':')).toLowerCase():
-            line.substring(line.indexOf(':') + 1).trim(),
-    };
-    final decoded =
-        jsonDecode(text.substring(split + 4)) as Map<String, dynamic>;
-    return (status, headers, decoded);
-  }
+  Map<String, String> headers(String requestId) => {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $token',
+    'x-request-id': requestId,
+  };
 
-  String postHead(String path, Map<String, String> extra) {
-    final host = Uri.parse(baseUrl).authority;
-    return [
-      'POST $path HTTP/1.1',
-      'Host: $host',
-      'Content-Type: application/json',
-      'Authorization: Bearer $token',
-      for (final entry in extra.entries) '${entry.key}: ${entry.value}',
-      '',
-      '',
-    ].join('\r\n');
-  }
-
-  test('corpo declarado acima de 1 MB: 413 sem ler, banco igual', () async {
+  test('corpo de 2 MiB: 413 com o limite, banco igual', () async {
     final before = await deckCount();
-    final (status, headers, body) = await raw(
-      postHead('/decks', {
-        'Content-Length': '${2 * 1024 * 1024}',
-        'x-request-id': 'e2e-limite-1',
+    final response = await http.post(
+      Uri.parse('$baseUrl/decks'),
+      headers: headers('e2e-limite-1'),
+      body: jsonEncode({
+        'name': 'x' * (2 * 1024 * 1024),
+        'format': 'commander',
       }),
-      body: utf8.encode('{"name": "'),
     );
-    expect(status, 413);
+    expect(response.statusCode, 413, reason: response.body);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
     expect(body['error'], 'request_body_too_large');
     expect(body['limit'], 1024 * 1024);
     expect(body['request_id'], 'e2e-limite-1');
-    expect(headers['x-request-id'], 'e2e-limite-1');
+    expect(response.headers['x-request-id'], 'e2e-limite-1');
     expect(await deckCount(), before);
   }, skip: skipReason);
 
-  test('corpo em partes: 411; comprimido: 415; banco igual', () async {
+  test('corpo em partes (sem Content-Length): 411, banco igual', () async {
+    // O cliente manda Transfer-Encoding: chunked; o shelf_io tira esse
+    // cabeçalho, e a guarda de entrada falha no primeiro pedaço.
     final before = await deckCount();
-    final (chunked, _, chunkedBody) = await raw(
-      postHead('/decks', {'Transfer-Encoding': 'chunked'}),
-      body: utf8.encode('2\r\n{}\r\n0\r\n\r\n'),
-    );
-    expect(chunked, 411);
-    expect(chunkedBody['error'], 'request_body_length_required');
+    final request = http.StreamedRequest('POST', Uri.parse('$baseUrl/decks'))
+      ..headers.addAll(headers('e2e-limite-partes'));
+    request.sink.add(utf8.encode('{"name": "Partes", '));
+    request.sink.add(utf8.encode('"format": "commander"}'));
+    unawaited(request.sink.close());
+    final response = await http.Response.fromStream(await request.send());
+    expect(response.statusCode, 411, reason: response.body);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    expect(body['error'], 'request_body_length_required');
+    expect(body['request_id'], 'e2e-limite-partes');
+    expect(await deckCount(), before);
+  }, skip: skipReason);
 
-    final gzipped = gzip.encode(utf8.encode(jsonEncode({'name': 'Deck'})));
-    final (compressed, _, compressedBody) = await raw(
-      postHead('/decks', {
-        'Content-Encoding': 'gzip',
-        'Content-Length': '${gzipped.length}',
-      }),
-      body: gzipped,
+  test('corpo comprimido: 415, nada é descomprimido', () async {
+    final before = await deckCount();
+    final response = await http.post(
+      Uri.parse('$baseUrl/decks'),
+      headers: {...headers('e2e-limite-gzip'), 'Content-Encoding': 'gzip'},
+      body: gzip.encode(
+        utf8.encode(jsonEncode({'name': 'Deck', 'format': 'commander'})),
+      ),
     );
-    expect(compressed, 415);
-    expect(compressedBody['error'], 'request_body_encoding_unsupported');
+    expect(response.statusCode, 415, reason: response.body);
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    expect(body['error'], 'request_body_encoding_unsupported');
     expect(await deckCount(), before);
   }, skip: skipReason);
 

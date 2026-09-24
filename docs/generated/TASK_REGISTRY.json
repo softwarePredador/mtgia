@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "7a2c04d563e1589aa79e4f506b9c81b9d1392b59b4d6f8aa58e04eea134887b3"
+    "sha256": "7ec25cd58641b5fbc39913416cff9df882e0f507711174067e1c3100be3fa175"
   },
   "required_task_fields": [
     "id",
@@ -180,7 +180,7 @@
       "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Limites globais de body antes do parse e limites por campo/URL.",
       "depends_on": [],
-      "acceptance": "Oversize/chunked/compressed rejeitado antes de alocar/gravar; DB não cresce. Decisão do dono em 2026-09-22: D-21, teto de body de 1 MB, maior só no import. Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24` (`server/lib/request_body_limits.dart`): o middleware raiz confere a URL antes da capability (acima de 8 KiB, 414) e, depois dela, os cabeçalhos, antes da observabilidade, do banco e do handler: `Content-Encoding` diferente de `identity` dá 415 (nada é descomprimido), corpo em partes dá 411, `Content-Length` inválido dá 400 e acima do limite dá 413 sem ler o corpo (a conexão fecha). Tetos: 1 MiB por padrão, 5 MiB nas cinco rotas de import, 16 KiB em `/auth`. O corpo dentro do limite é lido uma vez (o handler recebe o mesmo texto) e o JSON é conferido: texto de campo ou chave acima de 32 K caracteres fora do import, mais de 32 níveis (varredura linear, antes de decodificar) ou mais de 50 mil itens dão 413; corpo que não é UTF-8 dá 400. No cadastro, campo de tipo errado é 400 (antes era 500), nome de usuário até 30 e e-mail com formato e até 254; no login, e-mail até 254 e senha até 1024. Todas as recusas têm código estável e `request_id`. Evidência: `server/test/request_body_limits_test.dart` (o corpo recusado pelos cabeçalhos não é lido), `server/test/request_limits_db_live_test.dart` (cadeia real de `POST /decks` em PostgreSQL descartável: o banco não cresce) e `server/test/request_limits_e2e_live_test.dart` (por HTTP, com socket cru para o cabeçalho mentiroso; roda com o build da API da tarefa seguinte); 13 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-002-limites.md`.",
+      "acceptance": "Oversize/chunked/compressed rejeitado antes de alocar/gravar; DB não cresce. Decisão do dono em 2026-09-22: D-21, teto de body de 1 MB, maior só no import. Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24` (`server/lib/request_body_limits.dart`): o middleware raiz confere a URL antes da capability (acima de 8 KiB, 414) e, depois dela, os cabeçalhos, antes da observabilidade, do banco e do handler: `Content-Encoding` diferente de `identity` dá 415 (nada é descomprimido), corpo em partes dá 411 (o `shelf_io` tira o `Transfer-Encoding` dos cabeçalhos, então a guarda de entrada `guardBodyWithoutLength` troca o corpo sem `Content-Length` por um stream que falha no primeiro pedaço; achado no E2E e corrigido depois do primeiro commit), `Content-Length` inválido dá 400 e acima do limite dá 413 sem ler o corpo (a conexão fecha). Tetos: 1 MiB por padrão, 5 MiB nas cinco rotas de import, 16 KiB em `/auth`. O corpo dentro do limite é lido uma vez (o handler recebe o mesmo texto) e o JSON é conferido: texto de campo ou chave acima de 32 K caracteres fora do import, mais de 32 níveis (varredura linear, antes de decodificar) ou mais de 50 mil itens dão 413; corpo que não é UTF-8 dá 400. No cadastro, campo de tipo errado é 400 (antes era 500), nome de usuário até 30 e e-mail com formato e até 254; no login, e-mail até 254 e senha até 1024. Todas as recusas têm código estável e `request_id`. Evidência: `server/test/request_body_limits_test.dart` (o corpo recusado pelos cabeçalhos não é lido), `server/test/request_limits_db_live_test.dart` (cadeia real de `POST /decks` em PostgreSQL descartável: o banco não cresce) e `server/test/request_limits_e2e_live_test.dart` (por HTTP com clientes de verdade: corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL; roda com o build da API da tarefa seguinte); 16 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-002-limites.md`.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 312
     },
@@ -9884,5 +9884,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "cf24ddace0be167d7e03736f5222f31a596e9d12ef3116e70d8cfd0b6ea193c5"
+  "project_logic_source_digest_sha256": "1ad370c239ad2f863680ba787204b755ccb5b63be33f208f56bb1f497e05f1ae"
 }

@@ -49,13 +49,54 @@
 Todas as recusas têm código estável em `error`, frase em português e `request_id`, no
 contrato do BT-AUTH-001.
 
+## Correção depois do primeiro commit (`3d389f20f`)
+
+O primeiro E2E contra a API de verdade achou um buraco que os testes em processo não
+viam. O `shelf_io` tira o `Transfer-Encoding` dos cabeçalhos antes de entregar o pedido
+(`shelf_io.dart`, em `_fromHttpRequest`). O corpo em partes chegava então ao middleware sem
+nenhum sinal de tamanho e seguia para o handler sem limite. Numa sonda com `curl`, o
+`POST /decks` em partes passou da checagem e bateu na autenticação.
+
+A correção:
+
+- **`guardBodyWithoutLength`** (`server/lib/request_body_limits.dart`) passa a ser a
+  entrada do servidor, em `routes/_middleware.dart`, antes do middleware raiz. No pedido
+  que pode ter corpo (`POST`, `PUT`, `PATCH`, `DELETE`) e não declara `Content-Length`, ela
+  troca o corpo por um stream que falha no primeiro pedaço. Nada é acumulado, e a
+  checagem do corpo responde 411 `request_body_length_required`, fechando a conexão. Os
+  demais pedidos passam sem mudança de contexto.
+- **Defesa em profundidade:** sem a guarda, a checagem do corpo também recusa corpo não
+  vazio sem `Content-Length`.
+- **O que o E2E mostrou sobre o cabeçalho mentiroso:** o servidor só devolve a recusa
+  depois que o cliente termina de mandar o corpo que declarou. O `dart:io` descarta esse
+  resto sem guardar, então o limite continua valendo antes de alocar; só a banda do
+  cliente é gasta. O E2E passou a mandar o corpo inteiro, como um cliente de verdade.
+
+Testes da correção:
+
+- `request_body_limits_test` passou de 22 para 29 casos. Entre eles:
+  - um servidor HTTP de verdade (`serve` do dart_frog, com `shelf_io`): o pedido em partes
+    feito pelo cliente HTTP dá 411 e um corpo real acima do teto de `/auth` dá 413, os
+    dois sem chegar ao handler;
+  - dez pedaços de 1 KiB sem `Content-Length`: só o primeiro é lido;
+  - a entrada do servidor usa a guarda.
+- `request_limits_db_live_test` passou para 3 casos: o corpo em partes sem cabeçalho, pela
+  cadeia real de `POST /decks`, dá 411, lê só o primeiro pedaço e não grava.
+- Mutações:
+
+  | Mutação | O que muda | Resultado |
+  | --- | --- | --- |
+  | M72 | a entrada do servidor sem a guarda | falha |
+  | M73 | a guarda deixa os pedaços passarem | falha, também no teste de banco |
+  | M74 | a checagem sem tamanho declarado aceita corpo não vazio | falha |
+
 ## Evidência
 
 | Teste | Onde | Resultado |
 | --- | --- | --- |
 | `server/test/request_body_limits_test.dart` | unitário, com o middleware raiz e um stream que conta os bytes lidos | 22/22 |
 | `server/test/request_limits_db_live_test.dart` | PostgreSQL descartável (`RUN_REQUEST_LIMITS_DB_TESTS=1`), cadeia real de `POST /decks` (middleware raiz, autenticação e handler que grava) | 2/2 |
-| `server/test/request_limits_e2e_live_test.dart` | HTTP contra a API local (`RUN_REQUEST_LIMITS_E2E_TESTS=1`), com socket cru para o cabeçalho mentiroso | roda com o build da API da tarefa seguinte; o resultado entra no receipt do BT-LEGAL-ACCEPT-001 |
+| `server/test/request_limits_e2e_live_test.dart` | HTTP contra a API local (`RUN_REQUEST_LIMITS_E2E_TESTS=1`), com clientes de verdade (corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL) | roda com o build da API da tarefa seguinte; o resultado entra neste receipt no commit do BT-LEGAL-ACCEPT-001 |
 
 O teste de banco mostra que o banco não cresce, e o unitário, que a recusa acontece antes
 de alocar:

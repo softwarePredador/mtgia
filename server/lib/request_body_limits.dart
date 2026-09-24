@@ -6,7 +6,10 @@
 ///   - URL (caminho e query) acima de 8 KiB: 414;
 ///   - `Content-Encoding` diferente de `identity`: 415 (corpo comprimido não é
 ///     aceito; nada é descomprimido);
-///   - `Transfer-Encoding` (corpo em partes, sem tamanho declarado): 411;
+///   - corpo em partes (sem `Content-Length`): 411. O shelf_io tira o
+///     `Transfer-Encoding` dos cabeçalhos, então [guardBodyWithoutLength]
+///     troca o corpo do pedido sem tamanho declarado por um stream que falha
+///     no primeiro byte;
 ///   - `Content-Length` inválido: 400; acima do limite da URL: 413, sem ler o
 ///     corpo;
 ///   - corpo dentro do limite: lido uma vez (o dart_frog guarda o texto para o
@@ -117,6 +120,76 @@ String? _header(Map<String, String> headers, String name) {
   return null;
 }
 
+/// Corpo com dados e sem `Content-Length` (em partes).
+class RequestBodyLengthRequired implements Exception {
+  const RequestBodyLengthRequired();
+
+  @override
+  String toString() => 'RequestBodyLengthRequired';
+}
+
+const _lengthRequired = RequestLimitRejection(
+  HttpStatus.lengthRequired,
+  'request_body_length_required',
+  'Envie o corpo com Content-Length; corpo em partes não é aceito.',
+);
+
+const _methodsWithBody = {
+  HttpMethod.post,
+  HttpMethod.put,
+  HttpMethod.patch,
+  HttpMethod.delete,
+};
+
+bool _declaresLength(Map<String, String> headers) =>
+    (_header(headers, 'content-length')?.trim() ?? '').isNotEmpty;
+
+/// Guarda de entrada do servidor (vai antes do middleware raiz). O shelf_io
+/// tira o `Transfer-Encoding` dos cabeçalhos, então o corpo em partes chega
+/// sem nenhum sinal de tamanho. No pedido que pode ter corpo e não declara
+/// `Content-Length`, o corpo é trocado por um stream que falha no primeiro
+/// byte: nada é acumulado, e a checagem do corpo responde 411. Os demais
+/// pedidos passam sem mudança.
+Handler guardBodyWithoutLength(Handler inner) {
+  // O Cascade monta um RequestContext de verdade para o pedido trocado.
+  final guarded = Cascade().add(inner).handler;
+  return (context) {
+    final request = context.request;
+    if (!_methodsWithBody.contains(request.method) ||
+        _declaresLength(request.headers)) {
+      return inner(context);
+    }
+    return guarded(
+      _GuardedRequestContext(
+        request.copyWith(body: _failOnFirstByte(request.bytes())),
+      ),
+    );
+  };
+}
+
+Stream<List<int>> _failOnFirstByte(Stream<List<int>> source) async* {
+  await for (final chunk in source) {
+    if (chunk.isNotEmpty) throw const RequestBodyLengthRequired();
+  }
+}
+
+/// Só carrega o pedido trocado até o Cascade, que cria o contexto real.
+class _GuardedRequestContext implements RequestContext {
+  _GuardedRequestContext(this.request);
+
+  @override
+  final Request request;
+
+  @override
+  Map<String, String> get mountedParams => const {};
+
+  @override
+  RequestContext provide<T extends Object?>(T Function() create) => this;
+
+  @override
+  T read<T>() => throw StateError('Sem provedor de $T antes do middleware.');
+}
+
 /// Tamanho declarado do corpo, depois de [checkRequestHeaders] aceitar.
 int declaredContentLength(Map<String, String> headers) =>
     int.tryParse(_header(headers, 'content-length')?.trim() ?? '') ?? 0;
@@ -147,11 +220,7 @@ RequestLimitRejection? checkRequestHeaders({
   }
   final transfer = _header(headers, 'transfer-encoding')?.trim().toLowerCase();
   if (transfer != null && transfer.isNotEmpty && transfer != 'identity') {
-    return const RequestLimitRejection(
-      HttpStatus.lengthRequired,
-      'request_body_length_required',
-      'Envie o corpo com Content-Length; corpo em partes não é aceito.',
-    );
+    return _lengthRequired;
   }
   final limit = requestBodyLimitFor(path);
   final rawLength = _header(headers, 'content-length')?.trim();
@@ -180,20 +249,34 @@ RequestLimitRejection? checkRequestHeaders({
 /// Lê o corpo declarado uma vez (o dart_frog guarda o texto para o handler)
 /// e confere a forma do JSON. Chame depois de [checkRequestHeaders].
 Future<RequestLimitRejection?> checkRequestBody(Request request) async {
+  if (!_declaresLength(request.headers)) {
+    // Sem tamanho declarado, o corpo tem de ser vazio (a guarda de entrada
+    // já falha no primeiro byte do corpo em partes).
+    if (!_methodsWithBody.contains(request.method)) return null;
+    try {
+      return (await request.body()).isEmpty ? null : _lengthRequired;
+    } on RequestBodyLengthRequired {
+      return _lengthRequired;
+    } on Object {
+      return _unreadable;
+    }
+  }
   if (declaredContentLength(request.headers) <= 0) return null;
   final String body;
   try {
     body = await request.body();
   } on Object {
     // Corpo que não é texto UTF-8 ou conexão que caiu no meio.
-    return const RequestLimitRejection(
-      HttpStatus.badRequest,
-      'request_body_unreadable',
-      'Não foi possível ler o corpo da requisição. Envie JSON em UTF-8.',
-    );
+    return _unreadable;
   }
   return checkJsonBody(request.uri.path, body);
 }
+
+const _unreadable = RequestLimitRejection(
+  HttpStatus.badRequest,
+  'request_body_unreadable',
+  'Não foi possível ler o corpo da requisição. Envie JSON em UTF-8.',
+);
 
 /// Confere o corpo já lido. Só olha JSON (objeto ou lista); JSON inválido
 /// não é recusado aqui: o handler responde como sempre.

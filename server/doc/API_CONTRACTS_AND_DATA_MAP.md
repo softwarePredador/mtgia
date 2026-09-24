@@ -66,7 +66,11 @@
     - `Content-Encoding` other than `identity` is 415
       `request_body_encoding_unsupported`; nothing is decompressed.
     - `Transfer-Encoding` (a chunked body) is 411
-      `request_body_length_required`.
+      `request_body_length_required`. `shelf_io` strips that header, so the
+      server entry (`guardBodyWithoutLength`, before the root middleware)
+      replaces the body of a `POST`/`PUT`/`PATCH`/`DELETE` without
+      `Content-Length` with a stream that fails on the first chunk; the body
+      check then answers 411 and nothing is buffered.
     - An invalid `Content-Length` is 400 `request_body_length_invalid`.
     - A declared body above the path limit is 413 `request_body_too_large`,
       with `limit`.
