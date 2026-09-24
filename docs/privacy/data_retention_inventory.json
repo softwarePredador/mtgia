@@ -807,9 +807,9 @@
         "reason": "não guarda dado pessoal; o vínculo com a pessoa passa pelo convite"
       },
       "deletion": {
-        "mode": "cascade",
-        "by": "FK beta_invite_events.invite_id -> beta_invites.id ON DELETE CASCADE",
-        "notes": "Sai quando o convite sai."
+        "mode": "not_personal",
+        "by": null,
+        "notes": "Não guarda dado pessoal; sai junto quando o convite é apagado (FK invite_id ON DELETE CASCADE)."
       },
       "legal_exception": null
     },
