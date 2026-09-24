@@ -21,7 +21,8 @@
     "D-68": "Outbox da exclusão (D-23) aprovado: tabela account_deletion_outbox e job de consumo sem capability; a migration pede a palavra do dono na execução.",
     "D-70": "Limpeza por prazo separada da capability ai_analyze_optimize_advisory, com recibo por execução; ligar em produção só com a palavra do dono.",
     "D-71": "Registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo.",
-    "D-77": "O sidecar de Jogar contra IA é dado como limpo no outbox da exclusão depois do tempo máximo da sessão, 7200 s + 10 min contados da exclusão, sem rota de confirmação."
+    "D-77": "O sidecar de Jogar contra IA é dado como limpo no outbox da exclusão depois do tempo máximo da sessão, 7200 s + 10 min contados da exclusão, sem rota de confirmação.",
+    "D-78": "Os logs de pedido de exportação (MANALOOM_PRIVACY_EXPORT_REQUEST) são guardados por 90 dias; aplicar a rotação no host é configuração persistente, com o dono."
   },
   "vocabulary": {
     "category": [
@@ -146,6 +147,14 @@
         "artifact:backups"
       ],
       "status": "prazo de rotação ainda não decidido; backup local sem cifra e sem cópia fora da máquina (BT-DR-001)"
+    },
+    {
+      "decision": "D-78",
+      "rule": "logs de pedido de exportação guardados por 90 dias",
+      "applies_to": [
+        "artifact:privacy_export_request_log"
+      ],
+      "status": "registrado no inventário; a rotação de 90 dias no host da API não está aplicada (configuração persistente, com o dono)"
     }
   ],
   "retention_cleanup": {
@@ -2977,15 +2986,29 @@
     },
     "server_logs": {
       "kind": "logs",
-      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais. Cada pedido de exportação deixa uma linha MANALOOM_PRIVACY_EXPORT_REQUEST (server/lib/privacy/privacy_export_request_log.dart) só com horário, resultado e uma referência de quem pediu: HMAC-SHA256 do ID com chave derivada do JWT_SECRET, truncado em 16 hexadecimais; nunca o ID, a senha ou o conteúdo (D-71).",
+      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais. As linhas MANALOOM_PRIVACY_EXPORT_REQUEST têm artefato próprio, privacy_export_request_log (90 dias, D-78).",
       "personal_data": true,
       "retention": "rotação do host, não configurada no repositório",
       "export": "fora da exportação",
       "deletion": "não há limpeza na exclusão",
-      "decisions": [
-        "D-71"
-      ],
+      "decisions": [],
       "gap": "prazo de rotação dos logs não documentado; pseudonimização é o BT-SEC-AI-002"
+    },
+    "privacy_export_request_log": {
+      "kind": "logs",
+      "what": "Linhas MANALOOM_PRIVACY_EXPORT_REQUEST no stdout da API, uma por pedido que chega a POST /users/me/export (server/routes/users/me/export/index.dart): evento, horário, resultado e referência de quem pediu, HMAC-SHA256 do ID com chave derivada do JWT_SECRET, truncado em 16 hexadecimais. Nunca o ID, a senha ou o conteúdo (D-71).",
+      "personal_data": true,
+      "owner": "server/lib/privacy/privacy_export_request_log.dart",
+      "retention": "90 dias (D-78)",
+      "retention_days": 90,
+      "deleted_by": "rotação dos logs do host da API (serviço Docker Swarm do Easypanel), configurada pelo dono; o código não apaga log",
+      "export": "fora da exportação: a referência só se liga à conta com a chave do servidor",
+      "deletion": "a exclusão da conta não reescreve logs; a linha sai pela rotação de 90 dias",
+      "decisions": [
+        "D-71",
+        "D-78"
+      ],
+      "gap": "a rotação de 90 dias não está aplicada no host; é configuração persistente e fica com o dono (D-78)"
     },
     "sentry_server": {
       "kind": "error_tracking",

@@ -29,9 +29,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
   `person_ref` ou `deck_ref` (pseudônimo quando é de outra pessoa), `entity_ref`, ou `omit_*`
   (segredo, hash, estado interno, conteúdo de terceiro, UUID do catálogo).
 - **6 views**, **20 tabelas e 3 colunas que só existem na produção** (receipt de 2026-09-22; uma
-  das colunas, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **13 artefatos
+  das colunas, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **14 artefatos
   fora do banco**: caches em memória, sidecars, logs, Sentry, provedores externos, backups,
-  aparelho e o arquivo da exportação.
+  aparelho, o arquivo da exportação e o registro dos pedidos de exportação.
 
 ## Prazos já decididos
 
@@ -42,6 +42,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | D-30 | purga da lixeira em 30 dias | `decks.deleted_at` | não existe; é o `DCK-P0-06` |
 | D-32 | jobs de IA por 24 h | `ai_generate_jobs`, `ai_optimize_jobs` | o código apaga em 30 min; é o `BT-AI-032` |
 | D-23 | backups não são reescritos; rotação entra na política | backups | prazo de rotação ainda não decidido |
+| D-78 | logs de pedido de exportação (`MANALOOM_PRIVACY_EXPORT_REQUEST`) por 90 dias | log da API, artefato `privacy_export_request_log` | a linha não existia; existe desde a D-71, e a rotação de 90 dias no host não está aplicada (configuração do dono) |
 
 ## Resumo por classe
 
@@ -73,7 +74,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
    deste inventário, IDs de terceiros viram pseudônimos válidos só no arquivo, e as cinco
    tabelas que ficavam de fora entraram. Desde a D-71, cada pedido deixa uma linha de log
    `MANALOOM_PRIVACY_EXPORT_REQUEST` com horário, resultado e referência pseudônima de quem
-   pediu, sem o ID nem o conteúdo.
+   pediu, sem o ID nem o conteúdo; a D-78 manda guardá-la por 90 dias.
 3. **Exclusão** (parte corrigida no `BT-PRIV-002`, 2026-09-23): bloqueios e tokens do titular
    agora saem; eventos de bloqueio, recursos, ações de moderação e a evidência da denúncia ficam sem a
    pessoa; as simulações de outras pessoas contra o deck público do titular ficam com elas,
@@ -100,6 +101,8 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 ## Pendente de decisão do dono
 
 - Prazo de rotação dos backups (D-23 manda registrá-lo na política).
+- Aplicar no host a rotação de 90 dias dos logs de pedido de exportação (D-78): é configuração
+  persistente do host da API.
 - Ligar a limpeza por prazo em produção (D-70): é exclusão em produção. Os prazos de partida da
   D-69 (notificações, feedback de IA, replays, analytics) só entram no job depois do advogado.
 - Prazo de retenção de analytics (`activation_funnel_events`), replays e simulações,
