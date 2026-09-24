@@ -8,6 +8,11 @@ import 'email_verification_policy.dart';
 
 bool? _verifiedEmailRequiredOverride;
 
+/// Frase da resposta 403 de e-mail não verificado. Não cita troca, conversa
+/// nem publicação, que a beta não oferece (SCOPE-P0-TRD-00): a mesma resposta
+/// vale para o fichário, os decks e o import.
+const verifiedEmailRequiredMessage = 'Confirme seu e-mail para continuar.';
+
 /// Liga ou desliga a exigência nos testes, sem depender do ambiente do
 /// processo (em produção ela é sempre exigida). `null` volta ao ambiente.
 @visibleForTesting
@@ -73,8 +78,7 @@ Future<Response?> verifiedEmailRequiredResponse(Request request) async {
       statusCode: HttpStatus.forbidden,
       body: const {
         'error': 'email_verification_required',
-        'message':
-            'Verifique seu email antes de publicar, conversar ou negociar.',
+        'message': verifiedEmailRequiredMessage,
       },
     );
   }

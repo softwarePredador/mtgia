@@ -14,6 +14,10 @@ class OptimizeDeckContextData {
   final bool shouldAutoComplete;
   final String effectiveMode;
   final String deckSignature;
+
+  /// Revisão do deck lida junto com o formato (DCK-P0-01); o artefato de
+  /// apply do Optimize a liga.
+  final int? deckRevision;
   final String cacheKey;
   final List<String> commanders;
   final List<String> otherCards;
@@ -35,6 +39,7 @@ class OptimizeDeckContextData {
     required this.shouldAutoComplete,
     required this.effectiveMode,
     required this.deckSignature,
+    this.deckRevision,
     required this.cacheKey,
     required this.commanders,
     required this.otherCards,
@@ -104,7 +109,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
             'deck_context.deck_query',
             () => pool.execute(
               Sql.named('''
-            SELECT name, format
+            SELECT name, format, revision
             FROM decks
             WHERE id = CAST(@id AS uuid)
               AND user_id = CAST(@user_id AS uuid)
@@ -114,7 +119,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
           ) ??
           pool.execute(
             Sql.named('''
-          SELECT name, format
+          SELECT name, format, revision
           FROM decks
           WHERE id = CAST(@id AS uuid)
             AND user_id = CAST(@user_id AS uuid)
@@ -128,6 +133,8 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
 
   final deckRow = deckResult[0];
   final deckFormatRaw = deckRow[1] as String?;
+  final deckRevision =
+      deckRow.length > 2 ? (deckRow[2] as num?)?.toInt() : null;
   final deckFormat = (deckFormatRaw ?? '').toLowerCase().trim();
   if (deckFormat.isEmpty) {
     throw const OptimizeDeckContextException('DECK_FORMAT_MISSING');
@@ -386,6 +393,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
     shouldAutoComplete: shouldAutoComplete,
     effectiveMode: effectiveMode,
     deckSignature: deckSignature,
+    deckRevision: deckRevision,
     cacheKey: cacheKey,
     commanders: commanders,
     otherCards: otherCards,

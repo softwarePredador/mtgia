@@ -555,6 +555,35 @@ class PrivacyDbFixture {
         '''),
         parameters: {'a': userA, 'deck': deckA1},
       );
+      // DCK-P0-01: uma mudança no ledger de cada dono; a chave de
+      // idempotência e a impressão do pedido não saem na exportação.
+      for (final (owner, deckId) in [(userA, deckA1), (userB, deckB1Public)]) {
+        await tx.execute(
+          Sql.named('''
+            INSERT INTO deck_change_events (
+              deck_id, user_id, revision_before, revision_after, operation,
+              metadata_before, metadata_after, idempotency_key,
+              request_fingerprint
+            ) VALUES (
+              CAST(@deck AS uuid), CAST(@owner AS uuid), 1, 2, 'deck_patch',
+              '{"archetype": null}'::jsonb, '{"archetype": "aggro"}'::jsonb,
+              @key, @fingerprint
+            )
+          '''),
+          parameters: {
+            'deck': deckId,
+            'owner': owner,
+            'key': 'patch-$owner',
+            'fingerprint': 'f' * 64,
+          },
+        );
+        await tx.execute(
+          Sql.named(
+            'UPDATE decks SET revision = 2 WHERE id = CAST(@deck AS uuid)',
+          ),
+          parameters: {'deck': deckId},
+        );
+      }
       await tx.execute(
         Sql.named('''
           INSERT INTO ai_user_preferences (user_id, preferred_colors)

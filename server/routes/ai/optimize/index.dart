@@ -698,6 +698,7 @@ Future<Response> onRequest(RequestContext context) async {
     final deckFormat = deckContext.deckFormat;
     final effectiveMode = deckContext.effectiveMode;
     final deckSignature = deckContext.deckSignature;
+    final deckRevision = deckContext.deckRevision;
     final cacheKey = deckContext.cacheKey;
 
     final cachedResponse =
@@ -777,8 +778,10 @@ Future<Response> onRequest(RequestContext context) async {
               );
           _enforceCommanderSameLanePreviewSafety(responseBody);
           attachOptimizeApplyAuthorizationToResponse(
+            ownerId: authenticatedUserId,
             deckId: deckId,
             deckSignature: deckSignature,
+            deckRevision: deckRevision,
             responseBody: responseBody,
             bracket: bracket,
           );
@@ -1073,8 +1076,10 @@ Future<Response> onRequest(RequestContext context) async {
         if (integrity != null) responseBody['swap_integrity'] = integrity;
       }
       attachOptimizeApplyAuthorizationToResponse(
+        ownerId: authenticatedUserId,
         deckId: deckId,
         deckSignature: deckSignature,
+        deckRevision: deckRevision,
         responseBody: responseBody,
         bracket: bracket,
       );
@@ -1397,6 +1402,7 @@ Future<Response> onRequest(RequestContext context) async {
           deckAnalysis: deckAnalysis,
           userId: authenticatedUserId,
           deckSignature: deckSignature,
+          deckRevision: deckRevision,
           cacheKey: cacheKey,
           intensity: intensity,
           userPreferences: userPreferences,

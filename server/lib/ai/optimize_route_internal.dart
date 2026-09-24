@@ -289,6 +289,7 @@ Future<void> processCompleteModeAsync({
   required Map<String, dynamic> deckAnalysis,
   required String? userId,
   required String deckSignature,
+  int? deckRevision,
   required String? cacheKey,
   required OptimizeIntensityConfig intensity,
   required Map<String, dynamic> userPreferences,
@@ -605,8 +606,10 @@ Future<void> processCompleteModeAsync({
         );
       }
       attachOptimizeApplyAuthorizationToResponse(
+        ownerId: userId ?? '',
         deckId: deckId,
         deckSignature: deckSignature,
+        deckRevision: deckRevision,
         responseBody: responseBody,
         bracket: bracket,
       );

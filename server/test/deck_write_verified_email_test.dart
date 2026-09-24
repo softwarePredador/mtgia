@@ -25,9 +25,15 @@ const _deckRouteClassification = <String, bool>{
   'POST /decks': true,
   'GET /decks/sample': false,
   'PUT /decks/sample': true,
+  // DCK-P0-00 (D-27): edição incremental sob decks_private.
+  'PATCH /decks/sample': true,
   'DELETE /decks/sample': false,
   'POST /decks/sample/cards': true,
   'POST /decks/sample/cards/bulk': true,
+  'POST /decks/sample/cards/remove': true,
+  // DCK-P0-01: histórico lido sem exigência; desfazer grava conteúdo.
+  'GET /decks/sample/changes': false,
+  'POST /decks/sample/changes/sample/undo': true,
   'POST /decks/sample/cards/replace': true,
   'POST /decks/sample/cards/set': true,
   'GET /decks/sample/optimizations': false,
@@ -111,7 +117,9 @@ void main() {
       for (final request in const [
         'POST /decks',
         'PUT /decks/d1',
+        'PATCH /decks/d1',
         'POST /decks/d1/cards',
+        'POST /decks/d1/cards/remove',
         'POST /decks/d1/cards/bulk',
         'POST /decks/d1/cards/replace',
         'POST /decks/d1/cards/set',
@@ -168,7 +176,6 @@ void main() {
 
       for (final body in const <Map<String, Object?>>[
         {'deck_id': 'd1', 'save_mode': 'draft_clone'},
-        {'deck_id': 'd1'},
       ]) {
         Database.useConnectionForTesting(_accountLookups(1, verified: false));
         final response = await rebuild_route.onRequest(
@@ -183,19 +190,21 @@ void main() {
     });
 
     test('a prévia (preview_only) não grava e segue sem verificação', () async {
-      final routePool = ScriptedPool([scriptedResult()]);
+      // DCK-P0-00 (IA consultiva): sem save_mode o rebuild também é prévia.
+      for (final body in const <Map<String, Object?>>[
+        {'deck_id': 'd1', 'save_mode': 'preview_only'},
+        {'deck_id': 'd1'},
+      ]) {
+        final routePool = ScriptedPool([scriptedResult()]);
 
-      final response = await rebuild_route.onRequest(
-        _context(
-          'POST /ai/rebuild',
-          body: {'deck_id': 'd1', 'save_mode': 'preview_only'},
-          pool: routePool,
-        ),
-      );
+        final response = await rebuild_route.onRequest(
+          _context('POST /ai/rebuild', body: body, pool: routePool),
+        );
 
-      // Passou do portão e procurou o deck (o pool devolve vazio: 404).
-      expect(response.statusCode, HttpStatus.notFound);
-      expect(routePool.executedCount, 1);
+        // Passou do portão e procurou o deck (o pool devolve vazio: 404).
+        expect(response.statusCode, HttpStatus.notFound, reason: '$body');
+        expect(routePool.executedCount, 1, reason: '$body');
+      }
     });
   });
 }

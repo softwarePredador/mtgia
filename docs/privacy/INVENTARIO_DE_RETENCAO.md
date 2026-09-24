@@ -8,7 +8,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 - `server/test/privacy_data_inventory_test.dart` roda na suíte do servidor e compara o JSON com
   `project_logic_manifest.json#/database`, que o gerador de project logic extrai do baseline, das
-  60 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
+  61 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
   Ele também confere os prazos decididos pelo dono e se o modo de exclusão declarado bate com
   `server/lib/user_data_privacy_service.dart`.
 - `server/test/privacy_data_inventory_db_live_test.dart` confere o mesmo JSON contra o
@@ -20,12 +20,12 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## O que está no inventário
 
-- **80 tabelas** do schema versionado. **44 têm dado pessoal**: 42 de titulares de conta, 1 da
+- **81 tabelas** do schema versionado. **45 têm dado pessoal**: 43 de titulares de conta, 1 da
   equipe de moderação e 1 com nome público de jogador de torneio externo. As outras 36 são
   catálogo, referência, controle ou operação.
 - Para cada tabela: finalidade, dono no código, prazo, quem apaga, se entra na exportação e como
   sai na exclusão, e a exceção legal quando há.
-- Para as **39 tabelas exportadas**, a classificação de cada uma das 517 colunas: `include`,
+- Para as **40 tabelas exportadas**, a classificação de cada uma das 532 colunas: `include`,
   `person_ref` ou `deck_ref` (pseudônimo quando é de outra pessoa), `entity_ref`, ou `omit_*`
   (segredo, hash, estado interno, conteúdo de terceiro, UUID do catálogo).
 - **6 views**, **20 tabelas e 3 colunas que só existem na produção** (receipt de 2026-09-22; uma
@@ -49,7 +49,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | Classe | Tabelas | Prazo | Quem apaga | Exportação | Exclusão |
 | --- | --- | --- | --- | --- | --- |
 | Conta | `users`, `user_plans`, `ai_user_preferences` | enquanto a conta existir | exclusão de conta | sim | `users` pseudonimizada, o resto apagado |
-| Conteúdo | `decks`, `deck_cards`, `user_binder_items`, `post_game_notes`, `shared_deck_reports`, `deck_comments`, `deck_matchups`, `deck_weakness_reports` | enquanto a conta existir | exclusão de conta e cascata por deck | sim | apagado |
+| Conteúdo | `decks`, `deck_cards`, `deck_change_events`, `user_binder_items`, `post_game_notes`, `shared_deck_reports`, `deck_comments`, `deck_matchups`, `deck_weakness_reports` | enquanto a conta existir | exclusão de conta e cascata por deck | sim | apagado |
 | Atividade | `activation_funnel_events`, `deck_optimization_events`, `deck_learning_events`, `ml_prompt_feedback`, `ai_optimize_fallback_telemetry` | sem prazo, exceto telemetria (180 dias) | exclusão de conta; job de limpeza | sim | apagado |
 | IA em execução | `ai_logs`, `ai_generate_jobs`, `ai_optimize_jobs`, `ai_optimize_cache` | 180 dias; 24 h decidido para jobs; 6 h no cache | job de limpeza e o próprio serviço | sim, sem hashes | apagado |
 | Battle e replays | `battle_simulations`, `battle_simulation_attempts`, `battle_jobs`, `battle_job_live_records`, `interactive_battle_sessions`, `interactive_battle_records`, `battle_replay_annotations` | sem prazo | exclusão de conta | sim, sem hashes nem payload interno | apagado; as simulações de outras pessoas contra o deck do titular ficam com elas, anonimizadas (D-23) |

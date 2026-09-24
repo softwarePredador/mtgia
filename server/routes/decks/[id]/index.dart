@@ -10,7 +10,9 @@ import '../../../lib/deck_snapshot_contract.dart';
 import '../../../lib/commander_bracket.dart';
 import '../../../lib/deck_schema_support.dart';
 import '../../../lib/deck_validation_state_support.dart';
+import '../../../lib/deck_visibility_policy.dart';
 import '../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../lib/decks/deck_revision_support.dart';
 import '../../../lib/decks/deck_applied_analysis_support.dart';
 import '../../../lib/decks/optimization_apply_authorization_support.dart';
 import '../../../lib/decks/optimization_bracket_support.dart';
@@ -20,6 +22,7 @@ import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/card_identity_support.dart';
 import '../../../lib/battle/interactive_battle_deck_lifecycle.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/release_capability_policy.dart';
 import '../../../lib/scryfall_image_url.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -29,6 +32,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 
   if (context.request.method == HttpMethod.put) {
     return _updateDeck(context, deckId);
+  }
+
+  if (context.request.method == HttpMethod.patch) {
+    return _patchDeck(context, deckId);
   }
 
   if (context.request.method == HttpMethod.delete) {
@@ -43,12 +50,28 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
 Future<Response> _deleteDeck(RequestContext context, String deckId) async {
   final userId = context.read<String>();
   final conn = context.read<Pool>();
+  final ifMatch = readDeckIfMatch(context.request.headers);
+  if (ifMatch.malformed) {
+    return const DeckRevisionException(
+      code: deckIfMatchInvalidCode,
+      message: 'If-Match precisa trazer a revisão do deck, como "7".',
+      statusCode: HttpStatus.badRequest,
+    ).toResponse();
+  }
+  if (!ifMatch.present && deckRevisionPolicyOf(context).requireIfMatch) {
+    return const DeckRevisionException(
+      code: deckRevisionRequiredCode,
+      message: 'Envie If-Match com a revisão do deck para alterá-lo.',
+      statusCode: HttpStatus.preconditionRequired,
+    ).toResponse();
+  }
 
   try {
     final result = await deleteDeckAfterBattleGuard(
       conn,
       userId: userId,
       deckId: deckId,
+      expectedRevision: ifMatch.revision,
     );
     return switch (result) {
       InteractiveBattleDeckDeleteResult.deleted => Response(
@@ -57,6 +80,13 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
       InteractiveBattleDeckDeleteResult.notFound => notFound(
         'Deck not found or permission denied.',
       ),
+      InteractiveBattleDeckDeleteResult.staleRevision =>
+        const DeckRevisionException(
+          code: deckRevisionConflictCode,
+          message:
+              'O deck mudou desde a última leitura. Atualize e tente de novo.',
+          statusCode: HttpStatus.conflict,
+        ).toResponse(),
       InteractiveBattleDeckDeleteResult.activeBattle => Response.json(
         statusCode: HttpStatus.conflict,
         body: {
@@ -77,6 +107,9 @@ Future<Response> _deleteDeck(RequestContext context, String deckId) async {
 Future<Response> _updateDeck(RequestContext context, String deckId) async {
   final userId = context.read<String>();
   final conn = context.read<Pool>();
+  final galleryOpen = context.read<ReleaseCapabilityPolicy>().isAllowed(
+    'gallery_public',
+  );
   final hasMeta = await hasDeckMetaColumns(conn);
   final hasValidationState = await hasDeckValidationStateColumns(conn);
 
@@ -89,6 +122,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
   late final List<dynamic>? cards;
   late final List<Map<String, dynamic>>? rawCardObjects;
   late final Map<String, dynamic> mutationContext;
+  late final DeckMutationRequest mutation;
 
   try {
     final body = requireJsonObject(await context.request.json());
@@ -119,6 +153,17 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
     mutationContext =
         readOptionalObject(body, 'mutation_context') ??
         const <String, dynamic>{};
+    mutation = DeckMutationRequest.fromContext(
+      context,
+      operation:
+          DeckOptimizationHistoryService.normalizeMutationContext(
+                mutationContext,
+              ).isNotEmpty
+              ? 'optimization_apply'
+              : 'deck_replace',
+      deckId: deckId,
+      body: body,
+    );
   } on FormatException catch (e) {
     return badRequest('Invalid JSON body: ${e.message}');
   } on DeckRequestException catch (e) {
@@ -127,6 +172,15 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
 
   try {
     final updateResult = await conn.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) {
+        throw Exception('Deck not found or permission denied.');
+      }
       // 1. Verifica se o deck existe e pertence ao usuário
       final deckCheck = await session.execute(
         Sql.named(
@@ -170,7 +224,24 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       final nextDescription = description ?? existingDescription;
       final nextArchetype = archetype ?? existingArchetype;
       final nextBracket = bracket ?? existingBracket;
-      final nextIsPublic = isPublic ?? existingIsPublic;
+      // DCK-P0-00: publicar exige a galeria aberta e cartas depois da
+      // mudança; uma lista vazia nunca fica pública.
+      if (isPublic == true) {
+        ensureDeckPublicationAllowed(
+          requested: true,
+          cardCountAfter:
+              rawCardObjects != null
+                  ? rawCardObjects.length
+                  : await _deckCardCount(session, deckId),
+          galleryOpen: galleryOpen,
+        );
+      }
+      final unpublishBecauseEmpty =
+          rawCardObjects != null &&
+          rawCardObjects.isEmpty &&
+          (isPublic ?? existingIsPublic);
+      final nextIsPublic =
+          unpublishBecauseEmpty ? false : (isPublic ?? existingIsPublic);
 
       final currentFormat = nextFormat.toLowerCase();
       final isOptimizationMutation =
@@ -186,7 +257,8 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           description != null ||
           archetype != null ||
           bracket != null ||
-          isPublic != null) {
+          isPublic != null ||
+          unpublishBecauseEmpty) {
         await session.execute(
           Sql.named(
             hasMeta
@@ -240,12 +312,14 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
           final currentSignature =
               DeckOptimizationHistoryService.buildDeckSignature(beforeCards);
           if (expectedSignature.isEmpty) {
-            throw const DeckRequestException(
+            throw const _OptimizationPreviewConflict(
+              'optimization_signature_required',
               'Optimization apply requires expected_deck_signature.',
             );
           }
           if (expectedSignature != currentSignature) {
-            throw const DeckRequestException(
+            throw const _OptimizationPreviewConflict(
+              'optimization_preview_stale',
               'Deck changed after preview. Refresh the analysis and try again.',
             );
           }
@@ -322,7 +396,9 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
         final applyAuthorizationVerification =
             isOptimizationMutation
                 ? validateOptimizationApplyAuthorization(
+                  ownerId: userId,
                   deckId: deckId,
+                  currentDeckRevision: baseline.revision,
                   currentDeckSignature:
                       DeckOptimizationHistoryService.buildDeckSignature(
                         beforeCards,
@@ -533,6 +609,8 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
         );
       }
 
+      final receipt = await recordDeckMutation(session, baseline);
+
       // Retorna o deck atualizado (sem a lista de cartas, para simplicidade)
       final result = await session.execute(
         Sql.named('SELECT * FROM decks WHERE id = @deckId'),
@@ -564,10 +642,26 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
             'review_reasons': const <String>[],
             'validation_updated_at': deckMap['validation_updated_at'],
           },
+        ...receipt.toJson(),
       };
     });
 
-    return Response.json(body: {'success': true, ...updateResult});
+    return Response.json(
+      body: {'success': true, ...updateResult},
+      headers: deckRevisionHeadersOf(updateResult),
+    );
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
+  } on _OptimizationPreviewConflict catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.conflict,
+      body: {'error_code': e.code, 'error': e.message},
+    );
+  } on DeckVisibilityException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: e.responseBody,
+    );
   } on OptimizationLandFloorViolation catch (e) {
     print('[WARN] Optimization mana floor blocked deck update: $e');
     return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
@@ -593,6 +687,192 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
     }
     return internalServerError('Failed to update deck');
   }
+}
+
+/// Campos que o `PATCH /decks/:id` aceita.
+const deckPatchFields = <String>{
+  'name',
+  'description',
+  'archetype',
+  'bracket',
+  'is_public',
+};
+
+/// PATCH /decks/:id: nome, descrição, estratégia (arquétipo e bracket) e
+/// visibilidade, sem tocar nas cartas.
+///
+/// Decisão D-27 do dono: edição incremental sob `decks_private`; o `PUT`, que
+/// troca a lista inteira, segue sob `deck_replace_all`, fechado na beta.
+/// Campo fora de [deckPatchFields] responde 400
+/// `deck_patch_field_unsupported`; publicar segue a mesma regra do create
+/// (galeria aberta e deck com cartas), com 422 antes de gravar.
+Future<Response> _patchDeck(RequestContext context, String deckId) async {
+  final userId = context.read<String>();
+  final conn = context.read<Pool>();
+  final galleryOpen = context.read<ReleaseCapabilityPolicy>().isAllowed(
+    'gallery_public',
+  );
+
+  late final String? name;
+  late final String? description;
+  late final String? archetype;
+  late final int? bracket;
+  late final bool? isPublic;
+  late final DeckMutationRequest mutation;
+  try {
+    final body = requireJsonObject(await context.request.json());
+    final unsupported =
+        body.keys.where((key) => !deckPatchFields.contains(key)).toList()
+          ..sort();
+    if (unsupported.isNotEmpty) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'error':
+              'Este pedido altera só nome, descrição, estratégia e '
+              'visibilidade. As cartas mudam pelas rotas de cartas.',
+          'error_code': 'deck_patch_field_unsupported',
+          'fields': unsupported,
+        },
+      );
+    }
+    if (body.isEmpty) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: const {
+          'error': 'Nada para alterar.',
+          'error_code': 'deck_patch_empty',
+        },
+      );
+    }
+    name = readOptionalString(body, 'name', trim: true);
+    if (name != null && name.isEmpty) {
+      throw const DeckRequestException('Field name must not be empty.');
+    }
+    description = readOptionalString(body, 'description');
+    archetype = readOptionalString(body, 'archetype', trim: true);
+    final bracketResult = parseCommanderBracket(body['bracket']);
+    if (bracketResult.error != null) {
+      throw DeckRequestException(bracketResult.error!);
+    }
+    bracket = bracketResult.value;
+    isPublic = readOptionalBool(body, 'is_public');
+    mutation = DeckMutationRequest.fromContext(
+      context,
+      operation: 'deck_patch',
+      deckId: deckId,
+      body: body,
+    );
+    if (isPublic == true && !galleryOpen) {
+      // Galeria fechada: recusa antes de qualquer acesso ao banco.
+      ensureDeckPublicationAllowed(
+        requested: true,
+        cardCountAfter: 0,
+        galleryOpen: false,
+      );
+    }
+  } on FormatException catch (e) {
+    return badRequest('Invalid JSON body: ${e.message}');
+  } on DeckRequestException catch (e) {
+    return badRequest(e.message);
+  } on DeckVisibilityException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: e.responseBody,
+    );
+  }
+
+  try {
+    final hasMeta = await hasDeckMetaColumns(conn);
+    final updated = await conn.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) return null;
+
+      if (isPublic == true) {
+        ensureDeckPublicationAllowed(
+          requested: true,
+          cardCountAfter: await _deckCardCount(session, deckId),
+          galleryOpen: galleryOpen,
+        );
+      }
+
+      final sets = <String>[];
+      final parameters = <String, dynamic>{'deckId': deckId};
+      if (name != null) {
+        sets.add('name = @name');
+        parameters['name'] = name;
+      }
+      if (description != null) {
+        sets.add('description = @description');
+        parameters['description'] = description;
+      }
+      if (hasMeta && archetype != null) {
+        sets.add('archetype = @archetype');
+        parameters['archetype'] = archetype;
+      }
+      if (hasMeta && bracket != null) {
+        sets.add('bracket = @bracket');
+        parameters['bracket'] = bracket;
+      }
+      if (isPublic != null) {
+        sets.add('is_public = @isPublic');
+        parameters['isPublic'] = isPublic;
+      }
+      final returning =
+          hasMeta
+              ? 'id, name, description, archetype, bracket, is_public'
+              : 'id, name, description, NULL::text AS archetype, '
+                  'NULL::int AS bracket, is_public';
+      final result = await session.execute(
+        Sql.named(
+          sets.isEmpty
+              ? 'SELECT $returning FROM decks WHERE id = @deckId'
+              : 'UPDATE decks SET ${sets.join(', ')} WHERE id = @deckId '
+                  'RETURNING $returning',
+        ),
+        parameters: parameters,
+      );
+      final receipt = await recordDeckMutation(session, baseline);
+      return <String, Object?>{
+        'ok': true,
+        'deck': {...result.first.toColumnMap(), 'revision': receipt.revision},
+        ...receipt.toJson(),
+      };
+    });
+    if (updated == null) {
+      return notFound('Deck not found or permission denied.');
+    }
+    return Response.json(
+      body: updated,
+      headers: deckRevisionHeadersOf(updated),
+    );
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
+  } on DeckVisibilityException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: e.responseBody,
+    );
+  } on Exception catch (e) {
+    print('[ERROR] Failed to patch deck: ${e.runtimeType}');
+    return internalServerError('Failed to update deck');
+  }
+}
+
+Future<int> _deckCardCount(Session session, String deckId) async {
+  final result = await session.execute(
+    Sql.named(
+      'SELECT COALESCE(SUM(quantity), 0)::int FROM deck_cards '
+      'WHERE deck_id = @deckId',
+    ),
+    parameters: {'deckId': deckId},
+  );
+  return result.first[0] as int? ?? 0;
 }
 
 /// Busca um deck específico pelo seu ID, incluindo a lista de cartas.
@@ -623,7 +903,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           hasPricing
               ? 'pricing_currency, pricing_total, pricing_missing_cards, ${hasPricingSource ? 'pricing_source' : 'NULL::text AS pricing_source'}, pricing_updated_at,'
               : "NULL::text as pricing_currency, NULL::numeric as pricing_total, 0::int as pricing_missing_cards, NULL::text as pricing_source, NULL::timestamptz as pricing_updated_at,",
-          'created_at',
+          'created_at, revision',
           'FROM decks WHERE id = @deckId AND user_id = @userId',
         ].join(' '),
       ),
@@ -845,7 +1125,10 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
       'all_cards_flat': cardsList,
     };
 
-    return Response.json(body: responseBody);
+    return Response.json(
+      body: responseBody,
+      headers: deckRevisionHeadersOf(responseBody),
+    );
   } catch (e) {
     print('[ERROR] Failed to retrieve deck details: $e');
     return internalServerError('Failed to retrieve deck details');
@@ -858,6 +1141,15 @@ String _validateCardCondition(String? raw) {
   final upper = raw.trim().toUpperCase();
   const valid = {'NM', 'LP', 'MP', 'HP', 'DMG'};
   return valid.contains(upper) ? upper : 'NM';
+}
+
+/// Prévia do Optimize velha ou sem assinatura no `PUT`: conflito, como no
+/// `POST /decks/:id/cards/bulk`.
+class _OptimizationPreviewConflict implements Exception {
+  const _OptimizationPreviewConflict(this.code, this.message);
+
+  final String code;
+  final String message;
 }
 
 Future<bool> _hasTable(Pool pool, String tableName) async {

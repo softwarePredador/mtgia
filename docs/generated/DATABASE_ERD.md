@@ -56,6 +56,9 @@ erDiagram
     users ||--o{ conversations : "user_b_id -> id"
     cards ||--o{ deck_cards : "card_id -> id"
     decks ||--o{ deck_cards : "deck_id -> id"
+    decks ||--o{ deck_change_events : "deck_id -> id"
+    deck_change_events ||--o{ deck_change_events : "undo_of_event_id -> id"
+    users ||--o{ deck_change_events : "user_id -> id"
     decks ||--o{ deck_comments : "deck_id -> id"
     users ||--o{ deck_comments : "user_id -> id"
     decks ||--o{ deck_matchups : "deck_id -> id"
@@ -655,6 +658,22 @@ erDiagram
         boolean is_commander
         number quantity
     }
+    deck_change_events {
+        json cards_after
+        json cards_before
+        datetime created_at
+        uuid deck_id
+        uuid id PK
+        string idempotency_key
+        json metadata_after
+        json metadata_before
+        string operation
+        string request_fingerprint
+        number revision_after
+        number revision_before
+        uuid undo_of_event_id
+        uuid user_id
+    }
     deck_comments {
         string body
         datetime created_at
@@ -731,6 +750,7 @@ erDiagram
         string pricing_source
         number pricing_total
         datetime pricing_updated_at
+        number revision
         string strengths
         number synergy_score
         uuid user_id
@@ -1137,4 +1157,4 @@ erDiagram
     }
 ```
 
-Tabelas: 80; views: 6; migrations: 60 (latest `060`).
+Tabelas: 81; views: 6; migrations: 61 (latest `067`).

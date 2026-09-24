@@ -4,6 +4,7 @@ import '../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../lib/deck_format_support.dart';
 import '../../../lib/deck_request_support.dart';
 import '../../../lib/deck_rules_service.dart';
+import '../../../lib/decks/deck_revision_support.dart';
 import '../../../lib/import_card_lookup_service.dart';
 import '../../../lib/import_list_service.dart';
 import '../../../lib/import_to_deck_merge_support.dart';
@@ -28,8 +29,10 @@ Future<Response> _importToDeck(RequestContext context) async {
   late final String deckId;
   late final Object rawList;
   late final bool replaceAll;
+  late final Map<String, dynamic> requestBody;
   try {
     final body = requireJsonObject(await context.request.json());
+    requestBody = body;
     deckId = requireNonEmptyString(body, 'deck_id');
     final listValue = body['list'];
     if (listValue == null) {
@@ -210,7 +213,23 @@ Future<Response> _importToDeck(RequestContext context) async {
       (card) => card['is_commander'] == true,
     );
     var finalTotalCards = sumImportToDeckQuantities(consolidatedCards);
+    final mutation = DeckMutationRequest.fromContext(
+      context,
+      operation: 'import_to_deck',
+      deckId: deckId,
+      body: requestBody,
+    );
+    late final DeckMutationReceipt receipt;
     await pool.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) {
+        throw const _ImportDeckChangedDuringPreparation();
+      }
       final lockedDeck = await session.execute(
         Sql.named('''
           SELECT format
@@ -322,21 +341,28 @@ Future<Response> _importToDeck(RequestContext context) async {
         ''';
         await session.execute(Sql.named(sql), parameters: params);
       }
+      receipt = await recordDeckMutation(session, baseline);
     });
 
     return Response.json(
-      body: buildImportToDeckSuccessBody(
-        deckId: deckId,
-        normalizedFormat: normalizedFormat,
-        importedCards: consolidatedCards,
-        totalCards: finalTotalCards,
-        notFoundLines: notFoundCards,
-        localizedMatches: localizedMatches,
-        warnings: warnings,
-        commanderDetected: commanderDetected,
-        commanderPreserved: commanderPreserved,
-      ),
+      headers: receipt.headers,
+      body: {
+        ...buildImportToDeckSuccessBody(
+          deckId: deckId,
+          normalizedFormat: normalizedFormat,
+          importedCards: consolidatedCards,
+          totalCards: finalTotalCards,
+          notFoundLines: notFoundCards,
+          localizedMatches: localizedMatches,
+          warnings: warnings,
+          commanderDetected: commanderDetected,
+          commanderPreserved: commanderPreserved,
+        ),
+        ...receipt.toJson(),
+      },
     );
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
   } on _ImportDeckChangedDuringPreparation {
     return Response.json(
       statusCode: 409,

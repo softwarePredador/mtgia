@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "dd89128d95bc37a0e8033d6c9f0e3a00408e6c269e25dbf40986d0d411933d6c"
+    "sha256": "c101399f5ba2b2563d2141a995adb009913ad000542cc6a4001579e58c4fe70b"
   },
   "required_task_fields": [
     "id",
@@ -360,36 +360,36 @@
     {
       "id": "DCK-P0-00",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Conter fluxos perigosos: replace-all OFF, deck novo privado e IA advisory.",
       "depends_on": [
         "BT-SCP-001"
       ],
-      "acceptance": "Add-only continua; replace direto/API consumer nega; deck vazio não nasce público. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade — o portão `deck_replace_all` já está provado (`b2d3fc04f`; `release_capability_policy_test.dart:195-197`); um teste ainda afirma que deck vazio nasce público (`decks_crud_test.dart:184-212`). Decisão do dono em 2026-09-22: D-27, criar edição incremental (remoção e PATCH) sob `decks_private`; `deck_replace_all` segue off.",
+      "acceptance": "Add-only continua; replace direto/API consumer nega; deck vazio não nasce público. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade — o portão `deck_replace_all` já está provado (`b2d3fc04f`; `release_capability_policy_test.dart:195-197`); um teste ainda afirma que deck vazio nasce público (`decks_crud_test.dart:184-212`). Decisão do dono em 2026-09-22: D-27, criar edição incremental (remoção e PATCH) sob `decks_private`; `deck_replace_all` segue off. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `PATCH /decks/:id` (nome, descrição, arquétipo, bracket e visibilidade; cartas, formato e outros campos dão 400 `deck_patch_field_unsupported`) e `POST /decks/:id/cards/remove` abriram sob `decks_private`; `PUT /decks/:id`, a troca de edição e o import sobre deck existente seguem em `deck_replace_all`. Deck novo nasce privado; `is_public: true` exige `gallery_public` aberta e cartas, com 422 `deck_publication_unavailable` ou `deck_public_requires_cards` antes de gravar (`server/lib/deck_visibility_policy.dart`), e um deck público que fica vazio (remoção ou `PUT` com lista vazia) vira privado na mesma transação. IA consultiva: `POST /ai/rebuild` sem `save_mode` passou a ser só prévia. Evidência: `server/test/deck_containment_test.dart` (portão na matriz da beta, recusas antes do banco), `server/test/deck_incremental_edit_db_live_test.dart` (PostgreSQL descartável, 9 casos), o teste antigo que fixava deck vazio público invertido (`decks_crud_test.dart`) e 12 mutações derrubadas. Falta: o app usar as rotas novas, esconder as ações de replace-all e traduzir os códigos (raia do app). Recomendação registrada no diário da frente: levar a troca de edição (`cards/replace`) para `decks_private`, porque troca a impressão da mesma carta sem refazer a lista.",
       "section": "P0 do ciclo",
       "source_line": 335
     },
     {
       "id": "DCK-P0-01",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Revisão otimista de deck + ledger imutável de mudanças + undo universal.",
       "depends_on": [
         "BT-DB-001"
       ],
-      "acceptance": "Todo mutator usa expected revision/If-Match; uma de duas concorrentes vence; outra 409; retry não duplica; receipt atômico evita segunda validação; undo recusa HEAD novo. Decisão do dono em 2026-09-22: D-29, `If-Match` com transição: primeiro só avisa; passa a ser exigido quando a versão mínima do app mandar o cabeçalho.",
+      "acceptance": "Todo mutator usa expected revision/If-Match; uma de duas concorrentes vence; outra 409; retry não duplica; receipt atômico evita segunda validação; undo recusa HEAD novo. Decisão do dono em 2026-09-22: D-29, `If-Match` com transição: primeiro só avisa; passa a ser exigido quando a versão mínima do app mandar o cabeçalho. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar, com a migration 067 proposta e não aplicada: `decks.revision` e o ledger `deck_change_events`, que só recebe INSERT (um gatilho recusa UPDATE e DELETE direto; as linhas saem só na cascata do deck ou da conta). Todo mutator de deck existente (`PUT` e `PATCH /decks/:id`, `cards`, `cards/set`, `cards/replace`, `cards/remove`, `cards/bulk`, o rollback do Optimize e `POST /import/to-deck`) trava o deck, confere o `If-Match` antes de escrever (409 `deck_revision_conflict` com a revisão atual), sobe a revisão e grava no ledger só o que mudou, na mesma transação da mudança, e devolve o recibo (`revision`, `change_event_id`) com o `ETag`; o `DELETE` confere o `If-Match` e não grava evento. Transição da D-29: sem o cabeçalho a mudança segue com `revision_warning: if_match_missing`; `MANALOOM_DECK_IF_MATCH_REQUIRED=1` passa a exigir (428 `deck_revision_required`). Retry: a mesma `Idempotency-Key` devolve o recibo gravado sem aplicar de novo, e a mesma chave com outro pedido responde 422. Desfazer universal: `POST /decks/:id/changes/:eventId/undo` devolve o estado de antes como mudança nova, recusa HEAD novo (409 `deck_undo_conflict`), nunca publica e passa pelas regras de hoje (409 `deck_undo_invalid`); `GET /decks/:id/changes` lista o histórico com o que mudou. O artefato do Optimize passou a ligar a revisão (`DCK-P0-02`), e o `PUT` com prévia velha do Optimize responde 409, como o bulk. Evidência: `server/test/deck_revision_support_test.dart`, `server/test/deck_revision_ledger_db_live_test.dart` (PostgreSQL descartável: todo mutator, duas mudanças concorrentes com um vencedor e um 409, retry, transição, desfazer, histórico e ledger só de acréscimo), `server/test/deck_review_artifact_db_live_test.dart` e os testes de privacidade com o ledger na exportação e na exclusão; 25 mutações derrubadas. A validação estrita dentro de cada mudança fica com o `DCK-P1-04`, como a medição de 2026-09-22 apontou. Falta: o app mandar `If-Match` e a chave, ler o recibo e mostrar o histórico e o desfazer (raia do app); aplicar a 067 na produção pede a palavra do dono.",
       "section": "P0 do ciclo",
       "source_line": 336
     },
     {
       "id": "DCK-P0-02",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "`DeckReviewArtifact v1` único para preview/commit, com HMAC, revisão, hash, constraints e expiração.",
       "depends_on": [
         "DCK-P0-01"
       ],
-      "acceptance": "Qualquer mudança semântica invalida; outro usuário/tamper/stale/expired falha. Decisão do dono em 2026-09-22: D-29, artifact de preview com TTL de 24 h, reutilizável pelo mesmo usuário.",
+      "acceptance": "Qualquer mudança semântica invalida; outro usuário/tamper/stale/expired falha. Decisão do dono em 2026-09-22: D-29, artifact de preview com TTL de 24 h, reutilizável pelo mesmo usuário. Feito em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `server/lib/decks/deck_review_artifact.dart` é o `DeckReviewArtifact v1` (token com prefixo `drv1`, payload e assinatura em base64url; HMAC-SHA256 sobre prefixo e payload; 24 h, reutilizável pelo mesmo usuário enquanto vale, pela D-29). Ele liga dono, deck, revisão e assinatura do conteúdo do deck no preview, `input_hash` e `constraints_hash` canônicos (SHA-256 com as chaves em ordem) e o tipo do fluxo; revisão e assinatura do commit têm de ser as do preview, inclusive quando ausentes. A autorização de apply do Optimize passou a ser esse artefato, do tipo `optimize_apply`, emitido só para o usuário autenticado e verificado no `PUT /decks/:id` e no `POST /decks/:id/cards/bulk` antes de qualquer escrita, com o motivo em `authorization_error`; o token `v2` antigo é recusado, e o app segue devolvendo o objeto sem mexer. Evidência: `server/test/deck_review_artifact_test.dart` (cada recusa com seu código), `server/test/optimize_apply_authorization_test.dart` (dono e estado velho) e `server/test/deck_review_artifact_db_live_test.dart` (PostgreSQL descartável: controle positivo e, relendo cartas, validação e histórico de otimização, nenhuma escrita com artefato adulterado, expirado, de outro usuário, de outro deck ou de estado velho), com 14 mutações derrubadas. Com o `DCK-P0-01`, o artefato liga também a revisão do deck: mudança só de nome ou formato depois da prévia dá `stale_deck_revision`. O mesmo artefato no import sobre deck existente, no import novo, no Generate e no Rebuild fica com o `DCK-P0-03`, o `DCK-P1-02`, o `DCK-P0-04` e o `DCK-P1-08`, como a medição de 2026-09-22 separou.",
       "section": "P0 do ciclo",
       "source_line": 337
     },
@@ -2226,12 +2226,12 @@
     {
       "id": "SCOPE-P0-TRD-00",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Kill switch explícito de marketplace/trades e remoção de promessas da beta.",
       "depends_on": [
         "BT-SCP-001"
       ],
-      "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`.",
+      "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `POST /binder` e `PUT /binder/:id` recusam com 422 `binder_commerce_unavailable` (campo e capability no corpo), antes do banco, a cópia oferecida para troca sem `trades` ou para venda, ou com preço, sem `marketplace` (`server/lib/binder_item_contract.dart`); `false` e `null`, que o app manda quando não oferece, continuam valendo. D-38: `GET /community/marketplace` respeita `trade_visibility` (seguidores, ninguém e anônimo) no WHERE da contagem e da listagem. A resposta de e-mail não verificado deixou de prometer \"publicar, conversar ou negociar\". Evidência: `server/test/trade_marketplace_kill_switch_test.dart` (na matriz da beta, 8 rotas de proposta, match e marketplace dão 404 antes do handler; o fichário dá 422 sem tocar o banco e grava com as capabilities abertas), `server/test/community_marketplace_trade_visibility_db_live_test.dart` (PostgreSQL descartável), o mapa de `release_capability_policy_test.dart` com match e fichário, os termos em português no teste do site (`public_web_product_contract_test.dart`) e 13 mutações derrubadas. Falta: a parte do app (esconder troca e venda no fichário, D-04), o pack 05 (D-40, com a sessão do gate) e o receipt de negação por rota no SHA integrado.",
       "section": "Contenção que bloqueia a beta core",
       "source_line": 617
     },
@@ -7886,6 +7886,7 @@
       "methods": [
         "DELETE",
         "GET",
+        "PATCH",
         "PUT"
       ],
       "sources": [
@@ -7896,6 +7897,7 @@
           "methods": [
             "DELETE",
             "GET",
+            "PATCH",
             "PUT"
           ]
         },
@@ -9884,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "b856b7803ea31ebf1461cb0da0e7d3cceaceac33de4382582de36a4b6b19fad2"
+  "project_logic_source_digest_sha256": "7ff9a1ecb4da2da70cdde3d9b39c5b6d158c01a029fb97e72678ff415261d9ec"
 }

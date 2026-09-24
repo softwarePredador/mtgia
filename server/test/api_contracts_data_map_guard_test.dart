@@ -35,6 +35,92 @@ void main() {
       }
     });
 
+    test('documents the beta kill switch of trade and sale offers', () {
+      // SCOPE-P0-TRD-00 (D-39 e D-38).
+      final create = _contractRowFor(contracts, 'POST /binder');
+      final update = _contractRowFor(contracts, 'PUT /binder/:id');
+      final marketplace = _contractRowFor(
+        contracts,
+        'GET /community/marketplace?page=&limit=&search=&condition='
+        '&for_trade=&for_sale=&set_code=&rarity=',
+      );
+
+      for (final row in [create, update]) {
+        expect(row, contains('422'));
+        expect(row, contains('binder_commerce_unavailable'));
+        expect(row, contains('trade_marketplace_kill_switch_test.dart'));
+      }
+      expect(create, contains('`for_trade: true` requires the `trades`'));
+      expect(create, contains('requires `marketplace`'));
+      expect(marketplace, contains('`trade_visibility`'));
+      expect(marketplace, contains('D-38'));
+      expect(
+        marketplace,
+        contains('community_marketplace_trade_visibility_db_live_test.dart'),
+      );
+    });
+
+    test('documents the incremental deck editing of the beta', () {
+      // DCK-P0-00 (D-27): PATCH e remoção sob decks_private; deck vazio
+      // nunca público; o rebuild sem save_mode é só prévia.
+      final patch = _contractRowFor(contracts, 'PATCH /decks/:id');
+      final remove = _contractRowFor(contracts, 'POST /decks/:id/cards/remove');
+      final create = _contractRowFor(contracts, 'POST /decks');
+      final replace = _contractRowFor(contracts, 'PUT /decks/:id');
+      final rebuild = _contractRowFor(contracts, 'POST /ai/rebuild');
+
+      for (final row in [patch, remove]) {
+        expect(row, contains('decks_private'));
+        expect(row, contains('D-27'));
+        expect(row, contains('deck_incremental_edit_db_live_test.dart'));
+      }
+      expect(patch, contains('deck_patch_field_unsupported'));
+      expect(remove, contains('unpublished_because_empty'));
+      for (final row in [create, replace, patch]) {
+        expect(row, contains('deck_publication_unavailable'));
+        expect(row, contains('deck_public_requires_cards'));
+      }
+      expect(create, contains('`is_public` defaults to `false`'));
+      expect(replace, contains('`deck_replace_all`, off in the beta'));
+      expect(rebuild, contains('defaults to `preview_only`'));
+    });
+
+    test('documents the deck revision, change ledger and undo', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final detail = _contractRowFor(contracts, 'GET /decks/:id');
+      final changes = _contractRowFor(contracts, 'GET /decks/:id/changes');
+      final undo = _contractRowFor(
+        contracts,
+        'POST /decks/:id/changes/:eventId/undo',
+      );
+      final delete = _contractRowFor(contracts, 'DELETE /decks/:id');
+
+      expect(detail, contains('`revision` (also sent as the `ETag` header'));
+      expect(detail, contains('Requires migrations 039, 040, 047 and 067'));
+      expect(changes, contains('`can_undo`'));
+      expect(changes, contains('only the card rows that changed'));
+      expect(undo, contains('409 `deck_undo_conflict`'));
+      expect(undo, contains('409 `deck_undo_invalid`'));
+      expect(undo, contains('never publishes'));
+      expect(delete, contains('409 `deck_revision_conflict`'));
+      expect(
+        contracts,
+        contains('## Deck Revision, Change Ledger and Undo — 2026-09-24'),
+      );
+      for (final phrase in const [
+        '409\n  `deck_revision_conflict`',
+        '428\n  `deck_revision_required`',
+        '`revision_warning: if_match_missing`',
+        '`replayed: true`',
+        '422 `idempotency_key_reused`',
+        '`authorization_error: stale_deck_revision`',
+        'MANALOOM_DECK_IF_MATCH_REQUIRED=1',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
     test('does not document a generic GET binder item route', () {
       expect(
         contracts,

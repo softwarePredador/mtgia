@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import 'optimize_functional_role_support.dart';
+import '../decks/deck_review_artifact.dart';
 import '../runtime_environment.dart';
 
 // ============================================================================
@@ -20,9 +21,12 @@ import '../runtime_environment.dart';
 
 const String kSwapIntegrityAlgo = 'sha256';
 const String kSwapIntegrityVersion = 'v1';
-const String kOptimizeApplyAuthorizationVersion = 'v2';
-const String kOptimizeApplyAuthorizationAlgo = 'hmac-sha256';
-const Duration kOptimizeApplyAuthorizationLifetime = Duration(hours: 24);
+// DCK-P0-02: a autorização de apply do Optimize é um DeckReviewArtifact v1
+// (`lib/decks/deck_review_artifact.dart`) do tipo `optimize_apply`.
+const String kOptimizeApplyAuthorizationVersion = deckReviewArtifactVersion;
+const String kOptimizeApplyAuthorizationAlgo = deckReviewArtifactAlgo;
+const Duration kOptimizeApplyAuthorizationLifetime = deckReviewArtifactLifetime;
+const String kOptimizeApplyArtifactKind = 'optimize_apply';
 
 class SwapIntegrity {
   final String version;
@@ -185,14 +189,6 @@ String resolveOptimizeApplySigningSecret({Map<String, String>? environment}) {
   return runtime['JWT_SECRET']?.trim() ?? '';
 }
 
-String _base64UrlNoPadding(List<int> bytes) =>
-    base64Url.encode(bytes).replaceAll('=', '');
-
-List<int> _decodeBase64UrlNoPadding(String value) {
-  final padding = '=' * ((4 - value.length % 4) % 4);
-  return base64Url.decode('$value$padding');
-}
-
 Map<String, int> _canonicalQuantityMap(
   Iterable<Map<String, dynamic>> detailed,
 ) {
@@ -233,14 +229,17 @@ List<Map<String, dynamic>> buildOptimizationCardDelta({
 
 Map<String, dynamic>? buildOptimizeApplyAuthorizationForResponse({
   required String signingSecret,
+  required String ownerId,
   required String deckId,
   required String deckSignature,
+  int? deckRevision,
   required Map<String, dynamic> responseBody,
   int? bracket,
   DateTime? issuedAt,
   Duration lifetime = kOptimizeApplyAuthorizationLifetime,
 }) {
   if (signingSecret.trim().isEmpty ||
+      ownerId.trim().isEmpty ||
       responseBody['can_apply'] == false ||
       responseBody['learning_eligible'] == false ||
       responseBody['quality_error'] is Map) {
@@ -281,27 +280,30 @@ Map<String, dynamic>? buildOptimizeApplyAuthorizationForResponse({
 
   final now = (issuedAt ?? DateTime.now().toUtc()).toUtc();
   final expiresAt = now.add(lifetime);
-  final payload = <String, dynamic>{
-    'version': kOptimizeApplyAuthorizationVersion,
-    'deck_id': deckId,
-    'deck_signature': deckSignature,
+  final changes = <String, Object?>{
+    'removals': _canonicalQuantityMap(removals),
+    'additions': _canonicalQuantityMap(additions),
+    if (authorizedSwaps != null) 'swaps': authorizedSwaps,
+  };
+  final constraints = <String, Object?>{
     'mode': mode,
     'bracket': resolvedBracket,
     if (functionalRolePolicy != null)
       'functional_role_policy': functionalRolePolicy,
-    'removals': _canonicalQuantityMap(removals),
-    'additions': _canonicalQuantityMap(additions),
-    if (authorizedSwaps != null) 'swaps': authorizedSwaps,
-    'issued_at': now.millisecondsSinceEpoch ~/ 1000,
-    'expires_at': expiresAt.millisecondsSinceEpoch ~/ 1000,
   };
-  final payloadSegment = _base64UrlNoPadding(utf8.encode(jsonEncode(payload)));
-  final signature =
-      Hmac(
-        sha256,
-        utf8.encode(signingSecret),
-      ).convert(utf8.encode(payloadSegment)).bytes;
-  final token = '$payloadSegment.${_base64UrlNoPadding(signature)}';
+  final token = issueDeckReviewArtifact(
+    signingSecret: signingSecret,
+    kind: kOptimizeApplyArtifactKind,
+    ownerId: ownerId,
+    deckId: deckId,
+    deckRevision: deckRevision,
+    deckSignature: deckSignature,
+    inputHash: canonicalDeckReviewHash(changes),
+    constraintsHash: canonicalDeckReviewHash(constraints),
+    body: {...constraints, ...changes},
+    issuedAt: now,
+    lifetime: lifetime,
+  );
   return {
     'version': kOptimizeApplyAuthorizationVersion,
     'algo': kOptimizeApplyAuthorizationAlgo,
@@ -423,8 +425,10 @@ bool _isSatisfiedFunctionalRolePolicy(
 }
 
 void attachOptimizeApplyAuthorizationToResponse({
+  required String ownerId,
   required String deckId,
   required String deckSignature,
+  int? deckRevision,
   required Map<String, dynamic> responseBody,
   int? bracket,
   Map<String, String>? environment,
@@ -437,14 +441,16 @@ void attachOptimizeApplyAuthorizationToResponse({
   final signingSecret = resolveOptimizeApplySigningSecret(
     environment: environment,
   );
-  if (signingSecret.isEmpty) {
+  if (signingSecret.isEmpty || ownerId.trim().isEmpty) {
     _markOptimizeApplySigningUnavailable(responseBody);
     return;
   }
   final authorization = buildOptimizeApplyAuthorizationForResponse(
     signingSecret: signingSecret,
+    ownerId: ownerId,
     deckId: deckId,
     deckSignature: deckSignature,
+    deckRevision: deckRevision,
     responseBody: responseBody,
     bracket: bracket,
     issuedAt: issuedAt,
@@ -501,81 +507,34 @@ class OptimizeApplyAuthorizationVerification {
 OptimizeApplyAuthorizationVerification verifyOptimizeApplyAuthorization({
   required String signingSecret,
   required String token,
+  required String ownerId,
   required String deckId,
   required String deckSignature,
+  int? deckRevision,
   required Iterable<Map<String, dynamic>> actualRemovals,
   required Iterable<Map<String, dynamic>> actualAdditions,
   int? expectedBracket,
   DateTime? now,
 }) {
-  if (signingSecret.trim().isEmpty) {
-    return const OptimizeApplyAuthorizationVerification(
+  final artifact = verifyDeckReviewArtifact(
+    signingSecret: signingSecret,
+    token: token,
+    expectedKind: kOptimizeApplyArtifactKind,
+    ownerId: ownerId,
+    deckId: deckId,
+    currentDeckRevision: deckRevision,
+    currentDeckSignature: deckSignature,
+    now: now,
+  );
+  if (!artifact.valid) {
+    return OptimizeApplyAuthorizationVerification(
       valid: false,
-      code: 'signing_secret_unavailable',
+      code: artifact.code,
+      payload: artifact.payload,
     );
   }
-  final parts = token.trim().split('.');
-  if (parts.length != 2 || parts.any((part) => part.isEmpty)) {
-    return const OptimizeApplyAuthorizationVerification(
-      valid: false,
-      code: 'malformed_token',
-    );
-  }
-
+  final payload = artifact.payload;
   try {
-    final expectedSignature =
-        Hmac(
-          sha256,
-          utf8.encode(signingSecret),
-        ).convert(utf8.encode(parts[0])).bytes;
-    final receivedSignature = _decodeBase64UrlNoPadding(parts[1]);
-    if (!_constantTimeBytesEqual(expectedSignature, receivedSignature)) {
-      return const OptimizeApplyAuthorizationVerification(
-        valid: false,
-        code: 'invalid_signature',
-      );
-    }
-
-    final decoded = jsonDecode(
-      utf8.decode(_decodeBase64UrlNoPadding(parts[0])),
-    );
-    if (decoded is! Map) {
-      return const OptimizeApplyAuthorizationVerification(
-        valid: false,
-        code: 'invalid_payload',
-      );
-    }
-    final payload = decoded.cast<String, dynamic>();
-    if (payload['version'] != kOptimizeApplyAuthorizationVersion) {
-      return OptimizeApplyAuthorizationVerification(
-        valid: false,
-        code: 'unsupported_version',
-        payload: payload,
-      );
-    }
-    if (payload['deck_id']?.toString() != deckId ||
-        payload['deck_signature']?.toString() != deckSignature) {
-      return OptimizeApplyAuthorizationVerification(
-        valid: false,
-        code: 'deck_binding_mismatch',
-        payload: payload,
-      );
-    }
-    final expiresAt = switch (payload['expires_at']) {
-      int value => value,
-      num value => value.toInt(),
-      String value => int.tryParse(value),
-      _ => null,
-    };
-    final currentEpoch =
-        (now ?? DateTime.now().toUtc()).toUtc().millisecondsSinceEpoch ~/ 1000;
-    if (expiresAt == null || expiresAt < currentEpoch) {
-      return OptimizeApplyAuthorizationVerification(
-        valid: false,
-        code: 'expired_token',
-        payload: payload,
-      );
-    }
     final tokenBracket = switch (payload['bracket']) {
       int value => value,
       num value => value.toInt(),
@@ -751,13 +710,4 @@ bool _isQuantitySubset(Map<String, int> actual, Map<String, int> allowed) {
     if (entry.value > (allowed[entry.key] ?? 0)) return false;
   }
   return true;
-}
-
-bool _constantTimeBytesEqual(List<int> a, List<int> b) {
-  if (a.length != b.length) return false;
-  var difference = 0;
-  for (var index = 0; index < a.length; index++) {
-    difference |= a[index] ^ b[index];
-  }
-  return difference == 0;
 }

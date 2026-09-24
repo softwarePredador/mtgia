@@ -84,9 +84,30 @@ void main() {
       );
       expect(
         marketplace,
-        contains(r'final where = whereClauses.join(' "' AND '" r');'),
+        contains(
+          r'final where = whereClauses.join('
+          "' AND '"
+          r');',
+        ),
         reason: 'a junção compartilhada é o que garante o parágrafo acima',
       );
+    });
+
+    test('"só seguidores" vale também na busca global (D-38)', () {
+      // findTradeMatches já respeitava trade_visibility; o marketplace
+      // mostrava a oferta de quem abriu as trocas só para seguidores a
+      // qualquer um. A prova em banco está em
+      // community_marketplace_trade_visibility_db_live_test.dart.
+      for (final trecho in const [
+        "u.trade_visibility = 'everyone'",
+        "u.trade_visibility = 'followers'",
+        'FROM user_follows f',
+        'f.follower_id = CAST(@viewerUserId AS uuid)',
+        'AND f.following_id = u.id',
+      ]) {
+        expect(marketplace, contains(trecho), reason: trecho);
+      }
+      expect(tradeMatches, contains("u.trade_visibility = 'followers'"));
     });
 
     test('observador anônimo não é tratado como bloqueado', () {
