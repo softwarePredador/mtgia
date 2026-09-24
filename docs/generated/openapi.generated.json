@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56",
+  "x-manaloom-source-digest-sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1838,6 +1838,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -1879,6 +1880,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -1910,6 +1912,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -1941,6 +1944,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -1980,6 +1984,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2021,6 +2026,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2060,6 +2066,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2101,6 +2108,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2150,6 +2158,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2191,6 +2200,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2222,6 +2232,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2253,6 +2264,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -2284,6 +2296,7 @@
           "app/test/features/community/screens/community_screen_responsive_test.dart",
           "server/test/community_engagement_contract_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
           "server/test/deck_pricing_export_community_contract_test.dart",
           "server/test/profile_community_live_test.dart"
         ],
@@ -3919,7 +3932,9 @@
           "app/integration_test/binder_marketplace_trade_runtime_test.dart",
           "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
-          "server/test/market_movers_test.dart"
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
+          "server/test/market_movers_test.dart",
+          "server/test/trade_marketplace_kill_switch_test.dart"
         ],
         "parameters": [
           {
@@ -3956,7 +3971,9 @@
           "app/integration_test/binder_marketplace_trade_runtime_test.dart",
           "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
           "server/test/community_marketplace_privacy_contract_test.dart",
-          "server/test/market_movers_test.dart"
+          "server/test/community_marketplace_trade_visibility_db_live_test.dart",
+          "server/test/market_movers_test.dart",
+          "server/test/trade_marketplace_kill_switch_test.dart"
         ],
         "security": [
           {

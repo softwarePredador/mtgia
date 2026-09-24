@@ -142,6 +142,79 @@ void main() {
       }
     });
 
+    test(
+      'site copy promises no card trading or selling, in Portuguese too',
+      () {
+        // SCOPE-P0-TRD-00 (D-39): o site é pt-BR. O teste acima só procura
+        // termos em inglês em três arquivos; este lê todo o src do site.
+        final sources =
+            Directory('../web-public/src')
+                .listSync(recursive: true)
+                .whereType<File>()
+                .where(
+                  (file) =>
+                      file.path.endsWith('.ts') ||
+                      file.path.endsWith('.tsx') ||
+                      file.path.endsWith('.md') ||
+                      file.path.endsWith('.mdx') ||
+                      file.path.endsWith('.json'),
+                )
+                .toList();
+        expect(sources, isNotEmpty);
+
+        final promises = <RegExp>[
+          RegExp(r'\btro(c|qu)[a-zà-ú]*', caseSensitive: false),
+          RegExp(
+            r'\bvend(a|as|er|e|em|endo|edor[a-z]*)\b',
+            caseSensitive: false,
+          ),
+          RegExp(
+            r'\bcompr(a|as|ar|e|em|ando|ador[a-z]*)\b',
+            caseSensitive: false,
+          ),
+          RegExp(r'\bmercado\b', caseSensitive: false),
+          RegExp(r'\bmarketplace\b', caseSensitive: false),
+          RegExp(r'\bnegoci[a-zà-ú]*', caseSensitive: false),
+        ];
+        for (final file in sources) {
+          final text = file.readAsStringSync();
+          for (final promise in promises) {
+            expect(
+              promise.firstMatch(text)?.group(0),
+              isNull,
+              reason:
+                  '${file.path} promete troca ou venda (${promise.pattern})',
+            );
+          }
+        }
+
+        // O filtro pega o que precisa pegar e deixa passar o que não é oferta.
+        for (final claim in const [
+          'Troque cartas com a comunidade',
+          'Venda sua coleção',
+          'Compre cartas',
+          'mercado de cartas',
+          'negocie com jogadores',
+        ]) {
+          expect(
+            promises.any((promise) => promise.hasMatch(claim)),
+            isTrue,
+            reason: claim,
+          );
+        }
+        for (final neutral in const [
+          'Use o catálogo para compreender suas listas.',
+          'não é afiliado, endossado ou patrocinado',
+        ]) {
+          expect(
+            promises.any((promise) => promise.hasMatch(neutral)),
+            isFalse,
+            reason: neutral,
+          );
+        }
+      },
+    );
+
     test('public route and data boundary is report-only', () {
       final routes = File('../web-public/src/lib/routes.ts').readAsStringSync();
       final publicServer =

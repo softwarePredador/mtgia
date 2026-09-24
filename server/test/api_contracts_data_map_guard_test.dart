@@ -35,6 +35,31 @@ void main() {
       }
     });
 
+    test('documents the beta kill switch of trade and sale offers', () {
+      // SCOPE-P0-TRD-00 (D-39 e D-38).
+      final create = _contractRowFor(contracts, 'POST /binder');
+      final update = _contractRowFor(contracts, 'PUT /binder/:id');
+      final marketplace = _contractRowFor(
+        contracts,
+        'GET /community/marketplace?page=&limit=&search=&condition='
+        '&for_trade=&for_sale=&set_code=&rarity=',
+      );
+
+      for (final row in [create, update]) {
+        expect(row, contains('422'));
+        expect(row, contains('binder_commerce_unavailable'));
+        expect(row, contains('trade_marketplace_kill_switch_test.dart'));
+      }
+      expect(create, contains('`for_trade: true` requires the `trades`'));
+      expect(create, contains('requires `marketplace`'));
+      expect(marketplace, contains('`trade_visibility`'));
+      expect(marketplace, contains('D-38'));
+      expect(
+        marketplace,
+        contains('community_marketplace_trade_visibility_db_live_test.dart'),
+      );
+    });
+
     test('does not document a generic GET binder item route', () {
       expect(
         contracts,

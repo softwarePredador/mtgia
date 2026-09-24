@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56",
+  "source_digest_sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 700,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5290,
+    "dart_symbols": 5293,
     "semantic_resolved_files": 700,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43077,
-    "semantic_resolved_call_sites": 68531,
-    "semantic_resolved_type_references": 16296,
+    "semantic_resolved_call_edges": 43082,
+    "semantic_resolved_call_sites": 68542,
+    "semantic_resolved_type_references": 16305,
     "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 60,
     "scripts_and_jobs": 693,
     "environment_variables": 716,
-    "tests": 1256,
+    "tests": 1258,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1072,7 +1072,7 @@
         "server/lib/binder_item_contract.dart"
       ],
       "file_count": 1,
-      "symbol_count": 9,
+      "symbol_count": 12,
       "providers": [],
       "services": []
     },
@@ -32743,6 +32743,15 @@
       "line": 53
     },
     {
+      "name": "BinderCommerceUnavailableException",
+      "kind": "class",
+      "source": "server/lib/binder_item_contract.dart",
+      "line": 134,
+      "members": [
+        "toString"
+      ]
+    },
+    {
       "name": "BinderItemInputException",
       "kind": "class",
       "source": "server/lib/binder_item_contract.dart",
@@ -32752,52 +32761,64 @@
       ]
     },
     {
+      "name": "binderCommerceUnavailableBody",
+      "kind": "function",
+      "source": "server/lib/binder_item_contract.dart",
+      "line": 178
+    },
+    {
+      "name": "ensureBinderCommerceAllowed",
+      "kind": "function",
+      "source": "server/lib/binder_item_contract.dart",
+      "line": 150
+    },
+    {
       "name": "readBinderBoolean",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 103
+      "line": 101
     },
     {
       "name": "readBinderCardId",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 22
+      "line": 20
     },
     {
       "name": "readBinderCondition",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 49
+      "line": 47
     },
     {
       "name": "readBinderLanguage",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 67
+      "line": 65
     },
     {
       "name": "readBinderListType",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 85
+      "line": 83
     },
     {
       "name": "readBinderNotes",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 126
+      "line": 188
     },
     {
       "name": "readBinderPrice",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 114
+      "line": 112
     },
     {
       "name": "readBinderQuantity",
       "kind": "function",
       "source": "server/lib/binder_item_contract.dart",
-      "line": 32
+      "line": 30
     },
     {
       "name": "CardIdentityBackfillPayload",
@@ -34485,13 +34506,13 @@
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 832
+      "line": 452
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 452
+      "line": 832
     },
     {
       "name": "AiJobSchemaReadiness",
@@ -37872,19 +37893,19 @@
       "name": "overrideVerifiedEmailRequirementForTesting",
       "kind": "function",
       "source": "server/lib/verified_email_middleware.dart",
-      "line": 11
+      "line": 16
     },
     {
       "name": "verifiedEmailForMutations",
       "kind": "function",
       "source": "server/lib/verified_email_middleware.dart",
-      "line": 18
+      "line": 23
     },
     {
       "name": "verifiedEmailRequiredResponse",
       "kind": "function",
       "source": "server/lib/verified_email_middleware.dart",
-      "line": 41
+      "line": 46
     },
     {
       "name": "_header",
@@ -39258,55 +39279,55 @@
       "name": "_binderCommitmentConflict",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 788
+      "line": 803
     },
     {
       "name": "_deleteBinderItem",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 721
+      "line": 736
     },
     {
       "name": "_getAvailability",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 22
+      "line": 23
     },
     {
       "name": "_getStats",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 122
+      "line": 123
     },
     {
       "name": "_mapDistributions",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 509
+      "line": 510
     },
     {
       "name": "_toInt",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 496
+      "line": 497
     },
     {
       "name": "_toNullableDouble",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 502
+      "line": 503
     },
     {
       "name": "_updateBinderItem",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 530
+      "line": 531
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/binder/[id]/index.dart",
-      "line": 8
+      "line": 9
     },
     {
       "name": "middleware",
@@ -39372,37 +39393,37 @@
       "name": "_addToBinder",
       "kind": "function",
       "source": "server/routes/binder/index.dart",
-      "line": 304
+      "line": 305
     },
     {
       "name": "_listBinder",
       "kind": "function",
       "source": "server/routes/binder/index.dart",
-      "line": 18
+      "line": 19
     },
     {
       "name": "_normalizeDirection",
       "kind": "function",
       "source": "server/routes/binder/index.dart",
-      "line": 284
+      "line": 285
     },
     {
       "name": "_normalizeSort",
       "kind": "function",
       "source": "server/routes/binder/index.dart",
-      "line": 268
+      "line": 269
     },
     {
       "name": "_orderBySql",
       "kind": "function",
       "source": "server/routes/binder/index.dart",
-      "line": 289
+      "line": 290
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/binder/index.dart",
-      "line": 9
+      "line": 10
     },
     {
       "name": "capabilityPolicyResponse",
@@ -39606,43 +39627,43 @@
       "name": "_buildPriceInsight",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 318
+      "line": 334
     },
     {
       "name": "_buildTrustInsight",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 413
+      "line": 429
     },
     {
       "name": "_dateString",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 464
+      "line": 480
     },
     {
       "name": "_dateTimeString",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 471
+      "line": 487
     },
     {
       "name": "_round2",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 462
+      "line": 478
     },
     {
       "name": "_toDouble",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 449
+      "line": 465
     },
     {
       "name": "_toInt",
       "kind": "function",
       "source": "server/routes/community/marketplace/index.dart",
-      "line": 455
+      "line": 471
     },
     {
       "name": "onRequest",
@@ -41752,11 +41773,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43077,
-    "resolved_call_site_count": 68531,
-    "workspace_call_edge_count": 13483,
-    "unresolved_call_edge_count": 558,
-    "unresolved_call_site_count": 769,
+    "resolved_call_edge_count": 43082,
+    "resolved_call_site_count": 68542,
+    "workspace_call_edge_count": 13488,
+    "unresolved_call_edge_count": 559,
+    "unresolved_call_site_count": 772,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -156007,7 +156028,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 106,
+        "line": 104,
         "caller": "readBinderBoolean",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156018,7 +156039,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 118,
+        "line": 116,
         "caller": "readBinderPrice",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156029,7 +156050,18 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 129,
+        "line": 159,
+        "caller": "ensureBinderCommerceAllowed",
+        "kind": "constructor",
+        "lexical_target": "BinderCommerceUnavailableException",
+        "target": "BinderCommerceUnavailableException.BinderCommerceUnavailableException",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/binder_item_contract.dart",
+        "line": 191,
         "caller": "readBinderNotes",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156040,7 +156072,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 24,
+        "line": 22,
         "caller": "readBinderCardId",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156051,7 +156083,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 41,
+        "line": 39,
         "caller": "readBinderQuantity",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156062,7 +156094,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 52,
+        "line": 50,
         "caller": "readBinderCondition",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156073,7 +156105,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 70,
+        "line": 68,
         "caller": "readBinderLanguage",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -156084,7 +156116,7 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 88,
+        "line": 86,
         "caller": "readBinderListType",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -169317,7 +169349,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 35,
+        "line": 40,
         "caller": "verifiedEmailForMutations",
         "kind": "method",
         "lexical_target": "verifiedEmailRequiredResponse",
@@ -169328,7 +169360,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 47,
+        "line": 52,
         "caller": "verifiedEmailRequiredResponse",
         "kind": "method",
         "lexical_target": "isVerifiedEmailRequired",
@@ -169339,7 +169371,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 61,
+        "line": 66,
         "caller": "verifiedEmailRequiredResponse",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -169350,7 +169382,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 61,
+        "line": 66,
         "caller": "verifiedEmailRequiredResponse",
         "kind": "method",
         "lexical_target": "getUserFromToken",
@@ -180064,7 +180096,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 108,
+        "line": 109,
         "caller": "_getAvailability",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -180075,7 +180107,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 13,
+        "line": 14,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_getStats",
@@ -180086,7 +180118,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 14,
+        "line": 15,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_getAvailability",
@@ -180097,7 +180129,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 17,
+        "line": 18,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_updateBinderItem",
@@ -180108,7 +180140,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 18,
+        "line": 19,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_deleteBinderItem",
@@ -180119,7 +180151,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 35,
+        "line": 36,
         "caller": "_getAvailability",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -180130,7 +180162,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 374,
+        "line": 375,
         "caller": "_getStats",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -180141,7 +180173,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 377,
+        "line": 378,
         "caller": "_getStats",
         "kind": "method",
         "lexical_target": "_mapDistributions",
@@ -180152,7 +180184,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 383,
+        "line": 384,
         "caller": "_getStats",
         "kind": "method",
         "lexical_target": "_toNullableDouble",
@@ -180163,7 +180195,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 42,
+        "line": 43,
         "caller": "_getAvailability",
         "kind": "method",
         "lexical_target": "readBinderCardId",
@@ -180174,7 +180206,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 481,
+        "line": 482,
         "caller": "_getStats",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -180185,7 +180217,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 488,
+        "line": 489,
         "caller": "_getStats",
         "kind": "method",
         "lexical_target": "e",
@@ -180196,7 +180228,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 523,
+        "line": 524,
         "caller": "_mapDistributions",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -180207,7 +180239,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 538,
+        "line": 539,
         "caller": "_updateBinderItem",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -180218,7 +180250,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 550,
+        "line": 551,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderCardId",
@@ -180229,7 +180261,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 556,
+        "line": 557,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderQuantity",
@@ -180240,7 +180272,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 562,
+        "line": 563,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderCondition",
@@ -180251,7 +180283,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 569,
+        "line": 570,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderBoolean",
@@ -180262,7 +180294,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 584,
+        "line": 585,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderPrice",
@@ -180273,7 +180305,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 589,
+        "line": 590,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderNotes",
@@ -180284,7 +180316,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 594,
+        "line": 595,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderLanguage",
@@ -180295,7 +180327,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 598,
+        "line": 599,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "readBinderListType",
@@ -180306,7 +180338,18 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 648,
+        "line": 606,
+        "caller": "_updateBinderItem",
+        "kind": "method",
+        "lexical_target": "ensureBinderCommerceAllowed",
+        "target": "ensureBinderCommerceAllowed",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/[id]/index.dart",
+        "line": 658,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -180317,7 +180360,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 662,
+        "line": 672,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "_binderCommitmentConflict",
@@ -180328,7 +180371,18 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 694,
+        "line": 697,
+        "caller": "_updateBinderItem",
+        "kind": "method",
+        "lexical_target": "binderCommerceUnavailableBody",
+        "target": "binderCommerceUnavailableBody",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/[id]/index.dart",
+        "line": 709,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -180339,34 +180393,12 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 713,
+        "line": 728,
         "caller": "_updateBinderItem",
         "kind": "method",
         "lexical_target": "e",
         "target": "Log.e",
         "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/binder/[id]/index.dart",
-        "line": 758,
-        "caller": "_deleteBinderItem",
-        "kind": "method",
-        "lexical_target": "_toInt",
-        "target": "_toInt",
-        "target_library": "workspace:server/routes/binder/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/binder/[id]/index.dart",
-        "line": 760,
-        "caller": "_deleteBinderItem",
-        "kind": "method",
-        "lexical_target": "_binderCommitmentConflict",
-        "target": "_binderCommitmentConflict",
-        "target_library": "workspace:server/routes/binder/[id]/index.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -180375,6 +180407,28 @@
         "line": 773,
         "caller": "_deleteBinderItem",
         "kind": "method",
+        "lexical_target": "_toInt",
+        "target": "_toInt",
+        "target_library": "workspace:server/routes/binder/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/[id]/index.dart",
+        "line": 775,
+        "caller": "_deleteBinderItem",
+        "kind": "method",
+        "lexical_target": "_binderCommitmentConflict",
+        "target": "_binderCommitmentConflict",
+        "target_library": "workspace:server/routes/binder/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/[id]/index.dart",
+        "line": 788,
+        "caller": "_deleteBinderItem",
+        "kind": "method",
         "lexical_target": "captureRouteException",
         "target": "captureRouteException",
         "target_library": "package:server/observability.dart",
@@ -180383,7 +180437,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 780,
+        "line": 795,
         "caller": "_deleteBinderItem",
         "kind": "method",
         "lexical_target": "e",
@@ -180394,7 +180448,7 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 90,
+        "line": 91,
         "caller": "_getAvailability",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -180625,7 +180679,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 13,
+        "line": 14,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_listBinder",
@@ -180636,7 +180690,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 14,
+        "line": 15,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_addToBinder",
@@ -180647,7 +180701,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 183,
+        "line": 184,
         "caller": "_listBinder",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -180658,7 +180712,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 253,
+        "line": 254,
         "caller": "_listBinder",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -180669,7 +180723,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 260,
+        "line": 261,
         "caller": "_listBinder",
         "kind": "method",
         "lexical_target": "e",
@@ -180680,7 +180734,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 312,
+        "line": 313,
         "caller": "_addToBinder",
         "kind": "constructor",
         "lexical_target": "BinderItemInputException",
@@ -180691,7 +180745,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 318,
+        "line": 319,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "readBinderCardId",
@@ -180702,29 +180756,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 332,
-        "caller": "_addToBinder",
-        "kind": "method",
-        "lexical_target": "readBinderQuantity",
-        "target": "readBinderQuantity",
-        "target_library": "package:server/binder_item_contract.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/binder/index.dart",
-        "line": 333,
-        "caller": "_addToBinder",
-        "kind": "method",
-        "lexical_target": "readBinderCondition",
-        "target": "readBinderCondition",
-        "target_library": "package:server/binder_item_contract.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/binder/index.dart",
-        "line": 334,
+        "line": 320,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "readBinderBoolean",
@@ -180735,7 +180767,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 337,
+        "line": 322,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "readBinderPrice",
@@ -180746,7 +180778,40 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 338,
+        "line": 325,
+        "caller": "_addToBinder",
+        "kind": "method",
+        "lexical_target": "ensureBinderCommerceAllowed",
+        "target": "ensureBinderCommerceAllowed",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/index.dart",
+        "line": 344,
+        "caller": "_addToBinder",
+        "kind": "method",
+        "lexical_target": "readBinderQuantity",
+        "target": "readBinderQuantity",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/index.dart",
+        "line": 345,
+        "caller": "_addToBinder",
+        "kind": "method",
+        "lexical_target": "readBinderCondition",
+        "target": "readBinderCondition",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/index.dart",
+        "line": 347,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "readBinderNotes",
@@ -180757,7 +180822,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 339,
+        "line": 348,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "readBinderLanguage",
@@ -180768,7 +180833,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 340,
+        "line": 349,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "readBinderListType",
@@ -180779,7 +180844,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 39,
+        "line": 40,
         "caller": "_listBinder",
         "kind": "method",
         "lexical_target": "_normalizeSort",
@@ -180790,7 +180855,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 40,
+        "line": 41,
         "caller": "_listBinder",
         "kind": "method",
         "lexical_target": "_normalizeDirection",
@@ -180801,7 +180866,18 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 424,
+        "line": 435,
+        "caller": "_addToBinder",
+        "kind": "method",
+        "lexical_target": "binderCommerceUnavailableBody",
+        "target": "binderCommerceUnavailableBody",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/index.dart",
+        "line": 438,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -180812,7 +180888,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 431,
+        "line": 445,
         "caller": "_addToBinder",
         "kind": "method",
         "lexical_target": "e",
@@ -180823,7 +180899,7 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 91,
+        "line": 92,
         "caller": "_listBinder",
         "kind": "method",
         "lexical_target": "_orderBySql",
@@ -181846,7 +181922,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 245,
+        "line": 261,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -181857,7 +181933,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 283,
+        "line": 299,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_dateTimeString",
@@ -181868,7 +181944,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 285,
+        "line": 301,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_buildPriceInsight",
@@ -181879,7 +181955,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 294,
+        "line": 310,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_buildTrustInsight",
@@ -181890,7 +181966,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 303,
+        "line": 319,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -181901,7 +181977,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 310,
+        "line": 326,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "e",
@@ -181912,7 +181988,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 319,
+        "line": 335,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_toDouble",
@@ -181923,7 +181999,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 322,
+        "line": 338,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -181934,7 +182010,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 332,
+        "line": 348,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_dateString",
@@ -181945,7 +182021,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 352,
+        "line": 368,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_round2",
@@ -181956,7 +182032,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 404,
+        "line": 420,
         "caller": "_buildPriceInsight",
         "kind": "method",
         "lexical_target": "_dateTimeString",
@@ -181967,7 +182043,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 417,
+        "line": 433,
         "caller": "_buildTrustInsight",
         "kind": "method",
         "lexical_target": "_toInt",
@@ -181978,7 +182054,7 @@
       },
       {
         "source": "server/routes/community/marketplace/index.dart",
-        "line": 441,
+        "line": 457,
         "caller": "_buildTrustInsight",
         "kind": "method",
         "lexical_target": "_toDouble",
@@ -190210,7 +190286,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 488,
-        "occurrences": 951
+        "occurrences": 955
       },
       {
         "target_scope": "dependency",
@@ -193845,8 +193921,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/binder_item_contract.dart",
-        "unique_references": 34,
-        "occurrences": 42
+        "unique_references": 39,
+        "occurrences": 49
       },
       {
         "target_scope": "workspace",
@@ -199247,6 +199323,14 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/binder_item_contract.dart",
+        "line": 158,
+        "caller": "ensureBinderCommerceAllowed",
+        "kind": "function_expression",
+        "lexical_target": "isAllowed",
+        "occurrences": 3
+      },
+      {
         "source": "server/lib/catalog_search_rate_limit.dart",
         "line": 103,
         "caller": "catalogTextSearchRateLimitDecision",
@@ -199624,7 +199708,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 30,
+        "line": 35,
         "caller": "verifiedEmailForMutations",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -199632,7 +199716,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 32,
+        "line": 37,
         "caller": "verifiedEmailForMutations",
         "kind": "function_expression",
         "lexical_target": "appliesTo",
@@ -199767,9 +199851,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16296,
-    "workspace_type_reference_count": 3442,
-    "unresolved_type_reference_count": 355,
+    "resolved_type_reference_count": 16305,
+    "workspace_type_reference_count": 3447,
+    "unresolved_type_reference_count": 356,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -228974,7 +229058,17 @@
       },
       {
         "source": "server/lib/binder_item_contract.dart",
-        "line": 24,
+        "line": 159,
+        "lexical_type": "BinderCommerceUnavailableException",
+        "resolved_type": "BinderCommerceUnavailableException",
+        "target": "BinderCommerceUnavailableException",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/binder_item_contract.dart",
+        "line": 22,
         "lexical_type": "BinderItemInputException",
         "resolved_type": "BinderItemInputException",
         "target": "BinderItemInputException",
@@ -231294,7 +231388,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 61,
+        "line": 66,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -232834,13 +232928,33 @@
       },
       {
         "source": "server/routes/binder/[id]/index.dart",
-        "line": 35,
+        "line": 36,
         "lexical_type": "BinderItemInputException",
         "resolved_type": "BinderItemInputException",
         "target": "BinderItemInputException",
         "target_library": "package:server/binder_item_contract.dart",
         "target_scope": "workspace",
         "occurrences": 5
+      },
+      {
+        "source": "server/routes/binder/[id]/index.dart",
+        "line": 610,
+        "lexical_type": "ReleaseCapabilityPolicy",
+        "resolved_type": "ReleaseCapabilityPolicy",
+        "target": "ReleaseCapabilityPolicy",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/[id]/index.dart",
+        "line": 694,
+        "lexical_type": "BinderCommerceUnavailableException",
+        "resolved_type": "BinderCommerceUnavailableException",
+        "target": "BinderCommerceUnavailableException",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/routes/binder/import/apply/index.dart",
@@ -232874,13 +232988,33 @@
       },
       {
         "source": "server/routes/binder/index.dart",
-        "line": 312,
+        "line": 313,
         "lexical_type": "BinderItemInputException",
         "resolved_type": "BinderItemInputException",
         "target": "BinderItemInputException",
         "target_library": "package:server/binder_item_contract.dart",
         "target_scope": "workspace",
         "occurrences": 2
+      },
+      {
+        "source": "server/routes/binder/index.dart",
+        "line": 329,
+        "lexical_type": "ReleaseCapabilityPolicy",
+        "resolved_type": "ReleaseCapabilityPolicy",
+        "target": "ReleaseCapabilityPolicy",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/binder/index.dart",
+        "line": 432,
+        "lexical_type": "BinderCommerceUnavailableException",
+        "resolved_type": "BinderCommerceUnavailableException",
+        "target": "BinderCommerceUnavailableException",
+        "target_library": "package:server/binder_item_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/routes/capabilities/index.dart",
@@ -234221,8 +234355,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6285,
-        "occurrences": 39879
+        "unique_references": 6289,
+        "occurrences": 39894
       },
       {
         "target_scope": "dart_sdk",
@@ -234306,7 +234440,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 275,
-        "occurrences": 1102
+        "occurrences": 1104
       },
       {
         "target_scope": "dependency",
@@ -237551,8 +237685,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/binder_item_contract.dart",
-        "unique_references": 4,
-        "occurrences": 19
+        "unique_references": 7,
+        "occurrences": 25
       },
       {
         "target_scope": "workspace",
@@ -237941,8 +238075,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/release_capability_policy.dart",
-        "unique_references": 10,
-        "occurrences": 28
+        "unique_references": 12,
+        "occurrences": 30
       },
       {
         "target_scope": "workspace",
@@ -240077,6 +240211,12 @@
         "occurrences": 6
       },
       {
+        "source": "server/lib/binder_item_contract.dart",
+        "line": 152,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/catalog_search_rate_limit.dart",
         "line": 38,
         "lexical_type": "void",
@@ -240252,7 +240392,7 @@
       },
       {
         "source": "server/lib/verified_email_middleware.dart",
-        "line": 14,
+        "line": 19,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -252553,6 +252693,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252575,6 +252716,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252597,6 +252739,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252620,6 +252763,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252643,6 +252787,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252665,6 +252810,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252687,6 +252833,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252709,6 +252856,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252731,6 +252879,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252753,6 +252902,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -252775,6 +252925,7 @@
         "app/test/features/community/screens/community_screen_responsive_test.dart",
         "server/test/community_engagement_contract_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
         "server/test/deck_pricing_export_community_contract_test.dart",
         "server/test/profile_community_live_test.dart"
       ],
@@ -253526,7 +253677,9 @@
         "app/integration_test/binder_marketplace_trade_runtime_test.dart",
         "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
-        "server/test/market_movers_test.dart"
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
+        "server/test/market_movers_test.dart",
+        "server/test/trade_marketplace_kill_switch_test.dart"
       ],
       "method_contract": "source"
     },
@@ -253543,7 +253696,9 @@
         "app/integration_test/binder_marketplace_trade_runtime_test.dart",
         "app/test/features/binder/screens/marketplace_screen_overflow_test.dart",
         "server/test/community_marketplace_privacy_contract_test.dart",
-        "server/test/market_movers_test.dart"
+        "server/test/community_marketplace_trade_visibility_db_live_test.dart",
+        "server/test/market_movers_test.dart",
+        "server/test/trade_marketplace_kill_switch_test.dart"
       ],
       "method_contract": "source"
     },
@@ -274846,6 +275001,7 @@
     "server/test/commercial_quality_gate_contract_test.dart",
     "server/test/community_engagement_contract_test.dart",
     "server/test/community_marketplace_privacy_contract_test.dart",
+    "server/test/community_marketplace_trade_visibility_db_live_test.dart",
     "server/test/container_supply_chain_contract_test.dart",
     "server/test/core_flow_smoke_test.dart",
     "server/test/cors_policy_test.dart",
@@ -275129,6 +275285,7 @@
     "server/test/test_sync_cards_full_fast.py",
     "server/test/theme_contextual_rules_service_test.dart",
     "server/test/trade_counterproposal_contract_test.dart",
+    "server/test/trade_marketplace_kill_switch_test.dart",
     "server/test/unsupported_deck_sections_route_contract_test.dart",
     "server/test/user_data_privacy_contract_test.dart",
     "server/test/user_facing_brand_contract_test.dart",
@@ -276420,7 +276577,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "8a73ebe6a8d3a0cfb4e6e4c7ce86dc01dbd3d60d0957ef3503d8f4960de06f9b"
+      "sha256": "44d09cab876e90301225d20ceaaf1853e49b4329b43c50c766f314b4160b4f2a"
     },
     "required_task_fields": [
       "id",
@@ -278644,12 +278801,12 @@
       {
         "id": "SCOPE-P0-TRD-00",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IN_PROGRESS_CONTAINED",
         "delivery": "Kill switch explícito de marketplace/trades e remoção de promessas da beta.",
         "depends_on": [
           "BT-SCP-001"
         ],
-        "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`.",
+        "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `POST /binder` e `PUT /binder/:id` recusam com 422 `binder_commerce_unavailable` (campo e capability no corpo), antes do banco, a cópia oferecida para troca sem `trades` ou para venda, ou com preço, sem `marketplace` (`server/lib/binder_item_contract.dart`); `false` e `null`, que o app manda quando não oferece, continuam valendo. D-38: `GET /community/marketplace` respeita `trade_visibility` (seguidores, ninguém e anônimo) no WHERE da contagem e da listagem. A resposta de e-mail não verificado deixou de prometer \"publicar, conversar ou negociar\". Evidência: `server/test/trade_marketplace_kill_switch_test.dart` (na matriz da beta, 8 rotas de proposta, match e marketplace dão 404 antes do handler; o fichário dá 422 sem tocar o banco e grava com as capabilities abertas), `server/test/community_marketplace_trade_visibility_db_live_test.dart` (PostgreSQL descartável), o mapa de `release_capability_policy_test.dart` com match e fichário, os termos em português no teste do site (`public_web_product_contract_test.dart`) e 13 mutações derrubadas. Falta: a parte do app (esconder troca e venda no fichário, D-04), o pack 05 (D-40, com a sessão do gate) e o receipt de negação por rota no SHA integrado.",
         "section": "Contenção que bloqueia a beta core",
         "source_line": 617
       },
@@ -286302,7 +286459,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56"
+    "project_logic_source_digest_sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -289211,6 +289368,7 @@
       "server/test/commercial_quality_gate_contract_test.dart",
       "server/test/community_engagement_contract_test.dart",
       "server/test/community_marketplace_privacy_contract_test.dart",
+      "server/test/community_marketplace_trade_visibility_db_live_test.dart",
       "server/test/container_supply_chain_contract_test.dart",
       "server/test/core_flow_smoke_test.dart",
       "server/test/cors_policy_test.dart",
@@ -289494,6 +289652,7 @@
       "server/test/test_sync_cards_full_fast.py",
       "server/test/theme_contextual_rules_service_test.dart",
       "server/test/trade_counterproposal_contract_test.dart",
+      "server/test/trade_marketplace_kill_switch_test.dart",
       "server/test/unsupported_deck_sections_route_contract_test.dart",
       "server/test/user_data_privacy_contract_test.dart",
       "server/test/user_facing_brand_contract_test.dart",

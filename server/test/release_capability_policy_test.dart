@@ -217,6 +217,10 @@ void main() {
         'POST /users/me/fcm-token': 'social_push',
         'GET /community/binders/user': 'binder_public',
         'POST /trades': 'trades',
+        // SCOPE-P0-TRD-00: match e listagem também têm dono fixado.
+        'GET /community/trade-matches': 'trades',
+        'POST /binder': 'collection_private',
+        'PUT /binder/item': 'collection_private',
         'GET /community/marketplace': 'marketplace',
         'POST /users/me/plan/checkout': 'billing_checkout',
         'GET /ai/commander-learning': 'learning_reads',

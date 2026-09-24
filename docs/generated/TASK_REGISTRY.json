@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "8a73ebe6a8d3a0cfb4e6e4c7ce86dc01dbd3d60d0957ef3503d8f4960de06f9b"
+    "sha256": "44d09cab876e90301225d20ceaaf1853e49b4329b43c50c766f314b4160b4f2a"
   },
   "required_task_fields": [
     "id",
@@ -2226,12 +2226,12 @@
     {
       "id": "SCOPE-P0-TRD-00",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Kill switch explícito de marketplace/trades e remoção de promessas da beta.",
       "depends_on": [
         "BT-SCP-001"
       ],
-      "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`.",
+      "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `POST /binder` e `PUT /binder/:id` recusam com 422 `binder_commerce_unavailable` (campo e capability no corpo), antes do banco, a cópia oferecida para troca sem `trades` ou para venda, ou com preço, sem `marketplace` (`server/lib/binder_item_contract.dart`); `false` e `null`, que o app manda quando não oferece, continuam valendo. D-38: `GET /community/marketplace` respeita `trade_visibility` (seguidores, ninguém e anônimo) no WHERE da contagem e da listagem. A resposta de e-mail não verificado deixou de prometer \"publicar, conversar ou negociar\". Evidência: `server/test/trade_marketplace_kill_switch_test.dart` (na matriz da beta, 8 rotas de proposta, match e marketplace dão 404 antes do handler; o fichário dá 422 sem tocar o banco e grava com as capabilities abertas), `server/test/community_marketplace_trade_visibility_db_live_test.dart` (PostgreSQL descartável), o mapa de `release_capability_policy_test.dart` com match e fichário, os termos em português no teste do site (`public_web_product_contract_test.dart`) e 13 mutações derrubadas. Falta: a parte do app (esconder troca e venda no fichário, D-04), o pack 05 (D-40, com a sessão do gate) e o receipt de negação por rota no SHA integrado.",
       "section": "Contenção que bloqueia a beta core",
       "source_line": 617
     },
@@ -9884,5 +9884,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56"
+  "project_logic_source_digest_sha256": "b7a575a4c3487c636233419545fae55097fc2d1c7ae5c650d2a465a748158691"
 }
