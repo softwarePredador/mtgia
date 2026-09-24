@@ -160,12 +160,18 @@ async function launchChrome(chromePath) {
 
   return {
     endpoint: `ws://127.0.0.1:${port.trim()}${path.trim()}`,
+    // Waits for Chrome to exit (after Browser.close) before removing its
+    // profile; a helper still writing there would leave the folder behind.
     async close() {
-      child.kill("SIGTERM");
-      await new Promise((settle) => {
-        if (child.exitCode !== null) settle();
-        else child.once("exit", settle);
-      });
+      if (child.exitCode === null) {
+        await new Promise((settle) => {
+          const timer = setTimeout(() => child.kill("SIGTERM"), 5_000);
+          child.once("exit", () => {
+            clearTimeout(timer);
+            settle();
+          });
+        });
+      }
       try {
         rmSync(profileDir, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 });
       } catch (error) {
@@ -419,6 +425,10 @@ async function main() {
       }
     }
   } finally {
+    await Promise.race([
+      connection.send("Browser.close").catch(() => undefined),
+      new Promise((settle) => setTimeout(settle, 2_000))
+    ]);
     connection.close();
     await chrome.close();
   }
