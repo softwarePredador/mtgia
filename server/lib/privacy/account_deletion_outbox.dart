@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import 'package:postgres/postgres.dart';
 
+import '../battle/interactive_battle_contract.dart'
+    show interactiveBattleMaximumTtlSeconds;
+
 /// D-68 (BT-PRIV-002): o outbox da exclusão avisa os lugares fora do
 /// PostgreSQL que guardam dado da conta excluída, com recibo por consumidor,
 /// lease e nova tentativa.
@@ -63,6 +66,19 @@ class AccountDeletionOutboxConsumer {
 /// (`sweepInterval`). Os 5 min cobrem essa varredura.
 const endpointCacheOutboxDelay = Duration(hours: 24, minutes: 5);
 
+/// Quanto o sidecar de Jogar contra IA guarda uma sessão terminal na memória
+/// (`TERMINAL_RETENTION_MS` em `InteractiveBattleRegistry.java`).
+const interactiveBattleSidecarTerminalRetentionSeconds = 10 * 60;
+
+/// D-77: o sidecar é dado como limpo depois do tempo máximo da sessão
+/// ([interactiveBattleMaximumTtlSeconds], 7200 s) mais a retenção terminal
+/// (10 min), contados da exclusão. Não há rota de confirmação.
+const interactiveBattleSidecarOutboxDelay = Duration(
+  seconds:
+      interactiveBattleMaximumTtlSeconds +
+      interactiveBattleSidecarTerminalRetentionSeconds,
+);
+
 /// A lista fechada da D-68, na ordem do CHECK da migration 060.
 const accountDeletionOutboxConsumers = <AccountDeletionOutboxConsumer>[
   // Falta o consumidor: um job na imagem de ops que abra o knowledge.db
@@ -75,15 +91,13 @@ const accountDeletionOutboxConsumers = <AccountDeletionOutboxConsumer>[
     code: 'blocked_hermes_purge_not_implemented',
     carriesDeckTokens: true,
   ),
-  // Falta a confirmação: a sessão vive até 7200 s, mais 10 s de concessão e
-  // 10 min de retenção terminal, e só sai da memória na varredura que roda a
-  // cada chamada ao sidecar. O job de ops não tem rota nem credencial para o
-  // sidecar, e o Battle está desligado em produção (D-57).
+  // D-77: fecha pelo tempo, como o endpoint_cache. Sem rota de confirmação,
+  // os tokens de deck não teriam uso e não vão para esta linha.
   AccountDeletionOutboxConsumer(
     name: 'interactive_battle_sidecar',
-    handling: AccountDeletionOutboxHandling.blocked,
-    code: 'blocked_sidecar_expiry_not_confirmable',
-    carriesDeckTokens: true,
+    handling: AccountDeletionOutboxHandling.expiresByTtl,
+    code: 'expired_by_max_session_lifetime',
+    firstAttemptDelay: interactiveBattleSidecarOutboxDelay,
   ),
   AccountDeletionOutboxConsumer(
     name: 'endpoint_cache',

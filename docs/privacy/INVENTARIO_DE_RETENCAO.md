@@ -29,9 +29,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
   `person_ref` ou `deck_ref` (pseudônimo quando é de outra pessoa), `entity_ref`, ou `omit_*`
   (segredo, hash, estado interno, conteúdo de terceiro, UUID do catálogo).
 - **6 views**, **20 tabelas e 3 colunas que só existem na produção** (receipt de 2026-09-22; uma
-  das colunas, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **13 artefatos
+  das colunas, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **14 artefatos
   fora do banco**: caches em memória, sidecars, logs, Sentry, provedores externos, backups,
-  aparelho e o arquivo da exportação.
+  aparelho, o arquivo da exportação e o registro dos pedidos de exportação.
 
 ## Prazos já decididos
 
@@ -42,6 +42,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | D-30 | purga da lixeira em 30 dias | `decks.deleted_at` | não existe; é o `DCK-P0-06` |
 | D-32 | jobs de IA por 24 h | `ai_generate_jobs`, `ai_optimize_jobs` | o código apaga em 30 min; é o `BT-AI-032` |
 | D-23 | backups não são reescritos; rotação entra na política | backups | prazo de rotação ainda não decidido |
+| D-78 | logs de pedido de exportação (`MANALOOM_PRIVACY_EXPORT_REQUEST`) por 90 dias | log da API, artefato `privacy_export_request_log` | a linha não existia; existe desde a D-71, e a rotação de 90 dias no host não está aplicada (configuração do dono) |
 
 ## Resumo por classe
 
@@ -53,7 +54,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | IA em execução | `ai_logs`, `ai_generate_jobs`, `ai_optimize_jobs`, `ai_optimize_cache` | 180 dias; 24 h decidido para jobs; 6 h no cache | job de limpeza e o próprio serviço | sim, sem hashes | apagado |
 | Battle e replays | `battle_simulations`, `battle_simulation_attempts`, `battle_jobs`, `battle_job_live_records`, `interactive_battle_sessions`, `interactive_battle_records`, `battle_replay_annotations` | sem prazo | exclusão de conta | sim, sem hashes nem payload interno | apagado; as simulações de outras pessoas contra o deck do titular ficam com elas, anonimizadas (D-23) |
 | Social | `user_follows`, `user_blocks`, `user_block_events`, `conversations`, `direct_messages`, `notifications` | enquanto as contas existirem | exclusão de conta | sim, com pseudônimo para a outra pessoa | seguir, bloqueios e notificações apagados; mensagens do titular substituídas; trilha de bloqueios sem a pessoa |
-| Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão, menos os itens do titular em oferta aberta | exclusão de conta, para esses itens | sim | oferta aberta (`pending`) cancelada e sem os itens do titular (D-66); o resto anonimizado, porque é registro entre duas partes, e o item do titular sem o vínculo com o fichário |
+| Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão, menos os itens do titular em oferta aberta | exclusão de conta, para esses itens | sim | oferta aberta (`pending`) cancelada e sem os itens do titular (D-66); o resto, inclusive troca em andamento (D-76), anonimizado, porque é registro entre duas partes, e o item do titular sem o vínculo com o fichário |
 | Moderação | `content_reports`, `content_report_appeals`, `moderation_actions` | mantidas depois da exclusão | ninguém | denúncias e recursos do titular | denúncia, recurso e ação do moderador anonimizados |
 | Segurança | `password_reset_tokens`, `email_verification_tokens`, `rate_limit_events` | 20 min, 24 h e 24 h de validade | job de limpeza só para `rate_limit_events` | não | apagados |
 | Controle de privacidade | `account_deletion_receipts`, `account_deletion_outbox`, `privacy_deleted_deck_tombstones`, `privacy_keyring` | sem prazo; o outbox esvazia os tokens de deck quando o consumidor conclui | ninguém | não | mantidos, sem identificar a pessoa |
@@ -73,7 +74,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
    deste inventário, IDs de terceiros viram pseudônimos válidos só no arquivo, e as cinco
    tabelas que ficavam de fora entraram. Desde a D-71, cada pedido deixa uma linha de log
    `MANALOOM_PRIVACY_EXPORT_REQUEST` com horário, resultado e referência pseudônima de quem
-   pediu, sem o ID nem o conteúdo.
+   pediu, sem o ID nem o conteúdo; a D-78 manda guardá-la por 90 dias.
 3. **Exclusão** (parte corrigida no `BT-PRIV-002`, 2026-09-23): bloqueios e tokens do titular
    agora saem; eventos de bloqueio, recursos, ações de moderação e a evidência da denúncia ficam sem a
    pessoa; as simulações de outras pessoas contra o deck público do titular ficam com elas,
@@ -83,8 +84,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
    nos dois bancos (migration 059, não aplicada na produção). O outbox da D-23 (D-68, migration
    060, não aplicada na produção) grava uma linha por consumidor fora do banco na transação do
    recibo; o job `manaloom_account_deletion_outbox`, sem capability, conclui o EndpointCache
-   depois do teto de 24 h e o Sentry do servidor na hora, e deixa o Hermes, o sidecar e os
-   backups abertos com o motivo. Segue aberto: jobs e sessões de Jogar contra IA de outras
+   depois do teto de 24 h, o sidecar de Jogar contra IA depois do tempo máximo da sessão
+   (7200 s + 10 min, D-77) e o Sentry do servidor na hora, e deixa o Hermes e os backups
+   abertos com o motivo. Segue aberto: jobs e sessões de Jogar contra IA de outras
    pessoas guardam o hash e a lista do deck de quem saiu (`BT-BAT-002`).
 4. **Fora do banco**: o EndpointCache passou a ter teto de 24 h e a limpar as entradas vencidas,
    e o Sentry do servidor não recebe mais o ID do usuário (`BT-PRIV-002`). Seguem abertos: o
@@ -98,15 +100,11 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## Pendente de decisão do dono
 
-- Se o sidecar de Jogar contra IA pode ser dado como limpo pelo teto de vida da sessão (7200 s,
-  mais 10 s e 10 min de retenção terminal), como o EndpointCache, sem confirmação do próprio
-  sidecar. Hoje a linha do outbox fica aberta.
 - Prazo de rotação dos backups (D-23 manda registrá-lo na política).
+- Aplicar no host a rotação de 90 dias dos logs de pedido de exportação (D-78): é configuração
+  persistente do host da API.
 - Ligar a limpeza por prazo em produção (D-70): é exclusão em produção. Os prazos de partida da
   D-69 (notificações, feedback de IA, replays, analytics) só entram no job depois do advogado.
-- Trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) quando uma das partes
-  exclui a conta: seguem com a outra pessoa, como as concluídas. A D-66 manda apagar só os itens
-  de oferta aberta.
 - Prazo de retenção de analytics (`activation_funnel_events`), replays e simulações,
   notificações e feedback de IA.
 - Prazo de retenção de trocas e registros de moderação mantidos depois da exclusão, e base legal
