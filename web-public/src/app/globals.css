@@ -2,15 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Both files are variable fonts; without the weight range the browser treats
+   each one as a single 400 face and fakes every heavier weight. */
 @font-face {
   font-family: "Inter";
   src: url("/fonts/Inter.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
   font-display: swap;
 }
 
 @font-face {
   font-family: "Fraunces";
   src: url("/fonts/Fraunces.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
   font-display: swap;
 }
 
