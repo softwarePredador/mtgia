@@ -12,6 +12,7 @@ import '../lib/logger.dart';
 import '../lib/observability.dart';
 import '../lib/public_error_contract.dart';
 import '../lib/request_metrics_service.dart';
+import '../lib/request_body_limits.dart';
 import '../lib/request_trace.dart';
 import '../lib/release_capability_policy.dart';
 import '../lib/runtime_environment.dart';
@@ -103,6 +104,19 @@ Handler middlewareWithReleaseCapabilityPolicy(
       );
     }
 
+    // BT-AUTH-002: URL longa demais nem chega à decisão de capability.
+    final uriRejection = checkRequestUri(context.request.uri);
+    if (uriRejection != null) {
+      return _requestLimitResponse(
+        uriRejection,
+        requestId: requestId,
+        endpoint: endpoint,
+        startedAt: startedAt,
+        responseHeaders: responseHeaders,
+        closeConnection: true,
+      );
+    }
+
     final releaseCapabilityDecision = releaseCapabilityPolicy.decisionFor(
       path: context.request.uri.path,
       method: context.request.method.name,
@@ -142,6 +156,37 @@ Handler middlewareWithReleaseCapabilityPolicy(
           'Cache-Control': 'no-store',
           'x-request-id': requestId,
         },
+      );
+    }
+
+    // BT-AUTH-002: corpo comprimido, em partes ou acima do limite é recusado
+    // pelos cabeçalhos, sem ler nada; o corpo dentro do limite é lido uma vez
+    // (o dart_frog guarda o texto para o handler) e conferido por campo,
+    // profundidade e itens. Tudo antes da observabilidade, do banco e do
+    // handler: nada acima do limite é alocado nem gravado.
+    final headerRejection = checkRequestHeaders(
+      path: context.request.uri.path,
+      headers: context.request.headers,
+    );
+    if (headerRejection != null) {
+      return _requestLimitResponse(
+        headerRejection,
+        requestId: requestId,
+        endpoint: endpoint,
+        startedAt: startedAt,
+        responseHeaders: responseHeaders,
+        closeConnection: true,
+      );
+    }
+    final bodyRejection = await checkRequestBody(context.request);
+    if (bodyRejection != null) {
+      return _requestLimitResponse(
+        bodyRejection,
+        requestId: requestId,
+        endpoint: endpoint,
+        startedAt: startedAt,
+        responseHeaders: responseHeaders,
+        closeConnection: false,
       );
     }
 
@@ -283,6 +328,38 @@ bool isDatabaseIndependentHealthPath(String path) {
       path == '/health/' ||
       path == '/health/live' ||
       path == '/health/live/';
+}
+
+/// Recusa de limite (BT-AUTH-002): código estável, frase e request-id. Quando
+/// o corpo não foi lido, a conexão fecha em vez de drenar o resto.
+Response _requestLimitResponse(
+  RequestLimitRejection rejection, {
+  required String requestId,
+  required String endpoint,
+  required DateTime startedAt,
+  required Map<String, Object> responseHeaders,
+  required bool closeConnection,
+}) {
+  RequestMetricsService.instance.record(
+    endpoint: 'REQUEST_LIMIT_REJECTION ${rejection.code}',
+    statusCode: rejection.statusCode,
+    latencyMs: DateTime.now().difference(startedAt).inMilliseconds,
+  );
+  final shown =
+      endpoint.length > 160 ? '${endpoint.substring(0, 160)}...' : endpoint;
+  Log.w(
+    '[request_limit] rejected code=${rejection.code} '
+    'status=${rejection.statusCode} endpoint=$shown request_id=$requestId',
+  );
+  return Response.json(
+    statusCode: rejection.statusCode,
+    body: rejection.toJson(requestId: requestId),
+    headers: {
+      ...responseHeaders,
+      'x-request-id': requestId,
+      if (closeConnection) HttpHeaders.connectionHeader: 'close',
+    },
+  );
 }
 
 String? _header(Map<String, String> headers, String name) {

@@ -3,6 +3,7 @@ import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_service.dart';
 import '../../lib/observability.dart';
 import '../../lib/rate_limit_middleware.dart';
+import '../../lib/request_body_limits.dart';
 
 /// Login com autenticação real no banco de dados
 ///
@@ -36,6 +37,13 @@ Future<Response> onRequest(RequestContext context) async {
     }
     email = (rawEmail as String?)?.trim();
     password = rawPassword as String?;
+    // BT-AUTH-002: teto por campo antes de qualquer consulta ou bcrypt. Um
+    // valor acima do teto não é de conta nenhuma, então a resposta não diz
+    // nada sobre contas.
+    if ((email?.length ?? 0) > accountEmailMaxChars ||
+        (password?.length ?? 0) > loginPasswordMaxChars) {
+      return _invalidRequest();
+    }
   } on FormatException {
     return _invalidRequest();
   }

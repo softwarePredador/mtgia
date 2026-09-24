@@ -56,6 +56,37 @@
   - Early denials carry the code in `error` and `request_id` in the body:
     `cors_origin_denied`, `cors_preflight_rejected`, capability denials and
     `service_database_unavailable` (503).
+- **Request limits (BT-AUTH-002, D-21):** the root middleware checks every
+  request before observability, PostgreSQL and the handler
+  (`server/lib/request_body_limits.dart`). Every refusal has a stable code in
+  `error`, a Portuguese `message` and `request_id`.
+  - A URL (path and query) above 8 KiB is 414 `request_uri_too_long`,
+    checked before the capability decision.
+  - Header checks, before the body is read (the connection closes):
+    - `Content-Encoding` other than `identity` is 415
+      `request_body_encoding_unsupported`; nothing is decompressed.
+    - `Transfer-Encoding` (a chunked body) is 411
+      `request_body_length_required`.
+    - An invalid `Content-Length` is 400 `request_body_length_invalid`.
+    - A declared body above the path limit is 413 `request_body_too_large`,
+      with `limit`.
+  - Limits: 1 MiB by default; 5 MiB on `/import`, `/import/to-deck`,
+    `/import/validate`, `/binder/import/preview` and `/binder/import/apply`;
+    16 KiB under `/auth`.
+  - A body within the limit is read once (the handler gets the same text).
+    A JSON object or array is then checked, and each of these is 413:
+    - any string, value or key, above 32 K characters (on the import paths,
+      the body limit), with `request_field_too_large`;
+    - nesting deeper than 32, with `request_json_too_deep` (a linear scan
+      before decoding);
+    - more than 50,000 items, with `request_json_too_many_items`.
+  - A body that is not UTF-8 is 400 `request_body_unreadable`.
+  - Account fields:
+    - register: a field of the wrong type is 400 `request_invalid`; a
+      username longer than 30 is `auth_username_too_long`; an e-mail without
+      a minimal format or above 254 is `auth_email_invalid`;
+    - login: an e-mail above 254 or a password above 1024 is 400
+      `Dados inválidos.`.
 - **Pagination:** app-facing list routes use `page` and `limit` query params. Limits are capped in handlers (commonly 50, 100, or 200). Response shapes are usually `{data, page, limit, total}` or `{data, page, limit, total_returned}`.
 - **Optional fields:** `archetype`, `bracket`, `pricing_*`, set metadata, trust metrics, price insights, telemetry, AI diagnostics, and runtime analysis fields are optional/evolving unless listed as required in a request body.
 - **Route status vocabulary:** `stable` = app-facing and currently consumed; `experimental` = app-facing but AI/telemetry/simulation or evolving; `internal` = operational/admin/diagnostic; `deprecated` = retained only for compatibility; `not proven` = file exists or consumer exists but source evidence was incomplete. This status describes implementation/compatibility only. It never means the route is enabled in the current release or verified live.

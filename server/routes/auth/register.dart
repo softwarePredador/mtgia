@@ -12,6 +12,7 @@ import '../../lib/observability.dart';
 import '../../lib/password_policy.dart';
 import '../../lib/public_error_contract.dart';
 import '../../lib/rate_limit_middleware.dart';
+import '../../lib/request_body_limits.dart';
 import '../../lib/request_trace.dart';
 import '../../lib/runtime_environment.dart';
 
@@ -46,9 +47,21 @@ Future<Response> onRequest(RequestContext context) async {
       );
     }
     final body = decoded;
-    final username = (body['username'] as String?)?.trim();
-    final email = (body['email'] as String?)?.trim();
-    final password = body['password'] as String?;
+    // BT-AUTH-002: campo de tipo errado é 400, não exceção de conversão.
+    final rawUsername = body['username'];
+    final rawEmail = body['email'];
+    final rawPassword = body['password'];
+    if ((rawUsername != null && rawUsername is! String) ||
+        (rawEmail != null && rawEmail is! String) ||
+        (rawPassword != null && rawPassword is! String)) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'message': 'Dados inválidos.', 'code': 'request_invalid'},
+      );
+    }
+    final username = (rawUsername as String?)?.trim();
+    final email = (rawEmail as String?)?.trim();
+    final password = rawPassword as String?;
     final runtime = loadRuntimeEnvironment();
     final environment = <String, String>{
       if (runtime['ENVIRONMENT'] case final String value) 'ENVIRONMENT': value,
@@ -102,6 +115,25 @@ Future<Response> onRequest(RequestContext context) async {
       return Response.json(
         statusCode: HttpStatus.badRequest,
         body: {'message': 'Nome de usuário deve ter no mínimo 3 caracteres'},
+      );
+    }
+
+    // BT-AUTH-002: teto por campo antes de qualquer consulta ou bcrypt.
+    if (username.length > accountUsernameMaxChars) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {
+          'message':
+              'Nome de usuário deve ter no máximo '
+              '$accountUsernameMaxChars caracteres',
+          'code': 'auth_username_too_long',
+        },
+      );
+    }
+    if (!isAcceptableAccountEmail(email)) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'message': 'Email inválido', 'code': 'auth_email_invalid'},
       );
     }
 
