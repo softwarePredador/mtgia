@@ -13,9 +13,13 @@ function sourceFiles(directory) {
   });
 }
 
-const corpus = sourceFiles(sourceRoot)
-  .map((path) => `\n/* ${relative(projectRoot, path)} */\n${readFileSync(path, "utf8")}`)
-  .join("\n");
+function readCorpus(paths) {
+  return paths
+    .map((path) => `\n/* ${relative(projectRoot, path)} */\n${readFileSync(path, "utf8")}`)
+    .join("\n");
+}
+
+const corpus = readCorpus(sourceFiles(sourceRoot));
 
 const forbiddenPublicClaims = [
   ["paid tier", /\bpro\b/i],
@@ -30,6 +34,21 @@ const forbiddenPublicClaims = [
 for (const [label, pattern] of forbiddenPublicClaims) {
   assert.doesNotMatch(corpus, pattern, `web-public source reintroduced ${label}`);
 }
+
+// D-46: the beta ships neither explainable AI nor shareable reports, so the
+// site title, description and landing cannot claim them. The shared report
+// page keeps its own label, which server/test/product_retention_report_contract_test.dart locks.
+const sharedReportPage = join(sourceRoot, "app", "reports", "[id]", "page.tsx");
+const landingCorpus = readCorpus(sourceFiles(sourceRoot).filter((path) => path !== sharedReportPage));
+const siteMetadata = readFileSync(join(sourceRoot, "app/layout.tsx"), "utf8");
+assert.doesNotMatch(siteMetadata, /IA\s+explic[aá]vel/i, "D-46: site metadata must not claim explainable AI");
+assert.doesNotMatch(siteMetadata, /compartilh[aá]ve/i, "D-46: site metadata must not claim shareable reports");
+assert.doesNotMatch(corpus, /IA\s+explic[aá]vel/i, "D-46: public source must not claim explainable AI");
+assert.doesNotMatch(
+  landingCorpus,
+  /relat[oó]rios?\s+compartilh[aá]ve(?:l|is)/i,
+  "D-46: landing and offer must not promise shareable reports"
+);
 
 assert.doesNotMatch(corpus, /routes\.app\b/, "public source must not consume a legacy /app route");
 assert.doesNotMatch(

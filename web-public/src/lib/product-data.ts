@@ -45,8 +45,7 @@ export const freeBetaOffer: FreeBetaOffer = {
   features: [
     "Deck builder para criar e importar listas",
     "Coleção privada e catálogo de cartas",
-    "Sugestões de IA revisáveis, quando habilitadas",
-    "Relatórios compartilháveis quando esse recurso estiver habilitado"
+    "Sugestões de IA revisáveis, quando habilitadas"
   ],
   availability: [
     "A entrada pode ser liberada em etapas durante a preparação da beta.",
