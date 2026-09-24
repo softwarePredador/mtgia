@@ -21,8 +21,7 @@ export const metadata: Metadata = {
     siteName: "BrewTact",
     title: "BrewTact - Decks, coleção e contador de vida para Commander",
     description:
-      "Deck builder, coleção privada e contador de vida para Commander. Beta gratuita, por convite.",
-    url: absoluteUrl("/")
+      "Deck builder, coleção privada e contador de vida para Commander. Beta gratuita, por convite."
   }
 };
 
