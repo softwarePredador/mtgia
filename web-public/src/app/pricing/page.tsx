@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 
 import { BrandPageIntro } from "@/components/brand-page-intro";
 import { AccessPending, ButtonLink, Container } from "@/components/ui";
-import { freeBetaOffer } from "@/lib/product-data";
+import { freeBetaOffer, productCapabilities, waveLabels } from "@/lib/product-data";
 import { routes } from "@/lib/routes";
 
 export const metadata: Metadata = {
   title: "Beta gratuita",
-  description: "Informações sobre a Beta gratuita e controlada do BrewTact."
+  description: "Informações sobre a Beta gratuita do BrewTact, com acesso por convite."
 };
 
 export default function PricingPage() {
@@ -27,7 +27,7 @@ export default function PricingPage() {
               Sem cobrança durante a beta.
             </h2>
             <p className="mt-4 max-w-lg text-sm leading-6 text-mist-300">
-              O acesso pode ser liberado em etapas para validar estabilidade, clareza e utilidade com segurança.
+              A entrada é por convite, em lotes pequenos, para validar estabilidade, clareza e utilidade com segurança.
             </p>
           </div>
 
@@ -36,9 +36,9 @@ export default function PricingPage() {
               Experiência principal
             </p>
             <ul className="mt-4 grid gap-x-8 text-sm leading-6 text-mist-300 sm:grid-cols-2">
-              {freeBetaOffer.features.map((feature) => (
-                <li key={feature} className="border-t border-mist-700 py-3">
-                  {feature}
+              {productCapabilities.map((capability) => (
+                <li key={capability.surface} className="border-t border-mist-700 py-3">
+                  {capability.surface} · {waveLabels[capability.wave]}
                 </li>
               ))}
             </ul>

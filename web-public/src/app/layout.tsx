@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | BrewTact"
   },
   description:
-    "Beta gratuita e por convite: monte decks de Commander, organize sua coleção privada e acompanhe a mesa com o contador de vida.",
+    "Beta gratuita, por convite e sem cobrança: deck builder de Commander, coleção privada, catálogo de cartas e contador de vida.",
   icons: {
     icon: "/branding/app_logo.png",
     apple: "/branding/app_logo.png"
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     siteName: "BrewTact",
     title: "BrewTact - Decks, coleção e contador de vida para Commander",
     description:
-      "Deck builder, coleção privada e contador de vida para Commander. Beta gratuita, por convite."
+      "Deck builder, coleção privada, catálogo e contador de vida para Commander. Beta gratuita, por convite."
   }
 };
 

@@ -8,7 +8,7 @@ import { AccessPending, Container } from "./ui";
 const navItems = [
   { href: `${routes.home}#produto`, label: "Produto" },
   { href: routes.pricing, label: "Beta" },
-  { href: routes.disclaimer, label: "IA e dados" }
+  { href: routes.disclaimer, label: "Avisos" }
 ];
 
 export function SiteShell({ children }: { children: ReactNode }) {
@@ -50,7 +50,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
               <div className="font-display text-xl font-semibold">BrewTact</div>
             </div>
             <p className="mt-3 max-w-md text-sm leading-6 text-mist-300">
-              Beta gratuita em preparação: decks, coleção e sugestões revisáveis no mesmo lugar quando o acesso for liberado.
+              Beta gratuita em preparação, com acesso por convite: decks, coleção e contador de vida no mesmo lugar quando o acesso for liberado.
             </p>
           </div>
           <div className="grid gap-2 text-sm text-mist-300">
