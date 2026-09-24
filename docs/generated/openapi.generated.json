@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "a15c78659011da5e9012f722258b871b9d52a649cb0d170c8df6658ae5626ddf",
+  "x-manaloom-source-digest-sha256": "6c4803a734612e9e5c8d11f632667ac01e7fa708576063a2fddd6db369a076e3",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -4015,6 +4015,41 @@
           "import"
         ],
         "x-manaloom-source": "server/routes/import/to-deck/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/binder_import_visual_runtime_proof_test.dart",
+          "app/integration_test/localized_import_runtime_test.dart",
+          "app/test/features/binder/models/binder_import_models_test.dart",
+          "app/test/features/binder/providers/binder_import_provider_test.dart",
+          "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/decks/screens/deck_import_screen_test.dart",
+          "app/test/features/decks/widgets/deck_import_list_dialog_test.dart",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_lorehold_external_candidate_identity_import_preflight.py",
+          "server/test/binder_import_contract_test.dart",
+          "server/test/deck_import_review_contract_test.dart",
+          "server/test/external_commander_meta_import_support_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/import/to-deck/preview": {
+      "post": {
+        "operationId": "postImportToDeckPreview",
+        "summary": "POST /import/to-deck/preview",
+        "tags": [
+          "import"
+        ],
+        "x-manaloom-source": "server/routes/import/to-deck/preview/index.dart",
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "app/integration_test/binder_import_visual_runtime_proof_test.dart",

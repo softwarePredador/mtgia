@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "ae1bc18614a68573f148ceef87074d7a313cae78304888b14b9b3a596158c40b"
+    "sha256": "cee87517ad0686763ee3a142f68c78ef9de259a274923a0d350df138c6f221f3"
   },
   "required_task_fields": [
     "id",
@@ -396,13 +396,13 @@
     {
       "id": "DCK-P0-03",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Importar em deck existente em duas fases, diff completo e undo.",
       "depends_on": [
         "DCK-P0-01",
         "DCK-P0-02"
       ],
-      "acceptance": "Zero delete/insert antes de confirmar; falha preserva original; stale retorna 409. Decisão do dono em 2026-09-22: D-29, o preview de import em deck existente, que não grava nada, fica sob `decks_private`; o commit continua sob `deck_replace_all`; na beta, o import entra por deck novo (`/import`).",
+      "acceptance": "Zero delete/insert antes de confirmar; falha preserva original; stale retorna 409. Decisão do dono em 2026-09-22: D-29, o preview de import em deck existente, que não grava nada, fica sob `decks_private`; o commit continua sob `deck_replace_all`; na beta, o import entra por deck novo (`/import`). Parte do servidor feita em 2026-09-24 na branch `deck/rodada2-2026-09-24`, ainda fora do ar, sem migration: `POST /import/to-deck/preview` (sob `decks_private`) lê e resolve a lista, calcula a lista final (soma ou troca, com o comandante mantido quando a troca não traz um), a diferença completa (o que entra, sai e muda, com nome, quantidade, papel e condição, e os totais) e a validação da lista final numa transação só de leitura, e emite o `DeckReviewArtifact v1` do tipo `import_to_deck`, que carrega a lista final e liga dono, deck, revisão e conteúdo. `POST /import/to-deck` (sob `deck_replace_all`) só aplica com esse artefato: sem ele responde 428 `import_review_required`; deck mudado depois da prévia dá 409 `import_preview_stale`; artefato adulterado, expirado ou de outro deck dá 409 `import_review_invalid`; regra que passou a falhar depois da prévia dá 400; em todos, nada é escrito. Confirmado, grava só as linhas que mudam e o evento `import_to_deck` do ledger, que o desfazer universal volta. Evidência: `server/test/import_to_deck_two_phase_db_live_test.dart` (PostgreSQL descartável, 9 casos: prévia sem escrita, commit exato, comandante mantido, stale, adulterado, expirado, de outro deck, sem artefato, regra que falha depois, desfazer exato, deck de outra pessoa e lista sem mudança), `server/test/import_to_deck_merge_support_test.dart` e 11 mutações derrubadas. Falta: o app pedir a prévia, mostrar a diferença, confirmar com o artefato e oferecer o desfazer (raia do app; o app de hoje manda a lista direto e recebe 428).",
       "section": "P0 do ciclo",
       "source_line": 338
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "a15c78659011da5e9012f722258b871b9d52a649cb0d170c8df6658ae5626ddf"
+  "project_logic_source_digest_sha256": "6c4803a734612e9e5c8d11f632667ac01e7fa708576063a2fddd6db369a076e3"
 }

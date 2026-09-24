@@ -179,12 +179,19 @@ void main() {
       });
       expect(invalidImport.statusCode, 400, reason: invalidImport.body);
 
-      final invalidMerge = await post('/import/to-deck', {
+      // DCK-P0-03: a lista é lida na prévia; o commit sem artefato é 428.
+      final invalidMerge = await post('/import/to-deck/preview', {
         'deck_id': deckId,
         'list': 123,
         'replace_all': true,
       });
       expect(invalidMerge.statusCode, 400, reason: invalidMerge.body);
+      final unreviewedMerge = await post('/import/to-deck', {
+        'deck_id': deckId,
+        'list': '1 Sol Ring',
+        'replace_all': true,
+      });
+      expect(unreviewedMerge.statusCode, 428, reason: unreviewedMerge.body);
       persisted = await getDeck(deckId);
       expect((persisted['stats'] as Map)['total_cards'], 4);
 

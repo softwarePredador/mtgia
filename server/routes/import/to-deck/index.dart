@@ -1,381 +1,191 @@
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
-import '../../../lib/basic_land_utils.dart' as basic_lands;
+
 import '../../../lib/deck_format_support.dart';
 import '../../../lib/deck_request_support.dart';
 import '../../../lib/deck_rules_service.dart';
+import '../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../lib/decks/deck_review_artifact.dart';
 import '../../../lib/decks/deck_revision_support.dart';
-import '../../../lib/import_card_lookup_service.dart';
-import '../../../lib/import_list_service.dart';
-import '../../../lib/import_to_deck_merge_support.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/import_to_deck_merge_support.dart';
+import '../../../lib/logger.dart';
 
-class _ImportDeckChangedDuringPreparation implements Exception {
-  const _ImportDeckChangedDuringPreparation();
-}
+/// Códigos do artefato que dizem "o deck mudou depois da prévia".
+const _staleReviewCodes = {'stale_deck_revision', 'stale_deck_signature'};
 
+/// POST /import/to-deck
+///
+/// Fase 2 de 2 do import em deck existente (DCK-P0-03): confirma a prévia de
+/// `POST /import/to-deck/preview`. Body: `{deck_id, review_artifact}` (o
+/// objeto da prévia, ou só o `token`).
+///
+/// Numa transação só: trava o deck, confere o artefato (dono, deck, revisão e
+/// conteúdo da prévia, tipo e expiração) e as regras de hoje sobre a lista
+/// final assinada, grava só as linhas que mudam, sobe a revisão e acrescenta o
+/// evento `import_to_deck` ao ledger, que o desfazer universal volta.
+///
+/// - Sem artefato: 428 `import_review_required`, sem escrita (acabou o import
+///   de um tiro).
+/// - Deck mudado depois da prévia: 409 `import_preview_stale`; artefato
+///   adulterado, expirado, de outra pessoa ou de outro deck: 409
+///   `import_review_invalid`; o motivo vai em `review_error`.
+/// - Regra que passou a falhar depois da prévia: 400, e o deck fica igual.
+///
+/// Decisão D-29 do dono: o commit segue sob `deck_replace_all`.
 Future<Response> onRequest(RequestContext context) async {
-  if (context.request.method == HttpMethod.post) {
-    return _importToDeck(context);
+  if (context.request.method != HttpMethod.post) {
+    return methodNotAllowed();
   }
-  return methodNotAllowed();
-}
-
-/// Importa uma lista de cartas para um deck EXISTENTE
-Future<Response> _importToDeck(RequestContext context) async {
   final userId = context.read<String>();
   final pool = context.read<Pool>();
 
   late final String deckId;
-  late final Object rawList;
-  late final bool replaceAll;
-  late final Map<String, dynamic> requestBody;
+  late final String? token;
   try {
     final body = requireJsonObject(await context.request.json());
-    requestBody = body;
     deckId = requireNonEmptyString(body, 'deck_id');
-    final listValue = body['list'];
-    if (listValue == null) {
-      throw const DeckRequestException('Field list is required.');
-    }
-    rawList = listValue;
-    replaceAll = readOptionalBool(body, 'replace_all') ?? false;
+    final artifact = body['review_artifact'];
+    token = switch (artifact) {
+      final String value when value.trim().isNotEmpty => value.trim(),
+      final Map<String, dynamic> value
+          when value['token'] is String &&
+              (value['token'] as String).trim().isNotEmpty =>
+        (value['token'] as String).trim(),
+      _ => null,
+    };
   } on FormatException catch (e) {
     return badRequest('Invalid JSON body: ${e.message}');
   } on DeckRequestException catch (e) {
     return badRequest(e.message);
   }
-
-  // Verifica se o deck pertence ao usuário
-  final deckCheck = await pool.execute(
-    Sql.named(
-      'SELECT id, format FROM decks WHERE id = @id AND user_id = @userId',
-    ),
-    parameters: {'id': deckId, 'userId': userId},
-  );
-
-  if (deckCheck.isEmpty) {
-    return notFound('Deck not found or access denied.');
-  }
-
-  final format = deckCheck.first[1] as String;
-  final normalizedFormat = normalizeSupportedDeckFormat(format);
-  if (normalizedFormat == null) {
-    return badRequest(unsupportedDeckFormatMessage(format));
-  }
-
-  final unsupportedRawSections = unsupportedRawDeckSectionLabels(rawList);
-  if (unsupportedRawSections.isNotEmpty) {
-    return badRequest(
-      unsupportedDeckSectionsMessage(unsupportedRawSections),
-      details: {'unsupported_section_lines': unsupportedRawSections},
-    );
-  }
-
-  late final List<String> lines;
-  try {
-    lines = normalizeImportLines(rawList);
-  } on FormatException catch (e) {
-    return badRequest(e.message);
-  }
-
-  final cardsToInsert = <Map<String, dynamic>>[];
-  final notFoundCards = <String>[];
-  final warnings = <String>[];
-  final localizedMatches = <Map<String, dynamic>>[];
-  final localizedMatchKeys = <String>{};
-
-  final parseResult = parseImportLines(lines);
-  final parsedItems = parseResult.parsedItems;
-  notFoundCards.addAll(parseResult.invalidLines);
-  if (parseResult.unsupportedSectionLines.isNotEmpty) {
-    return badRequest(
-      unsupportedDeckSectionsMessage(parseResult.unsupportedSectionLines),
-      details: {
-        'unsupported_section_lines': parseResult.unsupportedSectionLines,
+  if (token == null) {
+    return Response.json(
+      statusCode: 428,
+      body: const {
+        'ok': false,
+        'error':
+            'Revise a importação antes de confirmar: peça a prévia em '
+            '/import/to-deck/preview e envie o review_artifact dela.',
+        'error_code': 'import_review_required',
       },
     );
   }
 
-  // 2) Resolve nomes em lote (exato + clean + split fallback)
-  final foundCardsMap = await resolveImportCardNames(
-    pool,
-    parsedItems,
-    preferredFormat: normalizedFormat,
+  final mutation = DeckMutationRequest.fromContext(
+    context,
+    operation: 'import_to_deck',
+    deckId: deckId,
+    body: {'deck_id': deckId, 'review_artifact': token},
   );
-
-  // 5. Montagem da lista final
-  for (final item in parsedItems) {
-    if (notFoundCards.contains(item['line'])) continue;
-
-    final cardData = findResolvedImportCard(
-      foundCardsMap,
-      item['name'] as String,
-    );
-
-    if (cardData != null) {
-      final localizedMatch = localizedImportMatchForCard(cardData, item);
-      if (localizedMatch != null &&
-          localizedMatchKeys.add('${localizedMatch['line']}')) {
-        localizedMatches.add(localizedMatch);
-      }
-
-      cardsToInsert.add({
-        'card_id': cardData['id'],
-        'quantity': item['quantity'],
-        'is_commander': item['isCommanderTag'] ?? false,
-        'name': cardData['name'],
-        'type_line': cardData['type_line'],
-      });
-    } else {
-      if (!notFoundCards.contains(item['line'])) {
-        notFoundCards.add(item['line']);
-      }
-    }
-  }
-
-  if (cardsToInsert.isEmpty) {
-    return badRequest(
-      'No valid cards found in the list.',
-      details: {
-        'not_found_lines': notFoundCards,
-        'localized_matches': localizedMatches,
-        'localized_matches_count': localizedMatches.length,
-        'hint':
-            'Confira formato das linhas (ex: "1 Sol Ring"). Nomes localizados dependem da tabela card_localized_names sincronizada.',
-      },
-    );
-  }
-
-  // 6. Validação de regras
-  final limit =
-      (normalizedFormat == 'commander' || normalizedFormat == 'brawl') ? 1 : 4;
-
-  // Agrupa cartas por card_id para evitar duplicatas
-  final cardMap = <String, Map<String, dynamic>>{};
-  for (final card in cardsToInsert) {
-    final cardId = card['card_id'] as String;
-    final existing = cardMap[cardId];
-    if (existing == null) {
-      cardMap[cardId] = Map<String, dynamic>.from(card);
-      continue;
-    }
-
-    existing['quantity'] =
-        (existing['quantity'] as int) + (card['quantity'] as int);
-    if (card['is_commander'] == true) {
-      existing['is_commander'] = true;
-    }
-  }
-
-  final consolidatedCards = cardMap.values.toList();
-
-  // Warnings com quantidades consolidadas (por NOME, para suportar múltiplas edições)
-  warnings.clear();
-  final copiesByName = <String, Map<String, dynamic>>{};
-
-  for (final card in consolidatedCards) {
-    final name = (card['name'] as String).trim();
-    final typeLine = card['type_line'] as String;
-    final quantity = card['quantity'] as int;
-    final isCommander = card['is_commander'] == true;
-
-    final isBasicLand = basic_lands.isBasicLandCard(
-      name: name,
-      typeLine: typeLine,
-    );
-
-    if (isCommander || isBasicLand) continue;
-
-    final key = name.toLowerCase();
-    final existing = copiesByName[key];
-    if (existing == null) {
-      copiesByName[key] = {'name': name, 'qty': quantity};
-    } else {
-      copiesByName[key] = {
-        'name': existing['name'] as String,
-        'qty': (existing['qty'] as int) + quantity,
-      };
-    }
-  }
-
-  for (final entry in copiesByName.values) {
-    final name = entry['name'] as String;
-    final qty = entry['qty'] as int;
-    if (qty > limit) {
-      warnings.add('$name: $qty cópias (limite $limit)');
-    }
-  }
+  final signingSecret = resolveDeckReviewSigningSecret();
 
   try {
-    var commanderPreserved = false;
-    var commanderDetected = consolidatedCards.any(
-      (card) => card['is_commander'] == true,
-    );
-    var finalTotalCards = sumImportToDeckQuantities(consolidatedCards);
-    final mutation = DeckMutationRequest.fromContext(
-      context,
-      operation: 'import_to_deck',
-      deckId: deckId,
-      body: requestBody,
-    );
-    late final DeckMutationReceipt receipt;
-    await pool.runTx((session) async {
+    final result = await pool.runTx((session) async {
       final baseline = await lockDeckForMutation(
         session,
         deckId: deckId,
         userId: userId,
         request: mutation,
       );
-      if (baseline == null) {
-        throw const _ImportDeckChangedDuringPreparation();
-      }
-      final lockedDeck = await session.execute(
-        Sql.named('''
-          SELECT format
-          FROM decks
-          WHERE id = @deckId
-            AND user_id = @userId
-            AND LOWER(format) = @normalizedFormat
-          FOR UPDATE
-        '''),
-        parameters: {
-          'deckId': deckId,
-          'userId': userId,
-          'normalizedFormat': normalizedFormat,
-        },
+      if (baseline == null) throw const DeckNotFoundForMutation();
+
+      final verification = verifyDeckReviewArtifact(
+        signingSecret: signingSecret,
+        token: token!,
+        expectedKind: importToDeckReviewArtifactKind,
+        ownerId: userId,
+        deckId: deckId,
+        currentDeckRevision: baseline.revision,
+        currentDeckSignature: DeckOptimizationHistoryService.buildDeckSignature(
+          [for (final card in baseline.cards) Map<String, dynamic>.of(card)],
+        ),
       );
-      if (lockedDeck.isEmpty) {
-        throw const _ImportDeckChangedDuringPreparation();
+      if (!verification.valid) {
+        throw _ImportReviewRejected(verification.code);
       }
+      final payload = verification.payload;
+      final format =
+          normalizeSupportedDeckFormat('${payload['format']}') ??
+          '${payload['format']}';
+      final finalCards = DeckOptimizationHistoryService.normalizeCards([
+        for (final card in (payload['cards'] as List? ?? const []))
+          if (card is Map) card.cast<String, dynamic>(),
+      ]);
 
-      final existingCards = <Map<String, dynamic>>[];
-
-      if (!replaceAll) {
-        final existingResult = await session.execute(
-          Sql.named('''
-            SELECT card_id::text, quantity::int, is_commander, condition
-            FROM deck_cards
-            WHERE deck_id = @deckId
-            FOR UPDATE
-          '''),
-          parameters: {'deckId': deckId},
-        );
-
-        for (final row in existingResult) {
-          final cardId = row[0] as String;
-          existingCards.add({
-            'card_id': cardId,
-            'quantity': row[1] as int,
-            'is_commander': row[2] as bool? ?? false,
-            'condition': row[3] as String? ?? 'NM',
-          });
-        }
-      } else if ((normalizedFormat == 'commander' ||
-              normalizedFormat == 'brawl') &&
-          !commanderDetected) {
-        final existingCommanderResult = await session.execute(
-          Sql.named('''
-            SELECT card_id::text, quantity::int, is_commander, condition
-            FROM deck_cards
-            WHERE deck_id = @deckId AND is_commander = TRUE
-            FOR UPDATE
-          '''),
-          parameters: {'deckId': deckId},
-        );
-
-        for (final row in existingCommanderResult) {
-          existingCards.add({
-            'card_id': row[0] as String,
-            'quantity': row[1] as int,
-            'is_commander': row[2] as bool? ?? false,
-            'condition': row[3] as String? ?? 'NM',
-          });
-        }
-        commanderPreserved = existingCommanderResult.isNotEmpty;
-        commanderDetected = commanderPreserved;
-      }
-
-      final mergeResult = mergeImportToDeckCards(
-        importedCards: consolidatedCards,
-        existingCards: existingCards,
-        commanderPreserved: commanderPreserved,
-      );
-      final validatedCards = mergeResult.cards;
-      finalTotalCards = mergeResult.totalCards;
-      commanderDetected = mergeResult.commanderDetected;
-      commanderPreserved = mergeResult.commanderPreserved;
-
+      // As regras de hoje: a legalidade pode ter mudado depois da prévia.
       await DeckRulesService(session).validateAndThrow(
-        format: normalizedFormat,
-        cards: validatedCards,
-        strict: false,
+        format: format,
+        cards: [for (final card in finalCards) Map.of(card)],
       );
 
-      await session.execute(
-        Sql.named('DELETE FROM deck_cards WHERE deck_id = @deckId'),
-        parameters: {'deckId': deckId},
-      );
-
-      if (validatedCards.isNotEmpty) {
-        final values = <String>[];
-        final params = <String, dynamic>{'deckId': deckId};
-
-        for (var i = 0; i < validatedCards.length; i++) {
-          final card = validatedCards[i];
-          final pId = 'c$i';
-          final pQty = 'q$i';
-          final pCmd = 'cmd$i';
-          final pCond = 'cond$i';
-
-          values.add('(@deckId, @$pId, @$pQty, @$pCmd, @$pCond)');
-          params[pId] = card['card_id'];
-          params[pQty] = card['quantity'];
-          params[pCmd] = card['is_commander'] ?? false;
-          params[pCond] = card['condition'] ?? 'NM';
-        }
-
-        final sql = '''
-          INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander, condition)
-          VALUES ${values.join(', ')}
-        ''';
-        await session.execute(Sql.named(sql), parameters: params);
+      final change = diffDeckCards(baseline.cards, [
+        for (final card in finalCards) Map<String, Object?>.of(card),
+      ]);
+      if (change != null) {
+        await replaceDeckCardRows(
+          session,
+          deckId: deckId,
+          touchedCardIds: {
+            for (final card in [...change.before, ...change.after])
+              '${card['card_id']}',
+          },
+          rows: change.after,
+        );
       }
-      receipt = await recordDeckMutation(session, baseline);
+      final receipt = await recordDeckMutation(session, baseline);
+      final diff = buildImportToDeckDiff(
+        beforeCards: [
+          for (final card in baseline.cards) Map<String, dynamic>.of(card),
+        ],
+        afterCards: finalCards,
+      );
+      final commanderDetected = finalCards.any(
+        (card) => card['is_commander'] == true,
+      );
+      return <String, Object?>{
+        'success': true,
+        'deck_id': deckId,
+        'format': format,
+        'replace_all': payload['replace_all'] == true,
+        'total_cards': sumImportToDeckQuantities(finalCards),
+        'cards_added': (diff['added'] as List).length,
+        'cards_removed': (diff['removed'] as List).length,
+        'cards_changed': (diff['changed'] as List).length,
+        'commander_detected': commanderDetected,
+        'missing_commander':
+            isCommanderImportFormat(format) && !commanderDetected,
+        ...receipt.toJson(),
+      };
     });
 
-    return Response.json(
-      headers: receipt.headers,
-      body: {
-        ...buildImportToDeckSuccessBody(
-          deckId: deckId,
-          normalizedFormat: normalizedFormat,
-          importedCards: consolidatedCards,
-          totalCards: finalTotalCards,
-          notFoundLines: notFoundCards,
-          localizedMatches: localizedMatches,
-          warnings: warnings,
-          commanderDetected: commanderDetected,
-          commanderPreserved: commanderPreserved,
-        ),
-        ...receipt.toJson(),
-      },
-    );
+    return Response.json(body: result, headers: deckRevisionHeadersOf(result));
   } on DeckMutationInterrupt catch (interrupt) {
     return interrupt.toResponse();
-  } on _ImportDeckChangedDuringPreparation {
+  } on _ImportReviewRejected catch (rejection) {
+    final stale = _staleReviewCodes.contains(rejection.code);
     return Response.json(
       statusCode: 409,
       body: {
+        'ok': false,
         'error':
-            'Deck changed while the import was being prepared. Review and retry.',
-        'error_code': 'import_deck_changed',
+            stale
+                ? 'O deck mudou depois da prévia. Refaça a prévia e confirme de novo.'
+                : 'Esta prévia não vale para este deck. Refaça a prévia.',
+        'error_code': stale ? 'import_preview_stale' : 'import_review_invalid',
+        'review_error': rejection.code,
       },
     );
   } on DeckRulesException catch (e) {
     return badRequest(e.message);
-  } catch (e) {
-    print('[ERROR] Failed to import cards: $e');
+  } catch (error) {
+    Log.e('[ERROR] import to deck failed: ${error.runtimeType}');
     return internalServerError('Failed to import cards');
   }
+}
+
+class _ImportReviewRejected implements Exception {
+  const _ImportReviewRejected(this.code);
+
+  final String code;
 }

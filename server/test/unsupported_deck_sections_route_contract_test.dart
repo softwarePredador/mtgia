@@ -30,8 +30,9 @@ void main() {
 
     test('import routes expose friendly unsupported-section errors', () {
       final importSource = File('routes/import/index.dart').readAsStringSync();
+      // DCK-P0-03: a lista é lida na prévia; o commit só aplica o artefato.
       final importToDeckSource =
-          File('routes/import/to-deck/index.dart').readAsStringSync();
+          File('routes/import/to-deck/preview/index.dart').readAsStringSync();
 
       expect(importSource, contains('parseResult.unsupportedSectionLines'));
       expect(importSource, contains('unsupported_section_lines'));
@@ -78,16 +79,15 @@ void main() {
       );
       expect(
         apiContract,
-        contains('`POST /import` and `POST /import/to-deck` reject'),
+        contains('`POST /import` and `POST /import/to-deck/preview` reject'),
       );
     });
 
-    test('import preview and update pass preferred format into card lookup',
-        () {
+    test('import preview and update pass preferred format into card lookup', () {
       final validateSource =
           File('routes/import/validate/index.dart').readAsStringSync();
       final importToDeckSource =
-          File('routes/import/to-deck/index.dart').readAsStringSync();
+          File('routes/import/to-deck/preview/index.dart').readAsStringSync();
       final apiContract =
           File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
 

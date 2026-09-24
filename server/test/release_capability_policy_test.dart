@@ -201,6 +201,8 @@ void main() {
         'PUT /decks/deck': 'deck_replace_all',
         'POST /decks/deck/cards/replace': 'deck_replace_all',
         'POST /import/to-deck': 'deck_replace_all',
+        // D-29: a prévia do import em deck existente não grava nada.
+        'POST /import/to-deck/preview': 'decks_private',
         'GET /decks/deck/analysis': 'ai_analyze_optimize_advisory',
         'POST /decks/deck/ai-analysis': 'ai_analyze_optimize_advisory',
         'POST /decks/deck/optimizations': 'ai_analyze_optimize_advisory',

@@ -138,6 +138,25 @@ void main() {
     }
   });
 
+  // DCK-P0-03: import em deck existente em duas fases. A prévia
+  // (`/import/to-deck/preview`) não grava e devolve o artefato; o commit
+  // (`/import/to-deck`) só aplica com ele.
+  Future<http.Response> previewImport(Map<String, dynamic> body) => http.post(
+    Uri.parse('$baseUrl/import/to-deck/preview'),
+    headers: authHeaders(withContentType: true),
+    body: jsonEncode(body),
+  );
+
+  Future<http.Response> commitImport(String deckId, Object? artifact) =>
+      http.post(
+        Uri.parse('$baseUrl/import/to-deck'),
+        headers: authHeaders(withContentType: true),
+        body: jsonEncode({
+          'deck_id': deckId,
+          if (artifact != null) 'review_artifact': artifact,
+        }),
+      );
+
   group('Import to existing deck | /import/to-deck', () {
     test(
       'creates complete Commander draft and resolves commander field separately',
@@ -211,45 +230,44 @@ void main() {
       final deckId = await createDeck();
       createdDeckIds.add(deckId);
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/import/to-deck'),
-        headers: authHeaders(withContentType: true),
-        body: jsonEncode({
-          'deck_id': deckId,
-          'list': '10 Forest',
-          'replace_all': false,
-        }),
-      );
+      final preview = await previewImport({
+        'deck_id': deckId,
+        'list': '10 Forest',
+        'replace_all': false,
+      });
+      expect(preview.statusCode, equals(200), reason: preview.body);
+      final previewBody = decodeJson(preview);
+      expect(previewBody['cards_imported'], equals(10));
+      expect(previewBody['can_commit'], isTrue, reason: preview.body);
 
+      final withoutReview = await commitImport(deckId, null);
+      expect(withoutReview.statusCode, equals(428));
+
+      final response = await commitImport(
+        deckId,
+        previewBody['review_artifact'],
+      );
       expect(response.statusCode, equals(200), reason: response.body);
       final body = decodeJson(response);
       expect(body['success'], isTrue, reason: response.body);
-      expect(body['cards_imported'], equals(10), reason: response.body);
+      expect(body['change_operation'], 'import_to_deck');
     }, skip: skipIntegration);
 
     test('returns 400 when list type is invalid', () async {
       final deckId = await createDeck();
       createdDeckIds.add(deckId);
 
-      final response = await http.post(
-        Uri.parse('$baseUrl/import/to-deck'),
-        headers: authHeaders(withContentType: true),
-        body: jsonEncode({'deck_id': deckId, 'list': 123}),
-      );
+      final response = await previewImport({'deck_id': deckId, 'list': 123});
 
       expect(response.statusCode, equals(400), reason: response.body);
       expect(decodeJson(response)['error'], isA<String>());
     }, skip: skipIntegration);
 
     test('returns 404 for missing deck', () async {
-      final response = await http.post(
-        Uri.parse('$baseUrl/import/to-deck'),
-        headers: authHeaders(withContentType: true),
-        body: jsonEncode({
-          'deck_id': '00000000-0000-0000-0000-000000000099',
-          'list': '10 Forest',
-        }),
-      );
+      final response = await previewImport({
+        'deck_id': '00000000-0000-0000-0000-000000000099',
+        'list': '10 Forest',
+      });
 
       expect(response.statusCode, equals(404), reason: response.body);
       expect(decodeJson(response)['error'], isA<String>());
@@ -281,17 +299,17 @@ void main() {
         );
         createdDeckIds.add(deckId);
 
-        final response = await http.post(
-          Uri.parse('$baseUrl/import/to-deck'),
-          headers: authHeaders(withContentType: true),
-          body: jsonEncode({
-            'deck_id': deckId,
-            'list': '1 Wastes',
-            'replace_all': false,
-          }),
-        );
+        final response = await previewImport({
+          'deck_id': deckId,
+          'list': '1 Wastes',
+          'replace_all': false,
+        });
 
-        expect(response.statusCode, equals(400), reason: response.body);
+        // A prévia mostra a regra que falha e não emite artefato.
+        expect(response.statusCode, equals(200), reason: response.body);
+        final body = decodeJson(response);
+        expect(body['can_commit'], isFalse, reason: response.body);
+        expect(body['review_unavailable_reason'], 'deck_rules_failed');
       },
       skip: skipIntegration,
     );
@@ -317,18 +335,16 @@ void main() {
         );
         createdDeckIds.add(deckId);
 
-        final response = await http.post(
-          Uri.parse('$baseUrl/import/to-deck'),
-          headers: authHeaders(withContentType: true),
-          body: jsonEncode({
-            'deck_id': deckId,
-            'list': '1 Sol Ring',
-            'replace_all': true,
-          }),
-        );
+        final preview = await previewImport({
+          'deck_id': deckId,
+          'list': '1 Sol Ring',
+          'replace_all': true,
+        });
 
+        expect(preview.statusCode, equals(200), reason: preview.body);
+        final body = decodeJson(preview);
+        final response = await commitImport(deckId, body['review_artifact']);
         expect(response.statusCode, equals(200), reason: response.body);
-        final body = decodeJson(response);
         expect(body['commander_detected'], isTrue, reason: response.body);
         expect(body['missing_commander'], isFalse, reason: response.body);
         expect(body['commander_preserved'], isTrue, reason: response.body);

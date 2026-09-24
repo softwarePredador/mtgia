@@ -4,7 +4,6 @@ import 'package:crypto/crypto.dart';
 
 import 'optimize_functional_role_support.dart';
 import '../decks/deck_review_artifact.dart';
-import '../runtime_environment.dart';
 
 // ============================================================================
 // OPTIMIZE SWAP INTEGRITY
@@ -175,19 +174,10 @@ Map<String, dynamic>? buildSwapIntegrityForResponse({
   ).toJson();
 }
 
-String resolveOptimizeApplySigningSecret({Map<String, String>? environment}) {
-  if (environment != null) {
-    final dedicated =
-        environment['OPTIMIZATION_APPLY_SIGNING_SECRET']?.trim() ?? '';
-    if (dedicated.isNotEmpty) return dedicated;
-    return environment['JWT_SECRET']?.trim() ?? '';
-  }
-
-  final runtime = loadRuntimeEnvironment();
-  final dedicated = runtime['OPTIMIZATION_APPLY_SIGNING_SECRET']?.trim() ?? '';
-  if (dedicated.isNotEmpty) return dedicated;
-  return runtime['JWT_SECRET']?.trim() ?? '';
-}
+/// O mesmo segredo dos artefatos de revisão de deck
+/// ([resolveDeckReviewSigningSecret]).
+String resolveOptimizeApplySigningSecret({Map<String, String>? environment}) =>
+    resolveDeckReviewSigningSecret(environment: environment);
 
 Map<String, int> _canonicalQuantityMap(
   Iterable<Map<String, dynamic>> detailed,

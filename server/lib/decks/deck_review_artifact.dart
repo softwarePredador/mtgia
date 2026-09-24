@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 
+import '../runtime_environment.dart';
+
 /// `DeckReviewArtifact v1` (DCK-P0-02; decisão D-29 do dono): o artefato único
 /// que liga o preview de uma mudança de deck ao commit dela.
 ///
@@ -39,6 +41,18 @@ const deckReviewArtifactClaimKeys = <String>{
   'issued_at',
   'expires_at',
 };
+
+/// O segredo que assina os artefatos: a chave dedicada às prévias
+/// (`OPTIMIZATION_APPLY_SIGNING_SECRET`, que nasceu com o Optimize) ou, sem
+/// ela, o `JWT_SECRET`. Vazio: nenhuma prévia recebe artefato e nenhum commit
+/// passa (falha fechado).
+String resolveDeckReviewSigningSecret({Map<String, String>? environment}) {
+  String? read(String key) =>
+      environment != null ? environment[key] : loadRuntimeEnvironment()[key];
+  final dedicated = read('OPTIMIZATION_APPLY_SIGNING_SECRET')?.trim() ?? '';
+  if (dedicated.isNotEmpty) return dedicated;
+  return read('JWT_SECRET')?.trim() ?? '';
+}
 
 class DeckReviewArtifactVerification {
   const DeckReviewArtifactVerification({

@@ -912,22 +912,30 @@ class TestRunner:
                    found >= 1 and not_found >= 1,
                    f"found={found}, not_found={not_found}")
 
-        # ── Import to existing deck ──
-        code, body = self._req("POST", "/import/to-deck",
+        # ── Import to existing deck (DCK-P0-03: prévia + commit) ──
+        code, body = self._req("POST", "/import/to-deck/preview",
                                token=self.user_a_token, json_data={
                                    "deck_id": self.deck_a_id,
                                    "list": "5x Forest"
+                               })
+        self._test(CAT, "POST /import/to-deck/preview → 200",
+                   code == 200, f"Got {code}: {body.get('error', '')}")
+        artifact = body.get("review_artifact") if isinstance(body, dict) else None
+        code, body = self._req("POST", "/import/to-deck",
+                               token=self.user_a_token, json_data={
+                                   "deck_id": self.deck_a_id,
+                                   "review_artifact": artifact
                                })
         self._test(CAT, "POST /import/to-deck → 200",
                    code == 200, f"Got {code}: {body.get('error', '')}")
 
         # ── Import to-deck of another user ──
-        code, body = self._req("POST", "/import/to-deck",
+        code, body = self._req("POST", "/import/to-deck/preview",
                                token=self.user_b_token, json_data={
                                    "deck_id": self.deck_a_id,
                                    "list": "1x Sol Ring"
                                })
-        self._test(CAT, "POST /import/to-deck deck de outro → 403/404",
+        self._test(CAT, "POST /import/to-deck/preview deck de outro → 403/404",
                    code in (403, 404), f"Got {code}")
 
     # ═══════════════════════════════════════════════════════════

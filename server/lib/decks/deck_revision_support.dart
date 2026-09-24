@@ -576,6 +576,46 @@ diffDeckCards(
   return (before: changedBefore, after: changedAfter);
 }
 
+/// Troca as linhas de [touchedCardIds] do deck pelas de [rows] (o estado
+/// novo dessas cartas; carta sem linha em [rows] sai do deck), sem tocar nas
+/// outras linhas. É como o desfazer e o import confirmado gravam só o que
+/// muda.
+Future<void> replaceDeckCardRows(
+  Session session, {
+  required String deckId,
+  required Set<String> touchedCardIds,
+  required Iterable<Map<String, Object?>> rows,
+}) async {
+  if (touchedCardIds.isEmpty) return;
+  await session.execute(
+    Sql.named('''
+      DELETE FROM deck_cards
+      WHERE deck_id = CAST(@deckId AS uuid)
+        AND card_id = ANY(CAST(@cardIds AS uuid[]))
+    '''),
+    parameters: {'deckId': deckId, 'cardIds': touchedCardIds.toList()},
+  );
+  for (final row in rows) {
+    await session.execute(
+      Sql.named('''
+        INSERT INTO deck_cards (
+          deck_id, card_id, quantity, is_commander, condition
+        ) VALUES (
+          CAST(@deckId AS uuid), CAST(@cardId AS uuid), @quantity,
+          @isCommander, @condition
+        )
+      '''),
+      parameters: {
+        'deckId': deckId,
+        'cardId': '${row['card_id']}',
+        'quantity': (row['quantity'] as num).toInt(),
+        'isCommander': row['is_commander'] == true,
+        'condition': row['condition']?.toString() ?? 'NM',
+      },
+    );
+  }
+}
+
 /// As cartas do deck em ordem estável, no formato do ledger.
 Future<List<Map<String, Object?>>> readDeckCardsSnapshot(
   Session session,

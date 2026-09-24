@@ -69,6 +69,8 @@ void main() {
         'POST /decks/d1/cards/set',
         'POST /decks/d1/cards/remove',
         'PATCH /decks/d1',
+        // DCK-P0-03 (D-29): a prévia do import não grava nada.
+        'POST /import/to-deck/preview',
       ]) {
         final separator = request.indexOf(' ');
         final decision = policy.decisionFor(
