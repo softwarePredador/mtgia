@@ -266,6 +266,20 @@ O dono decidiu, na conversa de coordenação:
 - **Contexto:** a tabela ocupa 1,0 GB dos 2,2 GB do banco, e nenhum job grava nela. Religar agora compararia o preço antigo (MTGJSON) com o novo (Scryfall) e mostraria altas e quedas que não aconteceram.
 - **Recomendação aprovada:** deixar desligada. Quando religar, recomeçar a série a partir da Scryfall.
 
+### Decididas em 2026-09-24, levantadas pela segunda rodada da privacidade
+
+O dono decidiu na conversa de coordenação. Aceitou as recomendações da D-76 à D-78. A rodada sobe depois das recapturas do gate. A limpeza por prazo (D-70) sobe só contando, e os números são trazidos a ele antes da ativação.
+
+**D-76 · Trocas em andamento quando uma das partes sai.**
+- **Contexto:** vale para trocas aceitas, enviadas, entregues ou em disputa.
+- **Recomendação aprovada:** ficam com a outra pessoa, como as concluídas, e o titular é anonimizado. A outra pessoa precisa do registro para concluir ou disputar.
+
+**D-77 · Sidecar do Battle no outbox da exclusão.**
+- **Recomendação aprovada:** dar como limpo depois do tempo máximo da sessão, 7.200 s mais 10 min, porque o sidecar só guarda a partida viva. Não vai ter rota de confirmação.
+
+**D-78 · Prazo dos logs de pedido de exportação.**
+- **Recomendação aprovada:** 90 dias, escritos na política de retenção.
+
 O andamento das demais está no backlog e na fila.
 
 ---

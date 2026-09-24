@@ -56,9 +56,15 @@ A execução das 06:20 UTC aplica isto sozinha, sob o mesmo contrato de apply.
 
 As três categorias de linhas-alias somam 34.074: 32.131 + 1.727 + 216.
 
+## Execução das 06:20 UTC de 2026-09-24, conferida às 11:35 UTC (só leitura)
+
+- O `sync_log` registrou `catalog_reference:alias_prices`, `success`, das 06:20:00 às 06:21:07 UTC, com 32.131 linhas atualizadas, 0 inseridas e 0 apagadas: exatamente o planejado. `cards`, `sets` e `card_legalities` também deram `success` às 06:20.
+- A fonte do preço ficou assim: `scryfall` em 37.002 linhas, `legacy` em 441 e sem fonte em 1.505. A data do preço mais recente é 2026-09-23 21:05 UTC, que é a data da fonte.
+- Exemplos: Sol Ring entre US$ 1,43 e 1,47; Lightning Bolt entre US$ 0,65 e 0,75.
+- `users` e `decks` continuam em 1.181 e 326.
+
 ## O que continua aberto
 
-- **Conferir a execução das 06:20 UTC de 2026-09-24:** a linha `catalog_reference:alias_prices` no `sync_log` e as contagens no receipt.
 - **Memorabilia de borda preta** (Collectors' Edition, 30th Anniversary Edition): ainda entra no menor preço. Costuma ser cara, então não deve baratear, mas o dono pode medir e decidir.
 - **Batch sem linha de demanda:** `POST /cards/resolve/batch` responde 200 com `unresolved` e não gera a linha de demanda.
 - **D-74 e D-75:** a D-74 (códigos de set duplicados) e a D-75 (`price_history`) aguardam execução.

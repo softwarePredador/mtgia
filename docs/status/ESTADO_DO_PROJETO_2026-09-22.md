@@ -4,7 +4,7 @@ Lifecycle: `CURRENT_CONTEXT · VERIFIED_STATE · NO_PRIORITY_AUTHORITY`. Este do
 **onde o projeto está de verdade** e **o que falta para a beta controlada**. Não define prioridade
 (isso é da decisão e do backlog) e não autoriza mutação. Toda afirmação aqui foi verificada na
 fonte primária em 2026-09-22; a evidência linha a linha está em
-[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (156 fatos: 129 da auditoria e 27 do adendo, com a medição, a leitura da produção de 2026-09-22, os deploys, o reinício do host e o lote integrado de 2026-09-23) e a origem de cada correção em
+[`docs/verdade/FATOS.md`](../verdade/FATOS.md) (157 fatos: 129 da auditoria e 28 do adendo, com a medição, a leitura da produção de 2026-09-22, os deploys, o reinício do host e o lote integrado de 2026-09-23) e a origem de cada correção em
 [`docs/verdade/PLANO_DE_CORRECAO.md`](../verdade/PLANO_DE_CORRECAO.md).
 
 - Checkout: `codex/free-beta-release-candidate-2026-07-17`. A correção documental e as decisões de
@@ -32,9 +32,9 @@ O BrewTact está **construído e trancado, no repositório e, desde 2026-09-23, 
   frentes (`c0f907108`, backend e agendador): recuperação de senha sem diferença de tempo,
   catálogo só de leitura, exportação com allowlist e exclusão com as lacunas fechadas. O XMage está desligado até o Battle abrir
   (D-57), e o `/app` segue numa imagem antiga. Cartas, sets e legalidades voltaram a se atualizar em
-  2026-09-23, pelo job diário ativado às 15:34 UTC (FATOS 11.26). O preço das cartas nos decks passa a vir
-  do catálogo (D-62, D-73), com a primeira aplicação na execução das 06:20 UTC de 2026-09-24
-  (FATOS 11.27).
+  2026-09-23, pelo job diário ativado às 15:34 UTC (FATOS 11.26). O preço das cartas nos decks vem do
+  catálogo (D-62, D-73), aplicado pela primeira vez às 06:20 UTC de 2026-09-24: 32.131 cartas
+  (FATOS 11.27–11.28).
 - **As tarefas:** **nenhuma das 49 P0 CORE medidas está atendida.** O slot `NOW` (`BT-SCP-001`) está
   aberto há quatro semanas. Um dos dois pontos que o travavam, o `npm audit` do site público, foi resolvido em 2026-09-22 (`BT-WEB-003`, falta o receipt); o outro é o último pack de
   evidência de UI.
