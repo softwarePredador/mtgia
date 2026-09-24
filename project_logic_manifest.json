@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "8958454899c817b4839ff028720a359585c2135d9f8d60e0fe98a6887e506c53",
+  "source_digest_sha256": "b60b5649ae4d9249c5a8b54819b550fc012756fbec305b6387916e68792b0941",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -70,7 +70,7 @@
     "semantic_resolved_files": 700,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 43077,
-    "semantic_resolved_call_sites": 68531,
+    "semantic_resolved_call_sites": 68532,
     "semantic_resolved_type_references": 16296,
     "modules": 159,
     "app_routes": 46,
@@ -36765,19 +36765,19 @@
       "name": "AccountDeletionOutboxConsumer",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 36
+      "line": 39
     },
     {
       "name": "AccountDeletionOutboxHandling",
       "kind": "enum",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 21
+      "line": 24
     },
     {
       "name": "AccountDeletionOutboxMissing",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 460,
+      "line": 474,
       "members": [
         "toString"
       ]
@@ -36786,19 +36786,19 @@
       "name": "AccountDeletionOutboxOutcome",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 175
+      "line": 189
     },
     {
       "name": "AccountDeletionOutboxRow",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 162
+      "line": 176
     },
     {
       "name": "AccountDeletionOutboxWorker",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 241,
+      "line": 255,
       "members": [
         "retryDelay",
         "runOnce"
@@ -36808,37 +36808,37 @@
       "name": "OutboxDone",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 180
+      "line": 194
     },
     {
       "name": "OutboxFailed",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 193
+      "line": 207
     },
     {
       "name": "OutboxNotYet",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 186
+      "line": 200
     },
     {
       "name": "accountDeletionOutboxReceiptLine",
       "kind": "function",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 469
+      "line": 483
     },
     {
       "name": "defaultAccountDeletionOutboxHandlers",
       "kind": "function",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 207
+      "line": 221
     },
     {
       "name": "enqueueAccountDeletionOutbox",
       "kind": "function",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 109
+      "line": 123
     },
     {
       "name": "anonymizeDeletedDeckReferences",
@@ -41753,7 +41753,7 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 43077,
-    "resolved_call_site_count": 68531,
+    "resolved_call_site_count": 68532,
     "workspace_call_edge_count": 13483,
     "unresolved_call_edge_count": 558,
     "unresolved_call_site_count": 769,
@@ -165885,7 +165885,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 228,
+        "line": 242,
         "caller": "defaultAccountDeletionOutboxHandlers",
         "kind": "constructor",
         "lexical_target": "OutboxDone",
@@ -165896,7 +165896,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 229,
+        "line": 243,
         "caller": "defaultAccountDeletionOutboxHandlers",
         "kind": "constructor",
         "lexical_target": "OutboxNotYet",
@@ -165907,7 +165907,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 251,
+        "line": 265,
         "caller": "AccountDeletionOutboxWorker.<constructor>",
         "kind": "method",
         "lexical_target": "defaultAccountDeletionOutboxHandlers",
@@ -165918,7 +165918,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 273,
+        "line": 287,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "constructor",
         "lexical_target": "AccountDeletionOutboxMissing",
@@ -165929,7 +165929,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 343,
+        "line": 357,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "constructor",
         "lexical_target": "AccountDeletionOutboxRow",
@@ -165940,7 +165940,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 359,
+        "line": 373,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "constructor",
         "lexical_target": "OutboxFailed",
@@ -165951,7 +165951,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 408,
+        "line": 422,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "method",
         "lexical_target": "retryDelay",
@@ -165962,7 +165962,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 72,
+        "line": 88,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "AccountDeletionOutboxConsumer",
@@ -190102,7 +190102,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 14346,
-        "occurrences": 24926
+        "occurrences": 24927
       },
       {
         "target_scope": "dart_sdk",
@@ -199552,7 +199552,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 356,
+        "line": 370,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "function_expression",
         "lexical_target": "handlers[row.consumer]!",
@@ -230744,7 +230744,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 181,
+        "line": 195,
         "lexical_type": "AccountDeletionOutboxOutcome",
         "resolved_type": "AccountDeletionOutboxOutcome",
         "target": "AccountDeletionOutboxOutcome",
@@ -230754,7 +230754,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 204,
+        "line": 218,
         "lexical_type": "AccountDeletionOutboxRow",
         "resolved_type": "AccountDeletionOutboxRow",
         "target": "AccountDeletionOutboxRow",
@@ -230764,7 +230764,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 208,
+        "line": 222,
         "lexical_type": "AccountDeletionOutboxHandler",
         "resolved_type": "Future<AccountDeletionOutboxOutcome> Function(Session, AccountDeletionOutboxRow)",
         "target": "AccountDeletionOutboxHandler",
@@ -230774,7 +230774,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 228,
+        "line": 242,
         "lexical_type": "OutboxDone",
         "resolved_type": "OutboxDone",
         "target": "OutboxDone",
@@ -230784,7 +230784,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 229,
+        "line": 243,
         "lexical_type": "OutboxNotYet",
         "resolved_type": "OutboxNotYet",
         "target": "OutboxNotYet",
@@ -230794,7 +230794,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 273,
+        "line": 287,
         "lexical_type": "AccountDeletionOutboxMissing",
         "resolved_type": "AccountDeletionOutboxMissing",
         "target": "AccountDeletionOutboxMissing",
@@ -230804,7 +230804,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 359,
+        "line": 373,
         "lexical_type": "OutboxFailed",
         "resolved_type": "OutboxFailed",
         "target": "OutboxFailed",
@@ -230814,7 +230814,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 48,
+        "line": 51,
         "lexical_type": "AccountDeletionOutboxHandling",
         "resolved_type": "AccountDeletionOutboxHandling",
         "target": "AccountDeletionOutboxHandling",
@@ -230824,7 +230824,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 67,
+        "line": 83,
         "lexical_type": "AccountDeletionOutboxConsumer",
         "resolved_type": "AccountDeletionOutboxConsumer",
         "target": "AccountDeletionOutboxConsumer",
@@ -234222,7 +234222,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6285,
-        "occurrences": 39879
+        "occurrences": 39880
       },
       {
         "target_scope": "dart_sdk",
@@ -240204,7 +240204,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 111,
+        "line": 125,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -276420,7 +276420,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "587f16e963f340208dd2f403692a9b8268c4d240d3f20732e4cff4b5897209d8"
+      "sha256": "511d4e595f7ebef1c5c29b9f1dbfe2def8bcba7278408fcb36e69ba3124f695b"
     },
     "required_task_fields": [
       "id",
@@ -276724,7 +276724,7 @@
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Pendente de decisão: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar, e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (falta rota e credencial do job para confirmar a varredura do sidecar; o Battle está desligado) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Pendente de decisão: se o sidecar pode ser dado como limpo pelo teto de vida da sessão, como o EndpointCache; aplicar a 060 na produção pede a palavra do dono. D-70 feita em 2026-09-23, na mesma branch, sem migration: o job `manaloom_ai_runtime_cleanup` saiu de `ai_analyze_optimize_advisory` e roda sem capability, sob o contrato `retention_cleanup_apply_v1` (em `PRIVACY_CONTROL_JOBS`, fechado com política inválida); apaga só os prazos da nova seção `retention_cleanup` do inventário (telemetria do Optimize e `ai_logs` em 180 dias, reservas de cota não confirmadas em 10 min, igual ao TTL do `PlanService`, `rate_limit_events` em 24 h e jobs de IA em 24 h, pela D-32), sem variável de ambiente nem flag de prazo, e deixa um recibo por execução (`MANALOOM_RETENTION_CLEANUP`, só contagens). Desligado por padrão: o agendado só conta até uma execução supervisionada com `MANALOOM_CONFIRM_POSTGRES_WRITES` (`--mode activate`) registrar a ativação em `sync_state`; `--mode deactivate` pausa, e outra execução em andamento faz a atual parar sem apagar. O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/retention_cleanup_test.dart` (10 testes; cruza as regras com o inventário nos dois sentidos), `server/test/retention_cleanup_db_live_test.dart` (6 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 16 mutações falham como esperado. Pendente de decisão: ligar em produção (`--mode activate`) é exclusão em produção e pede a palavra do dono; os prazos de partida da D-69 só entram no job depois do advogado.",
+        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Decisão do dono em 2026-09-24, D-76: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; nada muda no código. Aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar (o sidecar deixou de recebê-los na D-77), e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (até a D-77, abaixo) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Decisão do dono em 2026-09-24, D-77: o sidecar é dado como limpo depois do tempo máximo da sessão, sem rota de confirmação. Aplicar a 060 na produção pede a palavra do dono. D-70 feita em 2026-09-23, na mesma branch, sem migration: o job `manaloom_ai_runtime_cleanup` saiu de `ai_analyze_optimize_advisory` e roda sem capability, sob o contrato `retention_cleanup_apply_v1` (em `PRIVACY_CONTROL_JOBS`, fechado com política inválida); apaga só os prazos da nova seção `retention_cleanup` do inventário (telemetria do Optimize e `ai_logs` em 180 dias, reservas de cota não confirmadas em 10 min, igual ao TTL do `PlanService`, `rate_limit_events` em 24 h e jobs de IA em 24 h, pela D-32), sem variável de ambiente nem flag de prazo, e deixa um recibo por execução (`MANALOOM_RETENTION_CLEANUP`, só contagens). Desligado por padrão: o agendado só conta até uma execução supervisionada com `MANALOOM_CONFIRM_POSTGRES_WRITES` (`--mode activate`) registrar a ativação em `sync_state`; `--mode deactivate` pausa, e outra execução em andamento faz a atual parar sem apagar. O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/retention_cleanup_test.dart` (10 testes; cruza as regras com o inventário nos dois sentidos), `server/test/retention_cleanup_db_live_test.dart` (6 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 16 mutações falham como esperado. Pendente de decisão: ligar em produção (`--mode activate`) é exclusão em produção e pede a palavra do dono; os prazos de partida da D-69 só entram no job depois do advogado. D-77 feita em 2026-09-24, na branch `privacidade/rodada3-2026-09-24`, sem migration: o consumidor `interactive_battle_sidecar` do outbox fecha pelo tempo, como o `endpoint_cache`, 7200 s + 10 min contados da exclusão (o maior TTL de sessão do contrato do Battle mais a retenção terminal do sidecar), com o motivo `expired_by_max_session_lifetime` no recibo da execução, e deixa de receber os tokens de deck; ficam abertos só `hermes_learning_sqlite` e `backups`. Evidência: `server/test/account_deletion_outbox_test.dart` (9 testes; lê o limite de `ttl_seconds` e a retenção terminal do próprio `InteractiveBattleRegistry.java`) e `server/test/privacy_deletion_outbox_db_live_test.dart` (12 testes verdes contra PostgreSQL descartável: aberto com 2 h 9 min, fechado com 2 h 11 min); 9 mutações falham como esperado.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 323
       },
@@ -286302,7 +286302,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "8958454899c817b4839ff028720a359585c2135d9f8d60e0fe98a6887e506c53"
+    "project_logic_source_digest_sha256": "b60b5649ae4d9249c5a8b54819b550fc012756fbec305b6387916e68792b0941"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

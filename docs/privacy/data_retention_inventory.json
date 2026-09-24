@@ -20,7 +20,8 @@
     "D-32": "Jobs de IA retidos por 24 h.",
     "D-68": "Outbox da exclusão (D-23) aprovado: tabela account_deletion_outbox e job de consumo sem capability; a migration pede a palavra do dono na execução.",
     "D-70": "Limpeza por prazo separada da capability ai_analyze_optimize_advisory, com recibo por execução; ligar em produção só com a palavra do dono.",
-    "D-71": "Registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo."
+    "D-71": "Registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo.",
+    "D-77": "O sidecar de Jogar contra IA é dado como limpo no outbox da exclusão depois do tempo máximo da sessão, 7200 s + 10 min contados da exclusão, sem rota de confirmação."
   },
   "vocabulary": {
     "category": [
@@ -219,7 +220,7 @@
       "deletion": {
         "mode": "keep_legal",
         "by": null,
-        "notes": "Gravado na exclusão, na transação do recibo; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes e o sidecar."
+        "notes": "Gravado na exclusão, na transação do recibo; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes (desde a D-77, o sidecar fecha pelo tempo e não recebe tokens)."
       },
       "legal_exception": "Prova, por consumidor, de que a exclusão chegou aos lugares fora do banco; não guarda identificador da pessoa."
     },
@@ -2955,11 +2956,12 @@
       "personal_data": true,
       "retention": "até o TTL da sessão",
       "export": "fora da exportação; a sessão persistida entra por interactive_battle_sessions",
-      "deletion": "a sessão sai da memória até 7200 s + 10 s + 10 min depois de criada, na varredura a cada chamada ao sidecar; o outbox (D-68) guarda a obrigação (blocked_sidecar_expiry_not_confirmable)",
+      "deletion": "não recebe aviso da exclusão; a sessão vive até 7200 s e fica mais 10 min na memória depois de terminal. O outbox (D-68) dá a obrigação como cumprida 2 h 10 min depois da exclusão, sem confirmação do sidecar (D-77: interactive_battle_sidecar, expired_by_max_session_lifetime)",
       "decisions": [
-        "D-68"
+        "D-68",
+        "D-77"
       ],
-      "gap": "o job de ops não tem rota nem credencial para confirmar a varredura no sidecar; o Battle está desligado em produção (D-57) (BT-PRIV-002, BT-BAT-002)"
+      "gap": "a sessão terminal só sai da memória na primeira chamada ao sidecar depois dos 10 min (mais 10 s de concessão quando o motor não confirma o fim); sem chamada, espera a próxima ou o reinício. O Battle está desligado em produção (D-57)"
     },
     "hermes_sqlite_learning": {
       "kind": "sidecar_store",
