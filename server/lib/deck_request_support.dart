@@ -1,3 +1,18 @@
+/// Deck inexistente ou de outra conta (BT-AUTH-001): vira 404 com a frase
+/// e o código estável, sem texto de exceção.
+class DeckNotFoundException implements Exception {
+  const DeckNotFoundException([this.message = 'Deck não encontrado.']);
+
+  final String message;
+
+  static const code = 'deck_not_found';
+
+  Map<String, Object?> toJson() => {'error': message, 'error_code': code};
+
+  @override
+  String toString() => message;
+}
+
 class DeckRequestException implements Exception {
   const DeckRequestException(this.message);
 

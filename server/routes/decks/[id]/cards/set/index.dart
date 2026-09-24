@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../../../lib/basic_land_utils.dart' as basic_lands;
+import '../../../../../lib/deck_request_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
+import '../../../../../lib/http_responses.dart';
 
 /// POST /decks/:id/cards/set
 ///
@@ -74,7 +76,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
       final format = (deckResult.first[0] as String).toLowerCase();
       validateNoUnsupportedDeckSections(cards: [body]);
@@ -236,12 +238,11 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       statusCode: HttpStatus.badRequest,
       body: {'error': e.message},
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } catch (e) {
     print('[ERROR] handler: $e');
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': e.toString()},
-    );
+    return internalServerError('Falha ao ajustar a carta do deck');
   }
 }
 

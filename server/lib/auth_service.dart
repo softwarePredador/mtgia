@@ -12,6 +12,18 @@ import 'legal_policy.dart';
 import 'password_policy.dart';
 import 'runtime_environment.dart';
 
+/// Cadastro recusado por regra de negócio (BT-AUTH-001): a frase pública e
+/// um código estável, nunca o texto de uma exceção do banco.
+class RegistrationRejectedException implements Exception {
+  const RegistrationRejectedException(this.code, this.message);
+
+  final String code;
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
 /// Serviço centralizado de autenticação
 ///
 /// Responsabilidades:
@@ -183,7 +195,10 @@ class AuthService {
       email: normalizedEmail,
     );
     if (!passwordValidation.isValid) {
-      throw Exception(passwordValidation.message);
+      throw RegistrationRejectedException(
+        passwordValidation.code ?? 'weak_password',
+        passwordValidation.message ?? 'Senha fraca.',
+      );
     }
 
     final hashedPassword = hashPassword(password);
@@ -191,7 +206,57 @@ class AuthService {
     final emailVerificationExpiresAt = DateTime.now().toUtc().add(
       const Duration(hours: 24),
     );
-    final account = await conn.runTx((session) async {
+    final ({String userId, String username, String email, String? inviteId})
+    account;
+    try {
+      account = await _registerTransaction(
+        conn,
+        normalizedUsername: normalizedUsername,
+        normalizedEmail: normalizedEmail,
+        hashedPassword: hashedPassword,
+        legalAcceptance: legalAcceptance,
+        invite: invite,
+        emailVerificationToken: emailVerificationToken,
+        emailVerificationExpiresAt: emailVerificationExpiresAt,
+      );
+    } on ServerException catch (error) {
+      // Dois cadastros ao mesmo tempo com o mesmo nome ou e-mail passam das
+      // checagens e um bate no índice único: a recusa sai com código, nunca
+      // com o texto do PostgreSQL (BT-AUTH-001).
+      if (error.code != '23505') rethrow;
+      throw const RegistrationRejectedException(
+        'auth_account_taken',
+        'Nome de usuário ou email já está em uso',
+      );
+    }
+
+    // Gerar token
+    final token = generateToken(account.userId, account.username);
+
+    return {
+      'userId': account.userId,
+      'username': account.username,
+      'email': account.email,
+      'token': token,
+      'emailVerified': account.inviteId != null,
+      'inviteId': account.inviteId,
+      'emailVerificationToken': emailVerificationToken,
+      'emailVerificationExpiresAt': emailVerificationExpiresAt,
+    };
+  }
+
+  Future<({String userId, String username, String email, String? inviteId})>
+  _registerTransaction(
+    Pool conn, {
+    required String normalizedUsername,
+    required String normalizedEmail,
+    required String hashedPassword,
+    required LegalAcceptance? legalAcceptance,
+    required BetaInviteClaim? invite,
+    required String? emailVerificationToken,
+    required DateTime emailVerificationExpiresAt,
+  }) {
+    return conn.runTx((session) async {
       // O convite vem antes de tudo: negado aqui, nada foi escrito.
       final inviteId =
           invite == null
@@ -210,7 +275,10 @@ class AuthService {
         parameters: {'username': normalizedUsername},
       );
       if (usernameCheck.isNotEmpty) {
-        throw Exception('Username já está em uso');
+        throw const RegistrationRejectedException(
+          'auth_username_taken',
+          'Username já está em uso',
+        );
       }
 
       final emailCheck = await session.execute(
@@ -221,7 +289,10 @@ class AuthService {
         parameters: {'email': normalizedEmail},
       );
       if (emailCheck.isNotEmpty) {
-        throw Exception('Email já está em uso');
+        throw const RegistrationRejectedException(
+          'auth_email_taken',
+          'Email já está em uso',
+        );
       }
 
       final result = await session.execute(
@@ -294,20 +365,6 @@ class AuthService {
         inviteId: inviteId,
       );
     });
-
-    // Gerar token
-    final token = generateToken(account.userId, account.username);
-
-    return {
-      'userId': account.userId,
-      'username': account.username,
-      'email': account.email,
-      'token': token,
-      'emailVerified': account.inviteId != null,
-      'inviteId': account.inviteId,
-      'emailVerificationToken': emailVerificationToken,
-      'emailVerificationExpiresAt': emailVerificationExpiresAt,
-    };
   }
 
   /// Autentica um usuário com email e senha

@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/deck_cards_bulk_support.dart';
+import '../../../../../lib/deck_request_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
 import '../../../../../lib/deck_validation_state_support.dart';
 import '../../../../../lib/decks/deck_applied_analysis_support.dart';
@@ -12,6 +13,7 @@ import '../../../../../lib/decks/optimization_bracket_support.dart';
 import '../../../../../lib/decks/optimization_functional_role_floor_support.dart';
 import '../../../../../lib/decks/optimization_mana_floor_support.dart';
 import '../../../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../../../lib/http_responses.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method != HttpMethod.post) {
@@ -107,7 +109,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
 
       final format = (deckResult.first[0] as String).toLowerCase();
@@ -386,11 +388,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       statusCode: HttpStatus.badRequest,
       body: {'error': e.message},
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } catch (e) {
     print('[ERROR] handler: $e');
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': e.toString()},
-    );
+    return internalServerError('Falha ao alterar as cartas do deck');
   }
 }

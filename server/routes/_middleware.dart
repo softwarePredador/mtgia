@@ -10,6 +10,7 @@ import '../lib/cors_policy.dart';
 import '../lib/database.dart';
 import '../lib/logger.dart';
 import '../lib/observability.dart';
+import '../lib/public_error_contract.dart';
 import '../lib/request_metrics_service.dart';
 import '../lib/request_trace.dart';
 import '../lib/release_capability_policy.dart';
@@ -71,7 +72,7 @@ Handler middlewareWithReleaseCapabilityPolicy(
     if (!_corsPolicy.isAllowed(origin)) {
       return Response.json(
         statusCode: HttpStatus.forbidden,
-        body: {'error': 'cors_origin_denied'},
+        body: {'error': 'cors_origin_denied', 'request_id': requestId},
         headers: {...responseHeaders, 'x-request-id': requestId},
       );
     }
@@ -92,7 +93,7 @@ Handler middlewareWithReleaseCapabilityPolicy(
       if (!validPreflight) {
         return Response.json(
           statusCode: HttpStatus.forbidden,
-          body: {'error': 'cors_preflight_rejected'},
+          body: {'error': 'cors_preflight_rejected', 'request_id': requestId},
           headers: {...responseHeaders, 'x-request-id': requestId},
         );
       }
@@ -134,6 +135,7 @@ Handler middlewareWithReleaseCapabilityPolicy(
           'policy_version': releaseCapabilityPolicy.policyVersion,
           'policy_digest_sha256': releaseCapabilityPolicy.policyDigestSha256,
           'offer_mode': releaseCapabilityPolicy.offerMode,
+          'request_id': requestId,
         },
         headers: {
           ...responseHeaders,
@@ -152,7 +154,11 @@ Handler middlewareWithReleaseCapabilityPolicy(
           if (!_db.isConnected) {
             return Response.json(
               statusCode: HttpStatus.serviceUnavailable,
-              body: {'error': 'Serviço temporariamente indisponível (DB)'},
+              body: publicErrorBody(
+                code: serviceDatabaseUnavailableCode,
+                message: serviceDatabaseUnavailableMessage,
+                requestId: requestId,
+              ),
               headers: {...responseHeaders, 'x-request-id': requestId},
             );
           }
@@ -189,6 +195,27 @@ Handler middlewareWithReleaseCapabilityPolicy(
           headers: response.headers,
         );
       }
+
+      // BT-AUTH-001: nenhum erro sai com texto de exceção, SQL ou stack.
+      final unsanitizedStatus = response.statusCode;
+      response = await sanitizePublicErrorResponse(
+        response,
+        requestId: requestId,
+        onSanitized: (reason, original) {
+          // O corpo original fica só no log, truncado, para achar a causa
+          // pelo request-id.
+          final compact = original.replaceAll(RegExp(r'\s+'), ' ');
+          final shown =
+              compact.length > 500
+                  ? '${compact.substring(0, 500)}...'
+                  : compact;
+          Log.w(
+            '[public_error] sanitized reason=$reason endpoint=$endpoint '
+            'status=$unsanitizedStatus request_id=$requestId '
+            'original=$shown',
+          );
+        },
+      );
 
       final mergedHeaders = <String, Object>{
         ...response.headers,
@@ -236,7 +263,11 @@ Handler middlewareWithReleaseCapabilityPolicy(
 
       return Response.json(
         statusCode: HttpStatus.internalServerError,
-        body: {'error': 'Erro interno do servidor'},
+        body: publicErrorBody(
+          code: serverInternalErrorCode,
+          message: serverInternalErrorMessage,
+          requestId: requestId,
+        ),
         headers: {...responseHeaders, 'x-request-id': requestId},
       );
     }

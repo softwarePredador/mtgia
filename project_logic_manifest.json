@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "56b85a528f4c231ac20b5604b742242577ec56bc3aca23669d56f4e08d9bc6d7",
+  "source_digest_sha256": "c3fe3c244a39389421eb3c93ba0146be154797042d58d191bde5de33625c308d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,16 +63,16 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 707,
+    "dart_source_files": 708,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5332,
-    "semantic_resolved_files": 707,
+    "dart_symbols": 5345,
+    "semantic_resolved_files": 708,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43289,
-    "semantic_resolved_call_sites": 68841,
-    "semantic_resolved_type_references": 16413,
-    "modules": 160,
+    "semantic_resolved_call_edges": 43330,
+    "semantic_resolved_call_sites": 68892,
+    "semantic_resolved_type_references": 16442,
+    "modules": 161,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
@@ -81,7 +81,7 @@
     "migrations": 61,
     "scripts_and_jobs": 694,
     "environment_variables": 716,
-    "tests": 1260,
+    "tests": 1263,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -976,7 +976,7 @@
         "server/lib/auth_service.dart"
       ],
       "file_count": 1,
-      "symbol_count": 8,
+      "symbol_count": 9,
       "providers": [],
       "services": [
         "AuthService"
@@ -1440,7 +1440,7 @@
         "server/lib/deck_request_support.dart"
       ],
       "file_count": 1,
-      "symbol_count": 9,
+      "symbol_count": 10,
       "providers": [],
       "services": []
     },
@@ -1616,7 +1616,7 @@
         "server/lib/generated_deck_validation_service.dart"
       ],
       "file_count": 1,
-      "symbol_count": 10,
+      "symbol_count": 11,
       "providers": [],
       "services": [
         "GeneratedDeckValidationService"
@@ -1929,6 +1929,17 @@
       ],
       "file_count": 6,
       "symbol_count": 33,
+      "providers": [],
+      "services": []
+    },
+    {
+      "id": "server/lib/public_error_contract",
+      "layer": "server",
+      "files": [
+        "server/lib/public_error_contract.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 10,
       "providers": [],
       "services": []
     },
@@ -30330,7 +30341,7 @@
       "name": "AccountSecurityException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 927,
+      "line": 984,
       "members": [
         "toString"
       ]
@@ -30339,7 +30350,7 @@
       "name": "AccountSecurityResult",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 873,
+      "line": 930,
       "members": [
         "toJson"
       ]
@@ -30348,7 +30359,7 @@
       "name": "AuthService",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 15,
+      "line": 27,
       "members": [
         "_hashOpaqueToken",
         "_loginPasswordMatches",
@@ -30356,6 +30367,7 @@
         "_normalizePasswordForStorage",
         "_preparePassword",
         "_readInteger",
+        "_registerTransaction",
         "_rotateAuthenticationVersion",
         "_validateReplacementPassword",
         "changePassword",
@@ -30381,13 +30393,13 @@
       "name": "EmailVerificationRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 861
+      "line": 918
     },
     {
       "name": "InvalidCredentialsException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 916,
+      "line": 973,
       "members": [
         "toString"
       ]
@@ -30396,19 +30408,28 @@
       "name": "PasswordResetRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 849
+      "line": 906
+    },
+    {
+      "name": "RegistrationRejectedException",
+      "kind": "class",
+      "source": "server/lib/auth_service.dart",
+      "line": 15,
+      "members": [
+        "toString"
+      ]
     },
     {
       "name": "_PasswordPreparation",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 842
+      "line": 899
     },
     {
       "name": "accountProfileJson",
       "kind": "function",
       "source": "server/lib/auth_service.dart",
-      "line": 893
+      "line": 950
     },
     {
       "name": "isBasicLandCard",
@@ -33967,10 +33988,20 @@
       "line": 109
     },
     {
-      "name": "DeckRequestException",
+      "name": "DeckNotFoundException",
       "kind": "class",
       "source": "server/lib/deck_request_support.dart",
       "line": 1,
+      "members": [
+        "toJson",
+        "toString"
+      ]
+    },
+    {
+      "name": "DeckRequestException",
+      "kind": "class",
+      "source": "server/lib/deck_request_support.dart",
+      "line": 16,
       "members": [
         "toString"
       ]
@@ -33979,49 +34010,49 @@
       "name": "readOptionalBool",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 38
+      "line": 53
     },
     {
       "name": "readOptionalList",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 47
+      "line": 62
     },
     {
       "name": "readOptionalObject",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 56
+      "line": 71
     },
     {
       "name": "readOptionalString",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 25
+      "line": 40
     },
     {
       "name": "requireJsonObject",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 10
+      "line": 25
     },
     {
       "name": "requireNonEmptyString",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 17
+      "line": 32
     },
     {
       "name": "requireObjectList",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 68
+      "line": 83
     },
     {
       "name": "requirePositiveInteger",
       "kind": "function",
       "source": "server/lib/deck_request_support.dart",
-      "line": 83
+      "line": 98
     },
     {
       "name": "DeckRulesException",
@@ -34697,7 +34728,7 @@
       "name": "GeneratedDeckRepository",
       "kind": "class",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 11,
+      "line": 12,
       "members": [
         "findSuggestions",
         "resolveCardNames",
@@ -34708,7 +34739,7 @@
       "name": "GeneratedDeckValidationResult",
       "kind": "class",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 78,
+      "line": 93,
       "members": [
         "isValid",
         "qualityEvidenceSummary",
@@ -34719,7 +34750,7 @@
       "name": "GeneratedDeckValidationService",
       "kind": "class",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 165,
+      "line": 180,
       "members": [
         "_appendCmcIntegrityWarnings",
         "_basicLandNamesForConstructedDeck",
@@ -34740,7 +34771,7 @@
       "name": "PostgresGeneratedDeckRepository",
       "kind": "class",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 24,
+      "line": 39,
       "members": [
         "findSuggestions",
         "resolveCardNames",
@@ -34751,37 +34782,43 @@
       "name": "_isGeneratedDeckCmcIntegrityWarning",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 161
+      "line": 176
     },
     {
       "name": "_isGeneratedDeckRepairWarning",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 151
+      "line": 166
+    },
+    {
+      "name": "_validationFailure",
+      "kind": "function",
+      "source": "server/lib/generated_deck_validation_service.dart",
+      "line": 31
     },
     {
       "name": "addLookupName",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 226
+      "line": 241
     },
     {
       "name": "identityOf",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 458
+      "line": 473
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 452
+      "line": 467
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 832
+      "line": 847
     },
     {
       "name": "AiJobSchemaReadiness",
@@ -34967,37 +35004,37 @@
       "name": "apiError",
       "kind": "function",
       "source": "server/lib/http_responses.dart",
-      "line": 5
+      "line": 8
     },
     {
       "name": "badRequest",
       "kind": "function",
       "source": "server/lib/http_responses.dart",
-      "line": 17
+      "line": 28
     },
     {
       "name": "internalServerError",
       "kind": "function",
       "source": "server/lib/http_responses.dart",
-      "line": 35
+      "line": 46
     },
     {
       "name": "methodNotAllowed",
       "kind": "function",
       "source": "server/lib/http_responses.dart",
-      "line": 41
+      "line": 64
     },
     {
       "name": "notFound",
       "kind": "function",
       "source": "server/lib/http_responses.dart",
-      "line": 23
+      "line": 34
     },
     {
       "name": "unauthorized",
       "kind": "function",
       "source": "server/lib/http_responses.dart",
-      "line": 29
+      "line": 40
     },
     {
       "name": "_withLocalizedMetadata",
@@ -37283,6 +37320,66 @@
       "line": 319
     },
     {
+      "name": "_header",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 288
+    },
+    {
+      "name": "_isErrorEnvelope",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 269
+    },
+    {
+      "name": "_rebuildJson",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 273
+    },
+    {
+      "name": "_serverErrorMessageFor",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 83
+    },
+    {
+      "name": "_stableCode",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 264
+    },
+    {
+      "name": "containsInternalDetail",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 144
+    },
+    {
+      "name": "isStablePublicErrorCode",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 90
+    },
+    {
+      "name": "publicErrorBody",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 152
+    },
+    {
+      "name": "publicErrorCodeForStatus",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 77
+    },
+    {
+      "name": "sanitizePublicErrorResponse",
+      "kind": "function",
+      "source": "server/lib/public_error_contract.dart",
+      "line": 163
+    },
+    {
       "name": "_isLoopbackHost",
       "kind": "function",
       "source": "server/lib/public_site_url.dart",
@@ -38192,37 +38289,37 @@
       "name": "_header",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 257
+      "line": 288
     },
     {
       "name": "_recordHttpObservability",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 265
+      "line": 296
     },
     {
       "name": "_safeUserId",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 336
+      "line": 367
     },
     {
       "name": "isDatabaseIndependentHealthPath",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 246
+      "line": 277
     },
     {
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 45
+      "line": 46
     },
     {
       "name": "middlewareWithReleaseCapabilityPolicy",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 52
+      "line": 53
     },
     {
       "name": "AiEndpointAccessPolicy",
@@ -39506,13 +39603,13 @@
       "name": "_requestId",
       "kind": "function",
       "source": "server/routes/auth/register.dart",
-      "line": 265
+      "line": 280
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/auth/register.dart",
-      "line": 17
+      "line": 18
     },
     {
       "name": "_unauthorized",
@@ -39854,43 +39951,43 @@
       "name": "_buildVisualAnalysis",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 266
+      "line": 267
     },
     {
       "name": "_copyPublicDeck",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 318
+      "line": 319
     },
     {
       "name": "_curveReading",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 304
+      "line": 305
     },
     {
       "name": "_getPublicDeck",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 30
+      "line": 31
     },
     {
       "name": "calculateCmc",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 165
+      "line": 166
     },
     {
       "name": "getMainType",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 152
+      "line": 153
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/community/decks/[id]/index.dart",
-      "line": 14
+      "line": 15
     },
     {
       "name": "onRequest",
@@ -40301,37 +40398,37 @@
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-      "line": 16
+      "line": 18
     },
     {
       "name": "_validateCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/index.dart",
-      "line": 441
+      "line": 442
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/index.dart",
-      "line": 11
+      "line": 13
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/replace/index.dart",
-      "line": 8
+      "line": 10
     },
     {
       "name": "_validateCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/set/index.dart",
-      "line": 248
+      "line": 249
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/cards/set/index.dart",
-      "line": 8
+      "line": 10
     },
     {
       "name": "onRequest",
@@ -40349,13 +40446,13 @@
       "name": "_getDeckById",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 598
+      "line": 597
     },
     {
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 863
+      "line": 862
     },
     {
       "name": "_updateDeck",
@@ -40367,19 +40464,19 @@
       "name": "_validateCardCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 855
+      "line": 854
     },
     {
       "name": "calculateCmc",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 747
+      "line": 746
     },
     {
       "name": "getMainType",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 733
+      "line": 732
     },
     {
       "name": "onRequest",
@@ -41351,7 +41448,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 707,
+    "resolved_file_count": 708,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41907,6 +42004,7 @@
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "server/lib/privacy/privacy_export_request_log.dart",
       "server/lib/privacy/retention_cleanup.dart",
+      "server/lib/public_error_contract.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -42067,11 +42165,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43289,
-    "resolved_call_site_count": 68841,
-    "workspace_call_edge_count": 13588,
-    "unresolved_call_edge_count": 559,
-    "unresolved_call_site_count": 770,
+    "resolved_call_edge_count": 43330,
+    "resolved_call_site_count": 68892,
+    "workspace_call_edge_count": 13620,
+    "unresolved_call_edge_count": 560,
+    "unresolved_call_site_count": 771,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -146796,7 +146894,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 175,
+        "line": 110,
+        "caller": "AuthService.verifyPassword",
+        "kind": "method",
+        "lexical_target": "_preparePassword",
+        "target": "AuthService._preparePassword",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 187,
         "caller": "AuthService.register",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146807,7 +146916,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 178,
+        "line": 190,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "normalizeUsername",
@@ -146818,7 +146927,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 179,
+        "line": 191,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "normalizeEmail",
@@ -146829,7 +146938,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 180,
+        "line": 192,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "validate",
@@ -146840,7 +146949,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 189,
+        "line": 198,
+        "caller": "AuthService.register",
+        "kind": "constructor",
+        "lexical_target": "RegistrationRejectedException",
+        "target": "RegistrationRejectedException.RegistrationRejectedException",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 204,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -146851,7 +146971,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 190,
+        "line": 205,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "_newOpaqueToken",
@@ -146862,51 +146982,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 199,
+        "line": 212,
         "caller": "AuthService.register",
         "kind": "method",
-        "lexical_target": "lockForAcceptance",
-        "target": "BetaInviteAdmission.lockForAcceptance",
-        "target_library": "package:server/beta_invites/beta_invite_store.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 23,
-        "caller": "<top-level>",
-        "kind": "constructor",
-        "lexical_target": "AuthService._internal",
-        "target": "AuthService.AuthService._internal",
+        "lexical_target": "_registerTransaction",
+        "target": "AuthService._registerTransaction",
         "target_library": "package:server/auth_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 268,
-        "caller": "AuthService.register",
-        "kind": "method",
-        "lexical_target": "markAccepted",
-        "target": "BetaInviteAdmission.markAccepted",
-        "target_library": "package:server/beta_invites/beta_invite_store.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 285,
-        "caller": "AuthService.register",
-        "kind": "method",
-        "lexical_target": "_hashOpaqueToken",
-        "target": "AuthService._hashOpaqueToken",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 299,
+        "line": 234,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "generateToken",
@@ -146917,7 +147004,62 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 328,
+        "line": 264,
+        "caller": "AuthService._registerTransaction",
+        "kind": "method",
+        "lexical_target": "lockForAcceptance",
+        "target": "BetaInviteAdmission.lockForAcceptance",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 278,
+        "caller": "AuthService._registerTransaction",
+        "kind": "constructor",
+        "lexical_target": "RegistrationRejectedException",
+        "target": "RegistrationRejectedException.RegistrationRejectedException",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 339,
+        "caller": "AuthService._registerTransaction",
+        "kind": "method",
+        "lexical_target": "markAccepted",
+        "target": "BetaInviteAdmission.markAccepted",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 35,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "AuthService._internal",
+        "target": "AuthService.AuthService._internal",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 356,
+        "caller": "AuthService._registerTransaction",
+        "kind": "method",
+        "lexical_target": "_hashOpaqueToken",
+        "target": "AuthService._hashOpaqueToken",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 385,
         "caller": "AuthService.login",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146928,7 +147070,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 331,
+        "line": 388,
         "caller": "AuthService.login",
         "kind": "method",
         "lexical_target": "normalizeEmail",
@@ -146939,7 +147081,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 351,
+        "line": 408,
         "caller": "AuthService.login",
         "kind": "method",
         "lexical_target": "_loginPasswordMatches",
@@ -146950,7 +147092,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 356,
+        "line": 413,
         "caller": "AuthService.login",
         "kind": "constructor",
         "lexical_target": "InvalidCredentialsException",
@@ -146961,18 +147103,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 36,
-        "caller": "AuthService.<constructor>",
-        "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 362,
+        "line": 419,
         "caller": "AuthService.login",
         "kind": "method",
         "lexical_target": "_readInteger",
@@ -146983,7 +147114,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 365,
+        "line": 422,
         "caller": "AuthService.login",
         "kind": "method",
         "lexical_target": "generateToken",
@@ -146994,7 +147125,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 396,
+        "line": 453,
         "caller": "AuthService.getUserFromToken",
         "kind": "method",
         "lexical_target": "verifyToken",
@@ -147005,7 +147136,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 403,
+        "line": 460,
         "caller": "AuthService.getUserFromToken",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -147016,7 +147147,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 419,
+        "line": 476,
         "caller": "AuthService.getUserFromToken",
         "kind": "method",
         "lexical_target": "_readInteger",
@@ -147027,18 +147158,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 42,
+        "line": 48,
         "caller": "AuthService.<constructor>",
         "kind": "method",
-        "lexical_target": "validate",
-        "target": "JwtSecretPolicy.validate",
-        "target_library": "package:server/auth_runtime_policy.dart",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 436,
+        "line": 493,
         "caller": "AuthService.createEmailVerificationRequest",
         "kind": "method",
         "lexical_target": "_newOpaqueToken",
@@ -147049,7 +147180,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 438,
+        "line": 495,
         "caller": "AuthService.createEmailVerificationRequest",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -147060,7 +147191,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 468,
+        "line": 525,
         "caller": "AuthService.createEmailVerificationRequest",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -147071,7 +147202,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 472,
+        "line": 529,
         "caller": "AuthService.createEmailVerificationRequest",
         "kind": "constructor",
         "lexical_target": "EmailVerificationRequest",
@@ -147082,7 +147213,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 483,
+        "line": 54,
+        "caller": "AuthService.<constructor>",
+        "kind": "method",
+        "lexical_target": "validate",
+        "target": "JwtSecretPolicy.validate",
+        "target_library": "package:server/auth_runtime_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 540,
         "caller": "AuthService.verifyEmail",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -147093,7 +147235,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 488,
+        "line": 545,
         "caller": "AuthService.verifyEmail",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -147104,7 +147246,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 498,
+        "line": 555,
         "caller": "AuthService.verifyEmail",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -147115,7 +147257,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 538,
+        "line": 595,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "method",
         "lexical_target": "normalizeEmail",
@@ -147126,7 +147268,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 539,
+        "line": 596,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "method",
         "lexical_target": "_newOpaqueToken",
@@ -147137,18 +147279,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 54,
-        "caller": "AuthService.resetForTesting",
-        "kind": "constructor",
-        "lexical_target": "AuthService._internal",
-        "target": "AuthService.AuthService._internal",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 540,
+        "line": 597,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -147159,7 +147290,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 541,
+        "line": 598,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -147170,7 +147301,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 593,
+        "line": 650,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "constructor",
         "lexical_target": "PasswordResetRequest",
@@ -147181,7 +147312,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 607,
+        "line": 66,
+        "caller": "AuthService.resetForTesting",
+        "kind": "constructor",
+        "lexical_target": "AuthService._internal",
+        "target": "AuthService.AuthService._internal",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 664,
         "caller": "AuthService.resetPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -147192,7 +147334,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 612,
+        "line": 669,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -147203,7 +147345,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 613,
+        "line": 670,
         "caller": "AuthService.resetPassword",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -147214,7 +147356,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 644,
+        "line": 701,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "_validateReplacementPassword",
@@ -147225,7 +147367,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 662,
+        "line": 719,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -147236,7 +147378,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 683,
+        "line": 740,
         "caller": "AuthService.changePassword",
         "kind": "method",
         "lexical_target": "_rotateAuthenticationVersion",
@@ -147247,7 +147389,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 695,
+        "line": 752,
         "caller": "AuthService.revokeSessions",
         "kind": "method",
         "lexical_target": "_rotateAuthenticationVersion",
@@ -147258,7 +147400,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 706,
+        "line": 763,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -147269,7 +147411,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 718,
+        "line": 775,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -147280,7 +147422,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 719,
+        "line": 776,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -147291,18 +147433,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 72,
-        "caller": "<top-level>",
-        "kind": "method",
-        "lexical_target": "hashPassword",
-        "target": "AuthService.hashPassword",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 728,
+        "line": 785,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "_validateReplacementPassword",
@@ -147313,18 +147444,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 73,
-        "caller": "<top-level>",
-        "kind": "method",
-        "lexical_target": "_newOpaqueToken",
-        "target": "AuthService._newOpaqueToken",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 735,
+        "line": 792,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "_readInteger",
@@ -147335,7 +147455,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 761,
+        "line": 818,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -147346,7 +147466,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 774,
+        "line": 831,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "AccountSecurityResult",
@@ -147357,7 +147477,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 775,
+        "line": 832,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "generateToken",
@@ -147368,7 +147488,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 779,
+        "line": 836,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "accountProfileJson",
@@ -147379,7 +147499,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 790,
+        "line": 84,
+        "caller": "<top-level>",
+        "kind": "method",
+        "lexical_target": "hashPassword",
+        "target": "AuthService.hashPassword",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 847,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "validate",
@@ -147390,7 +147521,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 796,
+        "line": 85,
+        "caller": "<top-level>",
+        "kind": "method",
+        "lexical_target": "_newOpaqueToken",
+        "target": "AuthService._newOpaqueToken",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 853,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -147401,7 +147543,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 801,
+        "line": 858,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -147412,7 +147554,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 826,
+        "line": 883,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "method",
         "lexical_target": "_preparePassword",
@@ -147423,7 +147565,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 827,
+        "line": 884,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "constructor",
         "lexical_target": "_PasswordPreparation",
@@ -147434,22 +147576,11 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 86,
+        "line": 98,
         "caller": "AuthService.hashPassword",
         "kind": "method",
         "lexical_target": "_normalizePasswordForStorage",
         "target": "AuthService._normalizePasswordForStorage",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 98,
-        "caller": "AuthService.verifyPassword",
-        "kind": "method",
-        "lexical_target": "_preparePassword",
-        "target": "AuthService._preparePassword",
         "target_library": "package:server/auth_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -159611,7 +159742,18 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 12,
+        "line": 102,
+        "caller": "requirePositiveInteger",
+        "kind": "constructor",
+        "lexical_target": "DeckRequestException",
+        "target": "DeckRequestException.DeckRequestException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/deck_request_support.dart",
+        "line": 27,
         "caller": "requireJsonObject",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -159622,7 +159764,7 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 20,
+        "line": 35,
         "caller": "requireNonEmptyString",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -159633,7 +159775,7 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 33,
+        "line": 48,
         "caller": "readOptionalString",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -159644,7 +159786,7 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 42,
+        "line": 57,
         "caller": "readOptionalBool",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -159655,7 +159797,7 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 51,
+        "line": 66,
         "caller": "readOptionalList",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -159666,7 +159808,7 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 63,
+        "line": 78,
         "caller": "readOptionalObject",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -159677,19 +159819,8 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 76,
+        "line": 91,
         "caller": "requireObjectList",
-        "kind": "constructor",
-        "lexical_target": "DeckRequestException",
-        "target": "DeckRequestException.DeckRequestException",
-        "target_library": "package:server/deck_request_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_request_support.dart",
-        "line": 87,
-        "caller": "requirePositiveInteger",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
         "target": "DeckRequestException.DeckRequestException",
@@ -161558,7 +161689,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 146,
+        "line": 161,
         "caller": "GeneratedDeckValidationResult.validationSummary",
         "kind": "method",
         "lexical_target": "qualityEvidenceSummary",
@@ -161569,7 +161700,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 175,
+        "line": 190,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_normalizeFormat",
@@ -161580,7 +161711,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 181,
+        "line": 196,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "unsupportedDeckSectionLabels",
@@ -161591,7 +161722,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 183,
+        "line": 198,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "constructor",
         "lexical_target": "GeneratedDeckValidationResult",
@@ -161602,7 +161733,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 186,
+        "line": 201,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "unsupportedDeckSectionsMessage",
@@ -161613,7 +161744,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 191,
+        "line": 206,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_sumRawCardQuantities",
@@ -161624,7 +161755,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 199,
+        "line": 214,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "sanitizeCardName",
@@ -161635,7 +161766,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 234,
+        "line": 249,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "addLookupName",
@@ -161646,7 +161777,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 238,
+        "line": 253,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "resolveCardNames",
@@ -161657,7 +161788,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 245,
+        "line": 260,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_lookupKey",
@@ -161668,18 +161799,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 27,
-        "caller": "PostgresGeneratedDeckRepository.<constructor>",
-        "kind": "constructor",
-        "lexical_target": "CardValidationService",
-        "target": "CardValidationService.CardValidationService",
-        "target_library": "package:server/card_validation_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 298,
+        "line": 313,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_consolidateResolvedCards",
@@ -161690,7 +161810,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 304,
+        "line": 319,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_tryAutoRepairConstructed",
@@ -161701,7 +161821,18 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 311,
+        "line": 32,
+        "caller": "_validationFailure",
+        "kind": "method",
+        "lexical_target": "e",
+        "target": "Log.e",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 326,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_appendCmcIntegrityWarnings",
@@ -161712,7 +161843,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 330,
+        "line": 345,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "validateDeck",
@@ -161723,7 +161854,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 335,
+        "line": 350,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_tryAutoRepairCommanderOrBrawl",
@@ -161734,7 +161865,18 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 355,
+        "line": 367,
+        "caller": "GeneratedDeckValidationService.validate",
+        "kind": "method",
+        "lexical_target": "_validationFailure",
+        "target": "_validationFailure",
+        "target_library": "package:server/generated_deck_validation_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 370,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "_tryAutoRepairConstructedAfterFailure",
@@ -161745,18 +161887,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 36,
-        "caller": "PostgresGeneratedDeckRepository.findSuggestions",
-        "kind": "method",
-        "lexical_target": "findSuggestions",
-        "target": "CardValidationService.findSuggestions",
-        "target_library": "package:server/card_validation_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 398,
+        "line": 413,
         "caller": "GeneratedDeckValidationService.validate",
         "kind": "method",
         "lexical_target": "findSuggestions",
@@ -161767,18 +161898,18 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 43,
-        "caller": "PostgresGeneratedDeckRepository.resolveCardNames",
-        "kind": "method",
-        "lexical_target": "resolveImportCardNames",
-        "target": "resolveImportCardNames",
-        "target_library": "package:server/import_card_lookup_service.dart",
+        "line": 42,
+        "caller": "PostgresGeneratedDeckRepository.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "CardValidationService",
+        "target": "CardValidationService.CardValidationService",
+        "target_library": "package:server/card_validation_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 460,
+        "line": 475,
         "caller": "identityOf",
         "kind": "method",
         "lexical_target": "resolveCardColorIdentity",
@@ -161789,7 +161920,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 464,
+        "line": 479,
         "caller": "identityOf",
         "kind": "method",
         "lexical_target": "toStrings",
@@ -161800,7 +161931,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 471,
+        "line": 486,
         "caller": "GeneratedDeckValidationService._tryAutoRepairCommanderOrBrawl",
         "kind": "method",
         "lexical_target": "identityOf",
@@ -161811,18 +161942,18 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 48,
-        "caller": "PostgresGeneratedDeckRepository.resolveCardNames",
+        "line": 51,
+        "caller": "PostgresGeneratedDeckRepository.findSuggestions",
         "kind": "method",
-        "lexical_target": "loadCanonicalCardRoleMetadataByCardId",
-        "target": "loadCanonicalCardRoleMetadataByCardId",
-        "target_library": "package:server/ai/canonical_card_role_metadata_support.dart",
+        "lexical_target": "findSuggestions",
+        "target": "CardValidationService.findSuggestions",
+        "target_library": "package:server/card_validation_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 495,
+        "line": 510,
         "caller": "GeneratedDeckValidationService._tryAutoRepairCommanderOrBrawl",
         "kind": "method",
         "lexical_target": "isBasicLandCard",
@@ -161833,7 +161964,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 502,
+        "line": 517,
         "caller": "GeneratedDeckValidationService._tryAutoRepairCommanderOrBrawl",
         "kind": "method",
         "lexical_target": "isWithinCommanderIdentity",
@@ -161844,7 +161975,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 520,
+        "line": 535,
         "caller": "GeneratedDeckValidationService._tryAutoRepairCommanderOrBrawl",
         "kind": "method",
         "lexical_target": "_consolidateResolvedCards",
@@ -161855,7 +161986,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 562,
+        "line": 577,
         "caller": "GeneratedDeckValidationService._tryAutoRepairCommanderOrBrawl",
         "kind": "method",
         "lexical_target": "resolveCardNames",
@@ -161866,7 +161997,29 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 658,
+        "line": 58,
+        "caller": "PostgresGeneratedDeckRepository.resolveCardNames",
+        "kind": "method",
+        "lexical_target": "resolveImportCardNames",
+        "target": "resolveImportCardNames",
+        "target_library": "package:server/import_card_lookup_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 63,
+        "caller": "PostgresGeneratedDeckRepository.resolveCardNames",
+        "kind": "method",
+        "lexical_target": "loadCanonicalCardRoleMetadataByCardId",
+        "target": "loadCanonicalCardRoleMetadataByCardId",
+        "target_library": "package:server/ai/canonical_card_role_metadata_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 673,
         "caller": "GeneratedDeckValidationService._tryAutoRepairConstructed",
         "kind": "method",
         "lexical_target": "_isBasicLandCard",
@@ -161877,7 +162030,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 667,
+        "line": 682,
         "caller": "GeneratedDeckValidationService._tryAutoRepairConstructed",
         "kind": "method",
         "lexical_target": "_consolidateResolvedCards",
@@ -161888,52 +162041,8 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 675,
+        "line": 690,
         "caller": "GeneratedDeckValidationService._tryAutoRepairConstructed",
-        "kind": "method",
-        "lexical_target": "_fillConstructedDeckToMinimum",
-        "target": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
-        "target_library": "package:server/generated_deck_validation_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 706,
-        "caller": "GeneratedDeckValidationService._tryAutoRepairConstructedAfterFailure",
-        "kind": "method",
-        "lexical_target": "_isBasicLandCard",
-        "target": "GeneratedDeckValidationService._isBasicLandCard",
-        "target_library": "package:server/generated_deck_validation_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 71,
-        "caller": "PostgresGeneratedDeckRepository.validateDeck",
-        "kind": "constructor",
-        "lexical_target": "DeckRulesService",
-        "target": "DeckRulesService.DeckRulesService",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 71,
-        "caller": "PostgresGeneratedDeckRepository.validateDeck",
-        "kind": "method",
-        "lexical_target": "validateAndThrow",
-        "target": "DeckRulesService.validateAndThrow",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 720,
-        "caller": "GeneratedDeckValidationService._tryAutoRepairConstructedAfterFailure",
         "kind": "method",
         "lexical_target": "_fillConstructedDeckToMinimum",
         "target": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
@@ -161946,6 +162055,28 @@
         "line": 721,
         "caller": "GeneratedDeckValidationService._tryAutoRepairConstructedAfterFailure",
         "kind": "method",
+        "lexical_target": "_isBasicLandCard",
+        "target": "GeneratedDeckValidationService._isBasicLandCard",
+        "target_library": "package:server/generated_deck_validation_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 735,
+        "caller": "GeneratedDeckValidationService._tryAutoRepairConstructedAfterFailure",
+        "kind": "method",
+        "lexical_target": "_fillConstructedDeckToMinimum",
+        "target": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
+        "target_library": "package:server/generated_deck_validation_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 736,
+        "caller": "GeneratedDeckValidationService._tryAutoRepairConstructedAfterFailure",
+        "kind": "method",
         "lexical_target": "_consolidateResolvedCards",
         "target": "GeneratedDeckValidationService._consolidateResolvedCards",
         "target_library": "package:server/generated_deck_validation_service.dart",
@@ -161954,7 +162085,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 739,
+        "line": 754,
         "caller": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
         "kind": "method",
         "lexical_target": "_basicLandNamesForConstructedDeck",
@@ -161965,7 +162096,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 740,
+        "line": 755,
         "caller": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
         "kind": "method",
         "lexical_target": "resolveCardNames",
@@ -161976,7 +162107,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 752,
+        "line": 767,
         "caller": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
         "kind": "method",
         "lexical_target": "_lookupKey",
@@ -161987,7 +162118,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 774,
+        "line": 789,
         "caller": "GeneratedDeckValidationService._fillConstructedDeckToMinimum",
         "kind": "method",
         "lexical_target": "_consolidateResolvedCards",
@@ -161998,7 +162129,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 784,
+        "line": 799,
         "caller": "GeneratedDeckValidationService._basicLandNamesForConstructedDeck",
         "kind": "method",
         "lexical_target": "_isBasicLandCard",
@@ -162009,7 +162140,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 786,
+        "line": 801,
         "caller": "GeneratedDeckValidationService._basicLandNamesForConstructedDeck",
         "kind": "method",
         "lexical_target": "_identityOf",
@@ -162020,7 +162151,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 828,
+        "line": 843,
         "caller": "GeneratedDeckValidationService._isBasicLandCard",
         "kind": "method",
         "lexical_target": "isBasicLandCard",
@@ -162031,7 +162162,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 839,
+        "line": 854,
         "caller": "GeneratedDeckValidationService._identityOf",
         "kind": "method",
         "lexical_target": "resolveCardColorIdentity",
@@ -162042,7 +162173,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 843,
+        "line": 858,
         "caller": "GeneratedDeckValidationService._identityOf",
         "kind": "method",
         "lexical_target": "toStrings",
@@ -162053,7 +162184,29 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 879,
+        "line": 86,
+        "caller": "PostgresGeneratedDeckRepository.validateDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckRulesService",
+        "target": "DeckRulesService.DeckRulesService",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 86,
+        "caller": "PostgresGeneratedDeckRepository.validateDeck",
+        "kind": "method",
+        "lexical_target": "validateAndThrow",
+        "target": "DeckRulesService.validateAndThrow",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 894,
         "caller": "GeneratedDeckValidationService._appendCmcIntegrityWarnings",
         "kind": "method",
         "lexical_target": "hasSuspiciousNonLandCmc",
@@ -162064,7 +162217,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 904,
+        "line": 919,
         "caller": "GeneratedDeckValidationService._lookupKey",
         "kind": "method",
         "lexical_target": "cleanImportLookupKey",
@@ -162394,7 +162547,18 @@
       },
       {
         "source": "server/lib/http_responses.dart",
-        "line": 21,
+        "line": 20,
+        "caller": "apiError",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/http_responses.dart",
+        "line": 32,
         "caller": "badRequest",
         "kind": "method",
         "lexical_target": "apiError",
@@ -162405,7 +162569,7 @@
       },
       {
         "source": "server/lib/http_responses.dart",
-        "line": 27,
+        "line": 38,
         "caller": "notFound",
         "kind": "method",
         "lexical_target": "apiError",
@@ -162416,7 +162580,7 @@
       },
       {
         "source": "server/lib/http_responses.dart",
-        "line": 33,
+        "line": 44,
         "caller": "unauthorized",
         "kind": "method",
         "lexical_target": "apiError",
@@ -162427,18 +162591,18 @@
       },
       {
         "source": "server/lib/http_responses.dart",
-        "line": 39,
+        "line": 53,
         "caller": "internalServerError",
         "kind": "method",
-        "lexical_target": "apiError",
-        "target": "apiError",
-        "target_library": "package:server/http_responses.dart",
+        "lexical_target": "e",
+        "target": "Log.e",
+        "target_library": "package:server/logger.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/http_responses.dart",
-        "line": 44,
+        "line": 67,
         "caller": "methodNotAllowed",
         "kind": "method",
         "lexical_target": "apiError",
@@ -167552,6 +167716,105 @@
         "occurrences": 6
       },
       {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 173,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "_header",
+        "target": "_header",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 188,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "containsInternalDetail",
+        "target": "containsInternalDetail",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 191,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "_stableCode",
+        "target": "_stableCode",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 194,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "_isErrorEnvelope",
+        "target": "_isErrorEnvelope",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 209,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "_rebuildJson",
+        "target": "_rebuildJson",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 211,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "publicErrorCodeForStatus",
+        "target": "publicErrorCodeForStatus",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 231,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "publicErrorBody",
+        "target": "publicErrorBody",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 237,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "_serverErrorMessageFor",
+        "target": "_serverErrorMessageFor",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 266,
+        "caller": "_stableCode",
+        "kind": "method",
+        "lexical_target": "isStablePublicErrorCode",
+        "target": "isStablePublicErrorCode",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/public_site_url.dart",
         "line": 15,
         "caller": "resolvePublicSiteBaseUrl",
@@ -170699,7 +170962,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 105,
+        "line": 106,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "decisionFor",
@@ -170710,7 +170973,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 113,
+        "line": 114,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "entry",
@@ -170721,7 +170984,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 117,
+        "line": 118,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "record",
@@ -170732,18 +170995,18 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 122,
+        "line": 123,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "w",
         "target": "Log.w",
         "target_library": "package:server/logger.dart",
         "target_scope": "workspace",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 148,
+        "line": 150,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "ensureObservabilityInitialized",
@@ -170754,7 +171017,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 151,
+        "line": 153,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "connect",
@@ -170765,7 +171028,18 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 18,
+        "line": 157,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "publicErrorBody",
+        "target": "publicErrorBody",
+        "target_library": "package:server/public_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 19,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -170776,18 +171050,18 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 206,
+        "line": 201,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
-        "lexical_target": "_recordHttpObservability",
-        "target": "_recordHttpObservability",
-        "target_library": "workspace:server/routes/_middleware.dart",
+        "lexical_target": "sanitizePublicErrorResponse",
+        "target": "sanitizePublicErrorResponse",
+        "target_library": "package:server/public_error_contract.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 21,
+        "line": 22,
         "caller": "<top-level>",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -170798,18 +171072,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 216,
-        "caller": "middlewareWithReleaseCapabilityPolicy",
-        "kind": "method",
-        "lexical_target": "captureObservedException",
-        "target": "captureObservedException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/_middleware.dart",
-        "line": 22,
+        "line": 23,
         "caller": "<top-level>",
         "kind": "method",
         "lexical_target": "load",
@@ -170820,18 +171083,18 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 225,
+        "line": 233,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
-        "lexical_target": "e",
-        "target": "Log.e",
-        "target_library": "package:server/logger.dart",
+        "lexical_target": "_recordHttpObservability",
+        "target": "_recordHttpObservability",
+        "target_library": "workspace:server/routes/_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 23,
+        "line": 24,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "CorsPolicy.fromEnvironment",
@@ -170842,7 +171105,29 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 289,
+        "line": 243,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "captureObservedException",
+        "target": "captureObservedException",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 252,
+        "caller": "middlewareWithReleaseCapabilityPolicy",
+        "kind": "method",
+        "lexical_target": "e",
+        "target": "Log.e",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 320,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "_safeUserId",
@@ -170853,7 +171138,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 303,
+        "line": 334,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "e",
@@ -170864,7 +171149,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 305,
+        "line": 336,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "w",
@@ -170875,7 +171160,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 309,
+        "line": 340,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "captureObservedMessage",
@@ -170886,7 +171171,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 353,
+        "line": 384,
         "caller": "_safeUserId",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -170897,7 +171182,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 353,
+        "line": 384,
         "caller": "_safeUserId",
         "kind": "method",
         "lexical_target": "verifyToken",
@@ -170908,7 +171193,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 46,
+        "line": 47,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "middlewareWithReleaseCapabilityPolicy",
@@ -170919,7 +171204,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 58,
+        "line": 59,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "resolveRequestId",
@@ -170930,7 +171215,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 59,
+        "line": 60,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "constructor",
         "lexical_target": "RequestTrace",
@@ -170941,7 +171226,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 62,
+        "line": 63,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "_header",
@@ -170952,7 +171237,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 65,
+        "line": 66,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "headersFor",
@@ -170963,7 +171248,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 67,
+        "line": 68,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isDatabaseIndependentHealthPath",
@@ -170974,7 +171259,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 71,
+        "line": 72,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -170985,7 +171270,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 82,
+        "line": 83,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isValidPreflight",
@@ -181017,7 +181302,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 100,
+        "line": 108,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validate",
@@ -181028,7 +181313,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 118,
+        "line": 126,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "betaInviteCodeRateLimitResponse",
@@ -181039,7 +181324,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 120,
+        "line": 128,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "betaInviteRateLimitIdentifier",
@@ -181050,7 +181335,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 124,
+        "line": 132,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitResponse",
@@ -181061,7 +181346,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 135,
+        "line": 143,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "BetaInviteClaim",
@@ -181072,7 +181357,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 138,
+        "line": 146,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "preflight",
@@ -181083,7 +181368,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 139,
+        "line": 147,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -181094,7 +181379,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 144,
+        "line": 152,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "recordDenial",
@@ -181105,7 +181390,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 157,
+        "line": 165,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -181116,7 +181401,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 160,
+        "line": 168,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "register",
@@ -181127,7 +181412,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 198,
+        "line": 206,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "EmailVerificationRequest",
@@ -181138,7 +181423,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 205,
+        "line": 213,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "EmailVerificationDeliveryService",
@@ -181149,7 +181434,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 205,
+        "line": 213,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "deliver",
@@ -181160,7 +181445,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 211,
+        "line": 219,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -181171,7 +181456,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 218,
+        "line": 226,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "emailVerificationEnvironmentValues",
@@ -181182,7 +181467,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 232,
+        "line": 240,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "mayExposeEmailVerificationTokenForTesting",
@@ -181193,7 +181478,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 44,
+        "line": 52,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -181204,7 +181489,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 53,
+        "line": 61,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "evaluate",
@@ -181215,7 +181500,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 54,
+        "line": 62,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "registrationAdmission",
@@ -181226,7 +181511,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 58,
+        "line": 66,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_requestId",
@@ -181237,7 +181522,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 58,
+        "line": 66,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "logDenial",
@@ -181248,7 +181533,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 61,
+        "line": 69,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -181259,7 +181544,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 66,
+        "line": 74,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "parse",
@@ -181270,7 +181555,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 68,
+        "line": 76,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "isRequired",
@@ -182964,7 +183249,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 133,
+        "line": 134,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -182975,7 +183260,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 154,
+        "line": 155,
         "caller": "getMainType",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -182986,7 +183271,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 17,
+        "line": 18,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "handleCommunityFollowingFeed",
@@ -182997,7 +183282,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 195,
+        "line": 196,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "getMainType",
@@ -183008,18 +183293,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 20,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_getPublicDeck",
-        "target": "_getPublicDeck",
-        "target_library": "workspace:server/routes/community/decks/[id]/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 204,
+        "line": 205,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -183030,7 +183304,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 205,
+        "line": 206,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "calculateCmc",
@@ -183041,7 +183315,18 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 236,
+        "line": 21,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_getPublicDeck",
+        "target": "_getPublicDeck",
+        "target_library": "workspace:server/routes/community/decks/[id]/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/community/decks/[id]/index.dart",
+        "line": 237,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "_buildVisualAnalysis",
@@ -183052,7 +183337,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 24,
+        "line": 25,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_copyPublicDeck",
@@ -183063,7 +183348,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 249,
+        "line": 250,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -183074,7 +183359,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 256,
+        "line": 257,
         "caller": "_getPublicDeck",
         "kind": "method",
         "lexical_target": "e",
@@ -183085,7 +183370,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 296,
+        "line": 297,
         "caller": "_buildVisualAnalysis",
         "kind": "method",
         "lexical_target": "_curveReading",
@@ -183096,18 +183381,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 33,
-        "caller": "_getPublicDeck",
-        "kind": "method",
-        "lexical_target": "readAuthenticatedUserId",
-        "target": "readAuthenticatedUserId",
-        "target_library": "package:server/community_request_auth.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 330,
+        "line": 331,
         "caller": "_copyPublicDeck",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -183118,7 +183392,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 331,
+        "line": 332,
         "caller": "_copyPublicDeck",
         "kind": "method",
         "lexical_target": "getUserFromToken",
@@ -183129,7 +183403,29 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 394,
+        "line": 34,
+        "caller": "_getPublicDeck",
+        "kind": "method",
+        "lexical_target": "readAuthenticatedUserId",
+        "target": "readAuthenticatedUserId",
+        "target_library": "package:server/community_request_auth.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/community/decks/[id]/index.dart",
+        "line": 372,
+        "caller": "_copyPublicDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckNotFoundException",
+        "target": "DeckNotFoundException.DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/community/decks/[id]/index.dart",
+        "line": 397,
         "caller": "_copyPublicDeck",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -183140,7 +183436,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 394,
+        "line": 397,
         "caller": "_copyPublicDeck",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -183151,7 +183447,18 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 449,
+        "line": 452,
+        "caller": "_copyPublicDeck",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DeckNotFoundException.toJson",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/community/decks/[id]/index.dart",
+        "line": 454,
         "caller": "_copyPublicDeck",
         "kind": "method",
         "lexical_target": "e",
@@ -183162,7 +183469,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 456,
+        "line": 457,
         "caller": "_copyPublicDeck",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -185340,7 +185647,18 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 117,
+        "line": 112,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "DeckNotFoundException",
+        "target": "DeckNotFoundException.DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/bulk/index.dart",
+        "line": 119,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "deckValidationTimestampToJson",
@@ -185351,7 +185669,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 146,
+        "line": 148,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildDeckSignature",
@@ -185362,7 +185680,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 162,
+        "line": 164,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "mergeBulkCardIncrementsPreservingCondition",
@@ -185373,7 +185691,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 171,
+        "line": 173,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateOptimizationApplyAuthorization",
@@ -185384,7 +185702,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 181,
+        "line": 183,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "optimizationApplyAuthorizedBracket",
@@ -185395,7 +185713,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 185,
+        "line": 187,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -185406,7 +185724,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 185,
+        "line": 187,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -185417,7 +185735,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 192,
+        "line": 194,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
@@ -185428,7 +185746,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 202,
+        "line": 204,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationFunctionalRoleFloorViolation",
@@ -185439,7 +185757,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 207,
+        "line": 209,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderManaFloor",
@@ -185450,7 +185768,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 214,
+        "line": 216,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationLandFloorViolation",
@@ -185461,7 +185779,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 216,
+        "line": 218,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderBracket",
@@ -185472,7 +185790,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 224,
+        "line": 226,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "OptimizationBracketViolation",
@@ -185483,7 +185801,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 314,
+        "line": 316,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "loadAppliedDeckPostAnalysis",
@@ -185494,7 +185812,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 319,
+        "line": 321,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckOptimizationHistoryService",
@@ -185505,7 +185823,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 319,
+        "line": 321,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "recordAppliedOptimization",
@@ -185516,7 +185834,29 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 46,
+        "line": 392,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DeckNotFoundException.toJson",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/bulk/index.dart",
+        "line": 395,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/bulk/index.dart",
+        "line": 48,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateNoUnsupportedDeckSections",
@@ -185527,7 +185867,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 95,
+        "line": 97,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "normalizeMutationContext",
@@ -185538,7 +185878,18 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 134,
+        "line": 100,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "validateMainDeckCardEligibility",
+        "target": "validateMainDeckCardEligibility",
+        "target_library": "package:server/deck_card_eligibility.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/index.dart",
+        "line": 136,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "isBasicLandCard",
@@ -185549,7 +185900,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 145,
+        "line": 147,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "isCommanderEligibleCard",
@@ -185560,7 +185911,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 194,
+        "line": 196,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -185571,7 +185922,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 194,
+        "line": 196,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -185582,7 +185933,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 36,
+        "line": 38,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_validateCondition",
@@ -185593,7 +185944,40 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 64,
+        "line": 435,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DeckNotFoundException.toJson",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/index.dart",
+        "line": 438,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/index.dart",
+        "line": 62,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "DeckNotFoundException",
+        "target": "DeckNotFoundException.DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/index.dart",
+        "line": 66,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateNoUnsupportedDeckSections",
@@ -185604,7 +185988,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 79,
+        "line": 81,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesException",
@@ -185614,19 +185998,8 @@
         "occurrences": 13
       },
       {
-        "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 98,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "validateMainDeckCardEligibility",
-        "target": "validateMainDeckCardEligibility",
-        "target_library": "package:server/deck_card_eligibility.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
-        "line": 164,
+        "line": 166,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -185637,7 +186010,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
-        "line": 164,
+        "line": 166,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -185648,7 +186021,40 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
-        "line": 70,
+        "line": 224,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DeckNotFoundException.toJson",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/replace/index.dart",
+        "line": 227,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/replace/index.dart",
+        "line": 61,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "DeckNotFoundException",
+        "target": "DeckNotFoundException.DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/replace/index.dart",
+        "line": 72,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesException",
@@ -185659,7 +186065,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 179,
+        "line": 181,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "DeckRulesService",
@@ -185670,7 +186076,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 179,
+        "line": 181,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateAndThrow",
@@ -185681,7 +186087,29 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 47,
+        "line": 242,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "DeckNotFoundException.toJson",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/set/index.dart",
+        "line": 245,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/set/index.dart",
+        "line": 49,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_validateCondition",
@@ -185692,7 +186120,18 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 80,
+        "line": 79,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "DeckNotFoundException",
+        "target": "DeckNotFoundException.DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/set/index.dart",
+        "line": 82,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validateNoUnsupportedDeckSections",
@@ -185703,7 +186142,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 94,
+        "line": 96,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "isBasicLandCard",
@@ -185799,6 +186238,17 @@
         "target_library": "package:server/http_responses.dart",
         "target_scope": "workspace",
         "occurrences": 4
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 145,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckNotFoundException",
+        "target": "DeckNotFoundException.DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
@@ -186110,18 +186560,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 592,
+        "line": 590,
         "caller": "_updateDeck",
         "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
+        "lexical_target": "toJson",
+        "target": "DeckNotFoundException.toJson",
+        "target_library": "package:server/deck_request_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 594,
+        "line": 593,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -186132,7 +186582,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 602,
+        "line": 601,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -186143,7 +186593,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 603,
+        "line": 602,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckPricingColumns",
@@ -186154,7 +186604,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 604,
+        "line": 603,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckPricingSourceColumn",
@@ -186165,7 +186615,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 605,
+        "line": 604,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckValidationStateColumns",
@@ -186176,7 +186626,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 606,
+        "line": 605,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -186187,7 +186637,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 607,
+        "line": 606,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -186198,7 +186648,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 634,
+        "line": 633,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "notFound",
@@ -186209,7 +186659,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 652,
+        "line": 651,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -186220,7 +186670,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 705,
+        "line": 704,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -186242,7 +186692,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 735,
+        "line": 734,
         "caller": "getMainType",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -186253,7 +186703,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 780,
+        "line": 779,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "getMainType",
@@ -186264,7 +186714,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 791,
+        "line": 790,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -186275,7 +186725,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 792,
+        "line": 791,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "calculateCmc",
@@ -186308,7 +186758,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 826,
+        "line": 825,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -186319,7 +186769,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 851,
+        "line": 850,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -191565,14 +192015,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 595,
-        "occurrences": 743
+        "unique_references": 596,
+        "occurrences": 744
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14413,
-        "occurrences": 25016
+        "unique_references": 14417,
+        "occurrences": 25010
       },
       {
         "target_scope": "dart_sdk",
@@ -191679,8 +192129,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 489,
-        "occurrences": 956
+        "unique_references": 493,
+        "occurrences": 965
       },
       {
         "target_scope": "dependency",
@@ -195123,8 +195573,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/auth_service.dart",
-        "unique_references": 85,
-        "occurrences": 91
+        "unique_references": 88,
+        "occurrences": 96
       },
       {
         "target_scope": "workspace",
@@ -195537,8 +195987,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/deck_request_support.dart",
-        "unique_references": 36,
-        "occurrences": 61
+        "unique_references": 48,
+        "occurrences": 73
       },
       {
         "target_scope": "workspace",
@@ -195657,8 +196107,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/generated_deck_validation_service.dart",
-        "unique_references": 55,
-        "occurrences": 69
+        "unique_references": 56,
+        "occurrences": 72
       },
       {
         "target_scope": "workspace",
@@ -195669,8 +196119,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/http_responses.dart",
-        "unique_references": 166,
-        "occurrences": 251
+        "unique_references": 168,
+        "occurrences": 253
       },
       {
         "target_scope": "workspace",
@@ -195717,8 +196167,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 179,
-        "occurrences": 304
+        "unique_references": 182,
+        "occurrences": 308
       },
       {
         "target_scope": "workspace",
@@ -195911,6 +196361,12 @@
         "target_library": "package:server/privacy/retention_cleanup.dart",
         "unique_references": 15,
         "occurrences": 23
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/public_error_contract.dart",
+        "unique_references": 11,
+        "occurrences": 21
       },
       {
         "target_scope": "workspace",
@@ -200686,7 +201142,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 385,
+        "line": 442,
         "caller": "AuthService._loginPasswordMatches",
         "kind": "function_expression",
         "lexical_target": "verify",
@@ -201093,6 +201549,14 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 227,
+        "caller": "sanitizePublicErrorResponse",
+        "kind": "method",
+        "lexical_target": "call",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/push_notification_service.dart",
         "line": 272,
         "caller": "PushNotificationService._sendToUser",
@@ -201166,7 +201630,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 165,
+        "line": 171,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "function_expression",
         "lexical_target": "handler.use(provider<ReleaseCapabilityPolicy>((_) => releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
@@ -201174,7 +201638,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 172,
+        "line": 178,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "function_expression",
         "lexical_target": "handler.use(provider<Pool>((_) => _db.connection)).use(provider<ReleaseCapabilityPolicy>((_) => releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
@@ -201293,9 +201757,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16413,
-    "workspace_type_reference_count": 3481,
-    "unresolved_type_reference_count": 360,
+    "resolved_type_reference_count": 16442,
+    "workspace_type_reference_count": 3489,
+    "unresolved_type_reference_count": 361,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -227690,27 +228154,27 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 172,
+        "line": 184,
         "lexical_type": "LegalAcceptance?",
         "resolved_type": "LegalAcceptance?",
         "target": "LegalAcceptance",
         "target_library": "package:server/legal_policy.dart",
         "target_scope": "workspace",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 173,
+        "line": 185,
         "lexical_type": "BetaInviteClaim?",
         "resolved_type": "BetaInviteClaim?",
         "target": "BetaInviteClaim",
         "target_library": "package:server/beta_invites/beta_invite_store.dart",
         "target_scope": "workspace",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 175,
+        "line": 187,
         "lexical_type": "Database",
         "resolved_type": "Database",
         "target": "Database",
@@ -227720,7 +228184,17 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 23,
+        "line": 198,
+        "lexical_type": "RegistrationRejectedException",
+        "resolved_type": "RegistrationRejectedException",
+        "target": "RegistrationRejectedException",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 35,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -227730,7 +228204,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 356,
+        "line": 413,
         "lexical_type": "InvalidCredentialsException",
         "resolved_type": "InvalidCredentialsException",
         "target": "InvalidCredentialsException",
@@ -227740,7 +228214,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 432,
+        "line": 489,
         "lexical_type": "EmailVerificationRequest?",
         "resolved_type": "EmailVerificationRequest?",
         "target": "EmailVerificationRequest",
@@ -227750,7 +228224,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 472,
+        "line": 529,
         "lexical_type": "EmailVerificationRequest",
         "resolved_type": "EmailVerificationRequest",
         "target": "EmailVerificationRequest",
@@ -227760,7 +228234,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 483,
+        "line": 540,
         "lexical_type": "AccountSecurityException",
         "resolved_type": "AccountSecurityException",
         "target": "AccountSecurityException",
@@ -227770,7 +228244,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 534,
+        "line": 591,
         "lexical_type": "PasswordResetRequest?",
         "resolved_type": "PasswordResetRequest?",
         "target": "PasswordResetRequest",
@@ -227780,7 +228254,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 593,
+        "line": 650,
         "lexical_type": "PasswordResetRequest",
         "resolved_type": "PasswordResetRequest",
         "target": "PasswordResetRequest",
@@ -227790,7 +228264,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 678,
+        "line": 735,
         "lexical_type": "AccountSecurityResult",
         "resolved_type": "AccountSecurityResult",
         "target": "AccountSecurityResult",
@@ -227800,7 +228274,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 825,
+        "line": 882,
         "lexical_type": "_PasswordPreparation",
         "resolved_type": "_PasswordPreparation",
         "target": "_PasswordPreparation",
@@ -231170,7 +231644,7 @@
       },
       {
         "source": "server/lib/deck_request_support.dart",
-        "line": 12,
+        "line": 27,
         "lexical_type": "DeckRequestException",
         "resolved_type": "DeckRequestException",
         "target": "DeckRequestException",
@@ -231460,7 +231934,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 170,
+        "line": 185,
         "lexical_type": "GeneratedDeckValidationResult",
         "resolved_type": "GeneratedDeckValidationResult",
         "target": "GeneratedDeckValidationResult",
@@ -231470,27 +231944,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 24,
-        "lexical_type": "GeneratedDeckRepository",
-        "resolved_type": "GeneratedDeckRepository",
-        "target": "GeneratedDeckRepository",
-        "target_library": "package:server/generated_deck_validation_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 27,
-        "lexical_type": "CardValidationService",
-        "resolved_type": "CardValidationService",
-        "target": "CardValidationService",
-        "target_library": "package:server/card_validation_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 334,
+        "line": 349,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -231500,7 +231954,27 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 71,
+        "line": 39,
+        "lexical_type": "GeneratedDeckRepository",
+        "resolved_type": "GeneratedDeckRepository",
+        "target": "GeneratedDeckRepository",
+        "target_library": "package:server/generated_deck_validation_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 42,
+        "lexical_type": "CardValidationService",
+        "resolved_type": "CardValidationService",
+        "target": "CardValidationService",
+        "target_library": "package:server/card_validation_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/generated_deck_validation_service.dart",
+        "line": 86,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -233170,7 +233644,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 18,
+        "line": 19,
         "lexical_type": "Database",
         "resolved_type": "Database",
         "target": "Database",
@@ -233180,7 +233654,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 23,
+        "line": 24,
         "lexical_type": "CorsPolicy",
         "resolved_type": "CorsPolicy",
         "target": "CorsPolicy",
@@ -233190,7 +233664,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 353,
+        "line": 384,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -233200,7 +233674,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 54,
+        "line": 55,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -233210,7 +233684,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 59,
+        "line": 60,
         "lexical_type": "RequestTrace",
         "resolved_type": "RequestTrace",
         "target": "RequestTrace",
@@ -234570,7 +235044,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 135,
+        "line": 143,
         "lexical_type": "BetaInviteClaim",
         "resolved_type": "BetaInviteClaim",
         "target": "BetaInviteClaim",
@@ -234580,7 +235054,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 139,
+        "line": 147,
         "lexical_type": "Database",
         "resolved_type": "Database",
         "target": "Database",
@@ -234590,7 +235064,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 157,
+        "line": 165,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -234600,7 +235074,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 167,
+        "line": 175,
         "lexical_type": "BetaInviteDeniedException",
         "resolved_type": "BetaInviteDeniedException",
         "target": "BetaInviteDeniedException",
@@ -234610,7 +235084,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 198,
+        "line": 206,
         "lexical_type": "EmailVerificationRequest",
         "resolved_type": "EmailVerificationRequest",
         "target": "EmailVerificationRequest",
@@ -234620,7 +235094,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 205,
+        "line": 213,
         "lexical_type": "EmailVerificationDeliveryService",
         "resolved_type": "EmailVerificationDeliveryService",
         "target": "EmailVerificationDeliveryService",
@@ -234630,7 +235104,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 236,
+        "line": 244,
         "lexical_type": "LegalAcceptanceException",
         "resolved_type": "LegalAcceptanceException",
         "target": "LegalAcceptanceException",
@@ -234640,7 +235114,17 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 267,
+        "line": 249,
+        "lexical_type": "RegistrationRejectedException",
+        "resolved_type": "RegistrationRejectedException",
+        "target": "RegistrationRejectedException",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 282,
         "lexical_type": "RequestTrace",
         "resolved_type": "RequestTrace",
         "target": "RequestTrace",
@@ -234650,7 +235134,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 57,
+        "line": 65,
         "lexical_type": "BetaInviteDenial",
         "resolved_type": "BetaInviteDenial",
         "target": "BetaInviteDenial",
@@ -234870,7 +235354,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 330,
+        "line": 331,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -234880,7 +235364,17 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 394,
+        "line": 372,
+        "lexical_type": "DeckNotFoundException",
+        "resolved_type": "DeckNotFoundException",
+        "target": "DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/community/decks/[id]/index.dart",
+        "line": 397,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -234890,7 +235384,7 @@
       },
       {
         "source": "server/routes/community/decks/[id]/index.dart",
-        "line": 440,
+        "line": 443,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -235200,7 +235694,17 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 185,
+        "line": 112,
+        "lexical_type": "DeckNotFoundException",
+        "resolved_type": "DeckNotFoundException",
+        "target": "DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/bulk/index.dart",
+        "line": 187,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -235210,7 +235714,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 202,
+        "line": 204,
         "lexical_type": "OptimizationFunctionalRoleFloorViolation",
         "resolved_type": "OptimizationFunctionalRoleFloorViolation",
         "target": "OptimizationFunctionalRoleFloorViolation",
@@ -235220,7 +235724,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 214,
+        "line": 216,
         "lexical_type": "OptimizationLandFloorViolation",
         "resolved_type": "OptimizationLandFloorViolation",
         "target": "OptimizationLandFloorViolation",
@@ -235230,7 +235734,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 224,
+        "line": 226,
         "lexical_type": "OptimizationBracketViolation",
         "resolved_type": "OptimizationBracketViolation",
         "target": "OptimizationBracketViolation",
@@ -235240,7 +235744,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 319,
+        "line": 321,
         "lexical_type": "DeckOptimizationHistoryService",
         "resolved_type": "DeckOptimizationHistoryService",
         "target": "DeckOptimizationHistoryService",
@@ -235250,7 +235754,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 378,
+        "line": 380,
         "lexical_type": "OptimizationApplyAuthorizationViolation",
         "resolved_type": "OptimizationApplyAuthorizationViolation",
         "target": "OptimizationApplyAuthorizationViolation",
@@ -235260,7 +235764,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/bulk/index.dart",
-        "line": 49,
+        "line": 51,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -235270,7 +235774,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 104,
+        "line": 106,
         "lexical_type": "MainDeckCardEligibilityException",
         "resolved_type": "MainDeckCardEligibilityException",
         "target": "MainDeckCardEligibilityException",
@@ -235280,7 +235784,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 194,
+        "line": 196,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -235290,7 +235794,17 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/index.dart",
-        "line": 79,
+        "line": 62,
+        "lexical_type": "DeckNotFoundException",
+        "resolved_type": "DeckNotFoundException",
+        "target": "DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/index.dart",
+        "line": 81,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -235300,7 +235814,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
-        "line": 164,
+        "line": 166,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -235310,7 +235824,17 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/replace/index.dart",
-        "line": 70,
+        "line": 61,
+        "lexical_type": "DeckNotFoundException",
+        "resolved_type": "DeckNotFoundException",
+        "target": "DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/replace/index.dart",
+        "line": 72,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -235320,7 +235844,7 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 179,
+        "line": 181,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -235330,13 +235854,33 @@
       },
       {
         "source": "server/routes/decks/[id]/cards/set/index.dart",
-        "line": 234,
+        "line": 236,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
         "target_library": "package:server/deck_rules_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/cards/set/index.dart",
+        "line": 79,
+        "lexical_type": "DeckNotFoundException",
+        "resolved_type": "DeckNotFoundException",
+        "target": "DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 145,
+        "lexical_type": "DeckNotFoundException",
+        "resolved_type": "DeckNotFoundException",
+        "target": "DeckNotFoundException",
+        "target_library": "package:server/deck_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
@@ -236119,8 +236663,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1101,
-        "occurrences": 2227
+        "unique_references": 1103,
+        "occurrences": 2229
       },
       {
         "target_scope": "dart_sdk",
@@ -236137,8 +236681,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6340,
-        "occurrences": 40114
+        "unique_references": 6355,
+        "occurrences": 40180
       },
       {
         "target_scope": "dart_sdk",
@@ -236221,8 +236765,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 275,
-        "occurrences": 1109
+        "unique_references": 276,
+        "occurrences": 1118
       },
       {
         "target_scope": "dependency",
@@ -237463,14 +238007,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/exceptions.dart",
-        "unique_references": 5,
-        "occurrences": 6
+        "unique_references": 6,
+        "occurrences": 7
       },
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 202,
-        "occurrences": 485
+        "unique_references": 203,
+        "occurrences": 486
       },
       {
         "target_scope": "dependency",
@@ -237607,8 +238151,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 410,
-        "occurrences": 4775
+        "unique_references": 411,
+        "occurrences": 4778
       },
       {
         "target_scope": "workspace",
@@ -239281,8 +239825,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/auth_service.dart",
-        "unique_references": 34,
-        "occurrences": 58
+        "unique_references": 36,
+        "occurrences": 63
       },
       {
         "target_scope": "workspace",
@@ -239486,7 +240030,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/beta_invites/beta_invite_store.dart",
         "unique_references": 2,
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -239605,8 +240149,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/deck_request_support.dart",
-        "unique_references": 6,
-        "occurrences": 32
+        "unique_references": 12,
+        "occurrences": 44
       },
       {
         "target_scope": "workspace",
@@ -239714,7 +240258,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/legal_policy.dart",
         "unique_references": 5,
-        "occurrences": 5
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -241934,7 +242478,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 50,
+        "line": 62,
         "lexical_type": "void",
         "occurrences": 4
       },
@@ -242102,7 +242646,7 @@
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
-        "line": 18,
+        "line": 19,
         "lexical_type": "void",
         "occurrences": 4
       },
@@ -242197,6 +242741,12 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/public_error_contract.dart",
+        "line": 169,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/push_notification_service.dart",
         "line": 195,
         "lexical_type": "void",
@@ -242240,7 +242790,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 265,
+        "line": 296,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -243234,7 +243784,7 @@
       "name": "AuthService",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 15,
+      "line": 27,
       "members": [
         "_hashOpaqueToken",
         "_loginPasswordMatches",
@@ -243242,6 +243792,7 @@
         "_normalizePasswordForStorage",
         "_preparePassword",
         "_readInteger",
+        "_registerTransaction",
         "_rotateAuthenticationVersion",
         "_validateReplacementPassword",
         "changePassword",
@@ -243529,7 +244080,7 @@
       "name": "GeneratedDeckValidationService",
       "kind": "class",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 165,
+      "line": 180,
       "members": [
         "_appendCmcIntegrityWarnings",
         "_basicLandNamesForConstructedDeck",
@@ -277229,6 +277780,9 @@
     "server/test/product_shape_live_test.dart",
     "server/test/production_ai_mock_fallback_policy_test.dart",
     "server/test/profile_community_live_test.dart",
+    "server/test/public_error_contract_test.dart",
+    "server/test/public_error_db_live_test.dart",
+    "server/test/public_error_e2e_live_test.dart",
     "server/test/public_site_url_test.dart",
     "server/test/public_web_product_contract_test.dart",
     "server/test/pull_learning_events_schema_test.py",
@@ -278579,7 +279133,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "a4af024bdaaf0dec9ff31ea189f31f9186f066a9f9f1d539f4b7aec1a7945774"
+      "sha256": "e5f6983cd2b9a38ccbd12fee08b4c553f5787abff5a1570ac3467eb3787d5bae"
     },
     "required_task_fields": [
       "id",
@@ -278744,10 +279298,10 @@
       {
         "id": "BT-AUTH-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Padronizar erros públicos tipados e impedir exception/SQL/stack cru.",
         "depends_on": [],
-        "acceptance": "Corpus de falhas retorna código estável e request-id; zero detalhe interno. Decisão do dono em 2026-09-22: D-21, códigos `dominio_motivo` em snake_case acompanham a frase em português, sem substituí-la. Achado de 2026-09-23 (frente de segurança): `GET /reports/:id` devolve o texto da exceção em `details` quando o banco falha (`server/routes/reports/[id].dart:19`).",
+        "acceptance": "Corpus de falhas retorna código estável e request-id; zero detalhe interno. Decisão do dono em 2026-09-22: D-21, códigos `dominio_motivo` em snake_case acompanham a frase em português, sem substituí-la. Achado de 2026-09-23 (frente de segurança): `GET /reports/:id` devolve o texto da exceção em `details` quando o banco falha (`server/routes/reports/[id].dart:19`). Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24`: o middleware raiz passa todo 4xx e 5xx do handler por `server/lib/public_error_contract.dart`. Corpo com texto de exceção, SQL ou stack vira a frase genérica, com o código da rota (ou o do status) e o request-id; 5xx só passa com código estável em `error`; envelope 4xx sem código ganha `code` pelo status (400 `request_invalid`, 404 `resource_not_found`, 429 `rate_limited`...) e todo envelope ganha `request_id` (o header `x-request-id` já saía sempre); a frase fica onde a rota pôs, sem substituição. Fontes corrigidas: `apiError` e `internalServerError` não serializam exceção (inclui o achado de `/reports/:id`), as rotas de cartas do deck e `PUT /decks/:id` respondem 404 `deck_not_found` em vez de 500 com a exceção, o cadastro responde `auth_username_taken`, `auth_email_taken` e, na corrida que bate no índice único, `auth_account_taken`, e a validação do deck gerado não põe `e.toString()` na lista de erros. Evidência: `server/test/public_error_contract_test.dart` (corpus pelo middleware raiz e fontes sem ele), `server/test/public_error_db_live_test.dart` (corrida de cadastro em PostgreSQL descartável) e `server/test/public_error_e2e_live_test.dart` (10 casos por HTTP contra a API local); 16 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-001-erros-publicos.md`. O código de domínio por rota fica incremental: as frases antigas recebem o código pelo status.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 311
       },
@@ -288461,7 +289015,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "56b85a528f4c231ac20b5604b742242577ec56bc3aca23669d56f4e08d9bc6d7"
+    "project_logic_source_digest_sha256": "c3fe3c244a39389421eb3c93ba0146be154797042d58d191bde5de33625c308d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -291074,6 +291628,7 @@
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "server/lib/privacy/privacy_export_request_log.dart",
       "server/lib/privacy/retention_cleanup.dart",
+      "server/lib/public_error_contract.dart",
       "server/lib/public_site_url.dart",
       "server/lib/push_notification_service.dart",
       "server/lib/rate_limit_middleware.dart",
@@ -291605,6 +292160,9 @@
       "server/test/product_shape_live_test.dart",
       "server/test/production_ai_mock_fallback_policy_test.dart",
       "server/test/profile_community_live_test.dart",
+      "server/test/public_error_contract_test.dart",
+      "server/test/public_error_db_live_test.dart",
+      "server/test/public_error_e2e_live_test.dart",
       "server/test/public_site_url_test.dart",
       "server/test/public_web_product_contract_test.dart",
       "server/test/pull_learning_events_schema_test.py",

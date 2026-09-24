@@ -10,6 +10,7 @@ import '../../lib/email_verification_policy.dart';
 import '../../lib/legal_policy.dart';
 import '../../lib/observability.dart';
 import '../../lib/password_policy.dart';
+import '../../lib/public_error_contract.dart';
 import '../../lib/rate_limit_middleware.dart';
 import '../../lib/request_trace.dart';
 import '../../lib/runtime_environment.dart';
@@ -37,7 +38,14 @@ Future<Response> onRequest(RequestContext context) async {
   }
 
   try {
-    final body = await context.request.json() as Map<String, dynamic>;
+    final decoded = await context.request.json();
+    if (decoded is! Map<String, dynamic>) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: {'message': 'JSON inválido', 'code': 'request_json_invalid'},
+      );
+    }
+    final body = decoded;
     final username = (body['username'] as String?)?.trim();
     final email = (body['email'] as String?)?.trim();
     final password = body['password'] as String?;
@@ -238,17 +246,21 @@ Future<Response> onRequest(RequestContext context) async {
       statusCode: HttpStatus.badRequest,
       body: {'error': error.code, 'message': error.message},
     );
-  } on Exception catch (e) {
-    print('[ERROR] handler: $e');
-    // Erros de negócio (username/email duplicado, etc)
-    final message = e.toString().replaceFirst('Exception: ', '');
+  } on RegistrationRejectedException catch (error) {
+    // Regra de negócio (nome ou e-mail em uso, senha fraca): a frase fica
+    // em `message`, como o app já lê, e o código em `code`.
     return Response.json(
       statusCode: HttpStatus.badRequest,
-      body: {'message': message},
+      body: {'message': error.message, 'code': error.code},
+    );
+  } on FormatException {
+    return Response.json(
+      statusCode: HttpStatus.badRequest,
+      body: {'message': 'JSON inválido', 'code': 'request_json_invalid'},
     );
   } catch (e, stackTrace) {
-    print('[ERROR] handler: $e');
-    print('Erro ao criar conta: $e');
+    // BT-AUTH-001: exceção do banco ou do código nunca volta como texto.
+    print('[ERROR] handler: ${e.runtimeType}');
     await captureRouteException(
       context,
       e,
@@ -257,7 +269,10 @@ Future<Response> onRequest(RequestContext context) async {
     );
     return Response.json(
       statusCode: HttpStatus.internalServerError,
-      body: {'message': 'Erro ao criar conta'},
+      body: {
+        'error': serverInternalErrorCode,
+        'message': 'Erro ao criar conta. Tente de novo em instantes.',
+      },
     );
   }
 }

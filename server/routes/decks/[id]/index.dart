@@ -142,7 +142,7 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
       );
 
       if (deckCheck.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
 
       final existingName = deckCheck.first[1] as String;
@@ -586,11 +586,10 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
   } on DeckRequestException catch (e) {
     print('[ERROR] Invalid update deck request: $e');
     return badRequest(e.message);
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } on Exception catch (e) {
     print('[ERROR] Failed to update deck: $e');
-    if (e.toString().contains('permission denied')) {
-      return notFound(e.toString());
-    }
     return internalServerError('Failed to update deck');
   }
 }
