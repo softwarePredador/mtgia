@@ -14,17 +14,17 @@ const navItems = [
 export function SiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-obsidian-950 text-ivory-100">
-      <header className="relative z-20 border-b border-brass-700/25 bg-obsidian-950/92 backdrop-blur">
+      <header className="relative z-20 border-b border-ivory-100/10 bg-obsidian-950/92 backdrop-blur">
         <Container className="flex h-16 min-w-0 items-center gap-3">
           <Link href={routes.home} className="focus-ring mr-auto flex min-w-0 items-center gap-3 rounded-lg">
-            <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-brass-400/35 bg-obsidian-900 shadow-brass">
+            <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-obsidian-900 shadow-azulejo">
               <Image src="/branding/app_logo.png" alt="" fill sizes="40px" className="object-cover" />
             </span>
             <span className="min-w-0">
               <span className="block truncate font-display text-lg font-semibold leading-none text-ivory-100 sm:text-xl">
                 BrewTact
               </span>
-              <span className="hidden text-[10px] font-semibold uppercase tracking-[0.18em] text-brass-400 sm:block">
+              <span className="mt-1 hidden text-[10px] font-extrabold uppercase tracking-[0.085em] text-mist-300 sm:block">
                 Monte melhor. Jogue melhor.
               </span>
             </span>
@@ -40,11 +40,11 @@ export function SiteShell({ children }: { children: ReactNode }) {
         </Container>
       </header>
       {children}
-      <footer className="border-t border-mist-700 bg-obsidian-950">
+      <footer className="border-t border-ivory-100/10 bg-obsidian-950">
         <Container className="grid gap-8 py-10 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
             <div className="flex items-center gap-3">
-              <span className="relative h-10 w-10 overflow-hidden rounded-xl border border-brass-400/25">
+              <span className="relative h-10 w-10 overflow-hidden rounded-xl bg-obsidian-900 shadow-azulejo">
                 <Image src="/branding/app_logo.png" alt="" fill sizes="40px" className="object-cover" />
               </span>
               <div className="font-display text-xl font-semibold">BrewTact</div>

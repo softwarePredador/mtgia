@@ -21,12 +21,15 @@ export function RouteLink({ href, children, className }: RouteLinkProps) {
   );
 }
 
+// Access is not released while the capability matrix is all OFF: a status in
+// neutral glass, never an action.
 export function AccessPending({ compact = false }: { compact?: boolean }) {
   return (
     <span
       role="status"
-      className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-lg border border-mist-700 bg-obsidian-900/78 px-4 py-2 text-sm font-bold text-mist-300"
+      className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2.5 rounded-full bg-peca px-4 py-2 text-sm font-bold text-mist-300 shadow-azulejo"
     >
+      <span aria-hidden="true" className="h-2 w-2 rounded-full bg-mist-500" />
       {compact ? (
         <>
           <span className="sm:hidden">Em preparação</span>
@@ -41,20 +44,18 @@ export function AccessPending({ compact = false }: { compact?: boolean }) {
 
 export function ButtonLink({ href, children, variant = "primary" }: ButtonLinkProps) {
   const styles = {
-    primary:
-      "bg-brass-400 text-obsidian-950 hover:bg-brass-300 border-brass-400",
-    secondary:
-      "border-mist-700 bg-obsidian-850/72 text-ivory-100 hover:border-brass-400 hover:text-brass-300",
-    quiet:
-      "border-transparent bg-transparent text-mist-300 hover:text-brass-300"
+    primary: "bg-latao text-obsidian-950 shadow-latao",
+    secondary: "bg-peca text-ivory-100 shadow-azulejo hover:text-brass-300",
+    quiet: "bg-transparent text-mist-300 hover:text-brass-300"
   };
 
   return (
     <RouteLink
       href={href}
-      className={`focus-ring inline-flex min-h-11 items-center justify-center rounded-lg border px-4 py-2 text-sm font-bold transition ${styles[variant]}`}
+      className={`focus-ring relative inline-flex min-h-11 items-center justify-center overflow-hidden rounded-full px-5 py-2 text-sm font-bold transition active:scale-[0.97] ${styles[variant]}`}
     >
-      {children}
+      {variant === "primary" ? <span aria-hidden="true" className="pointer-events-none absolute inset-0 bg-brilho" /> : null}
+      <span className="relative">{children}</span>
     </RouteLink>
   );
 }
@@ -75,11 +76,11 @@ export function SectionHeader({
   return (
     <div className="max-w-3xl">
       {eyebrow ? (
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-brass-400">
+        <p className="mb-3 text-[11.5px] font-extrabold uppercase tracking-[0.085em] text-mist-300">
           {eyebrow}
         </p>
       ) : null}
-      <h2 className="font-display text-3xl font-semibold leading-tight text-ivory-100 sm:text-4xl">
+      <h2 className="text-balance font-display text-3xl font-semibold leading-tight text-ivory-100 sm:text-4xl">
         {title}
       </h2>
       {children ? <div className="mt-4 text-base leading-7 text-mist-300">{children}</div> : null}
