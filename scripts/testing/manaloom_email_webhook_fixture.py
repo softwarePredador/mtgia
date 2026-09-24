@@ -10,6 +10,14 @@ from pathlib import Path
 PORT = int(os.environ["MANALOOM_EMAIL_FIXTURE_PORT"])
 LOG_PATH = Path(os.environ["MANALOOM_EMAIL_FIXTURE_LOG"])
 
+# Template -> (campo do link, marcador que o link precisa levar). O convite da
+# beta (BT-AUTH-006) leva o código no parâmetro invite_code.
+LINK_FIELDS = {
+    "password_reset": ("reset_url", "token="),
+    "email_verification": ("verification_url", "token="),
+    "beta_invite": ("invite_url", "invite_code="),
+}
+
 
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_args):
@@ -29,15 +37,13 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
             template = payload.get("template")
             recipient = payload.get("recipient", "")
-            link_key = (
-                "reset_url" if template == "password_reset" else "verification_url"
-            )
+            link_key, marker = LINK_FIELDS.get(template, ("", ""))
             valid = (
-                template in {"password_reset", "email_verification"}
+                bool(link_key)
                 and isinstance(recipient, str)
                 and "@" in recipient
                 and isinstance(payload.get(link_key), str)
-                and "token=" in payload[link_key]
+                and marker in payload[link_key]
             )
             if not valid:
                 self.send_error(400)

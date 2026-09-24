@@ -56,6 +56,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão, menos os itens do titular em oferta aberta | exclusão de conta, para esses itens | sim | oferta aberta (`pending`) cancelada e sem os itens do titular (D-66); o resto anonimizado, porque é registro entre duas partes, e o item do titular sem o vínculo com o fichário |
 | Moderação | `content_reports`, `content_report_appeals`, `moderation_actions` | mantidas depois da exclusão | ninguém | denúncias e recursos do titular | denúncia, recurso e ação do moderador anonimizados |
 | Segurança | `password_reset_tokens`, `email_verification_tokens`, `rate_limit_events` | 20 min, 24 h e 24 h de validade | job de limpeza só para `rate_limit_events` | não | apagados |
+| Convites da beta (BT-AUTH-006) | `beta_invites`, `beta_invite_events` | o convite aberto vale até vencer (padrão 14 dias); a linha fica depois | ninguém (lacuna) | não; só hash do código e digest do e-mail | lacuna: o convite aceito fica ligado à conta pseudonimizada; a trilha sai junto com o convite |
 | Controle de privacidade | `account_deletion_receipts`, `account_deletion_outbox`, `privacy_deleted_deck_tombstones`, `privacy_keyring` | sem prazo; o outbox esvazia os tokens de deck quando o consumidor conclui | ninguém | não | mantidos, sem identificar a pessoa |
 
 ## Lacunas que o inventário expõe

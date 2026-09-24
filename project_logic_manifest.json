@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56",
+  "source_digest_sha256": "56b85a528f4c231ac20b5604b742242577ec56bc3aca23669d56f4e08d9bc6d7",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 700,
+    "dart_source_files": 707,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5290,
-    "semantic_resolved_files": 700,
+    "dart_symbols": 5332,
+    "semantic_resolved_files": 707,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43077,
-    "semantic_resolved_call_sites": 68531,
-    "semantic_resolved_type_references": 16296,
-    "modules": 159,
+    "semantic_resolved_call_edges": 43289,
+    "semantic_resolved_call_sites": 68841,
+    "semantic_resolved_type_references": 16413,
+    "modules": 160,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
-    "database_tables": 80,
+    "database_tables": 82,
     "database_views": 6,
-    "migrations": 60,
-    "scripts_and_jobs": 693,
+    "migrations": 61,
+    "scripts_and_jobs": 694,
     "environment_variables": 716,
-    "tests": 1256,
+    "tests": 1260,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -577,6 +577,7 @@
         "server/bin/auth_runtime_preflight.dart",
         "server/bin/backfill_card_identity_columns.dart",
         "server/bin/battle_job_worker.dart",
+        "server/bin/beta_invites.dart",
         "server/bin/candidate_quality_data_foundation.dart",
         "server/bin/candidate_quality_meta_signals.dart",
         "server/bin/canonicalize_learned_deck_metadata.dart",
@@ -637,8 +638,8 @@
         "server/bin/update_schema.dart",
         "server/bin/verify_schema.dart"
       ],
-      "file_count": 65,
-      "symbol_count": 695,
+      "file_count": 66,
+      "symbol_count": 699,
       "providers": [],
       "services": []
     },
@@ -1039,6 +1040,24 @@
         "BattleSimulationPersistenceService",
         "InteractiveBattleMetricsService",
         "InteractiveBattleService"
+      ]
+    },
+    {
+      "id": "server/lib/beta_invites",
+      "layer": "server",
+      "files": [
+        "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "server/lib/beta_invites/beta_invite_cli.dart",
+        "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "server/lib/beta_invites/beta_invite_issuance.dart",
+        "server/lib/beta_invites/beta_invite_policy.dart",
+        "server/lib/beta_invites/beta_invite_store.dart"
+      ],
+      "file_count": 6,
+      "symbol_count": 35,
+      "providers": [],
+      "services": [
+        "BetaInviteDeliveryService"
       ]
     },
     {
@@ -1944,7 +1963,7 @@
         "server/lib/rate_limit_middleware.dart"
       ],
       "file_count": 1,
-      "symbol_count": 27,
+      "symbol_count": 29,
       "providers": [],
       "services": []
     },
@@ -2182,7 +2201,7 @@
         "server/routes/auth/verify-email.dart"
       ],
       "file_count": 10,
-      "symbol_count": 16,
+      "symbol_count": 17,
       "providers": [],
       "services": []
     },
@@ -18365,6 +18384,30 @@
       "line": 12
     },
     {
+      "name": "_report",
+      "kind": "function",
+      "source": "server/bin/beta_invites.dart",
+      "line": 229
+    },
+    {
+      "name": "_run",
+      "kind": "function",
+      "source": "server/bin/beta_invites.dart",
+      "line": 116
+    },
+    {
+      "name": "_summary",
+      "kind": "function",
+      "source": "server/bin/beta_invites.dart",
+      "line": 263
+    },
+    {
+      "name": "main",
+      "kind": "function",
+      "source": "server/bin/beta_invites.dart",
+      "line": 37
+    },
+    {
       "name": "CandidateQualityCard",
       "kind": "class",
       "source": "server/bin/candidate_quality_data_foundation.dart",
@@ -19851,7 +19894,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 4151,
+      "line": 4227,
       "members": [
         "fullName"
       ]
@@ -19860,49 +19903,49 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 4215
+      "line": 4291
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4254
+      "line": 4332
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4171
+      "line": 4247
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4167
+      "line": 4243
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4175
+      "line": 4251
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4298
+      "line": 4381
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4182
+      "line": 4258
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4217
+      "line": 4293
     },
     {
       "name": "_assertPostMigration",
@@ -22398,7 +22441,7 @@
       "name": "AccountEmailDeliveryException",
       "kind": "class",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 66,
+      "line": 86,
       "members": [
         "toString"
       ]
@@ -22407,13 +22450,13 @@
       "name": "AccountEmailDeliveryMessage",
       "kind": "class",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 52
+      "line": 68
     },
     {
       "name": "AccountEmailDeliveryTransport",
       "kind": "class",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 76,
+      "line": 96,
       "members": [
         "_defaultClientFactory",
         "_deliverResend",
@@ -22433,25 +22476,25 @@
       "name": "_htmlBody",
       "kind": "function",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 284
+      "line": 305
     },
     {
       "name": "_idempotencyKey",
       "kind": "function",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 270
+      "line": 291
     },
     {
       "name": "_isProduction",
       "kind": "function",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 316
+      "line": 347
     },
     {
       "name": "_textBody",
       "kind": "function",
       "source": "server/lib/account_email_delivery_transport.dart",
-      "line": 305
+      "line": 332
     },
     {
       "name": "_configuredValues",
@@ -30287,7 +30330,7 @@
       "name": "AccountSecurityException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 894,
+      "line": 927,
       "members": [
         "toString"
       ]
@@ -30296,7 +30339,7 @@
       "name": "AccountSecurityResult",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 840,
+      "line": 873,
       "members": [
         "toJson"
       ]
@@ -30305,7 +30348,7 @@
       "name": "AuthService",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 14,
+      "line": 15,
       "members": [
         "_hashOpaqueToken",
         "_loginPasswordMatches",
@@ -30338,13 +30381,13 @@
       "name": "EmailVerificationRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 828
+      "line": 861
     },
     {
       "name": "InvalidCredentialsException",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 883,
+      "line": 916,
       "members": [
         "toString"
       ]
@@ -30353,19 +30396,19 @@
       "name": "PasswordResetRequest",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 816
+      "line": 849
     },
     {
       "name": "_PasswordPreparation",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 809
+      "line": 842
     },
     {
       "name": "accountProfileJson",
       "kind": "function",
       "source": "server/lib/auth_service.dart",
-      "line": 860
+      "line": 893
     },
     {
       "name": "isBasicLandCard",
@@ -32678,6 +32721,253 @@
       "line": 1184
     },
     {
+      "name": "BetaInviteAdmissionGate",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+      "line": 10,
+      "members": [
+        "evaluate"
+      ]
+    },
+    {
+      "name": "overrideRegistrationAdmissionForTesting",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+      "line": 42
+    },
+    {
+      "name": "registrationAdmission",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+      "line": 47
+    },
+    {
+      "name": "BetaInviteCliOptions",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 20
+    },
+    {
+      "name": "BetaInviteCommand",
+      "kind": "enum",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 9
+    },
+    {
+      "name": "BetaInviteUsageException",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 11,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "betaInvitePreview",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 221
+    },
+    {
+      "name": "betaInviteWriteBlockedReason",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 198
+    },
+    {
+      "name": "checkBetaInviteBatchSize",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 179
+    },
+    {
+      "name": "parseBetaInviteArgs",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 64
+    },
+    {
+      "name": "readBetaInviteEmails",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_cli.dart",
+      "line": 173
+    },
+    {
+      "name": "BetaInviteDeliveryService",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+      "line": 35,
+      "members": [
+        "deliver"
+      ]
+    },
+    {
+      "name": "betaInviteActionUrl",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+      "line": 25
+    },
+    {
+      "name": "BetaInviteDeliveryState",
+      "kind": "enum",
+      "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+      "line": 68
+    },
+    {
+      "name": "BetaInviteIssueOutcome",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+      "line": 80,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "BetaInviteIssuer",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+      "line": 109,
+      "members": [
+        "_checkActor",
+        "_checkBatch",
+        "_checkValidity",
+        "_deliverAndRecord",
+        "_hasActiveAccount",
+        "issue",
+        "list",
+        "plan",
+        "resend",
+        "revoke"
+      ]
+    },
+    {
+      "name": "BetaInvitePlanAction",
+      "kind": "enum",
+      "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+      "line": 25
+    },
+    {
+      "name": "BetaInvitePlanEntry",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+      "line": 54
+    },
+    {
+      "name": "iso",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+      "line": 449
+    },
+    {
+      "name": "BetaInviteDenial",
+      "kind": "enum",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 138
+    },
+    {
+      "name": "BetaInviteDeniedException",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 172,
+      "members": [
+        "toString"
+      ]
+    },
+    {
+      "name": "BetaInviteStatus",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 189
+    },
+    {
+      "name": "RegistrationAdmission",
+      "kind": "enum",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 22
+    },
+    {
+      "name": "_sha256Hex",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 244
+    },
+    {
+      "name": "betaInviteEmailDigest",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 98
+    },
+    {
+      "name": "betaInviteEmailHint",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 106
+    },
+    {
+      "name": "betaInviteRateLimitIdentifier",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 102
+    },
+    {
+      "name": "betaInviteTokenHash",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 94
+    },
+    {
+      "name": "evaluateBetaInvite",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 206
+    },
+    {
+      "name": "isAcceptableInviteEmail",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 120
+    },
+    {
+      "name": "isValidBetaInviteBatchLabel",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 128
+    },
+    {
+      "name": "newBetaInviteCode",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 67
+    },
+    {
+      "name": "normalizeBetaInviteCode",
+      "kind": "function",
+      "source": "server/lib/beta_invites/beta_invite_policy.dart",
+      "line": 80
+    },
+    {
+      "name": "BetaInviteAdmission",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_store.dart",
+      "line": 32,
+      "members": [
+        "_status",
+        "_statusParameters",
+        "lockForAcceptance",
+        "logDenial",
+        "markAccepted",
+        "preflight",
+        "recordDenial",
+        "recordEvent"
+      ]
+    },
+    {
+      "name": "BetaInviteClaim",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_store.dart",
+      "line": 10
+    },
+    {
       "name": "BillingCheckoutRequest",
       "kind": "class",
       "source": "server/lib/billing/payment_provider.dart",
@@ -34485,13 +34775,13 @@
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 832
+      "line": 452
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 452
+      "line": 832
     },
     {
       "name": "AiJobSchemaReadiness",
@@ -34563,115 +34853,115 @@
       "name": "_validBattleLiveHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 998
+      "line": 1000
     },
     {
       "name": "_validInteractiveBattleHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1264
+      "line": 1266
     },
     {
       "name": "buildReadinessResponseBody",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1735
+      "line": 1737
     },
     {
       "name": "disabledReleaseCapabilityReadinessCheck",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1722
+      "line": 1724
     },
     {
       "name": "evaluateAiJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 714
+      "line": 716
     },
     {
       "name": "evaluateAiRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1634
+      "line": 1636
     },
     {
       "name": "evaluateBattleJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 809
+      "line": 811
     },
     {
       "name": "evaluateBattleJobWorkerReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1298
+      "line": 1300
     },
     {
       "name": "evaluateBattleLiveSpectatorReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 912
+      "line": 914
     },
     {
       "name": "evaluateBattleRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1497
+      "line": 1499
     },
     {
       "name": "evaluateCollectionAvailabilitySchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1365
+      "line": 1367
     },
     {
       "name": "evaluateDeckValidationSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1467
+      "line": 1469
     },
     {
       "name": "evaluateInteractiveBattleReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1175
+      "line": 1177
     },
     {
       "name": "evaluateReleaseCapabilityRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1654
+      "line": 1656
     },
     {
       "name": "evaluateReleaseSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 639
+      "line": 641
     },
     {
       "name": "probeBattleLiveSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 903
+      "line": 905
     },
     {
       "name": "probeBattleSidecarHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1605
+      "line": 1607
     },
     {
       "name": "probeInteractiveBattleSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1166
+      "line": 1168
     },
     {
       "name": "readinessStatusCode",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1753
+      "line": 1755
     },
     {
       "name": "apiError",
@@ -37063,13 +37353,13 @@
       "name": "_accountScopedRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 578
+      "line": 626
     },
     {
       "name": "_aiRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 631
+      "line": 679
     },
     {
       "name": "_hasForwardedFor",
@@ -37129,25 +37419,31 @@
       "name": "accountReverificationRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 553
+      "line": 601
     },
     {
       "name": "aiPollingRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 623
+      "line": 671
     },
     {
       "name": "aiRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 615
+      "line": 663
     },
     {
       "name": "authRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
       "line": 371
+    },
+    {
+      "name": "betaInviteCodeRateLimitResponse",
+      "kind": "function",
+      "source": "server/lib/rate_limit_middleware.dart",
+      "line": 555
     },
     {
       "name": "buildAiRateLimitIdentifier",
@@ -37177,13 +37473,13 @@
       "name": "credentialEmailRateLimitIdentifier",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 497
+      "line": 500
     },
     {
       "name": "credentialEmailRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 507
+      "line": 510
     },
     {
       "name": "isAuthCredentialAttempt",
@@ -37195,13 +37491,19 @@
       "name": "overrideAccountReverificationRateLimiterForTesting",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 548
+      "line": 596
+    },
+    {
+      "name": "overrideBetaInviteCodeRateLimiterForTesting",
+      "kind": "function",
+      "source": "server/lib/rate_limit_middleware.dart",
+      "line": 550
     },
     {
       "name": "overrideCredentialEmailRateLimiterForTesting",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 492
+      "line": 495
     },
     {
       "name": "rateLimitMiddleware",
@@ -39201,10 +39503,16 @@
       "line": 5
     },
     {
+      "name": "_requestId",
+      "kind": "function",
+      "source": "server/routes/auth/register.dart",
+      "line": 265
+    },
+    {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/auth/register.dart",
-      "line": 11
+      "line": 17
     },
     {
       "name": "_unauthorized",
@@ -41043,7 +41351,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 700,
+    "resolved_file_count": 707,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41287,6 +41595,7 @@
       "server/bin/auth_runtime_preflight.dart",
       "server/bin/backfill_card_identity_columns.dart",
       "server/bin/battle_job_worker.dart",
+      "server/bin/beta_invites.dart",
       "server/bin/candidate_quality_data_foundation.dart",
       "server/bin/candidate_quality_meta_signals.dart",
       "server/bin/canonicalize_learned_deck_metadata.dart",
@@ -41496,6 +41805,12 @@
       "server/lib/battle/interactive_battle_runtime_client.dart",
       "server/lib/battle/interactive_battle_service.dart",
       "server/lib/battle/interactive_battle_store.dart",
+      "server/lib/beta_invites/beta_invite_admission_gate.dart",
+      "server/lib/beta_invites/beta_invite_cli.dart",
+      "server/lib/beta_invites/beta_invite_delivery_service.dart",
+      "server/lib/beta_invites/beta_invite_issuance.dart",
+      "server/lib/beta_invites/beta_invite_policy.dart",
+      "server/lib/beta_invites/beta_invite_store.dart",
       "server/lib/billing/payment_provider.dart",
       "server/lib/binder_import_contract.dart",
       "server/lib/binder_item_contract.dart",
@@ -41752,11 +42067,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43077,
-    "resolved_call_site_count": 68531,
-    "workspace_call_edge_count": 13483,
-    "unresolved_call_edge_count": 558,
-    "unresolved_call_site_count": 769,
+    "resolved_call_edge_count": 43289,
+    "resolved_call_site_count": 68841,
+    "workspace_call_edge_count": 13588,
+    "unresolved_call_edge_count": 559,
+    "unresolved_call_site_count": 770,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -108871,6 +109186,215 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/beta_invites.dart",
+        "line": 103,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteIssuer",
+        "target": "BetaInviteIssuer.BetaInviteIssuer",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 106,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteDeliveryService",
+        "target": "BetaInviteDeliveryService.BetaInviteDeliveryService",
+        "target_library": "package:server/beta_invites/beta_invite_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 110,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_run",
+        "target": "_run",
+        "target_library": "workspace:server/bin/beta_invites.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 125,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "plan",
+        "target": "BetaInviteIssuer.plan",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 135,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "betaInvitePreview",
+        "target": "betaInvitePreview",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 138,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "_summary",
+        "target": "_summary",
+        "target_library": "workspace:server/bin/beta_invites.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 144,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "issue",
+        "target": "BetaInviteIssuer.issue",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 150,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "_report",
+        "target": "_report",
+        "target_library": "workspace:server/bin/beta_invites.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 170,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "resend",
+        "target": "BetaInviteIssuer.resend",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 181,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "list",
+        "target": "BetaInviteIssuer.list",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 203,
+        "caller": "_run",
+        "kind": "method",
+        "lexical_target": "revoke",
+        "target": "BetaInviteIssuer.revoke",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 254,
+        "caller": "_report",
+        "kind": "method",
+        "lexical_target": "_summary",
+        "target": "_summary",
+        "target_library": "workspace:server/bin/beta_invites.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 39,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 51,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "parseBetaInviteArgs",
+        "target": "parseBetaInviteArgs",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 66,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "readBetaInviteEmails",
+        "target": "readBetaInviteEmails",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 68,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "checkBetaInviteBatchSize",
+        "target": "checkBetaInviteBatchSize",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 82,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "betaInviteWriteBlockedReason",
+        "target": "betaInviteWriteBlockedReason",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 92,
+        "caller": "main",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 93,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "connect",
+        "target": "Database.connect",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/candidate_quality_data_foundation.dart",
         "line": 108,
         "caller": "main",
@@ -113906,11 +114430,11 @@
         "target": "Migration.Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 60
+        "occurrences": 61
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4196,
+        "line": 4272,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -113921,7 +114445,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4255,
+        "line": 4333,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -113932,7 +114456,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4317,
+        "line": 4400,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -113943,7 +114467,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4318,
+        "line": 4401,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -113954,7 +114478,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4329,
+        "line": 4412,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -113965,7 +114489,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4332,
+        "line": 4415,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -113976,7 +114500,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4431,
+        "line": 4514,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -113987,7 +114511,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4432,
+        "line": 4515,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -120994,7 +121518,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 103,
+        "line": 123,
         "caller": "AccountEmailDeliveryTransport.deliver",
         "kind": "method",
         "lexical_target": "_validateMessage",
@@ -121005,7 +121529,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 104,
+        "line": 124,
         "caller": "AccountEmailDeliveryTransport.deliver",
         "kind": "method",
         "lexical_target": "accountEmailDeliveryProvider",
@@ -121016,7 +121540,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 106,
+        "line": 126,
         "caller": "AccountEmailDeliveryTransport.deliver",
         "kind": "method",
         "lexical_target": "_deliverWebhook",
@@ -121027,7 +121551,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 111,
+        "line": 131,
         "caller": "AccountEmailDeliveryTransport.deliver",
         "kind": "method",
         "lexical_target": "_deliverResend",
@@ -121038,7 +121562,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 120,
+        "line": 140,
         "caller": "AccountEmailDeliveryTransport._deliverWebhook",
         "kind": "method",
         "lexical_target": "_isProduction",
@@ -121049,7 +121573,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 124,
+        "line": 144,
         "caller": "AccountEmailDeliveryTransport._deliverWebhook",
         "kind": "constructor",
         "lexical_target": "AccountEmailDeliveryException",
@@ -121060,7 +121584,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 153,
+        "line": 173,
         "caller": "AccountEmailDeliveryTransport._deliverWebhook",
         "kind": "method",
         "lexical_target": "_idempotencyKey",
@@ -121071,7 +121595,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 163,
+        "line": 184,
         "caller": "AccountEmailDeliveryTransport._deliverWebhook",
         "kind": "method",
         "lexical_target": "_send",
@@ -121082,7 +121606,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 173,
+        "line": 194,
         "caller": "AccountEmailDeliveryTransport._deliverResend",
         "kind": "constructor",
         "lexical_target": "ResendEmailConfiguration.fromEnvironment",
@@ -121093,7 +121617,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 179,
+        "line": 200,
         "caller": "AccountEmailDeliveryTransport._deliverResend",
         "kind": "method",
         "lexical_target": "_idempotencyKey",
@@ -121104,7 +121628,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 185,
+        "line": 206,
         "caller": "AccountEmailDeliveryTransport._deliverResend",
         "kind": "method",
         "lexical_target": "_htmlBody",
@@ -121115,7 +121639,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 186,
+        "line": 207,
         "caller": "AccountEmailDeliveryTransport._deliverResend",
         "kind": "method",
         "lexical_target": "_textBody",
@@ -121126,7 +121650,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 188,
+        "line": 209,
         "caller": "AccountEmailDeliveryTransport._deliverResend",
         "kind": "method",
         "lexical_target": "_send",
@@ -121137,7 +121661,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 216,
+        "line": 237,
         "caller": "AccountEmailDeliveryTransport._send",
         "kind": "constructor",
         "lexical_target": "AccountEmailDeliveryException",
@@ -121148,7 +121672,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 250,
+        "line": 271,
         "caller": "AccountEmailDeliveryTransport._validateMessage",
         "kind": "constructor",
         "lexical_target": "AccountEmailDeliveryException",
@@ -121159,7 +121683,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 255,
+        "line": 276,
         "caller": "AccountEmailDeliveryTransport._validateMessage",
         "kind": "method",
         "lexical_target": "_isProduction",
@@ -146272,7 +146796,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 167,
+        "line": 175,
         "caller": "AuthService.register",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146283,7 +146807,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 170,
+        "line": 178,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "normalizeUsername",
@@ -146294,7 +146818,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 171,
+        "line": 179,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "normalizeEmail",
@@ -146305,7 +146829,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 172,
+        "line": 180,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "validate",
@@ -146316,7 +146840,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 181,
+        "line": 189,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -146327,7 +146851,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 182,
+        "line": 190,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "_newOpaqueToken",
@@ -146338,7 +146862,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 22,
+        "line": 199,
+        "caller": "AuthService.register",
+        "kind": "method",
+        "lexical_target": "lockForAcceptance",
+        "target": "BetaInviteAdmission.lockForAcceptance",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 23,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "AuthService._internal",
@@ -146349,7 +146884,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 255,
+        "line": 268,
+        "caller": "AuthService.register",
+        "kind": "method",
+        "lexical_target": "markAccepted",
+        "target": "BetaInviteAdmission.markAccepted",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 285,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -146360,7 +146906,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 267,
+        "line": 299,
         "caller": "AuthService.register",
         "kind": "method",
         "lexical_target": "generateToken",
@@ -146371,7 +146917,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 295,
+        "line": 328,
         "caller": "AuthService.login",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146382,7 +146928,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 298,
+        "line": 331,
         "caller": "AuthService.login",
         "kind": "method",
         "lexical_target": "normalizeEmail",
@@ -146393,7 +146939,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 318,
+        "line": 351,
         "caller": "AuthService.login",
         "kind": "method",
         "lexical_target": "_loginPasswordMatches",
@@ -146404,7 +146950,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 323,
+        "line": 356,
         "caller": "AuthService.login",
         "kind": "constructor",
         "lexical_target": "InvalidCredentialsException",
@@ -146415,29 +146961,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 329,
-        "caller": "AuthService.login",
-        "kind": "method",
-        "lexical_target": "_readInteger",
-        "target": "AuthService._readInteger",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 332,
-        "caller": "AuthService.login",
-        "kind": "method",
-        "lexical_target": "generateToken",
-        "target": "AuthService.generateToken",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 35,
+        "line": 36,
         "caller": "AuthService.<constructor>",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -146448,7 +146972,29 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 363,
+        "line": 362,
+        "caller": "AuthService.login",
+        "kind": "method",
+        "lexical_target": "_readInteger",
+        "target": "AuthService._readInteger",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 365,
+        "caller": "AuthService.login",
+        "kind": "method",
+        "lexical_target": "generateToken",
+        "target": "AuthService.generateToken",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 396,
         "caller": "AuthService.getUserFromToken",
         "kind": "method",
         "lexical_target": "verifyToken",
@@ -146459,7 +147005,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 370,
+        "line": 403,
         "caller": "AuthService.getUserFromToken",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146470,7 +147016,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 386,
+        "line": 419,
         "caller": "AuthService.getUserFromToken",
         "kind": "method",
         "lexical_target": "_readInteger",
@@ -146481,29 +147027,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 403,
-        "caller": "AuthService.createEmailVerificationRequest",
-        "kind": "method",
-        "lexical_target": "_newOpaqueToken",
-        "target": "AuthService._newOpaqueToken",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 405,
-        "caller": "AuthService.createEmailVerificationRequest",
-        "kind": "constructor",
-        "lexical_target": "Database",
-        "target": "Database.Database",
-        "target_library": "package:server/database.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 41,
+        "line": 42,
         "caller": "AuthService.<constructor>",
         "kind": "method",
         "lexical_target": "validate",
@@ -146514,7 +147038,29 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 435,
+        "line": 436,
+        "caller": "AuthService.createEmailVerificationRequest",
+        "kind": "method",
+        "lexical_target": "_newOpaqueToken",
+        "target": "AuthService._newOpaqueToken",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 438,
+        "caller": "AuthService.createEmailVerificationRequest",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 468,
         "caller": "AuthService.createEmailVerificationRequest",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -146525,7 +147071,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 439,
+        "line": 472,
         "caller": "AuthService.createEmailVerificationRequest",
         "kind": "constructor",
         "lexical_target": "EmailVerificationRequest",
@@ -146536,7 +147082,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 450,
+        "line": 483,
         "caller": "AuthService.verifyEmail",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -146547,7 +147093,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 455,
+        "line": 488,
         "caller": "AuthService.verifyEmail",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146558,7 +147104,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 465,
+        "line": 498,
         "caller": "AuthService.verifyEmail",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -146569,7 +147115,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 505,
+        "line": 538,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "method",
         "lexical_target": "normalizeEmail",
@@ -146580,7 +147126,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 506,
+        "line": 539,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "method",
         "lexical_target": "_newOpaqueToken",
@@ -146591,29 +147137,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 507,
-        "caller": "AuthService.createPasswordResetRequest",
-        "kind": "method",
-        "lexical_target": "_hashOpaqueToken",
-        "target": "AuthService._hashOpaqueToken",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 508,
-        "caller": "AuthService.createPasswordResetRequest",
-        "kind": "constructor",
-        "lexical_target": "Database",
-        "target": "Database.Database",
-        "target_library": "package:server/database.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 53,
+        "line": 54,
         "caller": "AuthService.resetForTesting",
         "kind": "constructor",
         "lexical_target": "AuthService._internal",
@@ -146624,7 +147148,29 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 560,
+        "line": 540,
+        "caller": "AuthService.createPasswordResetRequest",
+        "kind": "method",
+        "lexical_target": "_hashOpaqueToken",
+        "target": "AuthService._hashOpaqueToken",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 541,
+        "caller": "AuthService.createPasswordResetRequest",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 593,
         "caller": "AuthService.createPasswordResetRequest",
         "kind": "constructor",
         "lexical_target": "PasswordResetRequest",
@@ -146635,7 +147181,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 574,
+        "line": 607,
         "caller": "AuthService.resetPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -146646,7 +147192,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 579,
+        "line": 612,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "_hashOpaqueToken",
@@ -146657,7 +147203,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 580,
+        "line": 613,
         "caller": "AuthService.resetPassword",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146668,7 +147214,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 611,
+        "line": 644,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "_validateReplacementPassword",
@@ -146679,7 +147225,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 629,
+        "line": 662,
         "caller": "AuthService.resetPassword",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -146690,7 +147236,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 650,
+        "line": 683,
         "caller": "AuthService.changePassword",
         "kind": "method",
         "lexical_target": "_rotateAuthenticationVersion",
@@ -146701,7 +147247,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 662,
+        "line": 695,
         "caller": "AuthService.revokeSessions",
         "kind": "method",
         "lexical_target": "_rotateAuthenticationVersion",
@@ -146712,7 +147258,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 673,
+        "line": 706,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -146723,7 +147269,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 685,
+        "line": 718,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -146734,7 +147280,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 686,
+        "line": 719,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -146745,7 +147291,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 695,
+        "line": 72,
+        "caller": "<top-level>",
+        "kind": "method",
+        "lexical_target": "hashPassword",
+        "target": "AuthService.hashPassword",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 728,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "_validateReplacementPassword",
@@ -146756,29 +147313,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 702,
-        "caller": "AuthService._rotateAuthenticationVersion",
-        "kind": "method",
-        "lexical_target": "_readInteger",
-        "target": "AuthService._readInteger",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 71,
-        "caller": "<top-level>",
-        "kind": "method",
-        "lexical_target": "hashPassword",
-        "target": "AuthService.hashPassword",
-        "target_library": "package:server/auth_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/auth_service.dart",
-        "line": 72,
+        "line": 73,
         "caller": "<top-level>",
         "kind": "method",
         "lexical_target": "_newOpaqueToken",
@@ -146789,7 +147324,18 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 728,
+        "line": 735,
+        "caller": "AuthService._rotateAuthenticationVersion",
+        "kind": "method",
+        "lexical_target": "_readInteger",
+        "target": "AuthService._readInteger",
+        "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 761,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "hashPassword",
@@ -146800,7 +147346,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 741,
+        "line": 774,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "constructor",
         "lexical_target": "AccountSecurityResult",
@@ -146811,7 +147357,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 742,
+        "line": 775,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "generateToken",
@@ -146822,7 +147368,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 746,
+        "line": 779,
         "caller": "AuthService._rotateAuthenticationVersion",
         "kind": "method",
         "lexical_target": "accountProfileJson",
@@ -146833,7 +147379,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 757,
+        "line": 790,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "validate",
@@ -146844,7 +147390,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 763,
+        "line": 796,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "constructor",
         "lexical_target": "AccountSecurityException",
@@ -146855,7 +147401,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 768,
+        "line": 801,
         "caller": "AuthService._validateReplacementPassword",
         "kind": "method",
         "lexical_target": "verifyPassword",
@@ -146866,7 +147412,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 793,
+        "line": 826,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "method",
         "lexical_target": "_preparePassword",
@@ -146877,7 +147423,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 794,
+        "line": 827,
         "caller": "AuthService._normalizePasswordForStorage",
         "kind": "constructor",
         "lexical_target": "_PasswordPreparation",
@@ -146888,7 +147434,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 85,
+        "line": 86,
         "caller": "AuthService.hashPassword",
         "kind": "method",
         "lexical_target": "_normalizePasswordForStorage",
@@ -146899,7 +147445,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 97,
+        "line": 98,
         "caller": "AuthService.verifyPassword",
         "kind": "method",
         "lexical_target": "_preparePassword",
@@ -155841,6 +156387,765 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 29,
+        "caller": "BetaInviteAdmissionGate.evaluate",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteAdmissionGate._",
+        "target": "BetaInviteAdmissionGate.BetaInviteAdmissionGate._",
+        "target_library": "package:server/beta_invites/beta_invite_admission_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 32,
+        "caller": "BetaInviteAdmissionGate.evaluate",
+        "kind": "method",
+        "lexical_target": "normalizeBetaInviteCode",
+        "target": "normalizeBetaInviteCode",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 51,
+        "caller": "registrationAdmission",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 52,
+        "caller": "registrationAdmission",
+        "kind": "method",
+        "lexical_target": "fromEnvironment",
+        "target": "RegistrationAdmission.fromEnvironment",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 125,
+        "caller": "parseBetaInviteArgs",
+        "kind": "method",
+        "lexical_target": "isValidBetaInviteBatchLabel",
+        "target": "isValidBetaInviteBatchLabel",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 160,
+        "caller": "parseBetaInviteArgs",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteCliOptions",
+        "target": "BetaInviteCliOptions.BetaInviteCliOptions",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 183,
+        "caller": "checkBetaInviteBatchSize",
+        "kind": "method",
+        "lexical_target": "isAcceptableInviteEmail",
+        "target": "isAcceptableInviteEmail",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 186,
+        "caller": "checkBetaInviteBatchSize",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteUsageException",
+        "target": "BetaInviteUsageException.BetaInviteUsageException",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 229,
+        "caller": "betaInvitePreview",
+        "kind": "method",
+        "lexical_target": "betaInviteActionUrl",
+        "target": "betaInviteActionUrl",
+        "target_library": "package:server/beta_invites/beta_invite_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 66,
+        "caller": "parseBetaInviteArgs",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteUsageException",
+        "target": "BetaInviteUsageException.BetaInviteUsageException",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 14
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 55,
+        "caller": "BetaInviteDeliveryService.deliver",
+        "kind": "constructor",
+        "lexical_target": "AccountEmailDeliveryTransport",
+        "target": "AccountEmailDeliveryTransport.AccountEmailDeliveryTransport",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 55,
+        "caller": "BetaInviteDeliveryService.deliver",
+        "kind": "method",
+        "lexical_target": "deliver",
+        "target": "AccountEmailDeliveryTransport.deliver",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 60,
+        "caller": "BetaInviteDeliveryService.deliver",
+        "kind": "constructor",
+        "lexical_target": "AccountEmailDeliveryMessage",
+        "target": "AccountEmailDeliveryMessage.AccountEmailDeliveryMessage",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 63,
+        "caller": "BetaInviteDeliveryService.deliver",
+        "kind": "method",
+        "lexical_target": "betaInviteActionUrl",
+        "target": "betaInviteActionUrl",
+        "target_library": "package:server/beta_invites/beta_invite_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 127,
+        "caller": "BetaInviteIssuer.plan",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailHint",
+        "target": "betaInviteEmailHint",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 128,
+        "caller": "BetaInviteIssuer.plan",
+        "kind": "method",
+        "lexical_target": "isAcceptableInviteEmail",
+        "target": "isAcceptableInviteEmail",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 130,
+        "caller": "BetaInviteIssuer.plan",
+        "kind": "constructor",
+        "lexical_target": "BetaInvitePlanEntry",
+        "target": "BetaInvitePlanEntry.BetaInvitePlanEntry",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 148,
+        "caller": "BetaInviteIssuer.plan",
+        "kind": "method",
+        "lexical_target": "_hasActiveAccount",
+        "target": "BetaInviteIssuer._hasActiveAccount",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 166,
+        "caller": "BetaInviteIssuer.plan",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailDigest",
+        "target": "betaInviteEmailDigest",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 203,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "_checkBatch",
+        "target": "BetaInviteIssuer._checkBatch",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 208,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteIssueOutcome",
+        "target": "BetaInviteIssueOutcome.BetaInviteIssueOutcome",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 216,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "newBetaInviteCode",
+        "target": "newBetaInviteCode",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 232,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "recordEvent",
+        "target": "BetaInviteAdmission.recordEvent",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 258,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailDigest",
+        "target": "betaInviteEmailDigest",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 260,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "betaInviteTokenHash",
+        "target": "betaInviteTokenHash",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 260,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "normalizeBetaInviteCode",
+        "target": "normalizeBetaInviteCode",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 286,
+        "caller": "BetaInviteIssuer.issue",
+        "kind": "method",
+        "lexical_target": "_deliverAndRecord",
+        "target": "BetaInviteIssuer._deliverAndRecord",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 308,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailHint",
+        "target": "betaInviteEmailHint",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 309,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "_checkValidity",
+        "target": "BetaInviteIssuer._checkValidity",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 310,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "_checkActor",
+        "target": "BetaInviteIssuer._checkActor",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 311,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "isAcceptableInviteEmail",
+        "target": "isAcceptableInviteEmail",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 312,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteIssueOutcome",
+        "target": "BetaInviteIssueOutcome.BetaInviteIssueOutcome",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 317,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "_hasActiveAccount",
+        "target": "BetaInviteIssuer._hasActiveAccount",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 323,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "newBetaInviteCode",
+        "target": "newBetaInviteCode",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 341,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "betaInviteTokenHash",
+        "target": "betaInviteTokenHash",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 341,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "normalizeBetaInviteCode",
+        "target": "normalizeBetaInviteCode",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 343,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailDigest",
+        "target": "betaInviteEmailDigest",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 348,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "recordEvent",
+        "target": "BetaInviteAdmission.recordEvent",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 362,
+        "caller": "BetaInviteIssuer.resend",
+        "kind": "method",
+        "lexical_target": "_deliverAndRecord",
+        "target": "BetaInviteIssuer._deliverAndRecord",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 381,
+        "caller": "BetaInviteIssuer.revoke",
+        "kind": "method",
+        "lexical_target": "_checkActor",
+        "target": "BetaInviteIssuer._checkActor",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 389,
+        "caller": "BetaInviteIssuer.revoke",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailHint",
+        "target": "betaInviteEmailHint",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 409,
+        "caller": "BetaInviteIssuer.revoke",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailDigest",
+        "target": "betaInviteEmailDigest",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 414,
+        "caller": "BetaInviteIssuer.revoke",
+        "kind": "method",
+        "lexical_target": "recordEvent",
+        "target": "BetaInviteAdmission.recordEvent",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 422,
+        "caller": "BetaInviteIssuer.revoke",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteIssueOutcome",
+        "target": "BetaInviteIssueOutcome.BetaInviteIssueOutcome",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 458,
+        "caller": "BetaInviteIssuer.list",
+        "kind": "method",
+        "lexical_target": "iso",
+        "target": "iso",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 504,
+        "caller": "BetaInviteIssuer._deliverAndRecord",
+        "kind": "method",
+        "lexical_target": "recordEvent",
+        "target": "BetaInviteAdmission.recordEvent",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 513,
+        "caller": "BetaInviteIssuer._deliverAndRecord",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteIssueOutcome",
+        "target": "BetaInviteIssueOutcome.BetaInviteIssueOutcome",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 536,
+        "caller": "BetaInviteIssuer._checkBatch",
+        "kind": "method",
+        "lexical_target": "isValidBetaInviteBatchLabel",
+        "target": "isValidBetaInviteBatchLabel",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 543,
+        "caller": "BetaInviteIssuer._checkBatch",
+        "kind": "method",
+        "lexical_target": "_checkValidity",
+        "target": "BetaInviteIssuer._checkValidity",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 544,
+        "caller": "BetaInviteIssuer._checkBatch",
+        "kind": "method",
+        "lexical_target": "_checkActor",
+        "target": "BetaInviteIssuer._checkActor",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 100,
+        "caller": "betaInviteEmailDigest",
+        "kind": "method",
+        "lexical_target": "_sha256Hex",
+        "target": "_sha256Hex",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 104,
+        "caller": "betaInviteRateLimitIdentifier",
+        "kind": "method",
+        "lexical_target": "_sha256Hex",
+        "target": "_sha256Hex",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 211,
+        "caller": "evaluateBetaInvite",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteDeniedException",
+        "target": "BetaInviteDeniedException.BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 96,
+        "caller": "betaInviteTokenHash",
+        "kind": "method",
+        "lexical_target": "_sha256Hex",
+        "target": "_sha256Hex",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 136,
+        "caller": "BetaInviteAdmission.recordDenial",
+        "kind": "method",
+        "lexical_target": "logDenial",
+        "target": "BetaInviteAdmission.logDenial",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 141,
+        "caller": "BetaInviteAdmission.recordDenial",
+        "kind": "method",
+        "lexical_target": "recordEvent",
+        "target": "BetaInviteAdmission.recordEvent",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 149,
+        "caller": "BetaInviteAdmission.recordDenial",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 161,
+        "caller": "BetaInviteAdmission.logDenial",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 168,
+        "caller": "BetaInviteAdmission._statusParameters",
+        "kind": "method",
+        "lexical_target": "betaInviteTokenHash",
+        "target": "betaInviteTokenHash",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 169,
+        "caller": "BetaInviteAdmission._statusParameters",
+        "kind": "method",
+        "lexical_target": "betaInviteEmailDigest",
+        "target": "betaInviteEmailDigest",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 175,
+        "caller": "BetaInviteAdmission._status",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteStatus",
+        "target": "BetaInviteStatus.BetaInviteStatus",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 46,
+        "caller": "BetaInviteAdmission.preflight",
+        "kind": "method",
+        "lexical_target": "_statusParameters",
+        "target": "BetaInviteAdmission._statusParameters",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 48,
+        "caller": "BetaInviteAdmission.preflight",
+        "kind": "method",
+        "lexical_target": "_status",
+        "target": "BetaInviteAdmission._status",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 48,
+        "caller": "BetaInviteAdmission.preflight",
+        "kind": "method",
+        "lexical_target": "evaluateBetaInvite",
+        "target": "evaluateBetaInvite",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 61,
+        "caller": "BetaInviteAdmission.lockForAcceptance",
+        "kind": "method",
+        "lexical_target": "_statusParameters",
+        "target": "BetaInviteAdmission._statusParameters",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 63,
+        "caller": "BetaInviteAdmission.lockForAcceptance",
+        "kind": "method",
+        "lexical_target": "_status",
+        "target": "BetaInviteAdmission._status",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 64,
+        "caller": "BetaInviteAdmission.lockForAcceptance",
+        "kind": "method",
+        "lexical_target": "evaluateBetaInvite",
+        "target": "evaluateBetaInvite",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 90,
+        "caller": "BetaInviteAdmission.markAccepted",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteDeniedException",
+        "target": "BetaInviteDeniedException.BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 96,
+        "caller": "BetaInviteAdmission.markAccepted",
+        "kind": "method",
+        "lexical_target": "recordEvent",
+        "target": "BetaInviteAdmission.recordEvent",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/billing/payment_provider.dart",
         "line": 27,
         "caller": "ManaLoomPaymentProvider.createCheckout",
@@ -160770,7 +162075,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1188,
+        "line": 1190,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleReadiness",
@@ -160781,7 +162086,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1218,
+        "line": 1220,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleConfiguration.fromEnvironment",
@@ -160792,7 +162097,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1227,
+        "line": 1229,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160803,7 +162108,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1236,
+        "line": 1238,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "_validInteractiveBattleHealth",
@@ -160814,7 +162119,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1309,
+        "line": 1311,
         "caller": "evaluateBattleJobWorkerReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobWorkerReadiness",
@@ -160825,7 +162130,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1374,
+        "line": 1376,
         "caller": "evaluateCollectionAvailabilitySchemaReadiness",
         "kind": "constructor",
         "lexical_target": "CollectionAvailabilitySchemaReadiness",
@@ -160836,7 +162141,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1477,
+        "line": 1479,
         "caller": "evaluateDeckValidationSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "DeckValidationSchemaReadiness",
@@ -160847,7 +162152,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1507,
+        "line": 1509,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -160858,7 +162163,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1523,
+        "line": 1525,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleRuntimeReadiness",
@@ -160869,7 +162174,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1568,
+        "line": 1570,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -160880,7 +162185,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1635,
+        "line": 1637,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "OpenAiRuntimeConfig",
@@ -160891,7 +162196,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1641,
+        "line": 1643,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "AiRuntimeReadiness",
@@ -160902,7 +162207,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1666,
+        "line": 1668,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -160913,7 +162218,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1667,
+        "line": 1669,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleJobWorkerReadiness",
@@ -160924,7 +162229,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1671,
+        "line": 1673,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleRuntimeReadiness",
@@ -160935,7 +162240,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1675,
+        "line": 1677,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "disabledReleaseCapabilityReadinessCheck",
@@ -160946,7 +162251,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1687,
+        "line": 1689,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateAiRuntimeReadiness",
@@ -160957,7 +162262,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1698,
+        "line": 1700,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleLiveSpectatorReadiness",
@@ -160968,7 +162273,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1709,
+        "line": 1711,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateInteractiveBattleReadiness",
@@ -160979,7 +162284,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1719,
+        "line": 1721,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityRuntimeReadiness",
@@ -160990,7 +162295,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1726,
+        "line": 1728,
         "caller": "disabledReleaseCapabilityReadinessCheck",
         "kind": "method",
         "lexical_target": "entry",
@@ -161001,7 +162306,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 647,
+        "line": 649,
         "caller": "evaluateReleaseSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseSchemaReadiness",
@@ -161012,7 +162317,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 722,
+        "line": 724,
         "caller": "evaluateAiJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "AiJobSchemaReadiness",
@@ -161023,7 +162328,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 819,
+        "line": 821,
         "caller": "evaluateBattleJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobSchemaReadiness",
@@ -161034,7 +162339,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 919,
+        "line": 921,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "battleLiveSpectatorEnabledValue",
@@ -161045,7 +162350,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 925,
+        "line": 927,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleLiveSpectatorReadiness",
@@ -161056,7 +162361,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 949,
+        "line": 951,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -161067,7 +162372,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 966,
+        "line": 968,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -161078,7 +162383,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 973,
+        "line": 975,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "_validBattleLiveHealth",
@@ -166409,7 +167714,7 @@
         "target": "RateLimiter.RateLimiter",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
-        "occurrences": 10
+        "occurrences": 12
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
@@ -166699,7 +168004,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 515,
+        "line": 518,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -166710,7 +168015,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 516,
+        "line": 519,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_accountScopedRateLimitResponse",
@@ -166721,7 +168026,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 519,
+        "line": 522,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitIdentifier",
@@ -166732,7 +168037,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 522,
+        "line": 525,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_isProductionEnvironment",
@@ -166754,8 +168059,8 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 562,
-        "caller": "accountReverificationRateLimitResponse",
+        "line": 563,
+        "caller": "betaInviteCodeRateLimitResponse",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
         "target": "_rateLimitRuntimeEnvironment",
@@ -166765,22 +168070,11 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 563,
-        "caller": "accountReverificationRateLimitResponse",
+        "line": 564,
+        "caller": "betaInviteCodeRateLimitResponse",
         "kind": "method",
         "lexical_target": "_accountScopedRateLimitResponse",
         "target": "_accountScopedRateLimitResponse",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 569,
-        "caller": "accountReverificationRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "_isProductionEnvironment",
-        "target": "_isProductionEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -166798,55 +168092,44 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 585,
-        "caller": "_accountScopedRateLimitResponse",
+        "line": 570,
+        "caller": "betaInviteCodeRateLimitResponse",
         "kind": "method",
-        "lexical_target": "_isAllowedDistributedIfAvailable",
-        "target": "_isAllowedDistributedIfAvailable",
+        "lexical_target": "_isProductionEnvironment",
+        "target": "_isProductionEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 593,
-        "caller": "_accountScopedRateLimitResponse",
+        "line": 610,
+        "caller": "accountReverificationRateLimitResponse",
         "kind": "method",
-        "lexical_target": "isAllowed",
-        "target": "RateLimiter.isAllowed",
+        "lexical_target": "_rateLimitRuntimeEnvironment",
+        "target": "_rateLimitRuntimeEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 598,
-        "caller": "_accountScopedRateLimitResponse",
+        "line": 611,
+        "caller": "accountReverificationRateLimitResponse",
         "kind": "method",
-        "lexical_target": "buildRateLimitResponseBody",
-        "target": "buildRateLimitResponseBody",
+        "lexical_target": "_accountScopedRateLimitResponse",
+        "target": "_accountScopedRateLimitResponse",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 607,
-        "caller": "_accountScopedRateLimitResponse",
+        "line": 617,
+        "caller": "accountReverificationRateLimitResponse",
         "kind": "method",
-        "lexical_target": "buildRateLimitHeaders",
-        "target": "buildRateLimitHeaders",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 616,
-        "caller": "aiRateLimit",
-        "kind": "method",
-        "lexical_target": "_aiRateLimit",
-        "target": "_aiRateLimit",
+        "lexical_target": "_isProductionEnvironment",
+        "target": "_isProductionEnvironment",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -166864,7 +168147,62 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 624,
+        "line": 633,
+        "caller": "_accountScopedRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "_isAllowedDistributedIfAvailable",
+        "target": "_isAllowedDistributedIfAvailable",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 641,
+        "caller": "_accountScopedRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "RateLimiter.isAllowed",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 646,
+        "caller": "_accountScopedRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "buildRateLimitResponseBody",
+        "target": "buildRateLimitResponseBody",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 655,
+        "caller": "_accountScopedRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "buildRateLimitHeaders",
+        "target": "buildRateLimitHeaders",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 664,
+        "caller": "aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_aiRateLimit",
+        "target": "_aiRateLimit",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 672,
         "caller": "aiPollingRateLimit",
         "kind": "method",
         "lexical_target": "_aiRateLimit",
@@ -166875,7 +168213,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 639,
+        "line": 687,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "matches",
@@ -166886,7 +168224,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 643,
+        "line": 691,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -166897,7 +168235,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 645,
+        "line": 693,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_isProductionEnvironment",
@@ -166908,7 +168246,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 659,
+        "line": 707,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_requestRemoteAddress",
@@ -166919,7 +168257,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 660,
+        "line": 708,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "resolveRateLimitClientIdentity",
@@ -166930,7 +168268,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 666,
+        "line": 714,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_logIdentityFailure",
@@ -166941,7 +168279,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 672,
+        "line": 720,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitIdentityUnavailable",
@@ -166952,7 +168290,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 678,
+        "line": 726,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_isAllowedDistributedIfAvailable",
@@ -166963,7 +168301,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 689,
+        "line": 737,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -166974,7 +168312,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 697,
+        "line": 745,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
@@ -166985,7 +168323,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 709,
+        "line": 757,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -179681,94 +181019,6 @@
         "source": "server/routes/auth/register.dart",
         "line": 100,
         "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "EmailVerificationDeliveryService",
-        "target": "EmailVerificationDeliveryService.EmailVerificationDeliveryService",
-        "target_library": "package:server/email_verification_delivery_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 100,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "deliver",
-        "target": "EmailVerificationDeliveryService.deliver",
-        "target_library": "package:server/email_verification_delivery_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 106,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "captureRouteException",
-        "target": "captureRouteException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 113,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "emailVerificationEnvironmentValues",
-        "target": "emailVerificationEnvironmentValues",
-        "target_library": "package:server/email_verification_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 126,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "mayExposeEmailVerificationTokenForTesting",
-        "target": "mayExposeEmailVerificationTokenForTesting",
-        "target_library": "package:server/email_verification_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 30,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 36,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "parse",
-        "target": "LegalAcceptancePolicy.parse",
-        "target_library": "package:server/legal_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 38,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "isRequired",
-        "target": "LegalAcceptancePolicy.isRequired",
-        "target_library": "package:server/legal_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/auth/register.dart",
-        "line": 70,
-        "caller": "onRequest",
         "kind": "method",
         "lexical_target": "validate",
         "target": "PasswordPolicy.validate",
@@ -179778,7 +181028,84 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 86,
+        "line": 118,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "betaInviteCodeRateLimitResponse",
+        "target": "betaInviteCodeRateLimitResponse",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 120,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "betaInviteRateLimitIdentifier",
+        "target": "betaInviteRateLimitIdentifier",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 124,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "credentialEmailRateLimitResponse",
+        "target": "credentialEmailRateLimitResponse",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 135,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "BetaInviteClaim",
+        "target": "BetaInviteClaim.BetaInviteClaim",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 138,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "preflight",
+        "target": "BetaInviteAdmission.preflight",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 139,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "Database",
+        "target": "Database.Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 144,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "recordDenial",
+        "target": "BetaInviteAdmission.recordDenial",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 157,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -179789,7 +181116,7 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 87,
+        "line": 160,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "register",
@@ -179800,12 +181127,155 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 93,
+        "line": 198,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "EmailVerificationRequest",
         "target": "EmailVerificationRequest.EmailVerificationRequest",
         "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 205,
+        "caller": "onRequest",
+        "kind": "constructor",
+        "lexical_target": "EmailVerificationDeliveryService",
+        "target": "EmailVerificationDeliveryService.EmailVerificationDeliveryService",
+        "target_library": "package:server/email_verification_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 205,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "deliver",
+        "target": "EmailVerificationDeliveryService.deliver",
+        "target_library": "package:server/email_verification_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 211,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "captureRouteException",
+        "target": "captureRouteException",
+        "target_library": "package:server/observability.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 218,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "emailVerificationEnvironmentValues",
+        "target": "emailVerificationEnvironmentValues",
+        "target_library": "package:server/email_verification_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 232,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "mayExposeEmailVerificationTokenForTesting",
+        "target": "mayExposeEmailVerificationTokenForTesting",
+        "target_library": "package:server/email_verification_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 44,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 53,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "evaluate",
+        "target": "BetaInviteAdmissionGate.evaluate",
+        "target_library": "package:server/beta_invites/beta_invite_admission_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 54,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "registrationAdmission",
+        "target": "registrationAdmission",
+        "target_library": "package:server/beta_invites/beta_invite_admission_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 58,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_requestId",
+        "target": "_requestId",
+        "target_library": "workspace:server/routes/auth/register.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 58,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "logDenial",
+        "target": "BetaInviteAdmission.logDenial",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 61,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "BetaInviteDenial.toJson",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 66,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "parse",
+        "target": "LegalAcceptancePolicy.parse",
+        "target_library": "package:server/legal_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 68,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "isRequired",
+        "target": "LegalAcceptancePolicy.isRequired",
+        "target_library": "package:server/legal_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -190095,14 +191565,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 593,
-        "occurrences": 739
+        "unique_references": 595,
+        "occurrences": 743
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14346,
-        "occurrences": 24926
+        "unique_references": 14413,
+        "occurrences": 25016
       },
       {
         "target_scope": "dart_sdk",
@@ -190113,8 +191583,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 406,
-        "occurrences": 654
+        "unique_references": 412,
+        "occurrences": 675
       },
       {
         "target_scope": "dart_sdk",
@@ -190125,8 +191595,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 98,
-        "occurrences": 129
+        "unique_references": 101,
+        "occurrences": 132
       },
       {
         "target_scope": "dart_sdk",
@@ -190191,14 +191661,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/digest.dart",
-        "unique_references": 39,
-        "occurrences": 42
+        "unique_references": 40,
+        "occurrences": 43
       },
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hash.dart",
-        "unique_references": 40,
-        "occurrences": 44
+        "unique_references": 41,
+        "occurrences": 45
       },
       {
         "target_scope": "dependency",
@@ -190209,8 +191679,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 488,
-        "occurrences": 951
+        "unique_references": 489,
+        "occurrences": 956
       },
       {
         "target_scope": "dependency",
@@ -191463,14 +192933,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1213,
-        "occurrences": 1982
+        "unique_references": 1236,
+        "occurrences": 2008
       },
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 86,
-        "occurrences": 88
+        "unique_references": 89,
+        "occurrences": 91
       },
       {
         "target_scope": "dependency",
@@ -192945,8 +194415,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/account_email_delivery_transport.dart",
-        "unique_references": 20,
-        "occurrences": 25
+        "unique_references": 23,
+        "occurrences": 28
       },
       {
         "target_scope": "workspace",
@@ -193832,6 +195302,42 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_admission_gate.dart",
+        "unique_references": 3,
+        "occurrences": 6
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "unique_references": 8,
+        "occurrences": 22
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_delivery_service.dart",
+        "unique_references": 3,
+        "occurrences": 3
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "unique_references": 22,
+        "occurrences": 36
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "unique_references": 32,
+        "occurrences": 39
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "unique_references": 17,
+        "occurrences": 19
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/billing/payment_provider.dart",
         "unique_references": 7,
         "occurrences": 8
@@ -193965,8 +195471,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/database.dart",
-        "unique_references": 144,
-        "occurrences": 151
+        "unique_references": 147,
+        "occurrences": 156
       },
       {
         "target_scope": "workspace",
@@ -194211,8 +195717,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 177,
-        "occurrences": 302
+        "unique_references": 179,
+        "occurrences": 304
       },
       {
         "target_scope": "workspace",
@@ -194421,8 +195927,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/rate_limit_middleware.dart",
-        "unique_references": 60,
-        "occurrences": 75
+        "unique_references": 65,
+        "occurrences": 82
       },
       {
         "target_scope": "workspace",
@@ -194457,8 +195963,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/runtime_environment.dart",
-        "unique_references": 43,
-        "occurrences": 44
+        "unique_references": 45,
+        "occurrences": 46
       },
       {
         "target_scope": "workspace",
@@ -194543,6 +196049,12 @@
         "target_library": "workspace:server/bin/battle_job_worker.dart",
         "unique_references": 1,
         "occurrences": 3
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/bin/beta_invites.dart",
+        "unique_references": 4,
+        "occurrences": 9
       },
       {
         "target_scope": "workspace",
@@ -194674,7 +196186,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 8,
-        "occurrences": 67
+        "occurrences": 68
       },
       {
         "target_scope": "workspace",
@@ -194963,6 +196475,12 @@
         "target_library": "workspace:server/routes/auth/login.dart",
         "unique_references": 1,
         "occurrences": 3
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/routes/auth/register.dart",
+        "unique_references": 1,
+        "occurrences": 2
       },
       {
         "target_scope": "workspace",
@@ -198816,7 +200334,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 203,
+        "line": 224,
         "caller": "AccountEmailDeliveryTransport._send",
         "kind": "function_expression",
         "lexical_target": "_clientFactory",
@@ -198824,7 +200342,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 205,
+        "line": 226,
         "caller": "AccountEmailDeliveryTransport._send",
         "kind": "function_expression",
         "lexical_target": "(() async {final request = http.Request('POST', uri)..headers.addAll(headers)..encoding = utf8..body = body; final response = await client.send(request); await response.stream.drain<void>(); return response.statusCode;})",
@@ -199168,7 +200686,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 352,
+        "line": 385,
         "caller": "AuthService._loginPasswordMatches",
         "kind": "function_expression",
         "lexical_target": "verify",
@@ -199244,6 +200762,14 @@
         "caller": "BattlePreflightService.inspect",
         "kind": "function_expression",
         "lexical_target": "_coverageProbe",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 481,
+        "caller": "BetaInviteIssuer._deliverAndRecord",
+        "kind": "function_expression",
+        "lexical_target": "_deliver",
         "occurrences": 1
       },
       {
@@ -199328,7 +200854,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1223,
+        "line": 1225,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -199336,7 +200862,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1225,
+        "line": 1227,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -199344,7 +200870,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1555,
+        "line": 1557,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -199352,7 +200878,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 940,
+        "line": 942,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -199360,7 +200886,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 964,
+        "line": 966,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -199600,7 +201126,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 640,
+        "line": 688,
         "caller": "_aiRateLimit",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -199767,9 +201293,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16296,
-    "workspace_type_reference_count": 3442,
-    "unresolved_type_reference_count": 355,
+    "resolved_type_reference_count": 16413,
+    "workspace_type_reference_count": 3481,
+    "unresolved_type_reference_count": 360,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -221343,6 +222869,66 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/beta_invites.dart",
+        "line": 103,
+        "lexical_type": "BetaInviteIssuer",
+        "resolved_type": "BetaInviteIssuer",
+        "target": "BetaInviteIssuer",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 106,
+        "lexical_type": "BetaInviteDeliveryService",
+        "resolved_type": "BetaInviteDeliveryService",
+        "target": "BetaInviteDeliveryService",
+        "target_library": "package:server/beta_invites/beta_invite_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 232,
+        "lexical_type": "BetaInviteIssueOutcome",
+        "resolved_type": "BetaInviteIssueOutcome",
+        "target": "BetaInviteIssueOutcome",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 38,
+        "lexical_type": "BetaInviteCliOptions",
+        "resolved_type": "BetaInviteCliOptions",
+        "target": "BetaInviteCliOptions",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 52,
+        "lexical_type": "BetaInviteUsageException",
+        "resolved_type": "BetaInviteUsageException",
+        "target": "BetaInviteUsageException",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/beta_invites.dart",
+        "line": 92,
+        "lexical_type": "Database",
+        "resolved_type": "Database",
+        "target": "Database",
+        "target_library": "package:server/database.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/bin/candidate_quality_data_foundation.dart",
         "line": 108,
         "lexical_type": "Database",
@@ -221980,11 +223566,11 @@
         "target": "Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 63
+        "occurrences": 64
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4217,
+        "line": 4293,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
@@ -222994,47 +224580,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 124,
-        "lexical_type": "AccountEmailDeliveryException",
-        "resolved_type": "AccountEmailDeliveryException",
-        "target": "AccountEmailDeliveryException",
-        "target_library": "package:server/account_email_delivery_transport.dart",
-        "target_scope": "workspace",
-        "occurrences": 9
-      },
-      {
-        "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 173,
-        "lexical_type": "ResendEmailConfiguration",
-        "resolved_type": "ResendEmailConfiguration",
-        "target": "ResendEmailConfiguration",
-        "target_library": "package:server/account_email_delivery_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 60,
-        "lexical_type": "AccountEmailTemplate",
-        "resolved_type": "AccountEmailTemplate",
-        "target": "AccountEmailTemplate",
-        "target_library": "package:server/account_email_delivery_transport.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 79,
-        "lexical_type": "AccountEmailHttpClientFactory?",
-        "resolved_type": "Client Function()?",
-        "target": "AccountEmailHttpClientFactory",
-        "target_library": "package:server/account_email_delivery_transport.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 94,
+        "line": 114,
         "lexical_type": "AccountEmailHttpClientFactory",
         "resolved_type": "Client Function()",
         "target": "AccountEmailHttpClientFactory",
@@ -223044,13 +224590,53 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 99,
+        "line": 119,
         "lexical_type": "AccountEmailDeliveryMessage",
         "resolved_type": "AccountEmailDeliveryMessage",
         "target": "AccountEmailDeliveryMessage",
         "target_library": "package:server/account_email_delivery_transport.dart",
         "target_scope": "workspace",
         "occurrences": 7
+      },
+      {
+        "source": "server/lib/account_email_delivery_transport.dart",
+        "line": 144,
+        "lexical_type": "AccountEmailDeliveryException",
+        "resolved_type": "AccountEmailDeliveryException",
+        "target": "AccountEmailDeliveryException",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "server/lib/account_email_delivery_transport.dart",
+        "line": 194,
+        "lexical_type": "ResendEmailConfiguration",
+        "resolved_type": "ResendEmailConfiguration",
+        "target": "ResendEmailConfiguration",
+        "target_library": "package:server/account_email_delivery_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/account_email_delivery_transport.dart",
+        "line": 77,
+        "lexical_type": "AccountEmailTemplate",
+        "resolved_type": "AccountEmailTemplate",
+        "target": "AccountEmailTemplate",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/account_email_delivery_transport.dart",
+        "line": 99,
+        "lexical_type": "AccountEmailHttpClientFactory?",
+        "resolved_type": "Client Function()?",
+        "target": "AccountEmailHttpClientFactory",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/lib/ai/battle_engine_config.dart",
@@ -226104,7 +227690,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 165,
+        "line": 172,
         "lexical_type": "LegalAcceptance?",
         "resolved_type": "LegalAcceptance?",
         "target": "LegalAcceptance",
@@ -226114,7 +227700,17 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 167,
+        "line": 173,
+        "lexical_type": "BetaInviteClaim?",
+        "resolved_type": "BetaInviteClaim?",
+        "target": "BetaInviteClaim",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/auth_service.dart",
+        "line": 175,
         "lexical_type": "Database",
         "resolved_type": "Database",
         "target": "Database",
@@ -226124,7 +227720,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 22,
+        "line": 23,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -226134,7 +227730,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 323,
+        "line": 356,
         "lexical_type": "InvalidCredentialsException",
         "resolved_type": "InvalidCredentialsException",
         "target": "InvalidCredentialsException",
@@ -226144,7 +227740,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 399,
+        "line": 432,
         "lexical_type": "EmailVerificationRequest?",
         "resolved_type": "EmailVerificationRequest?",
         "target": "EmailVerificationRequest",
@@ -226154,7 +227750,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 439,
+        "line": 472,
         "lexical_type": "EmailVerificationRequest",
         "resolved_type": "EmailVerificationRequest",
         "target": "EmailVerificationRequest",
@@ -226164,7 +227760,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 450,
+        "line": 483,
         "lexical_type": "AccountSecurityException",
         "resolved_type": "AccountSecurityException",
         "target": "AccountSecurityException",
@@ -226174,7 +227770,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 501,
+        "line": 534,
         "lexical_type": "PasswordResetRequest?",
         "resolved_type": "PasswordResetRequest?",
         "target": "PasswordResetRequest",
@@ -226184,7 +227780,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 560,
+        "line": 593,
         "lexical_type": "PasswordResetRequest",
         "resolved_type": "PasswordResetRequest",
         "target": "PasswordResetRequest",
@@ -226194,7 +227790,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 645,
+        "line": 678,
         "lexical_type": "AccountSecurityResult",
         "resolved_type": "AccountSecurityResult",
         "target": "AccountSecurityResult",
@@ -226204,7 +227800,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 792,
+        "line": 825,
         "lexical_type": "_PasswordPreparation",
         "resolved_type": "_PasswordPreparation",
         "target": "_PasswordPreparation",
@@ -228923,6 +230519,276 @@
         "occurrences": 19
       },
       {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 15,
+        "lexical_type": "BetaInviteDenial?",
+        "resolved_type": "BetaInviteDenial?",
+        "target": "BetaInviteDenial",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 20,
+        "lexical_type": "BetaInviteAdmissionGate",
+        "resolved_type": "BetaInviteAdmissionGate",
+        "target": "BetaInviteAdmissionGate",
+        "target_library": "package:server/beta_invites/beta_invite_admission_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 21,
+        "lexical_type": "RegistrationAdmission",
+        "resolved_type": "RegistrationAdmission",
+        "target": "RegistrationAdmission",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 40,
+        "lexical_type": "RegistrationAdmission?",
+        "resolved_type": "RegistrationAdmission?",
+        "target": "RegistrationAdmission",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 33,
+        "lexical_type": "BetaInviteCommand",
+        "resolved_type": "BetaInviteCommand",
+        "target": "BetaInviteCommand",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 64,
+        "lexical_type": "BetaInviteCliOptions",
+        "resolved_type": "BetaInviteCliOptions",
+        "target": "BetaInviteCliOptions",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 66,
+        "lexical_type": "BetaInviteUsageException",
+        "resolved_type": "BetaInviteUsageException",
+        "target": "BetaInviteUsageException",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 16
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 68,
+        "lexical_type": "BetaInviteCommand?",
+        "resolved_type": "BetaInviteCommand?",
+        "target": "BetaInviteCommand",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 38,
+        "lexical_type": "AccountEmailHttpClientFactory?",
+        "resolved_type": "Client Function()?",
+        "target": "AccountEmailHttpClientFactory",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 55,
+        "lexical_type": "AccountEmailDeliveryTransport",
+        "resolved_type": "AccountEmailDeliveryTransport",
+        "target": "AccountEmailDeliveryTransport",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+        "line": 60,
+        "lexical_type": "AccountEmailDeliveryMessage",
+        "resolved_type": "AccountEmailDeliveryMessage",
+        "target": "AccountEmailDeliveryMessage",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 112,
+        "lexical_type": "BetaInviteDeliver",
+        "resolved_type": "Future<bool> Function({required String code, required String email, required DateTime expiresAt})",
+        "target": "BetaInviteDeliver",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 122,
+        "lexical_type": "BetaInvitePlanEntry",
+        "resolved_type": "BetaInvitePlanEntry",
+        "target": "BetaInvitePlanEntry",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 197,
+        "lexical_type": "BetaInviteIssueOutcome",
+        "resolved_type": "BetaInviteIssueOutcome",
+        "target": "BetaInviteIssueOutcome",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 12
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 490,
+        "lexical_type": "AccountEmailDeliveryException",
+        "resolved_type": "AccountEmailDeliveryException",
+        "target": "AccountEmailDeliveryException",
+        "target_library": "package:server/account_email_delivery_transport.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 64,
+        "lexical_type": "BetaInvitePlanAction",
+        "resolved_type": "BetaInvitePlanAction",
+        "target": "BetaInvitePlanAction",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 96,
+        "lexical_type": "BetaInviteDeliveryState",
+        "resolved_type": "BetaInviteDeliveryState",
+        "target": "BetaInviteDeliveryState",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 181,
+        "lexical_type": "BetaInviteDenial",
+        "resolved_type": "BetaInviteDenial",
+        "target": "BetaInviteDenial",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 209,
+        "lexical_type": "BetaInviteDeniedException?",
+        "resolved_type": "BetaInviteDeniedException?",
+        "target": "BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 209,
+        "lexical_type": "BetaInviteStatus?",
+        "resolved_type": "BetaInviteStatus?",
+        "target": "BetaInviteStatus",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 211,
+        "lexical_type": "BetaInviteDeniedException",
+        "resolved_type": "BetaInviteDeniedException",
+        "target": "BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_policy.dart",
+        "line": 39,
+        "lexical_type": "RegistrationAdmission",
+        "resolved_type": "RegistrationAdmission",
+        "target": "RegistrationAdmission",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 157,
+        "lexical_type": "BetaInviteDenial",
+        "resolved_type": "BetaInviteDenial",
+        "target": "BetaInviteDenial",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 172,
+        "lexical_type": "BetaInviteStatus?",
+        "resolved_type": "BetaInviteStatus?",
+        "target": "BetaInviteStatus",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 175,
+        "lexical_type": "BetaInviteStatus",
+        "resolved_type": "BetaInviteStatus",
+        "target": "BetaInviteStatus",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 39,
+        "lexical_type": "BetaInviteDeniedException?",
+        "resolved_type": "BetaInviteDeniedException?",
+        "target": "BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 90,
+        "lexical_type": "BetaInviteDeniedException",
+        "resolved_type": "BetaInviteDeniedException",
+        "target": "BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
         "source": "server/lib/billing/payment_provider.dart",
         "line": 24,
         "lexical_type": "BillingCheckoutRequest",
@@ -229644,7 +231510,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1175,
+        "line": 1177,
         "lexical_type": "InteractiveBattleReadiness",
         "resolved_type": "InteractiveBattleReadiness",
         "target": "InteractiveBattleReadiness",
@@ -229654,7 +231520,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1179,
+        "line": 1181,
         "lexical_type": "InteractiveBattleSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "InteractiveBattleSchemaProbe",
@@ -229664,7 +231530,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1218,
+        "line": 1220,
         "lexical_type": "InteractiveBattleConfiguration",
         "resolved_type": "InteractiveBattleConfiguration",
         "target": "InteractiveBattleConfiguration",
@@ -229674,7 +231540,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1298,
+        "line": 1300,
         "lexical_type": "BattleJobWorkerReadiness",
         "resolved_type": "BattleJobWorkerReadiness",
         "target": "BattleJobWorkerReadiness",
@@ -229684,7 +231550,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1365,
+        "line": 1367,
         "lexical_type": "CollectionAvailabilitySchemaReadiness",
         "resolved_type": "CollectionAvailabilitySchemaReadiness",
         "target": "CollectionAvailabilitySchemaReadiness",
@@ -229694,7 +231560,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1467,
+        "line": 1469,
         "lexical_type": "DeckValidationSchemaReadiness",
         "resolved_type": "DeckValidationSchemaReadiness",
         "target": "DeckValidationSchemaReadiness",
@@ -229704,7 +231570,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1501,
+        "line": 1503,
         "lexical_type": "BattleRuntimeReadiness",
         "resolved_type": "BattleRuntimeReadiness",
         "target": "BattleRuntimeReadiness",
@@ -229714,7 +231580,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1522,
+        "line": 1524,
         "lexical_type": "BattleEngineConfigurationException",
         "resolved_type": "BattleEngineConfigurationException",
         "target": "BattleEngineConfigurationException",
@@ -229724,7 +231590,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1634,
+        "line": 1636,
         "lexical_type": "AiRuntimeReadiness",
         "resolved_type": "AiRuntimeReadiness",
         "target": "AiRuntimeReadiness",
@@ -229734,7 +231600,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1635,
+        "line": 1637,
         "lexical_type": "OpenAiRuntimeConfig",
         "resolved_type": "OpenAiRuntimeConfig",
         "target": "OpenAiRuntimeConfig",
@@ -229744,7 +231610,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1657,
+        "line": 1659,
         "lexical_type": "ReleaseCapabilityRuntimeReadiness",
         "resolved_type": "ReleaseCapabilityRuntimeReadiness",
         "target": "ReleaseCapabilityRuntimeReadiness",
@@ -229754,7 +231620,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1659,
+        "line": 1661,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -229764,7 +231630,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 639,
+        "line": 641,
         "lexical_type": "ReleaseSchemaReadiness",
         "resolved_type": "ReleaseSchemaReadiness",
         "target": "ReleaseSchemaReadiness",
@@ -229774,7 +231640,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 714,
+        "line": 716,
         "lexical_type": "AiJobSchemaReadiness",
         "resolved_type": "AiJobSchemaReadiness",
         "target": "AiJobSchemaReadiness",
@@ -229784,7 +231650,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 809,
+        "line": 811,
         "lexical_type": "BattleJobSchemaReadiness",
         "resolved_type": "BattleJobSchemaReadiness",
         "target": "BattleJobSchemaReadiness",
@@ -229794,7 +231660,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 912,
+        "line": 914,
         "lexical_type": "BattleLiveSpectatorReadiness",
         "resolved_type": "BattleLiveSpectatorReadiness",
         "target": "BattleLiveSpectatorReadiness",
@@ -229804,7 +231670,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 915,
+        "line": 917,
         "lexical_type": "BattleSidecarProbe",
         "resolved_type": "Future<Map<String, dynamic>?> Function(String, Uri)",
         "target": "BattleSidecarProbe",
@@ -229814,7 +231680,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 916,
+        "line": 918,
         "lexical_type": "BattleLiveSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "BattleLiveSchemaProbe",
@@ -229824,7 +231690,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 949,
+        "line": 951,
         "lexical_type": "BattleEngineConfig",
         "resolved_type": "BattleEngineConfig",
         "target": "BattleEngineConfig",
@@ -230940,7 +232806,7 @@
         "target": "RateLimiter",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
-        "occurrences": 14
+        "occurrences": 16
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
@@ -230970,11 +232836,11 @@
         "target": "RateLimiter",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
-        "occurrences": 5
+        "occurrences": 7
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 513,
+        "line": 516,
         "lexical_type": "CredentialEmailBucket",
         "resolved_type": "CredentialEmailBucket",
         "target": "CredentialEmailBucket",
@@ -232704,27 +234570,27 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 100,
-        "lexical_type": "EmailVerificationDeliveryService",
-        "resolved_type": "EmailVerificationDeliveryService",
-        "target": "EmailVerificationDeliveryService",
-        "target_library": "package:server/email_verification_delivery_service.dart",
+        "line": 135,
+        "lexical_type": "BetaInviteClaim",
+        "resolved_type": "BetaInviteClaim",
+        "target": "BetaInviteClaim",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 130,
-        "lexical_type": "LegalAcceptanceException",
-        "resolved_type": "LegalAcceptanceException",
-        "target": "LegalAcceptanceException",
-        "target_library": "package:server/legal_policy.dart",
+        "line": 139,
+        "lexical_type": "Database",
+        "resolved_type": "Database",
+        "target": "Database",
+        "target_library": "package:server/database.dart",
         "target_scope": "workspace",
-        "occurrences": 1
+        "occurrences": 3
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 86,
+        "line": 157,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -232734,11 +234600,61 @@
       },
       {
         "source": "server/routes/auth/register.dart",
-        "line": 93,
+        "line": 167,
+        "lexical_type": "BetaInviteDeniedException",
+        "resolved_type": "BetaInviteDeniedException",
+        "target": "BetaInviteDeniedException",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 198,
         "lexical_type": "EmailVerificationRequest",
         "resolved_type": "EmailVerificationRequest",
         "target": "EmailVerificationRequest",
         "target_library": "package:server/auth_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 205,
+        "lexical_type": "EmailVerificationDeliveryService",
+        "resolved_type": "EmailVerificationDeliveryService",
+        "target": "EmailVerificationDeliveryService",
+        "target_library": "package:server/email_verification_delivery_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 236,
+        "lexical_type": "LegalAcceptanceException",
+        "resolved_type": "LegalAcceptanceException",
+        "target": "LegalAcceptanceException",
+        "target_library": "package:server/legal_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 267,
+        "lexical_type": "RequestTrace",
+        "resolved_type": "RequestTrace",
+        "target": "RequestTrace",
+        "target_library": "package:server/request_trace.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/auth/register.dart",
+        "line": 57,
+        "lexical_type": "BetaInviteDenial",
+        "resolved_type": "BetaInviteDenial",
+        "target": "BetaInviteDenial",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -234203,8 +236119,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1090,
-        "occurrences": 2210
+        "unique_references": 1101,
+        "occurrences": 2227
       },
       {
         "target_scope": "dart_sdk",
@@ -234216,25 +236132,25 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
         "unique_references": 43,
-        "occurrences": 55
+        "occurrences": 56
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6285,
-        "occurrences": 39879
+        "unique_references": 6340,
+        "occurrences": 40114
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 87,
-        "occurrences": 190
+        "unique_references": 89,
+        "occurrences": 192
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 33,
-        "occurrences": 53
+        "unique_references": 37,
+        "occurrences": 58
       },
       {
         "target_scope": "dart_sdk",
@@ -234306,7 +236222,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 275,
-        "occurrences": 1102
+        "occurrences": 1109
       },
       {
         "target_scope": "dependency",
@@ -235541,8 +237457,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 256,
-        "occurrences": 948
+        "unique_references": 261,
+        "occurrences": 967
       },
       {
         "target_scope": "dependency",
@@ -235553,8 +237469,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 201,
-        "occurrences": 484
+        "unique_references": 202,
+        "occurrences": 485
       },
       {
         "target_scope": "dependency",
@@ -235692,7 +237608,7 @@
         "target_scope": "unknown",
         "target_library": "<unresolved>",
         "unique_references": 410,
-        "occurrences": 4774
+        "occurrences": 4775
       },
       {
         "target_scope": "workspace",
@@ -236909,8 +238825,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/account_email_delivery_transport.dart",
-        "unique_references": 11,
-        "occurrences": 27
+        "unique_references": 15,
+        "occurrences": 32
       },
       {
         "target_scope": "workspace",
@@ -237538,6 +239454,42 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_admission_gate.dart",
+        "unique_references": 1,
+        "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_cli.dart",
+        "unique_references": 6,
+        "occurrences": 26
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_delivery_service.dart",
+        "unique_references": 1,
+        "occurrences": 1
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_issuance.dart",
+        "unique_references": 7,
+        "occurrences": 27
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_policy.dart",
+        "unique_references": 15,
+        "occurrences": 22
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/beta_invites/beta_invite_store.dart",
+        "unique_references": 2,
+        "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/billing/payment_provider.dart",
         "unique_references": 5,
         "occurrences": 9
@@ -237623,8 +239575,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/database.dart",
-        "unique_references": 50,
-        "occurrences": 60
+        "unique_references": 52,
+        "occurrences": 64
       },
       {
         "target_scope": "workspace",
@@ -237936,7 +239888,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/rate_limit_middleware.dart",
         "unique_references": 5,
-        "occurrences": 26
+        "occurrences": 30
       },
       {
         "target_scope": "workspace",
@@ -237959,8 +239911,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/request_trace.dart",
-        "unique_references": 13,
-        "occurrences": 20
+        "unique_references": 14,
+        "occurrences": 21
       },
       {
         "target_scope": "workspace",
@@ -238068,7 +240020,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 2,
-        "occurrences": 64
+        "occurrences": 65
       },
       {
         "target_scope": "workspace",
@@ -239225,6 +241177,12 @@
         "occurrences": 1
       },
       {
+        "source": "server/bin/beta_invites.dart",
+        "line": 37,
+        "lexical_type": "void",
+        "occurrences": 2
+      },
+      {
         "source": "server/bin/candidate_quality_data_foundation.dart",
         "line": 45,
         "lexical_type": "void",
@@ -239388,7 +241346,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4254,
+        "line": 4332,
         "lexical_type": "void",
         "occurrences": 2
       },
@@ -239640,7 +241598,7 @@
       },
       {
         "source": "server/lib/account_email_delivery_transport.dart",
-        "line": 197,
+        "line": 218,
         "lexical_type": "void",
         "occurrences": 3
       },
@@ -239976,7 +241934,7 @@
       },
       {
         "source": "server/lib/auth_service.dart",
-        "line": 49,
+        "line": 50,
         "lexical_type": "void",
         "occurrences": 4
       },
@@ -240075,6 +242033,30 @@
         "line": 962,
         "lexical_type": "void",
         "occurrences": 6
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_admission_gate.dart",
+        "line": 43,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_cli.dart",
+        "line": 180,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_issuance.dart",
+        "line": 535,
+        "lexical_type": "void",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/beta_invites/beta_invite_store.dart",
+        "line": 70,
+        "lexical_type": "void",
+        "occurrences": 4
       },
       {
         "source": "server/lib/catalog_search_rate_limit.dart",
@@ -240224,7 +242206,7 @@
         "source": "server/lib/rate_limit_middleware.dart",
         "line": 91,
         "lexical_type": "void",
-        "occurrences": 5
+        "occurrences": 6
       },
       {
         "source": "server/lib/request_metrics_service.dart",
@@ -241252,7 +243234,7 @@
       "name": "AuthService",
       "kind": "class",
       "source": "server/lib/auth_service.dart",
-      "line": 14,
+      "line": 15,
       "members": [
         "_hashOpaqueToken",
         "_loginPasswordMatches",
@@ -241410,6 +243392,15 @@
         "get",
         "list",
         "respond"
+      ]
+    },
+    {
+      "name": "BetaInviteDeliveryService",
+      "kind": "class",
+      "source": "server/lib/beta_invites/beta_invite_delivery_service.dart",
+      "line": 35,
+      "members": [
+        "deliver"
       ]
     },
     {
@@ -253935,8 +255926,8 @@
       "server/lib/collection_availability_contract.dart",
       "server/lib/import_card_lookup_service.dart"
     ],
-    "migration_count": 60,
-    "latest_migration": "060",
+    "migration_count": 61,
+    "latest_migration": "061",
     "migrations": [
       {
         "version": "001",
@@ -254236,6 +256227,11 @@
       {
         "version": "060",
         "name": "create_account_deletion_outbox",
+        "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "061",
+        "name": "create_beta_invites",
         "source": "server/bin/migrate.dart"
       }
     ],
@@ -255704,6 +257700,130 @@
             "type": "UUID",
             "primary_key": false,
             "nullable": true
+          }
+        ]
+      },
+      {
+        "name": "beta_invite_events",
+        "columns": [
+          {
+            "name": "actor",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "event",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "id",
+            "type": "BIGSERIAL",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "invite_id",
+            "type": "UUID",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "request_id",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          }
+        ]
+      },
+      {
+        "name": "beta_invites",
+        "columns": [
+          {
+            "name": "accepted_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "accepted_user_id",
+            "type": "UUID",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "batch_label",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "delivered_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "email_digest",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "email_hint",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "expires_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "issued_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "issued_by",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "revoked_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "revoked_reason",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "token_hash",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
           }
         ]
       },
@@ -260543,6 +262663,30 @@
         ],
         "from_column": "winner_deck_id",
         "to_table": "decks",
+        "to_columns": [
+          "id"
+        ],
+        "to_column": "id"
+      },
+      {
+        "from_table": "beta_invite_events",
+        "from_columns": [
+          "invite_id"
+        ],
+        "from_column": "invite_id",
+        "to_table": "beta_invites",
+        "to_columns": [
+          "id"
+        ],
+        "to_column": "id"
+      },
+      {
+        "from_table": "beta_invites",
+        "from_columns": [
+          "accepted_user_id"
+        ],
+        "from_column": "accepted_user_id",
+        "to_table": "users",
         "to_columns": [
           "id"
         ],
@@ -265881,6 +268025,12 @@
       ]
     },
     {
+      "path": "server/bin/beta_invites.dart",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
       "path": "server/bin/build_deck_quality_fixture.py",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -267715,7 +269865,8 @@
         "server/bin/migrate.dart",
         "server/bin/migration_038_040_isolated_support.dart",
         "server/bin/pull_learning_events.py",
-        "server/bin/sync_catalog_reference_from_scryfall.py"
+        "server/bin/sync_catalog_reference_from_scryfall.py",
+        "server/lib/beta_invites/beta_invite_cli.dart"
       ],
       "value_captured": false
     },
@@ -268108,6 +270259,7 @@
         "server/bin/migrate.dart",
         "server/lib/account_email_delivery_transport.dart",
         "server/lib/auth_runtime_policy.dart",
+        "server/lib/beta_invites/beta_invite_policy.dart",
         "server/lib/catalog_search_rate_limit.dart",
         "server/lib/cors_policy.dart",
         "server/lib/email_verification_policy.dart",
@@ -269850,7 +272002,8 @@
       "classification": "configuration",
       "sources": [
         "scripts/lib/manaloom_mutation_guard.sh",
-        "server/bin/lorehold_public_generator_parity_audit.dart"
+        "server/bin/lorehold_public_generator_parity_audit.dart",
+        "server/lib/beta_invites/beta_invite_cli.dart"
       ],
       "value_captured": false
     },
@@ -269866,7 +272019,8 @@
       "name": "MANALOOM_CONFIRM_POSTGRES_WRITES",
       "classification": "configuration",
       "sources": [
-        "scripts/lib/manaloom_mutation_guard.sh"
+        "scripts/lib/manaloom_mutation_guard.sh",
+        "server/lib/beta_invites/beta_invite_cli.dart"
       ],
       "value_captured": false
     },
@@ -271353,7 +273507,8 @@
       "classification": "configuration",
       "sources": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/global_commander_deck_contract_audit.py",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_transition_postgresql_scope_reconciliation.py"
+        "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_transition_postgresql_scope_reconciliation.py",
+        "server/lib/beta_invites/beta_invite_cli.dart"
       ],
       "value_captured": false
     },
@@ -274792,6 +276947,10 @@
     "server/test/battle_simulation_attempt_service_test.dart",
     "server/test/battle_simulation_request_support_test.dart",
     "server/test/battle_simulator_visual_snapshot_test.dart",
+    "server/test/beta_invite_db_live_test.dart",
+    "server/test/beta_invite_e2e_live_test.dart",
+    "server/test/beta_invite_policy_test.dart",
+    "server/test/beta_invite_registration_route_test.dart",
     "server/test/binder_import_contract_test.dart",
     "server/test/binder_item_contract_test.dart",
     "server/test/binder_route_test.dart",
@@ -276420,7 +278579,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "8a73ebe6a8d3a0cfb4e6e4c7ce86dc01dbd3d60d0957ef3503d8f4960de06f9b"
+      "sha256": "a4af024bdaaf0dec9ff31ea189f31f9186f066a9f9f1d539f4b7aec1a7945774"
     },
     "required_task_fields": [
       "id",
@@ -276639,14 +278798,14 @@
       {
         "id": "BT-AUTH-006",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Admissão controlada de contas antes de promover `account_registration`.",
         "depends_on": [
           "BT-AUTH-001",
           "BT-AUTH-002",
           "BT-SCP-001"
         ],
-        "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`).",
+        "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`). Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24`, com a migration 061 (`beta_invites` e `beta_invite_events`: só o hash do código e o digest do e-mail, um convite aberto por e-mail, auditoria sem dado pessoal): no modo `invite` (`MANALOOM_REGISTRATION_ADMISSION`, padrão da produção; `open` abre o cadastro), `POST /auth/register` exige `invite_code` e nega antes de criar a conta ou enviar e-mail (`invite_required`, `invite_invalid`, `invite_expired`, `invite_revoked`, `invite_already_used`); o convite é travado com `FOR UPDATE` e marcado aceito na transação que cria a conta, que já nasce com e-mail verificado; limites por IP, por e-mail e por código, distribuídos na produção. O dono emite, reenvia, revoga e lista pelo `server/bin/beta_invites.dart` (simulação por padrão, até 30 por lote, idempotente). Evidência: `server/test/beta_invite_policy_test.dart`, `server/test/beta_invite_registration_route_test.dart`, `server/test/beta_invite_db_live_test.dart` e `server/test/beta_invite_e2e_live_test.dart` (válido, sem convite, inválido, expirado, replay e 10 cadastros simultâneos com uma conta só, por HTTP); seis mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-006-convites.md`. A capability `account_registration` segue desligada: ligá-la é do dono.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 316
       },
@@ -286302,7 +288461,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56"
+    "project_logic_source_digest_sha256": "56b85a528f4c231ac20b5604b742242577ec56bc3aca23669d56f4e08d9bc6d7"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288530,6 +290689,7 @@
       "server/bin/backfill_card_identity_columns.dart",
       "server/bin/backfill_card_image_urls.py",
       "server/bin/battle_job_worker.dart",
+      "server/bin/beta_invites.dart",
       "server/bin/build_deck_quality_fixture.py",
       "server/bin/candidate_quality_data_foundation.dart",
       "server/bin/candidate_quality_meta_signals.dart",
@@ -288812,6 +290972,12 @@
       "server/lib/battle/interactive_battle_runtime_client.dart",
       "server/lib/battle/interactive_battle_service.dart",
       "server/lib/battle/interactive_battle_store.dart",
+      "server/lib/beta_invites/beta_invite_admission_gate.dart",
+      "server/lib/beta_invites/beta_invite_cli.dart",
+      "server/lib/beta_invites/beta_invite_delivery_service.dart",
+      "server/lib/beta_invites/beta_invite_issuance.dart",
+      "server/lib/beta_invites/beta_invite_policy.dart",
+      "server/lib/beta_invites/beta_invite_store.dart",
       "server/lib/billing/payment_provider.dart",
       "server/lib/binder_import_contract.dart",
       "server/lib/binder_item_contract.dart",
@@ -289157,6 +291323,10 @@
       "server/test/battle_simulation_attempt_service_test.dart",
       "server/test/battle_simulation_request_support_test.dart",
       "server/test/battle_simulator_visual_snapshot_test.dart",
+      "server/test/beta_invite_db_live_test.dart",
+      "server/test/beta_invite_e2e_live_test.dart",
+      "server/test/beta_invite_policy_test.dart",
+      "server/test/beta_invite_registration_route_test.dart",
       "server/test/binder_import_contract_test.dart",
       "server/test/binder_item_contract_test.dart",
       "server/test/binder_route_test.dart",

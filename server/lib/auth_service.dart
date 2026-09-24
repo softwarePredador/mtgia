@@ -6,6 +6,7 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'auth_runtime_policy.dart';
+import 'beta_invites/beta_invite_store.dart';
 import 'database.dart';
 import 'legal_policy.dart';
 import 'password_policy.dart';
@@ -157,12 +158,19 @@ class AuthService {
   /// - Email único
   /// - Senha com hash bcrypt
   ///
+  /// Com [invite] (BT-AUTH-006), o convite é travado e conferido dentro da
+  /// transação, antes de qualquer escrita: convite recusado lança
+  /// [BetaInviteDeniedException] sem criar a conta. Aceito, ele fica ligado à
+  /// conta nova e o e-mail já nasce verificado (D-56), sem token de
+  /// verificação.
+  ///
   /// Retorna: Map com 'userId', 'username', 'email' e 'token'
   Future<Map<String, dynamic>> register({
     required String username,
     required String email,
     required String password,
     LegalAcceptance? legalAcceptance,
+    BetaInviteClaim? invite,
   }) async {
     final db = Database();
     final conn = db.connection;
@@ -179,11 +187,21 @@ class AuthService {
     }
 
     final hashedPassword = hashPassword(password);
-    final emailVerificationToken = _newOpaqueToken();
+    final emailVerificationToken = invite == null ? _newOpaqueToken() : null;
     final emailVerificationExpiresAt = DateTime.now().toUtc().add(
       const Duration(hours: 24),
     );
     final account = await conn.runTx((session) async {
+      // O convite vem antes de tudo: negado aqui, nada foi escrito.
+      final inviteId =
+          invite == null
+              ? null
+              : await BetaInviteAdmission.lockForAcceptance(
+                session,
+                code: invite.code,
+                email: normalizedEmail,
+              );
+
       final usernameCheck = await session.execute(
         Sql.named(
           'SELECT id FROM users WHERE LOWER(username) = @username '
@@ -211,7 +229,8 @@ class AuthService {
           INSERT INTO users (
             username, email, password_hash,
             terms_version, terms_accepted_at,
-            privacy_version, privacy_accepted_at
+            privacy_version, privacy_accepted_at,
+            email_verified_at
           )
           VALUES (
             @username, @email, @passwordHash,
@@ -220,7 +239,9 @@ class AuthService {
               THEN NULL ELSE CURRENT_TIMESTAMP END,
             CAST(@privacyVersion AS text),
             CASE WHEN CAST(@privacyVersion AS text) IS NULL
-              THEN NULL ELSE CURRENT_TIMESTAMP END
+              THEN NULL ELSE CURRENT_TIMESTAMP END,
+            CASE WHEN CAST(@inviteVerified AS boolean)
+              THEN CURRENT_TIMESTAMP ELSE NULL END
           )
           RETURNING id, username, email
         '''),
@@ -230,6 +251,7 @@ class AuthService {
           'passwordHash': hashedPassword,
           'termsVersion': legalAcceptance?.termsVersion,
           'privacyVersion': legalAcceptance?.privacyVersion,
+          'inviteVerified': inviteId != null,
         },
       );
       final row = result.first;
@@ -242,24 +264,34 @@ class AuthService {
         '''),
         parameters: {'userId': userId},
       );
-      await session.execute(
-        Sql.named('''
-          INSERT INTO email_verification_tokens (
-            user_id, token_hash, expires_at
-          ) VALUES (
-            CAST(@userId AS uuid), @tokenHash, @expiresAt
-          )
-        '''),
-        parameters: {
-          'userId': userId,
-          'tokenHash': _hashOpaqueToken(emailVerificationToken),
-          'expiresAt': emailVerificationExpiresAt,
-        },
-      );
+      if (inviteId != null) {
+        await BetaInviteAdmission.markAccepted(
+          session,
+          inviteId: inviteId,
+          userId: userId,
+          requestId: invite!.requestId,
+        );
+      } else {
+        await session.execute(
+          Sql.named('''
+            INSERT INTO email_verification_tokens (
+              user_id, token_hash, expires_at
+            ) VALUES (
+              CAST(@userId AS uuid), @tokenHash, @expiresAt
+            )
+          '''),
+          parameters: {
+            'userId': userId,
+            'tokenHash': _hashOpaqueToken(emailVerificationToken!),
+            'expiresAt': emailVerificationExpiresAt,
+          },
+        );
+      }
       return (
         userId: userId,
         username: row[1] as String,
         email: row[2] as String,
+        inviteId: inviteId,
       );
     });
 
@@ -271,7 +303,8 @@ class AuthService {
       'username': account.username,
       'email': account.email,
       'token': token,
-      'emailVerified': false,
+      'emailVerified': account.inviteId != null,
+      'inviteId': account.inviteId,
       'emailVerificationToken': emailVerificationToken,
       'emailVerificationExpiresAt': emailVerificationExpiresAt,
     };

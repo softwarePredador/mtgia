@@ -469,7 +469,10 @@ Middleware authRateLimit({RateLimiter? limiterOverrideForTesting}) {
 /// alguém não bloquear também a recuperação de senha dessa pessoa.
 enum CredentialEmailBucket {
   login('auth_login_email'),
-  recovery('auth_recovery_email');
+  recovery('auth_recovery_email'),
+
+  /// Cadastro (BT-AUTH-006): tentativas contra o mesmo e-mail, de qualquer IP.
+  registration('auth_register_email');
 
   const CredentialEmailBucket(this.bucket);
 
@@ -524,6 +527,51 @@ Future<Response?> credentialEmailRateLimitResponse(
             : _credentialEmailRateLimiterDev),
     message:
         'Muitas tentativas com este e-mail. Aguarde alguns minutos e tente '
+        'novamente.',
+  );
+}
+
+/// Bucket das tentativas com o mesmo código de convite (BT-AUTH-006).
+const betaInviteCodeRateLimitBucket = 'auth_invite_code';
+
+/// Produção: 10 tentativas por código a cada 15 minutos.
+final _betaInviteCodeRateLimiter = RateLimiter(
+  maxRequests: 10,
+  windowSeconds: 900,
+);
+
+final _betaInviteCodeRateLimiterDev = RateLimiter(
+  maxRequests: 200,
+  windowSeconds: 60,
+);
+
+RateLimiter? _betaInviteCodeRateLimiterOverride;
+
+@visibleForTesting
+void overrideBetaInviteCodeRateLimiterForTesting(RateLimiter? limiter) {
+  _betaInviteCodeRateLimiterOverride = limiter;
+}
+
+/// Limite por código de convite, de qualquer IP. Junto com o limite por IP
+/// ([authRateLimit]) e por e-mail, impede martelar um código com e-mails
+/// diferentes. Distribuído na produção (`rate_limit_events`); só o digest do
+/// código chega ao limitador. Devolve a resposta 429, ou `null` para seguir.
+Future<Response?> betaInviteCodeRateLimitResponse(
+  RequestContext context, {
+  required String identifier,
+}) {
+  final environment = _rateLimitRuntimeEnvironment();
+  return _accountScopedRateLimitResponse(
+    context,
+    bucket: betaInviteCodeRateLimitBucket,
+    identifier: identifier,
+    limiter:
+        _betaInviteCodeRateLimiterOverride ??
+        (_isProductionEnvironment(environment)
+            ? _betaInviteCodeRateLimiter
+            : _betaInviteCodeRateLimiterDev),
+    message:
+        'Muitas tentativas com este convite. Aguarde alguns minutos e tente '
         'novamente.',
   );
 }

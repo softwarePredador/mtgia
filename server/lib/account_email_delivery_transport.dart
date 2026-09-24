@@ -30,6 +30,20 @@ enum AccountEmailTemplate {
     introduction:
         'Confirme este endereço para liberar os recursos da sua conta BrewTact.',
     actionLabel: 'Verificar email',
+  ),
+
+  /// Convite da beta (BT-AUTH-006, D-16): o e-mail leva o link e o código,
+  /// para quem preferir digitar o código no app.
+  betaInvite(
+    wireName: 'beta_invite',
+    actionField: 'invite_url',
+    subject: 'Seu convite para a beta do BrewTact',
+    heading: 'Você foi convidado para a beta do BrewTact',
+    introduction:
+        'Use este convite para criar sua conta. Ele vale uma vez e só para '
+        'este email.',
+    actionLabel: 'Criar minha conta',
+    closing: 'Se você não esperava este convite, ignore este email.',
   );
 
   const AccountEmailTemplate({
@@ -39,6 +53,7 @@ enum AccountEmailTemplate {
     required this.heading,
     required this.introduction,
     required this.actionLabel,
+    this.closing = 'Se você não fez esta solicitação, ignore este email.',
   });
 
   final String wireName;
@@ -47,6 +62,7 @@ enum AccountEmailTemplate {
   final String heading;
   final String introduction;
   final String actionLabel;
+  final String closing;
 }
 
 class AccountEmailDeliveryMessage {
@@ -55,12 +71,16 @@ class AccountEmailDeliveryMessage {
     required this.recipient,
     required this.actionUrl,
     required this.expiresAt,
+    this.code,
   });
 
   final AccountEmailTemplate template;
   final String recipient;
   final String actionUrl;
   final DateTime expiresAt;
+
+  /// Código para digitar à mão (só o convite usa).
+  final String? code;
 }
 
 class AccountEmailDeliveryException implements Exception {
@@ -159,6 +179,7 @@ class AccountEmailDeliveryTransport {
       'recipient': message.recipient,
       message.template.actionField: message.actionUrl,
       'expires_at': message.expiresAt.toUtc().toIso8601String(),
+      if (message.code != null) 'code': message.code,
     });
     await _send(
       uri: webhook,
@@ -288,6 +309,12 @@ String _htmlBody(AccountEmailDeliveryMessage message) {
   final safeExpiry = const HtmlEscape().convert(
     message.expiresAt.toUtc().toIso8601String(),
   );
+  final code = message.code;
+  final codeLine =
+      code == null
+          ? ''
+          : '  <p>Código do convite: '
+              '<strong>${const HtmlEscape().convert(code)}</strong></p>\n';
   return '''
 <!doctype html>
 <html lang="pt-BR">
@@ -295,23 +322,27 @@ String _htmlBody(AccountEmailDeliveryMessage message) {
   <h1>${message.template.heading}</h1>
   <p>${message.template.introduction}</p>
   <p><a href="$safeUrl">${message.template.actionLabel}</a></p>
-  <p>Este link expira em $safeExpiry.</p>
-  <p>Se você não fez esta solicitação, ignore este email.</p>
+$codeLine  <p>Este link expira em $safeExpiry.</p>
+  <p>${message.template.closing}</p>
 </body>
 </html>
 ''';
 }
 
-String _textBody(AccountEmailDeliveryMessage message) => '''
+String _textBody(AccountEmailDeliveryMessage message) {
+  final code = message.code;
+  final codeLine = code == null ? '' : 'Código do convite: $code\n';
+  return '''
 ${message.template.heading}
 
 ${message.template.introduction}
 
 ${message.template.actionLabel}: ${message.actionUrl}
-
+$codeLine
 Este link expira em ${message.expiresAt.toUtc().toIso8601String()}.
-Se você não fez esta solicitação, ignore este email.
+${message.template.closing}
 ''';
+}
 
 bool _isProduction(Map<String, String> environment) =>
     (environment['ENVIRONMENT'] ?? 'development').trim().toLowerCase() ==

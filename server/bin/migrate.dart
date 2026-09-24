@@ -4146,6 +4146,82 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS account_deletion_outbox;
     ''',
   ),
+  Migration(
+    version: '061',
+    name: 'create_beta_invites',
+    // BT-AUTH-006 (D-16, D-56): convite de uso único, emitido pelo dono em
+    // lotes e entregue por e-mail, com expiração e revogação. O banco guarda
+    // só o hash do código e o digest do e-mail convidado, mais uma pista
+    // mascarada para o dono listar; nunca o código nem o e-mail em claro.
+    // Um convite aberto por e-mail (índice parcial). A auditoria fica em
+    // beta_invite_events, sem dado pessoal.
+    up: '''
+      CREATE TABLE IF NOT EXISTS beta_invites (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        batch_label TEXT NOT NULL
+          CHECK (batch_label ~ '^[a-z0-9][a-z0-9._-]{0,63}\$'),
+        email_digest TEXT NOT NULL CHECK (email_digest ~ '^[0-9a-f]{64}\$'),
+        email_hint TEXT NOT NULL
+          CHECK (char_length(email_hint) BETWEEN 3 AND 120),
+        token_hash TEXT NOT NULL CHECK (token_hash ~ '^[0-9a-f]{64}\$'),
+        issued_by TEXT NOT NULL CHECK (char_length(issued_by) BETWEEN 1 AND 80),
+        issued_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        delivered_at TIMESTAMP WITH TIME ZONE,
+        revoked_at TIMESTAMP WITH TIME ZONE,
+        revoked_reason TEXT
+          CHECK (
+            revoked_reason IS NULL
+            OR char_length(revoked_reason) BETWEEN 1 AND 200
+          ),
+        accepted_at TIMESTAMP WITH TIME ZONE,
+        accepted_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        CONSTRAINT uq_beta_invites_token_hash UNIQUE (token_hash),
+        CONSTRAINT chk_beta_invites_expiry CHECK (expires_at > issued_at),
+        CONSTRAINT chk_beta_invites_single_outcome
+          CHECK (accepted_at IS NULL OR revoked_at IS NULL),
+        CONSTRAINT chk_beta_invites_revoked_reason
+          CHECK ((revoked_at IS NULL) = (revoked_reason IS NULL)),
+        CONSTRAINT chk_beta_invites_accepted_user
+          CHECK (accepted_at IS NOT NULL OR accepted_user_id IS NULL)
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_beta_invites_open_email
+        ON beta_invites (email_digest)
+        WHERE accepted_at IS NULL AND revoked_at IS NULL;
+      CREATE INDEX IF NOT EXISTS idx_beta_invites_batch
+        ON beta_invites (batch_label, issued_at);
+
+      CREATE TABLE IF NOT EXISTS beta_invite_events (
+        id BIGSERIAL PRIMARY KEY,
+        invite_id UUID NOT NULL
+          REFERENCES beta_invites(id) ON DELETE CASCADE,
+        event TEXT NOT NULL CHECK (event IN (
+          'issued',
+          'delivered',
+          'delivery_failed',
+          'resent',
+          'revoked',
+          'accepted',
+          'denied_expired',
+          'denied_revoked',
+          'denied_used',
+          'denied_email_mismatch'
+        )),
+        actor TEXT NOT NULL CHECK (char_length(actor) BETWEEN 1 AND 80),
+        request_id TEXT
+          CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_beta_invite_events_invite
+        ON beta_invite_events (invite_id, created_at);
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS beta_invite_events;
+      DROP TABLE IF EXISTS beta_invites;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4218,7 +4294,9 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
     switch (version) {
       // A 060 cria o outbox da exclusão (D-68): o down só roda com a tabela
       // vazia, porque cada linha é a obrigação de um consumidor.
-      '033' || '035' || '060' => MigrationRollbackPolicy.emptyOnly,
+      // A 061 cria os convites da beta (BT-AUTH-006): convite emitido é
+      // compromisso com quem o recebeu, e a trilha de auditoria vai junto.
+      '033' || '035' || '060' || '061' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
       '034' ||
@@ -4282,6 +4360,11 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
     '060' =>
       (await tx.execute(
             'SELECT EXISTS (SELECT 1 FROM account_deletion_outbox)',
+          )).first[0] ==
+          true,
+    '061' =>
+      (await tx.execute(
+            'SELECT EXISTS (SELECT 1 FROM beta_invites)',
           )).first[0] ==
           true,
     _ => false,

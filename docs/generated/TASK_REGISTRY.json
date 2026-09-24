@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "8a73ebe6a8d3a0cfb4e6e4c7ce86dc01dbd3d60d0957ef3503d8f4960de06f9b"
+    "sha256": "a4af024bdaaf0dec9ff31ea189f31f9186f066a9f9f1d539f4b7aec1a7945774"
   },
   "required_task_fields": [
     "id",
@@ -221,14 +221,14 @@
     {
       "id": "BT-AUTH-006",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Admissão controlada de contas antes de promover `account_registration`.",
       "depends_on": [
         "BT-AUTH-001",
         "BT-AUTH-002",
         "BT-SCP-001"
       ],
-      "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`).",
+      "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`). Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24`, com a migration 061 (`beta_invites` e `beta_invite_events`: só o hash do código e o digest do e-mail, um convite aberto por e-mail, auditoria sem dado pessoal): no modo `invite` (`MANALOOM_REGISTRATION_ADMISSION`, padrão da produção; `open` abre o cadastro), `POST /auth/register` exige `invite_code` e nega antes de criar a conta ou enviar e-mail (`invite_required`, `invite_invalid`, `invite_expired`, `invite_revoked`, `invite_already_used`); o convite é travado com `FOR UPDATE` e marcado aceito na transação que cria a conta, que já nasce com e-mail verificado; limites por IP, por e-mail e por código, distribuídos na produção. O dono emite, reenvia, revoga e lista pelo `server/bin/beta_invites.dart` (simulação por padrão, até 30 por lote, idempotente). Evidência: `server/test/beta_invite_policy_test.dart`, `server/test/beta_invite_registration_route_test.dart`, `server/test/beta_invite_db_live_test.dart` e `server/test/beta_invite_e2e_live_test.dart` (válido, sem convite, inválido, expirado, replay e 10 cadastros simultâneos com uma conta só, por HTTP); seis mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-006-convites.md`. A capability `account_registration` segue desligada: ligá-la é do dono.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 316
     },
@@ -9884,5 +9884,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "850271d2f9018a6960242240178b69598f58104c463c3d120af4722d7b08de56"
+  "project_logic_source_digest_sha256": "56b85a528f4c231ac20b5604b742242577ec56bc3aca23669d56f4e08d9bc6d7"
 }

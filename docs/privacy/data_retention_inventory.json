@@ -788,6 +788,56 @@
         "winner_deck_id": "deck_ref"
       }
     },
+    "beta_invite_events": {
+      "category": "security",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Trilha de auditoria dos convites da beta (BT-AUTH-006): emissão, entrega, reenvio, revogação, aceite e recusas, com ator, request-id e data.",
+      "owner": "server/lib/beta_invites/beta_invite_store.dart; server/lib/beta_invites/beta_invite_issuance.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o convite existir (apagada junto, ON DELETE CASCADE)",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "não guarda dado pessoal; o vínculo com a pessoa passa pelo convite"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK beta_invite_events.invite_id -> beta_invites.id ON DELETE CASCADE",
+        "notes": "Sai quando o convite sai."
+      },
+      "legal_exception": null
+    },
+    "beta_invites": {
+      "category": "security",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "accepted_user_id depois do aceite; antes dele, email_digest (digest do e-mail convidado)",
+      "purpose": "Convite de uso único da beta (BT-AUTH-006, D-16): hash do código, digest e pista mascarada do e-mail convidado, lote, validade, entrega, revogação e aceite.",
+      "owner": "server/lib/beta_invites/beta_invite_store.dart; server/lib/beta_invites/beta_invite_issuance.dart; server/bin/beta_invites.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "o convite aberto vale até expires_at (padrão 14 dias, 1 a 60 no script); a linha fica depois de aceita, vencida ou revogada",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "sem purga das linhas vencidas, revogadas ou aceitas; recomendação registrada no diário da frente de servidor: apagar 90 dias depois de vencer ou ser revogado"
+      },
+      "export": {
+        "section": null,
+        "reason": "controle de admissão: só hash do código e digest do e-mail; a conta criada já sai na exportação"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "A exclusão de conta ainda não apaga nem desliga o convite aceito (email_digest e email_hint ficam; accepted_user_id aponta para a conta pseudonimizada). Pendência para a frente de privacidade."
+      },
+      "legal_exception": null
+    },
     "card_battle_rules": {
       "category": "catalog",
       "subject_kind": "none",

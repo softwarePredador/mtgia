@@ -36,6 +36,8 @@ erDiagram
     decks ||--o{ battle_simulations : "deck_a_id -> id"
     decks ||--o{ battle_simulations : "deck_b_id -> id"
     decks ||--o{ battle_simulations : "winner_deck_id -> id"
+    beta_invites ||--o{ beta_invite_events : "invite_id -> id"
+    users ||--o{ beta_invites : "accepted_user_id -> id"
     cards ||--o{ card_battle_rules : "card_id -> id"
     cards ||--o{ card_function_tags : "card_id -> id"
     cards ||--o{ card_legalities : "card_id -> id"
@@ -336,6 +338,29 @@ erDiagram
         string simulation_type
         number turns_played
         uuid winner_deck_id
+    }
+    beta_invite_events {
+        string actor
+        datetime created_at
+        string event
+        string id PK
+        uuid invite_id
+        string request_id
+    }
+    beta_invites {
+        datetime accepted_at
+        uuid accepted_user_id
+        string batch_label
+        datetime delivered_at
+        string email_digest
+        string email_hint
+        datetime expires_at
+        uuid id PK
+        datetime issued_at
+        string issued_by
+        datetime revoked_at
+        string revoked_reason
+        string token_hash
     }
     card_battle_rules {
         uuid card_id
@@ -1137,4 +1162,4 @@ erDiagram
     }
 ```
 
-Tabelas: 80; views: 6; migrations: 60 (latest `060`).
+Tabelas: 82; views: 6; migrations: 61 (latest `061`).
