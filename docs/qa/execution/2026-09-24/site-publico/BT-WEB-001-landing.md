@@ -7,6 +7,18 @@ Este receipt registra a execução local de `BT-WEB-001` por uma sessão em nuve
 O `BT-WEB-001` continua `BLOCKED_BY_P0` no backlog até a coordenação integrar estes commits pelos hooks
 e existir prova same-SHA do deploy.
 
+## Adendo — hero C escolhido pelo dono
+
+- O dono escolheu a variação **C, "Faixa"**, e ela substituiu a A em `web-public/src/app/page.tsx`, no
+  commit que traz este adendo.
+- O arquivo commitado é o mesmo usado nas capturas `hero-c-faixa_home_*`, feitas sobre a árvore de
+  `aff00f0`. Essas duas capturas mostram o hero publicado; as `final_home_*` ficam como registro da A.
+- O restante da página (`#produto`, "Como funciona" e a oferta) não mudou, e os literais travados
+  continuam: 2× `min-h-[calc(100svh-11rem)]`, `fetchPriority="high"` no hub, `id="produto"` e o
+  `AccessPending`.
+- A peça de latão `HeroTile` fica no kit (`components/tiles.tsx`) sem uso na home; o JSX da A continua
+  no histórico, em `0a34a62`.
+
 ## Identidade
 
 - Branch: `nuvem/site-publico-2026-09-24`, criada de `origin/master` =
@@ -223,14 +235,16 @@ O fixture do relatório segue o formato de `scripts/manaloom_public_web_smoke.sh
 
 As três trocam só a seção do hero e mantêm os literais travados; o resto da página é o mesmo.
 
-- **A — "Mesa"** (aplicada): `hero-a-mesa_*`, igual byte a byte às capturas de viewport `final_home_*`.
+- **A — "Mesa"** (aplicada até a escolha do dono): `hero-a-mesa_*`, igual byte a byte às capturas de
+  viewport `final_home_*`.
   - É o tabuleiro do menu do contador (`provas-iphone/vt-02-menu-vivo.png`): uma peça de latão para a
     ação, o hub com a marca, azulejos de vidro com numeral e a IA com estado no canto.
   - No celular vira 2+1+1, com o hub entre Decks e Contador.
 - **B — "Numeral"**: `hero-b-numeral_*`, build da variação sobre `aff00f0` sem commit.
   - Um card de vidro com o "40" gigante em Fraunces, como o card de jogador na mesa, mais Decks 100 e a
     IA em "Segunda onda". A ação é uma pílula de latão, "Conhecer a beta".
-- **C — "Faixa"**: `hero-c-faixa_*`, build da variação sobre `aff00f0` sem commit.
+- **C — "Faixa"** (escolhida pelo dono e aplicada, ver o adendo): `hero-c-faixa_*`, build da
+  variação sobre `aff00f0`.
   - Hero tipográfico, com "BrewTact" enorme, o slogan como subtítulo e uma faixa de cinco azulejos com
     estado.
 

@@ -9,7 +9,6 @@ import {
   CollectionIcon,
   DeckIcon,
   FactTile,
-  HeroTile,
   Hub,
   LifeIcon,
   Numeral
@@ -44,79 +43,53 @@ export default function HomePage() {
   return (
     <main>
       <section className="relative min-h-[calc(100svh-11rem)] overflow-hidden border-b border-ivory-100/10">
-        <Container className="relative flex min-h-[calc(100svh-11rem)] items-center py-8 sm:py-10">
-          <div className="grid w-full items-center gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-12">
-            <div className="min-w-0">
+        <Container className="relative flex min-h-[calc(100svh-11rem)] flex-col justify-center gap-7 py-8 sm:gap-10 sm:py-10">
+          <div className="max-w-4xl">
+            <div className="flex items-center gap-3">
+              <Hub className="h-11 w-11">
+                <Image
+                  src="/branding/brewtact_mark.svg"
+                  alt=""
+                  width={26}
+                  height={26}
+                  priority
+                  fetchPriority="high"
+                  className="h-6 w-6"
+                />
+              </Hub>
               <p className="text-[11.5px] font-extrabold uppercase tracking-[0.085em] text-mist-300">
                 Beta gratuita · acesso por convite
               </p>
-              <h1 className="mt-4 text-balance font-display text-[2.6rem] font-semibold leading-[0.98] text-ivory-100 sm:text-6xl lg:text-[3.6rem] xl:text-[3.75rem]">
-                Monte melhor. Jogue melhor.
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-7 text-mist-300 sm:text-lg sm:leading-8">
-                Deck builder de Commander, coleção privada, catálogo de cartas e contador de vida. A primeira onda entra por convite e sem cobrança; a análise com IA chega na segunda.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-3 sm:mt-8">
-                <AccessPending />
-              </div>
             </div>
-
-            <div className="grid w-full min-w-0 gap-2 lg:max-w-[660px] lg:justify-self-end">
-              <div className="hidden gap-2 sm:grid sm:grid-cols-3">
-                <Azulejo label="Decks" icon={<DeckIcon />} numeral="100" className="min-h-[124px]" />
-                <Azulejo label="Coleção" icon={<CollectionIcon />} className="min-h-[124px]" />
-                <Azulejo label="Catálogo" icon={<CatalogIcon />} className="min-h-[124px]" />
-              </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_64px_minmax(0,1fr)] sm:grid-cols-[minmax(0,1.3fr)_80px_minmax(0,1fr)]">
-                <Azulejo
-                  label="Decks"
-                  icon={<DeckIcon />}
-                  numeral="100"
-                  className="min-h-[100px] sm:hidden"
-                  numeralClassName="text-[40px]"
-                />
-                <HeroTile
-                  href={routes.pricing}
-                  label="Beta gratuita"
-                  title="Por convite"
-                  accessibleName="Beta gratuita por convite: conhecer a beta"
-                  className="hidden min-h-[136px] sm:flex"
-                />
-                <div className="grid place-items-center">
-                  <Hub className="h-12 w-12 sm:h-14 sm:w-14">
-                    <Image
-                      src="/branding/brewtact_mark.svg"
-                      alt="BrewTact"
-                      width={30}
-                      height={30}
-                      priority
-                      fetchPriority="high"
-                      className="h-7 w-7 sm:h-8 sm:w-8"
-                    />
-                  </Hub>
-                </div>
-                <Azulejo
-                  label="Contador de vida"
-                  icon={<LifeIcon />}
-                  numeral="40"
-                  className="min-h-[100px] sm:min-h-[136px]"
-                  numeralClassName="text-[40px] sm:text-[56px]"
-                />
-              </div>
-              <HeroTile
-                href={routes.pricing}
-                label="Beta gratuita"
-                title="Por convite"
-                accessibleName="Beta gratuita por convite: conhecer a beta"
-                className="min-h-[76px] sm:hidden"
-              />
-              <Azulejo
-                label="Análise com IA"
-                icon={<AnalysisIcon className="h-[34px] w-[34px] text-mist-500" />}
-                state={{ word: "Segunda onda", off: true }}
-                className="min-h-[72px] sm:min-h-[104px]"
-              />
+            <h1 className="mt-5 font-display text-[4rem] font-semibold leading-[0.9] tracking-[-0.02em] text-ivory-100 sm:text-[6.5rem] lg:text-[8rem]">
+              BrewTact
+            </h1>
+            <p className="mt-3 font-display text-2xl font-semibold text-mist-300 sm:text-3xl">Monte melhor. Jogue melhor.</p>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-mist-300 sm:text-lg sm:leading-8">
+              Deck builder de Commander, coleção privada, catálogo de cartas e contador de vida. A primeira onda entra por convite e sem cobrança; a análise com IA chega na segunda.
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3 sm:mt-7">
+              <AccessPending />
+              <ButtonLink href={routes.pricing}>Conhecer a beta</ButtonLink>
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+            <Azulejo label="Decks" icon={<DeckIcon />} numeral="100" className="min-h-[96px] sm:min-h-[112px]" numeralClassName="text-[36px] sm:text-[44px]" />
+            <Azulejo label="Coleção" icon={<CollectionIcon />} className="hidden min-h-[112px] sm:flex" />
+            <Azulejo label="Catálogo" icon={<CatalogIcon />} className="hidden min-h-[112px] sm:flex" />
+            <Azulejo
+              label="Contador de vida"
+              icon={<LifeIcon />}
+              numeral="40"
+              className="min-h-[96px] sm:min-h-[112px]"
+              numeralClassName="text-[36px] sm:text-[44px]"
+            />
+            <Azulejo
+              label="Análise com IA"
+              icon={<AnalysisIcon className="h-[34px] w-[34px] text-mist-500" />}
+              state={{ word: "Segunda onda", off: true }}
+              className="col-span-2 min-h-[80px] sm:col-span-1 sm:min-h-[112px]"
+            />
           </div>
         </Container>
       </section>
