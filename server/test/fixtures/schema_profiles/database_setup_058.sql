@@ -1,0 +1,2749 @@
+-- Script para criar a tabela de Cartas e Decks no PostgreSQL
+
+-- Habilita a extensão para gerar UUIDs automaticamente
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- 1. Tabela de Usuários
+CREATE TABLE IF NOT EXISTS users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL, -- Nunca salvar senha em texto puro!
+    display_name TEXT,
+    avatar_url TEXT,
+    location_state TEXT,
+    location_city TEXT,
+    trade_notes TEXT,
+    profile_visibility TEXT NOT NULL DEFAULT 'public',
+    binder_visibility TEXT NOT NULL DEFAULT 'public',
+    location_visibility TEXT NOT NULL DEFAULT 'private',
+    message_visibility TEXT NOT NULL DEFAULT 'everyone',
+    trade_visibility TEXT NOT NULL DEFAULT 'everyone',
+    trade_notes_visibility TEXT NOT NULL DEFAULT 'private',
+    fcm_token TEXT,
+    auth_version INTEGER NOT NULL DEFAULT 0,
+    password_changed_at TIMESTAMP WITH TIME ZONE,
+    terms_version TEXT,
+    terms_accepted_at TIMESTAMP WITH TIME ZONE,
+    privacy_version TEXT,
+    privacy_accepted_at TIMESTAMP WITH TIME ZONE,
+    email_verified_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+-- 1.1 Planos de assinatura (Free/Pro)
+CREATE TABLE IF NOT EXISTS user_plans (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    plan_name TEXT NOT NULL DEFAULT 'free', -- free | pro
+    status TEXT NOT NULL DEFAULT 'active', -- active | canceled
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    renews_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_user_plans_name CHECK (plan_name IN ('free', 'pro')),
+    CONSTRAINT chk_user_plans_status CHECK (status IN ('active', 'canceled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_plans_plan_status ON user_plans (plan_name, status);
+
+-- Para bancos existentes (idempotente)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS location_state TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS location_city TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_notes TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_visibility TEXT NOT NULL DEFAULT 'public';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS binder_visibility TEXT NOT NULL DEFAULT 'public';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS location_visibility TEXT NOT NULL DEFAULT 'private';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS message_visibility TEXT NOT NULL DEFAULT 'everyone';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_visibility TEXT NOT NULL DEFAULT 'everyone';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS trade_notes_visibility TEXT NOT NULL DEFAULT 'private';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS fcm_token TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_version INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_changed_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_version TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_version TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS privacy_accepted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_profile_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_profile_visibility
+CHECK (profile_visibility IN ('public', 'private'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_binder_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_binder_visibility
+CHECK (binder_visibility IN ('public', 'private'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_location_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_location_visibility
+CHECK (location_visibility IN ('public', 'trade_only', 'private'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_message_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_message_visibility
+CHECK (message_visibility IN ('everyone', 'followers', 'none'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_trade_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_trade_visibility
+CHECK (trade_visibility IN ('everyone', 'followers', 'none'));
+ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_trade_notes_visibility;
+ALTER TABLE users ADD CONSTRAINT chk_users_trade_notes_visibility
+CHECK (trade_notes_visibility IN ('trade_only', 'private'));
+CREATE INDEX IF NOT EXISTS idx_users_active_identity
+    ON users (LOWER(email), LOWER(username)) WHERE deleted_at IS NULL;
+
+-- Tokens de recuperação nunca são persistidos em texto puro. Alterar ou
+-- recuperar a senha incrementa users.auth_version e invalida JWTs anteriores.
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    consumed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_active
+    ON password_reset_tokens (user_id, expires_at DESC)
+    WHERE consumed_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash CHAR(64) NOT NULL UNIQUE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    consumed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_user_active
+    ON email_verification_tokens (user_id, expires_at DESC)
+    WHERE consumed_at IS NULL;
+
+-- 2. Tabela de Cartas (Otimizada para busca e dados do MTGJSON)
+	CREATE TABLE IF NOT EXISTS cards (
+	    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	    scryfall_id UUID UNIQUE NOT NULL, -- ID unico da printing no Scryfall
+	    oracle_id UUID, -- ID Oracle/Scryfall compartilhado entre printings
+	    name TEXT NOT NULL,
+	    mana_cost TEXT,
+	    type_line TEXT,
+	    oracle_text TEXT,
+	    colors TEXT[], -- Array de cores ex: {'W', 'U'}
+	    color_identity TEXT[], -- Identidade de cor (Commander), ex: {'W','U'}
+	    power TEXT, -- Poder impresso quando aplicavel; texto para suportar "*" e variaveis
+	    toughness TEXT, -- Resistencia impressa quando aplicavel; texto para suportar "*" e variaveis
+	    keywords TEXT[], -- Keywords oficiais do MTGJSON/Scryfall, ex: {'Flying','Trample'}
+	    image_url TEXT, -- URL da imagem na Scryfall
+	    set_code TEXT,
+	    rarity TEXT,
+	    is_reserved BOOLEAN NOT NULL DEFAULT FALSE,
+	    layout TEXT,
+	    card_faces_json JSONB,
+	    ai_description TEXT, -- Cache de explicações da IA
+	    price DECIMAL(10,2), -- Compatibilidade legada; espelho do preço USD
+	    price_usd DECIMAL(10,2), -- Fonte canônica de preço de mercado
+	    price_usd_foil DECIMAL(10,2),
+	    price_source TEXT,
+	    price_updated_at TIMESTAMP WITH TIME ZONE,
+	    collector_number TEXT, -- Número de colecionador (ex: "157")
+	    foil BOOLEAN, -- disponibilidade foil da impressão no catálogo; não é cópia física
+	    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+	);
+
+-- Para bancos existentes (idempotente)
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS ai_description TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_usd DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_usd_foil DECIMAL(10,2);
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_source TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS price_updated_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS collector_number TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS foil BOOLEAN;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[];
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS layout TEXT;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS card_faces_json JSONB;
+ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN DEFAULT FALSE;
+UPDATE cards SET is_reserved = FALSE WHERE is_reserved IS NULL;
+ALTER TABLE cards ALTER COLUMN is_reserved SET DEFAULT FALSE;
+ALTER TABLE cards ALTER COLUMN is_reserved SET NOT NULL;
+
+-- Índice para busca rápida por nome
+CREATE INDEX IF NOT EXISTS idx_cards_name ON cards (name);
+CREATE INDEX IF NOT EXISTS idx_cards_name_lower ON cards (LOWER(name));
+CREATE INDEX IF NOT EXISTS idx_cards_front_name_lower
+ON cards (LOWER(split_part(name, ' // ', 1)));
+CREATE INDEX IF NOT EXISTS idx_cards_oracle_id ON cards (oracle_id);
+CREATE INDEX IF NOT EXISTS idx_cards_layout ON cards (layout);
+-- Índice GIN para buscas por identidade (Commander/Brawl)
+CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity);
+CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords);
+CREATE INDEX IF NOT EXISTS idx_cards_price_usd
+ON cards (price_usd) WHERE price_usd IS NOT NULL;
+ALTER TABLE cards DROP CONSTRAINT IF EXISTS chk_cards_price_source;
+ALTER TABLE cards ADD CONSTRAINT chk_cards_price_source
+CHECK (price_source IS NULL OR price_source IN ('scryfall', 'mtgjson', 'legacy'));
+
+-- Histórico de preços é dependência de runtime de Marketplace e Market.
+-- A ausência de pontos é um estado válido; a ausência da relação não é.
+CREATE TABLE IF NOT EXISTS price_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+    price_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    price_usd DECIMAL(10,2),
+    price_usd_foil DECIMAL(10,2),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(card_id, price_date)
+);
+CREATE INDEX IF NOT EXISTS idx_price_history_date
+ON price_history (price_date DESC);
+CREATE INDEX IF NOT EXISTS idx_price_history_card_date
+ON price_history (card_id, price_date DESC);
+CREATE INDEX IF NOT EXISTS idx_price_history_date_card_price
+ON price_history (price_date DESC, card_id) INCLUDE (price_usd);
+
+-- 2.1. Tabela de Sets/Edições (para exibir nome e data da edição)
+-- Fonte: MTGJSON SetList.json
+CREATE TABLE IF NOT EXISTS sets (
+    code TEXT PRIMARY KEY, -- Ex: 'UNH'
+    name TEXT NOT NULL, -- Ex: 'Unhinged'
+    release_date DATE, -- Ex: 2004-11-20
+    type TEXT, -- Ex: 'expansion', 'promo'
+    block TEXT, -- Ex: 'Ravnica'
+    is_online_only BOOLEAN,
+    is_foreign_only BOOLEAN,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_sets_name ON sets (name);
+
+-- 3. Tabela de Legalidade/Banidas (Relacionamento 1:N com Cartas)
+-- Ex: Card X -> Commander: Banned
+CREATE TABLE IF NOT EXISTS card_legalities (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_id UUID REFERENCES cards(id) ON DELETE CASCADE,
+    format TEXT NOT NULL, -- 'commander', 'modern', 'standard'
+    status TEXT NOT NULL, -- 'legal', 'banned', 'restricted'
+    UNIQUE(card_id, format)
+);
+
+-- 3.1. Semantica executavel de cartas para o simulador Hermes
+-- Fatos oficiais ficam em cards/card_rulings; esta tabela guarda a interpretacao
+-- revisavel que o battle/optimizer consegue executar.
+CREATE TABLE IF NOT EXISTS card_battle_rules (
+    normalized_name TEXT NOT NULL,
+    logical_rule_key TEXT NOT NULL,
+    card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
+    card_name TEXT NOT NULL,
+    effect_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    deck_role_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    source TEXT NOT NULL DEFAULT 'curated',
+    confidence NUMERIC(4,3) NOT NULL DEFAULT 1.0
+      CHECK (confidence >= 0 AND confidence <= 1),
+    review_status TEXT NOT NULL DEFAULT 'verified',
+    execution_status TEXT NOT NULL DEFAULT 'auto',
+    rule_version INTEGER NOT NULL DEFAULT 1 CHECK (rule_version >= 1),
+    oracle_hash TEXT,
+    notes TEXT,
+    reviewed_by TEXT,
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT chk_card_battle_rules_source CHECK (
+      source IN ('manual', 'curated', 'generated', 'heuristic', 'imported')
+    ),
+    CONSTRAINT chk_card_battle_rules_review_status CHECK (
+      review_status IN (
+        'verified',
+        'active',
+        'needs_review',
+        'rejected',
+        'deprecated'
+      )
+    ),
+    CONSTRAINT chk_card_battle_rules_execution_status CHECK (
+      execution_status IN (
+        'auto',
+        'executable',
+        'annotation_only',
+        'review_only',
+        'disabled'
+      )
+    ),
+    PRIMARY KEY (normalized_name, logical_rule_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
+ON card_battle_rules (normalized_name);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_card_id
+ON card_battle_rules (card_id);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_source_status
+ON card_battle_rules (source, review_status);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_effect
+ON card_battle_rules USING GIN (effect_json);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_deck_role
+ON card_battle_rules USING GIN (deck_role_json);
+
+CREATE INDEX IF NOT EXISTS idx_card_battle_rules_name_lower
+ON card_battle_rules (LOWER(card_name));
+
+-- 4. Tabela de Regras do Jogo (Para consulta e IA)
+CREATE TABLE IF NOT EXISTS rules (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title TEXT NOT NULL, -- Ex: "Combat Phase"
+    description TEXT NOT NULL, -- Texto completo da regra
+    category TEXT, -- Ex: "Turn Structure", "Keywords"
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para busca rápida de regras
+CREATE INDEX IF NOT EXISTS idx_rules_title ON rules (title);
+CREATE INDEX IF NOT EXISTS idx_rules_category ON rules (category);
+
+-- 5. Tabela de Decks
+	CREATE TABLE IF NOT EXISTS decks (
+	    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+	    name TEXT NOT NULL,
+	    format TEXT NOT NULL,
+	    description TEXT,
+	    is_public BOOLEAN DEFAULT FALSE,
+	    validation_state TEXT NOT NULL DEFAULT 'unknown',
+	    validation_reasons JSONB NOT NULL DEFAULT '["validation_not_recorded"]'::jsonb,
+	    validation_updated_at TIMESTAMP WITH TIME ZONE,
+
+    -- Preferências do usuário (UX)
+    archetype TEXT, -- Ex: "Goblin Tribal", "Voltron", etc.
+    bracket INTEGER, -- 1..5 (Commander bracket / power level)
+    
+	    -- Campos de Análise da IA
+	    synergy_score INTEGER DEFAULT 0, -- 0 a 100: Quão consolidado/sinérgico é o deck
+	    strengths TEXT, -- Ex: "Ramp rápido, Proteção contra anulações"
+	    weaknesses TEXT, -- Ex: "Vulnerável a board wipes, Falta de card draw"
+
+	    -- Snapshot de custo (UX)
+	    pricing_currency TEXT DEFAULT 'USD',
+	    pricing_total NUMERIC(10,2),
+	    pricing_missing_cards INTEGER DEFAULT 0,
+	    pricing_source TEXT,
+	    pricing_updated_at TIMESTAMP WITH TIME ZONE,
+	    
+	    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	    deleted_at TIMESTAMP WITH TIME ZONE -- Soft delete
+	);
+
+-- Backfill/compat: adiciona colunas se o banco já existir (idempotente)
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS archetype TEXT;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS bracket INTEGER;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_currency TEXT DEFAULT 'USD';
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_total NUMERIC(10,2);
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_missing_cards INTEGER DEFAULT 0;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_source TEXT;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS pricing_updated_at TIMESTAMP WITH TIME ZONE;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_state TEXT NOT NULL DEFAULT 'unknown';
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_reasons JSONB NOT NULL DEFAULT '["validation_not_recorded"]'::jsonb;
+	ALTER TABLE decks ADD COLUMN IF NOT EXISTS validation_updated_at TIMESTAMP WITH TIME ZONE;
+	UPDATE decks
+	SET validation_state = COALESCE(validation_state, 'unknown'),
+	    validation_reasons = COALESCE(validation_reasons, '["validation_not_recorded"]'::jsonb);
+	ALTER TABLE decks ALTER COLUMN validation_state SET DEFAULT 'unknown';
+	ALTER TABLE decks ALTER COLUMN validation_state SET NOT NULL;
+	ALTER TABLE decks ALTER COLUMN validation_reasons SET DEFAULT '["validation_not_recorded"]'::jsonb;
+	ALTER TABLE decks ALTER COLUMN validation_reasons SET NOT NULL;
+	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_state;
+	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_state
+	CHECK (validation_state IN ('unknown', 'draft', 'validated'));
+	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_reasons_array;
+	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_reasons_array
+	CHECK (jsonb_typeof(validation_reasons) = 'array');
+	UPDATE decks
+	SET validation_reasons = CASE validation_state
+	        WHEN 'unknown' THEN '["validation_not_recorded"]'::jsonb
+	        WHEN 'validated' THEN '[]'::jsonb
+	        ELSE CASE
+	            WHEN jsonb_array_length(validation_reasons) = 0 THEN
+	                '["strict_validation_pending"]'::jsonb
+	            ELSE validation_reasons
+	        END
+	    END,
+	    validation_updated_at = CASE validation_state
+	        WHEN 'unknown' THEN NULL
+	        ELSE COALESCE(validation_updated_at, CURRENT_TIMESTAMP)
+	    END;
+	ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_validation_state_payload;
+	ALTER TABLE decks ADD CONSTRAINT chk_decks_validation_state_payload
+	CHECK (
+	    (
+	        validation_state = 'unknown'
+	        AND validation_reasons = '["validation_not_recorded"]'::jsonb
+	        AND validation_updated_at IS NULL
+	    ) OR (
+	        validation_state = 'draft'
+	        AND jsonb_array_length(validation_reasons) > 0
+	        AND validation_updated_at IS NOT NULL
+	    ) OR (
+	        validation_state = 'validated'
+	        AND jsonb_array_length(validation_reasons) = 0
+	        AND validation_updated_at IS NOT NULL
+	    )
+	);
+	CREATE INDEX IF NOT EXISTS idx_decks_user_validation_state
+	ON decks (user_id, validation_state, created_at DESC)
+	WHERE deleted_at IS NULL;
+
+-- 6. Tabela de Itens do Deck (Relacionamento N:N entre Deck e Cartas)
+CREATE TABLE IF NOT EXISTS deck_cards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE CASCADE,
+    card_id UUID REFERENCES cards(id) ON DELETE CASCADE,
+    quantity INTEGER DEFAULT 1,
+    is_commander BOOLEAN DEFAULT FALSE,
+    condition TEXT DEFAULT 'NM', -- metadado legado da decklist; não aloca item do Binder
+    UNIQUE(deck_id, card_id),
+    CONSTRAINT chk_deck_cards_condition CHECK (condition IN ('NM', 'LP', 'MP', 'HP', 'DMG'))
+);
+
+-- Para bancos existentes (idempotente)
+ALTER TABLE deck_cards ADD COLUMN IF NOT EXISTS condition TEXT DEFAULT 'NM';
+
+CREATE OR REPLACE FUNCTION manaloom_mark_deck_cards_changed()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_cards_changed$
+DECLARE
+    affected_deck_ids UUID[];
+BEGIN
+    IF TG_OP = 'DELETE' THEN
+        affected_deck_ids := ARRAY[OLD.deck_id];
+    ELSIF TG_OP = 'UPDATE' AND NEW.deck_id IS DISTINCT FROM OLD.deck_id THEN
+        affected_deck_ids := ARRAY[OLD.deck_id, NEW.deck_id];
+    ELSE
+        affected_deck_ids := ARRAY[NEW.deck_id];
+    END IF;
+
+    UPDATE decks
+    SET validation_state = 'draft',
+        validation_reasons =
+            '["deck_cards_changed_since_validation"]'::jsonb,
+        validation_updated_at = CURRENT_TIMESTAMP
+    WHERE id = ANY(affected_deck_ids);
+
+    IF TG_OP = 'DELETE' THEN
+        RETURN OLD;
+    END IF;
+    RETURN NEW;
+END;
+$deck_cards_changed$;
+
+DROP TRIGGER IF EXISTS manaloom_deck_cards_require_review ON deck_cards;
+CREATE TRIGGER manaloom_deck_cards_require_review
+AFTER INSERT OR DELETE OR UPDATE OF deck_id, card_id, quantity, is_commander
+ON deck_cards
+FOR EACH ROW
+EXECUTE FUNCTION manaloom_mark_deck_cards_changed();
+
+CREATE OR REPLACE FUNCTION manaloom_mark_deck_format_changed()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_format_changed$
+BEGIN
+    IF NEW.format IS DISTINCT FROM OLD.format THEN
+        NEW.validation_state := 'draft';
+        NEW.validation_reasons :=
+            '["deck_format_changed_since_validation"]'::jsonb;
+        NEW.validation_updated_at := CURRENT_TIMESTAMP;
+    END IF;
+    RETURN NEW;
+END;
+$deck_format_changed$;
+
+DROP TRIGGER IF EXISTS manaloom_deck_format_require_review ON decks;
+CREATE TRIGGER manaloom_deck_format_require_review
+BEFORE UPDATE OF format ON decks
+FOR EACH ROW
+EXECUTE FUNCTION manaloom_mark_deck_format_changed();
+
+-- 7. Tabela de Matchups (Counters e Estatísticas)
+-- Armazena a vantagem estatística de um deck sobre outro
+CREATE TABLE IF NOT EXISTS deck_matchups (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE CASCADE,
+    opponent_deck_id UUID REFERENCES decks(id) ON DELETE CASCADE,
+    win_rate FLOAT, -- 0.0 a 1.0 (Ex: 0.75 = 75% de vitória)
+    notes TEXT, -- Observações da IA sobre o matchup
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(deck_id, opponent_deck_id)
+);
+
+-- 8. Tabela de Simulações de Batalha (Dataset para Machine Learning)
+-- Cada linha é uma partida simulada que serve de treino para a IA
+CREATE TABLE IF NOT EXISTS battle_simulations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    simulation_type TEXT NOT NULL DEFAULT 'legacy',
+    winner_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    turns_played INTEGER,
+    game_log JSONB, -- Log completo passo-a-passo da partida (crucial para RL)
+    metrics JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS battle_simulation_attempts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    replay_id UUID UNIQUE REFERENCES battle_simulations(id) ON DELETE SET NULL,
+    simulation_type TEXT NOT NULL,
+    test_objective TEXT NOT NULL DEFAULT 'general',
+    outcome TEXT,
+    request_id TEXT NOT NULL,
+    request_schema_version TEXT NOT NULL,
+    request_hash TEXT,
+    job_request_schema_version TEXT,
+    job_request_hash TEXT,
+    deck_hash_schema TEXT,
+    deck_a_hash TEXT,
+    deck_b_hash TEXT,
+    engine TEXT,
+    engine_version TEXT,
+    engine_commit TEXT,
+    engine_build TEXT,
+    engine_process_id TEXT,
+    engine_request_correlation_source TEXT,
+    timeout_ms INTEGER NOT NULL,
+    events_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    snapshots_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    outcome_reason TEXT,
+    error_code TEXT,
+    provenance JSONB NOT NULL DEFAULT '{}'::jsonb,
+    started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_battle_attempt_simulation_type
+        CHECK (char_length(trim(simulation_type)) BETWEEN 1 AND 32),
+    CONSTRAINT chk_battle_attempt_test_objective
+        CHECK (
+            test_objective IN (
+                'general',
+                'commander',
+                'mana_curve',
+                'interaction',
+                'combo',
+                'focus_cards'
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_outcome
+        CHECK (
+            outcome IS NULL OR outcome IN (
+                'completed',
+                'censored',
+                'timeout',
+                'coverage_error',
+                'engine_error',
+                'cancelled',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_timeout
+        CHECK (timeout_ms BETWEEN 1 AND 7200000),
+    CONSTRAINT chk_battle_attempt_deck_a_hash
+        CHECK (deck_a_hash IS NULL OR char_length(deck_a_hash) = 64),
+    CONSTRAINT chk_battle_attempt_deck_b_hash
+        CHECK (deck_b_hash IS NULL OR char_length(deck_b_hash) = 64),
+    CONSTRAINT chk_battle_attempt_request_hash
+        CHECK (request_hash IS NULL OR char_length(request_hash) = 64),
+    CONSTRAINT chk_battle_attempt_job_request_hash
+        CHECK (
+            job_request_hash IS NULL
+            OR (
+                char_length(job_request_schema_version) BETWEEN 1 AND 64
+                AND job_request_hash ~ '^[0-9a-f]{64}$'
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_request_correlation
+        CHECK (
+            engine_request_correlation_source IS NULL
+            OR (
+                request_hash IS NOT NULL
+                AND engine_request_correlation_source IN (
+                    'sidecar_echo_validated',
+                    'server_dispatch_recorded'
+                )
+            )
+        ),
+    CONSTRAINT chk_battle_attempt_lifecycle
+        CHECK (
+            (outcome IS NULL AND finished_at IS NULL) OR
+            (outcome IS NOT NULL AND finished_at IS NOT NULL)
+        )
+);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_user_created
+    ON battle_simulation_attempts (user_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_a_created
+    ON battle_simulation_attempts (deck_a_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_b_created
+    ON battle_simulation_attempts (deck_b_id, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_outcome_created
+    ON battle_simulation_attempts (outcome, started_at DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_a_hash
+    ON battle_simulation_attempts (deck_a_hash)
+    WHERE deck_a_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_deck_b_hash
+    ON battle_simulation_attempts (deck_b_hash)
+    WHERE deck_b_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_request_hash
+    ON battle_simulation_attempts (request_hash)
+    WHERE request_hash IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_battle_attempt_job_request_hash
+    ON battle_simulation_attempts (job_request_hash)
+    WHERE job_request_hash IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_attempt_id_replay
+    ON battle_simulation_attempts (id, replay_id);
+
+CREATE TABLE IF NOT EXISTS battle_replay_annotations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    replay_id UUID NOT NULL
+        REFERENCES battle_simulations(id) ON DELETE CASCADE,
+    attempt_id UUID NOT NULL,
+    subject_deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+    subject_deck_key TEXT NOT NULL,
+    deck_hash_schema TEXT NOT NULL,
+    subject_deck_hash TEXT NOT NULL,
+    subject_deck_revision TEXT NOT NULL,
+    event_ref TEXT,
+    snapshot_ref TEXT,
+    kind TEXT NOT NULL,
+    payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    idempotency_key TEXT NOT NULL,
+    request_fingerprint TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_battle_annotation_attempt_replay
+        FOREIGN KEY (attempt_id, replay_id)
+        REFERENCES battle_simulation_attempts (id, replay_id)
+        ON DELETE CASCADE,
+    CONSTRAINT chk_battle_annotation_subject
+        CHECK (subject_deck_key IN ('deck_a', 'deck_b')),
+    CONSTRAINT chk_battle_annotation_hash
+        CHECK (char_length(subject_deck_hash) = 64),
+    CONSTRAINT chk_battle_annotation_revision
+        CHECK (
+            char_length(trim(subject_deck_revision)) BETWEEN 1 AND 128
+        ),
+    CONSTRAINT chk_battle_annotation_kind
+        CHECK (
+            kind IN (
+                'bookmark',
+                'note',
+                'would_do_differently',
+                'mulligan_decision',
+                'helpful_feedback',
+                'event_report'
+            )
+        ),
+    CONSTRAINT chk_battle_annotation_event_ref
+        CHECK (
+            event_ref IS NULL
+            OR event_ref ~ '^event:[0-9]{1,6}$'
+        ),
+    CONSTRAINT chk_battle_annotation_snapshot_ref
+        CHECK (
+            snapshot_ref IS NULL
+            OR snapshot_ref ~ '^snapshot:[0-9]{1,6}$'
+        ),
+    CONSTRAINT chk_battle_annotation_payload
+        CHECK (
+            jsonb_typeof(payload) = 'object'
+            AND octet_length(payload::text) <= 8192
+        ),
+    CONSTRAINT chk_battle_annotation_kind_refs
+        CHECK (
+            kind IN ('bookmark', 'note')
+            OR (
+                kind = 'would_do_differently'
+                AND event_ref IS NOT NULL
+                AND snapshot_ref IS NULL
+            )
+            OR (
+                kind = 'mulligan_decision'
+                AND event_ref IS NULL
+                AND snapshot_ref IS NOT NULL
+            )
+            OR (
+                kind = 'helpful_feedback'
+                AND event_ref IS NULL
+                AND snapshot_ref IS NULL
+            )
+            OR (
+                kind = 'event_report'
+                AND event_ref IS NOT NULL
+                AND snapshot_ref IS NULL
+            )
+        ),
+    CONSTRAINT chk_battle_annotation_payload_shape
+        CHECK (
+            COALESCE(
+                CASE kind
+                    WHEN 'bookmark' THEN TRUE
+                    WHEN 'note' THEN
+                        jsonb_typeof(payload->'text') = 'string'
+                        AND char_length(trim(payload->>'text'))
+                            BETWEEN 1 AND 2000
+                    WHEN 'would_do_differently' THEN
+                        payload->>'stance' IN (
+                            'would_change',
+                            'would_repeat',
+                            'unsure'
+                        )
+                        AND payload->>'capture_contract' =
+                            'before_next_event_reveal'
+                    WHEN 'mulligan_decision' THEN
+                        payload->>'choice' IN ('keep', 'mulligan')
+                        AND jsonb_typeof(payload->'hand_size') = 'number'
+                        AND payload->>'hand_size' IN (
+                            '0', '1', '2', '3', '4', '5', '6', '7'
+                        )
+                        AND jsonb_typeof(payload->'mulligan_number') = 'number'
+                        AND payload->>'mulligan_number' IN (
+                            '0', '1', '2', '3', '4', '5', '6', '7'
+                        )
+                        AND payload->>'capture_contract' =
+                            'human_choice_before_heuristic_reveal'
+                        AND payload->'claims_correct_answer' = 'false'::jsonb
+                    WHEN 'helpful_feedback' THEN
+                        jsonb_typeof(payload->'helpful') = 'boolean'
+                        AND payload->>'surface' IN (
+                            'post_battle_report',
+                            'replay_timeline',
+                            'battle_insight'
+                        )
+                    WHEN 'event_report' THEN
+                        payload->>'reason_code' IN (
+                            'incorrect_event',
+                            'wrong_attribution',
+                            'hidden_information',
+                            'missing_context',
+                            'other'
+                        )
+                    ELSE FALSE
+                END,
+                FALSE
+            )
+        ),
+    CONSTRAINT chk_battle_annotation_idempotency
+        CHECK (
+            idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}$'
+            AND char_length(request_fingerprint) = 64
+        ),
+    CONSTRAINT chk_battle_annotation_timestamps
+        CHECK (updated_at >= created_at),
+    UNIQUE (user_id, idempotency_key)
+);
+CREATE INDEX IF NOT EXISTS idx_battle_annotation_user_replay_created
+    ON battle_replay_annotations (
+        user_id,
+        replay_id,
+        created_at DESC,
+        id DESC
+    );
+CREATE INDEX IF NOT EXISTS idx_battle_annotation_subject_created
+    ON battle_replay_annotations (
+        subject_deck_id,
+        created_at DESC,
+        id DESC
+    );
+CREATE INDEX IF NOT EXISTS idx_battle_annotation_kind_created
+    ON battle_replay_annotations (kind, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_annotation_reflection
+    ON battle_replay_annotations (
+        user_id,
+        replay_id,
+        subject_deck_id,
+        event_ref
+    )
+    WHERE kind = 'would_do_differently';
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_annotation_mulligan
+    ON battle_replay_annotations (
+        user_id,
+        replay_id,
+        subject_deck_id,
+        snapshot_ref
+    )
+    WHERE kind = 'mulligan_decision';
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_annotation_helpful
+    ON battle_replay_annotations (user_id, replay_id)
+    WHERE kind = 'helpful_feedback';
+
+CREATE TABLE IF NOT EXISTS battle_jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    schema_version TEXT NOT NULL DEFAULT 'battle_job_v1',
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_hash_schema TEXT NOT NULL,
+    deck_a_hash TEXT NOT NULL,
+    deck_b_hash TEXT NOT NULL,
+    request_schema_version TEXT NOT NULL,
+    request_hash TEXT NOT NULL,
+    request_payload JSONB NOT NULL,
+    requested_engine TEXT NOT NULL,
+    engine_lane TEXT NOT NULL,
+    engine TEXT,
+    engine_version TEXT,
+    engine_commit TEXT,
+    engine_build TEXT,
+    engine_process_id TEXT,
+    engine_process_started_at TIMESTAMP WITH TIME ZONE,
+    engine_request_schema_version TEXT,
+    engine_request_hash TEXT,
+    engine_request_correlation_source TEXT,
+    status TEXT NOT NULL DEFAULT 'queued',
+    stage TEXT NOT NULL DEFAULT 'queued',
+    progress_current INTEGER NOT NULL DEFAULT 0,
+    progress_total INTEGER NOT NULL DEFAULT 100,
+    timeout_ms INTEGER NOT NULL,
+    attempt_count INTEGER NOT NULL DEFAULT 0,
+    attempt_id UUID UNIQUE
+        REFERENCES battle_simulation_attempts(id) ON DELETE SET NULL,
+    replay_id UUID UNIQUE
+        REFERENCES battle_simulations(id) ON DELETE SET NULL,
+    idempotency_key TEXT NOT NULL,
+    request_fingerprint TEXT NOT NULL,
+    quota_user_limit INTEGER NOT NULL,
+    quota_global_limit INTEGER NOT NULL,
+    lease_owner TEXT,
+    lease_token UUID,
+    lease_expires_at TIMESTAMP WITH TIME ZONE,
+    heartbeat_at TIMESTAMP WITH TIME ZONE,
+    claimed_at TIMESTAMP WITH TIME ZONE,
+    started_at TIMESTAMP WITH TIME ZONE,
+    cancel_requested_at TIMESTAMP WITH TIME ZONE,
+    finished_at TIMESTAMP WITH TIME ZONE,
+    terminal_reason TEXT,
+    error_code TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_battle_job_attempt_replay
+        FOREIGN KEY (attempt_id, replay_id)
+        REFERENCES battle_simulation_attempts (id, replay_id)
+        ON DELETE SET NULL,
+    CONSTRAINT chk_battle_job_schema
+        CHECK (schema_version = 'battle_job_v1'),
+    CONSTRAINT chk_battle_job_status
+        CHECK (
+            status IN (
+                'queued',
+                'claimed',
+                'running',
+                'cancel_pending',
+                'completed',
+                'censored',
+                'timeout',
+                'coverage_error',
+                'engine_error',
+                'cancelled',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_battle_job_stage
+        CHECK (
+            stage IN (
+                'queued',
+                'claimed',
+                'starting_engine',
+                'running',
+                'persisting_replay',
+                'cancel_pending',
+                'completed',
+                'censored',
+                'timeout',
+                'coverage_error',
+                'engine_error',
+                'cancelled',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_battle_job_requested_engine
+        CHECK (requested_engine IN ('auto', 'xmage', 'forge', 'native')),
+    CONSTRAINT chk_battle_job_engine_lane
+        CHECK (engine_lane IN ('auto', 'xmage', 'forge', 'native')),
+    CONSTRAINT chk_battle_job_hashes
+        CHECK (
+            deck_hash_schema = 'external_battle_deck_hash_v1'
+            AND deck_a_hash ~ '^[0-9a-f]{64}$'
+            AND deck_b_hash ~ '^[0-9a-f]{64}$'
+            AND request_hash ~ '^[0-9a-f]{64}$'
+            AND request_fingerprint ~ '^[0-9a-f]{64}$'
+        ),
+    CONSTRAINT chk_battle_job_request
+        CHECK (
+            request_schema_version = 'battle_job_request_v1'
+            AND jsonb_typeof(request_payload) = 'object'
+            AND octet_length(request_payload::text) <= 1048576
+        ),
+    CONSTRAINT chk_battle_job_engine_request
+        CHECK (
+            (
+                engine_request_hash IS NULL
+                AND engine_request_schema_version IS NULL
+                AND engine_request_correlation_source IS NULL
+            )
+            OR (
+                engine_request_hash ~ '^[0-9a-f]{64}$'
+                AND char_length(engine_request_schema_version)
+                    BETWEEN 1 AND 64
+                AND engine_request_correlation_source IN (
+                    'sidecar_echo_validated',
+                    'server_dispatch_recorded'
+                )
+            )
+        ),
+    CONSTRAINT chk_battle_job_progress
+        CHECK (
+            progress_total BETWEEN 1 AND 10000
+            AND progress_current BETWEEN 0 AND progress_total
+        ),
+    CONSTRAINT chk_battle_job_timeout
+        CHECK (timeout_ms BETWEEN 1000 AND 180000),
+    CONSTRAINT chk_battle_job_attempt_count
+        CHECK (attempt_count BETWEEN 0 AND 100),
+    CONSTRAINT chk_battle_job_idempotency
+        CHECK (idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}$'),
+    CONSTRAINT chk_battle_job_quota
+        CHECK (
+            quota_user_limit BETWEEN 1 AND 100
+            AND quota_global_limit BETWEEN 1 AND 1000
+            AND quota_user_limit <= quota_global_limit
+        ),
+    CONSTRAINT chk_battle_job_identity_lengths
+        CHECK (
+            char_length(request_schema_version) BETWEEN 1 AND 64
+            AND char_length(deck_hash_schema) BETWEEN 1 AND 64
+            AND (
+                engine_process_id IS NULL
+                OR char_length(engine_process_id) BETWEEN 1 AND 256
+            )
+        ),
+    CONSTRAINT chk_battle_job_lease
+        CHECK (
+            (
+                status = 'queued'
+                AND lease_owner IS NULL
+                AND lease_token IS NULL
+                AND lease_expires_at IS NULL
+                AND finished_at IS NULL
+            )
+            OR (
+                status IN ('claimed', 'running', 'cancel_pending')
+                AND lease_owner IS NOT NULL
+                AND lease_token IS NOT NULL
+                AND lease_expires_at IS NOT NULL
+                AND finished_at IS NULL
+            )
+            OR (
+                status IN (
+                    'completed',
+                    'censored',
+                    'timeout',
+                    'coverage_error',
+                    'engine_error',
+                    'cancelled',
+                    'persistence_error'
+                )
+                AND lease_owner IS NULL
+                AND lease_token IS NULL
+                AND lease_expires_at IS NULL
+                AND finished_at IS NOT NULL
+            )
+        ),
+    CONSTRAINT chk_battle_job_cancel_pending
+        CHECK (
+            status <> 'cancel_pending'
+            OR cancel_requested_at IS NOT NULL
+        ),
+    CONSTRAINT chk_battle_job_completed_replay
+        CHECK (
+            status NOT IN ('completed', 'censored')
+            OR (
+                attempt_id IS NOT NULL
+                AND replay_id IS NOT NULL
+                AND engine IS NOT NULL
+                AND engine_process_id IS NOT NULL
+                AND engine_request_hash IS NOT NULL
+            )
+        ),
+    CONSTRAINT chk_battle_job_timestamps
+        CHECK (
+            updated_at >= created_at
+            AND (claimed_at IS NULL OR claimed_at >= created_at)
+            AND (started_at IS NULL OR started_at >= created_at)
+            AND (finished_at IS NULL OR finished_at >= created_at)
+        )
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_battle_jobs_user_idempotency
+    ON battle_jobs (user_id, idempotency_key);
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_user_created
+    ON battle_jobs (user_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_user_active
+    ON battle_jobs (user_id, status, created_at)
+    WHERE status IN ('queued', 'claimed', 'running', 'cancel_pending');
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_claim
+    ON battle_jobs (engine_lane, created_at, id)
+    WHERE status = 'queued';
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_lease
+    ON battle_jobs (lease_expires_at, status)
+    WHERE status IN ('claimed', 'running', 'cancel_pending');
+CREATE INDEX IF NOT EXISTS idx_battle_jobs_request_hash
+    ON battle_jobs (request_hash);
+
+CREATE TABLE IF NOT EXISTS battle_job_live_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    schema_version TEXT NOT NULL DEFAULT 'battle_live_record_v1',
+    job_id UUID NOT NULL
+        REFERENCES battle_jobs(id) ON DELETE CASCADE,
+    sequence BIGINT NOT NULL,
+    record_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    content_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    fingerprint TEXT NOT NULL,
+    source_kind TEXT NOT NULL,
+    public_visible BOOLEAN NOT NULL DEFAULT TRUE,
+    source_process_id TEXT,
+    source_sequence BIGINT,
+    source_record_id TEXT,
+    source_truncated BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_battle_live_record_schema
+        CHECK (schema_version = 'battle_live_record_v1'),
+    CONSTRAINT chk_battle_live_record_sequence
+        CHECK (sequence BETWEEN 0 AND 1000000),
+    CONSTRAINT chk_battle_live_record_id
+        CHECK (record_id ~ '^blr-[0-9a-f]{40}$'),
+    CONSTRAINT chk_battle_live_record_kind
+        CHECK (kind IN ('event', 'snapshot')),
+    CONSTRAINT chk_battle_live_record_payload
+        CHECK (
+            jsonb_typeof(payload) = 'object'
+            AND octet_length(payload::text) <= 131072
+        ),
+    CONSTRAINT chk_battle_live_record_fingerprint
+        CHECK (fingerprint ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT chk_battle_live_record_source
+        CHECK (
+            (
+                source_kind = 'xmage_live'
+                AND public_visible
+                AND source_process_id IS NOT NULL
+                AND source_sequence BETWEEN 0 AND 20000000
+                AND source_record_id IS NOT NULL
+            )
+            OR (
+                source_kind = 'xmage_checkpoint'
+                AND NOT public_visible
+                AND kind = 'event'
+                AND payload = '{}'::jsonb
+                AND source_process_id IS NOT NULL
+                AND source_sequence BETWEEN -1 AND 20000000
+                AND source_record_id IS NULL
+            )
+            OR (
+                source_kind = 'terminal_replay'
+                AND public_visible
+                AND source_process_id IS NULL
+                AND source_sequence IS NULL
+                AND source_record_id IS NULL
+            )
+        ),
+    CONSTRAINT chk_battle_live_record_source_identity
+        CHECK (
+            (
+                source_process_id IS NULL
+                OR char_length(source_process_id) BETWEEN 1 AND 256
+            )
+            AND (
+                source_record_id IS NULL
+                OR char_length(source_record_id) BETWEEN 1 AND 128
+            )
+        ),
+    CONSTRAINT uq_battle_live_record_job_sequence
+        UNIQUE (job_id, sequence),
+    CONSTRAINT uq_battle_live_record_job_fingerprint
+        UNIQUE (job_id, fingerprint)
+);
+
+CREATE INDEX IF NOT EXISTS idx_battle_live_record_job_public_sequence
+    ON battle_job_live_records (job_id, sequence)
+    WHERE public_visible;
+CREATE INDEX IF NOT EXISTS idx_battle_live_record_checkpoint
+    ON battle_job_live_records (job_id, sequence DESC)
+    WHERE source_kind = 'xmage_checkpoint';
+CREATE INDEX IF NOT EXISTS idx_battle_live_record_source_identity
+ON battle_job_live_records (
+    job_id,
+    source_process_id,
+        source_sequence
+)
+WHERE source_kind = 'xmage_live';
+
+CREATE TABLE IF NOT EXISTS interactive_battle_sessions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    schema_version TEXT NOT NULL DEFAULT 'interactive_battle_session_v1',
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_a_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_b_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_hash_schema TEXT NOT NULL,
+    deck_a_hash TEXT NOT NULL,
+    deck_b_hash TEXT NOT NULL,
+    request_schema_version TEXT NOT NULL,
+    request_hash TEXT NOT NULL,
+    request_payload JSONB NOT NULL,
+    idempotency_key TEXT NOT NULL,
+    request_fingerprint TEXT NOT NULL,
+    engine TEXT NOT NULL DEFAULT 'xmage',
+    engine_version TEXT,
+    engine_commit TEXT,
+    engine_build TEXT,
+    engine_process_id TEXT,
+    engine_process_started_at TIMESTAMP WITH TIME ZONE,
+    runtime_session_id TEXT,
+    status TEXT NOT NULL DEFAULT 'starting',
+    state_version BIGINT NOT NULL DEFAULT 0,
+    active_prompt_id TEXT,
+    active_prompt JSONB,
+    private_state JSONB NOT NULL DEFAULT '{}'::jsonb,
+    ttl_seconds INTEGER NOT NULL,
+    prompt_deadline_at TIMESTAMP WITH TIME ZONE,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    last_activity_at TIMESTAMP WITH TIME ZONE NOT NULL
+        DEFAULT CURRENT_TIMESTAMP,
+    attempt_id UUID UNIQUE
+        REFERENCES battle_simulation_attempts(id) ON DELETE SET NULL,
+    replay_id UUID UNIQUE
+        REFERENCES battle_simulations(id) ON DELETE SET NULL,
+    terminal_reason TEXT,
+    error_code TEXT,
+    started_at TIMESTAMP WITH TIME ZONE,
+    finished_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_interactive_battle_attempt_replay
+        FOREIGN KEY (attempt_id, replay_id)
+        REFERENCES battle_simulation_attempts (id, replay_id)
+        ON DELETE SET NULL,
+    CONSTRAINT chk_interactive_battle_schema
+        CHECK (schema_version = 'interactive_battle_session_v1'),
+    CONSTRAINT chk_interactive_battle_status
+        CHECK (
+            status IN (
+                'starting',
+                'running',
+                'waiting_for_action',
+                'action_pending',
+                'completed',
+                'censored',
+                'conceded',
+                'expired',
+                'timeout',
+                'abandoned',
+                'engine_error',
+                'process_lost',
+                'persistence_error'
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_hashes
+        CHECK (
+            deck_hash_schema = 'external_battle_deck_hash_v1'
+            AND deck_a_hash ~ '^[0-9a-f]{64}$'
+            AND deck_b_hash ~ '^[0-9a-f]{64}$'
+            AND request_hash ~ '^[0-9a-f]{64}$'
+            AND request_fingerprint ~ '^[0-9a-f]{64}$'
+        ),
+    CONSTRAINT chk_interactive_battle_request
+        CHECK (
+            request_schema_version = 'interactive_battle_request_v1'
+            AND jsonb_typeof(request_payload) = 'object'
+            AND octet_length(request_payload::text) <= 1048576
+        ),
+    CONSTRAINT chk_interactive_battle_idempotency
+        CHECK (idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}$'),
+    CONSTRAINT chk_interactive_battle_engine
+        CHECK (
+            engine = 'xmage'
+            AND (
+                engine_commit IS NULL
+                OR engine_commit ~ '^[0-9a-f]{40}$'
+            )
+            AND (
+                engine_process_id IS NULL
+                OR char_length(engine_process_id) BETWEEN 1 AND 256
+            )
+            AND (
+                runtime_session_id IS NULL
+                OR runtime_session_id ~ '^ibsrt_[A-Za-z0-9_-]{16,96}$'
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_state
+        CHECK (
+            state_version BETWEEN 0 AND 20000000
+            AND jsonb_typeof(private_state) = 'object'
+            AND octet_length(private_state::text) <= 524288
+            AND (
+                active_prompt IS NULL
+                OR (
+                    jsonb_typeof(active_prompt) = 'object'
+                    AND octet_length(active_prompt::text) <= 262144
+                )
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_prompt
+        CHECK (
+            (
+                status = 'waiting_for_action'
+                AND active_prompt_id ~ '^p_[A-Za-z0-9_-]{16,64}$'
+                AND active_prompt IS NOT NULL
+                AND prompt_deadline_at IS NOT NULL
+            )
+            OR (
+                status <> 'waiting_for_action'
+                AND active_prompt_id IS NULL
+                AND active_prompt IS NULL
+                AND prompt_deadline_at IS NULL
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_ttl
+        CHECK (
+            ttl_seconds BETWEEN 60 AND 7200
+            AND expires_at > created_at
+            AND last_activity_at >= created_at
+        ),
+    CONSTRAINT chk_interactive_battle_lifecycle
+        CHECK (
+            (
+                status IN (
+                    'starting',
+                    'running',
+                    'waiting_for_action',
+                    'action_pending'
+                )
+                AND finished_at IS NULL
+                AND terminal_reason IS NULL
+                AND error_code IS NULL
+            )
+            OR (
+                status IN (
+                    'completed',
+                    'censored',
+                    'conceded',
+                    'expired',
+                    'timeout',
+                    'abandoned',
+                    'engine_error',
+                    'process_lost',
+                    'persistence_error'
+                )
+                AND finished_at IS NOT NULL
+                AND terminal_reason IS NOT NULL
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_replay
+        CHECK (
+            status NOT IN ('completed', 'censored')
+            OR (
+                attempt_id IS NOT NULL
+                AND replay_id IS NOT NULL
+                AND engine_process_id IS NOT NULL
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_timestamps
+        CHECK (
+            updated_at >= created_at
+            AND (started_at IS NULL OR started_at >= created_at)
+            AND (finished_at IS NULL OR finished_at >= created_at)
+            AND (
+                engine_process_started_at IS NULL
+                OR engine_process_started_at <= updated_at
+            )
+        )
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_interactive_battle_user_idempotency
+ON interactive_battle_sessions (user_id, idempotency_key);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_interactive_battle_runtime_session
+ON interactive_battle_sessions (runtime_session_id)
+WHERE runtime_session_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_interactive_battle_user_created
+ON interactive_battle_sessions (user_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_interactive_battle_user_active
+ON interactive_battle_sessions (user_id, status, updated_at DESC)
+WHERE status IN (
+    'starting',
+    'running',
+    'waiting_for_action',
+    'action_pending'
+);
+CREATE INDEX IF NOT EXISTS idx_interactive_battle_expiry
+ON interactive_battle_sessions (expires_at, status)
+WHERE status IN (
+    'starting',
+    'running',
+    'waiting_for_action',
+    'action_pending'
+);
+
+CREATE TABLE IF NOT EXISTS interactive_battle_records (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    schema_version TEXT NOT NULL DEFAULT 'interactive_battle_record_v1',
+    session_id UUID NOT NULL
+        REFERENCES interactive_battle_sessions(id) ON DELETE CASCADE,
+    sequence BIGINT NOT NULL,
+    record_kind TEXT NOT NULL,
+    visibility TEXT NOT NULL,
+    state_version BIGINT NOT NULL,
+    prompt_id TEXT,
+    option_id TEXT,
+    idempotency_key TEXT,
+    request_fingerprint TEXT,
+    payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_interactive_battle_record_schema
+        CHECK (schema_version = 'interactive_battle_record_v1'),
+    CONSTRAINT chk_interactive_battle_record_sequence
+        CHECK (
+            sequence BETWEEN 0 AND 1000000
+            AND state_version BETWEEN 0 AND 20000000
+        ),
+    CONSTRAINT chk_interactive_battle_record_kind
+        CHECK (
+            record_kind IN (
+                'session_created',
+                'runtime_started',
+                'private_state',
+                'prompt_opened',
+                'action_submitted',
+                'action_accepted',
+                'action_rejected',
+                'concede_requested',
+                'terminal',
+                'replay_linked'
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_record_visibility
+        CHECK (
+            visibility IN (
+                'private_user',
+                'internal',
+                'public_replay_ref'
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_record_prompt
+        CHECK (
+            (
+                prompt_id IS NULL
+                OR prompt_id ~ '^p_[A-Za-z0-9_-]{16,64}$'
+            )
+            AND (
+                option_id IS NULL
+                OR option_id ~ '^o_[A-Za-z0-9_-]{16,64}$'
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_record_idempotency
+        CHECK (
+            (
+                idempotency_key IS NULL
+                AND request_fingerprint IS NULL
+            )
+            OR (
+                idempotency_key ~ '^[A-Za-z0-9._:-]{1,128}$'
+                AND request_fingerprint ~ '^[0-9a-f]{64}$'
+            )
+        ),
+    CONSTRAINT chk_interactive_battle_record_payload
+        CHECK (
+            jsonb_typeof(payload) = 'object'
+            AND octet_length(payload::text) <= 524288
+        ),
+    CONSTRAINT uq_interactive_battle_record_sequence
+        UNIQUE (session_id, sequence)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_interactive_battle_record_idempotency
+ON interactive_battle_records (session_id, idempotency_key)
+WHERE idempotency_key IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_interactive_battle_record_prompt
+ON interactive_battle_records (
+    session_id,
+    prompt_id,
+    state_version,
+    sequence
+)
+WHERE prompt_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_interactive_battle_record_created
+ON interactive_battle_records (session_id, created_at, sequence);
+
+CREATE OR REPLACE FUNCTION manaloom_interactive_battle_record_append_only()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $interactive_record_append_only$
+BEGIN
+    RAISE EXCEPTION USING
+        ERRCODE = '55000',
+        MESSAGE = 'interactive_battle_records_are_append_only';
+END;
+$interactive_record_append_only$;
+
+DROP TRIGGER IF EXISTS manaloom_interactive_battle_record_no_update
+ON interactive_battle_records;
+CREATE TRIGGER manaloom_interactive_battle_record_no_update
+BEFORE UPDATE ON interactive_battle_records
+FOR EACH ROW
+EXECUTE FUNCTION manaloom_interactive_battle_record_append_only();
+
+-- 9. Tabela de Decks do Meta (Crawler)
+-- Armazena decks competitivos importados de sites externos (MTGTop8, MTGO)
+CREATE TABLE IF NOT EXISTS meta_decks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    format TEXT NOT NULL, -- 'standard', 'commander', etc.
+    archetype TEXT, -- Ex: 'Rakdos Midrange', 'Mono Red Aggro'
+    commander_name TEXT, -- Derivado para EDH/cEDH sem sobrescrever archetype legado
+    partner_commander_name TEXT, -- Segundo comandante quando houver partner/background
+    shell_label TEXT, -- Label canonico do shell de comandante
+    strategy_archetype TEXT, -- Heuristica separada do shell/rotulo bruto
+    source_url TEXT UNIQUE NOT NULL, -- URL de origem para evitar duplicatas
+    card_list TEXT NOT NULL, -- Lista de cartas em texto puro (formato de importação)
+    placement TEXT, -- Posição no torneio (ex: '1', 'Top 8')
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS commander_name TEXT;
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS partner_commander_name TEXT;
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS shell_label TEXT;
+ALTER TABLE meta_decks ADD COLUMN IF NOT EXISTS strategy_archetype TEXT;
+
+-- 9.1. Tabela de candidatos externos Commander (pesquisa web controlada)
+-- Armazena listas pesquisadas por agentes/analistas antes de promover para meta_decks.
+-- Mantem status de validacao e payload bruto da pesquisa externa.
+CREATE TABLE IF NOT EXISTS external_commander_meta_candidates (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    source_name TEXT NOT NULL,
+    source_host TEXT,
+    source_url TEXT UNIQUE NOT NULL,
+    deck_name TEXT NOT NULL,
+    commander_name TEXT,
+    partner_commander_name TEXT,
+    format TEXT NOT NULL DEFAULT 'commander',
+    subformat TEXT, -- 'edh' | 'cedh'
+    archetype TEXT,
+    card_list TEXT NOT NULL,
+    placement TEXT,
+    color_identity TEXT[] DEFAULT '{}',
+    is_commander_legal BOOLEAN,
+    validation_status TEXT NOT NULL DEFAULT 'candidate',
+    legal_status TEXT,
+    validation_notes TEXT,
+    research_payload JSONB NOT NULL DEFAULT '{}',
+    imported_by TEXT NOT NULL DEFAULT 'copilot_cli_web_agent',
+    promoted_to_meta_decks_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_external_commander_meta_status CHECK (
+        validation_status IN ('candidate', 'staged', 'validated', 'rejected', 'promoted')
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_status
+ON external_commander_meta_candidates (validation_status);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_subformat
+ON external_commander_meta_candidates (subformat);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_commander
+ON external_commander_meta_candidates (commander_name);
+
+CREATE INDEX IF NOT EXISTS idx_external_commander_meta_color_identity
+ON external_commander_meta_candidates USING GIN (color_identity);
+
+-- 9.2. Decks aprendidos/promovidos por pipelines externos (Hermes/ManaLoom)
+-- Fonte runtime do backend para expor listas aprendidas sem depender do Hermes.
+CREATE TABLE IF NOT EXISTS commander_learned_decks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    commander_name TEXT NOT NULL,
+    commander_name_normalized TEXT NOT NULL,
+    deck_name TEXT NOT NULL,
+    source_system TEXT NOT NULL,
+    source_ref TEXT NOT NULL,
+    source_url TEXT,
+    archetype TEXT,
+    card_list TEXT NOT NULL,
+    card_count INTEGER NOT NULL,
+    score NUMERIC,
+    wincon_primary TEXT,
+    wincon_backup TEXT,
+    legal_status TEXT,
+    notes TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    promoted_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_system, source_ref)
+);
+
+CREATE INDEX IF NOT EXISTS idx_commander_learned_decks_active
+ON commander_learned_decks (commander_name_normalized, is_active, promoted_at DESC, updated_at DESC);
+
+-- 9.1. Eventos de aprendizado para loop Hermes (App -> Hermes)
+-- Registra decks criados/salvos no app para o Hermes consumir e aprender.
+CREATE TABLE IF NOT EXISTS deck_learning_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID NOT NULL,
+    commander_name TEXT,
+    format TEXT NOT NULL,
+    card_count INTEGER NOT NULL DEFAULT 0,
+    source TEXT NOT NULL DEFAULT 'user_created',
+    event_data JSONB DEFAULT '{}'::jsonb,
+    synced_to_hermes BOOLEAN NOT NULL DEFAULT FALSE,
+    synced_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_deck_learning_events_synced
+ON deck_learning_events (synced_to_hermes, created_at);
+
+-- 9.2. Contador de uso real de cartas por comandante (App usage feedback)
+-- Alimentado a cada deck salvo. Usado pelo generate/reference pra priorizar
+-- cartas com alta adocao real alem das fontes externas (EDHREC, etc).
+CREATE TABLE IF NOT EXISTS commander_card_usage (
+    commander_name_normalized TEXT NOT NULL,
+    card_name_normalized TEXT NOT NULL,
+    usage_count INTEGER NOT NULL DEFAULT 1,
+    last_used_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (commander_name_normalized, card_name_normalized)
+);
+
+CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
+ON commander_card_usage (commander_name_normalized, usage_count DESC);
+
+-- 10. Tabela de Staples por Formato (Sincronizada via Scryfall API)
+-- Armazena as cartas mais populares de cada formato, atualizada semanalmente
+-- Para evitar hardcoded staples e manter dados sempre atualizados
+CREATE TABLE IF NOT EXISTS format_staples (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    card_name TEXT NOT NULL,              -- Nome exato da carta (ex: 'Sol Ring')
+    format TEXT NOT NULL,                  -- 'commander', 'standard', 'modern', etc.
+    archetype TEXT,                        -- 'aggro', 'control', 'combo', 'midrange', NULL = universal
+    color_identity TEXT[],                 -- Cores da carta: {'W'}, {'U', 'B'}, etc. NULL = incolor/universal
+    edhrec_rank INTEGER,                   -- Rank EDHREC (1 = mais popular)
+    category TEXT,                         -- 'ramp', 'draw', 'removal', 'staple', 'finisher', etc.
+    scryfall_id UUID,                      -- ID da carta no Scryfall para referência
+    is_banned BOOLEAN DEFAULT FALSE,       -- Se foi banida recentemente (atualizado via sync)
+    last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(card_name, format, archetype)   -- Evita duplicatas por formato/arquétipo
+);
+
+-- Índices para busca eficiente de staples
+CREATE INDEX IF NOT EXISTS idx_format_staples_format ON format_staples (format);
+CREATE INDEX IF NOT EXISTS idx_format_staples_archetype ON format_staples (archetype);
+CREATE INDEX IF NOT EXISTS idx_format_staples_color ON format_staples USING GIN (color_identity);
+CREATE INDEX IF NOT EXISTS idx_format_staples_category ON format_staples (category);
+CREATE INDEX IF NOT EXISTS idx_format_staples_rank ON format_staples (edhrec_rank);
+
+-- 11. Tabela de Histórico de Sincronização (Log de Atualizações)
+-- Registra quando os dados foram sincronizados para auditoria e debugging
+CREATE TABLE IF NOT EXISTS sync_log (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sync_type TEXT NOT NULL,               -- 'staples', 'banlist', 'meta', 'prices'
+    format TEXT,                           -- Formato sincronizado (NULL = todos)
+    records_updated INTEGER DEFAULT 0,     -- Quantidade de registros atualizados
+    records_inserted INTEGER DEFAULT 0,    -- Quantidade de registros inseridos
+    records_deleted INTEGER DEFAULT 0,     -- Quantidade de registros removidos (bans)
+    status TEXT NOT NULL,                  -- 'success', 'partial', 'failed'
+    error_message TEXT,                    -- Mensagem de erro se houver
+    started_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    finished_at TIMESTAMP WITH TIME ZONE
+);
+
+-- 11.1. Sync State (Checkpoint do último sync)
+-- Armazena estado simples (key/value) para sincronizações incrementais.
+CREATE TABLE IF NOT EXISTS sync_state (
+    key TEXT PRIMARY KEY,
+    value TEXT,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 11.2 Tabela de eventos do funil de ativação (Sprint 4)
+CREATE TABLE IF NOT EXISTS activation_funnel_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    event_name TEXT NOT NULL,
+    format TEXT,
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    source TEXT,
+    metadata JSONB NOT NULL DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_activation_funnel_user_created
+ON activation_funnel_events (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_activation_funnel_event_created
+ON activation_funnel_events (event_name, created_at DESC);
+
+-- 12. Tabela de Counters por Arquétipo (Hate Cards e Counter-Strategies)
+-- Armazena cartas e estratégias para countar arquétipos específicos
+-- Evita hardcoded hate cards e permite atualização dinâmica
+CREATE TABLE IF NOT EXISTS archetype_counters (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    archetype TEXT NOT NULL,               -- 'graveyard', 'artifacts', 'tokens', 'ramp', 'combo'
+    counter_archetype TEXT,                -- Arquétipo que countera (opcional, para matchups)
+    hate_cards TEXT[] NOT NULL,            -- Array de nomes de cartas hate
+    priority INTEGER DEFAULT 1,            -- 1=essencial, 2=bom ter, 3=situacional
+    format TEXT DEFAULT 'commander',       -- Formato aplicável
+    color_identity TEXT[],                 -- Cores que podem usar (NULL = qualquer)
+    notes TEXT,                            -- Notas explicativas (ex: "Usar contra Muldrotha")
+    effectiveness_score INTEGER DEFAULT 5, -- 1-10, quão efetivo é o counter
+    last_synced_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Índices para busca eficiente de counters
+CREATE INDEX IF NOT EXISTS idx_archetype_counters_archetype ON archetype_counters (archetype);
+CREATE INDEX IF NOT EXISTS idx_archetype_counters_format ON archetype_counters (format);
+CREATE INDEX IF NOT EXISTS idx_archetype_counters_priority ON archetype_counters (priority);
+
+-- 17. Eventos de Rate Limit Distribuído
+-- Permite rate limiting compartilhado entre múltiplas instâncias do backend.
+CREATE TABLE IF NOT EXISTS rate_limit_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    bucket TEXT NOT NULL, -- ex: auth, ai
+    identifier TEXT NOT NULL, -- IP ou identificador de cliente
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limit_bucket_identifier_created
+    ON rate_limit_events (bucket, identifier, created_at DESC);
+
+-- Dados iniciais de hate cards por arquétipo (pode ser expandido via sync)
+INSERT INTO archetype_counters (archetype, hate_cards, priority, notes, effectiveness_score) VALUES
+    ('graveyard', ARRAY['Rest in Peace', 'Grafdigger''s Cage', 'Soul-Guide Lantern', 'Leyline of the Void', 'Bojuka Bog', 'Tormod''s Crypt', 'Relic of Progenitus'], 1, 'Essencial contra Muldrotha, Meren, Karador', 9),
+    ('artifacts', ARRAY['Collector Ouphe', 'Stony Silence', 'Null Rod', 'Vandalblast', 'Kataki, War''s Wage', 'Energy Flux'], 1, 'Essencial contra Urza, Breya, artifact storm', 8),
+    ('tokens', ARRAY['Massacre Wurm', 'Rakdos Charm', 'Illness in the Ranks', 'Virulent Plague', 'Echoing Truth', 'Aetherspouts'], 2, 'Bom contra go-wide strategies', 7),
+    ('ramp', ARRAY['Confiscate', 'Collector Ouphe', 'Blood Moon', 'Back to Basics', 'Stranglehold', 'Aven Mindcensor'], 2, 'Contra decks que dependem de ramp excessivo', 6),
+    ('combo', ARRAY['Rule of Law', 'Deafening Silence', 'Drannith Magistrate', 'Cursed Totem', 'Linvala, Keeper of Silence', 'Torpor Orb'], 1, 'Essencial contra storm e infinite combos', 9),
+    ('enchantments', ARRAY['Tranquil Grove', 'Back to Nature', 'Bane of Progress', 'Aura Shards', 'Primeval Light'], 2, 'Contra enchantress e aura-based strategies', 7),
+    ('planeswalkers', ARRAY['The Immortal Sun', 'Vampire Hexmage', 'Hex Parasite', 'Pithing Needle', 'Sorcerous Spyglass'], 2, 'Contra superfriends', 7),
+    ('voltron', ARRAY['Maze of Ith', 'Fog Bank', 'Ghostly Prison', 'Propaganda', 'Constant Mists', 'Spore Frog'], 2, 'Contra voltron e commander damage', 6),
+    ('control', ARRAY['Cavern of Souls', 'Boseiju, Who Shelters All', 'Destiny Spinner', 'Vexing Shusher', 'Defense Grid'], 2, 'Contra counterspell-heavy decks', 7),
+    ('aggro', ARRAY['Ensnaring Bridge', 'Crawlspace', 'Silent Arbiter', 'Meekstone', 'Sphere of Safety'], 2, 'Contra creature aggro', 6)
+ON CONFLICT DO NOTHING;
+
+-- 13. Tabela de Análise de Fraquezas (Weakness Reports)
+-- Armazena análises de fraquezas identificadas em decks
+CREATE TABLE IF NOT EXISTS deck_weakness_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE CASCADE,
+    weakness_type TEXT NOT NULL,           -- 'graveyard_vulnerability', 'low_removal', 'high_curve'
+    severity TEXT NOT NULL,                -- 'critical', 'high', 'medium', 'low'
+    description TEXT NOT NULL,             -- Descrição legível da fraqueza
+    recommendations TEXT[],                -- Array de cartas/ações recomendadas
+    auto_detected BOOLEAN DEFAULT TRUE,    -- Se foi detectado automaticamente
+    addressed BOOLEAN DEFAULT FALSE,       -- Se já foi tratado pelo usuário
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_weakness_reports_deck ON deck_weakness_reports (deck_id);
+CREATE INDEX IF NOT EXISTS idx_weakness_reports_severity ON deck_weakness_reports (severity);
+
+-- 14. Tabela de Logs de IA (Observabilidade)
+-- Armazena métricas e resumos das chamadas de IA para debugging e auditoria
+CREATE TABLE IF NOT EXISTS ai_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    endpoint TEXT NOT NULL,              -- 'optimize', 'complete', 'explain', 'archetypes'
+    model TEXT NOT NULL,                 -- 'gpt-4o', 'gpt-4o-mini', etc.
+    prompt_summary TEXT,                 -- Resumo do prompt (sem dados sensíveis)
+    input_tokens INTEGER,                -- Tokens de entrada (se disponível)
+    output_tokens INTEGER,               -- Tokens de saída (se disponível)
+    response_summary TEXT,               -- Resumo da resposta
+    success BOOLEAN NOT NULL DEFAULT TRUE,
+    error_message TEXT,                  -- Mensagem de erro (se falhou)
+    latency_ms INTEGER NOT NULL,         -- Tempo total da chamada em ms
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_logs_user ON ai_logs (user_id);
+CREATE INDEX IF NOT EXISTS idx_ai_logs_deck ON ai_logs (deck_id);
+CREATE INDEX IF NOT EXISTS idx_ai_logs_endpoint ON ai_logs (endpoint);
+CREATE INDEX IF NOT EXISTS idx_ai_logs_created ON ai_logs (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_logs_success ON ai_logs (success);
+
+-- 14.0.1 Feedback do pipeline ML/prompt de optimize
+-- Recebe feedback automático de qualidade das respostas de /ai/optimize.
+CREATE TABLE IF NOT EXISTS ml_prompt_feedback (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    archetype TEXT NOT NULL,
+    commander_name TEXT,
+    cards_accepted TEXT[] NOT NULL DEFAULT '{}',
+    cards_rejected TEXT[] NOT NULL DEFAULT '{}',
+    effectiveness_score INTEGER,
+    user_comment TEXT,
+    prompt_version TEXT NOT NULL DEFAULT 'v1.1-hybrid',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_ml_prompt_feedback_effectiveness_score
+        CHECK (effectiveness_score IS NULL OR (effectiveness_score >= 1 AND effectiveness_score <= 10))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_deck_created
+    ON ml_prompt_feedback (deck_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_user_created
+    ON ml_prompt_feedback (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_archetype_created
+    ON ml_prompt_feedback (LOWER(archetype), created_at DESC);
+
+-- 14.1 Telemetria de fallback do /ai/optimize (persistente)
+-- Registra eficácia do fallback de sugestões vazias para análise histórica.
+CREATE TABLE IF NOT EXISTS ai_optimize_fallback_telemetry (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    mode TEXT NOT NULL DEFAULT 'optimize',
+    recognized_format BOOLEAN NOT NULL DEFAULT FALSE,
+    triggered BOOLEAN NOT NULL DEFAULT FALSE,
+    applied BOOLEAN NOT NULL DEFAULT FALSE,
+    no_candidate BOOLEAN NOT NULL DEFAULT FALSE,
+    no_replacement BOOLEAN NOT NULL DEFAULT FALSE,
+    candidate_count INTEGER NOT NULL DEFAULT 0,
+    replacement_count INTEGER NOT NULL DEFAULT 0,
+    pair_count INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_opt_fallback_created ON ai_optimize_fallback_telemetry (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_opt_fallback_user ON ai_optimize_fallback_telemetry (user_id);
+CREATE INDEX IF NOT EXISTS idx_opt_fallback_deck ON ai_optimize_fallback_telemetry (deck_id);
+CREATE INDEX IF NOT EXISTS idx_opt_fallback_triggered ON ai_optimize_fallback_telemetry (triggered, applied);
+
+-- 14.1.1 Jobs assíncronos de /ai/optimize persistidos
+-- Garante polling consistente mesmo após restart ou múltiplas instâncias.
+CREATE TABLE IF NOT EXISTS ai_optimize_jobs (
+    id TEXT PRIMARY KEY,
+    deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+    archetype TEXT NOT NULL,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    stage TEXT NOT NULL DEFAULT 'Iniciando...',
+    stage_number INTEGER NOT NULL DEFAULT 0,
+    total_stages INTEGER NOT NULL DEFAULT 6,
+    result JSONB,
+    error TEXT,
+    quality_error JSONB,
+    request_key TEXT,
+    request_fingerprint TEXT,
+    cancelled_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_ai_optimize_jobs_status
+        CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_optimize_jobs_user_updated
+    ON ai_optimize_jobs (user_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_ai_optimize_jobs_created
+    ON ai_optimize_jobs (created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_optimize_jobs_user_request_key
+    ON ai_optimize_jobs (user_id, request_key)
+    WHERE user_id IS NOT NULL AND request_key IS NOT NULL;
+
+-- Jobs assíncronos de /ai/generate persistidos e retomáveis.
+CREATE TABLE IF NOT EXISTS ai_generate_jobs (
+    id TEXT PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    cache_key TEXT NOT NULL,
+    format TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    stage TEXT NOT NULL DEFAULT 'Iniciando...',
+    stage_number INTEGER NOT NULL DEFAULT 0,
+    total_stages INTEGER NOT NULL DEFAULT 4,
+    result_status_code INTEGER,
+    result JSONB,
+    error TEXT,
+    request_key TEXT,
+    request_fingerprint TEXT,
+    cancelled_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_ai_generate_jobs_status
+        CHECK (status IN ('pending', 'processing', 'completed', 'failed', 'cancelled'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_user_updated
+    ON ai_generate_jobs (user_id, updated_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_ai_generate_jobs_created
+    ON ai_generate_jobs (created_at DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ai_generate_jobs_user_request_key
+    ON ai_generate_jobs (user_id, request_key)
+    WHERE user_id IS NOT NULL AND request_key IS NOT NULL;
+
+-- 14.2 Memória de preferências de otimização por usuário
+CREATE TABLE IF NOT EXISTS ai_user_preferences (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    preferred_archetype TEXT,
+    preferred_bracket INTEGER,
+    keep_theme_default BOOLEAN NOT NULL DEFAULT TRUE,
+    preferred_colors TEXT[] NOT NULL DEFAULT '{}',
+    budget_tier TEXT NOT NULL DEFAULT 'mid',
+    playstyle TEXT NOT NULL DEFAULT 'balanced',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_user_preferences_archetype
+    ON ai_user_preferences (preferred_archetype);
+
+-- 14.3 Cache de /ai/optimize por assinatura de deck + prompt normalizado
+CREATE TABLE IF NOT EXISTS ai_optimize_cache (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cache_key TEXT NOT NULL UNIQUE,
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    deck_signature TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_ai_optimize_cache_expires_at
+    ON ai_optimize_cache (expires_at);
+
+CREATE INDEX IF NOT EXISTS idx_ai_optimize_cache_user
+    ON ai_optimize_cache (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_ai_optimize_cache_deck
+    ON ai_optimize_cache (deck_id);
+
+-- ============================================================
+-- SOCIAL: Sistema de Follows
+-- ============================================================
+CREATE TABLE IF NOT EXISTS user_follows (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    follower_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    following_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_follow UNIQUE (follower_id, following_id),
+    CONSTRAINT chk_no_self_follow CHECK (follower_id != following_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_follows_follower ON user_follows (follower_id);
+CREATE INDEX IF NOT EXISTS idx_user_follows_following ON user_follows (following_id);
+
+CREATE TABLE IF NOT EXISTS user_blocks (
+    blocker_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    blocked_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (blocker_id, blocked_id),
+    CONSTRAINT chk_no_self_block CHECK (blocker_id <> blocked_id)
+);
+CREATE INDEX IF NOT EXISTS idx_user_blocks_blocked
+    ON user_blocks (blocked_id, blocker_id);
+
+CREATE TABLE IF NOT EXISTS user_block_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    actor_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    target_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL CHECK (action IN ('blocked', 'unblocked')),
+    reason TEXT,
+    request_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_user_block_events_actor_created
+    ON user_block_events (actor_user_id, created_at DESC);
+
+-- ============================================================
+-- COLLECTION/TRADES: binder, negociação, mensagens e notificações
+-- ============================================================
+CREATE TABLE IF NOT EXISTS user_binder_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    condition TEXT NOT NULL DEFAULT 'NM'
+        CHECK (condition IN ('NM', 'LP', 'MP', 'HP', 'DMG')),
+    is_foil BOOLEAN NOT NULL DEFAULT FALSE,
+    for_trade BOOLEAN NOT NULL DEFAULT FALSE,
+    for_sale BOOLEAN NOT NULL DEFAULT FALSE,
+    price DECIMAL(10,2),
+    currency TEXT NOT NULL DEFAULT 'BRL'
+        CHECK (currency IN ('BRL', 'USD')),
+    notes TEXT,
+    language TEXT NOT NULL DEFAULT 'en',
+    list_type TEXT NOT NULL DEFAULT 'have'
+        CHECK (list_type IN ('have', 'want')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE user_binder_items
+ADD COLUMN IF NOT EXISTS list_type TEXT NOT NULL DEFAULT 'have';
+ALTER TABLE user_binder_items
+DROP CONSTRAINT IF EXISTS user_binder_items_user_id_card_id_condition_is_foil_key;
+UPDATE user_binder_items
+SET language = LOWER(REPLACE(TRIM(language), '_', '-'))
+WHERE language IS DISTINCT FROM LOWER(REPLACE(TRIM(language), '_', '-'));
+UPDATE user_binder_items SET language = 'en' WHERE language = '';
+DROP INDEX IF EXISTS uq_user_binder_items_identity;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_user_binder_items_physical_identity
+ON user_binder_items (
+    user_id, card_id, condition, is_foil, language, list_type
+);
+ALTER TABLE user_binder_items
+DROP CONSTRAINT IF EXISTS chk_user_binder_items_language;
+ALTER TABLE user_binder_items
+ADD CONSTRAINT chk_user_binder_items_language CHECK (
+    language ~ '^[a-z]{2,3}(-[a-z0-9]{2,8})*$'
+);
+CREATE INDEX IF NOT EXISTS idx_binder_user ON user_binder_items (user_id);
+CREATE INDEX IF NOT EXISTS idx_binder_card ON user_binder_items (card_id);
+CREATE INDEX IF NOT EXISTS idx_binder_for_trade
+ON user_binder_items (for_trade) WHERE for_trade = TRUE;
+CREATE INDEX IF NOT EXISTS idx_binder_for_sale
+ON user_binder_items (for_sale) WHERE for_sale = TRUE;
+
+CREATE TABLE IF NOT EXISTS trade_offers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN (
+            'pending', 'accepted', 'declined', 'shipped', 'delivered',
+            'completed', 'cancelled', 'disputed'
+        )),
+    type TEXT NOT NULL DEFAULT 'trade'
+        CHECK (type IN ('trade', 'sale', 'mixed')),
+    delivery_method TEXT
+        CHECK (delivery_method IS NULL OR delivery_method IN (
+            'correios', 'motoboy', 'pessoalmente', 'outro',
+            'mail', 'in_person'
+        )),
+    payment_method TEXT
+        CHECK (payment_method IS NULL OR payment_method IN ('pix', 'cash', 'transfer', 'other')),
+    payment_amount DECIMAL(10,2),
+    payment_currency TEXT NOT NULL DEFAULT 'BRL',
+    tracking_code TEXT,
+    message TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_no_self_trade CHECK (sender_id <> receiver_id)
+);
+ALTER TABLE trade_offers
+DROP CONSTRAINT IF EXISTS trade_offers_delivery_method_check;
+ALTER TABLE trade_offers
+DROP CONSTRAINT IF EXISTS chk_trade_offers_delivery_method;
+ALTER TABLE trade_offers
+ADD CONSTRAINT chk_trade_offers_delivery_method CHECK (
+    delivery_method IS NULL OR delivery_method IN (
+        'correios', 'motoboy', 'pessoalmente', 'outro',
+        'mail', 'in_person'
+    )
+);
+CREATE INDEX IF NOT EXISTS idx_trade_sender ON trade_offers (sender_id);
+CREATE INDEX IF NOT EXISTS idx_trade_receiver ON trade_offers (receiver_id);
+CREATE INDEX IF NOT EXISTS idx_trade_status ON trade_offers (status);
+
+CREATE TABLE IF NOT EXISTS trade_items (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
+    binder_item_id UUID REFERENCES user_binder_items(id) ON DELETE SET NULL,
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    direction TEXT NOT NULL CHECK (direction IN ('offering', 'requesting')),
+    quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
+    agreed_price DECIMAL(10,2),
+    snapshot_schema_version TEXT NOT NULL DEFAULT 'trade_item_snapshot_v1',
+    snapshot_status TEXT NOT NULL DEFAULT 'legacy_unavailable',
+    item_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+    snapshot_captured_at TIMESTAMP WITH TIME ZONE
+);
+ALTER TABLE trade_items ALTER COLUMN binder_item_id DROP NOT NULL;
+ALTER TABLE trade_items DROP CONSTRAINT IF EXISTS trade_items_binder_item_id_fkey;
+ALTER TABLE trade_items
+ADD CONSTRAINT trade_items_binder_item_id_fkey
+FOREIGN KEY (binder_item_id) REFERENCES user_binder_items(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_trade_items_offer
+ON trade_items (trade_offer_id);
+ALTER TABLE trade_items
+ADD COLUMN IF NOT EXISTS snapshot_schema_version TEXT NOT NULL
+DEFAULT 'trade_item_snapshot_v1';
+ALTER TABLE trade_items
+ADD COLUMN IF NOT EXISTS snapshot_status TEXT NOT NULL
+DEFAULT 'legacy_unavailable';
+ALTER TABLE trade_items
+ADD COLUMN IF NOT EXISTS item_snapshot JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE trade_items
+ADD COLUMN IF NOT EXISTS snapshot_captured_at TIMESTAMP WITH TIME ZONE;
+
+DROP TRIGGER IF EXISTS manaloom_trade_item_snapshot_immutable ON trade_items;
+WITH canonical_sets AS (
+    SELECT DISTINCT ON (LOWER(code)) code, name, release_date
+    FROM sets
+    ORDER BY LOWER(code), release_date DESC NULLS LAST, code
+), recoverable AS (
+    SELECT
+        ti.id,
+        jsonb_build_object(
+            'schema_version', 'trade_item_snapshot_v1',
+            'card', jsonb_strip_nulls(jsonb_build_object(
+                'id', c.id::text,
+                'scryfall_id', c.scryfall_id::text,
+                'oracle_id', c.oracle_id::text,
+                'name', c.name,
+                'image_url', c.image_url,
+                'layout', c.layout,
+                'card_faces', c.card_faces_json,
+                'set_code', c.set_code,
+                'collector_number', c.collector_number,
+                'set_name', s.name,
+                'set_release_date', TO_CHAR(s.release_date, 'YYYY-MM-DD'),
+                'mana_cost', c.mana_cost,
+                'type_line', c.type_line,
+                'rarity', c.rarity
+            )),
+            'physical', jsonb_build_object(
+                'condition', bi.condition,
+                'is_foil', bi.is_foil,
+                'language', bi.language
+            )
+        ) AS item_snapshot
+    FROM trade_items ti
+    JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+    JOIN cards c ON c.id = bi.card_id
+    LEFT JOIN canonical_sets s ON LOWER(s.code) = LOWER(c.set_code)
+    WHERE ti.snapshot_status = 'legacy_unavailable'
+      AND ti.item_snapshot = '{}'::jsonb
+)
+UPDATE trade_items ti
+SET snapshot_status = 'legacy_recovered',
+    item_snapshot = recoverable.item_snapshot,
+    snapshot_captured_at = CURRENT_TIMESTAMP
+FROM recoverable
+WHERE ti.id = recoverable.id;
+
+ALTER TABLE trade_items
+DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_schema;
+ALTER TABLE trade_items
+ADD CONSTRAINT chk_trade_items_snapshot_schema CHECK (
+    snapshot_schema_version = 'trade_item_snapshot_v1'
+);
+ALTER TABLE trade_items
+DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_status;
+ALTER TABLE trade_items
+ADD CONSTRAINT chk_trade_items_snapshot_status CHECK (
+    snapshot_status IN ('captured', 'legacy_recovered', 'legacy_unavailable')
+);
+ALTER TABLE trade_items
+DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_payload;
+ALTER TABLE trade_items
+ADD CONSTRAINT chk_trade_items_snapshot_payload CHECK (
+    jsonb_typeof(item_snapshot) = 'object'
+    AND OCTET_LENGTH(item_snapshot::text) <= 65536
+);
+ALTER TABLE trade_items
+DROP CONSTRAINT IF EXISTS chk_trade_items_snapshot_lifecycle;
+ALTER TABLE trade_items
+ADD CONSTRAINT chk_trade_items_snapshot_lifecycle CHECK (
+    (
+        snapshot_status IN ('captured', 'legacy_recovered')
+        AND item_snapshot <> '{}'::jsonb
+        AND snapshot_captured_at IS NOT NULL
+        AND item_snapshot ->> 'schema_version' = snapshot_schema_version
+        AND jsonb_typeof(item_snapshot -> 'card') = 'object'
+        AND jsonb_typeof(item_snapshot -> 'physical') = 'object'
+    ) OR (
+        snapshot_status = 'legacy_unavailable'
+        AND item_snapshot = '{}'::jsonb
+        AND snapshot_captured_at IS NULL
+    )
+);
+
+CREATE OR REPLACE FUNCTION manaloom_trade_item_snapshot_immutable()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NEW.snapshot_schema_version IS DISTINCT FROM OLD.snapshot_schema_version
+       OR NEW.snapshot_status IS DISTINCT FROM OLD.snapshot_status
+       OR NEW.item_snapshot IS DISTINCT FROM OLD.item_snapshot
+       OR NEW.snapshot_captured_at IS DISTINCT FROM OLD.snapshot_captured_at THEN
+        RAISE EXCEPTION USING
+            ERRCODE = '23514',
+            MESSAGE = 'trade_item_snapshot_immutable';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+CREATE TRIGGER manaloom_trade_item_snapshot_immutable
+BEFORE UPDATE OF snapshot_schema_version, snapshot_status, item_snapshot,
+    snapshot_captured_at ON trade_items
+FOR EACH ROW
+EXECUTE FUNCTION manaloom_trade_item_snapshot_immutable();
+
+CREATE TABLE IF NOT EXISTS trade_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    message TEXT,
+    attachment_url TEXT,
+    attachment_type TEXT
+        CHECK (attachment_type IS NULL OR attachment_type IN ('receipt', 'tracking', 'photo', 'other')),
+    client_request_id TEXT,
+    moderation_status TEXT NOT NULL DEFAULT 'visible',
+    CONSTRAINT chk_trade_messages_moderation_status
+        CHECK (moderation_status IN ('visible', 'removed')),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE trade_messages ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+ALTER TABLE trade_messages ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'visible';
+ALTER TABLE trade_messages DROP CONSTRAINT IF EXISTS chk_trade_messages_moderation_status;
+ALTER TABLE trade_messages ADD CONSTRAINT chk_trade_messages_moderation_status
+CHECK (moderation_status IN ('visible', 'removed'));
+CREATE INDEX IF NOT EXISTS idx_trade_messages_offer
+ON trade_messages (trade_offer_id, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_trade_messages_sender_request
+ON trade_messages (sender_id, client_request_id)
+WHERE client_request_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS trade_status_history (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
+    old_status TEXT,
+    new_status TEXT NOT NULL,
+    changed_by UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    notes TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_trade_history_offer
+ON trade_status_history (trade_offer_id, created_at DESC);
+
+-- Canonical playable-card availability shared by Collection, Deckbuilder and
+-- Trade. Printing/language/foil/condition remain binder-item attributes, while
+-- owned/allocated/free/missing are aggregated by Oracle identity.
+CREATE OR REPLACE VIEW collection_availability_snapshot AS
+WITH owned AS (
+  SELECT bi.user_id, COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'have'
+  GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+),
+allocated AS (
+  SELECT d.user_id, COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(dc.quantity), 0)::int AS allocated_quantity
+  FROM decks d
+  JOIN deck_cards dc ON dc.deck_id = d.id
+  JOIN cards c ON c.id = dc.card_id
+  WHERE d.deleted_at IS NULL
+  GROUP BY d.user_id, COALESCE(c.oracle_id, c.id)
+),
+committed AS (
+  SELECT ti.owner_id AS user_id,
+         COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(ti.quantity), 0)::int AS committed_trade_quantity
+  FROM trade_items ti
+  JOIN trade_offers trade ON trade.id = ti.trade_offer_id
+  JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+  JOIN cards c ON c.id = bi.card_id
+  WHERE trade.status IN (
+    'pending', 'accepted', 'shipped', 'delivered', 'disputed'
+  )
+    AND bi.list_type = 'have'
+  GROUP BY ti.owner_id, COALESCE(c.oracle_id, c.id)
+),
+wanted AS (
+  SELECT bi.user_id, COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         MIN(c.name) AS canonical_name,
+         COALESCE(SUM(bi.quantity), 0)::int AS wanted_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'want'
+  GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+),
+identities AS (
+  SELECT user_id, playable_card_id FROM owned
+  UNION SELECT user_id, playable_card_id FROM allocated
+  UNION SELECT user_id, playable_card_id FROM committed
+  UNION SELECT user_id, playable_card_id FROM wanted
+)
+SELECT identity.user_id, identity.playable_card_id,
+       COALESCE(owned.canonical_name, allocated.canonical_name,
+                committed.canonical_name, wanted.canonical_name)
+         AS canonical_name,
+       COALESCE(owned.owned_quantity, 0)::int AS owned_quantity,
+       COALESCE(allocated.allocated_quantity, 0)::int AS allocated_quantity,
+       COALESCE(committed.committed_trade_quantity, 0)::int
+         AS committed_trade_quantity,
+       GREATEST(COALESCE(owned.owned_quantity, 0)
+         - COALESCE(allocated.allocated_quantity, 0)
+         - COALESCE(committed.committed_trade_quantity, 0), 0)::int
+         AS free_quantity,
+       GREATEST(COALESCE(allocated.allocated_quantity, 0)
+         - COALESCE(owned.owned_quantity, 0), 0)::int AS missing_quantity,
+       COALESCE(wanted.wanted_quantity, 0)::int AS wanted_quantity,
+       GREATEST(COALESCE(wanted.wanted_quantity, 0)
+         - COALESCE(owned.owned_quantity, 0), 0)::int
+         AS wanted_missing_quantity
+FROM identities identity
+LEFT JOIN owned USING (user_id, playable_card_id)
+LEFT JOIN allocated USING (user_id, playable_card_id)
+LEFT JOIN committed USING (user_id, playable_card_id)
+LEFT JOIN wanted USING (user_id, playable_card_id);
+
+CREATE OR REPLACE VIEW binder_item_availability AS
+WITH item_priority AS (
+  SELECT bi.id AS binder_item_id, bi.user_id, bi.card_id,
+         COALESCE(c.oracle_id, c.id) AS playable_card_id,
+         bi.quantity AS item_quantity,
+         COALESCE(SUM(bi.quantity) OVER (
+           PARTITION BY bi.user_id, COALESCE(c.oracle_id, c.id)
+           ORDER BY CASE WHEN bi.for_trade OR bi.for_sale THEN 0 ELSE 1 END,
+                    bi.updated_at, bi.id
+           ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+         ), 0)::int AS prior_item_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'have'
+)
+SELECT item.binder_item_id, item.user_id, item.card_id,
+       item.playable_card_id, item.item_quantity,
+       availability.owned_quantity, availability.allocated_quantity,
+       availability.committed_trade_quantity, availability.free_quantity,
+       availability.missing_quantity,
+       GREATEST(LEAST(item.item_quantity,
+         availability.free_quantity - item.prior_item_quantity), 0)::int
+         AS available_quantity
+FROM item_priority item
+JOIN collection_availability_snapshot availability
+  ON availability.user_id = item.user_id
+ AND availability.playable_card_id = item.playable_card_id;
+
+CREATE TABLE IF NOT EXISTS conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_a_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_b_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    last_message_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_no_self_chat CHECK (user_a_id <> user_b_id)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_participants
+ON conversations (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id));
+
+CREATE TABLE IF NOT EXISTS direct_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    message TEXT NOT NULL,
+    client_request_id TEXT,
+    moderation_status TEXT NOT NULL DEFAULT 'visible',
+    CONSTRAINT chk_direct_messages_moderation_status
+        CHECK (moderation_status IN ('visible', 'removed')),
+    read_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS client_request_id TEXT;
+ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS moderation_status TEXT NOT NULL DEFAULT 'visible';
+ALTER TABLE direct_messages DROP CONSTRAINT IF EXISTS chk_direct_messages_moderation_status;
+ALTER TABLE direct_messages ADD CONSTRAINT chk_direct_messages_moderation_status
+CHECK (moderation_status IN ('visible', 'removed'));
+CREATE INDEX IF NOT EXISTS idx_dm_conversation
+ON direct_messages (conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dm_unread
+ON direct_messages (conversation_id) WHERE read_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_direct_messages_sender_request
+ON direct_messages (sender_id, client_request_id)
+WHERE client_request_id IS NOT NULL;
+
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type TEXT NOT NULL CHECK (type IN (
+        'new_follower', 'trade_offer_received', 'trade_accepted',
+        'trade_declined', 'trade_shipped', 'trade_delivered',
+        'trade_completed', 'trade_message', 'direct_message'
+    )),
+    reference_id UUID,
+    title TEXT NOT NULL,
+    body TEXT,
+    read_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_notifications_user
+ON notifications (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_unread
+ON notifications (user_id) WHERE read_at IS NULL;
+
+-- ============================================================
+-- RETENTION: Historico pos-jogo por deck
+-- ============================================================
+CREATE TABLE IF NOT EXISTS post_game_notes (
+    id TEXT PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    result TEXT NOT NULL DEFAULT '',
+    table_level TEXT NOT NULL DEFAULT '',
+    notes TEXT NOT NULL DEFAULT '',
+    performed_well JSONB NOT NULL DEFAULT '[]'::jsonb,
+    underperformed JSONB NOT NULL DEFAULT '[]'::jsonb,
+    issues JSONB NOT NULL DEFAULT '[]'::jsonb,
+    play_session_id TEXT,
+    session_started_at TIMESTAMP WITH TIME ZONE,
+    session_ended_at TIMESTAMP WITH TIME ZONE,
+    deck_snapshot_hash TEXT,
+    deck_version_at TIMESTAMP WITH TIME ZONE,
+    revision BIGINT NOT NULL DEFAULT 1 CHECK (revision > 0),
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_post_game_notes_session_order CHECK (
+        session_started_at IS NULL
+        OR session_ended_at IS NULL
+        OR session_ended_at >= session_started_at
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_post_game_notes_deck_created
+    ON post_game_notes (deck_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_game_notes_user_updated
+    ON post_game_notes (user_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_post_game_notes_user_sync
+    ON post_game_notes (user_id, updated_at, revision);
+CREATE INDEX IF NOT EXISTS idx_post_game_notes_tombstones
+    ON post_game_notes (user_id, deck_id, updated_at)
+    WHERE deleted_at IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_post_game_notes_play_session
+    ON post_game_notes (user_id, deck_id, play_session_id)
+    WHERE play_session_id IS NOT NULL AND deleted_at IS NULL;
+
+-- Watermark monotono: serializa leitura incremental e mutacoes para que um
+-- commit concorrente nunca fique permanentemente antes do cursor devolvido.
+CREATE TABLE IF NOT EXISTS post_game_sync_state (
+    id SMALLINT PRIMARY KEY CHECK (id = 1),
+    watermark TIMESTAMP WITH TIME ZONE NOT NULL
+);
+INSERT INTO post_game_sync_state (id, watermark)
+SELECT 1, GREATEST(
+    CURRENT_TIMESTAMP,
+    COALESCE(MAX(updated_at), CURRENT_TIMESTAMP)
+)
+FROM post_game_notes
+ON CONFLICT (id) DO UPDATE
+SET watermark = GREATEST(
+    post_game_sync_state.watermark,
+    EXCLUDED.watermark
+);
+
+-- PRIVACY: recibo operacional sem identificador do titular.
+CREATE TABLE IF NOT EXISTS account_deletion_receipts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    policy_version TEXT NOT NULL,
+    deletion_mode TEXT NOT NULL CHECK (deletion_mode IN ('anonymized')),
+    retention_summary JSONB NOT NULL DEFAULT '{}'::jsonb,
+    completed_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_account_deletion_receipts_completed
+    ON account_deletion_receipts (completed_at DESC);
+
+-- Chave interna versionada. O UUID do deck nunca e persistido no tombstone:
+-- somente HMAC-SHA256, nao correlacionavel sem esta chave restrita ao banco.
+CREATE TABLE IF NOT EXISTS privacy_keyring (
+    key_version SMALLINT PRIMARY KEY,
+    hmac_key BYTEA NOT NULL CHECK (octet_length(hmac_key) >= 32),
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_privacy_keyring_active
+    ON privacy_keyring (is_active)
+    WHERE is_active = TRUE;
+INSERT INTO privacy_keyring (key_version, hmac_key, is_active)
+VALUES (1, gen_random_bytes(32), FALSE)
+ON CONFLICT (key_version) DO NOTHING;
+UPDATE privacy_keyring
+SET is_active = TRUE
+WHERE key_version = (SELECT MIN(key_version) FROM privacy_keyring)
+  AND NOT EXISTS (
+      SELECT 1 FROM privacy_keyring WHERE is_active = TRUE
+  );
+
+CREATE TABLE IF NOT EXISTS privacy_deleted_deck_tombstones (
+    key_version SMALLINT NOT NULL
+        REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+    deck_token TEXT NOT NULL CHECK (char_length(deck_token) = 64),
+    deleted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (key_version, deck_token)
+);
+CREATE INDEX IF NOT EXISTS idx_privacy_deleted_deck_token
+    ON privacy_deleted_deck_tombstones (deck_token);
+
+-- ============================================================
+-- GROWTH: Relatorios compartilhaveis
+-- ============================================================
+CREATE TABLE IF NOT EXISTS shared_deck_reports (
+    id TEXT PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    payload JSONB NOT NULL,
+    is_public BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS idx_shared_deck_reports_deck_created
+    ON shared_deck_reports (deck_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_shared_deck_reports_public_updated
+    ON shared_deck_reports (is_public, updated_at DESC);
+
+-- ============================================================
+-- COMMUNITY: Comentarios, feedback publico e moderacao basica
+-- ============================================================
+CREATE TABLE IF NOT EXISTS deck_comments (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    body TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'visible',
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_deck_comments_status CHECK (
+        status IN ('visible', 'hidden', 'deleted')
+    ),
+    CONSTRAINT chk_deck_comments_body_length CHECK (
+        char_length(body) BETWEEN 3 AND 1200
+    )
+);
+
+CREATE INDEX IF NOT EXISTS idx_deck_comments_deck_created
+    ON deck_comments (deck_id, created_at DESC)
+    WHERE status = 'visible';
+CREATE INDEX IF NOT EXISTS idx_deck_comments_user_created
+    ON deck_comments (user_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS content_reports (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reporter_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    target_type TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    details TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'open',
+    priority SMALLINT NOT NULL DEFAULT 2,
+    evidence JSONB NOT NULL DEFAULT '{}'::jsonb,
+    sla_due_at TIMESTAMP WITH TIME ZONE NOT NULL
+        DEFAULT (CURRENT_TIMESTAMP + INTERVAL '72 hours'),
+    resolution TEXT,
+    resolution_action TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT chk_content_reports_target_type CHECK (
+        target_type IN (
+            'deck', 'comment', 'profile', 'binder_item',
+            'message', 'trade_message'
+        )
+    ),
+    CONSTRAINT chk_content_reports_reason CHECK (
+        reason IN ('spam', 'abuse', 'scam', 'inappropriate', 'copyright', 'other')
+    ),
+    CONSTRAINT chk_content_reports_status CHECK (
+        status IN ('open', 'reviewing', 'resolved', 'dismissed', 'appealed')
+    ),
+    CONSTRAINT chk_content_reports_priority CHECK (priority BETWEEN 1 AND 4),
+    CONSTRAINT chk_content_reports_resolution_action CHECK (
+        resolution_action IS NULL OR
+        resolution_action IN ('none', 'hide', 'remove', 'restrict')
+    )
+);
+
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS priority SMALLINT NOT NULL DEFAULT 2;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS evidence JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS sla_due_at TIMESTAMP WITH TIME ZONE;
+UPDATE content_reports
+SET sla_due_at = created_at + INTERVAL '72 hours'
+WHERE sla_due_at IS NULL;
+ALTER TABLE content_reports ALTER COLUMN sla_due_at SET NOT NULL;
+ALTER TABLE content_reports ALTER COLUMN sla_due_at
+SET DEFAULT (CURRENT_TIMESTAMP + INTERVAL '72 hours');
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS resolution TEXT;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS resolution_action TEXT;
+ALTER TABLE content_reports ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_target_type;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_target_type CHECK (
+    target_type IN (
+        'deck', 'comment', 'profile', 'binder_item',
+        'message', 'trade_message'
+    )
+);
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_status;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_status CHECK (
+    status IN ('open', 'reviewing', 'resolved', 'dismissed', 'appealed')
+);
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_priority;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_priority
+CHECK (priority BETWEEN 1 AND 4);
+ALTER TABLE content_reports DROP CONSTRAINT IF EXISTS chk_content_reports_resolution_action;
+ALTER TABLE content_reports ADD CONSTRAINT chk_content_reports_resolution_action CHECK (
+    resolution_action IS NULL OR
+    resolution_action IN ('none', 'hide', 'remove', 'restrict')
+);
+CREATE INDEX IF NOT EXISTS idx_content_reports_target_status
+    ON content_reports (target_type, target_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_content_reports_queue
+    ON content_reports (status, priority, sla_due_at, created_at);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_content_reports_active_reporter_target
+    ON content_reports (reporter_user_id, target_type, target_id)
+    WHERE reporter_user_id IS NOT NULL
+      AND status IN ('open', 'reviewing', 'appealed');
+
+CREATE TABLE IF NOT EXISTS moderation_actions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    report_id UUID NOT NULL REFERENCES content_reports(id) ON DELETE CASCADE,
+    moderator_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    action TEXT NOT NULL
+        CHECK (action IN (
+            'start_review', 'dismiss', 'hide', 'remove', 'restrict', 'restore'
+        )),
+    rationale TEXT NOT NULL,
+    evidence JSONB NOT NULL DEFAULT '{}'::jsonb,
+    request_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_moderation_actions_report_created
+    ON moderation_actions (report_id, created_at DESC);
+
+CREATE TABLE IF NOT EXISTS content_report_appeals (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    report_id UUID NOT NULL REFERENCES content_reports(id) ON DELETE CASCADE,
+    appellant_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    reason TEXT NOT NULL CHECK (char_length(reason) BETWEEN 10 AND 2000),
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'reviewing', 'upheld', 'overturned')),
+    reviewed_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMP WITH TIME ZONE,
+    resolution TEXT,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_content_report_appeals_pending
+    ON content_report_appeals (report_id, appellant_user_id)
+    WHERE status IN ('pending', 'reviewing');
+CREATE INDEX IF NOT EXISTS idx_content_report_appeals_queue
+    ON content_report_appeals (status, created_at);
+
+-- Serializa qualquer FK de usuario com a exclusao da conta. Uma escrita que
+-- chegar antes sera limpa pela mesma transacao; uma escrita posterior falha.
+CREATE OR REPLACE FUNCTION manaloom_require_active_user()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $active_user_function$
+DECLARE
+    referenced_user_id UUID;
+BEGIN
+    referenced_user_id := NULLIF(to_jsonb(NEW) ->> TG_ARGV[0], '')::UUID;
+    IF referenced_user_id IS NULL THEN
+        RETURN NEW;
+    END IF;
+
+    PERFORM 1
+    FROM users
+    WHERE id = referenced_user_id
+      AND deleted_at IS NULL
+    FOR UPDATE;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION USING
+            ERRCODE = '23503',
+            MESSAGE = 'inactive_user_reference';
+    END IF;
+    RETURN NEW;
+END;
+$active_user_function$;
+
+DO $active_user_triggers$
+DECLARE
+    reference RECORD;
+    trigger_name TEXT;
+BEGIN
+    FOR reference IN
+        SELECT constraint_row.oid AS constraint_oid,
+               namespace_row.nspname AS schema_name,
+               relation_row.relname AS table_name,
+               attribute_row.attname AS column_name
+        FROM pg_constraint constraint_row
+        JOIN pg_class relation_row
+          ON relation_row.oid = constraint_row.conrelid
+        JOIN pg_namespace namespace_row
+          ON namespace_row.oid = relation_row.relnamespace
+        JOIN pg_attribute attribute_row
+          ON attribute_row.attrelid = relation_row.oid
+         AND attribute_row.attnum = constraint_row.conkey[1]
+        WHERE constraint_row.contype = 'f'
+          AND constraint_row.confrelid = 'users'::regclass
+          AND array_length(constraint_row.conkey, 1) = 1
+    LOOP
+        trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+        EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+        );
+        EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+        );
+    END LOOP;
+END;
+$active_user_triggers$;
+
+CREATE OR REPLACE FUNCTION manaloom_guard_deck_learning_event()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_learning_guard$
+DECLARE
+    owner_user_id UUID;
+BEGIN
+    SELECT user_id
+    INTO owner_user_id
+    FROM decks
+    WHERE id = NEW.deck_id;
+
+    IF owner_user_id IS NOT NULL THEN
+        PERFORM 1
+        FROM users
+        WHERE id = owner_user_id
+          AND deleted_at IS NULL
+        FOR UPDATE;
+        IF NOT FOUND THEN
+            RAISE EXCEPTION USING
+                ERRCODE = '23503',
+                MESSAGE = 'inactive_deck_owner_reference';
+        END IF;
+    ELSIF EXISTS (
+        SELECT 1
+        FROM privacy_deleted_deck_tombstones tombstone
+        JOIN privacy_keyring keyring
+          ON keyring.key_version = tombstone.key_version
+        WHERE tombstone.deck_token = encode(
+            hmac(
+                convert_to(NEW.deck_id::text, 'UTF8'),
+                keyring.hmac_key,
+                'sha256'
+            ),
+            'hex'
+        )
+    ) THEN
+        RAISE EXCEPTION USING
+            ERRCODE = '23503',
+            MESSAGE = 'deleted_deck_learning_event_rejected';
+    END IF;
+
+    RETURN NEW;
+END;
+$deck_learning_guard$;
+
+CREATE OR REPLACE FUNCTION manaloom_guard_battle_simulation()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $battle_simulation_guard$
+DECLARE
+    referenced_decks UUID[];
+    expected_owner_count INTEGER;
+    active_owner_count INTEGER;
+    active_owner_id UUID;
+BEGIN
+    referenced_decks := ARRAY[
+        NULLIF(to_jsonb(NEW) ->> 'deck_a_id', '')::UUID,
+        NULLIF(to_jsonb(NEW) ->> 'deck_b_id', '')::UUID,
+        NULLIF(to_jsonb(NEW) ->> 'winner_deck_id', '')::UUID
+    ];
+
+    SELECT COUNT(DISTINCT deck.user_id)::INTEGER
+    INTO expected_owner_count
+    FROM decks deck
+    WHERE deck.id = ANY(referenced_decks);
+
+    active_owner_count := 0;
+    FOR active_owner_id IN
+        SELECT user_row.id
+        FROM users user_row
+        WHERE user_row.id IN (
+            SELECT DISTINCT deck.user_id
+            FROM decks deck
+            WHERE deck.id = ANY(referenced_decks)
+        )
+          AND user_row.deleted_at IS NULL
+        ORDER BY user_row.id
+        FOR UPDATE
+    LOOP
+        active_owner_count := active_owner_count + 1;
+    END LOOP;
+
+    IF active_owner_count <> expected_owner_count THEN
+        RAISE EXCEPTION USING
+            ERRCODE = '23503',
+            MESSAGE = 'inactive_battle_deck_owner_reference';
+    END IF;
+
+    RETURN NEW;
+END;
+$battle_simulation_guard$;
+
+DO $deck_learning_trigger$
+BEGIN
+    IF to_regclass('public.deck_learning_events') IS NOT NULL THEN
+        DROP TRIGGER IF EXISTS manaloom_guard_deck_learning_event
+        ON deck_learning_events;
+        CREATE TRIGGER manaloom_guard_deck_learning_event
+        BEFORE INSERT OR UPDATE OF deck_id ON deck_learning_events
+        FOR EACH ROW
+        EXECUTE FUNCTION manaloom_guard_deck_learning_event();
+    END IF;
+END;
+$deck_learning_trigger$;
+
+DO $battle_simulation_trigger$
+BEGIN
+    IF to_regclass('public.battle_simulations') IS NOT NULL THEN
+        DROP TRIGGER IF EXISTS manaloom_guard_battle_simulation
+        ON battle_simulations;
+        CREATE TRIGGER manaloom_guard_battle_simulation
+        BEFORE INSERT OR UPDATE OF deck_a_id, deck_b_id, winner_deck_id
+        ON battle_simulations
+        FOR EACH ROW
+        EXECUTE FUNCTION manaloom_guard_battle_simulation();
+    END IF;
+END;
+$battle_simulation_trigger$;

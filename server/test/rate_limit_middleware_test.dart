@@ -9,6 +9,35 @@ import '../lib/auth_runtime_policy.dart';
 import '../lib/rate_limit_middleware.dart';
 
 void main() {
+  group('contador distribuído (BT-CAT-03)', () {
+    test(
+      'falha do contador vira nulo, também quando a falha é assíncrona',
+      () async {
+        expect(await distributedAllowedOrNull(() async => true), isTrue);
+        expect(await distributedAllowedOrNull(() async => false), isFalse);
+        expect(
+          await distributedAllowedOrNull(
+            () => throw StateError('pool fechado'),
+          ),
+          isNull,
+        );
+        expect(
+          await distributedAllowedOrNull(
+            () => Future<bool>.error(const SocketException('PostgreSQL fora')),
+          ),
+          isNull,
+        );
+        expect(
+          await distributedAllowedOrNull(() async {
+            await Future<void>.delayed(Duration.zero);
+            throw StateError('fora do ar');
+          }),
+          isNull,
+        );
+      },
+    );
+  });
+
   group('RateLimiter', () {
     test('classifies transport peers without exposing address values', () {
       expect(classifyRateLimitTransportPeer(null), 'missing');

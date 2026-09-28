@@ -193,6 +193,10 @@ void main() {
     expect(response.statusCode, HttpStatus.ok);
     expect((body['windows'] as Map).keys, containsAll(['5m', '60m']));
     expect(body['cache'], contains('endpoint_cache_entries'));
+    // BT-CAT-03: o teto do cache, as saídas pelo teto e o guarda do catálogo.
+    expect(body['cache']['endpoint_cache_max_entries'], 10000);
+    expect(body['cache'], contains('endpoint_cache_evictions'));
+    expect(body['catalog_read_guard'], {'upstream_blocked': isA<int>()});
     expect(text, isNot(contains(deck)));
   });
 }

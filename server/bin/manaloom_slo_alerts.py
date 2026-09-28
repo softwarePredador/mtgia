@@ -58,9 +58,16 @@ KNOWN_ALERTS = {
     "job_overdue",
     "catalog_stale",
     "endpoint_cache_large",
+    "catalog_written_outside_job",
+    "catalog_read_upstream",
 }
 SEVERITIES = ("critical", "warning")
-CATALOG_SYNC_TYPES = ("cards", "card_legalities")
+# BT-CAT-03: o frescor é o do job de catálogo (BT-CAT-01), pela mesma regra dele:
+# a data da fonte aplicada e, sem ela, o último sync de cartas (sync_state).
+CATALOG_FRESHNESS_KEYS = ("catalog_reference_source_updated_at", "cards_last_sync_at")
+# Tabelas que só o job de catálogo escreve (contrato catalog_reference_apply_v1).
+CATALOG_TABLES = ("cards", "sets", "card_legalities")
+CATALOG_JOB_SYNC_TYPE = "catalog_reference"
 EMAIL = re.compile(r"^[^@\s<>]+@[^@\s<>]+\.[^@\s<>]+$")
 UUID = re.compile(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
 EMAIL_ANYWHERE = re.compile(r"[^@\s<>()\"']+@[^@\s<>()\"']+\.[A-Za-z]{2,}")
@@ -265,7 +272,7 @@ def http_get(url: str, headers: dict[str, str]) -> tuple[int | None, bytes]:
 
 
 def read_postgres(env: dict[str, str]) -> dict[str, Any]:
-    """Conexões e frescor do catálogo, numa transação READ ONLY."""
+    """Conexões, frescor e escritas do catálogo, numa transação READ ONLY."""
     import psycopg2  # disponível na imagem de ops (python3-psycopg2)
 
     connection = psycopg2.connect(
@@ -291,15 +298,30 @@ def read_postgres(env: dict[str, str]) -> dict[str, Any]:
             cursor.execute("SELECT current_setting('max_connections')::int")
             max_connections = int(cursor.fetchone()[0])
             cursor.execute(
-                "SELECT sync_type, max(finished_at) FROM sync_log "
-                "WHERE status = 'success' AND sync_type = ANY(%s) GROUP BY sync_type",
-                (list(CATALOG_SYNC_TYPES),),
+                "SELECT key, value FROM sync_state WHERE key = ANY(%s)",
+                (list(CATALOG_FRESHNESS_KEYS),),
             )
-            catalog = {
-                str(row[0]): row[1].astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-                for row in cursor.fetchall()
-                if row[1] is not None
-            }
+            state = {str(key): value for key, value in cursor.fetchall()}
+            freshness = {"updated_at": None, "key": None}
+            for key in CATALOG_FRESHNESS_KEYS:
+                parsed = parse_instant(state.get(key))
+                if parsed is not None:
+                    freshness = {"updated_at": _stamp(parsed), "key": key}
+                    break
+            # Linhas inseridas, atualizadas e apagadas nas tabelas do catálogo desde o
+            # último reset das estatísticas: o avaliador compara com a leitura anterior.
+            cursor.execute(
+                "SELECT COALESCE(sum(n_tup_ins + n_tup_upd + n_tup_del), 0)::bigint "
+                "FROM pg_stat_user_tables WHERE schemaname = 'public' AND relname = ANY(%s)",
+                (list(CATALOG_TABLES),),
+            )
+            catalog_writes = int(cursor.fetchone()[0])
+            cursor.execute(
+                "SELECT max(finished_at) FROM sync_log "
+                "WHERE sync_type = %s OR sync_type LIKE %s",
+                (CATALOG_JOB_SYNC_TYPE, CATALOG_JOB_SYNC_TYPE + ":%"),
+            )
+            last_job = cursor.fetchone()[0]
         connection.rollback()
     finally:
         connection.close()
@@ -307,8 +329,31 @@ def read_postgres(env: dict[str, str]) -> dict[str, Any]:
         "transaction_read_only": read_only,
         "connections_total": connections,
         "max_connections": max_connections,
-        "catalog_last_success": catalog,
+        "catalog_freshness": freshness,
+        "catalog_writes_total": catalog_writes,
+        "catalog_job_last_finished_at": _stamp(parse_instant(last_job)) if last_job else None,
     }
+
+
+def parse_instant(value: Any) -> dt.datetime | None:
+    """Data em UTC a partir de datetime ou ISO-8601; sem fuso vale UTC (como no job)."""
+    if isinstance(value, dt.datetime):
+        parsed = value
+    else:
+        text = str(value or "").strip()
+        if not text:
+            return None
+        try:
+            parsed = dt.datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
+
+
+def _stamp(value: dt.datetime) -> str:
+    return value.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def collect_signals(
@@ -342,10 +387,12 @@ def collect_signals(
                 payload = None
             if isinstance(payload, dict) and isinstance(payload.get("windows"), dict):
                 cache = payload.get("cache")
+                guard = payload.get("catalog_read_guard")
                 metrics = {
                     "ok": True,
                     "windows": payload["windows"],
                     "cache": cache if isinstance(cache, dict) else {},
+                    "catalog_read_guard": guard if isinstance(guard, dict) else {},
                 }
             else:
                 metrics = {"ok": False, "status": "corpo_fora_do_formato"}
@@ -449,6 +496,7 @@ def evaluate(
     rules = policy["alerts"]
     counters = dict(memory.get("consecutive", {}))
     first_seen = dict(memory.get("jobs_first_seen", {}))
+    catalog_writes = memory.get("catalog_writes")
     alerts: list[dict[str, Any]] = []
 
     def streak(code: str, failing: bool) -> bool:
@@ -513,6 +561,13 @@ def evaluate(
         alerts.append(
             _alert("endpoint_cache_large", cache_rule, entries, cache_rule["max_entries"])
         )
+    # BT-CAT-03: leitura do catálogo que tentou chamar terceiro (a API bloqueou).
+    guard = metrics.get("catalog_read_guard", {}) if metrics["ok"] else {}
+    blocked = guard.get("upstream_blocked") if isinstance(guard, dict) else None
+    if isinstance(blocked, int) and not isinstance(blocked, bool) and blocked > 0:
+        alerts.append(
+            _alert("catalog_read_upstream", rules["catalog_read_upstream"], blocked, 0)
+        )
 
     if postgres["ok"]:
         connections_rule = rules["postgres_connections_high"]
@@ -527,24 +582,34 @@ def evaluate(
                 )
             )
         stale_rule = rules["catalog_stale"]
-        last_success = postgres.get("catalog_last_success", {})
-        for sync_type in CATALOG_SYNC_TYPES:
-            finished = last_success.get(sync_type)
-            age_days = None
-            if finished:
-                finished_at = dt.datetime.strptime(finished, "%Y-%m-%dT%H:%M:%SZ").replace(
-                    tzinfo=dt.timezone.utc
+        freshness = postgres.get("catalog_freshness") or {}
+        updated = parse_instant(freshness.get("updated_at"))
+        age_days = None if updated is None else round((now - updated).total_seconds() / 86400, 1)
+        if age_days is None or age_days > stale_rule["max_age_days"]:
+            alerts.append(
+                _alert(
+                    "catalog_stale",
+                    stale_rule,
+                    age_days if age_days is not None else "sem data do catálogo",
+                    stale_rule["max_age_days"],
                 )
-                age_days = round((now - finished_at).total_seconds() / 86400, 1)
-            if age_days is None or age_days > stale_rule["max_age_days"]:
-                alerts.append(
-                    _alert(
-                        f"catalog_stale:{sync_type}",
-                        stale_rule,
-                        age_days if age_days is not None else "sem sync com sucesso",
-                        stale_rule["max_age_days"],
+            )
+        # BT-CAT-03: as tabelas do catálogo só mudam pelo job de catálogo. Linha
+        # escrita entre duas avaliações sem execução do job no intervalo é escrita
+        # fora do job (uma leitura que grava, um CLI antigo, um psql à mão).
+        total = postgres.get("catalog_writes_total")
+        if isinstance(total, int) and not isinstance(total, bool):
+            previous = catalog_writes if isinstance(catalog_writes, dict) else {}
+            since = parse_instant(previous.get("at"))
+            before = previous.get("total")
+            if since is not None and isinstance(before, int) and total > before:
+                job_finished = parse_instant(postgres.get("catalog_job_last_finished_at"))
+                if job_finished is None or job_finished <= since:
+                    writes_rule = rules["catalog_written_outside_job"]
+                    alerts.append(
+                        _alert("catalog_written_outside_job", writes_rule, total - before, 0)
                     )
-                )
+            catalog_writes = {"at": _stamp(now), "total": total}
 
     failed_rule = rules["job_failed"]
     overdue_rule = rules["job_overdue"]
@@ -582,7 +647,10 @@ def evaluate(
             )
     listed = {str(job.get("name") or "") for job in signals["jobs"]}
     first_seen = {name: seen for name, seen in first_seen.items() if name in listed}
-    return alerts, {"consecutive": counters, "jobs_first_seen": first_seen}
+    memory_out: dict[str, Any] = {"consecutive": counters, "jobs_first_seen": first_seen}
+    if isinstance(catalog_writes, dict):
+        memory_out["catalog_writes"] = catalog_writes
+    return alerts, memory_out
 
 
 # ------------------------------------------------------------ notificações

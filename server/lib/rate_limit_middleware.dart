@@ -255,7 +255,7 @@ Future<bool?> _isAllowedDistributedIfAvailable(
     return null;
   }
 
-  try {
+  return distributedAllowedOrNull(() {
     final pool = context.read<Pool>();
     final limiter = DistributedRateLimiter(
       pool: pool,
@@ -264,6 +264,17 @@ Future<bool?> _isAllowedDistributedIfAvailable(
       windowSeconds: windowSeconds,
     );
     return limiter.isAllowed(clientId);
+  });
+}
+
+/// A resposta do contador distribuído, ou `null` quando ele falha (o chamador
+/// usa então o contador em memória). O `await` fica dentro do `try`: sem ele,
+/// uma falha do PostgreSQL escapava como exceção da requisição (500) em vez
+/// de cair no contador em memória (BT-CAT-03).
+@visibleForTesting
+Future<bool?> distributedAllowedOrNull(Future<bool> Function() check) async {
+  try {
+    return await check();
   } catch (_) {
     return null;
   }

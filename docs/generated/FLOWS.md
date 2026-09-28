@@ -68,8 +68,8 @@ sequenceDiagram
     Cards_API->>Flutter: cards, disponibilidade e fallback
 ```
 
-Implementação: `app/lib/features/cards/providers/card_provider.dart`, `app/lib/features/collection/screens/sets_catalog_screen.dart`, `server/routes/cards/index.dart`, `server/routes/sets/index.dart`.
-Testes: `app/test/features/cards/providers/card_provider_search_test.dart`, `app/test/features/collection/sets_catalog_screen_test.dart`.
+Implementação: `app/lib/features/cards/providers/card_provider.dart`, `app/lib/features/collection/screens/sets_catalog_screen.dart`, `server/routes/cards/index.dart`, `server/routes/sets/index.dart`, `server/lib/catalog_read_guard.dart`.
+Testes: `app/test/features/cards/providers/card_provider_search_test.dart`, `app/test/features/collection/sets_catalog_screen_test.dart`, `server/test/catalog_read_guard_test.dart`.
 Gates: `scripts/quality_gate.sh`.
 
 ## Fichário, importação de coleção e scanner
@@ -239,8 +239,8 @@ sequenceDiagram
     Runtime->>Operator: health, smoke, observabilidade ou rollback
 ```
 
-Implementação: `scripts/manaloom_build_beta_release.sh`, `scripts/manaloom_deploy_backend_image.sh`, `scripts/manaloom_deploy_battle_sidecars.sh`, `scripts/manaloom_deploy_flutter_web.sh`, `scripts/manaloom_generate_release_sbom.py`, `server/bin/migrate.dart`, `server/lib/health_readiness_support.dart`, `server/routes/_middleware.dart`, `server/lib/release_capability_policy.dart`, `server/routes/capabilities/index.dart`, `app/lib/core/config/release_capabilities.dart`, `server/bin/manaloom_ops_daemon.py`.
-Testes: `server/test/deploy_rollback_convergence_contract_test.dart`, `server/test/ops_sidecar_digest_release_contract_test.dart`, `server/test/release_sbom_scope_test.py`, `server/test/flutter_web_deploy_contract_test.dart`, `server/test/data_model_migration_test.dart`, `server/test/release_capability_policy_test.dart`, `app/test/core/config/release_capabilities_test.dart`, `app/test/core/config/release_capability_surface_contract_test.dart`, `server/test/manaloom_ops_daemon_test.py`.
+Implementação: `scripts/manaloom_build_beta_release.sh`, `scripts/manaloom_deploy_backend_image.sh`, `scripts/manaloom_deploy_battle_sidecars.sh`, `scripts/manaloom_deploy_flutter_web.sh`, `scripts/manaloom_generate_release_sbom.py`, `scripts/manaloom_backup_cycle.sh`, `scripts/manaloom_backup_cadence.py`, `scripts/manaloom_migration_rehearsal.py`, `server/bin/migrate.dart`, `server/lib/migration_preflight.dart`, `server/lib/health_readiness_support.dart`, `server/routes/_middleware.dart`, `server/lib/release_capability_policy.dart`, `server/routes/capabilities/index.dart`, `app/lib/core/config/release_capabilities.dart`, `server/bin/manaloom_ops_daemon.py`.
+Testes: `server/test/deploy_rollback_convergence_contract_test.dart`, `server/test/ops_sidecar_digest_release_contract_test.dart`, `server/test/release_sbom_scope_test.py`, `server/test/backup_cadence_test.py`, `server/test/migration_preflight_test.dart`, `server/test/migration_rehearsal_test.py`, `server/test/flutter_web_deploy_contract_test.dart`, `server/test/data_model_migration_test.dart`, `server/test/active_user_trigger_rule_test.dart`, `server/test/production_shape_adoption_test.dart`, `server/test/release_capability_policy_test.dart`, `app/test/core/config/release_capabilities_test.dart`, `app/test/core/config/release_capability_surface_contract_test.dart`, `server/test/manaloom_ops_daemon_test.py`.
 Gates: `scripts/quality_gate.sh`, `scripts/manaloom_release_ops_contract_test.sh`, `scripts/manaloom_e2e_suite.sh`.
 
 ## Plano, cota de IA e comércio (beta gratuita, sem cobrança)

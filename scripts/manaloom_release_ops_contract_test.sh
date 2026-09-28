@@ -123,6 +123,7 @@ SHELL_SCRIPTS=(
   scripts/lib/manaloom_release_capabilities_contract.sh
   scripts/lib/manaloom_release_runtime_contract.sh
   scripts/lib/manaloom_safe_env.sh
+  scripts/manaloom_backup_cycle.sh
   scripts/manaloom_build_android_release.sh
   scripts/manaloom_capacity_snapshot.sh
   scripts/manaloom_build_beta_release.sh
@@ -198,19 +199,26 @@ fi
 PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
   python3 -m py_compile \
     "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py" \
+    "$ROOT_DIR/scripts/manaloom_backup_cadence.py" \
     "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
+    "$ROOT_DIR/scripts/manaloom_migration_rehearsal.py" \
     "$ROOT_DIR/scripts/manaloom_osv_scan_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_read_env.py" \
     "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
     "$ROOT_DIR/server/bin/audit_easypanel_runtime_alignment.py" \
     "$ROOT_DIR/server/bin/manaloom_slo_alerts.py" \
     "$ROOT_DIR/server/test/card_cli_schema_guard_test.py" \
+    "$ROOT_DIR/server/test/backup_cadence_test.py" \
+    "$ROOT_DIR/server/test/backup_cycle_db_live_test.py" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
+    "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
+    "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
-    "$ROOT_DIR/server/test/slo_alerts_test.py"
+    "$ROOT_DIR/server/test/slo_alerts_test.py" \
+    "$ROOT_DIR/server/test/support/production_drift_fixture.py"
 
 # BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
 # conferem o schema do PostgreSQL e param; não o alteram.
@@ -218,6 +226,12 @@ PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/card_cli_schema_guard_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py"
+# BT-DR-001: cadência do backup local e do ensaio de restauração isolado.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/backup_cadence_test.py"
+# BT-DB-003: catálogo, lista fechada da deriva e payload do ensaio de upgrade.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/migration_rehearsal_test.py"
 # BT-CAP-001: política de capacidade, snapshot só de leitura e preflight.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/capacity_policy_test.py"
@@ -589,14 +603,18 @@ grep -Fq "('061', 'create_beta_invites')" "$ROOT_DIR/scripts/manaloom_deploy_bac
 grep -Fq "('063', 'recreate_commander_learning_snapshot_view')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('064', 'adopt_production_unique_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('065', 'adopt_production_indexes_from_database_indexes_sql')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('066', 'adopt_remaining_production_only_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('067', 'create_deck_revision_ledger')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('068', 'demote_decks_on_legality_change')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('074', 'reinstall_active_user_triggers')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('075', 'adopt_production_ml_tables_and_shapes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('076', 'align_message_and_trade_history_user_fks')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_039_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_040_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq 'migrations_041_068_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'migrations_041_076_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.release_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.required_range == "038-068"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.latest_migration == "068"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.required_range == "038-076"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.latest_migration == "076"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_job_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'require_live_mutation_approval "deploy do backend ManaLoom"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

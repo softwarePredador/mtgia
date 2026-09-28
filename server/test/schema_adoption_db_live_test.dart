@@ -77,11 +77,15 @@ void main() {
   });
 
   test(
-    'os índices da 064 e da 065 saem com a definição da produção',
+    'os índices da 064, da 065 e da 066 saem com a definição da produção',
     () async {
       final production = productionOnlyIndexes(audit);
-      final adopted = {...adoptedIndexes('064'), ...adoptedIndexes('065')};
-      expect(adopted, hasLength(26));
+      final adopted = {
+        ...adoptedIndexes('064'),
+        ...adoptedIndexes('065'),
+        ...adoptedIndexes('066'),
+      };
+      expect(adopted, hasLength(47));
       final result = await pool.execute(
         Sql.named('''
           SELECT index_class.relname, pg_get_indexdef(index_class.oid)

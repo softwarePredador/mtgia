@@ -41,11 +41,11 @@
 | `/binder/import/preview` | `POST` | `server/routes/binder/import/preview/index.dart` | 2 | `source` |
 | `/binder/{id}` | `DELETE, GET, PUT` | `server/routes/binder/[id]/index.dart` | 2 | `source` |
 | `/capabilities` | `GET` | `server/routes/capabilities/index.dart` | 1 | `source` |
-| `/cards` | `GET` | `server/routes/cards/index.dart` | 1 | `source` |
-| `/cards/printings` | `GET` | `server/routes/cards/printings/index.dart` | 1 | `source` |
-| `/cards/resolve` | `POST` | `server/routes/cards/resolve/index.dart` | 1 | `source` |
-| `/cards/resolve/batch` | `POST` | `server/routes/cards/resolve/batch/index.dart` | 1 | `source` |
-| `/cards/{id}/rulings` | `GET` | `server/routes/cards/[id]/rulings/index.dart` | 1 | `source` |
+| `/cards` | `GET` | `server/routes/cards/index.dart` | 2 | `source` |
+| `/cards/printings` | `GET` | `server/routes/cards/printings/index.dart` | 2 | `source` |
+| `/cards/resolve` | `POST` | `server/routes/cards/resolve/index.dart` | 2 | `source` |
+| `/cards/resolve/batch` | `POST` | `server/routes/cards/resolve/batch/index.dart` | 2 | `source` |
+| `/cards/{id}/rulings` | `GET` | `server/routes/cards/[id]/rulings/index.dart` | 2 | `source` |
 | `/community/binders/{userId}` | `GET` | `server/routes/community/binders/[userId].dart` | 2 | `source` |
 | `/community/decks` | `GET` | `server/routes/community/decks/index.dart` | 2 | `source` |
 | `/community/decks/following` | `GET` | `server/routes/community/decks/[id]/index.dart` | 2 | `declared_alias` |
@@ -111,8 +111,8 @@
 | `/notifications/{id}/read` | `PUT` | `server/routes/notifications/[id]/read.dart` | 2 | `source` |
 | `/ready` | `GET` | `server/routes/ready/index.dart` | 1 | `source_plus_manual_override` |
 | `/reports/{id}` | `GET` | `server/routes/reports/[id].dart` | 1 | `source` |
-| `/rules` | `GET` | `server/routes/rules/index.dart` | 1 | `source` |
-| `/sets` | `GET` | `server/routes/sets/index.dart` | 1 | `source` |
+| `/rules` | `GET` | `server/routes/rules/index.dart` | 2 | `source` |
+| `/sets` | `GET` | `server/routes/sets/index.dart` | 2 | `source` |
 | `/trades` | `GET, POST` | `server/routes/trades/index.dart` | 2 | `source` |
 | `/trades/{id}` | `GET` | `server/routes/trades/[id]/index.dart` | 2 | `source` |
 | `/trades/{id}/messages` | `GET, POST` | `server/routes/trades/[id]/messages.dart` | 2 | `source` |

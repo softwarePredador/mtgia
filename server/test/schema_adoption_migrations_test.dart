@@ -104,6 +104,29 @@ void main() {
     });
   });
 
+  group('066 (D-83)', () {
+    test('cria os índices só da produção que não vinham do arquivo aposentado, '
+        'menos o UNIQUE do fichário', () {
+      final expected = {
+        for (final MapEntry(key: name, value: definition)
+            in productionOnly.entries)
+          if (!retiredDatabaseIndexesSql.contains(name) &&
+              !definition.startsWith('CREATE UNIQUE INDEX '))
+            name: definition,
+      };
+      expect(expected, hasLength(21));
+      expect(adoptedIndexes('066'), expected);
+      expect(adoptedIndexes('066'), isNot(contains(pendingBinderUniqueIndex)));
+    });
+
+    test('o down derruba o que o up cria, na ordem inversa', () {
+      expect(
+        droppedIndexes('066'),
+        adoptedIndexes('066').keys.toList().reversed.toList(),
+      );
+    });
+  });
+
   test('database_setup.sql cria os mesmos índices, com o mesmo texto', () {
     final setup = File('database_setup.sql').readAsStringSync();
     final setupTables = {
@@ -113,7 +136,7 @@ void main() {
         match.group(1)!,
     };
     final setupLines = setup.split('\n').toSet();
-    for (final version in const ['064', '065']) {
+    for (final version in const ['064', '065', '066']) {
       for (final statement in splitPostgresStatements(migrationUp(version))) {
         final table = RegExp(r' ON (\w+) USING ').firstMatch(statement)!;
         final name = RegExp(r'EXISTS (\w+) ON ').firstMatch(statement)!;
@@ -160,8 +183,8 @@ void main() {
     });
   });
 
-  test('063, 064 e 065 só voltam por plano manual', () {
-    for (final version in const ['063', '064', '065']) {
+  test('063 a 066 só voltam por plano manual', () {
+    for (final version in const ['063', '064', '065', '066']) {
       expect(
         migrate.migrationRollbackPolicy(version),
         migrate.MigrationRollbackPolicy.manualOnly,

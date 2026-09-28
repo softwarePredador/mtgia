@@ -20,16 +20,18 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## O que está no inventário
 
-- **81 tabelas** do schema versionado. **45 têm dado pessoal**: 43 de titulares de conta, 1 da
-  equipe de moderação e 1 com nome público de jogador de torneio externo. As outras 36 são
-  catálogo, referência, controle ou operação.
+- **87 tabelas** do schema versionado. **45 têm dado pessoal**: 43 de titulares de conta, 1 da
+  equipe de moderação e 1 com nome público de jogador de torneio externo. As outras 42 são
+  catálogo, referência, controle ou operação (seis delas vieram com a migration 075, da
+  `BT-DB-005`: `optimization_analysis_logs`, `synergy_packages`, `archetype_patterns`,
+  `ml_learning_state`, `theme_contextual_rules` e `analysis_sources`, sem dado pessoal).
 - Para cada tabela: finalidade, dono no código, prazo, quem apaga, se entra na exportação e como
   sai na exclusão, e a exceção legal quando há.
 - Para as **40 tabelas exportadas**, a classificação de cada uma das 532 colunas: `include`,
   `person_ref` ou `deck_ref` (pseudônimo quando é de outra pessoa), `entity_ref`, ou `omit_*`
   (segredo, hash, estado interno, conteúdo de terceiro, UUID do catálogo).
-- **6 views**, **20 tabelas e 3 colunas que só existem na produção** (receipt de 2026-09-22; uma
-  das colunas, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **14 artefatos
+- **6 views**, **14 tabelas e 1 coluna que só existem na produção** (receipt de 2026-09-22; a
+  coluna, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **14 artefatos
   fora do banco**: caches em memória, sidecars, logs, Sentry, provedores externos, backups,
   aparelho, o arquivo da exportação e o registro dos pedidos de exportação.
 

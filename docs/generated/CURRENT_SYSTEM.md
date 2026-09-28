@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `125ad61073b099c10a8d38d74eca6efdd69418d53507aa761ac84b2f41a6b5d5`
+**Digest das fontes:** `b225be1b8970a4e47b58e0c2236583d2d40dfd532011f8d5bc3fa695d586ae31`
 
 ## Fontes de verdade
 
@@ -15,29 +15,29 @@
 
 | Superfície | Quantidade |
 |---|---:|
-| `dart_source_files` | 716 |
+| `dart_source_files` | 721 |
 | `non_dart_product_files` | 52 |
 | `battle_sidecar_source_files` | 34 |
-| `dart_symbols` | 5432 |
-| `semantic_resolved_files` | 716 |
+| `dart_symbols` | 5447 |
+| `semantic_resolved_files` | 721 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 43762 |
-| `semantic_resolved_call_sites` | 69447 |
-| `semantic_resolved_type_references` | 16688 |
-| `modules` | 164 |
+| `semantic_resolved_call_edges` | 43800 |
+| `semantic_resolved_call_sites` | 69512 |
+| `semantic_resolved_type_references` | 16723 |
+| `modules` | 166 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
 | `api_routes` | 125 |
-| `database_tables` | 83 |
+| `database_tables` | 89 |
 | `database_views` | 6 |
-| `migrations` | 66 |
-| `scripts_and_jobs` | 697 |
+| `migrations` | 70 |
+| `scripts_and_jobs` | 700 |
 | `environment_variables` | 716 |
-| `tests` | 1287 |
+| `tests` | 1298 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
-| `tasks` | 244 |
-| `task_dependency_edges` | 435 |
+| `tasks` | 245 |
+| `task_dependency_edges` | 436 |
 | `route_consumer_bindings` | 57 |
 | `receipt_contracts` | 6 |
 

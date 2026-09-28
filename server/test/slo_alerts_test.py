@@ -67,6 +67,7 @@ class FakeHttp:
         self.five = _window()
         self.sixty = _window(requests=1200, errors=2, reads=900)
         self.cache_entries = 12
+        self.upstream_blocked: object = 0
         self.calls: list[tuple[str, dict]] = []
 
     def __call__(self, url: str, headers: dict[str, str]) -> tuple[int | None, bytes]:
@@ -84,6 +85,7 @@ class FakeHttp:
             body = {
                 "windows": {"5m": self.five, "60m": self.sixty},
                 "cache": {"endpoint_cache_entries": self.cache_entries},
+                "catalog_read_guard": {"upstream_blocked": self.upstream_blocked},
                 "endpoints": {f"GET /users/{USER_ID}": {"request_count": 1}},
             }
             return 200, json.dumps(body).encode()
@@ -100,21 +102,24 @@ class FakePost:
         return self.status
 
 
-def _postgres(connections=10, max_connections=100, cards_days=1, legalities_days=1):
-    def reader() -> dict:
-        def stamp(days):
-            return (NOW - dt.timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+def _stamp(moment: dt.datetime) -> str:
+    return moment.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        catalog = {}
-        if cards_days is not None:
-            catalog["cards"] = stamp(cards_days)
-        if legalities_days is not None:
-            catalog["card_legalities"] = stamp(legalities_days)
+
+def _postgres(connections=10, max_connections=100, catalog_days=1, writes=1000,
+              job_finished=None):
+    def reader() -> dict:
+        updated = None if catalog_days is None else _stamp(NOW - dt.timedelta(days=catalog_days))
         return {
             "transaction_read_only": "on",
             "connections_total": connections,
             "max_connections": max_connections,
-            "catalog_last_success": catalog,
+            "catalog_freshness": {
+                "updated_at": updated,
+                "key": None if updated is None else "catalog_reference_source_updated_at",
+            },
+            "catalog_writes_total": writes,
+            "catalog_job_last_finished_at": job_finished,
         }
 
     return reader
@@ -302,10 +307,47 @@ class EvaluateTest(unittest.TestCase):
         self.http.cache_entries = 12
         self.postgres = _postgres(connections=85)
         self.assertEqual(self._codes(), {"postgres_connections_high"})
-        self.postgres = _postgres(cards_days=8, legalities_days=None)
-        self.assertEqual(
-            self._codes(), {"catalog_stale:cards", "catalog_stale:card_legalities"}
-        )
+        # BT-CAT-03: o frescor é o do job de catálogo (sync_state), não o sync_log antigo.
+        self.postgres = _postgres(catalog_days=8)
+        self.assertEqual(self._codes(), {"catalog_stale"})
+        self.postgres = _postgres(catalog_days=None)
+        alerts, _ = slo.evaluate(self.policy, self._signals(), {}, NOW, LOCAL_NOW)
+        self.assertEqual([a["observed"] for a in alerts], ["sem data do catálogo"])
+        self.postgres = _postgres(catalog_days=6.9)
+        self.assertEqual(self._codes(), set())
+
+    def test_catalog_written_outside_the_job(self) -> None:
+        before = {"catalog_writes": {"at": _stamp(NOW - dt.timedelta(minutes=5)), "total": 100}}
+        # Primeira avaliação: só guarda a leitura.
+        self.postgres = _postgres(writes=100)
+        alerts, memory = slo.evaluate(self.policy, self._signals(), {}, NOW, LOCAL_NOW)
+        self.assertEqual(alerts, [])
+        self.assertEqual(memory["catalog_writes"], {"at": _stamp(NOW), "total": 100})
+        # Linhas novas sem o job no intervalo: alerta com o número de linhas.
+        self.postgres = _postgres(
+            writes=107, job_finished=_stamp(NOW - dt.timedelta(hours=6)))
+        alerts, memory = slo.evaluate(self.policy, self._signals(), before, NOW, LOCAL_NOW)
+        self.assertEqual([(a["code"], a["observed"]) for a in alerts],
+                         [("catalog_written_outside_job", 7)])
+        self.assertEqual(alerts[0]["severity"], "critical")
+        self.assertEqual(memory["catalog_writes"]["total"], 107)
+        # O job rodou no intervalo: as linhas são dele.
+        self.postgres = _postgres(
+            writes=107, job_finished=_stamp(NOW - dt.timedelta(minutes=2)))
+        self.assertEqual(self._codes(before), set())
+        # Nada escrito, ou estatística zerada (reinício do PostgreSQL): sem alerta.
+        for writes in (100, 3):
+            self.postgres = _postgres(writes=writes)
+            self.assertEqual(self._codes(before), set())
+
+    def test_catalog_read_upstream_attempt(self) -> None:
+        self.http.upstream_blocked = 2
+        alerts, _ = slo.evaluate(self.policy, self._signals(), {}, NOW, LOCAL_NOW)
+        self.assertEqual([(a["code"], a["observed"]) for a in alerts],
+                         [("catalog_read_upstream", 2)])
+        for value in (0, None, True, "3"):
+            self.http.upstream_blocked = value
+            self.assertEqual(self._codes(), set())
 
     def test_numbers_out_of_format_do_not_break_the_evaluation(self) -> None:
         self.http.five = {"request_count": None, "error_rate": "alto", "read_count": "x"}
