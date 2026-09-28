@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c7c37f078d362f29b00ddba37f9f2eba6eaa44f3b48409656fee0f98daf587d7",
+  "source_digest_sha256": "840db24c5958e1778b19ac2ac967694ff7a4315824e3aae18859d3dc512af577",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -81,7 +81,7 @@
     "migrations": 65,
     "scripts_and_jobs": 693,
     "environment_variables": 715,
-    "tests": 1277,
+    "tests": 1280,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -280605,6 +280605,9 @@
     "server/test/runtime_schema_migration_contract_test.dart",
     "server/test/sacrifice_outlet_family_reconciliation_source_test.dart",
     "server/test/schema_audit_test.dart",
+    "server/test/scope_containment_copy_test.dart",
+    "server/test/scope_containment_e2e_test.dart",
+    "server/test/scope_containment_route_matrix_test.dart",
     "server/test/scryfall_image_url_test.dart",
     "server/test/seed_database_image_selection_test.dart",
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
@@ -281923,7 +281926,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "70ed5a6867468f672f49ab4a2ff7973c4e3d844d8a7d2d86cad7ea47ee345e49"
+      "sha256": "cd3907502f4e0d340873a09bec2c4802b157164f31db500a0fbce3a01977b535"
     },
     "required_task_fields": [
       "id",
@@ -284147,12 +284150,12 @@
       {
         "id": "SCOPE-P0-TRD-00",
         "priority": "P0 CORE",
-        "status": "IN_PROGRESS_CONTAINED",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Kill switch explícito de marketplace/trades e remoção de promessas da beta.",
         "depends_on": [
           "BT-SCP-001"
         ],
-        "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `POST /binder` e `PUT /binder/:id` recusam com 422 `binder_commerce_unavailable` (campo e capability no corpo), antes do banco, a cópia oferecida para troca sem `trades` ou para venda, ou com preço, sem `marketplace` (`server/lib/binder_item_contract.dart`); `false` e `null`, que o app manda quando não oferece, continuam valendo. D-38: `GET /community/marketplace` respeita `trade_visibility` (seguidores, ninguém e anônimo) no WHERE da contagem e da listagem. A resposta de e-mail não verificado deixou de prometer \"publicar, conversar ou negociar\". Evidência: `server/test/trade_marketplace_kill_switch_test.dart` (na matriz da beta, 8 rotas de proposta, match e marketplace dão 404 antes do handler; o fichário dá 422 sem tocar o banco e grava com as capabilities abertas), `server/test/community_marketplace_trade_visibility_db_live_test.dart` (PostgreSQL descartável), o mapa de `release_capability_policy_test.dart` com match e fichário, os termos em português no teste do site (`public_web_product_contract_test.dart`) e 13 mutações derrubadas. Falta: a parte do app (esconder troca e venda no fichário, D-04), o pack 05 (D-40, com a sessão do gate) e o receipt de negação por rota no SHA integrado.",
+        "acceptance": "Nenhuma listagem/match/proposta pode ser criada via API direta; copy não promete venda/troca. Implementado em b2d3fc04f/fd0397a5a (marketplace/trades OFF; copy limpa em BT-GOV-001); receipt de negação por rota (listagem/match/proposta) pendente. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta código, não só receipt — `POST`/`PUT /binder` gravam `for_sale`/`for_trade`/`price` sem checar capability (`server/routes/binder/index.dart:335-364`; `[id]/index.dart:572-585`) e o editor do fichário mostra venda e troca (`binder_item_editor.dart:1093-1160`); ver `docs/flows/_p0/contencao-escopo.md`. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 listagens de venda ou troca (`for_sale` e `for_trade` falsos nos 214 itens de fichário). Decisão do dono em 2026-09-22: D-39, na beta a troca e a venda do fichário ficam escondidas e a escrita responde 422; D-38, `trade_visibility` respeitado também na busca global; D-40, pack 05 rotulado como capability futura; D-04, a parte de UI entra no slot do `BT-SCP-001`. Parte do servidor feita em 2026-09-24 na branch `deck/rodada1-2026-09-24`, ainda fora do ar: `POST /binder` e `PUT /binder/:id` recusam com 422 `binder_commerce_unavailable` (campo e capability no corpo), antes do banco, a cópia oferecida para troca sem `trades` ou para venda, ou com preço, sem `marketplace` (`server/lib/binder_item_contract.dart`); `false` e `null`, que o app manda quando não oferece, continuam valendo. D-38: `GET /community/marketplace` respeita `trade_visibility` (seguidores, ninguém e anônimo) no WHERE da contagem e da listagem. A resposta de e-mail não verificado deixou de prometer \"publicar, conversar ou negociar\". Evidência: `server/test/trade_marketplace_kill_switch_test.dart` (na matriz da beta, 8 rotas de proposta, match e marketplace dão 404 antes do handler; o fichário dá 422 sem tocar o banco e grava com as capabilities abertas), `server/test/community_marketplace_trade_visibility_db_live_test.dart` (PostgreSQL descartável), o mapa de `release_capability_policy_test.dart` com match e fichário, os termos em português no teste do site (`public_web_product_contract_test.dart`) e 13 mutações derrubadas. Evidência de negação por rota em 2026-09-28, ainda na branch `deck/rodada2-2026-09-24`: E2E contra a API local no harness isolado (`sandbox-exec` só loopback), com o log de statements do PostgreSQL descartável (`scope_containment_e2e_test.dart`); nas matrizes produção e núcleo, as rotas de proposta, match e marketplace negam com 404 e zero statements do servidor (e nada entre as requisições), e as ofertas do fichário respondem 422 sem tocar `user_binder_items` (só a leitura de `users` da autenticação); na matriz de controle, as mesmas chegam ao banco. Copy do servidor (e-mails, erros, OpenAPI) sem promessa (`scope_containment_copy_test.dart`); receipt em `docs/qa/execution/2026-09-28/SCOPE-P0-TRD-00-kill-switch-provado-pelo-banco.md`. Falta: a parte do app (esconder troca e venda no fichário, D-04), o pack 05 (D-40, com a sessão do gate) e o mesmo E2E no SHA integrado.",
         "section": "Contenção que bloqueia a beta core",
         "source_line": 617
       },
@@ -291807,7 +291810,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c7c37f078d362f29b00ddba37f9f2eba6eaa44f3b48409656fee0f98daf587d7"
+    "project_logic_source_digest_sha256": "840db24c5958e1778b19ac2ac967694ff7a4315824e3aae18859d3dc512af577"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -295010,6 +295013,9 @@
       "server/test/runtime_schema_migration_contract_test.dart",
       "server/test/sacrifice_outlet_family_reconciliation_source_test.dart",
       "server/test/schema_audit_test.dart",
+      "server/test/scope_containment_copy_test.dart",
+      "server/test/scope_containment_e2e_test.dart",
+      "server/test/scope_containment_route_matrix_test.dart",
       "server/test/scryfall_image_url_test.dart",
       "server/test/seed_database_image_selection_test.dart",
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
