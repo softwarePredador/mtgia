@@ -584,6 +584,32 @@ class PrivacyDbFixture {
           parameters: {'deck': deckId},
         );
       }
+      // DCK-P0-04: um pedido do Generate de cada pessoa; a chave, a
+      // impressão e o job não saem na exportação.
+      for (final (owner, deckId) in [(userA, deckA1), (userB, deckB1Public)]) {
+        await tx.execute(
+          Sql.named('''
+            INSERT INTO ai_generate_requests (
+              user_id, request_key, request_fingerprint, job_id, format,
+              controls, prompt, status, result_deck, result_fingerprint,
+              can_materialize, materialized_deck_id, materialized_at
+            ) VALUES (
+              CAST(@owner AS uuid), @key, @fingerprint, @job, 'commander',
+              '{"bracket": 2}'::jsonb, 'prompt do titular', 'completed',
+              '{"cards": [{"name": "Sol Ring", "quantity": 1}]}'::jsonb,
+              @resultFingerprint, TRUE, CAST(@deck AS uuid), CURRENT_TIMESTAMP
+            )
+          '''),
+          parameters: {
+            'owner': owner,
+            'key': 'generate-$owner',
+            'fingerprint': 'g' * 64,
+            'job': 'job-$owner',
+            'resultFingerprint': 'r' * 64,
+            'deck': deckId,
+          },
+        );
+      }
       await tx.execute(
         Sql.named('''
           INSERT INTO ai_user_preferences (user_id, preferred_colors)

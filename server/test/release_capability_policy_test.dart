@@ -209,6 +209,8 @@ void main() {
         'GET /ai/optimize/jobs/job': 'ai_analyze_optimize_advisory',
         'POST /ai/generate': 'ai_generate_rebuild',
         'GET /ai/generate/jobs/job': 'ai_generate_rebuild',
+        'GET /ai/generate/requests/latest': 'ai_generate_rebuild',
+        'POST /ai/generate/requests/req/materialize': 'ai_generate_rebuild',
         'GET /ai/battle/jobs': 'battle_batch',
         'POST /ai/battle/jobs': 'battle_batch',
         'DELETE /ai/battle/jobs/job': 'battle_batch',

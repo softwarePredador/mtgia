@@ -64,7 +64,13 @@ void main() {
       );
     }
 
-    for (final path in ['/ai/generate/jobs/job-1', '/ai/optimize/jobs/job-1']) {
+    for (final path in [
+      '/ai/generate/jobs/job-1',
+      '/ai/optimize/jobs/job-1',
+      // DCK-P0-04: ler o pedido e materializar não chamam IA.
+      '/ai/generate/requests/latest',
+      '/ai/generate/requests/req-1/materialize',
+    ]) {
       expect(
         ai_middleware.aiEndpointAccessPolicyForPath(path),
         ai_middleware.AiEndpointAccessPolicy.polling,

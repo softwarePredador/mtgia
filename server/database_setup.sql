@@ -2622,6 +2622,103 @@ REFERENCING OLD TABLE AS legality_old_rows
 FOR EACH STATEMENT
 EXECUTE FUNCTION manaloom_mark_decks_legality_deleted();
 
+-- DCK-P0-04 (migration 069): pedido do Generate durável, prompt bruto por 30
+-- dias (D-29) e redação governada da descrição no ledger.
+CREATE TABLE IF NOT EXISTS ai_generate_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  request_key TEXT NOT NULL,
+  request_fingerprint TEXT,
+  job_id TEXT,
+  format TEXT NOT NULL,
+  controls JSONB NOT NULL DEFAULT '{}'::jsonb,
+  prompt TEXT,
+  prompt_purged_at TIMESTAMP WITH TIME ZONE,
+  status TEXT NOT NULL DEFAULT 'pending',
+  result_deck JSONB,
+  result_fingerprint TEXT,
+  can_materialize BOOLEAN NOT NULL DEFAULT FALSE,
+  materialized_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+  materialized_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_ai_generate_requests_user_key UNIQUE (user_id, request_key),
+  CONSTRAINT chk_ai_generate_requests_status
+    CHECK (status IN ('pending', 'completed', 'failed', 'cancelled')),
+  CONSTRAINT chk_ai_generate_requests_prompt_purge
+    CHECK (
+      prompt_purged_at IS NULL
+      OR (prompt IS NULL AND request_fingerprint IS NULL)
+    ),
+  CONSTRAINT chk_ai_generate_requests_result
+    CHECK ((result_deck IS NULL) = (result_fingerprint IS NULL)),
+  CONSTRAINT chk_ai_generate_requests_materialize
+    CHECK (NOT can_materialize OR result_deck IS NOT NULL)
+);
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_user_created
+  ON ai_generate_requests (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_job
+  ON ai_generate_requests (job_id)
+  WHERE job_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_materialized_deck
+  ON ai_generate_requests (materialized_deck_id)
+  WHERE materialized_deck_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_prompt_retention
+  ON ai_generate_requests (created_at)
+  WHERE prompt IS NOT NULL;
+
+ALTER TABLE deck_change_events
+  ADD COLUMN IF NOT EXISTS description_redacted_at TIMESTAMP WITH TIME ZONE;
+
+CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_change_events_append_only$
+BEGIN
+  IF TG_OP = 'UPDATE' THEN
+    -- A única mudança aceita é a redação governada da D-29: a limpeza por
+    -- prazo tira o texto da descrição de antes e de depois e marca
+    -- description_redacted_at, com todo o resto igual.
+    IF current_setting('manaloom.deck_ledger_redaction', true)
+         = 'd29_prompt_retention'
+       AND OLD.description_redacted_at IS NULL
+       AND NEW.description_redacted_at IS NOT NULL
+       AND NEW.id = OLD.id
+       AND NEW.deck_id = OLD.deck_id
+       AND NEW.user_id = OLD.user_id
+       AND NEW.revision_before = OLD.revision_before
+       AND NEW.revision_after = OLD.revision_after
+       AND NEW.operation = OLD.operation
+       AND NEW.cards_before IS NOT DISTINCT FROM OLD.cards_before
+       AND NEW.cards_after IS NOT DISTINCT FROM OLD.cards_after
+       AND NEW.undo_of_event_id IS NOT DISTINCT FROM OLD.undo_of_event_id
+       AND NEW.idempotency_key IS NOT DISTINCT FROM OLD.idempotency_key
+       AND NEW.request_fingerprint IS NOT DISTINCT FROM OLD.request_fingerprint
+       AND NEW.created_at = OLD.created_at
+       AND (NEW.metadata_before - 'description')
+         = (OLD.metadata_before - 'description')
+       AND (NEW.metadata_after - 'description')
+         = (OLD.metadata_after - 'description')
+       AND COALESCE(NEW.metadata_before -> 'description', 'null'::jsonb)
+         = 'null'::jsonb
+       AND COALESCE(NEW.metadata_after -> 'description', 'null'::jsonb)
+         = 'null'::jsonb
+    THEN
+      RETURN NEW;
+    END IF;
+    RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+      USING ERRCODE = 'restrict_violation';
+  END IF;
+  -- DELETE só em cascata (deck ou conta apagados), que chega por um gatilho
+  -- de integridade: profundidade 2 ou mais.
+  IF pg_trigger_depth() <= 1 THEN
+    RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+      USING ERRCODE = 'restrict_violation';
+  END IF;
+  RETURN OLD;
+END;
+$deck_change_events_append_only$;
+
 -- ============================================================
 -- GROWTH: Relatorios compartilhaveis
 -- ============================================================

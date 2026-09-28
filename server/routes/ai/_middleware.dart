@@ -28,7 +28,9 @@ const rateLimitedAuxiliaryAiPaths = <String>{
 };
 
 AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
+  // DCK-P0-04: ler o pedido e materializar o resultado não chamam IA.
   if (path.startsWith('/ai/generate/jobs/') ||
+      path.startsWith('/ai/generate/requests/') ||
       path.startsWith('/ai/optimize/jobs/') ||
       path == '/ai/battle/jobs' ||
       path.startsWith('/ai/battle/jobs/') ||

@@ -18,6 +18,8 @@
 | `/ai/explain` | `POST` | `server/routes/ai/explain/index.dart` | 2 | `source` |
 | `/ai/generate` | `POST` | `server/routes/ai/generate/index.dart` | 2 | `source` |
 | `/ai/generate/jobs/{id}` | `DELETE, GET` | `server/routes/ai/generate/jobs/[id].dart` | 2 | `source` |
+| `/ai/generate/requests/{id}` | `GET` | `server/routes/ai/generate/requests/[id]/index.dart` | 2 | `source` |
+| `/ai/generate/requests/{id}/materialize` | `POST` | `server/routes/ai/generate/requests/[id]/materialize.dart` | 2 | `source` |
 | `/ai/ml-status` | `GET` | `server/routes/ai/ml-status/index.dart` | 2 | `source` |
 | `/ai/optimize` | `POST` | `server/routes/ai/optimize/index.dart` | 2 | `source` |
 | `/ai/optimize/jobs/{id}` | `DELETE, GET` | `server/routes/ai/optimize/jobs/[id].dart` | 2 | `source` |

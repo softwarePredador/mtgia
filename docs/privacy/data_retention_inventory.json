@@ -117,9 +117,11 @@
       "rule": "prompt bruto do Generate retido por 30 dias, fora de decks.description",
       "applies_to": [
         "decks.description",
-        "ai_generate_jobs.result"
+        "ai_generate_jobs.result",
+        "ai_generate_requests.prompt",
+        "deck_change_events.metadata_before"
       ],
-      "status": "não implementado: o app grava o prompt em decks.description e o job que o ecoa some em 30 min; o armazenamento do prompt com prazo é o DCK-P0-04"
+      "status": "implementado no servidor (DCK-P0-04): o pedido do Generate guarda o prompt em ai_generate_requests.prompt e a limpeza por prazo (retention_cleanup_apply_v1) o apaga em 30 dias, junto com o texto de descrição copiado no ledger; o deck materializado no servidor nasce sem o prompt na descrição. Falta: o app antigo ainda grava o prompt em decks.description ao salvar pelo POST /decks, e o prompt que já está em descrições de decks existentes fica como está (pendente de decisão do dono)"
     },
     {
       "decision": "D-30",
@@ -194,6 +196,22 @@
         "max_age_minutes": 1440,
         "scope": "todas as linhas",
         "decision": "D-32"
+      },
+      {
+        "id": "ai_generate_requests_prompt_30d",
+        "table": "ai_generate_requests",
+        "max_age_minutes": 43200,
+        "scope": "só o prompt bruto e a impressão derivada dele (a linha fica)",
+        "decision": "D-29",
+        "action": "redact"
+      },
+      {
+        "id": "deck_change_events_description_30d",
+        "table": "deck_change_events",
+        "max_age_minutes": 43200,
+        "scope": "só o texto de descrição copiado no ledger (a linha fica, com description_redacted_at)",
+        "decision": "D-29",
+        "action": "redact"
       }
     ]
   },
@@ -320,6 +338,61 @@
         "stage_number": "include",
         "status": "include",
         "total_stages": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_generate_requests": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Pedido durável do Generate (DCK-P0-04): a entrada original (prompt e controles), a impressão do pedido, o resultado quando o job termina e o deck que o servidor materializou a partir dele.",
+      "owner": "server/lib/ai/ai_generate_request_store.dart; server/routes/ai/generate/**",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "o pedido fica enquanto a conta existir; o prompt bruto e a impressão derivada dele, 30 dias",
+        "decision": "D-29",
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null,
+        "redactions": [
+          {
+            "rule": "ai_generate_requests_prompt_30d",
+            "columns": [
+              "prompt",
+              "request_fingerprint"
+            ],
+            "period": "30 dias",
+            "decision": "D-29",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
+      },
+      "export": {
+        "section": "data.ai_activity.generate_requests"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "can_materialize": "include",
+        "controls": "include",
+        "created_at": "include",
+        "format": "include",
+        "id": "include",
+        "job_id": "omit_internal",
+        "materialized_at": "include",
+        "materialized_deck_id": "deck_ref",
+        "prompt": "include",
+        "prompt_purged_at": "include",
+        "request_fingerprint": "omit_hash",
+        "request_key": "omit_hash",
+        "result_deck": "include",
+        "result_fingerprint": "omit_hash",
+        "status": "include",
         "updated_at": "include",
         "user_id": "person_ref"
       }
@@ -1439,10 +1512,22 @@
       "owner": "server/lib/decks/deck_revision_support.dart",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto o deck existir",
+        "period": "enquanto o deck existir; o texto de descrição copiado no ledger, 30 dias (D-29)",
         "decision": null,
         "enforced_by": "FK deck_change_events.deck_id ON DELETE CASCADE",
-        "gap": "quando a descrição do deck muda, o texto anterior fica no ledger enquanto o deck existir; se a descrição tiver o prompt bruto do Generate (hoje o app o grava ali), essa cópia não segue os 30 dias da D-29 até o DCK-P0-04 tirar o prompt da descrição"
+        "gap": null,
+        "redactions": [
+          {
+            "rule": "deck_change_events_description_30d",
+            "columns": [
+              "metadata_before.description",
+              "metadata_after.description"
+            ],
+            "period": "30 dias",
+            "decision": "D-29",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.deck_change_events"
@@ -1450,7 +1535,7 @@
       "deletion": {
         "mode": "cascade",
         "by": "FK deck_change_events.deck_id -> decks ON DELETE CASCADE",
-        "notes": "O ledger só recebe INSERT: o gatilho manaloom_deck_change_events_append_only recusa UPDATE e DELETE direto e deixa passar só a cascata do deck ou da conta."
+        "notes": "O ledger só recebe INSERT: o gatilho manaloom_deck_change_events_append_only recusa DELETE direto e deixa passar só a cascata do deck ou da conta; o único UPDATE aceito é a redação governada da descrição (D-29), com a sessão marcada pela limpeza por prazo."
       },
       "legal_exception": null,
       "columns": {
@@ -1458,6 +1543,7 @@
         "cards_before": "include",
         "created_at": "include",
         "deck_id": "deck_ref",
+        "description_redacted_at": "include",
         "id": "include",
         "idempotency_key": "omit_hash",
         "metadata_after": "include",

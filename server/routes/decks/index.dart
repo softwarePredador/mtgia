@@ -349,6 +349,19 @@ Future<Response> _createDeck(RequestContext context) async {
   // DCK-P0-00: deck novo nasce privado; publicar na criação exige a galeria
   // aberta e cartas na lista. A recusa vem antes de qualquer acesso ao banco.
   try {
+    // DCK-P0-04: deck de um Generate nasce no servidor, pela
+    // materialização do resultado; o app não manda essa lista aqui.
+    if (body.containsKey('generate_request_id') ||
+        body.containsKey('source_generate_request_id')) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: const {
+          'error':
+              'Deck do Generate é criado pela materialização do resultado.',
+          'error_code': 'generate_materialize_required',
+        },
+      );
+    }
     ensureDeckPublicationAllowed(
       requested: isPublic,
       cardCountAfter: rawCardObjects.length,

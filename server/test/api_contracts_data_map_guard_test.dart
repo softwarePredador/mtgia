@@ -85,6 +85,31 @@ void main() {
       expect(rebuild, contains('defaults to `preview_only`'));
     });
 
+    test('documents the durable Generate request and materialization', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final read = _contractRowFor(contracts, 'GET /ai/generate/requests/:id');
+      final materialize = _contractRowFor(
+        contracts,
+        'POST /ai/generate/requests/:id/materialize',
+      );
+
+      expect(read, contains('kind `generate_materialize`'));
+      expect(read, contains('null after the 30 days of D-29'));
+      expect(materialize, contains('No cards and no controls'));
+      expect(materialize, contains('`constraints_mismatch`'));
+      expect(materialize, contains('`replayed: true`'));
+      for (final phrase in const [
+        '## Generate Request and Server-side Materialization — 2026-09-28',
+        '`generate_materialize_required`',
+        '`ai_generate_requests_prompt_30d`',
+        '`deck_change_events_description_30d`',
+        '409 `deck_undo_redacted`',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
     test('documents strict validation per revision and legality', () {
       final contracts =
           File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();

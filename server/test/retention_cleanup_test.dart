@@ -40,6 +40,8 @@ void main() {
 
     test('só apaga tabela com prazo (ttl) que o inventário põe neste job', () {
       for (final rule in retentionCleanupRules) {
+        // A redação (D-29) tem a declaração dela no inventário.
+        if (rule.isRedaction) continue;
         final retention = tables[rule.table]!['retention'] as Map;
         expect(retention['class'], 'ttl', reason: rule.table);
         expect(
@@ -50,6 +52,39 @@ void main() {
           ),
           reason: rule.table,
         );
+      }
+    });
+
+    test('toda redação declarada no inventário tem regra, e vice-versa '
+        '(D-29)', () {
+      final declared = <String>{
+        for (final MapEntry(key: name, value: entry) in tables.entries)
+          for (final redaction
+              in ((entry['retention'] as Map)['redactions'] as List? ??
+                      const [])
+                  .cast<Map>())
+            '$name:${redaction['rule']}',
+      };
+      final fromCode = {
+        for (final rule in retentionCleanupRules)
+          if (rule.isRedaction) '${rule.table}:${rule.id}',
+      };
+      expect(fromCode, declared);
+      expect(fromCode, isNotEmpty);
+      for (final MapEntry(key: name, value: entry) in tables.entries) {
+        for (final redaction
+            in ((entry['retention'] as Map)['redactions'] as List? ?? const [])
+                .cast<Map>()) {
+          expect(
+            '${redaction['enforced_by']}',
+            allOf(
+              contains(retentionCleanupJobName),
+              contains(retentionCleanupContract),
+            ),
+            reason: name,
+          );
+          expect(redaction['decision'], 'D-29', reason: name);
+        }
       }
     });
 
@@ -95,11 +130,21 @@ void main() {
         'código', () {
       expect('DELETE FROM'.allMatches(source), hasLength(1));
       expect(source, contains(r"'DELETE FROM $table WHERE $_where'"));
+      expect('UPDATE '.allMatches(source), hasLength(1));
+      expect(source, contains(r"'UPDATE $table SET $redactSet WHERE $_where'"));
       for (final rule in retentionCleanupRules) {
         expect(rule.table, matches(RegExp(r'^[a-z_]+$')));
-        expect(rule.deleteSql, startsWith('DELETE FROM ${rule.table} WHERE '));
+        final sql = rule.isRedaction ? rule.redactSql : rule.deleteSql;
         expect(
-          rule.deleteSql,
+          sql,
+          startsWith(
+            rule.isRedaction
+                ? 'UPDATE ${rule.table} SET '
+                : 'DELETE FROM ${rule.table} WHERE ',
+          ),
+        );
+        expect(
+          sql,
           endsWith(
             'created_at < CURRENT_TIMESTAMP - '
             'make_interval(mins => ${rule.maxAge.inMinutes})',

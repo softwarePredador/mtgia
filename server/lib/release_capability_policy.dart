@@ -424,6 +424,7 @@ String? requiredCapabilityForRequest({
 
   if (normalizedPath == '/ai/generate' ||
       normalizedPath.startsWith('/ai/generate/jobs/') ||
+      normalizedPath.startsWith('/ai/generate/requests/') ||
       normalizedPath == '/ai/rebuild' ||
       normalizedPath == '/ai/commander-reference') {
     return 'ai_generate_rebuild';

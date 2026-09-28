@@ -43,6 +43,7 @@ const accountDeletionRelations = <String>[
   'account_deletion_receipts',
   'activation_funnel_events',
   'ai_generate_jobs',
+  'ai_generate_requests',
   'ai_logs',
   'ai_optimize_cache',
   'ai_optimize_fallback_telemetry',
@@ -298,6 +299,15 @@ class UserDataPrivacyService {
         session,
         'ai_generate_jobs',
         'DELETE FROM ai_generate_jobs WHERE user_id = CAST(@userId AS uuid)',
+        userId,
+      );
+      // DCK-P0-04: o pedido durável do Generate (prompt, controles e
+      // resultado) sai com a conta.
+      await _executeOn(
+        session,
+        'ai_generate_requests',
+        'DELETE FROM ai_generate_requests '
+            'WHERE user_id = CAST(@userId AS uuid)',
         userId,
       );
       await _executeOn(

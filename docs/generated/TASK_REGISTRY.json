@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "e02d13c482ed2b00e5f4f1b27afa39498b5e363ce4b7d7c3f66715e5546d5b97"
+    "sha256": "43f6d66428d67b4902a9f86b861eee843304c66e28efd8ac9ad1345a0871e830"
   },
   "required_task_fields": [
     "id",
@@ -409,13 +409,13 @@
     {
       "id": "DCK-P0-04",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Generate persiste request/fingerprint e materializa server-side pelo job.",
       "depends_on": [
         "DCK-P0-02",
         "BT-PRIV-003"
       ],
-      "acceptance": "Resultado A nunca salva como controles B; cliente não injeta lista; cross-device reidrata a entrada original. Decisão do dono em 2026-09-22: D-29, prompt bruto retido por 30 dias e fora de `decks.description`; D-25, depende do `BT-PRIV-003`.",
+      "acceptance": "Resultado A nunca salva como controles B; cliente não injeta lista; cross-device reidrata a entrada original. Decisão do dono em 2026-09-22: D-29, prompt bruto retido por 30 dias e fora de `decks.description`; D-25, depende do `BT-PRIV-003`. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar, com a migration 069 proposta e não aplicada, e a IA desligada na produção. O `POST /ai/generate` assíncrono grava o pedido durável em `ai_generate_requests` logo depois de criar o job (prompt, controles, impressão e o job) e devolve `generate_request_id`; ao terminar, o job grava o resultado e se ele pode virar deck. `GET /ai/generate/requests/latest` (ou pelo id) reidrata a entrada original em outro aparelho. `POST /ai/generate/requests/:id/materialize` cria o deck no servidor a partir do resultado e dos controles gravados, com o `DeckReviewArtifact v1` do tipo `generate_materialize` (dono, pedido, hash do resultado e hash dos controles): controles mudados dão 409 `constraints_mismatch`, o app não manda lista (o `POST /decks` recusa `generate_request_id`), repetir devolve o mesmo deck, e o deck nasce privado e sem o prompt na descrição. D-29: a limpeza por prazo (`retention_cleanup_apply_v1`, D-70) ganhou duas regras de redação que apagam, em 30 dias, o prompt do pedido (com a impressão derivada dele) e o texto de descrição copiado no ledger de mudanças; a 069 deixa o gatilho do ledger aceitar só essa redação, na transação marcada pela limpeza, e o desfazer recusa a mudança redigida (409 `deck_undo_redacted`). Evidência: `server/test/ai_generate_request_db_live_test.dart` (PostgreSQL descartável, 8 casos), `server/test/ai_generate_request_route_contract_test.dart`, `server/test/retention_cleanup_test.dart` e `server/test/retention_cleanup_db_live_test.dart` com as regras novas, e as 19 mutações (14 de código do grupo `dck004` e 5 de schema da 069) derrubadas; receipt em `docs/qa/execution/2026-09-28/DCK-P0-04-pedido-duravel-do-generate.md`. Falta: o app ler o pedido, mostrar o resultado, materializar com o artefato e parar de mandar a lista e o prompt ao `POST /decks` (raia do app); o prompt já gravado em descrições de decks existentes fica como está (pendente de decisão do dono); aplicar a 069 e ativar a limpeza na produção pedem a palavra do dono.",
       "section": "P0 do ciclo",
       "source_line": 339
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "c9e38855729d4f11afe3ce68640ab7756816bcdca0c1d96233edff9cf065e0bb"
+  "project_logic_source_digest_sha256": "e4a7568d2266d3f8aa1a4c5aea53c0e7013786df8c92cb33d22718f2063d993b"
 }

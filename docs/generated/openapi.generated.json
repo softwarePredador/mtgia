@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "c9e38855729d4f11afe3ce68640ab7756816bcdca0c1d96233edff9cf065e0bb",
+  "x-manaloom-source-digest-sha256": "e4a7568d2266d3f8aa1a4c5aea53c0e7013786df8c92cb33d22718f2063d993b",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -668,6 +668,96 @@
           "ai"
         ],
         "x-manaloom-source": "server/routes/ai/generate/jobs/[id].dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/horizontal_discovery_rail_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/commercial/ai_usage_meter_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/generate/requests/{id}": {
+      "get": {
+        "operationId": "getAiGenerateRequestsId",
+        "summary": "GET /ai/generate/requests/{id}",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/generate/requests/[id]/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+          "app/test/core/widgets/horizontal_discovery_rail_test.dart",
+          "app/test/core/widgets/main_scaffold_test.dart",
+          "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/cards/providers/card_provider_ai_test.dart",
+          "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
+          "app/test/features/commercial/ai_usage_gate_test.dart",
+          "app/test/features/commercial/ai_usage_meter_test.dart",
+          "app/test/features/community/screens/community_deck_detail_screen_test.dart",
+          "app/test/features/decks/models/deck_details_test.dart",
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
+          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/ai/generate/requests/{id}/materialize": {
+      "post": {
+        "operationId": "postAiGenerateRequestsIdMaterialize",
+        "summary": "POST /ai/generate/requests/{id}/materialize",
+        "tags": [
+          "ai"
+        ],
+        "x-manaloom-source": "server/routes/ai/generate/requests/[id]/materialize.dart",
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "app/integration_test/commander_learned_deck_availability_runtime_test.dart",

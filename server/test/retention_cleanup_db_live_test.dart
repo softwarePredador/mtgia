@@ -91,6 +91,7 @@ void main() {
       {'user': user, 'name': 'Deck de retencao $suffix'},
     );
 
+    var ledgerRevision = 0;
     Future<String> row(
       String table,
       Duration age, {
@@ -136,6 +137,39 @@ void main() {
           {
             'id': 'opt-$suffix-${at.microsecondsSinceEpoch}',
             'deck': deck,
+            'at': at,
+          },
+        ),
+        // D-29: pedido do Generate com prompt e mudança do ledger com
+        // descrição (a redação apaga o texto e deixa a linha).
+        'ai_generate_requests' => one(
+          '''
+          INSERT INTO ai_generate_requests (
+            user_id, request_key, request_fingerprint, format, prompt,
+            created_at
+          ) VALUES (
+            CAST(@user AS uuid), @key, 'impressao', 'commander',
+            'prompt bruto', @at
+          ) RETURNING id::text
+          ''',
+          {'user': user, 'key': 'req-${at.microsecondsSinceEpoch}', 'at': at},
+        ),
+        'deck_change_events' => one(
+          '''
+          INSERT INTO deck_change_events (
+            deck_id, user_id, revision_before, revision_after, operation,
+            metadata_before, metadata_after, created_at
+          ) VALUES (
+            CAST(@deck AS uuid), CAST(@user AS uuid), @before, @after,
+            'deck_patch', '{"description": "prompt bruto"}'::jsonb,
+            '{"description": "outra"}'::jsonb, @at
+          ) RETURNING id::text
+          ''',
+          {
+            'deck': deck,
+            'user': user,
+            'before': ++ledgerRevision,
+            'after': ledgerRevision + 1,
             'at': at,
           },
         ),
@@ -199,6 +233,23 @@ void main() {
     return result.single.single == true;
   }
 
+  /// A linha segue como estava: para a regra que apaga, existe; para a
+  /// redação da D-29, o texto ainda está lá.
+  Future<bool> intact(RetentionCleanupRule rule, String id) async {
+    if (!rule.isRedaction) return exists(rule.table, id);
+    final column = switch (rule.table) {
+      'ai_generate_requests' => 'prompt IS NOT NULL',
+      _ => 'description_redacted_at IS NULL',
+    };
+    final result = await pool.execute(
+      Sql.named(
+        'SELECT $column FROM ${rule.table} WHERE id = CAST(@id AS uuid)',
+      ),
+      parameters: {'id': id},
+    );
+    return result.single.single == true;
+  }
+
   Future<String?> state() async {
     final result = await pool.execute(
       Sql.named('SELECT value FROM sync_state WHERE key = @key'),
@@ -213,8 +264,8 @@ void main() {
   ) async {
     for (final rule in retentionCleanupRules) {
       final (expired, fresh) = seeded.byRule[rule.id]!;
-      expect(await exists(rule.table, expired), isTrue, reason: rule.id);
-      expect(await exists(rule.table, fresh), isTrue, reason: rule.id);
+      expect(await intact(rule, expired), isTrue, reason: rule.id);
+      expect(await intact(rule, fresh), isTrue, reason: rule.id);
     }
     for (final (table, id) in seeded.kept) {
       expect(await exists(table, id), isTrue, reason: table);
@@ -260,8 +311,8 @@ void main() {
     expect(receipt['applied'], isTrue);
     for (final rule in retentionCleanupRules) {
       final (expired, fresh) = seeded.byRule[rule.id]!;
-      expect(await exists(rule.table, expired), isFalse, reason: rule.id);
-      expect(await exists(rule.table, fresh), isTrue, reason: rule.id);
+      expect(await intact(rule, expired), isFalse, reason: rule.id);
+      expect(await intact(rule, fresh), isTrue, reason: rule.id);
     }
     for (final (table, id) in seeded.kept) {
       expect(await exists(table, id), isTrue, reason: table);
@@ -276,8 +327,8 @@ void main() {
     expect(applied['applied'], isTrue);
     for (final rule in retentionCleanupRules) {
       final (expired, fresh) = seeded.byRule[rule.id]!;
-      expect(await exists(rule.table, expired), isFalse, reason: rule.id);
-      expect(await exists(rule.table, fresh), isTrue, reason: rule.id);
+      expect(await intact(rule, expired), isFalse, reason: rule.id);
+      expect(await intact(rule, fresh), isTrue, reason: rule.id);
     }
 
     await expectLater(

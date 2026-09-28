@@ -60,7 +60,7 @@ Future<Response> onRequest(
               ? await session.execute(
                 Sql.named('''
                   SELECT revision_after, cards_before, cards_after,
-                         metadata_before
+                         metadata_before, description_redacted_at
                   FROM deck_change_events
                   WHERE id = CAST(@eventId AS uuid)
                     AND deck_id = CAST(@deckId AS uuid)
@@ -81,6 +81,19 @@ Future<Response> onRequest(
           HttpStatus.conflict,
           'deck_undo_conflict',
           'O deck mudou depois desta mudança. Desfaça a mais recente primeiro.',
+          currentRevision: baseline.revision,
+        );
+      }
+
+      // D-29: passados 30 dias, o texto de descrição da mudança saiu do
+      // ledger; desfazer não inventa a descrição de antes.
+      if (row['description_redacted_at'] != null &&
+          _jsonMap(row['metadata_before']).containsKey('description')) {
+        throw _UndoRefusal(
+          HttpStatus.conflict,
+          'deck_undo_redacted',
+          'Esta mudança tem mais de 30 dias e o texto anterior da '
+              'descrição já foi apagado. Não dá para desfazê-la.',
           currentRevision: baseline.revision,
         );
       }
