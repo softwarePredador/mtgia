@@ -443,13 +443,13 @@ String? requiredCapabilityForRequest({
   if (normalizedPath == '/ai/commander-learning') {
     return normalizedMethod == 'GET' ? 'learning_reads' : 'learning_writes';
   }
+  // As quatro rotas legadas sem consumidor (POST /decks/:id/recommendations,
+  // GET /decks/:id/simulate, POST /ai/simulate-matchup e
+  // POST /ai/weakness-analysis) saíram na D-31 (BT-AI-029). Quem ainda chamar
+  // /ai/simulate-matchup ou /ai/weakness-analysis cai em rota não classificada
+  // (404 e contador próprio); as de /decks/:id não têm mais handler.
   if (normalizedPath == '/ai/ml-status' ||
-      normalizedPath == '/ai/simulate-matchup' ||
-      normalizedPath == '/ai/weakness-analysis' ||
-      normalizedPath.startsWith('/ai/optimize/telemetry') ||
-      RegExp(
-        r'^/decks/[^/]+/(recommendations|simulate)$',
-      ).hasMatch(normalizedPath)) {
+      normalizedPath.startsWith('/ai/optimize/telemetry')) {
     return 'legacy_ai_routes';
   }
 

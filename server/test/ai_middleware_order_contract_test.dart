@@ -51,8 +51,6 @@ void main() {
 
     for (final path in [
       '/ai/simulate',
-      '/ai/simulate-matchup',
-      '/ai/weakness-analysis',
       '/ai/commander-reference',
       '/ai/ml-status',
       '/ai/optimize/telemetry',
@@ -136,16 +134,9 @@ void main() {
         File(
           'routes/decks/[id]/ai-analysis/_middleware.dart',
         ).readAsStringSync();
-    final recommendationsSource =
-        File(
-          'routes/decks/[id]/recommendations/_middleware.dart',
-        ).readAsStringSync();
 
     expect(analysisSource, contains('.use(aiRateLimit())'));
     expect(analysisSource, contains('.use(aiPlanLimitMiddleware())'));
     expect(analysisSource, contains('.use(authMiddleware())'));
-    expect(recommendationsSource, contains('.use(aiRateLimit())'));
-    expect(recommendationsSource, contains('.use(aiPlanLimitMiddleware())'));
-    expect(recommendationsSource, contains('.use(authMiddleware())'));
   });
 }

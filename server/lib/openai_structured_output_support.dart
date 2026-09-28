@@ -95,46 +95,6 @@ const openAiArchetypesSchema = <String, dynamic>{
   'additionalProperties': false,
 };
 
-const _openAiRecommendationItemSchema = <String, dynamic>{
-  'type': 'object',
-  'properties': {
-    'card_name': {'type': 'string'},
-    'reason': {'type': 'string'},
-  },
-  'required': ['card_name', 'reason'],
-  'additionalProperties': false,
-};
-
-const openAiDeckRecommendationsSchema = <String, dynamic>{
-  'type': 'object',
-  'properties': {
-    'archetype': {'type': 'string'},
-    'power_level': {'type': 'integer', 'minimum': 1, 'maximum': 5},
-    'analysis': {'type': 'string'},
-    'recommendations': {
-      'type': 'object',
-      'properties': {
-        'add': {
-          'type': 'array',
-          'minItems': 5,
-          'maxItems': 5,
-          'items': _openAiRecommendationItemSchema,
-        },
-        'remove': {
-          'type': 'array',
-          'minItems': 5,
-          'maxItems': 5,
-          'items': _openAiRecommendationItemSchema,
-        },
-      },
-      'required': ['add', 'remove'],
-      'additionalProperties': false,
-    },
-  },
-  'required': ['archetype', 'power_level', 'analysis', 'recommendations'],
-  'additionalProperties': false,
-};
-
 const openAiDeckOptimizationSchema = <String, dynamic>{
   'type': 'object',
   'properties': {

@@ -50,8 +50,6 @@ void main() {
       () {
         for (final route in const [
           'POST /ai/simulate',
-          'POST /ai/simulate-matchup',
-          'POST /ai/weakness-analysis',
           'GET /ai/commander-learning?commander=',
         ]) {
           expect(
@@ -87,22 +85,9 @@ void main() {
       expect(row, contains('Raw Hermes `metadata` must remain hidden'));
     });
 
-    test('documents advisory AI analysis and simulation response shapes', () {
-      final weakness = _contractRowFor(contracts, 'POST /ai/weakness-analysis');
+    test('documents advisory AI simulation response shapes', () {
       final simulate = _contractRowFor(contracts, 'POST /ai/simulate');
-      final legacyDeckSimulate = _contractRowFor(
-        contracts,
-        'GET /decks/:id/simulate',
-      );
-      final matchup = _contractRowFor(contracts, 'POST /ai/simulate-matchup');
       final optimize = _contractRowFor(contracts, 'POST /ai/optimize');
-
-      expect(weakness, contains('weaknesses[]'));
-      expect(weakness, contains('weakness_count'));
-      expect(weakness, contains('color_identity_source'));
-      expect(weakness, contains('does not return top-level `recommendations`'));
-      expect(weakness, contains('This is a write route'));
-      expect(weakness, contains('advisory investigation evidence only'));
 
       expect(simulate, contains('simulations` is clamped to `1..5000`'));
       expect(
@@ -110,34 +95,6 @@ void main() {
         contains('This is a write route when storage tables exist'),
       );
       expect(simulate, contains('not legal verdict'));
-
-      expect(legacyDeckSimulate, contains('optional query params'));
-      expect(legacyDeckSimulate, contains('seed'));
-      expect(legacyDeckSimulate, contains('iterations'));
-      expect(legacyDeckSimulate, contains('legacy_monte_carlo'));
-      expect(legacyDeckSimulate, contains('legacy_consistency_only'));
-      expect(legacyDeckSimulate, contains('advisory=true'));
-      expect(legacyDeckSimulate, contains('not a legality, strategy'));
-      expect(
-        legacyDeckSimulate,
-        contains('deck_simulate_route_adapter_test.dart'),
-      );
-
-      expect(matchup, contains('optional `seed`'));
-      expect(matchup, contains('color_identity_source'));
-      expect(matchup, contains('simulation.{runs,seed,wins,losses'));
-      expect(
-        matchup,
-        contains('does not return top-level `win_rate` or `stats`'),
-      );
-      expect(
-        matchup,
-        contains('card_intelligence_snapshot.function_tag_details'),
-      );
-      expect(matchup, contains('resolveCardFunctionalRoles'));
-      expect(matchup, contains('commander `color_identity`'));
-      expect(matchup, contains('meta-deck opponent stats remain sparse'));
-      expect(matchup, contains('This is a write route'));
 
       expect(optimize, contains('swap_integrity'));
       expect(contracts, contains('card_id:quantity:condition:role'));
@@ -147,6 +104,30 @@ void main() {
       expect(contracts, contains('scoped by `user_id`, `deck_id`'));
       expect(contracts, contains('commander_functional_role_floors_v3'));
       expect(optimize, contains('optimize_cache_support_test.dart'));
+    });
+
+    test('documents the four AI routes removed by D-31 only as removed', () {
+      final removedSection = contracts.substring(
+        contracts.indexOf('### Removed AI routes (D-31, BT-AI-029)'),
+        contracts.indexOf('### Market'),
+      );
+      final liveContracts = contracts.replaceFirst(removedSection, '');
+      for (final (route, substitute) in const [
+        ('POST /decks/:id/recommendations', 'Optimize'),
+        ('GET /decks/:id/simulate', 'Battle'),
+        ('POST /ai/simulate-matchup', 'Battle'),
+        ('POST /ai/weakness-analysis', 'Analyze'),
+      ]) {
+        expect(
+          liveContracts,
+          isNot(contains('| `$route')),
+          reason: '$route was removed (D-31) and is no longer a contract',
+        );
+        final row = _contractRowFor(removedSection, route);
+        expect(row, contains(substitute), reason: route);
+      }
+      expect(removedSection, contains('server/config/ai_route_registry.json'));
+      expect(removedSection, contains('ai_route_registry_test.dart'));
     });
 
     test('documents deck builder read/write contract boundaries', () {
@@ -184,10 +165,6 @@ void main() {
       final validate = _contractRowFor(contracts, 'POST /decks/:id/validate');
       final pricing = _contractRowFor(contracts, 'POST /decks/:id/pricing');
       final export = _contractRowFor(contracts, 'GET /decks/:id/export');
-      final recommendations = _contractRowFor(
-        contracts,
-        'POST /decks/:id/recommendations',
-      );
 
       expect(cards, contains('include_tokens` defaults to `false`'));
       expect(cards, contains('`dedupe=identity`'));
@@ -347,68 +324,6 @@ void main() {
       expect(export, contains('does not return `deck_id`'));
       expect(export, contains('card_count` is exported line count'));
       expect(export, contains('not total quantity'));
-
-      expect(recommendations, contains('external model call'));
-      expect(recommendations, contains('source=openai'));
-      expect(recommendations, contains('advisory=true'));
-      expect(recommendations, contains('recommendation_validation'));
-      expect(
-        recommendations,
-        contains('fallback-compatible response scaffold'),
-      );
-      expect(recommendations, contains('HTTP error responses'));
-      expect(recommendations, contains('`error`'));
-      expect(recommendations, contains('recommendations.add/remove'));
-      expect(recommendations, contains('`trending`'));
-      expect(recommendations, contains('`power_level`'));
-      expect(recommendations, contains('`1..5`'));
-      expect(
-        recommendations,
-        contains('estimateRecommendationBracketPowerLevel(...)'),
-      );
-      expect(recommendations, contains('unvalidated_ai_text'));
-      expect(recommendations, contains('backend_post_validated=false'));
-      expect(recommendations, contains('actionability=advisory_only'));
-      expect(recommendations, contains('candidate_color_identity'));
-      expect(recommendations, contains('color_identity_source'));
-      expect(recommendations, contains('commander_color_identity'));
-      expect(recommendations, contains('observed_deck_colors'));
-      expect(
-        recommendations,
-        contains('authoritative Commander color identity'),
-      );
-      expect(recommendations, contains('buildHeuristicRecommendationsForDeck'));
-      expect(recommendations, contains('buildHeuristicRecommendationsBody'));
-      expect(recommendations, contains('buildDeckRecommendationsRouteResult'));
-      expect(recommendations, contains('rising EDHREC trend snapshots'));
-      expect(recommendations, contains('HTTP error response paths'));
-      expect(recommendations, contains('fake `RequestContext`/`Pool`'));
-      expect(recommendations, contains('DB-backed candidate lookup'));
-      expect(recommendations, contains('EDHREC trend query plumbing'));
-      expect(recommendations, contains('does not persist recommendations'));
-      expect(recommendations, contains('below `33`'));
-      expect(recommendations, contains('target band `33-38`'));
-      expect(recommendations, contains('advisory suggestions-for-review'));
-      expect(
-        recommendations,
-        contains('deck_recommendations_route_adapter_test.dart'),
-      );
-      expect(
-        recommendations,
-        contains('deck_recommendations_route_support_test.dart'),
-      );
-      expect(
-        recommendations,
-        contains('deck_recommendations_advisory_support_test.dart'),
-      );
-      expect(
-        recommendations,
-        contains('deck_recommendations_fallback_support_test.dart'),
-      );
-      expect(
-        recommendations,
-        contains('deck_recommendations_power_level_support_test.dart'),
-      );
     });
   });
 }

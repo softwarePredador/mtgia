@@ -90,8 +90,6 @@ void main() {
       );
       const intentionalNonTypeReceivers = <String, Set<String>>{
         'bin/ramp_family_audit.dart': {'oracle'},
-        'lib/archetype_counters_service.dart': {'oracleText'},
-        'lib/deck_recommendations_fallback_support.dart': {'oracleText'},
         'lib/ai/battle_simulator.dart': {'text'},
         'lib/ai/commander_learned_deck_support.dart': {'effectiveTags'},
         'lib/ai/edhrec_service.dart': {'lower'},
@@ -125,15 +123,6 @@ void main() {
         violations,
         isEmpty,
         reason: 'Land type checks must use isLandTypeLine/boundary SQL',
-      );
-
-      final recommendationsSource =
-          File(
-            'routes/decks/[id]/recommendations/index.dart',
-          ).readAsStringSync();
-      expect(
-        recommendationsSource,
-        contains(r"~* '(^|[^[:alpha:]])land([^[:alpha:]]|\$)'"),
       );
 
       const activePythonLandConsumers = <String>[

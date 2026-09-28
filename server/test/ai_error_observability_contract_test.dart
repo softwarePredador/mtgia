@@ -8,7 +8,6 @@ void main() {
     for (final root in <Directory>[
       Directory('routes/ai'),
       Directory('routes/decks/[id]/ai-analysis'),
-      Directory('routes/decks/[id]/recommendations'),
     ]) {
       for (final entity in root.listSync(recursive: true)) {
         if (entity is File && entity.path.endsWith('.dart')) {
@@ -89,12 +88,9 @@ void main() {
       'routes/ai/optimize/telemetry/index.dart',
       'routes/ai/rebuild/index.dart',
       'routes/ai/simulate/index.dart',
-      'routes/ai/simulate-matchup/index.dart',
-      'routes/ai/weakness-analysis/index.dart',
       'routes/ai/commander-reference/index.dart',
       'routes/ai/ml-status/index.dart',
       'routes/decks/[id]/ai-analysis/index.dart',
-      'routes/decks/[id]/recommendations/index.dart',
     ];
 
     for (final path in observedRoutes) {

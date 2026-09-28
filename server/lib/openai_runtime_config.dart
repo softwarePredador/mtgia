@@ -54,14 +54,6 @@ class OpenAiRuntimeConfig {
     prodFallback: 'gpt-4o-mini',
   );
 
-  String get recommendationsModel => modelFor(
-    key: 'OPENAI_MODEL_RECOMMENDATIONS',
-    fallback: 'gpt-4o-mini',
-    devFallback: 'gpt-4o-mini',
-    stagingFallback: 'gpt-4o-mini',
-    prodFallback: 'gpt-4o-mini',
-  );
-
   String get analysisModel => modelFor(
     key: 'OPENAI_MODEL_AI_ANALYSIS',
     fallback: 'gpt-4o-mini',
@@ -98,7 +90,6 @@ class OpenAiRuntimeConfig {
     'generate': generateModel,
     'archetypes': archetypesModel,
     'explain': explainModel,
-    'recommendations': recommendationsModel,
     'analysis': analysisModel,
     'optimize': optimizeModel,
     'complete': completeModel,

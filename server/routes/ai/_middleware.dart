@@ -21,8 +21,6 @@ const meteredAiActionPaths = <String>{
 
 const rateLimitedAuxiliaryAiPaths = <String>{
   '/ai/simulate',
-  '/ai/simulate-matchup',
-  '/ai/weakness-analysis',
   '/ai/commander-reference',
   '/ai/ml-status',
   '/ai/optimize/telemetry',

@@ -592,7 +592,7 @@ main() {
     "cd \"$ROOT_DIR/app\" && flutter test test/core/utils/logger_test.dart test/core/observability/app_observability_test.dart test/features/auth/providers/auth_provider_log_sanitization_test.dart --no-version-check --reporter compact"
 
   run_step "Server AI deckbuilder battle route contracts" \
-    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_e2e_$STAMP dart test test/ai_generate_learning_boundary_test.dart test/deck_simulate_route_adapter_test.dart test/deck_recommendations_route_adapter_test.dart test/deck_recommendations_route_support_test.dart test/deck_recommendations_power_level_support_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_ai_prompt_eval_suite_test.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/production_ai_mock_fallback_policy_test.dart"
+    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_e2e_$STAMP dart test test/ai_generate_learning_boundary_test.dart test/ai_route_registry_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_ai_prompt_eval_suite_test.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/production_ai_mock_fallback_policy_test.dart"
 
   run_ramp_and_data_foundation_contracts
 

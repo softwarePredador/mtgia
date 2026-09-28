@@ -1554,8 +1554,8 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "deck_id -> decks.user_id",
-      "purpose": "Resultado legado de simulação de confronto entre dois decks (POST /ai/simulate-matchup, desligada e com remoção decidida na D-31).",
-      "owner": "server/routes/ai/simulate-matchup/index.dart",
+      "purpose": "Resultado legado de simulação de confronto entre dois decks. A rota que o gravava (POST /ai/simulate-matchup) saiu na D-31, em 2026-09-28; as linhas antigas seguem na exportação e na exclusão.",
+      "owner": "nenhum escritor desde a D-31: POST /ai/simulate-matchup saiu em 2026-09-28 (BT-AI-029); descartar a tabela fica com o BT-DB-005",
       "retention": {
         "class": "account_lifetime",
         "period": "enquanto o deck existir",
@@ -1631,8 +1631,8 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "deck_id -> decks.user_id",
-      "purpose": "Relatório legado de fraquezas do deck (POST /ai/weakness-analysis, desligada e com remoção decidida na D-31).",
-      "owner": "server/routes/ai/weakness-analysis/index.dart",
+      "purpose": "Relatório legado de fraquezas do deck. A rota que o gravava (POST /ai/weakness-analysis) saiu na D-31, em 2026-09-28; as linhas antigas seguem na exportação e na exclusão.",
+      "owner": "nenhum escritor desde a D-31: POST /ai/weakness-analysis saiu em 2026-09-28 (BT-AI-029); descartar a tabela fica com o BT-DB-005",
       "retention": {
         "class": "account_lifetime",
         "period": "enquanto o deck existir",

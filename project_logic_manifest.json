@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "e7bf1689dd1a6e666df510ccf8211aa21d6c185e40edd3e476ce9466f40456ed",
+  "source_digest_sha256": "d6423bbbc5f78544af05bf50cb3d43b8c78796e0f05bb011630b048c56ed1be7",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 712,
+    "dart_source_files": 701,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5388,
-    "semantic_resolved_files": 712,
+    "dart_symbols": 5319,
+    "semantic_resolved_files": 701,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43474,
-    "semantic_resolved_call_sites": 69078,
-    "semantic_resolved_type_references": 16529,
-    "modules": 164,
+    "semantic_resolved_call_edges": 43070,
+    "semantic_resolved_call_sites": 68301,
+    "semantic_resolved_type_references": 16336,
+    "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
-    "api_routes": 122,
+    "api_routes": 118,
     "database_tables": 83,
     "database_views": 6,
     "migrations": 62,
     "scripts_and_jobs": 694,
     "environment_variables": 716,
-    "tests": 1271,
+    "tests": 1266,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -707,7 +707,6 @@
         "server/lib/ai/commander_reference_readiness_support.dart",
         "server/lib/ai/commander_spellbook_service.dart",
         "server/lib/ai/commander_staple_impact_policy.dart",
-        "server/lib/ai/deck_advanced_analysis.dart",
         "server/lib/ai/deck_battle_learning_evidence.dart",
         "server/lib/ai/deck_learning_event_support.dart",
         "server/lib/ai/deck_quality_report.dart",
@@ -786,8 +785,8 @@
         "server/lib/ai/theme_contextual_rules_service.dart",
         "server/lib/ai/xmage_battle_client.dart"
       ],
-      "file_count": 102,
-      "symbol_count": 1094,
+      "file_count": 101,
+      "symbol_count": 1079,
       "providers": [],
       "services": [
         "CommanderSpellbookService",
@@ -933,19 +932,6 @@
       "symbol_count": 2,
       "providers": [],
       "services": []
-    },
-    {
-      "id": "server/lib/archetype_counters_service",
-      "layer": "server",
-      "files": [
-        "server/lib/archetype_counters_service.dart"
-      ],
-      "file_count": 1,
-      "symbol_count": 1,
-      "providers": [],
-      "services": [
-        "ArchetypeCountersService"
-      ]
     },
     {
       "id": "server/lib/auth_middleware",
@@ -1386,50 +1372,6 @@
       ],
       "file_count": 1,
       "symbol_count": 1,
-      "providers": [],
-      "services": []
-    },
-    {
-      "id": "server/lib/deck_recommendations_advisory_support",
-      "layer": "server",
-      "files": [
-        "server/lib/deck_recommendations_advisory_support.dart"
-      ],
-      "file_count": 1,
-      "symbol_count": 3,
-      "providers": [],
-      "services": []
-    },
-    {
-      "id": "server/lib/deck_recommendations_fallback_support",
-      "layer": "server",
-      "files": [
-        "server/lib/deck_recommendations_fallback_support.dart"
-      ],
-      "file_count": 1,
-      "symbol_count": 8,
-      "providers": [],
-      "services": []
-    },
-    {
-      "id": "server/lib/deck_recommendations_power_level_support",
-      "layer": "server",
-      "files": [
-        "server/lib/deck_recommendations_power_level_support.dart"
-      ],
-      "file_count": 1,
-      "symbol_count": 1,
-      "providers": [],
-      "services": []
-    },
-    {
-      "id": "server/lib/deck_recommendations_route_support",
-      "layer": "server",
-      "files": [
-        "server/lib/deck_recommendations_route_support.dart"
-      ],
-      "file_count": 1,
-      "symbol_count": 5,
       "providers": [],
       "services": []
     },
@@ -2222,12 +2164,10 @@
         "server/routes/ai/optimize/jobs/[id].dart",
         "server/routes/ai/optimize/telemetry/index.dart",
         "server/routes/ai/rebuild/index.dart",
-        "server/routes/ai/simulate-matchup/index.dart",
-        "server/routes/ai/simulate/index.dart",
-        "server/routes/ai/weakness-analysis/index.dart"
+        "server/routes/ai/simulate/index.dart"
       ],
-      "file_count": 22,
-      "symbol_count": 204,
+      "file_count": 20,
+      "symbol_count": 185,
       "providers": [],
       "services": []
     },
@@ -2376,16 +2316,13 @@
         "server/routes/decks/[id]/post-game-notes/index.dart",
         "server/routes/decks/[id]/post-game-timeline/index.dart",
         "server/routes/decks/[id]/pricing/index.dart",
-        "server/routes/decks/[id]/recommendations/_middleware.dart",
-        "server/routes/decks/[id]/recommendations/index.dart",
         "server/routes/decks/[id]/reports/index.dart",
-        "server/routes/decks/[id]/simulate/index.dart",
         "server/routes/decks/[id]/validate/index.dart",
         "server/routes/decks/_middleware.dart",
         "server/routes/decks/index.dart"
       ],
-      "file_count": 27,
-      "symbol_count": 99,
+      "file_count": 24,
+      "symbol_count": 82,
       "providers": [],
       "services": []
     },
@@ -24981,100 +24918,6 @@
       "line": 53
     },
     {
-      "name": "AdvancedAnalysisResult",
-      "kind": "class",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 73
-    },
-    {
-      "name": "WinconCategory",
-      "kind": "enum",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 84
-    },
-    {
-      "name": "_Card",
-      "kind": "class",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 18,
-      "members": [
-        "isCreature",
-        "isInstantSpeed"
-      ]
-    },
-    {
-      "name": "_isAltWin",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 104
-    },
-    {
-      "name": "_isCombatFinisher",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 139
-    },
-    {
-      "name": "_isDirectDamage",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 114
-    },
-    {
-      "name": "_isDrain",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 123
-    },
-    {
-      "name": "_isMill",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 133
-    },
-    {
-      "name": "_normalize",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 43
-    },
-    {
-      "name": "_winconCategories",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 157
-    },
-    {
-      "name": "_winconCategoryName",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 87
-    },
-    {
-      "name": "analyzeDrawCompleteness",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 391
-    },
-    {
-      "name": "analyzePostResolutionViability",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 487
-    },
-    {
-      "name": "analyzeRemovalToThreatRatio",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 306
-    },
-    {
-      "name": "analyzeWinconDiversity",
-      "kind": "function",
-      "source": "server/lib/ai/deck_advanced_analysis.dart",
-      "line": 175
-    },
-    {
       "name": "_emptyEvidence",
       "kind": "function",
       "source": "server/lib/ai/deck_battle_learning_evidence.dart",
@@ -30258,19 +30101,6 @@
       "line": 4
     },
     {
-      "name": "ArchetypeCountersService",
-      "kind": "class",
-      "source": "server/lib/archetype_counters_service.dart",
-      "line": 3,
-      "members": [
-        "detectDeckArchetype",
-        "getAvailableArchetypes",
-        "getCounterStrategy",
-        "getHateCards",
-        "upsertCounter"
-      ]
-    },
-    {
       "name": "authMiddleware",
       "kind": "function",
       "source": "server/lib/auth_middleware.dart",
@@ -33922,108 +33752,6 @@
       "line": 5
     },
     {
-      "name": "_normalizedRecommendations",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_advisory_support.dart",
-      "line": 77
-    },
-    {
-      "name": "buildOpenAiRecommendationsAdvisoryBody",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_advisory_support.dart",
-      "line": 23
-    },
-    {
-      "name": "buildOpenAiRecommendationsErrorBody",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_advisory_support.dart",
-      "line": 13
-    },
-    {
-      "name": "RecommendationDeckSummary",
-      "kind": "class",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 24
-    },
-    {
-      "name": "addCandidates",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 260
-    },
-    {
-      "name": "buildHeuristicRecommendationsAnalysis",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 588
-    },
-    {
-      "name": "buildHeuristicRecommendationsBody",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 500
-    },
-    {
-      "name": "buildHeuristicRecommendationsForDeck",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 246
-    },
-    {
-      "name": "buildOpenAiRecommendationFallbackShape",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 221
-    },
-    {
-      "name": "buildRecommendationStatistics",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 564
-    },
-    {
-      "name": "summarizeRecommendationDeck",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_fallback_support.dart",
-      "line": 70
-    },
-    {
-      "name": "estimateRecommendationBracketPowerLevel",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_power_level_support.dart",
-      "line": 1
-    },
-    {
-      "name": "DeckRecommendationRecord",
-      "kind": "class",
-      "source": "server/lib/deck_recommendations_route_support.dart",
-      "line": 14
-    },
-    {
-      "name": "DeckRecommendationsRouteResult",
-      "kind": "class",
-      "source": "server/lib/deck_recommendations_route_support.dart",
-      "line": 26
-    },
-    {
-      "name": "_defaultOpenAiPost",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_route_support.dart",
-      "line": 329
-    },
-    {
-      "name": "buildDeckRecommendationsRouteResult",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_route_support.dart",
-      "line": 52
-    },
-    {
-      "name": "buildOpenAiRecommendationsRouteResult",
-      "kind": "function",
-      "source": "server/lib/deck_recommendations_route_support.dart",
-      "line": 109
-    },
-    {
       "name": "DeckNotFoundException",
       "kind": "class",
       "source": "server/lib/deck_request_support.dart",
@@ -34304,7 +34032,7 @@
       "name": "DeckWriteVerificationExemption",
       "kind": "class",
       "source": "server/lib/deck_write_verification_policy.dart",
-      "line": 91
+      "line": 86
     },
     {
       "name": "isDeckContentWrite",
@@ -34316,7 +34044,7 @@
       "name": "verifiedEmailForDeckContentWrites",
       "kind": "function",
       "source": "server/lib/deck_write_verification_policy.dart",
-      "line": 100
+      "line": 95
     },
     {
       "name": "_readDouble",
@@ -36922,7 +36650,6 @@
         "optimizationCriticModel",
         "optimizeModel",
         "profile",
-        "recommendationsModel",
         "selectedModels",
         "shouldUseFallbackForInvalidApiKey",
         "temperatureFor",
@@ -38609,13 +38336,13 @@
       "name": "aiEndpointAccessPolicyForPath",
       "kind": "function",
       "source": "server/routes/ai/_middleware.dart",
-      "line": 31
+      "line": 29
     },
     {
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/ai/_middleware.dart",
-      "line": 54
+      "line": 52
     },
     {
       "name": "_annotateArchetypesPayload",
@@ -39641,78 +39368,6 @@
       "line": 17
     },
     {
-      "name": "_analyzeMatchup",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 328
-    },
-    {
-      "name": "_functionalTagsSelectSql",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 625
-    },
-    {
-      "name": "_getArchetypeMatchupModifier",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 585
-    },
-    {
-      "name": "_getDeckData",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 109
-    },
-    {
-      "name": "_getMatchupVerdict",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 601
-    },
-    {
-      "name": "_getMetaDeckData",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 289
-    },
-    {
-      "name": "_hasTable",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 610
-    },
-    {
-      "name": "_loadStoredMatchup",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 554
-    },
-    {
-      "name": "_normalizedSimulationCount",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 672
-    },
-    {
-      "name": "_semanticV2SelectSql",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 647
-    },
-    {
-      "name": "_stableMatchupSeed",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 677
-    },
-    {
-      "name": "onRequest",
-      "kind": "function",
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "line": 13
-    },
-    {
       "name": "_RouteBattleAttempt",
       "kind": "class",
       "source": "server/routes/ai/simulate/index.dart",
@@ -39786,48 +39441,6 @@
       "kind": "function",
       "source": "server/routes/ai/simulate/index.dart",
       "line": 25
-    },
-    {
-      "name": "_findWeaknessRecommendations",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 812
-    },
-    {
-      "name": "_functionalTagsSelectSql",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 968
-    },
-    {
-      "name": "_hasTable",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 953
-    },
-    {
-      "name": "_loadWeaknessHistory",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 757
-    },
-    {
-      "name": "_semanticV2SelectSql",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 990
-    },
-    {
-      "name": "_sqlStringLiteral",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 949
-    },
-    {
-      "name": "onRequest",
-      "kind": "function",
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "line": 14
     },
     {
       "name": "middleware",
@@ -40901,112 +40514,10 @@
       "line": 8
     },
     {
-      "name": "middleware",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/_middleware.dart",
-      "line": 7
-    },
-    {
-      "name": "_findCardsForCategory",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 242
-    },
-    {
-      "name": "_functionalTagsSelectSql",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 195
-    },
-    {
-      "name": "_generateRecommendations",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 19
-    },
-    {
-      "name": "_hasTable",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 180
-    },
-    {
-      "name": "_recommendationsEnv",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 172
-    },
-    {
-      "name": "_semanticV2SelectSql",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 217
-    },
-    {
-      "name": "_sqlStringLiteral",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 361
-    },
-    {
-      "name": "onRequest",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "line": 12
-    },
-    {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/reports/index.dart",
       "line": 10
-    },
-    {
-      "name": "_SimCard",
-      "kind": "class",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 244
-    },
-    {
-      "name": "_SimulationConfig",
-      "kind": "class",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 234
-    },
-    {
-      "name": "_analyzeOpeningHand",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 220
-    },
-    {
-      "name": "_boundedIntParam",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 209
-    },
-    {
-      "name": "_calculateCmc",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 252
-    },
-    {
-      "name": "_simulateDeck",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 14
-    },
-    {
-      "name": "_simulationConfig",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 196
-    },
-    {
-      "name": "onRequest",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/simulate/index.dart",
-      "line": 7
     },
     {
       "name": "onRequest",
@@ -41762,7 +41273,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 712,
+    "resolved_file_count": 701,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -42093,7 +41604,6 @@
       "server/lib/ai/commander_reference_readiness_support.dart",
       "server/lib/ai/commander_spellbook_service.dart",
       "server/lib/ai/commander_staple_impact_policy.dart",
-      "server/lib/ai/deck_advanced_analysis.dart",
       "server/lib/ai/deck_battle_learning_evidence.dart",
       "server/lib/ai/deck_learning_event_support.dart",
       "server/lib/ai/deck_quality_report.dart",
@@ -42183,7 +41693,6 @@
       "server/lib/ai_provider_runtime_support.dart",
       "server/lib/ai_provider_usage_support.dart",
       "server/lib/ai_telemetry_contract.dart",
-      "server/lib/archetype_counters_service.dart",
       "server/lib/auth_middleware.dart",
       "server/lib/auth_runtime_policy.dart",
       "server/lib/auth_service.dart",
@@ -42251,10 +41760,6 @@
       "server/lib/deck_format_support.dart",
       "server/lib/deck_import_review_contract.dart",
       "server/lib/deck_readiness_contract.dart",
-      "server/lib/deck_recommendations_advisory_support.dart",
-      "server/lib/deck_recommendations_fallback_support.dart",
-      "server/lib/deck_recommendations_power_level_support.dart",
-      "server/lib/deck_recommendations_route_support.dart",
       "server/lib/deck_request_support.dart",
       "server/lib/deck_rules_service.dart",
       "server/lib/deck_schema_support.dart",
@@ -42360,9 +41865,7 @@
       "server/routes/ai/optimize/jobs/[id].dart",
       "server/routes/ai/optimize/telemetry/index.dart",
       "server/routes/ai/rebuild/index.dart",
-      "server/routes/ai/simulate-matchup/index.dart",
       "server/routes/ai/simulate/index.dart",
-      "server/routes/ai/weakness-analysis/index.dart",
       "server/routes/auth/_middleware.dart",
       "server/routes/auth/change-password.dart",
       "server/routes/auth/forgot-password.dart",
@@ -42424,10 +41927,7 @@
       "server/routes/decks/[id]/post-game-notes/index.dart",
       "server/routes/decks/[id]/post-game-timeline/index.dart",
       "server/routes/decks/[id]/pricing/index.dart",
-      "server/routes/decks/[id]/recommendations/_middleware.dart",
-      "server/routes/decks/[id]/recommendations/index.dart",
       "server/routes/decks/[id]/reports/index.dart",
-      "server/routes/decks/[id]/simulate/index.dart",
       "server/routes/decks/[id]/validate/index.dart",
       "server/routes/decks/_middleware.dart",
       "server/routes/decks/index.dart",
@@ -42483,11 +41983,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43474,
-    "resolved_call_site_count": 69078,
-    "workspace_call_edge_count": 13695,
-    "unresolved_call_edge_count": 564,
-    "unresolved_call_site_count": 779,
+    "resolved_call_edge_count": 43070,
+    "resolved_call_site_count": 68301,
+    "workspace_call_edge_count": 13550,
+    "unresolved_call_edge_count": 558,
+    "unresolved_call_site_count": 773,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -128676,193 +128176,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 159,
-        "caller": "_winconCategories",
-        "kind": "method",
-        "lexical_target": "_isAltWin",
-        "target": "_isAltWin",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 163,
-        "caller": "_winconCategories",
-        "kind": "method",
-        "lexical_target": "_isDirectDamage",
-        "target": "_isDirectDamage",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 164,
-        "caller": "_winconCategories",
-        "kind": "method",
-        "lexical_target": "_isDrain",
-        "target": "_isDrain",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 165,
-        "caller": "_winconCategories",
-        "kind": "method",
-        "lexical_target": "_isMill",
-        "target": "_isMill",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 166,
-        "caller": "_winconCategories",
-        "kind": "method",
-        "lexical_target": "_isCombatFinisher",
-        "target": "_isCombatFinisher",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 182,
-        "caller": "analyzeWinconDiversity",
-        "kind": "method",
-        "lexical_target": "_normalize",
-        "target": "_normalize",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 193,
-        "caller": "analyzeWinconDiversity",
-        "kind": "method",
-        "lexical_target": "_winconCategories",
-        "target": "_winconCategories",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 199,
-        "caller": "analyzeWinconDiversity",
-        "kind": "method",
-        "lexical_target": "_winconCategoryName",
-        "target": "_winconCategoryName",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 299,
-        "caller": "analyzeWinconDiversity",
-        "kind": "constructor",
-        "lexical_target": "AdvancedAnalysisResult",
-        "target": "AdvancedAnalysisResult.AdvancedAnalysisResult",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 314,
-        "caller": "analyzeRemovalToThreatRatio",
-        "kind": "method",
-        "lexical_target": "_normalize",
-        "target": "_normalize",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 384,
-        "caller": "analyzeRemovalToThreatRatio",
-        "kind": "constructor",
-        "lexical_target": "AdvancedAnalysisResult",
-        "target": "AdvancedAnalysisResult.AdvancedAnalysisResult",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 397,
-        "caller": "analyzeDrawCompleteness",
-        "kind": "method",
-        "lexical_target": "_normalize",
-        "target": "_normalize",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 480,
-        "caller": "analyzeDrawCompleteness",
-        "kind": "constructor",
-        "lexical_target": "AdvancedAnalysisResult",
-        "target": "AdvancedAnalysisResult.AdvancedAnalysisResult",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 495,
-        "caller": "analyzePostResolutionViability",
-        "kind": "method",
-        "lexical_target": "_normalize",
-        "target": "_normalize",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 51,
-        "caller": "_normalize",
-        "kind": "method",
-        "lexical_target": "resolveCardFunctionalRoles",
-        "target": "resolveCardFunctionalRoles",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 58,
-        "caller": "_normalize",
-        "kind": "constructor",
-        "lexical_target": "_Card",
-        "target": "_Card._Card",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 605,
-        "caller": "analyzePostResolutionViability",
-        "kind": "constructor",
-        "lexical_target": "AdvancedAnalysisResult",
-        "target": "AdvancedAnalysisResult.AdvancedAnalysisResult",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
         "source": "server/lib/ai/deck_battle_learning_evidence.dart",
         "line": 161,
         "caller": "_loadCurrentDeckHash",
@@ -159740,336 +159053,6 @@
         "occurrences": 2
       },
       {
-        "source": "server/lib/deck_recommendations_advisory_support.dart",
-        "line": 17,
-        "caller": "buildOpenAiRecommendationsErrorBody",
-        "kind": "method",
-        "lexical_target": "buildOpenAiRecommendationsAdvisoryBody",
-        "target": "buildOpenAiRecommendationsAdvisoryBody",
-        "target_library": "package:server/deck_recommendations_advisory_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_advisory_support.dart",
-        "line": 42,
-        "caller": "buildOpenAiRecommendationsAdvisoryBody",
-        "kind": "method",
-        "lexical_target": "_normalizedRecommendations",
-        "target": "_normalizedRecommendations",
-        "target_library": "package:server/deck_recommendations_advisory_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 101,
-        "caller": "summarizeRecommendationDeck",
-        "kind": "method",
-        "lexical_target": "resolveCardFunctionalRoles",
-        "target": "resolveCardFunctionalRoles",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 122,
-        "caller": "summarizeRecommendationDeck",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 189,
-        "caller": "summarizeRecommendationDeck",
-        "kind": "method",
-        "lexical_target": "estimateRecommendationBracketPowerLevel",
-        "target": "estimateRecommendationBracketPowerLevel",
-        "target_library": "package:server/deck_recommendations_power_level_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 197,
-        "caller": "summarizeRecommendationDeck",
-        "kind": "constructor",
-        "lexical_target": "RecommendationDeckSummary",
-        "target": "RecommendationDeckSummary.RecommendationDeckSummary",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 226,
-        "caller": "buildOpenAiRecommendationFallbackShape",
-        "kind": "method",
-        "lexical_target": "buildRecommendationStatistics",
-        "target": "buildRecommendationStatistics",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 253,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "method",
-        "lexical_target": "summarizeRecommendationDeck",
-        "target": "summarizeRecommendationDeck",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 285,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "method",
-        "lexical_target": "addCandidates",
-        "target": "addCandidates",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 401,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 431,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "method",
-        "lexical_target": "isBasicLandCard",
-        "target": "isBasicLandCard",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 456,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "method",
-        "lexical_target": "toJson",
-        "target": "EdhrecCardTrend.toJson",
-        "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 477,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "method",
-        "lexical_target": "buildHeuristicRecommendationsBody",
-        "target": "buildHeuristicRecommendationsBody",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 530,
-        "caller": "buildHeuristicRecommendationsBody",
-        "kind": "method",
-        "lexical_target": "buildHeuristicRecommendationsAnalysis",
-        "target": "buildHeuristicRecommendationsAnalysis",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 543,
-        "caller": "buildHeuristicRecommendationsBody",
-        "kind": "method",
-        "lexical_target": "buildRecommendationStatistics",
-        "target": "buildRecommendationStatistics",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 194,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "timeoutFor",
-        "target": "OpenAiRuntimeConfig.timeoutFor",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 212,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "aiSafetyIdentifierPayload",
-        "target": "aiSafetyIdentifierPayload",
-        "target_library": "package:server/ai_provider_runtime_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 222,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "temperatureFor",
-        "target": "OpenAiRuntimeConfig.temperatureFor",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 229,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "openAiTokenLimitPayload",
-        "target": "openAiTokenLimitPayload",
-        "target_library": "package:server/openai_structured_output_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 230,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "openAiStructuredResponseFormat",
-        "target": "openAiStructuredResponseFormat",
-        "target_library": "package:server/openai_structured_output_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 239,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "recordAiProviderCall",
-        "target": "recordAiProviderCall",
-        "target_library": "package:server/ai_provider_usage_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 250,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "constructor",
-        "lexical_target": "DeckRecommendationsRouteResult",
-        "target": "DeckRecommendationsRouteResult.DeckRecommendationsRouteResult",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 252,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "buildOpenAiRecommendationsErrorBody",
-        "target": "buildOpenAiRecommendationsErrorBody",
-        "target_library": "package:server/deck_recommendations_advisory_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 294,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "mapAiProviderHttpStatus",
-        "target": "mapAiProviderHttpStatus",
-        "target_library": "package:server/ai_provider_runtime_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 312,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "buildOpenAiRecommendationsAdvisoryBody",
-        "target": "buildOpenAiRecommendationsAdvisoryBody",
-        "target_library": "package:server/deck_recommendations_advisory_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 66,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "constructor",
-        "lexical_target": "DeckRecommendationsRouteResult",
-        "target": "DeckRecommendationsRouteResult.DeckRecommendationsRouteResult",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 73,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "summarizeRecommendationDeck",
-        "target": "summarizeRecommendationDeck",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 77,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "buildOpenAiRecommendationFallbackShape",
-        "target": "buildOpenAiRecommendationFallbackShape",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 82,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "buildOpenAiRecommendationsRouteResult",
-        "target": "buildOpenAiRecommendationsRouteResult",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 99,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "method",
-        "lexical_target": "buildHeuristicRecommendationsForDeck",
-        "target": "buildHeuristicRecommendationsForDeck",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
         "source": "server/lib/deck_request_support.dart",
         "line": 102,
         "caller": "requirePositiveInteger",
@@ -160720,7 +159703,18 @@
       },
       {
         "source": "server/lib/deck_write_verification_policy.dart",
-        "line": 102,
+        "line": 43,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "DeckWriteVerificationExemption",
+        "target": "DeckWriteVerificationExemption.DeckWriteVerificationExemption",
+        "target_library": "package:server/deck_write_verification_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "server/lib/deck_write_verification_policy.dart",
+        "line": 97,
         "caller": "verifiedEmailForDeckContentWrites",
         "kind": "method",
         "lexical_target": "verifiedEmailForMutations",
@@ -160731,7 +159725,7 @@
       },
       {
         "source": "server/lib/deck_write_verification_policy.dart",
-        "line": 104,
+        "line": 99,
         "caller": "verifiedEmailForDeckContentWrites",
         "kind": "method",
         "lexical_target": "isDeckContentWrite",
@@ -160739,17 +159733,6 @@
         "target_library": "package:server/deck_write_verification_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_write_verification_policy.dart",
-        "line": 43,
-        "caller": "<top-level>",
-        "kind": "constructor",
-        "lexical_target": "DeckWriteVerificationExemption",
-        "target": "DeckWriteVerificationExemption.DeckWriteVerificationExemption",
-        "target_library": "package:server/deck_write_verification_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 9
       },
       {
         "source": "server/lib/decks/deck_applied_analysis_support.dart",
@@ -166979,7 +165962,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 154,
+        "line": 145,
         "caller": "OpenAiRuntimeConfig.temperatureFor",
         "kind": "method",
         "lexical_target": "_clampTemp",
@@ -167024,17 +166007,6 @@
       {
         "source": "server/lib/openai_runtime_config.dart",
         "line": 57,
-        "caller": "OpenAiRuntimeConfig.recommendationsModel",
-        "kind": "method",
-        "lexical_target": "modelFor",
-        "target": "OpenAiRuntimeConfig.modelFor",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/openai_runtime_config.dart",
-        "line": 65,
         "caller": "OpenAiRuntimeConfig.analysisModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -167045,7 +166017,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 73,
+        "line": 65,
         "caller": "OpenAiRuntimeConfig.optimizeModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -167056,7 +166028,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 81,
+        "line": 73,
         "caller": "OpenAiRuntimeConfig.completeModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -167067,7 +166039,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 89,
+        "line": 81,
         "caller": "OpenAiRuntimeConfig.optimizationCriticModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -172204,7 +171176,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 68,
+        "line": 66,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "legalAcceptanceForWrites",
@@ -172215,7 +171187,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 69,
+        "line": 67,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "authMiddleware",
@@ -172226,7 +171198,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 71,
+        "line": 69,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiPollingRateLimit",
@@ -172237,7 +171209,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 75,
+        "line": 73,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiRateLimit",
@@ -172248,7 +171220,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 80,
+        "line": 78,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiPlanLimitMiddleware",
@@ -172259,7 +171231,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 86,
+        "line": 84,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiEndpointAccessPolicyForPath",
@@ -180761,358 +179733,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 105,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 117,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 128,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "_functionalTagsSelectSql",
-        "target": "_functionalTagsSelectSql",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 132,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "_semanticV2SelectSql",
-        "target": "_semanticV2SelectSql",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 224,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "resolveCardFunctionalRoles",
-        "target": "resolveCardFunctionalRoles",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 234,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 242,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "contains",
-        "target": "CardRoles.contains",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 25,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 284,
-        "caller": "_getDeckData",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 306,
-        "caller": "_getMetaDeckData",
-        "kind": "method",
-        "lexical_target": "parseMetaDeckCardList",
-        "target": "parseMetaDeckCardList",
-        "target_library": "package:server/meta/meta_deck_card_list_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 32,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "requireJsonObject",
-        "target": "requireJsonObject",
-        "target_library": "package:server/json_object_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 321,
-        "caller": "_getMetaDeckData",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 33,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "readOptionalJsonString",
-        "target": "readOptionalJsonString",
-        "target_library": "package:server/json_object_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 341,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "detectDeckArchetype",
-        "target": "ArchetypeCountersService.detectDeckArchetype",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 359,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "getHateCards",
-        "target": "ArchetypeCountersService.getHateCards",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 40,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "badRequest",
-        "target": "badRequest",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 438,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "_getArchetypeMatchupModifier",
-        "target": "_getArchetypeMatchupModifier",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 456,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "_stableMatchupSeed",
-        "target": "_stableMatchupSeed",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 46,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_normalizedSimulationCount",
-        "target": "_normalizedSimulationCount",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 480,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "_loadStoredMatchup",
-        "target": "_loadStoredMatchup",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 503,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 549,
-        "caller": "_analyzeMatchup",
-        "kind": "method",
-        "lexical_target": "_getMatchupVerdict",
-        "target": "_getMatchupVerdict",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 55,
-        "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "ArchetypeCountersService",
-        "target": "ArchetypeCountersService.ArchetypeCountersService",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 578,
-        "caller": "_loadStoredMatchup",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 58,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_getDeckData",
-        "target": "_getDeckData",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 626,
-        "caller": "_functionalTagsSelectSql",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 648,
-        "caller": "_semanticV2SelectSql",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 67,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 72,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_getMetaDeckData",
-        "target": "_getMetaDeckData",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 77,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_analyzeMatchup",
-        "target": "_analyzeMatchup",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 98,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "e",
-        "target": "Log.e",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 99,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "captureRouteException",
-        "target": "captureRouteException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
         "source": "server/routes/ai/simulate/index.dart",
         "line": 109,
         "caller": "onRequest",
@@ -181617,391 +180237,6 @@
         "target_library": "workspace:server/routes/ai/simulate/index.dart",
         "target_scope": "workspace",
         "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 164,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "resolveCardFunctionalRoles",
-        "target": "resolveCardFunctionalRoles",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 174,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 186,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "contains",
-        "target": "CardRoles.contains",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 12
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 197,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "summarizeOptimizationRampProfilesForDeck",
-        "target": "summarizeOptimizationRampProfilesForDeck",
-        "target_library": "package:server/ai/optimization_ramp_profile.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 210,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "detectDeckArchetype",
-        "target": "ArchetypeCountersService.detectDeckArchetype",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 22,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 259,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_findWeaknessRecommendations",
-        "target": "_findWeaknessRecommendations",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 8
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 28,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "requireJsonObject",
-        "target": "requireJsonObject",
-        "target_library": "package:server/json_object_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 29,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "readOptionalJsonString",
-        "target": "readOptionalJsonString",
-        "target_library": "package:server/json_object_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 31,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "badRequest",
-        "target": "badRequest",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 44,
-        "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "ArchetypeCountersService",
-        "target": "ArchetypeCountersService.ArchetypeCountersService",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 45,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 515,
-        "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "DeckCombosResult",
-        "target": "DeckCombosResult.DeckCombosResult",
-        "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 520,
-        "caller": "onRequest",
-        "kind": "constructor",
-        "lexical_target": "CommanderSpellbookService",
-        "target": "CommanderSpellbookService.CommanderSpellbookService",
-        "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 520,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "findDeckCombos",
-        "target": "CommanderSpellbookService.findDeckCombos",
-        "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 527,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 56,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_functionalTagsSelectSql",
-        "target": "_functionalTagsSelectSql",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 579,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "analyzeWinconDiversity",
-        "target": "analyzeWinconDiversity",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 584,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "analyzeRemovalToThreatRatio",
-        "target": "analyzeRemovalToThreatRatio",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 588,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "analyzeDrawCompleteness",
-        "target": "analyzeDrawCompleteness",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 589,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "analyzePostResolutionViability",
-        "target": "analyzePostResolutionViability",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 60,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_semanticV2SelectSql",
-        "target": "_semanticV2SelectSql",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 644,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "getHateCards",
-        "target": "ArchetypeCountersService.getHateCards",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 679,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_loadWeaknessHistory",
-        "target": "_loadWeaknessHistory",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 74,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 746,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "e",
-        "target": "Log.e",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 747,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "captureRouteException",
-        "target": "captureRouteException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 753,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 805,
-        "caller": "_loadWeaknessHistory",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 832,
-        "caller": "_findWeaknessRecommendations",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 864,
-        "caller": "_findWeaknessRecommendations",
-        "kind": "method",
-        "lexical_target": "_sqlStringLiteral",
-        "target": "_sqlStringLiteral",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 925,
-        "caller": "_findWeaknessRecommendations",
-        "kind": "method",
-        "lexical_target": "optimizationRampProfileForCard",
-        "target": "optimizationRampProfileForCard",
-        "target_library": "package:server/ai/optimization_ramp_profile.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 940,
-        "caller": "_findWeaknessRecommendations",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 969,
-        "caller": "_functionalTagsSelectSql",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 991,
-        "caller": "_semanticV2SelectSql",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
       },
       {
         "source": "server/routes/auth/_middleware.dart",
@@ -188527,248 +186762,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/routes/decks/[id]/recommendations/_middleware.dart",
-        "line": 10,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "authMiddleware",
-        "target": "authMiddleware",
-        "target_library": "package:server/auth_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/_middleware.dart",
-        "line": 8,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "aiRateLimit",
-        "target": "aiRateLimit",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/_middleware.dart",
-        "line": 9,
-        "caller": "middleware",
-        "kind": "method",
-        "lexical_target": "aiPlanLimitMiddleware",
-        "target": "aiPlanLimitMiddleware",
-        "target_library": "package:server/plan_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 137,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "_findCardsForCategory",
-        "target": "_findCardsForCategory",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 14,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_generateRecommendations",
-        "target": "_generateRecommendations",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 149,
-        "caller": "_generateRecommendations",
-        "kind": "constructor",
-        "lexical_target": "EdhrecTrendService",
-        "target": "EdhrecTrendService.EdhrecTrendService",
-        "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 149,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "getCardTrends",
-        "target": "EdhrecTrendService.getCardTrends",
-        "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 155,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "e",
-        "target": "Log.e",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 156,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "captureRouteException",
-        "target": "captureRouteException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 176,
-        "caller": "_recommendationsEnv",
-        "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 196,
-        "caller": "_functionalTagsSelectSql",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 218,
-        "caller": "_semanticV2SelectSql",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 25,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "_recommendationsEnv",
-        "target": "_recommendationsEnv",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 26,
-        "caller": "_generateRecommendations",
-        "kind": "constructor",
-        "lexical_target": "OpenAiRuntimeConfig",
-        "target": "OpenAiRuntimeConfig.OpenAiRuntimeConfig",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 264,
-        "caller": "_findCardsForCategory",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 297,
-        "caller": "_findCardsForCategory",
-        "kind": "method",
-        "lexical_target": "_sqlStringLiteral",
-        "target": "_sqlStringLiteral",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 30,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "buildDeckRecommendationsRouteResult",
-        "target": "buildDeckRecommendationsRouteResult",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 353,
-        "caller": "_findCardsForCategory",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 49,
-        "caller": "_generateRecommendations",
-        "kind": "constructor",
-        "lexical_target": "DeckRecommendationRecord",
-        "target": "DeckRecommendationRecord.DeckRecommendationRecord",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 56,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "_hasTable",
-        "target": "_hasTable",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 67,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "_functionalTagsSelectSql",
-        "target": "_functionalTagsSelectSql",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 71,
-        "caller": "_generateRecommendations",
-        "kind": "method",
-        "lexical_target": "_semanticV2SelectSql",
-        "target": "_semanticV2SelectSql",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
         "source": "server/routes/decks/[id]/reports/index.dart",
         "line": 12,
         "caller": "onRequest",
@@ -188831,94 +186824,6 @@
         "lexical_target": "internalServerError",
         "target": "internalServerError",
         "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 17,
-        "caller": "_simulateDeck",
-        "kind": "method",
-        "lexical_target": "_simulationConfig",
-        "target": "_simulationConfig",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 183,
-        "caller": "_simulateDeck",
-        "kind": "method",
-        "lexical_target": "_analyzeOpeningHand",
-        "target": "_analyzeOpeningHand",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 198,
-        "caller": "_simulationConfig",
-        "kind": "constructor",
-        "lexical_target": "_SimulationConfig",
-        "target": "_SimulationConfig._SimulationConfig",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 199,
-        "caller": "_simulationConfig",
-        "kind": "method",
-        "lexical_target": "_boundedIntParam",
-        "target": "_boundedIntParam",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 71,
-        "caller": "_simulateDeck",
-        "kind": "constructor",
-        "lexical_target": "_SimCard",
-        "target": "_SimCard._SimCard",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 73,
-        "caller": "_simulateDeck",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 74,
-        "caller": "_simulateDeck",
-        "kind": "method",
-        "lexical_target": "_calculateCmc",
-        "target": "_calculateCmc",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 9,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_simulateDeck",
-        "target": "_simulateDeck",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -193146,26 +191051,26 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 520,
-        "occurrences": 666
+        "unique_references": 519,
+        "occurrences": 665
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:collection",
-        "unique_references": 131,
-        "occurrences": 138
+        "unique_references": 129,
+        "occurrences": 136
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 597,
-        "occurrences": 745
+        "unique_references": 594,
+        "occurrences": 741
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14454,
-        "occurrences": 25056
+        "unique_references": 14263,
+        "occurrences": 24575
       },
       {
         "target_scope": "dart_sdk",
@@ -193188,8 +191093,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 101,
-        "occurrences": 132
+        "unique_references": 97,
+        "occurrences": 125
       },
       {
         "target_scope": "dart_sdk",
@@ -193272,14 +191177,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 509,
-        "occurrences": 989
+        "unique_references": 496,
+        "occurrences": 968
       },
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
-        "unique_references": 17,
-        "occurrences": 46
+        "unique_references": 16,
+        "occurrences": 43
       },
       {
         "target_scope": "dependency",
@@ -194430,8 +192335,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:http/http.dart",
-        "unique_references": 52,
-        "occurrences": 57
+        "unique_references": 51,
+        "occurrences": 56
       },
       {
         "target_scope": "dependency",
@@ -194526,8 +192431,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1242,
-        "occurrences": 2016
+        "unique_references": 1204,
+        "occurrences": 1965
       },
       {
         "target_scope": "dependency",
@@ -194538,8 +192443,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/types.dart",
-        "unique_references": 20,
-        "occurrences": 32
+        "unique_references": 15,
+        "occurrences": 25
       },
       {
         "target_scope": "dependency",
@@ -196146,20 +194051,14 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "unique_references": 10,
-        "occurrences": 14
+        "unique_references": 7,
+        "occurrences": 11
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/commander_staple_impact_policy.dart",
         "unique_references": 3,
         "occurrences": 3
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "unique_references": 20,
-        "occurrences": 20
       },
       {
         "target_scope": "workspace",
@@ -196194,8 +194093,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "unique_references": 6,
-        "occurrences": 6
+        "unique_references": 3,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -196266,8 +194165,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "unique_references": 144,
-        "occurrences": 183
+        "unique_references": 138,
+        "occurrences": 159
       },
       {
         "target_scope": "workspace",
@@ -196278,8 +194177,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimization_ramp_profile.dart",
-        "unique_references": 45,
-        "occurrences": 64
+        "unique_references": 43,
+        "occurrences": 62
       },
       {
         "target_scope": "workspace",
@@ -196680,14 +194579,14 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai_provider_runtime_support.dart",
-        "unique_references": 18,
-        "occurrences": 22
+        "unique_references": 16,
+        "occurrences": 20
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai_provider_usage_support.dart",
-        "unique_references": 9,
-        "occurrences": 24
+        "unique_references": 8,
+        "occurrences": 21
       },
       {
         "target_scope": "workspace",
@@ -196697,15 +194596,9 @@
       },
       {
         "target_scope": "workspace",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "unique_references": 6,
-        "occurrences": 7
-      },
-      {
-        "target_scope": "workspace",
         "target_library": "package:server/auth_middleware.dart",
-        "unique_references": 22,
-        "occurrences": 25
+        "unique_references": 21,
+        "occurrences": 24
       },
       {
         "target_scope": "workspace",
@@ -196722,8 +194615,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/basic_land_utils.dart",
-        "unique_references": 106,
-        "occurrences": 119
+        "unique_references": 100,
+        "occurrences": 113
       },
       {
         "target_scope": "workspace",
@@ -197105,30 +194998,6 @@
       },
       {
         "target_scope": "workspace",
-        "target_library": "package:server/deck_recommendations_advisory_support.dart",
-        "unique_references": 4,
-        "occurrences": 7
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "unique_references": 10,
-        "occurrences": 16
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "package:server/deck_recommendations_power_level_support.dart",
-        "unique_references": 1,
-        "occurrences": 1
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "unique_references": 5,
-        "occurrences": 10
-      },
-      {
-        "target_scope": "workspace",
         "target_library": "package:server/deck_request_support.dart",
         "unique_references": 48,
         "occurrences": 73
@@ -197173,7 +195042,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/deck_write_verification_policy.dart",
         "unique_references": 3,
-        "occurrences": 11
+        "occurrences": 10
       },
       {
         "target_scope": "workspace",
@@ -197262,8 +195131,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/http_responses.dart",
-        "unique_references": 169,
-        "occurrences": 254
+        "unique_references": 161,
+        "occurrences": 241
       },
       {
         "target_scope": "workspace",
@@ -197292,8 +195161,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/json_object_support.dart",
-        "unique_references": 18,
-        "occurrences": 24
+        "unique_references": 14,
+        "occurrences": 19
       },
       {
         "target_scope": "workspace",
@@ -197322,8 +195191,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 183,
-        "occurrences": 309
+        "unique_references": 172,
+        "occurrences": 297
       },
       {
         "target_scope": "workspace",
@@ -197376,8 +195245,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/meta/meta_deck_card_list_support.dart",
-        "unique_references": 24,
-        "occurrences": 26
+        "unique_references": 23,
+        "occurrences": 25
       },
       {
         "target_scope": "workspace",
@@ -197424,20 +195293,20 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/observability.dart",
-        "unique_references": 128,
-        "occurrences": 152
+        "unique_references": 125,
+        "occurrences": 149
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/openai_runtime_config.dart",
-        "unique_references": 40,
-        "occurrences": 46
+        "unique_references": 36,
+        "occurrences": 42
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/openai_structured_output_support.dart",
-        "unique_references": 18,
-        "occurrences": 18
+        "unique_references": 16,
+        "occurrences": 16
       },
       {
         "target_scope": "workspace",
@@ -197466,8 +195335,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/plan_middleware.dart",
-        "unique_references": 7,
-        "occurrences": 7
+        "unique_references": 6,
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -197538,8 +195407,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/rate_limit_middleware.dart",
-        "unique_references": 65,
-        "occurrences": 82
+        "unique_references": 64,
+        "occurrences": 81
       },
       {
         "target_scope": "workspace",
@@ -197580,8 +195449,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/runtime_environment.dart",
-        "unique_references": 46,
-        "occurrences": 47
+        "unique_references": 45,
+        "occurrences": 46
       },
       {
         "target_scope": "workspace",
@@ -198065,21 +195934,9 @@
       },
       {
         "target_scope": "workspace",
-        "target_library": "workspace:server/routes/ai/simulate-matchup/index.dart",
-        "unique_references": 13,
-        "occurrences": 15
-      },
-      {
-        "target_scope": "workspace",
         "target_library": "workspace:server/routes/ai/simulate/index.dart",
         "unique_references": 13,
         "occurrences": 37
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "workspace:server/routes/ai/weakness-analysis/index.dart",
-        "unique_references": 9,
-        "occurrences": 17
       },
       {
         "target_scope": "workspace",
@@ -198290,18 +196147,6 @@
         "target_library": "workspace:server/routes/decks/[id]/pricing/index.dart",
         "unique_references": 1,
         "occurrences": 2
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "workspace:server/routes/decks/[id]/recommendations/index.dart",
-        "unique_references": 10,
-        "occurrences": 11
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "unique_references": 7,
-        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -202404,54 +200249,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 267,
-        "caller": "addCandidates",
-        "kind": "function_expression",
-        "lexical_target": "candidateFinder",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 279,
-        "caller": "addCandidates",
-        "kind": "function_expression",
-        "lexical_target": "reasonFor",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 450,
-        "caller": "buildHeuristicRecommendationsForDeck",
-        "kind": "function_expression",
-        "lexical_target": "trendFinder",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 205,
-        "caller": "buildOpenAiRecommendationsRouteResult",
-        "kind": "function_expression",
-        "lexical_target": "openAiPost",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 64,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "function_expression",
-        "lexical_target": "deckLoader",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 72,
-        "caller": "buildDeckRecommendationsRouteResult",
-        "kind": "function_expression",
-        "lexical_target": "deckCardLoader",
-        "occurrences": 1
-      },
-      {
         "source": "server/lib/endpoint_cache.dart",
         "line": 38,
         "caller": "EndpointCache.get",
@@ -202845,7 +200642,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 88,
+        "line": 86,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "costlyAiHandler",
@@ -202853,7 +200650,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 90,
+        "line": 88,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "rateLimitedAuxiliaryHandler",
@@ -202861,7 +200658,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 92,
+        "line": 90,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "pollingHandler",
@@ -202869,7 +200666,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 94,
+        "line": 92,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "authOnlyHandler",
@@ -202956,9 +200753,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16529,
-    "workspace_type_reference_count": 3506,
-    "unresolved_type_reference_count": 364,
+    "resolved_type_reference_count": 16336,
+    "workspace_type_reference_count": 3480,
+    "unresolved_type_reference_count": 363,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -226852,36 +224649,6 @@
         "occurrences": 3
       },
       {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 177,
-        "lexical_type": "AdvancedAnalysisResult",
-        "resolved_type": "AdvancedAnalysisResult",
-        "target": "AdvancedAnalysisResult",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 8
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 43,
-        "lexical_type": "_Card",
-        "resolved_type": "_Card",
-        "target": "_Card",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 8
-      },
-      {
-        "source": "server/lib/ai/deck_advanced_analysis.dart",
-        "line": 87,
-        "lexical_type": "WinconCategory",
-        "resolved_type": "WinconCategory",
-        "target": "WinconCategory",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
         "source": "server/lib/ai/deck_quality_report.dart",
         "line": 207,
         "lexical_type": "GoldfishSimulator",
@@ -232722,126 +230489,6 @@
         "occurrences": 4
       },
       {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 22,
-        "lexical_type": "EdhrecCardTrend",
-        "resolved_type": "EdhrecCardTrend",
-        "target": "EdhrecCardTrend",
-        "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 250,
-        "lexical_type": "RecommendationCandidateFinder",
-        "resolved_type": "Future<List<String>> Function({required Set<String> deckColors, required Set<String> excludeNames, required String format, bool landOnly, required int limit, required List<String> oraclePatterns, required List<String> roles})",
-        "target": "RecommendationCandidateFinder",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 251,
-        "lexical_type": "RecommendationTrendFinder?",
-        "resolved_type": "Future<List<EdhrecCardTrend>> Function(String)?",
-        "target": "RecommendationTrendFinder",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 70,
-        "lexical_type": "RecommendationDeckSummary",
-        "resolved_type": "RecommendationDeckSummary",
-        "target": "RecommendationDeckSummary",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 37,
-        "lexical_type": "DeckRecommendationRecord?",
-        "resolved_type": "DeckRecommendationRecord?",
-        "target": "DeckRecommendationRecord",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 52,
-        "lexical_type": "DeckRecommendationsRouteResult",
-        "resolved_type": "DeckRecommendationsRouteResult",
-        "target": "DeckRecommendationsRouteResult",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 9
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 56,
-        "lexical_type": "OpenAiRuntimeConfig",
-        "resolved_type": "OpenAiRuntimeConfig",
-        "target": "OpenAiRuntimeConfig",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 57,
-        "lexical_type": "DeckRecommendationLoader",
-        "resolved_type": "Future<DeckRecommendationRecord?> Function({required String deckId, required String userId})",
-        "target": "DeckRecommendationLoader",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 58,
-        "lexical_type": "DeckRecommendationCardLoader",
-        "resolved_type": "Future<List<Map<String, dynamic>>> Function({required String deckId})",
-        "target": "DeckRecommendationCardLoader",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 59,
-        "lexical_type": "RecommendationCandidateFinder",
-        "resolved_type": "Future<List<String>> Function({required Set<String> deckColors, required Set<String> excludeNames, required String format, bool landOnly, required int limit, required List<String> oraclePatterns, required List<String> roles})",
-        "target": "RecommendationCandidateFinder",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 60,
-        "lexical_type": "RecommendationTrendFinder?",
-        "resolved_type": "Future<List<EdhrecCardTrend>> Function(String)?",
-        "target": "RecommendationTrendFinder",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/deck_recommendations_route_support.dart",
-        "line": 61,
-        "lexical_type": "OpenAiRecommendationsPost",
-        "resolved_type": "Future<Response> Function(Uri, {Object? body, Map<String, String>? headers})",
-        "target": "OpenAiRecommendationsPost",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
         "source": "server/lib/deck_request_support.dart",
         "line": 27,
         "lexical_type": "DeckRequestException",
@@ -232919,7 +230566,7 @@
         "target": "DeckWriteVerificationExemption",
         "target_library": "package:server/deck_write_verification_policy.dart",
         "target_scope": "workspace",
-        "occurrences": 10
+        "occurrences": 9
       },
       {
         "source": "server/lib/decks/deck_applied_analysis_support.dart",
@@ -235023,7 +232670,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 31,
+        "line": 29,
         "lexical_type": "AiEndpointAccessPolicy",
         "resolved_type": "AiEndpointAccessPolicy",
         "target": "AiEndpointAccessPolicy",
@@ -236112,26 +233759,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 39,
-        "lexical_type": "JsonObjectValidationException",
-        "resolved_type": "JsonObjectValidationException",
-        "target": "JsonObjectValidationException",
-        "target_library": "package:server/json_object_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/simulate-matchup/index.dart",
-        "line": 55,
-        "lexical_type": "ArchetypeCountersService",
-        "resolved_type": "ArchetypeCountersService",
-        "target": "ArchetypeCountersService",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
         "source": "server/routes/ai/simulate/index.dart",
         "line": 155,
         "lexical_type": "_RouteBattleAttempt",
@@ -236270,46 +233897,6 @@
         "target_library": "package:server/battle/battle_simulation_attempt_service.dart",
         "target_scope": "workspace",
         "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 30,
-        "lexical_type": "JsonObjectValidationException",
-        "resolved_type": "JsonObjectValidationException",
-        "target": "JsonObjectValidationException",
-        "target_library": "package:server/json_object_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 44,
-        "lexical_type": "ArchetypeCountersService",
-        "resolved_type": "ArchetypeCountersService",
-        "target": "ArchetypeCountersService",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 515,
-        "lexical_type": "DeckCombosResult",
-        "resolved_type": "DeckCombosResult",
-        "target": "DeckCombosResult",
-        "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/weakness-analysis/index.dart",
-        "line": 520,
-        "lexical_type": "CommanderSpellbookService",
-        "resolved_type": "CommanderSpellbookService",
-        "target": "CommanderSpellbookService",
-        "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
       },
       {
         "source": "server/routes/auth/change-password.dart",
@@ -237412,36 +234999,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 149,
-        "lexical_type": "EdhrecTrendService",
-        "resolved_type": "EdhrecTrendService",
-        "target": "EdhrecTrendService",
-        "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 26,
-        "lexical_type": "OpenAiRuntimeConfig",
-        "resolved_type": "OpenAiRuntimeConfig",
-        "target": "OpenAiRuntimeConfig",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/recommendations/index.dart",
-        "line": 49,
-        "lexical_type": "DeckRecommendationRecord",
-        "resolved_type": "DeckRecommendationRecord",
-        "target": "DeckRecommendationRecord",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
         "source": "server/routes/decks/[id]/reports/index.dart",
         "line": 16,
         "lexical_type": "ShareableReportService",
@@ -237450,26 +235007,6 @@
         "target_library": "package:server/reports/shareable_report_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 196,
-        "lexical_type": "_SimulationConfig",
-        "resolved_type": "_SimulationConfig",
-        "target": "_SimulationConfig",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/simulate/index.dart",
-        "line": 60,
-        "lexical_type": "_SimCard",
-        "resolved_type": "_SimCard",
-        "target": "_SimCard",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
       },
       {
         "source": "server/routes/decks/[id]/validate/index.dart",
@@ -238032,8 +235569,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1112,
-        "occurrences": 2242
+        "unique_references": 1085,
+        "occurrences": 2204
       },
       {
         "target_scope": "dart_sdk",
@@ -238050,8 +235587,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6400,
-        "occurrences": 40333
+        "unique_references": 6295,
+        "occurrences": 39696
       },
       {
         "target_scope": "dart_sdk",
@@ -238062,8 +235599,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 37,
-        "occurrences": 58
+        "unique_references": 35,
+        "occurrences": 55
       },
       {
         "target_scope": "dart_sdk",
@@ -238134,14 +235671,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 284,
-        "occurrences": 1150
+        "unique_references": 275,
+        "occurrences": 1125
       },
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/handler.dart",
-        "unique_references": 18,
-        "occurrences": 37
+        "unique_references": 17,
+        "occurrences": 35
       },
       {
         "target_scope": "dependency",
@@ -238164,8 +235701,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dotenv/src/dotenv.dart",
-        "unique_references": 6,
-        "occurrences": 16
+        "unique_references": 5,
+        "occurrences": 14
       },
       {
         "target_scope": "dependency",
@@ -239346,8 +236883,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:http/src/response.dart",
-        "unique_references": 21,
-        "occurrences": 52
+        "unique_references": 20,
+        "occurrences": 49
       },
       {
         "target_scope": "dependency",
@@ -239370,8 +236907,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 263,
-        "occurrences": 972
+        "unique_references": 258,
+        "occurrences": 949
       },
       {
         "target_scope": "dependency",
@@ -239382,14 +236919,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 206,
-        "occurrences": 492
+        "unique_references": 201,
+        "occurrences": 471
       },
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/types.dart",
-        "unique_references": 16,
-        "occurrences": 32
+        "unique_references": 13,
+        "occurrences": 25
       },
       {
         "target_scope": "dependency",
@@ -239520,8 +237057,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 412,
-        "occurrences": 4779
+        "unique_references": 404,
+        "occurrences": 4705
       },
       {
         "target_scope": "workspace",
@@ -240810,14 +238347,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/commander_spellbook_service.dart",
-        "unique_references": 5,
-        "occurrences": 15
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "package:server/ai/deck_advanced_analysis.dart",
         "unique_references": 3,
-        "occurrences": 19
+        "occurrences": 12
       },
       {
         "target_scope": "workspace",
@@ -240834,8 +238365,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/edhrec_trend_service.dart",
-        "unique_references": 5,
-        "occurrences": 8
+        "unique_references": 3,
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -241181,12 +238712,6 @@
       },
       {
         "target_scope": "workspace",
-        "target_library": "package:server/archetype_counters_service.dart",
-        "unique_references": 2,
-        "occurrences": 3
-      },
-      {
-        "target_scope": "workspace",
         "target_library": "package:server/auth_runtime_policy.dart",
         "unique_references": 6,
         "occurrences": 20
@@ -241505,18 +239030,6 @@
       },
       {
         "target_scope": "workspace",
-        "target_library": "package:server/deck_recommendations_fallback_support.dart",
-        "unique_references": 5,
-        "occurrences": 7
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "package:server/deck_recommendations_route_support.dart",
-        "unique_references": 6,
-        "occurrences": 15
-      },
-      {
-        "target_scope": "workspace",
         "target_library": "package:server/deck_request_support.dart",
         "unique_references": 12,
         "occurrences": 44
@@ -241537,7 +239050,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/deck_write_verification_policy.dart",
         "unique_references": 1,
-        "occurrences": 10
+        "occurrences": 9
       },
       {
         "target_scope": "workspace",
@@ -241620,8 +239133,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/json_object_support.dart",
-        "unique_references": 9,
-        "occurrences": 16
+        "unique_references": 7,
+        "occurrences": 14
       },
       {
         "target_scope": "workspace",
@@ -241728,8 +239241,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/openai_runtime_config.dart",
-        "unique_references": 11,
-        "occurrences": 15
+        "unique_references": 9,
+        "occurrences": 12
       },
       {
         "target_scope": "workspace",
@@ -242078,12 +239591,6 @@
         "target_library": "workspace:server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart",
         "unique_references": 1,
         "occurrences": 6
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "workspace:server/routes/decks/[id]/simulate/index.dart",
-        "unique_references": 2,
-        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -244002,12 +241509,6 @@
         "occurrences": 1
       },
       {
-        "source": "server/lib/deck_recommendations_fallback_support.dart",
-        "line": 260,
-        "lexical_type": "void",
-        "occurrences": 1
-      },
-      {
         "source": "server/lib/deck_rules_service.dart",
         "line": 21,
         "lexical_type": "void",
@@ -245164,19 +242665,6 @@
         "getStatsByEndpoint",
         "log",
         "loggedCall"
-      ]
-    },
-    {
-      "name": "ArchetypeCountersService",
-      "kind": "class",
-      "source": "server/lib/archetype_counters_service.dart",
-      "line": 3,
-      "members": [
-        "detectDeckArchetype",
-        "getAvailableArchetypes",
-        "getCounterStrategy",
-        "getHateCards",
-        "upsertCounter"
       ]
     },
     {
@@ -255945,58 +253433,6 @@
       "method_contract": "source"
     },
     {
-      "path": "/ai/simulate-matchup",
-      "methods": [
-        "POST"
-      ],
-      "source": "server/routes/ai/simulate-matchup/index.dart",
-      "middleware": [
-        "server/routes/_middleware.dart",
-        "server/routes/ai/_middleware.dart"
-      ],
-      "tests": [
-        "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
-        "app/test/core/widgets/horizontal_discovery_rail_test.dart",
-        "app/test/core/widgets/main_scaffold_test.dart",
-        "app/test/features/auth/screens/verify_email_screen_test.dart",
-        "app/test/features/cards/providers/card_provider_ai_test.dart",
-        "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
-        "app/test/features/commercial/ai_usage_gate_test.dart",
-        "app/test/features/commercial/ai_usage_meter_test.dart",
-        "app/test/features/community/screens/community_deck_detail_screen_test.dart",
-        "app/test/features/decks/models/deck_details_test.dart",
-        "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-        "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
-      ],
-      "method_contract": "source"
-    },
-    {
-      "path": "/ai/weakness-analysis",
-      "methods": [
-        "POST"
-      ],
-      "source": "server/routes/ai/weakness-analysis/index.dart",
-      "middleware": [
-        "server/routes/_middleware.dart",
-        "server/routes/ai/_middleware.dart"
-      ],
-      "tests": [
-        "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
-        "app/test/core/widgets/horizontal_discovery_rail_test.dart",
-        "app/test/core/widgets/main_scaffold_test.dart",
-        "app/test/features/auth/screens/verify_email_screen_test.dart",
-        "app/test/features/cards/providers/card_provider_ai_test.dart",
-        "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
-        "app/test/features/commercial/ai_usage_gate_test.dart",
-        "app/test/features/commercial/ai_usage_meter_test.dart",
-        "app/test/features/community/screens/community_deck_detail_screen_test.dart",
-        "app/test/features/decks/models/deck_details_test.dart",
-        "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-        "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
-      ],
-      "method_contract": "source"
-    },
-    {
       "path": "/auth/change-password",
       "methods": [
         "POST"
@@ -257199,50 +254635,11 @@
       "method_contract": "source"
     },
     {
-      "path": "/decks/{id}/recommendations",
-      "methods": [
-        "POST"
-      ],
-      "source": "server/routes/decks/[id]/recommendations/index.dart",
-      "middleware": [
-        "server/routes/_middleware.dart",
-        "server/routes/decks/_middleware.dart",
-        "server/routes/decks/[id]/recommendations/_middleware.dart"
-      ],
-      "tests": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
-        "server/test/auto_promote_learned_decks_test.py",
-        "server/test/auto_sync_learned_decks_test.py",
-        "server/test/decks_crud_test.dart",
-        "server/test/decks_incremental_add_test.dart"
-      ],
-      "method_contract": "source"
-    },
-    {
       "path": "/decks/{id}/reports",
       "methods": [
         "POST"
       ],
       "source": "server/routes/decks/[id]/reports/index.dart",
-      "middleware": [
-        "server/routes/_middleware.dart",
-        "server/routes/decks/_middleware.dart"
-      ],
-      "tests": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
-        "server/test/auto_promote_learned_decks_test.py",
-        "server/test/auto_sync_learned_decks_test.py",
-        "server/test/decks_crud_test.dart",
-        "server/test/decks_incremental_add_test.dart"
-      ],
-      "method_contract": "source"
-    },
-    {
-      "path": "/decks/{id}/simulate",
-      "methods": [
-        "GET"
-      ],
-      "source": "server/routes/decks/[id]/simulate/index.dart",
       "middleware": [
         "server/routes/_middleware.dart",
         "server/routes/decks/_middleware.dart"
@@ -278932,9 +276329,10 @@
     "server/test/ai_provider_failure_injection_live_test.dart",
     "server/test/ai_provider_runtime_support_test.dart",
     "server/test/ai_provider_usage_support_test.dart",
+    "server/test/ai_route_registry_e2e_live_test.dart",
+    "server/test/ai_route_registry_test.dart",
     "server/test/ai_simulate_authorization_live_test.dart",
     "server/test/ai_simulate_persistence_service_test.dart",
-    "server/test/ai_weakness_analysis_live_test.dart",
     "server/test/api_contracts_data_map_guard_test.dart",
     "server/test/audit_easypanel_cron_runtime_test.py",
     "server/test/audit_easypanel_runtime_alignment_test.py",
@@ -279071,15 +276469,9 @@
     "server/test/deck_pricing_live_test.dart",
     "server/test/deck_pricing_read_only_test.dart",
     "server/test/deck_readiness_contract_test.dart",
-    "server/test/deck_recommendations_advisory_support_test.dart",
-    "server/test/deck_recommendations_fallback_support_test.dart",
-    "server/test/deck_recommendations_power_level_support_test.dart",
-    "server/test/deck_recommendations_route_adapter_test.dart",
-    "server/test/deck_recommendations_route_support_test.dart",
     "server/test/deck_request_support_test.dart",
     "server/test/deck_rules_service_identity_test.dart",
     "server/test/deck_rules_service_test.dart",
-    "server/test/deck_simulate_route_adapter_test.dart",
     "server/test/deck_snapshot_contract_test.dart",
     "server/test/deck_update_optimization_mana_floor_test.dart",
     "server/test/deck_validation_route_support_test.dart",
@@ -280629,7 +278021,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "96b0337fb42415de8e1b4240d9ce51acfa80f112832da039d97bb3297e53e51a"
+      "sha256": "1ada6f65567f1d602794978d617dfed37583dd2372653123b89e637984deca61"
     },
     "required_task_fields": [
       "id",
@@ -281922,7 +279314,7 @@
           "BT-KPI-001",
           "BT-AI-029"
         ],
-        "acceptance": "Nenhum consumidor depende; uma única verdade de recomendação.",
+        "acceptance": "Nenhum consumidor depende; uma única verdade de recomendação. A rota standalone `POST /decks/:id/recommendations` saiu em 2026-09-28 pela D-31 (`BT-AI-029`); o substituto é o Optimize.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 491
       },
@@ -282168,13 +279560,13 @@
       {
         "id": "BT-AI-029",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Registry de todas as rotas IA, consumer, writes, capability, owner e substituto.",
         "depends_on": [
           "BT-SCP-001",
           "BT-DOC-004"
         ],
-        "acceptance": "Rotas sem consumer (`recommendations`, weakness, simulate-matchup e simulate legado) ficam OFF antes de PG/provider; telemetria decide adapter/410/remove. Medição de 2026-09-22 (`docs/flows/_p0/contencao-escopo.md`): a metade \"OFF antes do PG\" já foi entregue (`b2d3fc04f`, `406d7dd53`); faltam o registry com owner/substituto e a decisão adapter/410/remove. Decisão do dono em 2026-09-22: D-31, remover as quatro rotas sem consumidor (`POST /decks/:id/recommendations`, `GET /decks/:id/simulate`, `POST /ai/simulate-matchup`, `POST /ai/weakness-analysis`) e os testes que as tratam como recurso; substitutos: Optimize, Battle e Analyze; janela de telemetria em produção dispensada; `/ai/optimize/telemetry` segue off sob `legacy_ai_routes`, e o registry decide pela mesma regra.",
+        "acceptance": "Rotas sem consumer (`recommendations`, weakness, simulate-matchup e simulate legado) ficam OFF antes de PG/provider; telemetria decide adapter/410/remove. Medição de 2026-09-22 (`docs/flows/_p0/contencao-escopo.md`): a metade \"OFF antes do PG\" já foi entregue (`b2d3fc04f`, `406d7dd53`); faltam o registry com owner/substituto e a decisão adapter/410/remove. Decisão do dono em 2026-09-22: D-31, remover as quatro rotas sem consumidor (`POST /decks/:id/recommendations`, `GET /decks/:id/simulate`, `POST /ai/simulate-matchup`, `POST /ai/weakness-analysis`) e os testes que as tratam como recurso; substitutos: Optimize, Battle e Analyze; janela de telemetria em produção dispensada; `/ai/optimize/telemetry` segue off sob `legacy_ai_routes`, e o registry decide pela mesma regra. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`: registry machine-readable `server/config/ai_route_registry.json` com as 34 combinações de rota de IA (24 sob `/ai` e 10 de IA sob `/decks/:id`), cada uma com consumidor (arquivo e trecho que chama a rota), escritas, capability, política de acesso de `/ai`, trava do reaceite, dono (tarefa do backlog), raia, substituto, provedor externo, se a URL do provedor é configurável e o que acontece sem ele (a URL da OpenAI está fixa em 8 pontos de 7 arquivos, contados por arquivo; o servidor não lê o `OPENAI_BASE_URL` da fixture; o `POST /ai/optimize` registra os quatro pontos em que tenta o provedor, inclusive o Critic IA depois do caminho determinístico, e sem chave nenhum é tentado). `server/test/ai_route_registry_test.dart` falha quando surge rota de IA fora dele (rota sob `/ai`, com capability de IA ou que fala com o provedor), quando uma entrada diverge da política de capability, do handler ou do consumidor, quando uma chamada nova ao provedor aparece fora da lista ou um ponto novo com a URL surge num arquivo registrado, e quando uma chamada registrada do optimize deixa de gravar em `ai_logs` com o endpoint declarado. D-31 executada: as quatro rotas saíram com os testes que as tratavam como recurso e as seis bibliotecas que só elas usavam; as tabelas `deck_weakness_reports` e `deck_matchups` ficam (sem migration). Veredito da regra para `/ai/optimize/telemetry`: sem consumidor; segue off sob `legacy_ai_routes`, com a remoção em decisão do dono. Evidência: `server/test/ai_route_registry_test.dart` 6/6 e foco de 76 arquivos/647 testes; `server/test/ai_route_registry_e2e_live_test.dart` 2/2 (as quatro dão 404 por HTTP mesmo com `legacy_ai_routes` ligada, sob a guarda de egress só loopback), regressão E2E 25/25 e os testes de banco da frente com 78 verdes e 2 pulados (a rodada com chave da D-82); guardas de contrato atualizados; 15 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-029-registry-de-rotas-de-ia.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 511
       },
@@ -290511,7 +287903,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "e7bf1689dd1a6e666df510ccf8211aa21d6c185e40edd3e476ce9466f40456ed"
+    "project_logic_source_digest_sha256": "d6423bbbc5f78544af05bf50cb3d43b8c78796e0f05bb011630b048c56ed1be7"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -292899,7 +290291,6 @@
       "server/lib/ai/commander_reference_readiness_support.dart",
       "server/lib/ai/commander_spellbook_service.dart",
       "server/lib/ai/commander_staple_impact_policy.dart",
-      "server/lib/ai/deck_advanced_analysis.dart",
       "server/lib/ai/deck_battle_learning_evidence.dart",
       "server/lib/ai/deck_learning_event_support.dart",
       "server/lib/ai/deck_quality_report.dart",
@@ -292989,7 +290380,6 @@
       "server/lib/ai_provider_runtime_support.dart",
       "server/lib/ai_provider_usage_support.dart",
       "server/lib/ai_telemetry_contract.dart",
-      "server/lib/archetype_counters_service.dart",
       "server/lib/auth_middleware.dart",
       "server/lib/auth_runtime_policy.dart",
       "server/lib/auth_service.dart",
@@ -293057,10 +290447,6 @@
       "server/lib/deck_format_support.dart",
       "server/lib/deck_import_review_contract.dart",
       "server/lib/deck_readiness_contract.dart",
-      "server/lib/deck_recommendations_advisory_support.dart",
-      "server/lib/deck_recommendations_fallback_support.dart",
-      "server/lib/deck_recommendations_power_level_support.dart",
-      "server/lib/deck_recommendations_route_support.dart",
       "server/lib/deck_request_support.dart",
       "server/lib/deck_rules_service.dart",
       "server/lib/deck_schema_support.dart",
@@ -293168,9 +290554,7 @@
       "server/routes/ai/optimize/jobs/[id].dart",
       "server/routes/ai/optimize/telemetry/index.dart",
       "server/routes/ai/rebuild/index.dart",
-      "server/routes/ai/simulate-matchup/index.dart",
       "server/routes/ai/simulate/index.dart",
-      "server/routes/ai/weakness-analysis/index.dart",
       "server/routes/auth/_middleware.dart",
       "server/routes/auth/change-password.dart",
       "server/routes/auth/forgot-password.dart",
@@ -293232,10 +290616,7 @@
       "server/routes/decks/[id]/post-game-notes/index.dart",
       "server/routes/decks/[id]/post-game-timeline/index.dart",
       "server/routes/decks/[id]/pricing/index.dart",
-      "server/routes/decks/[id]/recommendations/_middleware.dart",
-      "server/routes/decks/[id]/recommendations/index.dart",
       "server/routes/decks/[id]/reports/index.dart",
-      "server/routes/decks/[id]/simulate/index.dart",
       "server/routes/decks/[id]/validate/index.dart",
       "server/routes/decks/_middleware.dart",
       "server/routes/decks/index.dart",
@@ -293324,9 +290705,10 @@
       "server/test/ai_provider_failure_injection_live_test.dart",
       "server/test/ai_provider_runtime_support_test.dart",
       "server/test/ai_provider_usage_support_test.dart",
+      "server/test/ai_route_registry_e2e_live_test.dart",
+      "server/test/ai_route_registry_test.dart",
       "server/test/ai_simulate_authorization_live_test.dart",
       "server/test/ai_simulate_persistence_service_test.dart",
-      "server/test/ai_weakness_analysis_live_test.dart",
       "server/test/api_contracts_data_map_guard_test.dart",
       "server/test/audit_easypanel_cron_runtime_test.py",
       "server/test/audit_easypanel_runtime_alignment_test.py",
@@ -293463,15 +290845,9 @@
       "server/test/deck_pricing_live_test.dart",
       "server/test/deck_pricing_read_only_test.dart",
       "server/test/deck_readiness_contract_test.dart",
-      "server/test/deck_recommendations_advisory_support_test.dart",
-      "server/test/deck_recommendations_fallback_support_test.dart",
-      "server/test/deck_recommendations_power_level_support_test.dart",
-      "server/test/deck_recommendations_route_adapter_test.dart",
-      "server/test/deck_recommendations_route_support_test.dart",
       "server/test/deck_request_support_test.dart",
       "server/test/deck_rules_service_identity_test.dart",
       "server/test/deck_rules_service_test.dart",
-      "server/test/deck_simulate_route_adapter_test.dart",
       "server/test/deck_snapshot_contract_test.dart",
       "server/test/deck_update_optimization_mana_floor_test.dart",
       "server/test/deck_validation_route_support_test.dart",
