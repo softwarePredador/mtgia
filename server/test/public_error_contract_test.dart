@@ -476,6 +476,7 @@ void main() {
     );
 
     test('deck de outra conta: a rota já devolve 404 tipado', () async {
+      const deckId = '00000000-0000-4000-8000-00000000d001';
       final pool = ScriptedPool([
         scriptedResult(columns: ['id', 'format']),
       ]);
@@ -483,18 +484,21 @@ void main() {
       final response = await deck_cards_route.onRequest(
         ScriptedRequestContext(
           Request.post(
-            Uri.parse('http://localhost/decks/deck-1/cards'),
+            Uri.parse('http://localhost/decks/$deckId/cards'),
             headers: const {'content-type': 'application/json'},
             body: jsonEncode({'card_id': 'card-1', 'quantity': 1}),
           ),
           providers: {Pool: pool, String: 'user-1'},
         ),
-        'deck-1',
+        deckId,
       );
       final text = await response.body();
       expectNoInternalDetail(text);
       expect(response.statusCode, 404);
+      // A trava de revisão do deck (DCK-P0-01) responde antes do banco e usa
+      // o corpo do contrato de mutação de deck, que o app lê por `ok`.
       expect(jsonDecode(text), {
+        'ok': false,
         'error': 'Deck não encontrado.',
         'error_code': 'deck_not_found',
       });
@@ -632,12 +636,13 @@ void main() {
     );
 
     test('POST /decks/:id/cards com o banco falhando: 500 tipado', () async {
+      const deckId = '00000000-0000-4000-8000-00000000d001';
       final pool = ScriptedPool([Exception(postgresFailure)]);
       Database.useConnectionForTesting(pool);
       final (response, body) = await call(
-        (context) => deck_cards_route.onRequest(context, 'deck-1'),
+        (context) => deck_cards_route.onRequest(context, deckId),
         Request.post(
-          Uri.parse('http://localhost/decks/deck-1/cards'),
+          Uri.parse('http://localhost/decks/$deckId/cards'),
           headers: const {'content-type': 'application/json'},
           body: jsonEncode({'card_id': 'card-1', 'quantity': 1}),
         ),
