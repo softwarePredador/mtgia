@@ -2786,7 +2786,7 @@ BEGIN
 END;
 $battle_simulation_trigger$;
 
--- D-48 e D-67 (migrations 064 e 065): índices que só existiam na produção (auditoria
+-- D-48, D-67 e D-83 (migrations 064 a 066): índices que só existiam na produção (auditoria
 -- BT-DB-001). O banco novo sai com os mesmos nomes e definições. Os de
 -- card_meta_insights e card_rulings ficam na 064, porque essas tabelas nascem
 -- de migration. uq_binder_user_card_cond_foil_list fica de fora, pendente de
@@ -2815,3 +2815,24 @@ CREATE INDEX IF NOT EXISTS idx_binder_marketplace_available_created ON user_bind
 CREATE INDEX IF NOT EXISTS idx_binder_user_list_name_filters ON user_binder_items USING btree (user_id, list_type, condition, for_trade, for_sale);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users USING btree (email);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users USING btree (username);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_created_at ON battle_simulations USING btree (created_at);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_a_id ON battle_simulations USING btree (deck_a_id);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_b_id ON battle_simulations USING btree (deck_b_id);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_winner_deck_id ON battle_simulations USING btree (winner_deck_id);
+CREATE INDEX IF NOT EXISTS idx_card_legalities_card_id ON card_legalities USING btree (card_id);
+CREATE INDEX IF NOT EXISTS idx_card_legalities_format ON card_legalities USING btree (format);
+CREATE INDEX IF NOT EXISTS idx_card_legalities_status ON card_legalities USING btree (status);
+CREATE INDEX IF NOT EXISTS idx_cards_collector_set ON cards USING btree (collector_number, set_code) WHERE (collector_number IS NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_cards_set_code ON cards USING btree (set_code);
+CREATE INDEX IF NOT EXISTS idx_deck_cards_is_commander ON deck_cards USING btree (is_commander);
+CREATE INDEX IF NOT EXISTS idx_deck_matchups_deck_id ON deck_matchups USING btree (deck_id);
+CREATE INDEX IF NOT EXISTS idx_deck_matchups_opponent_deck_id ON deck_matchups USING btree (opponent_deck_id);
+CREATE INDEX IF NOT EXISTS idx_deck_matchups_win_rate ON deck_matchups USING btree (win_rate);
+CREATE INDEX IF NOT EXISTS idx_decks_created_at ON decks USING btree (created_at);
+CREATE INDEX IF NOT EXISTS idx_decks_is_public ON decks USING btree (is_public);
+CREATE INDEX IF NOT EXISTS idx_decks_user_public ON decks USING btree (user_id, is_public);
+CREATE INDEX IF NOT EXISTS idx_meta_decks_commander_name ON meta_decks USING btree (commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (commander_name IS NOT NULL));
+CREATE INDEX IF NOT EXISTS idx_meta_decks_partner_commander_name ON meta_decks USING btree (partner_commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (partner_commander_name IS NOT NULL));
+CREATE INDEX IF NOT EXISTS idx_binder_list_type ON user_binder_items USING btree (user_id, list_type);
+CREATE INDEX IF NOT EXISTS idx_users_display_name_lower ON users USING btree (lower(COALESCE(display_name, ''::text)));
+CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users USING btree (lower(username));

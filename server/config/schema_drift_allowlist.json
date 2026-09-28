@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy": "brewtact-schema-drift-allowlist",
-  "version": "2026-09-28.2",
+  "version": "2026-09-28.3",
   "task": "BT-DB-003",
   "status": "proposta_pendente_do_dono",
   "fonte": "docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.saida.json",
@@ -39,6 +39,29 @@
       "idx_trade_offers_sender_updated",
       "idx_users_email",
       "idx_users_username"
+    ],
+    "066": [
+      "idx_battle_simulations_created_at",
+      "idx_battle_simulations_deck_a_id",
+      "idx_battle_simulations_deck_b_id",
+      "idx_battle_simulations_winner_deck_id",
+      "idx_binder_list_type",
+      "idx_card_legalities_card_id",
+      "idx_card_legalities_format",
+      "idx_card_legalities_status",
+      "idx_cards_collector_set",
+      "idx_cards_set_code",
+      "idx_deck_cards_is_commander",
+      "idx_deck_matchups_deck_id",
+      "idx_deck_matchups_opponent_deck_id",
+      "idx_deck_matchups_win_rate",
+      "idx_decks_created_at",
+      "idx_decks_is_public",
+      "idx_decks_user_public",
+      "idx_meta_decks_commander_name",
+      "idx_meta_decks_partner_commander_name",
+      "idx_users_display_name_lower",
+      "idx_users_username_lower"
     ],
     "075": [
       "public.optimization_analysis_logs",
@@ -403,156 +426,9 @@
     {
       "categoria": "indices",
       "tipo": "sobrando",
-      "objeto": "public.idx_battle_simulations_created_at",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_battle_simulations_deck_a_id",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_battle_simulations_deck_b_id",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_battle_simulations_winner_deck_id",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_binder_list_type",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_card_legalities_card_id",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_card_legalities_format",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_card_legalities_status",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_cards_collector_set",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_cards_set_code",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_deck_cards_is_commander",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_deck_matchups_deck_id",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_deck_matchups_opponent_deck_id",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_deck_matchups_win_rate",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_decks_created_at",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_decks_is_public",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_decks_user_public",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_meta_decks_commander_name",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_meta_decks_partner_commander_name",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_users_display_name_lower",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
-      "objeto": "public.idx_users_username_lower",
-      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
-      "decisao": "pendente: BT-DB-004 (066)"
-    },
-    {
-      "categoria": "indices",
-      "tipo": "sobrando",
       "objeto": "public.uq_binder_user_card_cond_foil_list",
-      "motivo": "UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); não adotado pela 064",
-      "decisao": "pendente: BT-DB-004"
+      "motivo": "não adotado (D-83): UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); na produção a rota POST /binder devolve 500 para a mesma carta em outro idioma, e tirá-lo de lá pede um passo governado",
+      "decisao": "D-83"
     },
     {
       "categoria": "restricoes",

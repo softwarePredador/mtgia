@@ -195,12 +195,13 @@ class MigrationRehearsalOnDisposablePostgresTest(unittest.TestCase):
         check = report["etapas"]["pos_checagem"]
         self.assertEqual((code, report["resultado"]), (0, "PASS"), json.dumps(check)[:4000])
         self.assertEqual(check["inesperadas"], [])
-        # 186 diferenças aceitas na 074; a 075 e a 076 reconciliam 65 delas.
-        self.assertGreaterEqual(check["aceitas"], 110)
+        # 186 diferenças aceitas na 074; a 066, a 075 e a 076 reconciliam 86 delas.
+        self.assertGreaterEqual(check["aceitas"], 90)
         allowlist = json.loads(ALLOWLIST.read_text(encoding="utf-8"))
         # O que as migrations reconciliam some depois do upgrade.
         reconciled = allowlist["reconciliado_pelas_migrations"]
-        self.assertFalse(({"public." + name for name in reconciled["064"] + reconciled["065"]}
+        self.assertFalse(({"public." + name for name in reconciled["064"] + reconciled["065"]
+                           + reconciled["066"]}
                           | set(reconciled["075"]) | set(reconciled["076"]))
                          & {entry["objeto"] for entry in allowlist["itens"]})
         # Só fica sem ocorrência o que o fixture não reproduz sem a produção: o que ele

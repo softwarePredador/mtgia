@@ -193,7 +193,7 @@ class PayloadTest(unittest.TestCase):
 
 
 class ClosedListTest(unittest.TestCase):
-    """A lista fechada casa com a auditoria e com as migrations 064, 065, 075 e 076."""
+    """A lista fechada casa com a auditoria e com as migrations 064, 065, 066, 075 e 076."""
 
     def setUp(self) -> None:
         self.allowlist = rehearsal.load_allowlist(ALLOWLIST)
@@ -229,7 +229,9 @@ class ClosedListTest(unittest.TestCase):
         reconciled = self.allowlist["reconciliado_pelas_migrations"]
         self.assertEqual(set(reconciled["064"]), adopted("064"))
         self.assertEqual(set(reconciled["065"]), adopted("065"))
-        adopted_names = {"public." + name for name in reconciled["064"] + reconciled["065"]}
+        self.assertEqual(set(reconciled["066"]), adopted("066"))
+        adopted_names = {"public." + name
+                         for name in reconciled["064"] + reconciled["065"] + reconciled["066"]}
         # 075 e 076 (BT-DB-005) listam o objeto inteiro: a migration tem de citá-lo, e ele
         # sai da lista fechada.
         for version in ("075", "076"):

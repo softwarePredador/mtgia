@@ -90,6 +90,14 @@ void main() {
         expect(requiredReleaseSchemaMigrations.keys.first, '038');
         expect(requiredReleaseSchemaMigrations.keys.last, '076');
         expect(releaseSchemaReadinessSql, contains("MAX(version)"));
+        // A contagem do SQL é a da lista: uma migration nova sem somar aqui
+        // deixaria a readiness verde com a lista incompleta.
+        expect(
+          releaseSchemaReadinessSql,
+          contains(
+            'SELECT COUNT(*) = ${requiredReleaseSchemaMigrations.length}\n',
+          ),
+        );
         expect(releaseSchemaReadinessSql, contains(") = '076'"));
         for (final entry in requiredReleaseSchemaMigrations.entries) {
           expect(

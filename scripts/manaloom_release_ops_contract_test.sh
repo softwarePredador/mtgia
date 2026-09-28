@@ -602,6 +602,7 @@ grep -Fq "('060', 'create_account_deletion_outbox')" "$ROOT_DIR/scripts/manaloom
 grep -Fq "('063', 'recreate_commander_learning_snapshot_view')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('064', 'adopt_production_unique_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('065', 'adopt_production_indexes_from_database_indexes_sql')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('066', 'adopt_remaining_production_only_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('074', 'reinstall_active_user_triggers')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('075', 'adopt_production_ml_tables_and_shapes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('076', 'align_message_and_trade_history_user_fks')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

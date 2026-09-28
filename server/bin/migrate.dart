@@ -6297,6 +6297,61 @@ DROP VIEW IF EXISTS collection_availability_snapshot;
     ''',
   ),
   Migration(
+    version: '066',
+    name: 'adopt_remaining_production_only_indexes',
+    // D-83 (BT-DB-004, 2026-09-28): os 21 índices que só a produção tinha e que
+    // não vinham do database_indexes.sql aposentado (auditoria BT-DB-001). Lá já
+    // existem com estes nomes e definições, então o IF NOT EXISTS não muda nada; o
+    // banco novo passa a tê-los. uq_binder_user_card_cond_foil_list continua de
+    // fora: não tem o idioma e contradiz a identidade física da 049.
+    up: r'''
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_created_at ON battle_simulations USING btree (created_at);
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_a_id ON battle_simulations USING btree (deck_a_id);
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_b_id ON battle_simulations USING btree (deck_b_id);
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_winner_deck_id ON battle_simulations USING btree (winner_deck_id);
+      CREATE INDEX IF NOT EXISTS idx_card_legalities_card_id ON card_legalities USING btree (card_id);
+      CREATE INDEX IF NOT EXISTS idx_card_legalities_format ON card_legalities USING btree (format);
+      CREATE INDEX IF NOT EXISTS idx_card_legalities_status ON card_legalities USING btree (status);
+      CREATE INDEX IF NOT EXISTS idx_cards_collector_set ON cards USING btree (collector_number, set_code) WHERE (collector_number IS NOT NULL);
+      CREATE INDEX IF NOT EXISTS idx_cards_set_code ON cards USING btree (set_code);
+      CREATE INDEX IF NOT EXISTS idx_deck_cards_is_commander ON deck_cards USING btree (is_commander);
+      CREATE INDEX IF NOT EXISTS idx_deck_matchups_deck_id ON deck_matchups USING btree (deck_id);
+      CREATE INDEX IF NOT EXISTS idx_deck_matchups_opponent_deck_id ON deck_matchups USING btree (opponent_deck_id);
+      CREATE INDEX IF NOT EXISTS idx_deck_matchups_win_rate ON deck_matchups USING btree (win_rate);
+      CREATE INDEX IF NOT EXISTS idx_decks_created_at ON decks USING btree (created_at);
+      CREATE INDEX IF NOT EXISTS idx_decks_is_public ON decks USING btree (is_public);
+      CREATE INDEX IF NOT EXISTS idx_decks_user_public ON decks USING btree (user_id, is_public);
+      CREATE INDEX IF NOT EXISTS idx_meta_decks_commander_name ON meta_decks USING btree (commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (commander_name IS NOT NULL));
+      CREATE INDEX IF NOT EXISTS idx_meta_decks_partner_commander_name ON meta_decks USING btree (partner_commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (partner_commander_name IS NOT NULL));
+      CREATE INDEX IF NOT EXISTS idx_binder_list_type ON user_binder_items USING btree (user_id, list_type);
+      CREATE INDEX IF NOT EXISTS idx_users_display_name_lower ON users USING btree (lower(COALESCE(display_name, ''::text)));
+      CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users USING btree (lower(username));
+    ''',
+    down: r'''
+      DROP INDEX IF EXISTS idx_users_username_lower;
+      DROP INDEX IF EXISTS idx_users_display_name_lower;
+      DROP INDEX IF EXISTS idx_binder_list_type;
+      DROP INDEX IF EXISTS idx_meta_decks_partner_commander_name;
+      DROP INDEX IF EXISTS idx_meta_decks_commander_name;
+      DROP INDEX IF EXISTS idx_decks_user_public;
+      DROP INDEX IF EXISTS idx_decks_is_public;
+      DROP INDEX IF EXISTS idx_decks_created_at;
+      DROP INDEX IF EXISTS idx_deck_matchups_win_rate;
+      DROP INDEX IF EXISTS idx_deck_matchups_opponent_deck_id;
+      DROP INDEX IF EXISTS idx_deck_matchups_deck_id;
+      DROP INDEX IF EXISTS idx_deck_cards_is_commander;
+      DROP INDEX IF EXISTS idx_cards_set_code;
+      DROP INDEX IF EXISTS idx_cards_collector_set;
+      DROP INDEX IF EXISTS idx_card_legalities_status;
+      DROP INDEX IF EXISTS idx_card_legalities_format;
+      DROP INDEX IF EXISTS idx_card_legalities_card_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_winner_deck_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_deck_b_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_deck_a_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_created_at;
+    ''',
+  ),
+  Migration(
     version: '074',
     name: 'reinstall_active_user_triggers',
     // BT-DB-007 (Frente C): refaz a trava de conta ativa
@@ -7107,6 +7162,8 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '063' ||
       '064' ||
       '065' ||
+      // A 066 adota os índices que só a produção tinha (D-83).
+      '066' ||
       // A 075 adota tabelas e formas da produção, e a 076 alinha três chaves
       // que na produção estavam sem ação: o down automático mudaria a produção.
       '075' ||

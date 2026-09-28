@@ -137,6 +137,7 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '063': 'recreate_commander_learning_snapshot_view',
   '064': 'adopt_production_unique_indexes',
   '065': 'adopt_production_indexes_from_database_indexes_sql',
+  '066': 'adopt_remaining_production_only_indexes',
   '074': 'reinstall_active_user_triggers',
   '075': 'adopt_production_ml_tables_and_shapes',
   '076': 'align_message_and_trade_history_user_fks',
@@ -171,13 +172,14 @@ const releaseSchemaReadinessSql = '''
       ('063', 'recreate_commander_learning_snapshot_view'),
       ('064', 'adopt_production_unique_indexes'),
       ('065', 'adopt_production_indexes_from_database_indexes_sql'),
+      ('066', 'adopt_remaining_production_only_indexes'),
       ('074', 'reinstall_active_user_triggers'),
       ('075', 'adopt_production_ml_tables_and_shapes'),
       ('076', 'align_message_and_trade_history_user_fks')
   )
   SELECT
     (
-      SELECT COUNT(*) = 29
+      SELECT COUNT(*) = 30
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
