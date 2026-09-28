@@ -124,6 +124,7 @@ SHELL_SCRIPTS=(
   scripts/lib/manaloom_release_runtime_contract.sh
   scripts/lib/manaloom_safe_env.sh
   scripts/manaloom_build_android_release.sh
+  scripts/manaloom_capacity_snapshot.sh
   scripts/manaloom_build_beta_release.sh
   scripts/manaloom_battle_product_gate.sh
   scripts/manaloom_deploy_battle_sidecars.sh
@@ -196,19 +197,37 @@ elif PYTHONDONTWRITEBYTECODE=1 python3 "$XMAGE_TRANSITION_AUDITOR" \
 fi
 PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
   python3 -m py_compile \
+    "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py" \
+    "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_osv_scan_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_read_env.py" \
     "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
     "$ROOT_DIR/server/bin/audit_easypanel_runtime_alignment.py" \
+    "$ROOT_DIR/server/bin/manaloom_slo_alerts.py" \
+    "$ROOT_DIR/server/test/card_cli_schema_guard_test.py" \
+    "$ROOT_DIR/server/test/capacity_policy_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
-    "$ROOT_DIR/server/test/release_sbom_scope_test.py"
+    "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
+    "$ROOT_DIR/server/test/slo_alerts_test.py"
 
+# BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
+# conferem o schema do PostgreSQL e param; não o alteram.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/card_cli_schema_guard_test.py"
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py"
+# BT-CAP-001: política de capacidade, snapshot só de leitura e preflight.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/capacity_policy_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/release_sbom_scope_test.py"
+# BT-OBS-001: SLOs, regras de alerta, receptor humano e teste de alerta.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/slo_alerts_test.py"
 
 SAFE_ENV_FIXTURE="$TMP_DIR/safe.env"
 SAFE_ENV_MARKER="$TMP_DIR/env-code-executed"
@@ -566,6 +585,9 @@ grep -Fq "('057', 'expand_battle_job_async_timeout')" "$ROOT_DIR/scripts/manaloo
 grep -Fq "('058', 'snapshot_trade_item_identity')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('059', 'align_trade_items_owner_fk')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('060', 'create_account_deletion_outbox')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('063', 'recreate_commander_learning_snapshot_view')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('064', 'adopt_production_unique_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('065', 'adopt_production_indexes_from_database_indexes_sql')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('067', 'create_deck_revision_ledger')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('068', 'demote_decks_on_legality_change')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_039_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

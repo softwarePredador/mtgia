@@ -187,7 +187,7 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertFalse(runtime.allowed("battle_batch"))
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(runtime)],
-            ["hermes_cron_governor_report"],
+            ["hermes_cron_governor_report", "manaloom_slo_alerts"],
         )
 
     def test_all_off_policy_schedules_only_governor_catalog_and_privacy_jobs(
@@ -207,6 +207,7 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                 "manaloom_account_deletion_outbox",
                 "manaloom_catalog_reference_refresh",
                 "hermes_cron_governor_report",
+                "manaloom_slo_alerts",
             ],
         )
         self.assertEqual(
@@ -218,9 +219,34 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         module = _load_module()
         invalid = module.ReleasePolicy(False, "invalid", {})
 
+        # O governor e o avaliador de SLO só leem: rodam até com política
+        # inválida, quando o alerta mais importa (BT-OBS-001).
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(invalid)],
-            ["hermes_cron_governor_report"],
+            ["hermes_cron_governor_report", "manaloom_slo_alerts"],
+        )
+
+    def test_slo_alerts_job_runs_the_evaluator_every_five_minutes(self) -> None:
+        module = _load_module()
+        jobs = {job.name: job for job in module.JOBS}
+        job = jobs["manaloom_slo_alerts"]
+        policy = json.loads(
+            (module.REPO_ROOT / "server/config/slo_alert_policy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+
+        self.assertEqual(job.schedule, policy["evaluation"]["schedule"])
+        self.assertEqual(policy["evaluation"]["job"], job.name)
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME" && python3 ./server/bin/manaloom_slo_alerts.py run',
+        )
+        self.assertEqual(module.JOB_REQUIRED_CAPABILITIES[job.name], ())
+        self.assertNotIn(job.name, module.REFERENCE_DATA_JOBS)
+        self.assertNotIn(job.name, module.PRIVACY_CONTROL_JOBS)
+        self.assertTrue(
+            (module.REPO_ROOT / "server/bin/manaloom_slo_alerts.py").is_file()
         )
 
     def test_only_catalog_and_privacy_contract_jobs_are_capability_free(
@@ -239,6 +265,7 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                 "manaloom_catalog_reference_refresh",
                 "manaloom_account_deletion_outbox",
                 "manaloom_ai_runtime_cleanup",
+                "manaloom_slo_alerts",
             },
         )
         self.assertEqual(

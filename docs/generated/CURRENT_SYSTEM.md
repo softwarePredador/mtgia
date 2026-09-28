@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `c4ec96cfe418d3f9c1ccc0c70197a9f92b358f7f5681837ac711d0b9fce46945`
+**Digest das fontes:** `421bd62a29672c692bcae186fce8e2d51333b0e4bcbe68ce24e877861e235ff8`
 
 ## Fontes de verdade
 
@@ -21,19 +21,19 @@
 | `dart_symbols` | 5354 |
 | `semantic_resolved_files` | 707 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 43421 |
-| `semantic_resolved_call_sites` | 69014 |
-| `semantic_resolved_type_references` | 16487 |
-| `modules` | 160 |
+| `semantic_resolved_call_edges` | 43432 |
+| `semantic_resolved_call_sites` | 68990 |
+| `semantic_resolved_type_references` | 16508 |
+| `modules` | 161 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
 | `api_routes` | 125 |
 | `database_tables` | 81 |
 | `database_views` | 6 |
-| `migrations` | 62 |
-| `scripts_and_jobs` | 693 |
-| `environment_variables` | 715 |
-| `tests` | 1267 |
+| `migrations` | 65 |
+| `scripts_and_jobs` | 696 |
+| `environment_variables` | 716 |
+| `tests` | 1277 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
 | `tasks` | 244 |
@@ -57,7 +57,7 @@
 | Build, migração, deploy, observabilidade e rollback | `guarded_no_implicit_live_write` | same-SHA release contract, artifact digests, migration ledger and health/readiness |
 | Plano, cota de IA e comércio (beta gratuita, sem cobrança) | `free_beta_no_commerce` | user_plans and ai_logs in PostgreSQL under PlanService; offer_mode free_beta_no_commerce in server/config/release_capabilities.json; no payment provider exists |
 | Site público (brewtact.com) e relatório compartilhável | `active_release_scope` | web-public/src/lib/product-data.ts and routes.ts under the free-beta offer contract; shared_deck_reports in PostgreSQL for GET /reports/{id}; no product capability is served |
-| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor |
+| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (19 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox), manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) and manaloom_slo_alerts (BT-OBS-001 read-only SLO and alert evaluator that notifies the owner by e-mail or Telegram, D-47) run; an invalid policy keeps only the governor and the SLO evaluator |
 
 ## Como validar
 

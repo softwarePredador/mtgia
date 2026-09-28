@@ -6,6 +6,7 @@ import 'package:postgres/postgres.dart';
 import '../basic_land_utils.dart' as basic_lands;
 import '../color_identity.dart';
 import '../import_card_lookup_service.dart';
+import '../schema_requirements.dart';
 import 'commander_reference_card_stats_support.dart';
 
 const commanderReferenceDecksTable = 'commander_reference_decks';
@@ -1190,68 +1191,26 @@ String classifyCommanderReferenceDeckCardRole(
   return 'other';
 }
 
-Future<void> ensureCommanderReferenceDeckCorpusTables(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_reference_decks (
-      source_deck_key TEXT PRIMARY KEY,
-      commander_name TEXT NOT NULL,
-      commander_name_normalized TEXT NOT NULL,
-      source TEXT NOT NULL,
-      source_url TEXT,
-      power_lane TEXT,
-      theme TEXT,
-      deck_hash TEXT NOT NULL,
-      main_quantity INTEGER NOT NULL,
-      commander_quantity INTEGER NOT NULL,
-      resolved_count INTEGER NOT NULL,
-      unresolved_count INTEGER NOT NULL,
-      off_color_count INTEGER NOT NULL,
-      singleton_violations JSONB NOT NULL DEFAULT '{}'::jsonb,
-      role_summary JSONB NOT NULL DEFAULT '{}'::jsonb,
-      accepted BOOLEAN NOT NULL DEFAULT FALSE,
-      rejection_reasons JSONB NOT NULL DEFAULT '[]'::jsonb,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  ''');
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_reference_deck_cards (
-      source_deck_key TEXT NOT NULL REFERENCES commander_reference_decks(source_deck_key) ON DELETE CASCADE,
-      board TEXT NOT NULL,
-      card_name TEXT NOT NULL,
-      card_name_normalized TEXT NOT NULL,
-      card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
-      quantity INTEGER NOT NULL,
-      role TEXT NOT NULL,
-      unresolved BOOLEAN NOT NULL DEFAULT FALSE,
-      off_color BOOLEAN NOT NULL DEFAULT FALSE,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (source_deck_key, board, card_name_normalized)
-    )
-  ''');
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_reference_deck_analysis (
-      commander_name_normalized TEXT NOT NULL,
-      source TEXT NOT NULL,
-      commander_name TEXT NOT NULL,
-      deck_count INTEGER NOT NULL,
-      accepted_deck_count INTEGER NOT NULL,
-      average_role_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-      top_cards JSONB NOT NULL DEFAULT '[]'::jsonb,
-      theme_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (commander_name_normalized, source)
-    )
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_commander_reference_decks_lookup
-    ON commander_reference_decks (commander_name_normalized, accepted, updated_at DESC)
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_commander_reference_deck_cards_hot
-    ON commander_reference_deck_cards (card_name_normalized, role, unresolved, off_color)
-  ''');
-}
+/// As tabelas e os índices nascem da migration 034 (BT-DB-004): o CLI só
+/// confere que existem e para se faltar algo.
+const commanderReferenceDeckCorpusSchemaRequirements = SchemaRequirements(
+  tables: {
+    'commander_reference_decks',
+    'commander_reference_deck_cards',
+    'commander_reference_deck_analysis',
+  },
+  indexes: {
+    'idx_commander_reference_decks_lookup',
+    'idx_commander_reference_deck_cards_hot',
+  },
+);
+
+Future<void> requireCommanderReferenceDeckCorpusSchema(Pool pool) =>
+    requireSchemaObjects(
+      pool,
+      caller: 'commander_reference_deck_corpus',
+      requirements: commanderReferenceDeckCorpusSchemaRequirements,
+    );
 
 Future<void> upsertCommanderReferenceDeckCorpus(
   Pool pool,

@@ -1,5 +1,7 @@
 import 'package:postgres/postgres.dart';
 
+import 'schema_requirements.dart';
+
 String cleanImportLookupKey(String value) =>
     value.replaceAll(RegExp(r'\s+\d+$'), '');
 
@@ -29,93 +31,6 @@ const _localizedImportAliases = <String, String>{
   'memorial de akroma': "Akroma's Memorial",
 };
 
-const createCardLocalizedNamesTableSql = '''
-CREATE TABLE IF NOT EXISTS card_localized_names (
-  scryfall_id UUID NOT NULL,
-  oracle_id UUID,
-  card_id UUID REFERENCES cards(id) ON DELETE CASCADE,
-  lang TEXT NOT NULL,
-  printed_name TEXT NOT NULL,
-  normalized_printed_name TEXT NOT NULL,
-  canonical_name TEXT NOT NULL,
-  set_code TEXT,
-  collector_number TEXT,
-  source TEXT NOT NULL DEFAULT 'scryfall',
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (scryfall_id, lang, normalized_printed_name)
-)
-''';
-
-const createCardLocalizedNamesIndexesSql = [
-  '''
-  CREATE INDEX IF NOT EXISTS idx_card_localized_names_lookup
-  ON card_localized_names (normalized_printed_name, lang)
-  ''',
-  '''
-  CREATE INDEX IF NOT EXISTS idx_card_localized_names_card_id
-  ON card_localized_names (card_id)
-  ''',
-  '''
-  CREATE INDEX IF NOT EXISTS idx_card_localized_names_oracle_id
-  ON card_localized_names (oracle_id)
-  ''',
-];
-
-const createCardIdentityBridgeViewSql = '''
-CREATE OR REPLACE VIEW card_identity_bridge AS
-SELECT
-  c.id AS card_id,
-  c.oracle_id,
-  c.scryfall_id,
-  c.name AS canonical_name,
-  LOWER(TRIM(c.name)) AS normalized_canonical_name,
-  c.name AS lookup_name,
-  LOWER(TRIM(c.name)) AS normalized_lookup_name,
-  c.name AS printed_name,
-  'en'::text AS lang,
-  c.type_line,
-  c.image_url,
-  c.color_identity,
-  c.colors,
-  c.oracle_text,
-  c.mana_cost,
-  c.cmc,
-  'cards'::text AS source,
-  0 AS match_priority
-FROM cards c
-UNION ALL
-SELECT
-  c.id AS card_id,
-  COALESCE(l.oracle_id, c.oracle_id) AS oracle_id,
-  COALESCE(l.scryfall_id, c.scryfall_id) AS scryfall_id,
-  c.name AS canonical_name,
-  LOWER(TRIM(c.name)) AS normalized_canonical_name,
-  l.printed_name AS lookup_name,
-  l.normalized_printed_name AS normalized_lookup_name,
-  l.printed_name,
-  l.lang,
-  c.type_line,
-  c.image_url,
-  c.color_identity,
-  c.colors,
-  c.oracle_text,
-  c.mana_cost,
-  c.cmc,
-  l.source,
-  CASE
-    WHEN c.id = l.card_id THEN 1
-    WHEN c.scryfall_id = l.scryfall_id THEN 2
-    WHEN c.scryfall_id = l.oracle_id THEN 3
-    ELSE 4
-  END AS match_priority
-FROM card_localized_names l
-JOIN cards c
-  ON c.id = l.card_id
-  OR c.scryfall_id = l.scryfall_id
-  OR c.scryfall_id = l.oracle_id
-  OR LOWER(c.name) = LOWER(l.canonical_name)
-''';
-
 String canonicalizeImportLookupName(String value) {
   final cleanKey = cleanImportLookupKey(value.trim().toLowerCase());
   final folded = foldImportLookupKey(cleanKey);
@@ -133,13 +48,24 @@ String? staticLocalizedImportAliasTarget(String value) {
   return _localizedImportAliases[folded]?.toLowerCase();
 }
 
-Future<void> ensureCardLocalizedNamesTable(Session session) async {
-  await session.execute(Sql.named(createCardLocalizedNamesTableSql));
-  for (final sql in createCardLocalizedNamesIndexesSql) {
-    await session.execute(Sql.named(sql));
-  }
-  await session.execute(Sql.named(createCardIdentityBridgeViewSql));
-}
+/// A tabela, os índices e a view `card_identity_bridge` nascem da migration
+/// 022 (BT-DB-004): o sync de nomes localizados só confere que existem.
+const cardLocalizedNamesSchemaRequirements = SchemaRequirements(
+  tables: {'card_localized_names', 'cards'},
+  indexes: {
+    'idx_card_localized_names_lookup',
+    'idx_card_localized_names_card_id',
+    'idx_card_localized_names_oracle_id',
+  },
+  views: {'card_identity_bridge'},
+);
+
+Future<void> requireCardLocalizedNamesSchema(Session session) =>
+    requireSchemaObjects(
+      session,
+      caller: 'sync_localized_card_names',
+      requirements: cardLocalizedNamesSchemaRequirements,
+    );
 
 Future<bool> hasCardLocalizedNamesTable(Pool pool) async {
   final result = await pool.execute(

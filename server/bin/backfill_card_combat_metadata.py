@@ -143,15 +143,56 @@ def parse_atomic_cards(path: Path, limit: int = 0) -> list[tuple[Any, ...]]:
     return rows
 
 
-def ensure_columns(conn) -> None:
+# BT-DB-004: o schema só muda por migration. As colunas e os índices abaixo
+# nascem do database_setup.sql; este CLI só confere e para se faltar algo.
+REQUIRED_CARD_COLUMNS = ("power", "toughness", "keywords",)
+REQUIRED_CARD_INDEXES = ("idx_cards_keywords",)
+
+
+def missing_schema_objects(conn) -> list[str]:
     with conn.cursor() as cur:
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]")
         cur.execute(
-            "CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING gin (keywords)"
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'cards'
+              AND column_name = ANY(%s)
+            """,
+            (list(REQUIRED_CARD_COLUMNS),),
         )
-    conn.commit()
+        present_columns = {row[0] for row in cur.fetchall()}
+        cur.execute(
+            """
+            SELECT indexname
+            FROM pg_indexes
+            WHERE schemaname = 'public'
+              AND indexname = ANY(%s)
+            """,
+            (list(REQUIRED_CARD_INDEXES),),
+        )
+        present_indexes = {row[0] for row in cur.fetchall()}
+    conn.rollback()
+    return [
+        f"coluna cards.{column}"
+        for column in REQUIRED_CARD_COLUMNS
+        if column not in present_columns
+    ] + [
+        f"índice {index}"
+        for index in REQUIRED_CARD_INDEXES
+        if index not in present_indexes
+    ]
+
+
+def require_schema(conn) -> None:
+    missing = missing_schema_objects(conn)
+    if missing:
+        raise SystemExit(
+            "Schema incompleto para backfill_card_combat_metadata: falta "
+            + ", ".join(missing)
+            + ". O schema só muda por migration: aplique bin/migrate.dart "
+            "pelo fluxo aprovado."
+        )
 
 
 def update_batch(conn, rows: list[tuple[Any, ...]]) -> int:
@@ -215,7 +256,7 @@ def main() -> None:
     if not args.dry_run:
         conn = connect()
         try:
-            ensure_columns(conn)
+            require_schema(conn)
             before = coverage(conn)
             for index in range(0, len(rows), args.batch_size):
                 batch = rows[index : index + args.batch_size]

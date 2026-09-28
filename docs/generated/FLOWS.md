@@ -295,7 +295,7 @@ Gates: `scripts/quality_gate.sh`, `scripts/manaloom_public_web_smoke.sh`.
 ## Scheduler operacional (manaloom-ops) e sincronizações
 
 Estado: `guarded_no_implicit_live_write`
-Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (18 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox) and manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) run; an invalid policy keeps only the governor
+Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (19 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox), manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) and manaloom_slo_alerts (BT-OBS-001 read-only SLO and alert evaluator that notifies the owner by e-mail or Telegram, D-47) run; an invalid policy keeps only the governor and the SLO evaluator
 
 ```mermaid
 sequenceDiagram
@@ -307,14 +307,17 @@ sequenceDiagram
     participant Catalog_Refresh as Catalog Refresh
     participant Scryfall as Scryfall
     participant PostgreSQL as PostgreSQL
+    participant SLO_Evaluator as SLO Evaluator
+    participant Owner as Owner
     Operator->>Ops_Image: deploy da imagem do daemon (mesmo SHA)
     Ops_Daemon->>Capability_Policy: lê release_capabilities.json no boot
     Ops_Daemon->>Job: agenda job cuja capability está on; com tudo off, só o governor e o refresh de dado de referência
     Catalog_Refresh->>Scryfall: bulk default_cards, uma vez por dia, só com o contrato ativado
     Job->>PostgreSQL: sync_log, sync_state e data_source_snapshots
     Ops_Daemon->>Operator: GET /health próprio e relatório do governor
+    SLO_Evaluator->>Owner: alerta de API, banco, jobs, cache e catálogo por e-mail ou Telegram (D-47)
 ```
 
-Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/cron_account_deletion_outbox.sh`, `server/bin/account_deletion_outbox_worker.dart`, `server/lib/privacy/account_deletion_outbox.dart`, `server/bin/cleanup_optimize_telemetry.dart`, `server/lib/privacy/retention_cleanup.dart`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`.
-Testes: `server/test/manaloom_ops_daemon_test.py`, `server/test/sync_catalog_reference_from_scryfall_test.py`.
+Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/cron_account_deletion_outbox.sh`, `server/bin/account_deletion_outbox_worker.dart`, `server/lib/privacy/account_deletion_outbox.dart`, `server/bin/cleanup_optimize_telemetry.dart`, `server/lib/privacy/retention_cleanup.dart`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`, `server/bin/manaloom_slo_alerts.py`, `server/config/slo_alert_policy.json`.
+Testes: `server/test/manaloom_ops_daemon_test.py`, `server/test/sync_catalog_reference_from_scryfall_test.py`, `server/test/slo_alerts_test.py`.
 Gates: `scripts/manaloom_battle_product_gate.sh`.

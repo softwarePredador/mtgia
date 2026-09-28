@@ -40,7 +40,7 @@ void main() {
     test(
       'free, missing and commitments are clamped and independently named',
       () {
-        final normalized = normalizeSql(collectionAvailabilityViewsSql);
+        final normalized = normalizeSql(migration.up);
         expect(normalized, contains('as owned_quantity'));
         expect(normalized, contains('as allocated_quantity'));
         expect(normalized, contains('as committed_trade_quantity'));
@@ -56,7 +56,7 @@ void main() {
     );
 
     test('item availability is deterministic across multiple printings', () {
-      final normalized = normalizeSql(collectionAvailabilityViewsSql);
+      final normalized = normalizeSql(migration.up);
       expect(normalized, contains('partition by bi.user_id'));
       expect(
         normalized,

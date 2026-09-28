@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:postgres/postgres.dart';
 
+import '../schema_requirements.dart';
+
 const loreholdReferenceCommanderName = 'Lorehold, the Historian';
 const loreholdReferenceProfileVersion =
     'lorehold_reference_profile_v1_2026-05-11';
@@ -603,17 +605,18 @@ Future<Map<String, bool>> auditCommanderReferenceTables(Pool pool) async {
   };
 }
 
-Future<void> ensureCommanderReferenceProfileTable(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_reference_profiles (
-      commander_name TEXT PRIMARY KEY,
-      source TEXT NOT NULL,
-      deck_count INTEGER NOT NULL DEFAULT 0,
-      profile_json JSONB NOT NULL,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  ''');
-}
+/// A tabela nasce da migration 034 (BT-DB-004): o CLI só confere que existe
+/// e para se faltar.
+const commanderReferenceProfileSchemaRequirements = SchemaRequirements(
+  tables: {'commander_reference_profiles'},
+);
+
+Future<void> requireCommanderReferenceProfileSchema(Pool pool) =>
+    requireSchemaObjects(
+      pool,
+      caller: 'commander_reference_profile',
+      requirements: commanderReferenceProfileSchemaRequirements,
+    );
 
 Future<void> upsertLoreholdReferenceProfile(
   Pool pool, {

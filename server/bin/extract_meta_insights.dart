@@ -20,11 +20,35 @@ import '../lib/meta/meta_deck_format_support.dart';
 /// Uso:
 ///   dart run bin/extract_meta_insights.dart [--full | --incremental]
 ///   dart run bin/extract_meta_insights.dart --report-only
+///
+/// `--full` apaga `card_meta_insights`, `synergy_packages` e
+/// `archetype_patterns` (TRUNCATE ... CASCADE) antes de reescrever. Por isso
+/// exige `MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL` e para
+/// antes de abrir a conexão sem ela (D-48, BT-DB-004).
+
+const metaInsightsFullRebuildApprovalEnvironment =
+    'MANALOOM_CONFIRM_POSTGRES_WRITES';
+const metaInsightsFullRebuildApprovalPhrase = 'I_HAVE_EXPLICIT_APPROVAL';
 
 void main(List<String> args) async {
   final isFullRebuild = args.contains('--full');
   final reportOnly = args.contains('--report-only');
   final startTime = DateTime.now();
+
+  if (isFullRebuild &&
+      !reportOnly &&
+      Platform.environment[metaInsightsFullRebuildApprovalEnvironment] !=
+          metaInsightsFullRebuildApprovalPhrase) {
+    stderr.writeln(
+      'BLOCKED: --full apaga card_meta_insights, synergy_packages e '
+      'archetype_patterns. Defina '
+      '$metaInsightsFullRebuildApprovalEnvironment='
+      '$metaInsightsFullRebuildApprovalPhrase para executar. Nenhuma conexão '
+      'foi aberta.',
+    );
+    exitCode = 2;
+    return;
+  }
 
   print('═══════════════════════════════════════════════════════════════');
   print('  META INSIGHTS EXTRACTOR - Imitation Learning Pipeline');

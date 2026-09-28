@@ -77,7 +77,7 @@ Notas:
 
   try {
     await pool.runTx((session) async {
-      await ensureCardLocalizedNamesTable(session);
+      await requireCardLocalizedNamesSchema(session);
       await _upsertRows(session, rows);
     });
     stdout.writeln('✅ Apply concluido: ${rows.length} aliases sincronizados.');

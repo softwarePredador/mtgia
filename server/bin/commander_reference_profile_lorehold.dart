@@ -67,8 +67,8 @@ Future<void> main(List<String> args) async {
     );
 
     if (apply) {
-      await ensureCommanderReferenceProfileTable(pool);
-      await ensureCommanderReferenceCardStatsTable(pool);
+      await requireCommanderReferenceProfileSchema(pool);
+      await requireCommanderReferenceCardStatsSchema(pool);
       await upsertLoreholdReferenceProfile(pool, updatedAt: startedAt);
       await upsertCommanderReferenceCardStats(pool, cardStatsResolution.stats);
     }

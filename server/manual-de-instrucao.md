@@ -8349,7 +8349,7 @@ Este documento serve como guia definitivo para o entendimento, manutenção e ex
   - `bin/seed_rules.dart` - Importação de regras oficiais (modo legado via `magicrules.txt`)
   - `bin/sync_cards.dart` - Sync idempotente (cartas + legalidades) com checkpoint
   - `bin/sync_rules.dart` - Sync idempotente das Comprehensive Rules (baixa o .txt mais recente da Wizards)
-  - `bin/setup_database.dart` - Cria schema inicial
+  - `bin/setup_database.dart` - aposentado (tombstone; ver 3.2)
 - [x] Schema do banco de dados completo (`database_setup.sql`)
 
 ### ✅ **Implementado (Frontend - Flutter)**
@@ -9293,21 +9293,21 @@ No método `connect()`, usamos `DotEnv` para ler `DB_HOST`, `DB_PASS`, etc. Isso
 - Por padrão: `ENVIRONMENT=production` → `sslMode=require`, senão → `sslMode=disable`.
 - Override explícito: `DB_SSL_MODE=disable|require|verifyFull`.
 
-### 3.2. Setup Inicial do Banco (`bin/setup_database.dart`)
+### 3.2. Setup Inicial do Banco (`bin/setup_database.dart`, aposentado)
 
-**Objetivo:**
-Automatizar a criação das tabelas. Rodar comandos SQL manualmente no terminal é propenso a erro.
+**Aposentado em 2026-09-24 (D-48, `BT-DB-004`):** `bin/setup_database.dart` virou
+tombstone. Não abre conexão, avisa `BLOCKED:` e sai com código 2. Ele aplicava o
+`database_setup.sql` inteiro no banco do `.env`, sem aprovação e sem restrição a
+loopback, e saía com 0 mesmo quando um comando falhava.
 
-**Como funciona:**
-1.  Lê o arquivo `database_setup.sql` como texto.
-2.  Separa o texto em comandos individuais (usando `;` como separador).
-3.  Executa cada comando sequencialmente no banco.
-
-**Exemplo de Uso:**
-Para recriar a estrutura do banco (cuidado, isso pode não apagar dados existentes dependendo do SQL, mas cria se não existir):
+O schema só muda por migration (`bin/migrate.dart`) e pelo gate de schema. Um banco
+novo e descartável nasce assim, como nos gates:
 ```bash
-dart run bin/setup_database.dart
+psql -X -v ON_ERROR_STOP=1 -h 127.0.0.1 -d <banco-novo> -f database_setup.sql
+dart run bin/migrate.dart
 ```
+Nenhum CLI cria, altera ou apaga tabela, coluna, índice ou view: eles conferem o
+catálogo e param com a lista do que falta (`lib/schema_requirements.dart`).
 
 ### 3.3. Populando o Banco (Seed) - `bin/seed_database.dart`
 

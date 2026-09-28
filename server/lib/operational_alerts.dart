@@ -25,7 +25,9 @@ class OperationalAlert {
   };
 }
 
-const int operationalAlertThresholdsVersion = 2;
+/// Versão 3 (BT-OBS-001): a taxa de 5xx passa a vir da janela de 5 minutos
+/// de `RequestMetricsService` quando ela existe; os valores não mudaram.
+const int operationalAlertThresholdsVersion = 3;
 const int _minimumRequestSample = 20;
 const int _minimumEndpointSample = 10;
 const int _minimumAiSample = 5;
@@ -45,6 +47,30 @@ const int _minimumBattleTerminalSample = 5;
 const double _warningBattleFailureRate = 0.20;
 const double _criticalBattleFailureRate = 0.50;
 const int _criticalCoachTerminalCount = 3;
+
+/// Os valores da [operationalAlertThresholdsVersion], expostos para que um
+/// teste os trave junto com a versão: mudar um valor exige subir a versão.
+const operationalAlertThresholds = <String, num>{
+  'minimum_request_sample': _minimumRequestSample,
+  'minimum_endpoint_sample': _minimumEndpointSample,
+  'minimum_ai_sample': _minimumAiSample,
+  'warning_error_rate': _warningErrorRate,
+  'critical_error_rate': _criticalErrorRate,
+  'warning_endpoint_p95_ms': _warningEndpointP95Ms,
+  'critical_endpoint_p95_ms': _criticalEndpointP95Ms,
+  'warning_oldest_ai_job_seconds': _warningOldestAiJobSeconds,
+  'critical_oldest_ai_job_seconds': _criticalOldestAiJobSeconds,
+  'warning_ai_failure_rate': _warningAiFailureRate,
+  'critical_ai_failure_rate': _criticalAiFailureRate,
+  'warning_oldest_battle_job_seconds': _warningOldestBattleJobSeconds,
+  'critical_oldest_battle_job_seconds': _criticalOldestBattleJobSeconds,
+  'warning_battle_queue_seconds': _warningBattleQueueSeconds,
+  'critical_battle_queue_seconds': _criticalBattleQueueSeconds,
+  'minimum_battle_terminal_sample': _minimumBattleTerminalSample,
+  'warning_battle_failure_rate': _warningBattleFailureRate,
+  'critical_battle_failure_rate': _criticalBattleFailureRate,
+  'critical_coach_terminal_count': _criticalCoachTerminalCount,
+};
 
 Map<String, Object> evaluateOperationalAlerts({
   required Map<String, dynamic> requestMetrics,
@@ -87,7 +113,10 @@ Map<String, Object> evaluateOperationalAlerts({
 Iterable<OperationalAlert> _requestAlerts(
   Map<String, dynamic> requestMetrics,
 ) sync* {
-  final totals = _map(requestMetrics['totals']);
+  // BT-OBS-001: a janela de 5 minutos mostra um apagão; o total desde o
+  // início do processo o dilui. O total só vale para snapshot sem janela.
+  final window = _map(_map(requestMetrics['windows'])['5m']);
+  final totals = window.isNotEmpty ? window : _map(requestMetrics['totals']);
   final requestCount = _integer(totals['request_count']);
   final errorRate = _decimal(totals['error_rate']);
   if (requestCount >= _minimumRequestSample && errorRate >= _warningErrorRate) {

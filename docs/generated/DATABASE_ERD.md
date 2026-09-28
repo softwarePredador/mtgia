@@ -1157,4 +1157,4 @@ erDiagram
     }
 ```
 
-Tabelas: 81; views: 6; migrations: 62 (latest `068`).
+Tabelas: 81; views: 6; migrations: 65 (latest `068`).

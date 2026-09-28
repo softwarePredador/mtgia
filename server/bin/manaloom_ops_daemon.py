@@ -730,6 +730,17 @@ JOBS = [
         command='cd "$MTGIA_HOME" && ./server/bin/hermes_cron_governor_report.sh',
         script_name="hermes_cron_governor_report.sh",
     ),
+    Job(
+        name="manaloom_slo_alerts",
+        schedule=os.environ.get("MANALOOM_SLO_ALERTS_CRON", "*/5 * * * *"),
+        lockfile=LOCK_DIR / "manaloom_slo_alerts.lock",
+        # BT-OBS-001 (D-47): reads the API health and metrics, PostgreSQL in a
+        # READ ONLY transaction and this daemon's own manifest, and notifies
+        # the owner. Without a configured receiver it records the observation
+        # and exits with an error.
+        command='cd "$MTGIA_HOME" && python3 ./server/bin/manaloom_slo_alerts.py run',
+        script_name="manaloom_slo_alerts.py",
+    ),
 ]
 
 JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
@@ -763,6 +774,9 @@ JOB_REQUIRED_CAPABILITIES: dict[str, tuple[str, ...]] = {
     # This report only summarizes the local scheduler manifest/log status. It
     # is the liveness/housekeeping job that also runs on an invalid policy.
     "hermes_cron_governor_report": (),
+    # SLO and alert evaluator (BT-OBS-001, D-47). It only reads and notifies
+    # the owner, so it also runs on an invalid policy, when alerts matter most.
+    "manaloom_slo_alerts": (),
 }
 
 # Jobs that keep reference data fresh under a versioned apply contract (BT-CAT-01,

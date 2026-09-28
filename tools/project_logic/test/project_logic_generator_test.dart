@@ -39,7 +39,7 @@ void main() {
     expect(stats['api_routes'] as int, greaterThanOrEqualTo(95));
     expect(stats['database_tables'], 81);
     expect(stats['database_views'], 6);
-    expect(stats['migrations'], 62);
+    expect(stats['migrations'], 65);
     expect(stats['flows'], 13);
   });
 

@@ -956,6 +956,9 @@ WITH required_migrations(version, name) AS (
     ('058', 'snapshot_trade_item_identity'),
     ('059', 'align_trade_items_owner_fk'),
     ('060', 'create_account_deletion_outbox'),
+    ('063', 'recreate_commander_learning_snapshot_view'),
+    ('064', 'adopt_production_unique_indexes'),
+    ('065', 'adopt_production_indexes_from_database_indexes_sql'),
     ('067', 'create_deck_revision_ledger'),
     ('068', 'demote_decks_on_legality_change')
 ), checks(check_name, ok) AS (
@@ -967,7 +970,7 @@ WITH required_migrations(version, name) AS (
     (
       'required_migrations_registered',
       (
-        SELECT COUNT(*) = 22
+        SELECT COUNT(*) = 25
         FROM required_migrations required
         JOIN public.schema_migrations actual
           ON actual.version = required.version

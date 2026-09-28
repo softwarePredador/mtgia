@@ -49,7 +49,19 @@ void main() {
     () {
       expect(source, contains('pool.runTx<Map<String, int>>'));
       expect(source, contains('pg_advisory_xact_lock'));
-      expect(source, contains('_ensureSchema(session)'));
+      // BT-DB-004: dentro da transação o schema só é conferido, nunca criado.
+      expect(
+        source,
+        contains(
+          'await requireSchemaObjects(\n'
+          '          session,\n'
+          "          caller: 'semantic_layer_v2_backfill',\n"
+          '          requirements: candidateQualitySchemaRequirements,\n'
+          '        );\n'
+          '        await _lockAuthoritativeTables(session);',
+        ),
+      );
+      expect(source, isNot(contains('_ensureSchema')));
       expect(source, contains('_lockAuthoritativeTables(session)'));
       expect(source, contains('LOCK TABLE cards IN SHARE MODE'));
       expect(
