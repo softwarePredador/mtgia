@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "9e619238a120f430057e01b5dda33b62ca4056d73f407aa79d8ff7e4e019b15c",
+  "source_digest_sha256": "36c8ca507b9f423336cabe08bb97e11c137da0766946388de48c726800bb89da",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -277301,7 +277301,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "12fe941644658bcf005386d148f0aa8f9d03d211507eaf4e28e6393fe62c8e2f"
+      "sha256": "d432b1befced1dd595ce94e5970f0a7bc3c284095fcdd417e15dc1f483555634"
     },
     "required_task_fields": [
       "id",
@@ -279931,7 +279931,7 @@
         "depends_on": [
           "BT-DB-002"
         ],
-        "acceptance": "Canonical e live-drift suportados explicitamente; perfil misto falha antes de DDL. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção e sem migration nova. Runner: o preflight classifica o banco pelo ledger antes de qualquer DDL, na aplicação e no rollback; `dart bin/migrate.dart --preflight` só lê, e `--target VERSÃO` aplica até a versão. Ensaio: `scripts/manaloom_migration_rehearsal.py` sobe um PostgreSQL 17 descartável (loopback, sem socket, `sandbox-exec`), restaura o dump duas vezes (modo `estrutura`, só estrutura e ledger, ou `completo`), roda o preflight (misto para sem DDL e com o banco igual), o banco novo, o upgrade, a pós-checagem do catálogo inteiro (schemas, extensões, tabelas, colunas, restrições, chaves, índices, views, funções, gatilhos, sequências, enums e ledger) contra o banco novo com a lista fechada `server/config/schema_drift_allowlist.json` (94 itens da auditoria BT-DB-001 menos o que a 058, a 059 e a 063 a 065 reconciliam, cada um com a decisão que o tira; proposta pendente do dono), o payload por tabela, a reaplicação, o rollback pelo restore do mesmo dump (idêntico ao de antes) e o reforward (igual ao upgrade). Evidência (`docs/qa/execution/2026-09-28/BT-DB-003-ensaio-de-upgrade.md`): `server/test/migration_preflight_test.dart` (10), `server/test/migration_rehearsal_test.py` (9) e `server/test/migration_rehearsal_db_live_test.py` (5, `RUN_SCHEMA_DB_TESTS=1`, ligado no gate de schema): o canônico (o bootstrap da produção em 41bab49c9 com as migrations até a 058) chega ao banco novo sem nenhuma diferença, com payload, rollback e reforward iguais; o live-drift (o canônico com a deriva publicada pela BT-DB-001) deixa só a lista fechada (186 diferenças, nenhuma inesperada); quatro perfis mistos param com código 3 e o banco intacto; 14 mutações falham como esperado. Segue aberto: o dono aprovar a lista fechada; o ensaio com a forma real da produção e o código integrado antes do lote (o roteiro da coordenação roda com o dump novo, no modo completo).",
+        "acceptance": "Canonical e live-drift suportados explicitamente; perfil misto falha antes de DDL. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção e sem migration nova. Runner: o preflight classifica o banco pelo ledger antes de qualquer DDL, na aplicação e no rollback; `dart bin/migrate.dart --preflight` só lê, e `--target VERSÃO` aplica até a versão. Ensaio: `scripts/manaloom_migration_rehearsal.py` sobe um PostgreSQL 17 descartável (loopback, sem socket, `sandbox-exec`), restaura o dump duas vezes (modo `estrutura`, só estrutura e ledger, ou `completo`), roda o preflight (misto para sem DDL e com o banco igual), o banco novo, o upgrade, a pós-checagem do catálogo inteiro (schemas, extensões, tabelas, colunas, restrições, chaves, índices, views, funções, gatilhos, sequências, enums e ledger) contra o banco novo com a lista fechada `server/config/schema_drift_allowlist.json` (94 itens da auditoria BT-DB-001 menos o que a 058, a 059 e a 063 a 065 reconciliam, cada um com a decisão que o tira; proposta pendente do dono), o payload por tabela, a reaplicação, o rollback pelo restore do mesmo dump (idêntico ao de antes) e o reforward (igual ao upgrade). Evidência (`docs/qa/execution/2026-09-28/BT-DB-003-ensaio-de-upgrade.md`): `server/test/migration_preflight_test.dart` (10), `server/test/migration_rehearsal_test.py` (9) e `server/test/migration_rehearsal_db_live_test.py` (5, `RUN_SCHEMA_DB_TESTS=1`, ligado no gate de schema): o canônico (o bootstrap da produção em 41bab49c9 com as migrations até a 058) chega ao banco novo sem nenhuma diferença, com payload, rollback e reforward iguais; o live-drift (o canônico com a deriva publicada pela BT-DB-001) deixa só a lista fechada (186 diferenças, nenhuma inesperada); quatro perfis mistos param com código 3 e o banco intacto; 14 mutações falham como esperado. Em 2026-09-28, com a autorização da coordenação, o ensaio rodou na estrutura do dump local de 2026-09-23 (só estrutura e ledger, nenhuma linha de dado, cluster apagado) com a prévia do código integrado (integração mais as pontas das três frentes, 71 migrations, até a 074): a cadeia 058 a 074 aplica na forma real da produção (upgrade sem erro, reaplicação sem mudança, rollback pelo restore idêntico e reforward igual); 10 diferenças ficaram fora da lista fechada, todas em CHECK, gatilho e enum, categorias que a auditoria não leu, e vão para a `BT-DB-005` (`docs/qa/execution/2026-09-28/BT-DB-003-ensaio-na-estrutura-da-producao.md`, só nomes e resultados). Segue aberto: o dono aprovar a lista fechada; o ensaio no modo completo com o dump novo, no lote de deploy (o roteiro da coordenação).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 667
       },
@@ -287247,7 +287247,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "9e619238a120f430057e01b5dda33b62ca4056d73f407aa79d8ff7e4e019b15c"
+    "project_logic_source_digest_sha256": "36c8ca507b9f423336cabe08bb97e11c137da0766946388de48c726800bb89da"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
