@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import '../lib/privacy/privacy_export_request_log.dart'
+    show privacyExportRequestLogMarker;
+
 /// BT-PRIV-003: o inventário de retenção
 /// (`docs/privacy/data_retention_inventory.json`) tem de cobrir o schema real.
 ///
@@ -255,6 +258,25 @@ void main() {
       expect(ruleFor('D-30', '30 dias'), contains('lixeira'));
       expect(ruleFor('D-32', '24 h'), contains('jobs de IA'));
       expect(ruleFor('D-23', 'rotação'), contains('backup'));
+      expect(ruleFor('D-78', '90 dias'), contains('exportação'));
+    });
+
+    test('o log de pedido de exportação guarda 90 dias, com dono e quem '
+        'apaga (D-78)', () {
+      final artifacts = (inventory['artifacts'] as Map).cast<String, Map>();
+      final log = artifacts['privacy_export_request_log']!;
+      expect(log['retention_days'], 90);
+      expect(_text(log['retention']), startsWith('90 dias'));
+      expect(_text(log['owner']), isNotEmpty);
+      expect(File('../${log['owner']}').existsSync(), isTrue);
+      expect(_text(log['deleted_by']), isNotEmpty);
+      expect(log['personal_data'], isTrue);
+      expect(log['decisions'], containsAll(['D-71', 'D-78']));
+      expect(_text(log['what']), contains(privacyExportRequestLogMarker));
+      final rule = (inventory['decided_retention'] as List)
+          .cast<Map>()
+          .singleWhere((rule) => rule['decision'] == 'D-78');
+      expect(rule['applies_to'], ['artifact:privacy_export_request_log']);
     });
 
     test('cada prazo decidido aponta para tabela, coluna ou artefato real', () {

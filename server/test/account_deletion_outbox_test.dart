@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import '../bin/migrate.dart' as migrate;
+import '../lib/battle/interactive_battle_contract.dart';
 import '../lib/endpoint_cache.dart';
 import '../lib/privacy/account_deletion_outbox.dart';
 import '../lib/user_data_privacy_service.dart';
@@ -90,6 +91,7 @@ void main() {
       }
       expect(defaultAccountDeletionOutboxHandlers().keys.toSet(), {
         'endpoint_cache',
+        'interactive_battle_sidecar',
         'sentry',
       });
     });
@@ -100,7 +102,7 @@ void main() {
           for (final consumer in accountDeletionOutboxConsumers)
             if (consumer.carriesDeckTokens) consumer.name,
         },
-        {'hermes_learning_sqlite', 'interactive_battle_sidecar'},
+        {'hermes_learning_sqlite'},
       );
     });
 
@@ -117,6 +119,45 @@ void main() {
         endpointCache.firstAttemptDelay,
         greaterThanOrEqualTo(
           EndpointCache.maxTtl + EndpointCache.sweepInterval,
+        ),
+      );
+    });
+
+    test('interactive_battle_sidecar fecha pelo tempo máximo da sessão mais a '
+        'retenção terminal do sidecar, contados da exclusão (D-77)', () {
+      final sidecar = accountDeletionOutboxConsumers.singleWhere(
+        (consumer) => consumer.name == 'interactive_battle_sidecar',
+      );
+      expect(sidecar.handling, AccountDeletionOutboxHandling.expiresByTtl);
+      expect(sidecar.code, 'expired_by_max_session_lifetime');
+      expect(sidecar.carriesDeckTokens, isFalse);
+      expect(
+        sidecar.firstAttemptDelay,
+        const Duration(seconds: 7200) + const Duration(minutes: 10),
+      );
+
+      // O prazo acompanha o sidecar: o maior TTL aceito e a retenção
+      // terminal vêm do próprio código dele.
+      final registry =
+          File(
+            '../services/xmage-sidecar/src/main/java/com/manaloom/xmage/'
+            'InteractiveBattleRegistry.java',
+          ).readAsStringSync();
+      final retention = RegExp(
+        r'TERMINAL_RETENTION_MS\s*=\s*TimeUnit\.MINUTES\.toMillis\((\d+)\)',
+      ).firstMatch(registry);
+      final ttl = RegExp(
+        r'"ttl_seconds",\s*(\d+),\s*(\d+)\s*\)',
+      ).firstMatch(registry);
+      expect(retention, isNotNull, reason: 'TERMINAL_RETENTION_MS');
+      expect(ttl, isNotNull, reason: 'limite de ttl_seconds');
+      final sidecarMaximumTtl = int.parse(ttl!.group(2)!);
+      expect(sidecarMaximumTtl, interactiveBattleMaximumTtlSeconds);
+      expect(
+        sidecar.firstAttemptDelay,
+        greaterThanOrEqualTo(
+          Duration(seconds: sidecarMaximumTtl) +
+              Duration(minutes: int.parse(retention!.group(1)!)),
         ),
       );
     });

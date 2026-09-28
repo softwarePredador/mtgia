@@ -372,6 +372,10 @@ void main() {
     final fixture = await seed();
     await delete(fixture.userA);
     final receipt = await latestReceipt();
+    expect(
+      (await rowsOf(receipt))['hermes_learning_sqlite']!['deck_tokens'],
+      hasLength(2),
+    );
     // Simula o consumidor do Hermes que ainda não existe.
     await runWorker(
       handlers: {
@@ -383,7 +387,58 @@ void main() {
     final rows = await rowsOf(receipt);
     expect(rows['hermes_learning_sqlite']!['status'], 'done');
     expect(rows['hermes_learning_sqlite']!['deck_tokens'], isEmpty);
-    expect(rows['interactive_battle_sidecar']!['deck_tokens'], hasLength(2));
+  }, skip: skipReason);
+
+  test('o sidecar fecha pelo tempo máximo da sessão, contado da exclusão, e o '
+      'recibo diz por quê (D-77)', () async {
+    final fixture = await seed();
+    await delete(fixture.userA);
+    final receipt = await latestReceipt();
+
+    /// Deixa a linha do sidecar com [age] de idade e vencida para o job.
+    Future<void> age(String age) => pool.execute(
+      Sql.named('''
+        UPDATE account_deletion_outbox
+        SET created_at = CURRENT_TIMESTAMP - CAST(@age AS interval),
+            next_attempt_at = CURRENT_TIMESTAMP - INTERVAL '1 second'
+        WHERE receipt_id = CAST(@receipt AS uuid)
+          AND consumer = 'interactive_battle_sidecar'
+      '''),
+      parameters: {'receipt': receipt, 'age': age},
+    );
+
+    var row = (await rowsOf(receipt))['interactive_battle_sidecar']!;
+    expect(row['status'], 'pending');
+    expect(row['deck_tokens'], isEmpty);
+    expect(row['delay_seconds'], interactiveBattleSidecarOutboxDelay.inSeconds);
+
+    // Na hora da exclusão, nada: a primeira tentativa é 2 h 10 min depois.
+    await runWorker();
+    row = (await rowsOf(receipt))['interactive_battle_sidecar']!;
+    expect(row['status'], 'pending');
+    expect(row['attempts'], 0);
+    expect(row['last_error_code'], isNull);
+
+    // 2 h 9 min depois: ainda dentro do tempo máximo da sessão.
+    await age('2 hours 9 minutes');
+    await runWorker();
+    row = (await rowsOf(receipt))['interactive_battle_sidecar']!;
+    expect(row['status'], 'pending');
+    expect(row['attempts'], 0);
+    expect(row['delay_seconds'], interactiveBattleSidecarOutboxDelay.inSeconds);
+
+    // 2 h 11 min depois: passou 7200 s + 10 min.
+    await age('2 hours 11 minutes');
+    final run = await runWorker();
+    row = (await rowsOf(receipt))['interactive_battle_sidecar']!;
+    expect(row['status'], 'done');
+    expect(row['completed'], isTrue);
+    expect(row['last_error_code'], isNull);
+    final sidecar =
+        (run['consumers'] as Map)['interactive_battle_sidecar'] as Map;
+    expect(sidecar['done'], 1);
+    expect(sidecar['handling'], 'expiresByTtl');
+    expect(sidecar['code'], 'expired_by_max_session_lifetime');
   }, skip: skipReason);
 
   test('linha que outro job retomou não é fechada por este', () async {
