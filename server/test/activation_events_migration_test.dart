@@ -34,7 +34,9 @@ void main() {
     }
     // Não cria tabela: o laço dos gatilhos de conta ativa não é preciso.
     expect(migration073.up, isNot(contains('CREATE TABLE')));
-    expect(migrate.migrations.last.version, '073');
+    final versions = [for (final m in migrate.migrations) m.version];
+    expect(versions, contains('073'));
+    expect(versions.indexOf('073'), greaterThan(versions.indexOf('072')));
   });
 
   test('o down desfaz tudo e o rollback é o padrão', () {

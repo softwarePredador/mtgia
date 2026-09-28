@@ -199,6 +199,45 @@
       "notes": "o id \"latest\" devolve o último trabalho da conta, ou 200 {\"job\": null} quando não há (BT-AI-031)"
     },
     {
+      "method": "GET",
+      "path": "/ai/generate/requests/:id",
+      "handler": "server/routes/ai/generate/requests/[id]/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [],
+      "consumer_note": "Ainda sem consumidor: o app guarda um rascunho local do Generate, e a reidratação do pedido em outro aparelho entra na raia do app (DCK-P0-04).",
+      "writes": [],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "Leitura do pedido durável do Generate pela conta dona (id ou latest). Sem consumidor no app ainda: a reidratação em outro aparelho é da raia do app. Não chama provedor."
+    },
+    {
+      "method": "POST",
+      "path": "/ai/generate/requests/:id/materialize",
+      "handler": "server/routes/ai/generate/requests/[id]/materialize.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "polling",
+      "legal_reacceptance": true,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [],
+      "consumer_note": "Ainda sem consumidor: o app atual salva o deck do Generate pelo caminho antigo; a materialização no servidor entra na raia do app (DCK-P0-04).",
+      "writes": [
+        "decks",
+        "deck_cards",
+        "deck_change_events",
+        "ai_generate_requests"
+      ],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "Materializa no servidor o resultado do Generate num deck novo, com o review_artifact generate_materialize. Cria deck, então passa pela trava do reaceite (D-24). Sem consumidor no app ainda. Não chama provedor."
+    },
+    {
       "method": "DELETE",
       "path": "/ai/generate/jobs/:id",
       "handler": "server/routes/ai/generate/jobs/[id].dart",

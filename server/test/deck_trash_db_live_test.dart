@@ -20,7 +20,6 @@ import '../lib/reports/shareable_report_service.dart';
 import '../lib/user_data_privacy_service.dart';
 import '../routes/ai/archetypes/index.dart' as archetypes_route;
 import '../routes/ai/rebuild/index.dart' as rebuild_route;
-import '../routes/ai/weakness-analysis/index.dart' as weakness_route;
 import '../routes/decks/[id]/_middleware.dart' as deck_id_middleware;
 import '../routes/decks/[id]/changes/[eventId]/undo/index.dart' as undo_route;
 import '../routes/decks/[id]/changes/index.dart' as changes_route;
@@ -471,14 +470,6 @@ void main() {
           context('POST', '/ai/rebuild', {
             'deck_id': trashed,
             'save_mode': 'preview_only',
-          }, asUser: owner),
-        ),
-      ),
-      (
-        'weakness-analysis',
-        () => weakness_route.onRequest(
-          context('POST', '/ai/weakness-analysis', {
-            'deck_id': trashed,
           }, asUser: owner),
         ),
       ),

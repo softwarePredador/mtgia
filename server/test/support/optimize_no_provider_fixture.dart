@@ -59,6 +59,16 @@ Future<void> seedOptimizeNoProviderCatalog(Pool pool) async {
         'identity': identity,
       },
     );
+    // D-28 (DCK-P1-04): carta sem linha de legalidade não é legal, e a
+    // shortlist determinística só aceita carta legal no formato do deck.
+    await pool.execute(
+      Sql.named('''
+        INSERT INTO card_legalities (card_id, format, status)
+        VALUES (CAST(@id AS uuid), 'commander', 'legal')
+        ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status
+      '''),
+      parameters: {'id': id},
+    );
   }
 
   await card(

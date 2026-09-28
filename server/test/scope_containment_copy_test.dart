@@ -24,7 +24,8 @@ final _commercePromise = RegExp(
 
 void main() {
   test('os e-mails da conta não falam de comércio', () {
-    expect(AccountEmailTemplate.values, hasLength(2));
+    // Com o convite da beta (BT-AUTH-006) são 3 modelos; todos são conferidos.
+    expect(AccountEmailTemplate.values, hasLength(3));
     for (final template in AccountEmailTemplate.values) {
       for (final text in [
         template.subject,
