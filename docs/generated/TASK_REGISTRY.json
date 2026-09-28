@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "11d47e51370bf05667c3c2df5b4c530ca430d949249a2dd0a5fd1cba58a9e155"
+    "sha256": "56a4311c45460038eb00ec95f9be2b1e8b7978e39ce719c2962c958ab67c8375"
   },
   "required_task_fields": [
     "id",
@@ -1560,7 +1560,7 @@
         "DCK-P0-05",
         "BT-PRIV-002"
       ],
-      "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo.",
+      "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (D-83, item 3 das decisões do `BT-PRIV-002`): o `sync_pg_target_deck_to_hermes.py` ganhou a proteção do alimentador; com `--apply`, pega o lock de escrita do SQLite (`BEGIN IMMEDIATE`, espera de 30 s) e só então confirma no PostgreSQL que o deck existe e não está na lixeira; deck sumido faz rollback e `DeckGoneError` sem o id na mensagem, e a cópia anterior fica para o expurgo, que pega o mesmo lock. Evidência: `test_sync_pg_target_deck_to_hermes.py` 17/17 (5 novos) e `test_sync_pg_target_deck_to_hermes_pg_live.py` 2/2 contra PostgreSQL descartável, sob a guarda de egress e com `DATABASE_URL` explícita em loopback; 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-sync-do-deck-alvo-sob-o-lock.md`. O resto do item (opt-out, leases, contribuição agregada) segue aberto.",
       "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
       "source_line": 512
     },
@@ -9884,5 +9884,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "7b13ea0c79a95c25c4b28ef9f02404f1c0e1c996356ddcc3c3a4460708dadfa7"
+  "project_logic_source_digest_sha256": "034e27d759969f46faedd19075ca9084bf419b030e0bd8ace8c5022ddc2b3bb8"
 }
