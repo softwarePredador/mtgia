@@ -40,7 +40,6 @@ void main() {
       for (final schema in [
         openAiDeckGenerationSchema,
         openAiArchetypesSchema,
-        openAiDeckRecommendationsSchema,
         openAiDeckOptimizationSchema,
         openAiDeckCompletionSchema,
         openAiOptimizationCriticSchema,

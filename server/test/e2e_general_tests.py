@@ -449,12 +449,8 @@ class TestRunner:
                    code == 200 and "mana_curve" in body,
                    f"Got {code}")
 
-        # ── Simulate (Monte Carlo) ──
-        code, body = self._req("GET", f"/decks/{did}/simulate",
-                               token=self.user_a_token)
-        self._test(CAT, "GET /decks/:id/simulate → 200",
-                   code == 200 and "iterations" in body,
-                   f"Got {code}")
+        # GET /decks/:id/simulate saiu na D-31 (BT-AI-029); o substituto é
+        # POST /ai/simulate (Battle).
 
     # ═══════════════════════════════════════════════════════════
     #  COMMUNITY TESTS (public decks, search, copy)
@@ -1355,58 +1351,9 @@ class TestRunner:
         self._test(CAT, "POST /ai/simulate matchup sem opponent → 400",
                    code == 400, f"Got {code}")
 
-        # ── AI Simulate-Matchup (dedicated endpoint) ──
-        code, body = self._req("POST", "/ai/simulate-matchup",
-                               token=self.user_a_token, json_data={
-                                   "my_deck_id": self.deck_a_id,
-                                   "opponent_deck_id": self.deck_b_id,
-                                   "simulations": 10
-                               })
-        self._test(CAT, "POST /ai/simulate-matchup → 200",
-                   code == 200,
-                   f"Got {code}: {body.get('error', '')}")
-
-        code, body = self._req("POST", "/ai/simulate-matchup",
-                               token=self.user_a_token, json_data={})
-        self._test(CAT, "POST /ai/simulate-matchup sem IDs → 400",
-                   code == 400, f"Got {code}")
-
-        code, body = self._req("POST", "/ai/simulate-matchup",
-                               token=self.user_a_token, json_data={
-                                   "my_deck_id": "00000000-0000-0000-0000-000000000000",
-                                   "opponent_deck_id": self.deck_b_id
-                               })
-        self._test(CAT, "POST /ai/simulate-matchup my_deck inexistente → 404",
-                   code == 404, f"Got {code}")
-
-        code, body = self._req("POST", "/ai/simulate-matchup",
-                               token=self.user_a_token, json_data={
-                                   "my_deck_id": self.deck_a_id,
-                                   "opponent_deck_id": "00000000-0000-0000-0000-000000000000"
-                               })
-        self._test(CAT, "POST /ai/simulate-matchup opponent inexistente → 404",
-                   code == 404, f"Got {code}")
-
-        # ── AI Weakness Analysis ──
-        code, body = self._req("POST", "/ai/weakness-analysis",
-                               token=self.user_a_token, json_data={
-                                   "deck_id": self.deck_a_id
-                               })
-        self._test(CAT, "POST /ai/weakness-analysis → 200",
-                   code == 200,
-                   f"Got {code}: {body.get('error', '')}")
-
-        code, body = self._req("POST", "/ai/weakness-analysis",
-                               token=self.user_a_token, json_data={})
-        self._test(CAT, "POST /ai/weakness-analysis sem deck_id → 400",
-                   code == 400, f"Got {code}")
-
-        code, body = self._req("POST", "/ai/weakness-analysis",
-                               token=self.user_a_token, json_data={
-                                   "deck_id": "00000000-0000-0000-0000-000000000000"
-                               })
-        self._test(CAT, "POST /ai/weakness-analysis deck inexistente → 404",
-                   code == 404, f"Got {code}")
+        # POST /ai/simulate-matchup e POST /ai/weakness-analysis saíram na D-31
+        # (BT-AI-029); os substitutos são Battle (/ai/simulate) e Analyze
+        # (/decks/:id/analysis e /decks/:id/ai-analysis).
 
     # ═══════════════════════════════════════════════════════════
     #  DECK ADVANCED FEATURES TESTS
@@ -1468,19 +1415,8 @@ class TestRunner:
         self._test(CAT, "POST /decks/:id/ai-analysis cached → 200",
                    code == 200, f"Got {code}")
 
-        # ── Recommendations ──
-        code, body = self._req("POST", f"/decks/{self.deck_a_id}/recommendations",
-                               token=self.user_a_token, json_data={})
-        # Pode retornar 500 se OPENAI_API_KEY não estiver configurada
-        self._test(CAT, "POST /decks/:id/recommendations → 200 ou 500 (sem key)",
-                   code in (200, 500),
-                   f"Got {code}: {body.get('error', '')}")
-
-        code, body = self._req("POST",
-                               "/decks/00000000-0000-0000-0000-000000000000/recommendations",
-                               token=self.user_a_token, json_data={})
-        self._test(CAT, "POST /decks/:id/recommendations deck inexistente → 404/500",
-                   code in (404, 500), f"Got {code}")
+        # POST /decks/:id/recommendations saiu na D-31 (BT-AI-029); o substituto
+        # é o Optimize (/ai/optimize).
 
         # ── Cards Replace ──
         # Primeiro, buscar outra printing de uma carta no deck

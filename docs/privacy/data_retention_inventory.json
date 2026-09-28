@@ -213,7 +213,7 @@
       "subject_kind": "none",
       "personal_data": false,
       "subject_link": null,
-      "purpose": "Outbox da exclusão (D-68): uma linha por consumidor fora do PostgreSQL (SQLite do Hermes, sidecar de Jogar contra IA, EndpointCache, Sentry, backups), com lease, nova tentativa e recibo por consumidor.",
+      "purpose": "Outbox da exclusão (D-68): uma linha por consumidor fora do PostgreSQL (SQLite do Hermes, sidecar de Jogar contra IA, EndpointCache, Sentry, backups), com lease, nova tentativa e recibo por consumidor. Cada execução do job cria a linha que falta para todo recibo de exclusão (BT-PRIV-002).",
       "owner": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
       "retention": {
         "class": "legal_hold",
@@ -229,7 +229,7 @@
       "deletion": {
         "mode": "keep_legal",
         "by": null,
-        "notes": "Gravado na exclusão, na transação do recibo; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes (desde a D-77, o sidecar fecha pelo tempo e não recebe tokens)."
+        "notes": "Gravado na exclusão, na transação do recibo, ou pela reconciliação do job, que conta o prazo da hora da exclusão; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes (desde a D-77, o sidecar fecha pelo tempo e não recebe tokens)."
       },
       "legal_exception": "Prova, por consumidor, de que a exclusão chegou aos lugares fora do banco; não guarda identificador da pessoa."
     },
@@ -1654,8 +1654,8 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "deck_id -> decks.user_id",
-      "purpose": "Resultado legado de simulação de confronto entre dois decks (POST /ai/simulate-matchup, desligada e com remoção decidida na D-31).",
-      "owner": "server/routes/ai/simulate-matchup/index.dart",
+      "purpose": "Resultado legado de simulação de confronto entre dois decks. A rota que o gravava (POST /ai/simulate-matchup) saiu na D-31, em 2026-09-28; as linhas antigas seguem na exportação e na exclusão.",
+      "owner": "nenhum escritor desde a D-31: POST /ai/simulate-matchup saiu em 2026-09-28 (BT-AI-029); descartar a tabela fica com o BT-DB-005",
       "retention": {
         "class": "account_lifetime",
         "period": "enquanto o deck existir",
@@ -1731,8 +1731,8 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "deck_id -> decks.user_id",
-      "purpose": "Relatório legado de fraquezas do deck (POST /ai/weakness-analysis, desligada e com remoção decidida na D-31).",
-      "owner": "server/routes/ai/weakness-analysis/index.dart",
+      "purpose": "Relatório legado de fraquezas do deck. A rota que o gravava (POST /ai/weakness-analysis) saiu na D-31, em 2026-09-28; as linhas antigas seguem na exportação e na exclusão.",
+      "owner": "nenhum escritor desde a D-31: POST /ai/weakness-analysis saiu em 2026-09-28 (BT-AI-029); descartar a tabela fica com o BT-DB-005",
       "retention": {
         "class": "account_lifetime",
         "period": "enquanto o deck existir",
@@ -2931,6 +2931,31 @@
         "id": "include"
       }
     },
+    "user_legal_acceptances": {
+      "category": "privacy_control",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Histórico de aceites de Termos de uso e Política de privacidade (BT-LEGAL-ACCEPT-001, D-24): versões aceitas, origem (cadastro, reaceite ou retrato inicial da migration 062), request-id e data. É a prova de consentimento; users guarda só o aceite vigente.",
+      "owner": "server/lib/legal_acceptance_service.dart; server/routes/users/me/legal-acceptance/index.dart; server/lib/auth_service.dart (cadastro)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo; só cresce (nenhuma rota apaga ou altera linha)",
+        "decision": "D-24",
+        "enforced_by": null,
+        "gap": "prazo de guarda da prova de consentimento a confirmar com o advogado (BT-LEGAL-001)"
+      },
+      "export": {
+        "section": null,
+        "reason": "as versões aceitas vigentes já saem em users (terms_version, privacy_version); pôr o histórico na exportação fica com a frente de privacidade"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "A exclusão de conta não apaga o histórico: a linha fica ligada à conta pseudonimizada, sem nome, e-mail nem IP. Só a remoção física de users (que a exclusão não faz) levaria as linhas junto, pela FK ON DELETE CASCADE."
+      },
+      "legal_exception": "Prova de consentimento (LGPD, art. 8º, § 2º: o ônus da prova do consentimento é do controlador); confirmar prazo e escopo com o advogado (BT-LEGAL-001)."
+    },
     "user_plans": {
       "category": "account",
       "subject_kind": "account_holder",
@@ -3160,7 +3185,20 @@
       "export": "fora da exportação: métrica operacional",
       "deletion": "não há limpeza na exclusão",
       "decisions": [],
-      "gap": "o caminho cru com IDs é chave de métrica (BT-OBS-001, BT-SEC-AI-002)"
+      "gap": "o caminho cru com IDs é chave de métrica (BT-SEC-AI-002). O BT-OBS-001 (2d1f2cc52, na integração) troca a chave pelo template da rota, com :id no lugar de UUID, número e token; integrado, a métrica deixa de guardar identificador"
+    },
+    "optimize_job_memory": {
+      "kind": "memory_cache",
+      "what": "OptimizeJobStore (server/lib/ai/optimize_job.dart): cópia em memória, por réplica, dos jobs de Optimize assíncrono (id, deck, usuário e resultado); a verdade é ai_optimize_jobs.",
+      "personal_data": true,
+      "retention": "30 min; a limpeza roda na próxima chamada ao store depois de 5 min",
+      "export": "fora da exportação: cópia passageira de ai_optimize_jobs",
+      "deletion": "a exclusão apaga ai_optimize_jobs, e toda leitura do job vai ao PostgreSQL, então a cópia não é servida depois disso; um job em andamento não recria a linha, porque as escritas são UPDATE por id e status. O teto de 30 min fica abaixo das 24 h da D-23, coberto pela linha endpoint_cache do outbox (24 h 5 min)",
+      "decisions": [
+        "D-23",
+        "D-68"
+      ],
+      "gap": "sem nenhuma chamada ao store, a cópia vencida espera a próxima chamada ou o reinício, sem ser servida"
     },
     "interactive_battle_sidecar_memory": {
       "kind": "sidecar_store",
@@ -3177,15 +3215,16 @@
     },
     "hermes_sqlite_learning": {
       "kind": "sidecar_store",
-      "what": "SQLite do laboratório Hermes (knowledge.db, tabela user_learning_events), preenchido por server/bin/pull_learning_events.py com deck_id cru e até 200 cartas por evento.",
+      "what": "SQLite do Hermes (knowledge.db na imagem de ops, HERMES_KNOWLEDGE_DB): user_learning_events, preenchido por server/bin/pull_learning_events.py com deck_id cru e até 200 cartas por evento, e as cópias de deck (decks e deck_cards) que sync_pg_target_deck_to_hermes.py grava com o pg_deck_id no notes.",
       "personal_data": true,
-      "retention": "sem prazo",
+      "retention": "sem prazo; o que é de deck apagado sai pelo outbox",
       "export": "fora da exportação",
-      "deletion": "não é apagado na exclusão; o outbox (D-68) guarda a obrigação com os tokens HMAC dos decks (blocked_hermes_purge_not_implemented); contido porque learning_writes está OFF",
+      "deletion": "o outbox apaga (D-68, BT-PRIV-002). O job manaloom_account_deletion_outbox varre o knowledge.db (server/bin/hermes_learning_purge.py), acha no PostgreSQL, pelo HMAC dos tombstones, os decks apagados que o arquivo guarda e apaga os eventos e as cópias sob o lock de escrita do SQLite; cada linha confere os próprios decks e conclui (hermes_learning_sqlite: purged_by_tombstone_sweep). O alimentador só grava evento que ainda existe no PostgreSQL, conferido sob o mesmo lock, então nada de deck apagado volta depois da varredura",
       "decisions": [
+        "D-23",
         "D-68"
       ],
-      "gap": "falta o consumidor na imagem de ops: abrir o knowledge.db, calcular no PostgreSQL o HMAC de cada deck_id de user_learning_events com a chave da linha e apagar os que baterem (BT-AI-030)"
+      "gap": "sync_pg_target_deck_to_hermes.py não confere a existência do deck sob o lock: rodado à mão em paralelo com o outbox, pode regravar a cópia de um deck apagado até a próxima varredura (no agendador, o master_optimizer_preflight roda em sequência com o outbox e está desligado por capability)"
     },
     "server_logs": {
       "kind": "logs",
@@ -3196,6 +3235,16 @@
       "deletion": "não há limpeza na exclusão",
       "decisions": [],
       "gap": "prazo de rotação dos logs não documentado; pseudonimização é o BT-SEC-AI-002"
+    },
+    "ops_artifacts": {
+      "kind": "ops_artifacts",
+      "what": "Saída e relatórios dos jobs do manaloom_ops_daemon.py em /data/manaloom-ops (cron/output e artifacts): o log do alimentador do Hermes (id do evento e comandante), os relatórios do master_optimizer_preflight (deck-alvo copiado, com o pg_deck_id) e do validador de base de mana (nome e comandante dos decks do Hermes), e os recibos sem identificador do outbox e da limpeza por prazo.",
+      "personal_data": true,
+      "retention": "sem rotação configurada no repositório",
+      "export": "fora da exportação",
+      "deletion": "a exclusão não reescreve relatórios passados; os jobs que leem deck de conta (alimentador e master_optimizer_preflight) estão desligados por capability (learning_writes, ai_analyze_optimize_advisory e battle_batch OFF)",
+      "decisions": [],
+      "gap": "prazo de rotação dos artefatos de ops não definido (decisão do dono)"
     },
     "privacy_export_request_log": {
       "kind": "logs",

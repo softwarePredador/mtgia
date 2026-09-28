@@ -4,178 +4,60 @@ import 'package:test/test.dart';
 
 void main() {
   group('experimental deck/AI authorization source guards', () {
-    test('deck simulation and recommendations scope deck reads by owner', () {
-      final simulate =
-          File('routes/decks/[id]/simulate/index.dart').readAsStringSync();
-      final recommendations =
+    test('/ai/simulate does not read private decks by id only', () {
+      final simulate = File('routes/ai/simulate/index.dart').readAsStringSync();
+      final battleRuntime =
+          File('lib/battle/battle_execution_runtime.dart').readAsStringSync();
+      final simulationPersistence =
           File(
-            'routes/decks/[id]/recommendations/index.dart',
+            'lib/battle/battle_simulation_persistence_service.dart',
           ).readAsStringSync();
-      final routeSupport =
-          File(
-            'lib/deck_recommendations_route_support.dart',
-          ).readAsStringSync();
-      final routeAdapterTest =
-          File(
-            'test/deck_recommendations_route_adapter_test.dart',
-          ).readAsStringSync();
-      final simulateAdapterTest =
-          File('test/deck_simulate_route_adapter_test.dart').readAsStringSync();
-      final fallbackSupport =
-          File(
-            'lib/deck_recommendations_fallback_support.dart',
-          ).readAsStringSync();
-
       expect(simulate, contains('final userId = context.read<String>()'));
-      expect(simulate, contains('AND user_id = CAST(@userId AS uuid)'));
       expect(simulate, contains('JOIN decks d ON d.id = dc.deck_id'));
-      expect(simulate, contains('AND d.user_id = CAST(@userId AS uuid)'));
-      expect(simulate, contains("'legacy_monte_carlo'"));
-      expect(simulate, contains("'legacy_consistency_only'"));
-      expect(simulate, contains("'advisory': true"));
-      expect(simulate, contains("'strategy_or_swap_proof': false"));
-      expect(simulate, contains("params['iterations']"));
-      expect(simulate, contains("params['seed']"));
-      expect(simulateAdapterTest, contains('implements RequestContext'));
-      expect(simulateAdapterTest, contains('implements Pool'));
-      expect(simulateAdapterTest, contains('simulate_route.onRequest'));
-      expect(simulateAdapterTest, contains('legacy_consistency_only'));
-      expect(simulateAdapterTest, contains('strategy_or_swap_proof'));
+      expect(simulate, contains('d.user_id = CAST(@userId AS uuid)'));
       expect(
-        recommendations,
-        contains('final userId = context.read<String>()'),
+        simulate,
+        contains('OR (CAST(@allowPublic AS boolean) AND d.is_public = true)'),
       );
-      expect(recommendations, contains('AND user_id = CAST(@userId AS uuid)'));
-      expect(fallbackSupport, contains('resolveCardFunctionalRoles('));
-      expect(recommendations, contains('card_intelligence_snapshot'));
-      expect(recommendations, contains("'card_function_tags'"));
-      expect(recommendations, contains("'card_semantic_tags_v2'"));
-      expect(recommendations, contains('semantic_tags_v2'));
-      expect(fallbackSupport, contains('final commanderColorIdentity'));
-      expect(fallbackSupport, contains('commanderColorIdentity.addAll'));
-      expect(fallbackSupport, contains('final candidateColorIdentity'));
-      expect(fallbackSupport, contains('commander_color_identity'));
-      expect(fallbackSupport, contains('observed_deck_colors'));
-      expect(fallbackSupport, contains("'candidate_color_identity'"));
-      expect(fallbackSupport, contains("'color_identity_source'"));
+      expect(simulate, contains('dc.is_commander DESC'));
+      expect(simulate, contains('LOWER(c.name) ASC'));
+      expect(simulate, contains("COALESCE(c.oracle_id::text, '') ASC"));
+      expect(simulate, contains("COALESCE(c.scryfall_id::text, '') ASC"));
+      expect(simulate, contains('c.id::text ASC'));
+      expect(simulationPersistence, contains('AND column_name IN ('));
+      expect(simulationPersistence, contains("'simulation_type',"));
+      expect(simulationPersistence, contains("'metrics',"));
+      expect(simulationPersistence, contains("'winner_deck_id',"));
+      expect(simulationPersistence, contains("'turns_played'"));
+      expect(simulationPersistence, contains("contains('simulation_type')"));
+      expect(simulationPersistence, contains("contains('metrics')"));
+      expect(simulationPersistence, contains('@simulationType'));
+      expect(simulationPersistence, contains('@metrics::jsonb'));
+      expect(simulationPersistence, contains('RETURNING id::text'));
       expect(
-        recommendations,
-        contains(
-          "import '../../../../lib/deck_recommendations_route_support.dart'",
-        ),
+        simulationPersistence,
+        contains('BattleSimulationPersistenceOutcome.failed'),
       );
-      expect(recommendations, contains('buildDeckRecommendationsRouteResult('));
-      expect(recommendations, contains('_recommendationsEnv(context)'));
-      expect(recommendations, contains('context.read<DotEnv>()'));
-      expect(routeSupport, contains('buildOpenAiRecommendationsAdvisoryBody('));
-      expect(routeSupport, contains('buildOpenAiRecommendationFallbackShape('));
-      expect(routeSupport, contains('buildHeuristicRecommendationsForDeck('));
-      expect(routeSupport, contains('recommendations,'));
       expect(
-        routeSupport,
-        contains('fallbackResponseShape: fallbackResponseShape'),
+        simulate,
+        contains('BattleSimulationPersistenceService(pool).save('),
       );
-      expect(routeSupport, contains('jsonDecode(content)'));
-      expect(routeAdapterTest, contains('implements RequestContext'));
-      expect(routeAdapterTest, contains('implements Pool'));
-      expect(routeAdapterTest, contains('recommendations_route.onRequest'));
-      expect(routeAdapterTest, contains('Pool-Backed Candidate'));
-      expect(routeAdapterTest, contains('Pool-Backed Rising Trend'));
+      expect(simulate, contains('if (!persistence.isSaved)'));
+      expect(simulate, contains('_simulationPersistenceFailure(persistence)'));
+      expect(simulate, contains('canonicalBattleWinnerDeckId('));
+      expect(simulate, contains("'winner_deck_id': winnerDeckId"));
+      expect(simulate, contains('BattleExecutionRuntime.fromEnvironment'));
+      expect(simulate, contains('runtime.execute('));
+      expect(battleRuntime, contains('NativeBattleClient'));
+      expect(battleRuntime, contains('baseUrl: config.nativeSidecarUrl'));
+      expect(battleRuntime, contains("'required_rule_cards'"));
+      expect(
+        battleRuntime,
+        contains("'required_rule_cards': _allDeckCardRows(request)"),
+      );
+      expect(simulate, contains('_isNaturalBattleResult(data, result)'));
+      expect(simulate, isNot(contains('BattleSimulator(')));
     });
-
-    test(
-      'AI matchup and weakness routes do not read private decks by id only',
-      () {
-        final simulate =
-            File('routes/ai/simulate/index.dart').readAsStringSync();
-        final battleRuntime =
-            File('lib/battle/battle_execution_runtime.dart').readAsStringSync();
-        final simulationPersistence =
-            File(
-              'lib/battle/battle_simulation_persistence_service.dart',
-            ).readAsStringSync();
-        final matchup =
-            File('routes/ai/simulate-matchup/index.dart').readAsStringSync();
-        final weakness =
-            File('routes/ai/weakness-analysis/index.dart').readAsStringSync();
-
-        expect(simulate, contains('final userId = context.read<String>()'));
-        expect(simulate, contains('JOIN decks d ON d.id = dc.deck_id'));
-        expect(simulate, contains('d.user_id = CAST(@userId AS uuid)'));
-        expect(
-          simulate,
-          contains('OR (CAST(@allowPublic AS boolean) AND d.is_public = true)'),
-        );
-        expect(simulate, contains('dc.is_commander DESC'));
-        expect(simulate, contains('LOWER(c.name) ASC'));
-        expect(simulate, contains("COALESCE(c.oracle_id::text, '') ASC"));
-        expect(simulate, contains("COALESCE(c.scryfall_id::text, '') ASC"));
-        expect(simulate, contains('c.id::text ASC'));
-        expect(simulationPersistence, contains('AND column_name IN ('));
-        expect(simulationPersistence, contains("'simulation_type',"));
-        expect(simulationPersistence, contains("'metrics',"));
-        expect(simulationPersistence, contains("'winner_deck_id',"));
-        expect(simulationPersistence, contains("'turns_played'"));
-        expect(simulationPersistence, contains("contains('simulation_type')"));
-        expect(simulationPersistence, contains("contains('metrics')"));
-        expect(simulationPersistence, contains('@simulationType'));
-        expect(simulationPersistence, contains('@metrics::jsonb'));
-        expect(simulationPersistence, contains('RETURNING id::text'));
-        expect(
-          simulationPersistence,
-          contains('BattleSimulationPersistenceOutcome.failed'),
-        );
-        expect(
-          simulate,
-          contains('BattleSimulationPersistenceService(pool).save('),
-        );
-        expect(simulate, contains('if (!persistence.isSaved)'));
-        expect(
-          simulate,
-          contains('_simulationPersistenceFailure(persistence)'),
-        );
-        expect(simulate, contains('canonicalBattleWinnerDeckId('));
-        expect(simulate, contains("'winner_deck_id': winnerDeckId"));
-        expect(simulate, contains('BattleExecutionRuntime.fromEnvironment'));
-        expect(simulate, contains('runtime.execute('));
-        expect(battleRuntime, contains('NativeBattleClient'));
-        expect(battleRuntime, contains('baseUrl: config.nativeSidecarUrl'));
-        expect(battleRuntime, contains("'required_rule_cards'"));
-        expect(
-          battleRuntime,
-          contains("'required_rule_cards': _allDeckCardRows(request)"),
-        );
-        expect(simulate, contains('_isNaturalBattleResult(data, result)'));
-        expect(simulate, isNot(contains('BattleSimulator(')));
-        expect(matchup, contains('final userId = context.read<String>()'));
-        expect(matchup, contains('user_id = CAST(@user_id AS uuid)'));
-        expect(matchup, contains('card_intelligence_snapshot'));
-        expect(matchup, contains('function_tag_details'));
-        expect(matchup, contains('semantic_tags_v2'));
-        expect(matchup, contains('resolveCardFunctionalRoles('));
-        expect(
-          matchup,
-          contains('OR (CAST(@allow_public AS boolean) AND is_public = true)'),
-        );
-        expect(
-          matchup,
-          isNot(contains('SELECT id, name, format FROM decks WHERE id = @id')),
-        );
-        expect(weakness, contains('final userId = context.read<String>()'));
-        expect(weakness, contains('AND user_id = CAST(@user_id AS uuid)'));
-        expect(weakness, contains('resolveCardFunctionalRoles('));
-        expect(weakness, contains('card_intelligence_snapshot'));
-        expect(weakness, contains("'card_function_tags'"));
-        expect(weakness, contains("'card_semantic_tags_v2'"));
-        expect(weakness, contains('semantic_tags_v2'));
-        expect(weakness, contains("cardRoles.contains('wipe')"));
-        expect(weakness, contains("cardRoles.contains('board_wipe')"));
-        expect(
-          weakness,
-          isNot(contains('SELECT name, format FROM decks WHERE id = @id')),
-        );
-      },
-    );
 
     test('/ai/archetypes scopes deck reads by owner', () {
       final archetypes =
@@ -235,246 +117,28 @@ void main() {
       expect(analysis, isNot(contains('LEFT JOIN card_semantic_tags_v2')));
     });
 
-    test(
-      'weakness-analysis recommendations use DB lookup over fixed staples',
-      () {
-        final weakness =
-            File('routes/ai/weakness-analysis/index.dart').readAsStringSync();
+    test('/ai/simulate clamps runs and exposes non-live response shapes', () {
+      final simulate = File('routes/ai/simulate/index.dart').readAsStringSync();
+      final simulationPersistence =
+          File(
+            'lib/battle/battle_simulation_persistence_service.dart',
+          ).readAsStringSync();
+      final simulationRequestSupport =
+          File(
+            'lib/ai/battle_simulation_request_support.dart',
+          ).readAsStringSync();
 
-        expect(weakness, contains('_findWeaknessRecommendations('));
-        expect(
-          weakness,
-          contains('commanderColorIdentity.addAll(colorIdentity)'),
-        );
-        expect(weakness, contains("'commander_color_identity'"));
-        expect(
-          weakness,
-          contains("'color_identity_source': colorIdentitySource"),
-        );
-        expect(
-          weakness,
-          contains('Commander decks geralmente precisam de 33-38'),
-        );
-        expect(weakness, contains("'recommended_value': 33"));
-        for (final cardName in const [
-          "'Sol Ring'",
-          "'Arcane Signet'",
-          "'Rhystic Study'",
-          "'Mystic Remora'",
-          "'Swords to Plowshares'",
-          "'Path to Exile'",
-          "'Wrath of God'",
-          "'Damnation'",
-          "'Cyclonic Rift'",
-          "'Toxic Deluge'",
-          "'Teferi\\'s Protection'",
-          "'Heroic Intervention'",
-          "'Lightning Greaves'",
-          "'Swiftfoot Boots'",
-        ]) {
-          expect(weakness, isNot(contains(cardName)));
-        }
-      },
-    );
-
-    test(
-      'weakness-analysis response shape is covered without live DB writes',
-      () {
-        final weakness =
-            File('routes/ai/weakness-analysis/index.dart').readAsStringSync();
-
-        for (final field in const [
-          "'weakness_count'",
-          "'critical_count'",
-          "'combos'",
-          "'advanced'",
-          "'history'",
-          "'hate_cards_for_archetype'",
-          "'color_identity_source'",
-        ]) {
-          expect(weakness, contains(field));
-        }
-        expect(weakness, contains('deck_weakness_reports'));
-        expect(weakness, contains("weakness['recommendations']"));
-        expect(weakness, isNot(contains("'recommendations': hateCards")));
-      },
-    );
-
-    test(
-      'AI simulation routes clamp runs and expose non-live response shapes',
-      () {
-        final simulate =
-            File('routes/ai/simulate/index.dart').readAsStringSync();
-        final simulationPersistence =
-            File(
-              'lib/battle/battle_simulation_persistence_service.dart',
-            ).readAsStringSync();
-        final matchup =
-            File('routes/ai/simulate-matchup/index.dart').readAsStringSync();
-        final simulationRequestSupport =
-            File(
-              'lib/ai/battle_simulation_request_support.dart',
-            ).readAsStringSync();
-
-        expect(simulate, contains('parseBattleSimulationRequest(data)'));
-        expect(simulate, contains('routeRequest.simulations'));
-        expect(simulationRequestSupport, contains('max: 5000'));
-        expect(simulationRequestSupport, contains('value.clamp(min, max)'));
-        expect(simulate, contains("'type': 'goldfish'"));
-        expect(simulate, contains("'type': 'battle'"));
-        expect(simulate, contains("'type': 'matchup'"));
-        expect(simulationPersistence, contains('battle_simulations'));
-        expect(simulate, contains("'replay_id': persistence.replayId"));
-        expect(simulate, contains("'persistence': persistence.toJson()"));
-
-        expect(matchup, contains('_normalizedSimulationCount('));
-        expect(matchup, contains('parsed.clamp(1, 5000)'));
-        expect(matchup, contains('_stableMatchupSeed('));
-        expect(matchup, contains("'seed': seed"));
-        expect(matchup, contains("'simulation': {"));
-        expect(matchup, contains("'stored_matchup': {"));
-        expect(matchup, contains("'win_rate_numeric': winRate"));
-        expect(
-          matchup,
-          contains("'color_identity_source': colorIdentitySource"),
-        );
-        expect(matchup, contains("'commander_color_identity'"));
-        expect(
-          matchup,
-          contains("hateCardsForOpponent = await countersService.getHateCards"),
-        );
-        expect(matchup, contains('deck_matchups'));
-      },
-    );
-
-    test(
-      'deck recommendations fallback is semantic DB-backed, not fixed staples',
-      () {
-        final recommendations =
-            File(
-              'routes/decks/[id]/recommendations/index.dart',
-            ).readAsStringSync();
-        final advisorySupport =
-            File(
-              'lib/deck_recommendations_advisory_support.dart',
-            ).readAsStringSync();
-        final fallbackSupport =
-            File(
-              'lib/deck_recommendations_fallback_support.dart',
-            ).readAsStringSync();
-        final routeSupport =
-            File(
-              'lib/deck_recommendations_route_support.dart',
-            ).readAsStringSync();
-
-        expect(recommendations, contains('_findCardsForCategory('));
-        expect(recommendations, contains('card_function_tags'));
-        expect(recommendations, contains('card_semantic_tags_v2'));
-        expect(recommendations, contains('card_legalities'));
-        expect(recommendations, contains('c.color_identity'));
-        expect(recommendations, contains('TypedValue(Type.textArray'));
-        expect(recommendations, contains('COALESCE(c.color_identity'));
-        expect(recommendations, contains('EXISTS ('));
-        expect(recommendations, contains('deckColors: deckColors'));
-        expect(
-          fallbackSupport,
-          contains('deckColors: summary.candidateColorIdentity'),
-        );
-        expect(
-          fallbackSupport,
-          contains('estimateRecommendationBracketPowerLevel('),
-        );
-        expect(
-          fallbackSupport,
-          contains('const recommendationCommanderFallbackLandFloor = 33;'),
-        );
-        expect(
-          fallbackSupport,
-          contains("const recommendationCommanderLandTargetBand = '33-38';"),
-        );
-        expect(
-          fallbackSupport,
-          contains(
-            'summary.landCount < recommendationCommanderFallbackLandFloor',
-          ),
-        );
-        expect(
-          fallbackSupport,
-          contains(
-            'recommendationCommanderFallbackLandFloor - summary.landCount',
-          ),
-        );
-        expect(
-          routeSupport,
-          contains(r'$recommendationCommanderLandTargetBand lands'),
-        );
-        expect(
-          fallbackSupport,
-          contains(r'recomendado: $recommendationCommanderLandTargetBand'),
-        );
-        expect(advisorySupport, contains('recommendation_validation'));
-        expect(advisorySupport, contains('unvalidated_ai_text'));
-        expect(advisorySupport, contains('backend_post_validated'));
-        expect(
-          advisorySupport,
-          contains('buildOpenAiRecommendationsErrorBody'),
-        );
-        expect(advisorySupport, contains('fallbackResponseShape'));
-        expect(advisorySupport, contains('_normalizedRecommendations'));
-        expect(advisorySupport, contains('candidate_color_identity'));
-        expect(advisorySupport, contains('color_identity_source'));
-        expect(advisorySupport, contains('trending'));
-        expect(fallbackSupport, contains('buildHeuristicRecommendationsBody'));
-        expect(fallbackSupport, contains('heuristicRecommendationsSource'));
-        expect(fallbackSupport, contains('candidate_color_identity'));
-        expect(fallbackSupport, contains('color_identity_source'));
-        expect(fallbackSupport, contains('trending'));
-        expect(fallbackSupport, contains('buildHeuristicRecommendationsBody'));
-        expect(
-          fallbackSupport,
-          contains('buildHeuristicRecommendationsForDeck'),
-        );
-        expect(fallbackSupport, contains('RecommendationCandidateFinder'));
-        expect(fallbackSupport, contains('RecommendationTrendFinder'));
-        expect(routeSupport, contains('buildHeuristicRecommendationsForDeck('));
-        expect(
-          routeSupport,
-          contains('buildOpenAiRecommendationFallbackShape('),
-        );
-        expect(
-          fallbackSupport,
-          contains("'statistics': buildRecommendationStatistics"),
-        );
-        expect(fallbackSupport, contains("'candidate_color_identity':"));
-        expect(fallbackSupport, contains("'color_identity_source':"));
-        expect(fallbackSupport, contains("'trending': const"));
-        expect(routeSupport, contains('response.statusCode != 200'));
-        expect(routeSupport, contains('buildOpenAiRecommendationsErrorBody('));
-        expect(routeSupport, contains('OpenAiRecommendationsPost'));
-        expect(routeSupport, contains('DeckRecommendationLoader'));
-        expect(routeSupport, contains('DeckRecommendationCardLoader'));
-        expect(
-          routeSupport,
-          isNot(contains("body: {'error': 'OpenAI API Error")),
-        );
-        expect(
-          recommendations,
-          isNot(contains("'card_name': 'Command Tower'")),
-        );
-        expect(
-          recommendations,
-          isNot(contains("c.rarity IN ('rare', 'mythic')")),
-        );
-        expect(recommendations, isNot(contains('landCount < 34')));
-        expect(recommendations, isNot(contains('35-38')));
-        expect(recommendations, isNot(contains('powerLevel = 5')));
-        expect(recommendations, isNot(contains('powerLevel = 7')));
-        expect(recommendations, isNot(contains('powerLevel = 8')));
-        expect(recommendations, isNot(contains('powerLevel = 3')));
-        expect(recommendations, isNot(contains('ARRAY[\$colorFilter]')));
-        expect(recommendations, isNot(contains('colorFilter')));
-      },
-    );
+      expect(simulate, contains('parseBattleSimulationRequest(data)'));
+      expect(simulate, contains('routeRequest.simulations'));
+      expect(simulationRequestSupport, contains('max: 5000'));
+      expect(simulationRequestSupport, contains('value.clamp(min, max)'));
+      expect(simulate, contains("'type': 'goldfish'"));
+      expect(simulate, contains("'type': 'battle'"));
+      expect(simulate, contains("'type': 'matchup'"));
+      expect(simulationPersistence, contains('battle_simulations'));
+      expect(simulate, contains("'replay_id': persistence.replayId"));
+      expect(simulate, contains("'persistence': persistence.toJson()"));
+    });
 
     test('following community feed is routed before deck id lookup', () {
       final dynamicRoute =

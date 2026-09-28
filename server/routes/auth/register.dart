@@ -203,6 +203,7 @@ Future<Response> onRequest(RequestContext context) async {
         password: password,
         legalAcceptance: legalAcceptance,
         invite: invite,
+        requestId: requestId,
       );
     } on BetaInviteDeniedException catch (denied) {
       await BetaInviteAdmission.recordDenial(

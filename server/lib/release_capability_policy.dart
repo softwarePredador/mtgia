@@ -443,13 +443,13 @@ String? requiredCapabilityForRequest({
   if (normalizedPath == '/ai/commander-learning') {
     return normalizedMethod == 'GET' ? 'learning_reads' : 'learning_writes';
   }
+  // As quatro rotas legadas sem consumidor (POST /decks/:id/recommendations,
+  // GET /decks/:id/simulate, POST /ai/simulate-matchup e
+  // POST /ai/weakness-analysis) saíram na D-31 (BT-AI-029). Quem ainda chamar
+  // /ai/simulate-matchup ou /ai/weakness-analysis cai em rota não classificada
+  // (404 e contador próprio); as de /decks/:id não têm mais handler.
   if (normalizedPath == '/ai/ml-status' ||
-      normalizedPath == '/ai/simulate-matchup' ||
-      normalizedPath == '/ai/weakness-analysis' ||
-      normalizedPath.startsWith('/ai/optimize/telemetry') ||
-      RegExp(
-        r'^/decks/[^/]+/(recommendations|simulate)$',
-      ).hasMatch(normalizedPath)) {
+      normalizedPath.startsWith('/ai/optimize/telemetry')) {
     return 'legacy_ai_routes';
   }
 
@@ -615,6 +615,10 @@ const _exactControlPlaneRequests = <String>{
   'GET /users/me/blocks',
   'GET /users/me/activation-events',
   'POST /users/me/activation-events',
+  // Reaceite de Termos e Privacidade (BT-LEGAL-ACCEPT-001): a conta
+  // bloqueada precisa sair do bloqueio com qualquer capability desligada.
+  'GET /users/me/legal-acceptance',
+  'POST /users/me/legal-acceptance',
   'DELETE /users/me/fcm-token',
   'POST /content-reports',
   'GET /moderation/reports',

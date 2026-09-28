@@ -31,9 +31,10 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
   `person_ref` ou `deck_ref` (pseudônimo quando é de outra pessoa), `entity_ref`, ou `omit_*`
   (segredo, hash, estado interno, conteúdo de terceiro, UUID do catálogo).
 - **6 views**, **14 tabelas e 1 coluna que só existem na produção** (receipt de 2026-09-22; a
-  coluna, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **14 artefatos
-  fora do banco**: caches em memória, sidecars, logs, Sentry, provedores externos, backups,
-  aparelho, o arquivo da exportação e o registro dos pedidos de exportação.
+  coluna, `ml_prompt_feedback.user_rating`, é dado pessoal e fica fora da exportação) e **16 artefatos
+  fora do banco**: caches em memória, sidecars, logs, artefatos do agendador de ops, Sentry,
+  provedores externos, backups, aparelho, o arquivo da exportação e o registro dos pedidos de
+  exportação.
 
 ## Prazos já decididos
 
@@ -60,6 +61,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | Moderação | `content_reports`, `content_report_appeals`, `moderation_actions` | mantidas depois da exclusão | ninguém | denúncias e recursos do titular | denúncia, recurso e ação do moderador anonimizados |
 | Segurança | `password_reset_tokens`, `email_verification_tokens`, `rate_limit_events` | 20 min, 24 h e 24 h de validade | job de limpeza só para `rate_limit_events` | não | apagados |
 | Convites da beta (BT-AUTH-006) | `beta_invites`, `beta_invite_events` | o convite aberto vale até vencer (padrão 14 dias); a linha fica depois | ninguém (lacuna) | não; só hash do código e digest do e-mail | lacuna: o convite aceito fica ligado à conta pseudonimizada; a trilha sai junto com o convite |
+| Aceite de Termos e Privacidade (BT-LEGAL-ACCEPT-001) | `user_legal_acceptances` | sem prazo, só cresce (prova de consentimento, D-24) | ninguém | não; as versões vigentes saem em `users` | mantido, ligado à conta pseudonimizada |
 | Controle de privacidade | `account_deletion_receipts`, `account_deletion_outbox`, `privacy_deleted_deck_tombstones`, `privacy_keyring` | sem prazo; o outbox esvazia os tokens de deck quando o consumidor conclui | ninguém | não | mantidos, sem identificar a pessoa |
 
 ## Lacunas que o inventário expõe
@@ -88,15 +90,18 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
    060, não aplicada na produção) grava uma linha por consumidor fora do banco na transação do
    recibo; o job `manaloom_account_deletion_outbox`, sem capability, conclui o EndpointCache
    depois do teto de 24 h, o sidecar de Jogar contra IA depois do tempo máximo da sessão
-   (7200 s + 10 min, D-77) e o Sentry do servidor na hora, e deixa o Hermes e os backups
-   abertos com o motivo. Segue aberto: jobs e sessões de Jogar contra IA de outras
-   pessoas guardam o hash e a lista do deck de quem saiu (`BT-BAT-002`).
+   (7200 s + 10 min, D-77) e o Sentry do servidor na hora. Desde 2026-09-28, também apaga do
+   SQLite do Hermes os eventos e as cópias dos decks apagados. Para isso, varre o arquivo e acha
+   os decks pelo HMAC dos tombstones, sob o lock de escrita que o alimentador também usa. A cada
+   execução, cria a linha que falta para todo recibo, então exclusões de antes do outbox também
+   entram. Os backups seguem abertos com o motivo. Segue aberto também: jobs e sessões de Jogar
+   contra IA de outras pessoas guardam o hash e a lista do deck de quem saiu (`BT-BAT-002`).
 4. **Fora do banco**: o EndpointCache passou a ter teto de 24 h e a limpar as entradas vencidas,
    e o Sentry do servidor não recebe mais o ID do usuário (`BT-PRIV-002`). Seguem abertos: o
-   Sentry do app ainda identifica o usuário (raia do app); o SQLite do Hermes guarda decklists de
-   contas excluídas (contido por `learning_writes` OFF, `BT-AI-030`; o outbox guarda a obrigação
-   com os tokens HMAC dos decks até existir o consumidor); logs têm `user_id` cru
-   (`BT-SEC-AI-002`); a exclusão não limpa o aparelho.
+   Sentry do app ainda identifica o usuário (raia do app); logs têm `user_id` cru
+   (`BT-SEC-AI-002`); os artefatos do agendador de ops não têm prazo de rotação; a exclusão não
+   limpa o aparelho. O SQLite do Hermes passou a ser limpo pelo outbox (`BT-PRIV-002`,
+   2026-09-28).
 5. **Sem prazo definido**: eventos de ativação, replays e simulações, notificações, feedback de
    IA, relatórios compartilhados vencidos, notas pós-jogo apagadas, sessões expiradas e tokens
    usados ou vencidos.

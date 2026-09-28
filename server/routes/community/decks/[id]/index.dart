@@ -6,6 +6,7 @@ import '../../../../lib/auth_service.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../../lib/deck_request_support.dart';
 import '../../../../lib/deck_rules_service.dart';
+import '../../../../lib/legal_acceptance_middleware.dart';
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/scryfall_image_url.dart';
@@ -339,6 +340,13 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
 
   final userId = user['id'] as String;
   final conn = context.read<Pool>();
+
+  // BT-LEGAL-ACCEPT-001: copiar cria um deck novo.
+  final legalBlocked = await legalAcceptanceRequiredResponse(
+    userId: userId,
+    pool: conn,
+  );
+  if (legalBlocked != null) return legalBlocked;
 
   try {
     final newDeck = await conn.runTx((session) async {

@@ -103,11 +103,13 @@ void main() {
     final response = await binder(post('/binder'));
 
     expect(response.statusCode, HttpStatus.forbidden);
+    // Sem espaços: a cadeia pode ter a trava do reaceite antes
+    // (BT-LEGAL-ACCEPT-001), mas o e-mail verificado vem logo depois da conta.
     expect(
-      File('routes/import/_middleware.dart').readAsStringSync(),
-      contains(
-        'handler.use(verifiedEmailForMutations()).use(authMiddleware())',
-      ),
+      File(
+        'routes/import/_middleware.dart',
+      ).readAsStringSync().replaceAll(RegExp(r'\s+'), ''),
+      contains('.use(verifiedEmailForMutations()).use(authMiddleware())'),
     );
   });
 }

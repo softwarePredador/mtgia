@@ -2495,6 +2495,23 @@ CREATE TABLE IF NOT EXISTS beta_invite_events (
 CREATE INDEX IF NOT EXISTS idx_beta_invite_events_invite
     ON beta_invite_events (invite_id, created_at);
 
+-- BT-LEGAL-ACCEPT-001 (migration 062, D-24): histórico de aceites de Termos e
+-- Privacidade, a prova de consentimento. Só cresce.
+CREATE TABLE IF NOT EXISTS user_legal_acceptances (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    terms_version TEXT NOT NULL
+        CHECK (char_length(terms_version) BETWEEN 1 AND 40),
+    privacy_version TEXT NOT NULL
+        CHECK (char_length(privacy_version) BETWEEN 1 AND 40),
+    source TEXT NOT NULL CHECK (source IN ('register', 'reaccept', 'backfill')),
+    request_id TEXT CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+    accepted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_legal_acceptances_user
+    ON user_legal_acceptances (user_id, accepted_at DESC);
+
 -- DCK-P0-01 (migration 067): revisão otimista do deck e ledger imutável de
 -- mudanças, com desfazer universal e Idempotency-Key
 -- (lib/decks/deck_revision_support.dart).

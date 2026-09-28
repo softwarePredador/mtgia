@@ -8,6 +8,11 @@ Somente eventos ``user_created`` podem ser elegiveis para treinamento. Outras
 fontes permanecem no SQLite apenas como telemetria em quarentena.
 
 Execucao idempotente: eventos ja sincronizados sao ignorados.
+
+Exclusao de conta (BT-PRIV-002): o SQLite so recebe evento que ainda existe no
+PG, conferido sob o lock de escrita do SQLite (BEGIN IMMEDIATE). O expurgo do
+outbox (server/bin/hermes_learning_purge.py) pega o mesmo lock, entao evento
+de conta excluida nunca volta ao SQLite depois da varredura.
 """
 import json, os, sqlite3, sys
 from pathlib import Path
@@ -51,6 +56,7 @@ PG_USER = os.environ.get("PGUSER") or os.environ.get("DB_USER") or ""
 PG_PASS = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASS") or ""
 MIN_TRAINING_CARD_COUNT = int(os.environ.get("HERMES_MIN_TRAINING_CARD_COUNT", "90"))
 USER_CREATED_SOURCE = "user_created"
+SQLITE_BUSY_TIMEOUT_SECONDS = 30
 
 
 def main():
@@ -101,7 +107,7 @@ def main():
     """)
     events = cur.fetchall()
 
-    sqlite = sqlite3.connect(SQLITE_DB)
+    sqlite = sqlite3.connect(SQLITE_DB, timeout=SQLITE_BUSY_TIMEOUT_SECONDS)
     _ensure_tables(sqlite)
 
     if not events:
@@ -112,82 +118,15 @@ def main():
         conn.close()
         return 0
 
-    imported = 0
-    for ev in events:
-        ev_id = ev["id"]
-        commander = (ev["commander_name"] or "").strip()
-        fmt = ev["format"]
-        card_count = ev["card_count"]
-        source = (ev["source"] or "").strip().lower()
-        event_data = ev["event_data"] or {}
-        created_at = ev["created_at"]
+    imported, skipped_deleted, live_ids = _import_events(sqlite, cur, events)
 
-        classification = _classify_learning_event(
-            fmt,
-            card_count,
-            commander,
-            source,
+    # Marca como sincronizado no PG (so os que ainda existem)
+    if live_ids:
+        placeholders = ",".join(["%s"] * len(live_ids))
+        cur.execute(
+            f"UPDATE deck_learning_events SET synced_to_hermes = TRUE, synced_at = NOW() WHERE id IN ({placeholders})",
+            tuple(sorted(live_ids)),
         )
-
-        print(
-            "  event="
-            f"{ev_id} commander={commander} format={fmt} cards={card_count} "
-            f"status={classification['learning_status']}"
-        )
-
-        # Importa commander se tiver nome
-        if (
-            source == USER_CREATED_SOURCE
-            and commander
-            and (fmt or "").lower() == "commander"
-        ):
-            _import_commander(sqlite, commander)
-
-        # Loga evento no SQLite
-        sqlite.execute(
-            """INSERT OR REPLACE INTO user_learning_events
-               (
-                 event_id,
-                 deck_id,
-                 commander,
-                 format,
-                 card_count,
-                 source,
-                 event_data,
-                 created_at,
-                 imported_at,
-                 training_eligible,
-                 learning_status,
-                 learning_reason
-               )
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (
-                str(ev_id),
-                str(ev["deck_id"]),
-                commander,
-                fmt,
-                card_count,
-                source,
-                json.dumps(_sanitize_event_data(event_data)),
-                created_at.isoformat() if created_at else None,
-                datetime.now(timezone.utc).isoformat(),
-                1 if classification["training_eligible"] else 0,
-                classification["learning_status"],
-                classification["learning_reason"],
-            ),
-        )
-
-        imported += 1
-
-    sqlite.commit()
-
-    # Marca como sincronizado no PG
-    event_ids = [str(e["id"]) for e in events]
-    placeholders = ",".join(["%s"] * len(event_ids))
-    cur.execute(
-        f"UPDATE deck_learning_events SET synced_to_hermes = TRUE, synced_at = NOW() WHERE id IN ({placeholders})",
-        tuple(event_ids),
-    )
 
     totals = sqlite.execute(
         """
@@ -204,6 +143,7 @@ def main():
     print(
         "\nTOTALS "
         f"imported={imported} "
+        f"skipped_deleted={skipped_deleted} "
         f"stored_total={totals[0] or 0} "
         f"trainable={totals[1] or 0} "
         f"partial={totals[2] or 0} "
@@ -214,6 +154,108 @@ def main():
     cur.close()
     conn.close()
     return 0
+
+
+def _events_still_in_postgres(cur, event_ids):
+    """Ids que ainda existem em deck_learning_events (a exclusao apaga os da conta)."""
+    if not event_ids:
+        return set()
+    cur.execute(
+        "SELECT id::text AS id FROM deck_learning_events WHERE id::text = ANY(%s)",
+        (list(event_ids),),
+    )
+    return {str(row["id"]) for row in cur.fetchall()}
+
+
+def _import_events(sqlite, cur, events):
+    """Grava no SQLite so o que ainda existe no PG, conferido sob o lock.
+
+    O lock de escrita (BEGIN IMMEDIATE) vem antes da conferencia. Assim, se a
+    conta for excluida depois do SELECT, ou o evento ja foi gravado antes de o
+    expurgo pegar o lock (e o expurgo apaga), ou a conferencia ja nao o acha.
+    """
+    sqlite.commit()
+    sqlite.execute("BEGIN IMMEDIATE")
+    try:
+        live_ids = _events_still_in_postgres(cur, [str(ev["id"]) for ev in events])
+        imported = 0
+        skipped_deleted = 0
+        for ev in events:
+            if str(ev["id"]) not in live_ids:
+                skipped_deleted += 1
+                continue
+            _import_event(sqlite, ev)
+            imported += 1
+        sqlite.commit()
+    except BaseException:
+        sqlite.rollback()
+        raise
+    return imported, skipped_deleted, live_ids
+
+
+def _import_event(sqlite, ev):
+    ev_id = ev["id"]
+    commander = (ev["commander_name"] or "").strip()
+    fmt = ev["format"]
+    card_count = ev["card_count"]
+    source = (ev["source"] or "").strip().lower()
+    event_data = ev["event_data"] or {}
+    created_at = ev["created_at"]
+
+    classification = _classify_learning_event(
+        fmt,
+        card_count,
+        commander,
+        source,
+    )
+
+    print(
+        "  event="
+        f"{ev_id} commander={commander} format={fmt} cards={card_count} "
+        f"status={classification['learning_status']}"
+    )
+
+    # Importa commander se tiver nome
+    if (
+        source == USER_CREATED_SOURCE
+        and commander
+        and (fmt or "").lower() == "commander"
+    ):
+        _import_commander(sqlite, commander)
+
+    # Loga evento no SQLite
+    sqlite.execute(
+        """INSERT OR REPLACE INTO user_learning_events
+           (
+             event_id,
+             deck_id,
+             commander,
+             format,
+             card_count,
+             source,
+             event_data,
+             created_at,
+             imported_at,
+             training_eligible,
+             learning_status,
+             learning_reason
+           )
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
+            str(ev_id),
+            str(ev["deck_id"]),
+            commander,
+            fmt,
+            card_count,
+            source,
+            json.dumps(_sanitize_event_data(event_data)),
+            created_at.isoformat() if created_at else None,
+            datetime.now(timezone.utc).isoformat(),
+            1 if classification["training_eligible"] else 0,
+            classification["learning_status"],
+            classification["learning_reason"],
+        ),
+    )
 
 
 def _ensure_tables(sqlite):

@@ -419,6 +419,12 @@ void _enforceCommanderSameLanePreviewSafety(Map<String, dynamic> responseBody) {
   responseBody['apply_blockers'] = blockers.toList()..sort();
 }
 
+/// D-82: marca de proveniência quando não há provedor de IA configurado.
+const _aiProviderNotConfigured = <String, Object>{
+  'configured': false,
+  'attempted': false,
+};
+
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.post) {
     return methodNotAllowed();
@@ -967,6 +973,12 @@ Future<Response> onRequest(RequestContext context) async {
         responseBody,
         postGameEvidence,
       );
+      // D-82: sem provedor configurado, a resposta e a telemetria dizem que
+      // nenhum provedor foi configurado nem tentado.
+      final providerConfigured = apiKey != null && apiKey.isNotEmpty;
+      if (!providerConfigured) {
+        responseBody['ai_provider'] ??= _aiProviderNotConfigured;
+      }
       responseBody['deck_state'] ??= deckState.toJson();
       responseBody['intensity'] ??= intensity.selected;
       responseBody['optimize_intensity'] ??= intensity.toJson(
@@ -1108,6 +1120,13 @@ Future<Response> onRequest(RequestContext context) async {
           deterministicSwapCandidates: deterministicSwapCandidates,
           cacheKey: cacheKey,
           executionTimeMs: requestStopwatch.elapsedMilliseconds,
+          provenance:
+              providerConfigured
+                  ? null
+                  : {
+                    'strategy_source': responseBody['strategy_source'],
+                    'ai_provider': _aiProviderNotConfigured,
+                  },
         );
       }
 
@@ -1435,7 +1454,14 @@ Future<Response> onRequest(RequestContext context) async {
     // ================================================================
     //  SYNC MODE: optimize simples (troca de cartas) — roda inline
     // ================================================================
-    if (deckOptimizer == null) {
+    final deterministicFirstEnabled =
+        effectiveMode == 'optimize' && deterministicSwapCandidates.isNotEmpty;
+    // D-82: sem provedor de IA configurado, a shortlist determinística (só
+    // PostgreSQL) vira a resposta, pela mesma prévia e confirmação de sempre.
+    // Nenhuma chamada ao provedor é tentada: sem `optimizer`, a tentativa
+    // primária, o fallback por IA e o Critic IA são pulados. Sem shortlist,
+    // continua o mock não acionável.
+    if (deckOptimizer == null && !deterministicFirstEnabled) {
       // Mock response for development (optimize-only). It is deliberately
       // non-actionable and excluded from telemetry/ML learning so a local
       // environment connected to shared data cannot promote fabricated swaps.
@@ -1460,14 +1486,12 @@ Future<Response> onRequest(RequestContext context) async {
     }
 
     final optimizer = deckOptimizer;
-
-    final deterministicFirstEnabled =
-        effectiveMode == 'optimize' && deterministicSwapCandidates.isNotEmpty;
     var optimizeFallbackAttempted = false;
 
     Future<Map<String, dynamic>?> runAiOptimizeAttempt({
       required String trigger,
     }) async {
+      if (optimizer == null) return null;
       try {
         final aiResponse = await telemetry.trackAsync(
           'request.ai_optimize_call',
@@ -1506,6 +1530,13 @@ Future<Response> onRequest(RequestContext context) async {
         targetArchetype: effectiveOptimizeArchetype,
         intensity: intensity,
       );
+      if (optimizer == null) {
+        jsonResponse['reasoning'] =
+            'O backend montou trocas determinísticas para '
+            '$effectiveOptimizeArchetype com a função das cartas, a prioridade '
+            'do comandante e o histórico de rejeição. Nenhum provedor de IA está '
+            'configurado neste ambiente, então não houve revisão por IA.';
+      }
       Log.i(
         'Optimize deterministic-first ativado com ${deterministicSwapCandidates.length} swap(s) candidatos.',
       );
@@ -2201,7 +2232,9 @@ Future<Response> onRequest(RequestContext context) async {
           commanders.isNotEmpty &&
           validAdditions.isNotEmpty) {
         try {
-          final edhrecService = optimizer.edhrecService;
+          // D-82: sem provedor de IA, a validação EDHREC segue como no caminho
+          // determinístico com chave (a coleta tem chave própria).
+          final edhrecService = optimizer?.edhrecService ?? EdhrecService();
           edhrecValidationData = await edhrecService.fetchCommanderData(
             commanders.firstOrNull ?? "",
           );
@@ -2336,7 +2369,9 @@ Future<Response> onRequest(RequestContext context) async {
                     qualityErrorCode: 'OPTIMIZE_NO_SAFE_SWAPS',
                     isComplete: isComplete,
                   );
-              if (retryPlan.shouldRetry && retryPlan.trigger != null) {
+              if (optimizer != null &&
+                  retryPlan.shouldRetry &&
+                  retryPlan.trigger != null) {
                 optimizeFallbackAttempted = true;
                 final aiFallbackResponse = await runAiOptimizeAttempt(
                   trigger: retryPlan.trigger!,
@@ -2661,7 +2696,9 @@ Future<Response> onRequest(RequestContext context) async {
           qualityErrorCode: 'OPTIMIZE_QUALITY_REJECTED',
           isComplete: isComplete,
         );
-        if (retryPlan.shouldRetry && retryPlan.trigger != null) {
+        if (optimizer != null &&
+            retryPlan.shouldRetry &&
+            retryPlan.trigger != null) {
           optimizeFallbackAttempted = true;
           final aiFallbackResponse = await runAiOptimizeAttempt(
             trigger: retryPlan.trigger!,
@@ -3290,8 +3327,10 @@ Future<Response> onRequest(RequestContext context) async {
       );
 
       try {
-        if (semanticV2OptimizeEnforcementMode ==
-            SemanticV2OptimizeEnforcementMode.disabled) {
+        // D-82: resposta sem provedor não entra no cache compartilhado.
+        if (optimizer != null &&
+            semanticV2OptimizeEnforcementMode ==
+                SemanticV2OptimizeEnforcementMode.disabled) {
           await saveOptimizeCache(
             pool: pool,
             cacheKey: cacheKey,

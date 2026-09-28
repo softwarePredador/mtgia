@@ -957,6 +957,7 @@ WITH required_migrations(version, name) AS (
     ('059', 'align_trade_items_owner_fk'),
     ('060', 'create_account_deletion_outbox'),
     ('061', 'create_beta_invites'),
+    ('062', 'record_legal_acceptance_history'),
     ('063', 'recreate_commander_learning_snapshot_view'),
     ('064', 'adopt_production_unique_indexes'),
     ('065', 'adopt_production_indexes_from_database_indexes_sql'),
@@ -975,7 +976,7 @@ WITH required_migrations(version, name) AS (
     (
       'required_migrations_registered',
       (
-        SELECT COUNT(*) = 30
+        SELECT COUNT(*) = 31
         FROM required_migrations required
         JOIN public.schema_migrations actual
           ON actual.version = required.version

@@ -115,8 +115,9 @@ Testes:
   | M75 | volta a cancelar no primeiro pedaço | 28/31, com o cliente do servidor de verdade sem resposta |
   | M76 | descarte sem teto | 30/31 |
 
-O E2E com clientes de verdade roda de novo com o próximo build da API, junto do
-BT-LEGAL-ACCEPT-001.
+O E2E com clientes de verdade rodou contra a API rebuildada em 2026-09-28: 5/5, com o
+411 do corpo em partes chegando ao cliente. O registro está em
+`docs/qa/execution/2026-09-28/BT-AUTH-002-e2e-segunda-correcao.md`.
 
 ## Evidência
 
@@ -124,7 +125,7 @@ BT-LEGAL-ACCEPT-001.
 | --- | --- | --- |
 | `server/test/request_body_limits_test.dart` | unitário, com o middleware raiz e um stream que conta os bytes lidos | 22/22 |
 | `server/test/request_limits_db_live_test.dart` | PostgreSQL descartável (`RUN_REQUEST_LIMITS_DB_TESTS=1`), cadeia real de `POST /decks` (middleware raiz, autenticação e handler que grava) | 2/2 |
-| `server/test/request_limits_e2e_live_test.dart` | HTTP contra a API local (`RUN_REQUEST_LIMITS_E2E_TESTS=1`), com clientes de verdade (corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL) | roda com o build da API da tarefa seguinte; o resultado entra neste receipt no commit do BT-LEGAL-ACCEPT-001 |
+| `server/test/request_limits_e2e_live_test.dart` | HTTP contra a API local (`RUN_REQUEST_LIMITS_E2E_TESTS=1`), com clientes de verdade (corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL) | 5/5 em 2026-09-28, contra a API rebuildada (duas corridas); ver `docs/qa/execution/2026-09-28/BT-AUTH-002-e2e-segunda-correcao.md` |
 
 O teste de banco mostra que o banco não cresce, e o unitário, que a recusa acontece antes
 de alocar:

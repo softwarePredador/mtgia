@@ -24,8 +24,6 @@
 | `/ai/optimize/telemetry` | `GET` | `server/routes/ai/optimize/telemetry/index.dart` | 2 | `source` |
 | `/ai/rebuild` | `POST` | `server/routes/ai/rebuild/index.dart` | 2 | `source` |
 | `/ai/simulate` | `POST` | `server/routes/ai/simulate/index.dart` | 2 | `source` |
-| `/ai/simulate-matchup` | `POST` | `server/routes/ai/simulate-matchup/index.dart` | 2 | `source` |
-| `/ai/weakness-analysis` | `POST` | `server/routes/ai/weakness-analysis/index.dart` | 2 | `source` |
 | `/auth/change-password` | `POST` | `server/routes/auth/change-password.dart` | 2 | `source` |
 | `/auth/forgot-password` | `POST` | `server/routes/auth/forgot-password.dart` | 2 | `source` |
 | `/auth/login` | `POST` | `server/routes/auth/login.dart` | 2 | `source` |
@@ -86,9 +84,7 @@
 | `/decks/{id}/post-game-notes/{noteId}` | `DELETE` | `server/routes/decks/[id]/post-game-notes/[noteId].dart` | 2 | `source` |
 | `/decks/{id}/post-game-timeline` | `GET` | `server/routes/decks/[id]/post-game-timeline/index.dart` | 2 | `source` |
 | `/decks/{id}/pricing` | `POST` | `server/routes/decks/[id]/pricing/index.dart` | 2 | `source` |
-| `/decks/{id}/recommendations` | `POST` | `server/routes/decks/[id]/recommendations/index.dart` | 3 | `source` |
 | `/decks/{id}/reports` | `POST` | `server/routes/decks/[id]/reports/index.dart` | 2 | `source` |
-| `/decks/{id}/simulate` | `GET` | `server/routes/decks/[id]/simulate/index.dart` | 2 | `source` |
 | `/decks/{id}/validate` | `POST` | `server/routes/decks/[id]/validate/index.dart` | 2 | `source` |
 | `/health` | `GET` | `server/routes/health/index.dart` | 2 | `source` |
 | `/health/ai-history` | `GET` | `server/routes/health/ai-history/index.dart` | 2 | `source` |
@@ -123,6 +119,7 @@
 | `/users/me/blocks` | `GET` | `server/routes/users/me/blocks/index.dart` | 2 | `source` |
 | `/users/me/export` | `POST` | `server/routes/users/me/export/index.dart` | 2 | `source` |
 | `/users/me/fcm-token` | `DELETE, PUT` | `server/routes/users/me/fcm-token/index.dart` | 2 | `source` |
+| `/users/me/legal-acceptance` | `GET, POST` | `server/routes/users/me/legal-acceptance/index.dart` | 2 | `source` |
 | `/users/me/plan` | `GET` | `server/routes/users/me/plan/index.dart` | 2 | `source` |
 | `/users/me/plan/checkout` | `POST` | `server/routes/users/me/plan/checkout/index.dart` | 2 | `source` |
 | `/users/{id}/block` | `DELETE, GET, POST` | `server/routes/users/[id]/block/index.dart` | 2 | `source` |

@@ -6,8 +6,9 @@ set -euo pipefail
 # ============================================================
 #
 # Baixa o bulk variants.json (~500MB, streaming) e popula
-# `card_combos` + `combo_cards`. Consumido em weakness-analysis para
-# detectar combos completos e near-miss (a 1 carta) no deck.
+# `card_combos` + `combo_cards`. O consumidor era POST /ai/weakness-analysis,
+# removida na D-31 (BT-AI-029, 2026-09-28): hoje nenhuma rota lê essas
+# tabelas. Pausar ou reaproveitar o job fica com o dono do catálogo.
 #
 # POR QUE SEMANAL:
 #   A base de combos muda lentamente; o download é pesado. O script tem

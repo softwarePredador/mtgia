@@ -240,6 +240,7 @@ Future<void> recordOptimizeAnalysisOutcome({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
+  Map<String, Object?>? provenance,
 }) async {
   await optimize_analysis.recordOptimizeAnalysisOutcome(
     pool: pool,
@@ -264,6 +265,7 @@ Future<void> recordOptimizeAnalysisOutcome({
     deterministicSwapCandidates: deterministicSwapCandidates,
     cacheKey: cacheKey,
     executionTimeMs: executionTimeMs,
+    provenance: provenance,
   );
 }
 

@@ -8,6 +8,7 @@ import 'package:postgres/postgres.dart';
 import 'auth_runtime_policy.dart';
 import 'beta_invites/beta_invite_store.dart';
 import 'database.dart';
+import 'legal_acceptance_service.dart';
 import 'legal_policy.dart';
 import 'password_policy.dart';
 import 'runtime_environment.dart';
@@ -183,6 +184,7 @@ class AuthService {
     required String password,
     LegalAcceptance? legalAcceptance,
     BetaInviteClaim? invite,
+    String? requestId,
   }) async {
     final db = Database();
     final conn = db.connection;
@@ -216,6 +218,7 @@ class AuthService {
         hashedPassword: hashedPassword,
         legalAcceptance: legalAcceptance,
         invite: invite,
+        requestId: requestId,
         emailVerificationToken: emailVerificationToken,
         emailVerificationExpiresAt: emailVerificationExpiresAt,
       );
@@ -253,6 +256,7 @@ class AuthService {
     required String hashedPassword,
     required LegalAcceptance? legalAcceptance,
     required BetaInviteClaim? invite,
+    required String? requestId,
     required String? emailVerificationToken,
     required DateTime emailVerificationExpiresAt,
   }) {
@@ -335,6 +339,16 @@ class AuthService {
         '''),
         parameters: {'userId': userId},
       );
+      // BT-LEGAL-ACCEPT-001 (D-24): o aceite do cadastro entra no histórico.
+      if (legalAcceptance != null) {
+        await LegalAcceptanceService.recordHistory(
+          session,
+          userId: userId,
+          acceptance: legalAcceptance,
+          source: LegalAcceptanceSource.register,
+          requestId: requestId,
+        );
+      }
       if (inviteId != null) {
         await BetaInviteAdmission.markAccepted(
           session,

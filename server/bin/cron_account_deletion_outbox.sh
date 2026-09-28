@@ -6,10 +6,13 @@ set -euo pipefail
 # Roda na imagem de ops (server/Dockerfile.manaloom-ops), agendado pelo
 # manaloom_ops_daemon.py como `manaloom_account_deletion_outbox`, sem
 # capability. Consome as linhas que a exclusão grava em
-# account_deletion_outbox: conclui os consumidores que já sabe concluir
-# (endpoint_cache pelo teto de 24 h, sentry porque os eventos do servidor não
-# levam o usuário), marca os bloqueados com o motivo e deixa um recibo por
-# execução, sem identificador.
+# account_deletion_outbox. Cria a linha que falta para todo recibo de exclusão
+# e conclui os consumidores que já sabe concluir: endpoint_cache pelo teto de
+# 24 h, o sidecar pelo tempo máximo da sessão (D-77) e sentry porque os
+# eventos do servidor não levam o usuário. O hermes_learning_sqlite conclui
+# depois de apagar os decks apagados do knowledge.db (HERMES_KNOWLEDGE_DB, via
+# bin/hermes_learning_purge.py, BT-PRIV-002). Marca os bloqueados (backups)
+# com o motivo e deixa um recibo por execução, sem identificador.
 #
 # O recibo vai para MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR (o daemon aponta
 # para o diretório de artefatos) ou para --output-dir <dir>.

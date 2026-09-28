@@ -600,6 +600,7 @@ grep -Fq "('058', 'snapshot_trade_item_identity')" "$ROOT_DIR/scripts/manaloom_d
 grep -Fq "('059', 'align_trade_items_owner_fk')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('060', 'create_account_deletion_outbox')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('061', 'create_beta_invites')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq "('062', 'record_legal_acceptance_history')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('063', 'recreate_commander_learning_snapshot_view')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('064', 'adopt_production_unique_indexes')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq "('065', 'adopt_production_indexes_from_database_indexes_sql')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

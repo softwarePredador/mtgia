@@ -6,6 +6,7 @@ import '../bin/migrate.dart' as migrate;
 import '../lib/battle/interactive_battle_contract.dart';
 import '../lib/endpoint_cache.dart';
 import '../lib/privacy/account_deletion_outbox.dart';
+import '../lib/privacy/hermes_learning_purge.dart';
 import '../lib/user_data_privacy_service.dart';
 
 /// D-68 (BT-PRIV-002), sem banco: a migration 060 cria o outbox com o DDL
@@ -89,11 +90,63 @@ void main() {
           reason: consumer.name,
         );
       }
+      // BT-PRIV-002: só os backups seguem bloqueados.
       expect(defaultAccountDeletionOutboxHandlers().keys.toSet(), {
+        'hermes_learning_sqlite',
         'endpoint_cache',
         'interactive_battle_sidecar',
         'sentry',
       });
+      expect(
+        [
+          for (final consumer in accountDeletionOutboxConsumers)
+            if (consumer.handling == AccountDeletionOutboxHandling.blocked)
+              consumer.name,
+        ],
+        ['backups'],
+      );
+    });
+
+    test('hermes_learning_sqlite conclui pela varredura contra os '
+        'tombstones', () {
+      final hermes = accountDeletionOutboxConsumers.singleWhere(
+        (consumer) => consumer.name == 'hermes_learning_sqlite',
+      );
+      expect(
+        hermes.handling,
+        AccountDeletionOutboxHandling.purgesByTombstoneSweep,
+      );
+      expect(hermes.code, hermesLearningPurgeCode);
+      expect(hermes.firstAttemptDelay, Duration.zero);
+    });
+
+    test('o knowledge.db vem de HERMES_KNOWLEDGE_DB, como o agendador põe em '
+        'todo job', () {
+      final config = HermesKnowledgeDbConfig.fromEnvironment(const {
+        'HERMES_KNOWLEDGE_DB': '/data/manaloom-ops/knowledge.db',
+        'MANALOOM_KNOWLEDGE_DB': '/outro/knowledge.db',
+      });
+      expect(config.path, '/data/manaloom-ops/knowledge.db');
+      expect(config.helperScript, defaultHermesPurgeHelperScript);
+      expect(File(config.helperScript).existsSync(), isTrue);
+      expect(
+        HermesKnowledgeDbConfig.fromEnvironment(const {
+          'MANALOOM_KNOWLEDGE_DB': '/outro/knowledge.db',
+        }).path,
+        '/outro/knowledge.db',
+      );
+      expect(
+        HermesKnowledgeDbConfig.fromEnvironment(const {
+          'HERMES_KNOWLEDGE_DB': '  ',
+        }).path,
+        isNull,
+      );
+      final daemon = File('bin/manaloom_ops_daemon.py').readAsStringSync();
+      expect(
+        daemon,
+        contains('"HERMES_KNOWLEDGE_DB": str(KNOWLEDGE_DB)'),
+        reason: 'o agendador passa o caminho a todo job, inclusive o outbox',
+      );
     });
 
     test('só quem precisa achar decks recebe os tokens', () {

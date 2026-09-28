@@ -135,6 +135,7 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '059': 'align_trade_items_owner_fk',
   '060': 'create_account_deletion_outbox',
   '061': 'create_beta_invites',
+  '062': 'record_legal_acceptance_history',
   '063': 'recreate_commander_learning_snapshot_view',
   '064': 'adopt_production_unique_indexes',
   '065': 'adopt_production_indexes_from_database_indexes_sql',
@@ -173,6 +174,7 @@ const releaseSchemaReadinessSql = '''
       ('059', 'align_trade_items_owner_fk'),
       ('060', 'create_account_deletion_outbox'),
       ('061', 'create_beta_invites'),
+      ('062', 'record_legal_acceptance_history'),
       ('063', 'recreate_commander_learning_snapshot_view'),
       ('064', 'adopt_production_unique_indexes'),
       ('065', 'adopt_production_indexes_from_database_indexes_sql'),
@@ -185,7 +187,7 @@ const releaseSchemaReadinessSql = '''
   )
   SELECT
     (
-      SELECT COUNT(*) = 33
+      SELECT COUNT(*) = 34
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
