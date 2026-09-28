@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "0e53ea8e58ecb8b51de6533c615eb469a21899578c0da32ea807619e313cd61c"
+    "sha256": "16d8d2c365aa06642d11428375c38ca0790a621558c7d89ab143c5d6d780bd82"
   },
   "required_task_fields": [
     "id",
@@ -2770,7 +2770,7 @@
     {
       "id": "BT-REL-001",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Transação de promoção full-stack e rollback comprovado.",
       "depends_on": [
         "BT-SCP-001",
@@ -2778,7 +2778,7 @@
         "BT-DR-001",
         "BT-OBS-001"
       ],
-      "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível. Decisão do dono em 2026-09-22: D-13, `/app` implantável com as 29 capabilities off como release de plano de controle (a regra de ao menos uma on vale só quando uma capability abrir); ordem backend, site público, `/app` e Android; Android da primeira coorte por APK no release host, sem Play Store por enquanto. Em 2026-09-23 o `/app` seguia na imagem antiga (`app-web@sha256:f94930bc…`); o deploy do Flutter Web com tudo off continua bloqueado pela contradição entre o loader e o gate.",
+      "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível. Decisão do dono em 2026-09-22: D-13, `/app` implantável com as 29 capabilities off como release de plano de controle (a regra de ao menos uma on vale só quando uma capability abrir); ordem backend, site público, `/app` e Android; Android da primeira coorte por APK no release host, sem Play Store por enquanto. Em 2026-09-23 o `/app` seguia na imagem antiga (`app-web@sha256:f94930bc…`); o deploy do Flutter Web com tudo off continua bloqueado pela contradição entre o loader e o gate. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção. D-13 no `/app`: `manaloom_resolve_public_app_release_mode` (`scripts/lib/manaloom_release_capabilities_contract.sh`) devolve `control_plane` com a matriz toda off e, com alguma capability on, deixa o gate de abertura de sempre decidir. O deploy do Flutter Web chama o resolvedor antes da aprovação e grava e confere `release_mode` no `release.json`; o contrato shell e o contrato Dart provam o all-off e a matriz incoerente, sem nenhuma raiz do digest de UI. Transação: `scripts/manaloom_promote_release.sh` promove backend, ops, site, `/app` e Android na ordem da D-13 (`server/config/release_promotion.json`), tudo ou nada. O preflight só lê: SHA limpo no `origin/master`, matriz e modo da D-13, capacidade do `BT-CAP-001` e linha de base reversível de cada superfície. Cada passo entra num diário encadeado por SHA-256, em diretório durável, antes de acontecer. Cada deploy é conferido (spec, tarefa, origem do EasyPanel, mesmo SHA e sonda pública), e todas convergem juntas no fim. Uma falha desfaz o que começou na ordem inversa (spec anterior exata, ou redeploy pelo EasyPanel onde o env não vive na spec), provado por superfície como `exact` ou `identity`. Volta sem prova é CRITICAL; o marcador `EM_ANDAMENTO`, o diário sem fim e o `--status` (4 ou 1) deixam a falha antes do receipt sempre visível e bloqueiam a próxima promoção até o `--resolve` com o motivo. Evidência: `server/test/release_promotion_test.py` (37 testes, com a ferramenta de verdade num repositório descartável, um Swarm, um EasyPanel e sondas falsas, e stubs dos cinco deploys com falha antes e depois de mudar, rollback próprio, saída mentirosa, SHA errado, SIGTERM e SIGKILL). O teste está ligado em `scripts/manaloom_release_ops_contract_test.sh`, e 53 mutações falham como esperado; receipt em `docs/qa/execution/2026-09-28/BT-REL-001-transacao-de-promocao.md`. Segue aberto: rodar na produção pelo passo do lote, com a palavra do dono; o primeiro preflight confirma a lista do EasyPanel e a origem do site.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 679
     },
@@ -9508,6 +9508,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9536,6 +9538,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9564,6 +9568,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9592,6 +9598,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9620,6 +9628,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9648,6 +9658,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9676,6 +9688,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9704,6 +9718,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9732,6 +9748,8 @@
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9984,5 +10002,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "fde0daeca955f2b8772c0e39a482331d7f0c870604d09000ceb132eb644d7586"
+  "project_logic_source_digest_sha256": "efc1e1979f8b4fdd1d39ab2764d34c628709bb6fc52e528f6485cbddbc8a03ba"
 }

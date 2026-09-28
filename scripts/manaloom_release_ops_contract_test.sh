@@ -127,6 +127,7 @@ SHELL_SCRIPTS=(
   scripts/manaloom_build_android_release.sh
   scripts/manaloom_capacity_snapshot.sh
   scripts/manaloom_capacity_resources.sh
+  scripts/manaloom_promote_release.sh
   scripts/manaloom_build_beta_release.sh
   scripts/manaloom_battle_product_gate.sh
   scripts/manaloom_deploy_battle_sidecars.sh
@@ -203,6 +204,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/manaloom_backup_cadence.py" \
     "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
     "$ROOT_DIR/scripts/manaloom_capacity_resources.py" \
+    "$ROOT_DIR/scripts/manaloom_promote_release.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_migration_rehearsal.py" \
@@ -216,6 +218,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/backup_cycle_db_live_test.py" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
     "$ROOT_DIR/server/test/capacity_resources_test.py" \
+    "$ROOT_DIR/server/test/release_promotion_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
@@ -242,6 +245,10 @@ PYTHONDONTWRITEBYTECODE=1 \
 # contra a spec gravada e um plano de controle falso (nenhuma conexão sai).
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/capacity_resources_test.py"
+# BT-REL-001 (D-13): transação de promoção full-stack, com o diário, a volta provada
+# e a falha que nunca some, contra um plano de controle falso e deploys de mentira.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/release_promotion_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
@@ -304,8 +311,8 @@ done
 
 NGINX="$ROOT_DIR/app/web/nginx.conf"
 FLUTTER_WEB_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
-grep -Fq 'manaloom_require_public_app_release_open' "$FLUTTER_WEB_DEPLOY"
-flutter_app_gate_line="$(grep -n -m1 'manaloom_require_public_app_release_open' \
+grep -Fq 'manaloom_resolve_public_app_release_mode' "$FLUTTER_WEB_DEPLOY"
+flutter_app_gate_line="$(grep -n -m1 'manaloom_resolve_public_app_release_mode' \
   "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"
 flutter_approval_line="$(grep -n -m1 'require_live_mutation_approval "ManaLoom Flutter Web deployment"' \
   "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"

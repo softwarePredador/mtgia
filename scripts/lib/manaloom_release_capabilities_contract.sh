@@ -187,3 +187,27 @@ manaloom_require_public_app_release_open() {
     return 2
   fi
 }
+
+# D-13 (2026-09-22): o /app pode ser implantado com as capabilities todas off,
+# como release de plano de controle (conta, recuperacao, verificacao, perfil,
+# exportacao e exclusao, para contas que ja existem). A regra de ao menos uma
+# capability on, com verificacao live datada, vale so quando alguma capability
+# abrir: ai o gate de abertura acima decide. Publica
+# MANALOOM_PUBLIC_APP_RELEASE_MODE (control_plane ou product_open).
+manaloom_resolve_public_app_release_mode() {
+  local policy_json="$1"
+  local mode
+
+  if jq -e '
+    (.capabilities | type == "object" and length > 0) and
+    all(.capabilities[]; .release_capability == "off" and .allowed == false)
+  ' >/dev/null 2>&1 <<<"$policy_json"; then
+    mode="control_plane"
+  else
+    manaloom_require_public_app_release_open "$policy_json" || return 2
+    mode="product_open"
+  fi
+  # Public readonly output consumed by the release scripts.
+  # shellcheck disable=SC2034
+  readonly MANALOOM_PUBLIC_APP_RELEASE_MODE="$mode"
+}

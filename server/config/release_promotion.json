@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-release-promotion",
+  "version": "2026-09-28.1",
+  "task": "BT-REL-001",
+  "decisions": [
+    "D-13"
+  ],
+  "project": "evolution",
+  "control_plane_release": "D-13: com as 29 capabilities off, o /app sai como release de plano de controle (conta, recuperação, verificação, perfil, exportação e exclusão); a regra de ao menos uma capability on, com verificação live datada, vale só quando uma capability abrir.",
+  "order_rationale": "D-13: backend, site público, /app e Android, nesta ordem. O ops entra logo depois do backend, cuja API e cujas capabilities ele consome. Cada superfície só sobe com a anterior no ar e provada.",
+  "transaction": {
+    "all_or_nothing": true,
+    "rationale": "Uma superfície que falha desfaz as já promovidas, na ordem inversa, até o estado de antes, provado por superfície. Uma falha antes do receipt fica no diário: o marcador de transação em andamento bloqueia a próxima promoção até o diário fechar ou ser resolvido com a palavra do dono."
+  },
+  "surfaces": [
+    {
+      "id": "backend",
+      "service": "cartinhas",
+      "deploy": "scripts/manaloom_deploy_backend_image.sh",
+      "easypanel_source": "managed",
+      "env_in_swarm_spec": true,
+      "success_status": [
+        "deployed"
+      ],
+      "same_sha_field": "git_sha",
+      "probe": {
+        "kind": "json_field",
+        "url": "https://evolution-cartinhas.2ta7qx.easypanel.host/health",
+        "field": "git_sha"
+      },
+      "compensation": [
+        "swarm_rollback"
+      ],
+      "rationale": "O deploy do backend grava imagem e env numa única atualização da spec do Swarm (o e-mail herdado vive só na spec): voltar exige a spec anterior exata, e um redeploy pelo EasyPanel perderia o env."
+    },
+    {
+      "id": "ops",
+      "service": "manaloom-ops",
+      "deploy": "scripts/manaloom_deploy_ops_image.sh",
+      "easypanel_source": "swarm_direct",
+      "env_in_swarm_spec": true,
+      "success_status": [
+        "deployed"
+      ],
+      "same_sha_field": "git_sha",
+      "probe": null,
+      "compensation": [
+        "swarm_rollback"
+      ],
+      "rationale": "Daemon interno, sem URL pública, com deploy direto no Swarm (o EasyPanel não é a origem): a identidade é a da spec (imagem, env, réplicas e recursos), e só a spec anterior exata desfaz."
+    },
+    {
+      "id": "site",
+      "service": "manaloom-web-public",
+      "deploy": "scripts/manaloom_deploy_public_web.sh",
+      "easypanel_source": "detect",
+      "env_in_swarm_spec": true,
+      "success_status": [
+        "deployed"
+      ],
+      "same_sha_field": "git_sha",
+      "probe": {
+        "kind": "status_only",
+        "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/healthz"
+      },
+      "compensation": [
+        "swarm_rollback"
+      ],
+      "rationale": "Next.js estático. O deploy troca imagem e env (GIT_SHA e DEPLOY_TIMESTAMP) numa única atualização da spec do Swarm, e o EasyPanel pode nem ser a origem (contrato Swarm direto): só a spec anterior exata desfaz."
+    },
+    {
+      "id": "app",
+      "service": "manaloom-app",
+      "deploy": "scripts/manaloom_deploy_flutter_web.sh",
+      "easypanel_source": "managed",
+      "env_in_swarm_spec": false,
+      "success_status": [
+        "deployed"
+      ],
+      "same_sha_field": "git_sha",
+      "probe": {
+        "kind": "body_sha256",
+        "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/release.json",
+        "fallback_url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/flutter_bootstrap.js"
+      },
+      "compensation": [
+        "swarm_rollback",
+        "easypanel_redeploy"
+      ],
+      "rationale": "Flutter Web estático, env do EasyPanel. O deploy ajusta a política de update e depois troca a imagem pelo EasyPanel (duas atualizações): se a spec anterior não for a de antes, o redeploy da imagem de antes pelo EasyPanel devolve a identidade. A imagem antiga não tem release.json: o marcador de antes vem do flutter_bootstrap.js, como no rollback do próprio deploy."
+    },
+    {
+      "id": "android",
+      "service": "manaloom-releases",
+      "deploy": "scripts/manaloom_publish_android_release.sh",
+      "easypanel_source": "managed",
+      "env_in_swarm_spec": false,
+      "success_status": [
+        "published"
+      ],
+      "same_sha_field": "git_sha",
+      "probe": {
+        "kind": "body_sha256",
+        "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/downloads/release.json"
+      },
+      "compensation": [
+        "swarm_rollback",
+        "easypanel_redeploy"
+      ],
+      "rationale": "APK da primeira coorte no release host (D-13), sem Play Store: nginx estático com env do EasyPanel e as mesmas duas atualizações do /app."
+    }
+  ]
+}

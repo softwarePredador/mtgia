@@ -37,7 +37,9 @@ if [[ "$BUILD_ONLY" == "0" ]]; then
   FLUTTER_WEB_RELEASE_SOURCE_SHA="${MANALOOM_RELEASE_SOURCE_SHA:-$(git -C "$ROOT_DIR" rev-parse HEAD)}"
   manaloom_load_release_capabilities_from_git \
     "$ROOT_DIR" "$FLUTTER_WEB_RELEASE_SOURCE_SHA"
-  manaloom_require_public_app_release_open \
+  # D-13: com a matriz toda off, o /app sai como release de plano de controle;
+  # com alguma capability on, vale o gate de abertura (on com verificacao live).
+  manaloom_resolve_public_app_release_mode \
     "$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON"
   require_live_mutation_approval "ManaLoom Flutter Web deployment"
   readonly LIVE_MUTATION_APPROVED=1
@@ -304,6 +306,13 @@ SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
 VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
 SOURCE_COMMITTED_AT="$(jq -r '.source_committed_at' <<<"$IDENTITY_JSON")"
 RELEASE_CAPABILITIES_JSON="$(jq -cer '.release_capabilities' <<<"$IDENTITY_JSON")"
+if [[ "$BUILD_ONLY" == "1" ]]; then
+  # O build local grava o mesmo modo que o deploy gravaria (D-13).
+  # shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+  source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
+  manaloom_resolve_public_app_release_mode "$RELEASE_CAPABILITIES_JSON"
+fi
+RELEASE_MODE="$MANALOOM_PUBLIC_APP_RELEASE_MODE"
 IMAGE="$IMAGE_REPO:$SHORT_SHA"
 RELEASE_DIR="${MANALOOM_RELEASE_DIR:-$HOME/.manaloom/releases/$VERSION/$SHORT_SHA}"
 WORKTREE_DIR="$(mktemp -d /tmp/manaloom-app-web-source.XXXXXX)"
@@ -402,6 +411,7 @@ jq -n \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --arg release_mode "$RELEASE_MODE" \
   '{
     schema_version: 1,
     product: "manaloom",
@@ -412,6 +422,7 @@ jq -n \
     built_at: $built_at,
     source_committed_at: $source_committed_at,
     release_capabilities: $release_capabilities,
+    release_mode: $release_mode,
     api_base_url: $api_base_url,
     features: {
       battle_live_spectator_enabled: $battle_live_spectator_enabled,
@@ -439,10 +450,12 @@ jq -n \
   }' > "$WORKTREE_DIR/app/build/web/release.json"
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --arg release_mode "$RELEASE_MODE" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '.git_sha == $sha and .version == $version and .platform == "web" and
    .release_capabilities == $release_capabilities and
+   .release_mode == $release_mode and
    .features.battle_live_spectator_enabled == $battle_live_spectator_enabled and
    .features.interactive_battle_enabled == $interactive_battle_enabled' \
   "$WORKTREE_DIR/app/build/web/release.json" >/dev/null
@@ -477,9 +490,10 @@ if [[ "$BUILD_ONLY" == "1" ]]; then
     --arg release_dir "$WEB_RELEASE_DIR" \
     --arg manifest "$WEB_RELEASE_DIR/release.json" \
     --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+    --arg release_mode "$RELEASE_MODE" \
     '{status:"built", platform:"web", version:$version, git_sha:$git_sha,
       release_dir:$release_dir, manifest:$manifest,
-      release_capabilities:$release_capabilities}'
+      release_capabilities:$release_capabilities, release_mode:$release_mode}'
   exit 0
 fi
 
@@ -661,10 +675,12 @@ ROOT_CODE="$(curl -sS -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL/")"
 grep -Fq '<base href="/app/">' /tmp/manaloom_app_web_deep.html
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --arg release_mode "$RELEASE_MODE" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '.git_sha == $sha and .version == $version and .platform == "web" and
    .release_capabilities == $release_capabilities and
+   .release_mode == $release_mode and
    .features.battle_live_spectator_enabled == $battle_live_spectator_enabled and
    .features.interactive_battle_enabled == $interactive_battle_enabled' \
   /tmp/manaloom_app_release.json >/dev/null
@@ -693,6 +709,7 @@ jq -cn \
   --argjson release_code "$RELEASE_CODE" \
   --argjson deep_link_code "$DEEP_LINK_CODE" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --arg release_mode "$RELEASE_MODE" \
   '{
     status: "deployed",
     service: $service,
@@ -701,6 +718,7 @@ jq -cn \
     version: $version,
     git_sha: $git_sha,
     release_capabilities: $release_capabilities,
+    release_mode: $release_mode,
     app_url: $app_url,
     root_code: $root_code,
     app_code: $app_code,
