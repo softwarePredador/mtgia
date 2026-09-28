@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "840db24c5958e1778b19ac2ac967694ff7a4315824e3aae18859d3dc512af577",
+  "source_digest_sha256": "f95069f35a27a5f5e59553dc155dce055ccd7e37d9420d5d44aca8632e2dc2cb",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -281926,7 +281926,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "cd3907502f4e0d340873a09bec2c4802b157164f31db500a0fbce3a01977b535"
+      "sha256": "e76d19e255fc6cdff50dc1c8c8cafa08e7c55c131a1ee0a311939a3a3f3ad04b"
     },
     "required_task_fields": [
       "id",
@@ -284138,12 +284138,12 @@
       {
         "id": "SCOPE-P0-SOC-00",
         "priority": "P0 CORE",
-        "status": "EVIDENCE_REQUIRED",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Flags server-side separadas para gallery, profiles, comments, follows, user search, DM, public binder, trades e push; todas OFF.",
         "depends_on": [
           "BT-SCP-001"
         ],
-        "acceptance": "UI/deep links ausentes e API direta nega antes de PG; flags no release identity. Implementado em b2d3fc04f (política 29/29 OFF; `server/routes/_middleware.dart:105-144`; guards do app); receipt próprio pendente. Medição de 2026-09-22 (`docs/flows/_p0/contencao-escopo.md`): quase lá — falta um teste de negação em runtime por rota social (hoje só `/ai/battle/jobs` e `/auth/register` passam pelo middleware real em teste) e o receipt. Decisão do dono em 2026-09-22: D-39, abrir as flags sociais uma a uma, depois de corrigir os endpoints compostos que vazam dado de outras flags.",
+        "acceptance": "UI/deep links ausentes e API direta nega antes de PG; flags no release identity. Implementado em b2d3fc04f (política 29/29 OFF; `server/routes/_middleware.dart:105-144`; guards do app); receipt próprio pendente. Medição de 2026-09-22 (`docs/flows/_p0/contencao-escopo.md`): quase lá — falta um teste de negação em runtime por rota social (hoje só `/ai/battle/jobs` e `/auth/register` passam pelo middleware real em teste) e o receipt. Decisão do dono em 2026-09-22: D-39, abrir as flags sociais uma a uma, depois de corrigir os endpoints compostos que vazam dado de outras flags. Evidência do servidor em 2026-09-28, ainda na branch `deck/rodada2-2026-09-24`: as 32 rotas×método das 9 flags sociais e o feed de seguidos, fixados por `scope_containment_route_matrix_test.dart` e passados pelo middleware raiz real, negam com 404 e zero statements do servidor no E2E contra a API local (`scope_containment_e2e_test.dart`, harness isolado sob `sandbox-exec` só loopback, log de statements do PostgreSQL descartável) nas matrizes produção e núcleo, e chegam ao banco na matriz de controle; a release identity traz as 9 flags `off` e o digest da política que a API carrega. Receipt em `docs/qa/execution/2026-09-28/SCOPE-P0-SOC-00-flags-sociais-provadas.md`. Falta: a UI e os deep links (raia do app), o teste de push e polling e o atalho de matches do fichário (app), os endpoints compostos antes de abrir qualquer flag (D-39) e o mesmo E2E no SHA integrado.",
         "section": "Contenção que bloqueia a beta core",
         "source_line": 616
       },
@@ -291810,7 +291810,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "840db24c5958e1778b19ac2ac967694ff7a4315824e3aae18859d3dc512af577"
+    "project_logic_source_digest_sha256": "f95069f35a27a5f5e59553dc155dce055ccd7e37d9420d5d44aca8632e2dc2cb"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
