@@ -4222,6 +4222,95 @@ final migrations = <Migration>[
       DROP TABLE IF EXISTS beta_invites;
     ''',
   ),
+  Migration(
+    version: '062',
+    name: 'record_legal_acceptance_history',
+    // BT-LEGAL-ACCEPT-001 (D-24): histórico de aceites de Termos e
+    // Privacidade, a prova de consentimento. `users` guarda o aceite vigente;
+    // aqui fica cada aceite (cadastro, reaceite e, uma vez, o retrato do que
+    // já estava aceito antes desta migration). Só cresce: nenhuma rota apaga
+    // ou altera linha.
+    up: '''
+      CREATE TABLE IF NOT EXISTS user_legal_acceptances (
+        id BIGSERIAL PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        terms_version TEXT NOT NULL
+          CHECK (char_length(terms_version) BETWEEN 1 AND 40),
+        privacy_version TEXT NOT NULL
+          CHECK (char_length(privacy_version) BETWEEN 1 AND 40),
+        source TEXT NOT NULL
+          CHECK (source IN ('register', 'reaccept', 'backfill')),
+        request_id TEXT
+          CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+        accepted_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_user_legal_acceptances_user
+        ON user_legal_acceptances (user_id, accepted_at DESC);
+
+      INSERT INTO user_legal_acceptances (
+        user_id, terms_version, privacy_version, source, accepted_at
+      )
+      SELECT u.id, u.terms_version, u.privacy_version, 'backfill',
+             GREATEST(u.terms_accepted_at, u.privacy_accepted_at)
+      FROM users u
+      WHERE u.deleted_at IS NULL
+        AND u.terms_version IS NOT NULL
+        AND u.privacy_version IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM user_legal_acceptances a WHERE a.user_id = u.id
+        );
+
+      -- A chave nova para users ganha a trava de conta ativa (migration 038),
+      -- como as tabelas das migrations seguintes. O laço refaz todas as
+      -- chaves para users, então também cobre a de beta_invites (061).
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS user_legal_acceptances;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4325,7 +4414,10 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       // A 059 alinha a chave de trade_items.owner_id: o down volta ao
       // CASCADE da 041, mas a produção estava sem ação antes dela. Voltar no
       // automático mudaria o comportamento da produção.
-      '059' => MigrationRollbackPolicy.manualOnly,
+      '059' ||
+      // A 062 guarda o histórico de aceites (prova de consentimento, D-24) e
+      // copia o aceite que já estava em users: o down apagaria a prova.
+      '062' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

@@ -2730,6 +2730,31 @@
         "id": "include"
       }
     },
+    "user_legal_acceptances": {
+      "category": "privacy_control",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Histórico de aceites de Termos de uso e Política de privacidade (BT-LEGAL-ACCEPT-001, D-24): versões aceitas, origem (cadastro, reaceite ou retrato inicial da migration 062), request-id e data. É a prova de consentimento; users guarda só o aceite vigente.",
+      "owner": "server/lib/legal_acceptance_service.dart; server/routes/users/me/legal-acceptance/index.dart; server/lib/auth_service.dart (cadastro)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo; só cresce (nenhuma rota apaga ou altera linha)",
+        "decision": "D-24",
+        "enforced_by": null,
+        "gap": "prazo de guarda da prova de consentimento a confirmar com o advogado (BT-LEGAL-001)"
+      },
+      "export": {
+        "section": null,
+        "reason": "as versões aceitas vigentes já saem em users (terms_version, privacy_version); pôr o histórico na exportação fica com a frente de privacidade"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "A exclusão de conta não apaga o histórico: a linha fica ligada à conta pseudonimizada, sem nome, e-mail nem IP. Só a remoção física de users (que a exclusão não faz) levaria as linhas junto, pela FK ON DELETE CASCADE."
+      },
+      "legal_exception": "Prova de consentimento (LGPD, art. 8º, § 2º: o ônus da prova do consentimento é do controlador); confirmar prazo e escopo com o advogado (BT-LEGAL-001)."
+    },
     "user_plans": {
       "category": "account",
       "subject_kind": "account_holder",

@@ -105,6 +105,7 @@ erDiagram
     users ||--o{ user_blocks : "blocker_id -> id"
     users ||--o{ user_follows : "follower_id -> id"
     users ||--o{ user_follows : "following_id -> id"
+    users ||--o{ user_legal_acceptances : "user_id -> id"
     users ||--o{ user_plans : "user_id -> id"
     account_deletion_outbox {
         number attempts
@@ -1126,6 +1127,15 @@ erDiagram
         uuid following_id
         uuid id PK
     }
+    user_legal_acceptances {
+        datetime accepted_at
+        string id PK
+        string privacy_version
+        string request_id
+        string source
+        string terms_version
+        uuid user_id
+    }
     user_plans {
         string plan_name
         datetime renews_at
@@ -1162,4 +1172,4 @@ erDiagram
     }
 ```
 
-Tabelas: 82; views: 6; migrations: 61 (latest `061`).
+Tabelas: 83; views: 6; migrations: 62 (latest `062`).

@@ -615,6 +615,10 @@ const _exactControlPlaneRequests = <String>{
   'GET /users/me/blocks',
   'GET /users/me/activation-events',
   'POST /users/me/activation-events',
+  // Reaceite de Termos e Privacidade (BT-LEGAL-ACCEPT-001): a conta
+  // bloqueada precisa sair do bloqueio com qualquer capability desligada.
+  'GET /users/me/legal-acceptance',
+  'POST /users/me/legal-acceptance',
   'DELETE /users/me/fcm-token',
   'POST /content-reports',
   'GET /moderation/reports',

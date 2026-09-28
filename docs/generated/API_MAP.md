@@ -119,6 +119,7 @@
 | `/users/me/blocks` | `GET` | `server/routes/users/me/blocks/index.dart` | 2 | `source` |
 | `/users/me/export` | `POST` | `server/routes/users/me/export/index.dart` | 2 | `source` |
 | `/users/me/fcm-token` | `DELETE, PUT` | `server/routes/users/me/fcm-token/index.dart` | 2 | `source` |
+| `/users/me/legal-acceptance` | `GET, POST` | `server/routes/users/me/legal-acceptance/index.dart` | 2 | `source` |
 | `/users/me/plan` | `GET` | `server/routes/users/me/plan/index.dart` | 2 | `source` |
 | `/users/me/plan/checkout` | `POST` | `server/routes/users/me/plan/checkout/index.dart` | 2 | `source` |
 | `/users/{id}/block` | `DELETE, GET, POST` | `server/routes/users/[id]/block/index.dart` | 2 | `source` |
