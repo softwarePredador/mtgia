@@ -7,11 +7,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(absoluteUrl("/")),
   title: {
-    default: "BrewTact - Commander com IA explicável",
+    default: "BrewTact - Decks, coleção e contador de vida para Commander",
     template: "%s | BrewTact"
   },
   description:
-    "Construa, organize e revise decks de Commander com IA explicável e relatórios compartilháveis.",
+    "Beta gratuita, por convite e sem cobrança: deck builder de Commander, coleção privada, catálogo de cartas e contador de vida.",
   icons: {
     icon: "/branding/app_logo.png",
     apple: "/branding/app_logo.png"
@@ -19,10 +19,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "BrewTact",
-    title: "BrewTact - Commander com IA explicável",
+    title: "BrewTact - Decks, coleção e contador de vida para Commander",
     description:
-      "Deck builder, coleção privada e sugestões revisáveis para Commander.",
-    url: absoluteUrl("/")
+      "Deck builder, coleção privada, catálogo e contador de vida para Commander. Beta gratuita, por convite."
   }
 };
 

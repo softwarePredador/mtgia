@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "50854643561b7f80b8551653ae2d1b4b9d3119ee76dc3f49843890475afb77cb",
+  "source_digest_sha256": "eefb70f2a7abd210ca28fd750a40295d2141902c67e8265642976c3174cf89de",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -64,7 +64,7 @@
   ],
   "statistics": {
     "dart_source_files": 716,
-    "non_dart_product_files": 50,
+    "non_dart_product_files": 52,
     "battle_sidecar_source_files": 34,
     "dart_symbols": 5432,
     "semantic_resolved_files": 716,
@@ -293591,7 +293591,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "50854643561b7f80b8551653ae2d1b4b9d3119ee76dc3f49843890475afb77cb"
+    "project_logic_source_digest_sha256": "eefb70f2a7abd210ca28fd750a40295d2141902c67e8265642976c3174cf89de"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -296902,7 +296902,9 @@
       "web-public/src/app/sitemap.ts",
       "web-public/src/components/brand-page-intro.tsx",
       "web-public/src/components/data-visuals.tsx",
+      "web-public/src/components/product-waves.tsx",
       "web-public/src/components/site-shell.tsx",
+      "web-public/src/components/tiles.tsx",
       "web-public/src/components/ui.tsx",
       "web-public/src/lib/product-data.ts",
       "web-public/src/lib/public-server.ts",

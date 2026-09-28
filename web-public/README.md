@@ -55,6 +55,7 @@ NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://seu-backend.example.com npm run dev
 cd web-public
 npm run lint
 npm run build
+npm run test:contract
 ```
 
 ## Estrutura
@@ -76,7 +77,39 @@ web-public/
   src/lib/
     product-data.ts
     routes.ts
+  scripts/
+    capture-screens.mjs
+  tests/
+    free-beta-offer-contract.mjs
 ```
+
+## Capturas
+
+`scripts/capture-screens.mjs` fotografa as páginas públicas em Chrome ou
+Chromium headless, pelo DevTools Protocol, sem dependência nova (Node 22+).
+Ele só aceita `--base-url` de loopback e abre o navegador sem proxy e sem
+resolver nenhum host além do loopback.
+
+```bash
+cd web-public
+NEXT_PUBLIC_MANALOOM_API_BASE_URL=http://127.0.0.1:<porta-do-fixture> npm run build
+# servir .next/standalone em 127.0.0.1, como faz scripts/manaloom_public_web_smoke.sh
+node scripts/capture-screens.mjs --base-url http://127.0.0.1:3100 \
+  --out ../docs/qa/execution/<data>/site-publico --prefix final \
+  --routes /,/pricing,/blog,/legal/terms --full-page
+```
+
+- Viewports: `desktop_1440x900` (DPR 1) e `mobile_390x844` (DPR 2, PNG com
+  780 px de largura).
+- `--full-page` acrescenta a página inteira, com as alturas `svh`/`vh`
+  travadas antes da captura.
+- `CHROME_BIN` escolhe o navegador; sem ele, o script tenta o Chromium do
+  Playwright e o Chrome do macOS.
+- `capture-manifest.json` registra, por arquivo, sha256, bytes, dimensões,
+  status HTTP, título e metadata, fontes carregadas, erros de console, topo do
+  `#produto`, navegador e o SHA do commit; `build_inputs_dirty` indica quando
+  o build não corresponde ao commit.
+- Status diferente de 200 ou erro de console fazem o script sair com código 1.
 
 ## Dados reais
 
