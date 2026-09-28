@@ -307,6 +307,90 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 - **O que o `BT-DR-001` passa a exigir:** o backup local em `backups/manaloom-postgres/` e o ensaio de restauração isolado (`scripts/manaloom_full_restore_drill.sh --execute`), com cadência e receipt. Os dois já foram feitos na `BT-REL-000`.
 - **Risco aceito:** se a máquina que guarda o backup e o servidor se perderem juntos, não há cópia fora deles.
 
+### Decididas em 2026-09-28
+
+**D-82 · Optimize determinístico sem provedor.**
+- **Contexto:** sem chave de IA, o `POST /ai/optimize` devolvia uma prévia falsa e não acionável, mesmo com trocas determinísticas prontas, calculadas só no PostgreSQL. Com uma chave falsa, o `/ai/archetypes` quebrava a folha. Isso impedia a sessão do gate de capturar o `optimization-card-reader-web`.
+- **Decisão do dono:** "Consertar o servidor".
+  - Sem provedor, a rota entrega as trocas determinísticas quando a shortlist existe.
+  - Sem shortlist, continua o mock.
+  - Com chave, nada muda.
+  - Sem chave, nenhuma tentativa de provedor.
+  - As trocas continuam passando pela prévia e pela confirmação (D-27, D-29).
+- **Execução:** `b0f06073d`, com E2E sob `sandbox-exec` só em loopback e um controle que prova que tentativas seriam vistas. A produção sem chave segue em 503 `provider_unavailable`.
+
+**D-83 · Recomendações técnicas das frentes, aceitas em bloco.** São código local e reversível. Cada item está no receipt da tarefa em `docs/qa/execution/2026-09-28/`.
+- **Termos e conta:**
+  - A trava de reaceite fica desligada até a tela do app existir; liga com `MANALOOM_LEGAL_REACCEPTANCE=enforce`. O escopo é o da D-24. A passagem de deck para público é travada no `PUT` e no `PATCH` depois da integração.
+  - O histórico de aceites não guarda IP nem user-agent. A 062 tem rollback manual.
+  - Convites:
+    - modo `invite` na produção;
+    - validade de 14 dias e lotes de até 30;
+    - o convite não aceito é apagado 90 dias depois de expirar ou ser revogado.
+  - Erros: código ao lado da frase e `request_id` em todo envelope. O app prefere `message`.
+  - Limites de corpo: 5 MiB no import, 1 MiB no resto e 16 KiB em `/auth`. Corpo em partes dá 411 e corpo comprimido dá 415. O teto do proxy é conferido no deploy.
+- **Deck e IA:**
+  - Validação estrita só no modo estrito (D-28).
+  - Generate:
+    - controles e resultado ficam enquanto a conta existir;
+    - o prompt e a impressão dele saem em 30 dias;
+    - a descrição do ledger é redigida depois de 30 dias, e o desfazer de mudança redigida dá 409.
+  - Lixeira: a purga leva relatórios e eventos de aprendizado. Restaurar exige e-mail verificado. Apagar de vez antes dos 30 dias fica para depois da beta. O pull do Hermes só leva deck vivo.
+  - Continuação da D-82:
+    - "pode aplicar" e "pode aprender" se separam no `DCK-P0-05`;
+    - a resposta sem provedor não entra em cache;
+    - o EDHREC segue como está.
+  - BT-AI-029:
+    - `GET /ai/optimize/telemetry` sai na próxima rodada;
+    - a URL da OpenAI é centralizada, e `OPENAI_BASE_URL` só vale fora da produção e em loopback;
+    - o job de sync de combos é pausado;
+    - o Critic IA continua quando há chave;
+    - a heurística `/recommendations` sai do app;
+    - `deck_weakness_reports` e `deck_matchups` vão para o `BT-DB-005`, contando as linhas antes.
+- **Métricas (BT-KPI-001):**
+  - Definições v1 da D-47 ao pé da letra: ativação é deck criado ou importado em até 24 h; a coorte é a semana UTC; conta excluída fica fora.
+  - A volta na segunda semana conta ações registradas no servidor.
+  - Guardrails v1.
+  - Coletor estrito, que descarta os três campos livres do app.
+- **Privacidade (BT-PRIV-002):**
+  - Rotação de 30 dias para os artefatos de ops.
+  - O `sync_pg_target_deck_to_hermes.py` ganha a trava do SQLite antes de ligar o preflight.
+  - A lista da D-68 fica como está.
+- **Banco:**
+  - Ensaio de restauração toda semana e antes de toda migration na produção.
+  - Lista fechada de deriva aprovada, com 94 itens.
+  - A 066 adota os 21 índices que só a produção tem, com o nome da produção e `IF NOT EXISTS`. O `uq_binder_user_card_cond_foil_list` fica fora.
+  - A 074 é a última do lote, com down neutro. Da 070 em diante, toda migration com chave para `users` roda o laço de gatilhos de conta ativa.
+  - A 075 segue a regra de direção: o lado mais estrito vence, o que é só metadado vai para a produção e nenhum NOT NULL é afrouxado. A 076 é `RESTRICT` nas três chaves.
+  - `card_meta_insights.created_at` fica como deriva aceita.
+  - `ml_prompt_feedback.user_rating` espera a decisão de exportação da privacidade.
+- **Escopo:**
+  - O E2E de contenção roda de novo no SHA integrado antes do lote.
+  - Marcar a capability no OpenAPI gerado fica para depois.
+
+**D-84 · Backup local: 30 dias, com cifra em repouso pelo FileVault.**
+- **Decisão do dono:** "30 dias + FileVault". São os 30 dias da D-69, e o disco do Mac que guarda os dumps já é cifrado.
+- **Consequência:** quando a rotação estiver automatizada, o consumidor `backups` da exclusão de conta passa a fechar pelo tempo, em 30 dias mais 1. Até lá, apagar dump continua pedindo o sim do dono na hora.
+
+**D-85 · Correções de dados na produção, aprovadas em princípio.**
+- **Decisão do dono:** "Aprovar em princípio". Cada correção roda no lote de deploy, com contagem antes e depois, receipt e confirmação do dono na hora da escrita.
+- **As cinco correções:**
+  1. limpar das descrições de deck o prompt do Generate gravado ali;
+  2. apagar os relatórios públicos órfãos de decks já apagados;
+  3. tirar a chave de idempotência, os IDs e o arquétipo livre do metadado antigo de `activation_funnel_events`;
+  4. validar três CHECK (`NOT VALID` e depois `VALIDATE`), só depois de contar zero violações;
+  5. arquivar cifrado e apagar `card_rulings_legacy` e `poststatus` (higiene da D-49).
+
+**D-86 · Push de branches com `--no-verify`, autorizado até o gate completo ficar verde.**
+- **Decisão do dono:** "Sim, só branches".
+- **Escopo:** a coordenação pode fazer push da integração e das branches das frentes depois de cada integração. Master e deploy continuam pedindo a palavra do dono.
+- **Registro:** cada push vai para o log da coordenação.
+
+**Ficam para depois:**
+- retenção de analytics (proposta de 180 dias) e o texto da política de privacidade, depois do advogado (D-69);
+- rotação do journal do host (D-78), porque o host é compartilhado com outros projetos;
+- tabela própria do `/ai/explain` antes de ligar a IA (`BT-AI-020`).
+
 O andamento das demais está no backlog e na fila.
 
 ---
