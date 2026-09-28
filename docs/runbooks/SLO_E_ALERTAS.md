@@ -146,8 +146,9 @@ job que acabou de aparecer no manifesto só conta a partir do primeiro horário 
 
 ## catalog_stale
 
-O último sync com sucesso de `cards` ou de `card_legalities` em `sync_log` tem mais de 7 dias.
-A D-18 exige cartas com menos de 7 dias para o GO.
+O catálogo tem mais de 7 dias, pela mesma regra do job de catálogo: a data da fonte aplicada
+(`catalog_reference_source_updated_at` em `sync_state`) e, sem ela, o último sync de cartas
+(`cards_last_sync_at`). A D-18 exige cartas com menos de 7 dias para o GO.
 
 1. O job `manaloom_catalog_reference_refresh` está ligado e rodou? Ver `job_failed` e
    `job_overdue`.
@@ -155,8 +156,34 @@ A D-18 exige cartas com menos de 7 dias para o GO.
 
 ## endpoint_cache_large
 
-O cache de rotas em memória desta réplica passou de 5.000 entradas.
+O cache de rotas em memória desta réplica passou de 5.000 entradas. Ele tem teto de 10.000: no
+teto, as entradas mais antigas saem primeiro, e `endpoint_cache_evictions` em `/health/metrics`
+conta quantas saíram assim.
 
 1. As entradas vencem em no máximo 24 h (D-23). Um crescimento contínuo indica chave que não
    se repete. Ver quais rotas usam `EndpointCache`.
 2. Memória do contêiner da API: a política de capacidade traz os limites do host.
+
+## catalog_written_outside_job
+
+Linhas de `cards`, `sets` ou `card_legalities` foram inseridas, atualizadas ou apagadas entre
+duas avaliações sem nenhuma execução do job de catálogo no intervalo (`sync_log` com
+`catalog_reference`). Pelo contrato `catalog_reference_apply_v1`, só o job escreve essas
+tabelas, e as leituras do catálogo não gravam (BT-CAT-02). O valor observado é o número de
+linhas.
+
+1. Uma rota voltou a gravar? A guarda `server/test/catalog_routes_read_only_guard_test.dart`
+   barra no código; confira o deploy mais recente.
+2. Alguém rodou um CLI antigo de cartas ou SQL à mão? Os CLIs de sync deixam linha própria em
+   `sync_log`.
+3. O alerta fecha na avaliação seguinte, se nada mais for escrito.
+
+## catalog_read_upstream
+
+Uma leitura do catálogo (`/cards`, `/sets` ou `/rules`) tentou abrir conexão com um serviço de
+fora. A API bloqueou a chamada (a leitura responde erro) e contou em
+`catalog_read_guard.upstream_blocked` de `/health/metrics`. Leitura do catálogo não chama a
+Scryfall (D-35): a sincronização é só do job.
+
+1. Qual rota? O log da API tem `catalog_read_upstream_blocked` com o caminho.
+2. A contagem é da réplica desde o último início; o alerta fecha com o conserto e o redeploy.

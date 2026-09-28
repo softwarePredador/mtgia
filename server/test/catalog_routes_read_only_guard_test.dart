@@ -28,13 +28,32 @@ void main() {
       'routes/rules',
     ]) {
       for (final entity in Directory(directory).listSync(recursive: true)) {
-        if (entity is File && entity.path.endsWith('.dart')) {
+        if (entity is File &&
+            entity.path.endsWith('.dart') &&
+            p.basename(entity.path) != '_middleware.dart') {
           files.add(p.normalize(entity.path));
         }
       }
     }
     return files..sort();
   }
+
+  // BT-CAT-03: o guarda de chamada a terceiro fica no middleware de cada raiz.
+  const middlewares = [
+    'routes/cards/_middleware.dart',
+    'routes/rules/_middleware.dart',
+    'routes/sets/_middleware.dart',
+  ];
+
+  test('as três raízes do catálogo passam pelo guarda de leitura', () {
+    for (final path in middlewares) {
+      expect(
+        File(path).readAsStringSync(),
+        contains('handler.use(catalogReadGuard())'),
+        reason: path,
+      );
+    }
+  });
 
   test('o inventário cobre as 7 rotas de catálogo', () {
     expect(catalogRoutes(), [
@@ -52,7 +71,7 @@ void main() {
     'rotas de catálogo e suas bibliotecas não gravam nem chamam terceiro',
     () {
       final checked = <String>{};
-      for (final route in catalogRoutes()) {
+      for (final route in [...catalogRoutes(), ...middlewares]) {
         checked.add(route);
         final source = File(route).readAsStringSync();
         for (final match in libImport.allMatches(source)) {
@@ -61,6 +80,7 @@ void main() {
       }
 
       expect(checked, contains('lib/catalog_read_contract.dart'));
+      expect(checked, contains('lib/catalog_read_guard.dart'));
       for (final path in checked) {
         final source = File(path).readAsStringSync();
         expect(source, isNot(matches(httpClient)), reason: path);

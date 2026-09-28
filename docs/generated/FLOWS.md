@@ -68,8 +68,8 @@ sequenceDiagram
     Cards_API->>Flutter: cards, disponibilidade e fallback
 ```
 
-Implementação: `app/lib/features/cards/providers/card_provider.dart`, `app/lib/features/collection/screens/sets_catalog_screen.dart`, `server/routes/cards/index.dart`, `server/routes/sets/index.dart`.
-Testes: `app/test/features/cards/providers/card_provider_search_test.dart`, `app/test/features/collection/sets_catalog_screen_test.dart`.
+Implementação: `app/lib/features/cards/providers/card_provider.dart`, `app/lib/features/collection/screens/sets_catalog_screen.dart`, `server/routes/cards/index.dart`, `server/routes/sets/index.dart`, `server/lib/catalog_read_guard.dart`.
+Testes: `app/test/features/cards/providers/card_provider_search_test.dart`, `app/test/features/collection/sets_catalog_screen_test.dart`, `server/test/catalog_read_guard_test.dart`.
 Gates: `scripts/quality_gate.sh`.
 
 ## Fichário, importação de coleção e scanner

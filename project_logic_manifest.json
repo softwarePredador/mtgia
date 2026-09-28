@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c7200927cc0344ecb7981d9489906a36ba094132873cae15f5ba511727549fc3",
+  "source_digest_sha256": "9e619238a120f430057e01b5dda33b62ca4056d73f407aa79d8ff7e4e019b15c",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,16 +63,16 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 701,
+    "dart_source_files": 705,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5298,
-    "semantic_resolved_files": 701,
+    "dart_symbols": 5305,
+    "semantic_resolved_files": 705,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43111,
-    "semantic_resolved_call_sites": 68553,
-    "semantic_resolved_type_references": 16340,
-    "modules": 161,
+    "semantic_resolved_call_edges": 43126,
+    "semantic_resolved_call_sites": 68569,
+    "semantic_resolved_type_references": 16352,
+    "modules": 162,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
@@ -81,7 +81,7 @@
     "migrations": 64,
     "scripts_and_jobs": 699,
     "environment_variables": 717,
-    "tests": 1273,
+    "tests": 1275,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 245,
@@ -1144,6 +1144,17 @@
       "services": []
     },
     {
+      "id": "server/lib/catalog_read_guard",
+      "layer": "server",
+      "files": [
+        "server/lib/catalog_read_guard.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 3,
+      "providers": [],
+      "services": []
+    },
+    {
       "id": "server/lib/catalog_search_rate_limit",
       "layer": "server",
       "files": [
@@ -1954,7 +1965,7 @@
         "server/lib/rate_limit_middleware.dart"
       ],
       "file_count": 1,
-      "symbol_count": 27,
+      "symbol_count": 28,
       "providers": [],
       "services": []
     },
@@ -2249,13 +2260,14 @@
       "layer": "server",
       "files": [
         "server/routes/cards/[id]/rulings/index.dart",
+        "server/routes/cards/_middleware.dart",
         "server/routes/cards/index.dart",
         "server/routes/cards/printings/index.dart",
         "server/routes/cards/resolve/batch/index.dart",
         "server/routes/cards/resolve/index.dart"
       ],
-      "file_count": 5,
-      "symbol_count": 14,
+      "file_count": 6,
+      "symbol_count": 15,
       "providers": [],
       "services": []
     },
@@ -2454,10 +2466,11 @@
       "id": "server/routes/rules",
       "layer": "server",
       "files": [
+        "server/routes/rules/_middleware.dart",
         "server/routes/rules/index.dart"
       ],
-      "file_count": 1,
-      "symbol_count": 4,
+      "file_count": 2,
+      "symbol_count": 5,
       "providers": [],
       "services": []
     },
@@ -2465,10 +2478,11 @@
       "id": "server/routes/sets",
       "layer": "server",
       "files": [
+        "server/routes/sets/_middleware.dart",
         "server/routes/sets/index.dart"
       ],
-      "file_count": 1,
-      "symbol_count": 1,
+      "file_count": 2,
+      "symbol_count": 2,
       "providers": [],
       "services": []
     },
@@ -32951,6 +32965,29 @@
       "line": 73
     },
     {
+      "name": "CatalogReadGuard",
+      "kind": "class",
+      "source": "server/lib/catalog_read_guard.dart",
+      "line": 8,
+      "members": [
+        "resetForTesting",
+        "snapshot",
+        "upstreamBlocked"
+      ]
+    },
+    {
+      "name": "CatalogUpstreamBlocked",
+      "kind": "class",
+      "source": "server/lib/catalog_read_guard.dart",
+      "line": 32
+    },
+    {
+      "name": "catalogReadGuard",
+      "kind": "function",
+      "source": "server/lib/catalog_read_guard.dart",
+      "line": 42
+    },
+    {
       "name": "_catalogRateLimitEnvironment",
       "kind": "function",
       "source": "server/lib/catalog_search_rate_limit.dart",
@@ -34371,6 +34408,8 @@
         "_clearExpired",
         "_sweepIfDue",
         "clearExpired",
+        "entryLimit",
+        "evictions",
         "get",
         "length",
         "set"
@@ -37063,7 +37102,7 @@
       "name": "CredentialEmailBucket",
       "kind": "enum",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 463
+      "line": 474
     },
     {
       "name": "RateLimiter",
@@ -37082,13 +37121,13 @@
       "name": "_accountScopedRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 578
+      "line": 589
     },
     {
       "name": "_aiRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 631
+      "line": 642
     },
     {
       "name": "_hasForwardedFor",
@@ -37124,7 +37163,7 @@
       "name": "_rateLimitIdentityUnavailable",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 272
+      "line": 283
     },
     {
       "name": "_rateLimitRuntimeEnvironment",
@@ -37148,25 +37187,25 @@
       "name": "accountReverificationRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 553
+      "line": 564
     },
     {
       "name": "aiPollingRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 623
+      "line": 634
     },
     {
       "name": "aiRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 615
+      "line": 626
     },
     {
       "name": "authRateLimit",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 371
+      "line": 382
     },
     {
       "name": "buildAiRateLimitIdentifier",
@@ -37196,37 +37235,43 @@
       "name": "credentialEmailRateLimitIdentifier",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 497
+      "line": 508
     },
     {
       "name": "credentialEmailRateLimitResponse",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 507
+      "line": 518
+    },
+    {
+      "name": "distributedAllowedOrNull",
+      "kind": "function",
+      "source": "server/lib/rate_limit_middleware.dart",
+      "line": 270
     },
     {
       "name": "isAuthCredentialAttempt",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 338
+      "line": 349
     },
     {
       "name": "overrideAccountReverificationRateLimiterForTesting",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 548
+      "line": 559
     },
     {
       "name": "overrideCredentialEmailRateLimiterForTesting",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 492
+      "line": 503
     },
     {
       "name": "rateLimitMiddleware",
       "kind": "function",
       "source": "server/lib/rate_limit_middleware.dart",
-      "line": 285
+      "line": 296
     },
     {
       "name": "ReleaseCapabilityDecision",
@@ -39502,6 +39547,12 @@
       "line": 5
     },
     {
+      "name": "middleware",
+      "kind": "function",
+      "source": "server/routes/cards/_middleware.dart",
+      "line": 5
+    },
+    {
       "name": "_QueryBuilder",
       "kind": "class",
       "source": "server/routes/cards/index.dart",
@@ -40510,7 +40561,7 @@
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/health/metrics/index.dart",
-      "line": 9
+      "line": 10
     },
     {
       "name": "onRequest",
@@ -40675,6 +40726,12 @@
       "line": 7
     },
     {
+      "name": "middleware",
+      "kind": "function",
+      "source": "server/routes/rules/_middleware.dart",
+      "line": 5
+    },
+    {
       "name": "_isTrue",
       "kind": "function",
       "source": "server/routes/rules/index.dart",
@@ -40696,6 +40753,12 @@
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/rules/index.dart",
+      "line": 5
+    },
+    {
+      "name": "middleware",
+      "kind": "function",
+      "source": "server/routes/sets/_middleware.dart",
       "line": 5
     },
     {
@@ -41122,7 +41185,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 701,
+    "resolved_file_count": 705,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41583,6 +41646,7 @@
       "server/lib/card_resolution_support.dart",
       "server/lib/card_validation_service.dart",
       "server/lib/catalog_read_contract.dart",
+      "server/lib/catalog_read_guard.dart",
       "server/lib/catalog_search_rate_limit.dart",
       "server/lib/collection_availability_contract.dart",
       "server/lib/color_identity.dart",
@@ -41731,6 +41795,7 @@
       "server/routes/binder/index.dart",
       "server/routes/capabilities/index.dart",
       "server/routes/cards/[id]/rulings/index.dart",
+      "server/routes/cards/_middleware.dart",
       "server/routes/cards/index.dart",
       "server/routes/cards/printings/index.dart",
       "server/routes/cards/resolve/batch/index.dart",
@@ -41806,7 +41871,9 @@
       "server/routes/notifications/read-all.dart",
       "server/routes/ready/index.dart",
       "server/routes/reports/[id].dart",
+      "server/routes/rules/_middleware.dart",
       "server/routes/rules/index.dart",
+      "server/routes/sets/_middleware.dart",
       "server/routes/sets/index.dart",
       "server/routes/trades/[id]/index.dart",
       "server/routes/trades/[id]/messages.dart",
@@ -41832,11 +41899,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43111,
-    "resolved_call_site_count": 68553,
-    "workspace_call_edge_count": 13508,
-    "unresolved_call_edge_count": 560,
-    "unresolved_call_site_count": 771,
+    "resolved_call_edge_count": 43126,
+    "resolved_call_site_count": 68569,
+    "workspace_call_edge_count": 13516,
+    "unresolved_call_edge_count": 562,
+    "unresolved_call_site_count": 773,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -156570,6 +156637,28 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/catalog_read_guard.dart",
+        "line": 54,
+        "caller": "catalogReadGuard",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/catalog_read_guard.dart",
+        "line": 55,
+        "caller": "catalogReadGuard",
+        "kind": "constructor",
+        "lexical_target": "CatalogUpstreamBlocked",
+        "target": "CatalogUpstreamBlocked.CatalogUpstreamBlocked",
+        "target_library": "package:server/catalog_read_guard.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/catalog_search_rate_limit.dart",
         "line": 100,
         "caller": "catalogTextSearchRateLimitDecision",
@@ -160322,7 +160411,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 20,
+        "line": 26,
         "caller": "EndpointCache.<constructor>",
         "kind": "constructor",
         "lexical_target": "EndpointCache._",
@@ -160333,7 +160422,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 22,
+        "line": 28,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "EndpointCache._",
@@ -160344,7 +160433,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 39,
+        "line": 57,
         "caller": "EndpointCache.get",
         "kind": "method",
         "lexical_target": "_sweepIfDue",
@@ -160355,7 +160444,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 55,
+        "line": 73,
         "caller": "EndpointCache.set",
         "kind": "method",
         "lexical_target": "_sweepIfDue",
@@ -160366,7 +160455,18 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 57,
+        "line": 78,
+        "caller": "EndpointCache.set",
+        "kind": "method",
+        "lexical_target": "_clearExpired",
+        "target": "EndpointCache._clearExpired",
+        "target_library": "package:server/endpoint_cache.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/endpoint_cache.dart",
+        "line": 84,
         "caller": "EndpointCache.set",
         "kind": "constructor",
         "lexical_target": "_CacheItem",
@@ -160377,7 +160477,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 60,
+        "line": 87,
         "caller": "EndpointCache.clearExpired",
         "kind": "method",
         "lexical_target": "_clearExpired",
@@ -160388,7 +160488,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 66,
+        "line": 93,
         "caller": "EndpointCache._sweepIfDue",
         "kind": "method",
         "lexical_target": "_clearExpired",
@@ -166713,6 +166813,17 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
+        "line": 258,
+        "caller": "_isAllowedDistributedIfAvailable",
+        "kind": "method",
+        "lexical_target": "distributedAllowedOrNull",
+        "target": "distributedAllowedOrNull",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
         "line": 260,
         "caller": "_isAllowedDistributedIfAvailable",
         "kind": "constructor",
@@ -166735,7 +166846,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 291,
+        "line": 302,
         "caller": "rateLimitMiddleware",
         "kind": "constructor",
         "lexical_target": "RateLimiter",
@@ -166746,7 +166857,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 301,
+        "line": 312,
         "caller": "rateLimitMiddleware",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -166757,7 +166868,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 304,
+        "line": 315,
         "caller": "rateLimitMiddleware",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -166768,7 +166879,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 311,
+        "line": 322,
         "caller": "rateLimitMiddleware",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
@@ -166779,7 +166890,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 380,
+        "line": 391,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "isAuthCredentialAttempt",
@@ -166790,7 +166901,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 384,
+        "line": 395,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -166801,7 +166912,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 385,
+        "line": 396,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_isProductionEnvironment",
@@ -166812,7 +166923,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 389,
+        "line": 400,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_requestRemoteAddress",
@@ -166823,7 +166934,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 390,
+        "line": 401,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "resolveRateLimitClientIdentity",
@@ -166834,7 +166945,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 396,
+        "line": 407,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_logIdentityFailure",
@@ -166845,7 +166956,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 402,
+        "line": 413,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitIdentityUnavailable",
@@ -166856,7 +166967,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 410,
+        "line": 421,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "_isAllowedDistributedIfAvailable",
@@ -166867,7 +166978,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 421,
+        "line": 432,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -166878,7 +166989,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 428,
+        "line": 439,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
@@ -166889,7 +167000,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 440,
+        "line": 451,
         "caller": "authRateLimit",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -166900,7 +167011,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 515,
+        "line": 526,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -166911,7 +167022,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 516,
+        "line": 527,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_accountScopedRateLimitResponse",
@@ -166922,7 +167033,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 519,
+        "line": 530,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "credentialEmailRateLimitIdentifier",
@@ -166933,7 +167044,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 522,
+        "line": 533,
         "caller": "credentialEmailRateLimitResponse",
         "kind": "method",
         "lexical_target": "_isProductionEnvironment",
@@ -166955,39 +167066,6 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 562,
-        "caller": "accountReverificationRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "_rateLimitRuntimeEnvironment",
-        "target": "_rateLimitRuntimeEnvironment",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 563,
-        "caller": "accountReverificationRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "_accountScopedRateLimitResponse",
-        "target": "_accountScopedRateLimitResponse",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 569,
-        "caller": "accountReverificationRateLimitResponse",
-        "kind": "method",
-        "lexical_target": "_isProductionEnvironment",
-        "target": "_isProductionEnvironment",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
         "line": 57,
         "caller": "RateLimiter._defaultIdentifier",
         "kind": "method",
@@ -166999,7 +167077,40 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 585,
+        "line": 573,
+        "caller": "accountReverificationRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "_rateLimitRuntimeEnvironment",
+        "target": "_rateLimitRuntimeEnvironment",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 574,
+        "caller": "accountReverificationRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "_accountScopedRateLimitResponse",
+        "target": "_accountScopedRateLimitResponse",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 580,
+        "caller": "accountReverificationRateLimitResponse",
+        "kind": "method",
+        "lexical_target": "_isProductionEnvironment",
+        "target": "_isProductionEnvironment",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 596,
         "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
         "lexical_target": "_isAllowedDistributedIfAvailable",
@@ -167010,7 +167121,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 593,
+        "line": 604,
         "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -167021,7 +167132,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 598,
+        "line": 609,
         "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -167032,22 +167143,11 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 607,
+        "line": 618,
         "caller": "_accountScopedRateLimitResponse",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
         "target": "buildRateLimitHeaders",
-        "target_library": "package:server/rate_limit_middleware.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/rate_limit_middleware.dart",
-        "line": 616,
-        "caller": "aiRateLimit",
-        "kind": "method",
-        "lexical_target": "_aiRateLimit",
-        "target": "_aiRateLimit",
         "target_library": "package:server/rate_limit_middleware.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -167065,7 +167165,18 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 624,
+        "line": 627,
+        "caller": "aiRateLimit",
+        "kind": "method",
+        "lexical_target": "_aiRateLimit",
+        "target": "_aiRateLimit",
+        "target_library": "package:server/rate_limit_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 635,
         "caller": "aiPollingRateLimit",
         "kind": "method",
         "lexical_target": "_aiRateLimit",
@@ -167076,7 +167187,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 639,
+        "line": 650,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "matches",
@@ -167087,7 +167198,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 643,
+        "line": 654,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitRuntimeEnvironment",
@@ -167098,7 +167209,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 645,
+        "line": 656,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_isProductionEnvironment",
@@ -167109,7 +167220,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 659,
+        "line": 670,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_requestRemoteAddress",
@@ -167120,7 +167231,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 660,
+        "line": 671,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "resolveRateLimitClientIdentity",
@@ -167131,7 +167242,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 666,
+        "line": 677,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_logIdentityFailure",
@@ -167142,7 +167253,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 672,
+        "line": 683,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_rateLimitIdentityUnavailable",
@@ -167153,7 +167264,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 678,
+        "line": 689,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "_isAllowedDistributedIfAvailable",
@@ -167164,7 +167275,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 689,
+        "line": 700,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitResponseBody",
@@ -167175,7 +167286,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 697,
+        "line": 708,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "buildRateLimitHeaders",
@@ -167186,7 +167297,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 709,
+        "line": 720,
         "caller": "_aiRateLimit",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -181232,6 +181343,17 @@
         "occurrences": 1
       },
       {
+        "source": "server/routes/cards/_middleware.dart",
+        "line": 6,
+        "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "catalogReadGuard",
+        "target": "catalogReadGuard",
+        "target_library": "package:server/catalog_read_guard.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/routes/cards/index.dart",
         "line": 132,
         "caller": "onRequest",
@@ -187338,7 +187460,7 @@
       },
       {
         "source": "server/routes/health/metrics/index.dart",
-        "line": 14,
+        "line": 16,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -187349,12 +187471,23 @@
       },
       {
         "source": "server/routes/health/metrics/index.dart",
-        "line": 17,
+        "line": 19,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "snapshot",
         "target": "RequestMetricsService.snapshot",
         "target_library": "package:server/request_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/health/metrics/index.dart",
+        "line": 31,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "snapshot",
+        "target": "CatalogReadGuard.snapshot",
+        "target_library": "package:server/catalog_read_guard.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -188668,6 +188801,17 @@
         "occurrences": 1
       },
       {
+        "source": "server/routes/rules/_middleware.dart",
+        "line": 6,
+        "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "catalogReadGuard",
+        "target": "catalogReadGuard",
+        "target_library": "package:server/catalog_read_guard.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/routes/rules/index.dart",
         "line": 22,
         "caller": "_searchRules",
@@ -188697,6 +188841,17 @@
         "lexical_target": "_searchRules",
         "target": "_searchRules",
         "target_library": "workspace:server/routes/rules/index.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/sets/_middleware.dart",
+        "line": 6,
+        "caller": "middleware",
+        "kind": "method",
+        "lexical_target": "catalogReadGuard",
+        "target": "catalogReadGuard",
+        "target_library": "package:server/catalog_read_guard.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -190432,8 +190587,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:_http",
-        "unique_references": 8,
-        "occurrences": 8
+        "unique_references": 9,
+        "occurrences": 9
       },
       {
         "target_scope": "dart_sdk",
@@ -190456,8 +190611,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14370,
-        "occurrences": 24963
+        "unique_references": 14373,
+        "occurrences": 24967
       },
       {
         "target_scope": "dart_sdk",
@@ -190570,8 +190725,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
-        "unique_references": 17,
-        "occurrences": 39
+        "unique_references": 20,
+        "occurrences": 42
       },
       {
         "target_scope": "dependency",
@@ -194241,6 +194396,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/catalog_read_guard.dart",
+        "unique_references": 5,
+        "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/catalog_search_rate_limit.dart",
         "unique_references": 10,
         "occurrences": 14
@@ -194500,8 +194661,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/endpoint_cache.dart",
-        "unique_references": 15,
-        "occurrences": 18
+        "unique_references": 16,
+        "occurrences": 19
       },
       {
         "target_scope": "workspace",
@@ -194566,8 +194727,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 177,
-        "occurrences": 302
+        "unique_references": 178,
+        "occurrences": 303
       },
       {
         "target_scope": "workspace",
@@ -194782,8 +194943,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/rate_limit_middleware.dart",
-        "unique_references": 60,
-        "occurrences": 75
+        "unique_references": 61,
+        "occurrences": 76
       },
       {
         "target_scope": "workspace",
@@ -199614,6 +199775,14 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/catalog_read_guard.dart",
+        "line": 51,
+        "caller": "catalogReadGuard",
+        "kind": "function_expression",
+        "lexical_target": "handler",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/catalog_search_rate_limit.dart",
         "line": 103,
         "caller": "catalogTextSearchRateLimitDecision",
@@ -199671,7 +199840,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 38,
+        "line": 56,
         "caller": "EndpointCache.get",
         "kind": "function_expression",
         "lexical_target": "_clock",
@@ -199679,7 +199848,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 54,
+        "line": 72,
         "caller": "EndpointCache.set",
         "kind": "function_expression",
         "lexical_target": "_clock",
@@ -199687,7 +199856,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 60,
+        "line": 87,
         "caller": "EndpointCache.clearExpired",
         "kind": "function_expression",
         "lexical_target": "_clock",
@@ -199943,7 +200112,15 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 299,
+        "line": 277,
+        "caller": "distributedAllowedOrNull",
+        "kind": "function_expression",
+        "lexical_target": "check",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/rate_limit_middleware.dart",
+        "line": 310,
         "caller": "rateLimitMiddleware",
         "kind": "function_expression",
         "lexical_target": "limiter.identifier",
@@ -199951,7 +200128,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 320,
+        "line": 331,
         "caller": "rateLimitMiddleware",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -199959,7 +200136,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 381,
+        "line": 392,
         "caller": "authRateLimit",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -199967,7 +200144,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 640,
+        "line": 651,
         "caller": "_aiRateLimit",
         "kind": "function_expression",
         "lexical_target": "handler",
@@ -200150,9 +200327,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16340,
-    "workspace_type_reference_count": 3457,
-    "unresolved_type_reference_count": 357,
+    "resolved_type_reference_count": 16352,
+    "workspace_type_reference_count": 3458,
+    "unresolved_type_reference_count": 358,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -229476,6 +229653,16 @@
         "occurrences": 12
       },
       {
+        "source": "server/lib/catalog_read_guard.dart",
+        "line": 55,
+        "lexical_type": "CatalogUpstreamBlocked",
+        "resolved_type": "CatalogUpstreamBlocked",
+        "target": "CatalogUpstreamBlocked",
+        "target_library": "package:server/catalog_read_guard.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/catalog_search_rate_limit.dart",
         "line": 25,
         "lexical_type": "RateLimiter",
@@ -230027,7 +230214,7 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 20,
+        "line": 26,
         "lexical_type": "EndpointCache",
         "resolved_type": "EndpointCache",
         "target": "EndpointCache",
@@ -230037,13 +230224,13 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 31,
+        "line": 42,
         "lexical_type": "_CacheItem",
         "resolved_type": "_CacheItem",
         "target": "_CacheItem",
         "target_library": "package:server/endpoint_cache.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "source": "server/lib/generated_deck_validation_service.dart",
@@ -231467,7 +231654,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 377,
+        "line": 388,
         "lexical_type": "RateLimiter?",
         "resolved_type": "RateLimiter?",
         "target": "RateLimiter",
@@ -231477,7 +231664,7 @@
       },
       {
         "source": "server/lib/rate_limit_middleware.dart",
-        "line": 513,
+        "line": 524,
         "lexical_type": "CredentialEmailBucket",
         "resolved_type": "CredentialEmailBucket",
         "target": "CredentialEmailBucket",
@@ -234736,8 +234923,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1092,
-        "occurrences": 2203
+        "unique_references": 1093,
+        "occurrences": 2205
       },
       {
         "target_scope": "dart_sdk",
@@ -234754,8 +234941,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6308,
-        "occurrences": 39965
+        "unique_references": 6314,
+        "occurrences": 39982
       },
       {
         "target_scope": "dart_sdk",
@@ -234844,14 +235031,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/handler.dart",
-        "unique_references": 17,
-        "occurrences": 35
+        "unique_references": 20,
+        "occurrences": 41
       },
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/middleware.dart",
-        "unique_references": 6,
-        "occurrences": 10
+        "unique_references": 7,
+        "occurrences": 11
       },
       {
         "target_scope": "dependency",
@@ -238113,6 +238300,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/catalog_read_guard.dart",
+        "unique_references": 1,
+        "occurrences": 1
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/commander_bracket.dart",
         "unique_references": 1,
         "occurrences": 5
@@ -238259,7 +238452,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/endpoint_cache.dart",
         "unique_references": 2,
-        "occurrences": 5
+        "occurrences": 6
       },
       {
         "target_scope": "workspace",
@@ -240622,6 +240815,12 @@
         "occurrences": 6
       },
       {
+        "source": "server/lib/catalog_read_guard.dart",
+        "line": 29,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/catalog_search_rate_limit.dart",
         "line": 38,
         "lexical_type": "void",
@@ -240653,13 +240852,13 @@
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 16,
+        "line": 19,
         "lexical_type": "DateTime",
         "occurrences": 1
       },
       {
         "source": "server/lib/endpoint_cache.dart",
-        "line": 49,
+        "line": 67,
         "lexical_type": "void",
         "occurrences": 4
       },
@@ -252978,7 +253177,8 @@
       ],
       "source": "server/routes/cards/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/cards/_middleware.dart"
       ],
       "tests": [
         "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
@@ -253003,7 +253203,8 @@
       ],
       "source": "server/routes/cards/printings/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/cards/_middleware.dart"
       ],
       "tests": [
         "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
@@ -253028,7 +253229,8 @@
       ],
       "source": "server/routes/cards/resolve/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/cards/_middleware.dart"
       ],
       "tests": [
         "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
@@ -253053,7 +253255,8 @@
       ],
       "source": "server/routes/cards/resolve/batch/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/cards/_middleware.dart"
       ],
       "tests": [
         "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
@@ -253078,7 +253281,8 @@
       ],
       "source": "server/routes/cards/[id]/rulings/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/cards/_middleware.dart"
       ],
       "tests": [
         "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
@@ -254224,7 +254428,8 @@
       ],
       "source": "server/routes/rules/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/rules/_middleware.dart"
       ],
       "tests": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
@@ -254249,7 +254454,8 @@
       ],
       "source": "server/routes/sets/index.dart",
       "middleware": [
-        "server/routes/_middleware.dart"
+        "server/routes/_middleware.dart",
+        "server/routes/sets/_middleware.dart"
       ],
       "tests": [
         "app/integration_test/sets_catalog_runtime_test.dart",
@@ -275452,6 +275658,7 @@
     "server/test/cards_resolve_read_only_test.dart",
     "server/test/cards_route_test.dart",
     "server/test/catalog_card_demand_log_test.dart",
+    "server/test/catalog_read_guard_test.dart",
     "server/test/catalog_routes_read_only_guard_test.dart",
     "server/test/catalog_search_rate_limit_test.dart",
     "server/test/cmc_safety_test.dart",
@@ -275544,6 +275751,7 @@
     "server/test/edhrec_service_authorization_test.dart",
     "server/test/email_verification_contract_test.dart",
     "server/test/email_verification_live_test.dart",
+    "server/test/endpoint_cache_cap_test.dart",
     "server/test/endpoint_cache_ttl_test.dart",
     "server/test/error_contract_test.dart",
     "server/test/experimental_deck_ai_authorization_source_test.dart",
@@ -275977,7 +276185,8 @@
         "app/lib/features/cards/providers/card_provider.dart",
         "app/lib/features/collection/screens/sets_catalog_screen.dart",
         "server/routes/cards/index.dart",
-        "server/routes/sets/index.dart"
+        "server/routes/sets/index.dart",
+        "server/lib/catalog_read_guard.dart"
       ],
       "storage": [
         "cards",
@@ -275986,7 +276195,8 @@
       ],
       "tests": [
         "app/test/features/cards/providers/card_provider_search_test.dart",
-        "app/test/features/collection/sets_catalog_screen_test.dart"
+        "app/test/features/collection/sets_catalog_screen_test.dart",
+        "server/test/catalog_read_guard_test.dart"
       ],
       "gates": [
         "scripts/quality_gate.sh"
@@ -277091,7 +277301,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "0d1f61b2f9c20a6a3952019535c77b2ded587715392e5ab0d6e4c2784a96931f"
+      "sha256": "12fe941644658bcf005386d148f0aa8f9d03d211507eaf4e28e6393fe62c8e2f"
     },
     "required_task_fields": [
       "id",
@@ -277986,13 +278196,13 @@
       {
         "id": "BT-CAT-03",
         "priority": "P0 CORE",
-        "status": "IN_PROGRESS_CONTAINED",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Rate limit/cache/freshness/observabilidade do catálogo.",
         "depends_on": [
           "BT-CAT-01",
           "BT-CAT-02"
         ],
-        "acceptance": "Limiter-down fail-closed quando caro; alerta de DML/upstream em leitura >0. Medição de 2026-09-22 (`docs/flows/_p0/catalogo-arte.md`): metade pode andar hoje (rate limit, fail-closed e teto do cache). Decisão do dono em 2026-09-22: D-36, catálogo com mais de 7 dias dispara alerta sem bloquear a leitura; leitura cara é busca textual sem filtro, com limite por IP. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `GET /cards` com `name` e sem `set` nem `id` (a busca textual sem filtro) passa por limite por IP antes de tocar o banco (`server/lib/catalog_search_rate_limit.dart`: 60 por minuto em produção no contador distribuído, 429 `catalog_search_rate_limited`; contador fora do ar ou origem não validada dá 503 fail-closed); as outras leituras seguem sem esse limite. O job do `BT-CAT-01` mede a idade do catálogo em toda execução, pela data da fonte aplicada ou pelo último sync: com mais de 7 dias o receipt marca `catalog_stale`, o stderr leva `MANALOOM_CATALOG_FRESHNESS_ALERT` e o modo agendado sai com 3, que o daemon registra como erro e o relatório do governor mostra; a leitura nunca consulta o frescor, então nada é bloqueado. O alerta dispara mesmo com o contrato inativo, que será o caso da produção quando a imagem de ops com o job subir (catálogo de 2026-06-06, contrato inativo até a ativação supervisionada). Evidência: `server/test/catalog_search_rate_limit_test.dart` (classificação da leitura cara, 429 por IP, contador distribuído, fail-closed e rota que responde antes de consultar), `server/test/sync_catalog_reference_from_scryfall_test.py` (limite de 7 dias, data da fonte, alerta com o contrato inativo e sem alerta depois do apply) e o teste em PostgreSQL descartável com relógio fixo. Falta: o alerta de DML/upstream em leitura existe como guarda de teste (`server/test/catalog_routes_read_only_guard_test.dart` e os testes de comportamento do `BT-CAT-02`), não como contador em execução; o teto de entradas do `EndpointCache` e o `return await` de `server/lib/rate_limit_middleware.dart:263` não foram mexidos (arquivos compartilhados com outras frentes). No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Depois da ativação do `BT-CAT-01` (2026-09-23, 15:34 UTC), o alerta de frescor apagou: catálogo com 0,27 dia.",
+        "acceptance": "Limiter-down fail-closed quando caro; alerta de DML/upstream em leitura >0. Medição de 2026-09-22 (`docs/flows/_p0/catalogo-arte.md`): metade pode andar hoje (rate limit, fail-closed e teto do cache). Decisão do dono em 2026-09-22: D-36, catálogo com mais de 7 dias dispara alerta sem bloquear a leitura; leitura cara é busca textual sem filtro, com limite por IP. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `GET /cards` com `name` e sem `set` nem `id` (a busca textual sem filtro) passa por limite por IP antes de tocar o banco (`server/lib/catalog_search_rate_limit.dart`: 60 por minuto em produção no contador distribuído, 429 `catalog_search_rate_limited`; contador fora do ar ou origem não validada dá 503 fail-closed); as outras leituras seguem sem esse limite. O job do `BT-CAT-01` mede a idade do catálogo em toda execução, pela data da fonte aplicada ou pelo último sync: com mais de 7 dias o receipt marca `catalog_stale`, o stderr leva `MANALOOM_CATALOG_FRESHNESS_ALERT` e o modo agendado sai com 3, que o daemon registra como erro e o relatório do governor mostra; a leitura nunca consulta o frescor, então nada é bloqueado. O alerta dispara mesmo com o contrato inativo, que será o caso da produção quando a imagem de ops com o job subir (catálogo de 2026-06-06, contrato inativo até a ativação supervisionada). Evidência: `server/test/catalog_search_rate_limit_test.dart` (classificação da leitura cara, 429 por IP, contador distribuído, fail-closed e rota que responde antes de consultar), `server/test/sync_catalog_reference_from_scryfall_test.py` (limite de 7 dias, data da fonte, alerta com o contrato inativo e sem alerta depois do apply) e o teste em PostgreSQL descartável com relógio fixo. Falta: o alerta de DML/upstream em leitura existe como guarda de teste (`server/test/catalog_routes_read_only_guard_test.dart` e os testes de comportamento do `BT-CAT-02`), não como contador em execução; o teto de entradas do `EndpointCache` e o `return await` de `server/lib/rate_limit_middleware.dart:263` não foram mexidos (arquivos compartilhados com outras frentes). No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Depois da ativação do `BT-CAT-01` (2026-09-23, 15:34 UTC), o alerta de frescor apagou: catálogo com 0,27 dia. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção nem o job de catálogo, o que faltava: (1) o alerta de chamada a terceiro numa leitura virou contador em execução: `/cards`, `/sets` e `/rules` passam pelo middleware de `server/lib/catalog_read_guard.dart`, que bloqueia e conta qualquer cliente HTTP aberto numa leitura (inclusive o do `package:http`) antes de conectar; `/health/metrics` publica `catalog_read_guard.upstream_blocked`, e o avaliador de SLO alerta com uma só tentativa (`catalog_read_upstream`, crítico); (2) a escrita nas tabelas do catálogo fora do job é vigiada no PostgreSQL, qualquer que seja a origem: o avaliador compara as linhas inseridas, atualizadas e apagadas em `cards`, `sets` e `card_legalities` (`pg_stat_user_tables`) com a avaliação anterior e alerta (`catalog_written_outside_job`, crítico) quando elas mudam sem execução do job no intervalo (`sync_log` com `catalog_reference`); (3) o `EndpointCache` tem teto de 10.000 entradas por réplica (no teto saem as vencidas e depois as gravadas há mais tempo; o teto e `endpoint_cache_evictions` saem em `/health/metrics`); (4) o `await` do contador distribuído ficou dentro do `try` (`distributedAllowedOrNull` em `server/lib/rate_limit_middleware.dart`): falha do PostgreSQL cai no contador em memória em vez de virar 500. Achado corrigido junto: o `catalog_stale` do avaliador do `BT-OBS-001` lia os tipos antigos do `sync_log` (`cards` e `card_legalities`), que o job ativo não grava (ele grava `catalog_reference:*`), e alertaria sempre depois de ligado; agora lê o frescor pela regra do job (`catalog_reference_source_updated_at` e, sem ela, `cards_last_sync_at`, em `sync_state`). Evidência (`docs/qa/execution/2026-09-28/BT-CAT-03-guarda-e-alertas-do-catalogo.md`): `server/test/catalog_read_guard_test.dart` (5), `server/test/endpoint_cache_cap_test.dart` (4), os testes de rate limit, métricas e guarda das rotas atualizados, `server/test/slo_alerts_test.py` (24) e `server/test/slo_alerts_db_live_test.py` (2, `RUN_SCHEMA_DB_TESTS=1`); 16 mutações falham como esperado. Segue aberto: as regras só valem na produção com o ops configurado (`BT-OBS-001`); o `sync=true` que o app ainda envia é da raia do app.",
         "section": "P0",
         "source_line": 444
       },
@@ -284237,6 +284447,7 @@
           }
         ],
         "flow_producers": [
+          "server/lib/catalog_read_guard.dart",
           "server/routes/cards/index.dart",
           "server/routes/sets/index.dart"
         ],
@@ -284271,6 +284482,7 @@
           }
         ],
         "flow_producers": [
+          "server/lib/catalog_read_guard.dart",
           "server/routes/cards/index.dart",
           "server/routes/sets/index.dart"
         ],
@@ -284305,6 +284517,7 @@
           }
         ],
         "flow_producers": [
+          "server/lib/catalog_read_guard.dart",
           "server/routes/cards/index.dart",
           "server/routes/sets/index.dart"
         ],
@@ -286296,6 +286509,7 @@
         "flow_id": "card_collection",
         "entrypoint": "GET /cards",
         "flow_producers": [
+          "server/lib/catalog_read_guard.dart",
           "server/routes/cards/index.dart",
           "server/routes/sets/index.dart"
         ],
@@ -286308,6 +286522,7 @@
         "flow_id": "card_collection",
         "entrypoint": "GET /sets",
         "flow_producers": [
+          "server/lib/catalog_read_guard.dart",
           "server/routes/cards/index.dart",
           "server/routes/sets/index.dart"
         ],
@@ -287032,7 +287247,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c7200927cc0344ecb7981d9489906a36ba094132873cae15f5ba511727549fc3"
+    "project_logic_source_digest_sha256": "9e619238a120f430057e01b5dda33b62ca4056d73f407aa79d8ff7e4e019b15c"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -289556,6 +289771,7 @@
       "server/lib/card_resolution_support.dart",
       "server/lib/card_validation_service.dart",
       "server/lib/catalog_read_contract.dart",
+      "server/lib/catalog_read_guard.dart",
       "server/lib/catalog_search_rate_limit.dart",
       "server/lib/collection_availability_contract.dart",
       "server/lib/color_identity.dart",
@@ -289706,6 +289922,7 @@
       "server/routes/binder/index.dart",
       "server/routes/capabilities/index.dart",
       "server/routes/cards/[id]/rulings/index.dart",
+      "server/routes/cards/_middleware.dart",
       "server/routes/cards/index.dart",
       "server/routes/cards/printings/index.dart",
       "server/routes/cards/resolve/batch/index.dart",
@@ -289781,7 +289998,9 @@
       "server/routes/notifications/read-all.dart",
       "server/routes/ready/index.dart",
       "server/routes/reports/[id].dart",
+      "server/routes/rules/_middleware.dart",
       "server/routes/rules/index.dart",
+      "server/routes/sets/_middleware.dart",
       "server/routes/sets/index.dart",
       "server/routes/trades/[id]/index.dart",
       "server/routes/trades/[id]/messages.dart",
@@ -289916,6 +290135,7 @@
       "server/test/cards_resolve_read_only_test.dart",
       "server/test/cards_route_test.dart",
       "server/test/catalog_card_demand_log_test.dart",
+      "server/test/catalog_read_guard_test.dart",
       "server/test/catalog_routes_read_only_guard_test.dart",
       "server/test/catalog_search_rate_limit_test.dart",
       "server/test/cmc_safety_test.dart",
@@ -290008,6 +290228,7 @@
       "server/test/edhrec_service_authorization_test.dart",
       "server/test/email_verification_contract_test.dart",
       "server/test/email_verification_live_test.dart",
+      "server/test/endpoint_cache_cap_test.dart",
       "server/test/endpoint_cache_ttl_test.dart",
       "server/test/error_contract_test.dart",
       "server/test/experimental_deck_ai_authorization_source_test.dart",

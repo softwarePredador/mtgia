@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy": "brewtact-slo-alerts",
-  "version": "2026-09-24.1",
+  "version": "2026-09-28.1",
   "task": "BT-OBS-001",
   "decisions": [
     "D-47",
@@ -107,7 +107,7 @@
     },
     "catalog_stale": {
       "severity": "warning",
-      "source": "sync_log (último sync com sucesso de cards e card_legalities), em transação READ ONLY",
+      "source": "sync_state do job de catálogo (catalog_reference_source_updated_at e, sem ela, cards_last_sync_at, a mesma regra do job), em transação READ ONLY",
       "max_age_days": 7,
       "summary": "O catálogo de cartas está com mais de 7 dias.",
       "runbook": "catalog_stale"
@@ -118,6 +118,18 @@
       "max_entries": 5000,
       "summary": "O cache de rotas em memória passou de 5.000 entradas.",
       "runbook": "endpoint_cache_large"
+    },
+    "catalog_written_outside_job": {
+      "severity": "critical",
+      "source": "pg_stat_user_tables (linhas inseridas, atualizadas e apagadas em cards, sets e card_legalities) contra a avaliação anterior, e a última execução do job de catálogo em sync_log, em transação READ ONLY",
+      "summary": "As tabelas do catálogo mudaram sem execução do job de catálogo no intervalo: uma leitura que grava, um CLI antigo ou SQL à mão.",
+      "runbook": "catalog_written_outside_job"
+    },
+    "catalog_read_upstream": {
+      "severity": "critical",
+      "source": "catalog_read_guard.upstream_blocked de /health/metrics",
+      "summary": "Uma leitura do catálogo tentou chamar um serviço de fora; a API bloqueou e contou.",
+      "runbook": "catalog_read_upstream"
     }
   },
   "thresholds_status": "proposta_pendente_do_dono",
@@ -128,7 +140,9 @@
     "postgres_connections_high": "O mesmo limite da política de capacidade (BT-CAP-001).",
     "job_overdue": "30 minutos de tolerância cobrem um job longo que ainda está rodando.",
     "catalog_stale": "A D-18 exige cartas com menos de 7 dias para o GO.",
-    "endpoint_cache_large": "O cache é por réplica e sem teto de entradas; acima de 5.000 respostas guardadas ele passa a pesar na memória da API.",
+    "endpoint_cache_large": "O cache é por réplica e tem teto de 10.000 entradas (as mais antigas saem primeiro, BT-CAT-03); acima de 5.000 respostas guardadas ele já pesa na memória da API.",
+    "catalog_written_outside_job": "O contrato catalog_reference_apply_v1 (BT-CAT-01) deixa só o job escrever cards, sets e card_legalities, e as leituras não gravam (BT-CAT-02); qualquer linha escrita fora de uma execução do job é o que o aceite do BT-CAT-03 manda alertar.",
+    "catalog_read_upstream": "Leitura do catálogo não chama a Scryfall (D-35); a API bloqueia a tentativa, e uma só já é o alerta do aceite do BT-CAT-03.",
     "consecutive": "Duas avaliações seguidas (10 minutos) antes de acordar alguém por queda ou lentidão."
   },
   "receiver": {

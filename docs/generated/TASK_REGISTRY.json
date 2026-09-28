@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "0d1f61b2f9c20a6a3952019535c77b2ded587715392e5ab0d6e4c2784a96931f"
+    "sha256": "12fe941644658bcf005386d148f0aa8f9d03d211507eaf4e28e6393fe62c8e2f"
   },
   "required_task_fields": [
     "id",
@@ -897,13 +897,13 @@
     {
       "id": "BT-CAT-03",
       "priority": "P0 CORE",
-      "status": "IN_PROGRESS_CONTAINED",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Rate limit/cache/freshness/observabilidade do catálogo.",
       "depends_on": [
         "BT-CAT-01",
         "BT-CAT-02"
       ],
-      "acceptance": "Limiter-down fail-closed quando caro; alerta de DML/upstream em leitura >0. Medição de 2026-09-22 (`docs/flows/_p0/catalogo-arte.md`): metade pode andar hoje (rate limit, fail-closed e teto do cache). Decisão do dono em 2026-09-22: D-36, catálogo com mais de 7 dias dispara alerta sem bloquear a leitura; leitura cara é busca textual sem filtro, com limite por IP. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `GET /cards` com `name` e sem `set` nem `id` (a busca textual sem filtro) passa por limite por IP antes de tocar o banco (`server/lib/catalog_search_rate_limit.dart`: 60 por minuto em produção no contador distribuído, 429 `catalog_search_rate_limited`; contador fora do ar ou origem não validada dá 503 fail-closed); as outras leituras seguem sem esse limite. O job do `BT-CAT-01` mede a idade do catálogo em toda execução, pela data da fonte aplicada ou pelo último sync: com mais de 7 dias o receipt marca `catalog_stale`, o stderr leva `MANALOOM_CATALOG_FRESHNESS_ALERT` e o modo agendado sai com 3, que o daemon registra como erro e o relatório do governor mostra; a leitura nunca consulta o frescor, então nada é bloqueado. O alerta dispara mesmo com o contrato inativo, que será o caso da produção quando a imagem de ops com o job subir (catálogo de 2026-06-06, contrato inativo até a ativação supervisionada). Evidência: `server/test/catalog_search_rate_limit_test.dart` (classificação da leitura cara, 429 por IP, contador distribuído, fail-closed e rota que responde antes de consultar), `server/test/sync_catalog_reference_from_scryfall_test.py` (limite de 7 dias, data da fonte, alerta com o contrato inativo e sem alerta depois do apply) e o teste em PostgreSQL descartável com relógio fixo. Falta: o alerta de DML/upstream em leitura existe como guarda de teste (`server/test/catalog_routes_read_only_guard_test.dart` e os testes de comportamento do `BT-CAT-02`), não como contador em execução; o teto de entradas do `EndpointCache` e o `return await` de `server/lib/rate_limit_middleware.dart:263` não foram mexidos (arquivos compartilhados com outras frentes). No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Depois da ativação do `BT-CAT-01` (2026-09-23, 15:34 UTC), o alerta de frescor apagou: catálogo com 0,27 dia.",
+      "acceptance": "Limiter-down fail-closed quando caro; alerta de DML/upstream em leitura >0. Medição de 2026-09-22 (`docs/flows/_p0/catalogo-arte.md`): metade pode andar hoje (rate limit, fail-closed e teto do cache). Decisão do dono em 2026-09-22: D-36, catálogo com mais de 7 dias dispara alerta sem bloquear a leitura; leitura cara é busca textual sem filtro, com limite por IP. Feito em 2026-09-23, na branch `catalogo/2026-09-23`: `GET /cards` com `name` e sem `set` nem `id` (a busca textual sem filtro) passa por limite por IP antes de tocar o banco (`server/lib/catalog_search_rate_limit.dart`: 60 por minuto em produção no contador distribuído, 429 `catalog_search_rate_limited`; contador fora do ar ou origem não validada dá 503 fail-closed); as outras leituras seguem sem esse limite. O job do `BT-CAT-01` mede a idade do catálogo em toda execução, pela data da fonte aplicada ou pelo último sync: com mais de 7 dias o receipt marca `catalog_stale`, o stderr leva `MANALOOM_CATALOG_FRESHNESS_ALERT` e o modo agendado sai com 3, que o daemon registra como erro e o relatório do governor mostra; a leitura nunca consulta o frescor, então nada é bloqueado. O alerta dispara mesmo com o contrato inativo, que será o caso da produção quando a imagem de ops com o job subir (catálogo de 2026-06-06, contrato inativo até a ativação supervisionada). Evidência: `server/test/catalog_search_rate_limit_test.dart` (classificação da leitura cara, 429 por IP, contador distribuído, fail-closed e rota que responde antes de consultar), `server/test/sync_catalog_reference_from_scryfall_test.py` (limite de 7 dias, data da fonte, alerta com o contrato inativo e sem alerta depois do apply) e o teste em PostgreSQL descartável com relógio fixo. Falta: o alerta de DML/upstream em leitura existe como guarda de teste (`server/test/catalog_routes_read_only_guard_test.dart` e os testes de comportamento do `BT-CAT-02`), não como contador em execução; o teto de entradas do `EndpointCache` e o `return await` de `server/lib/rate_limit_middleware.dart:263` não foram mexidos (arquivos compartilhados com outras frentes). No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Depois da ativação do `BT-CAT-01` (2026-09-23, 15:34 UTC), o alerta de frescor apagou: catálogo com 0,27 dia. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção nem o job de catálogo, o que faltava: (1) o alerta de chamada a terceiro numa leitura virou contador em execução: `/cards`, `/sets` e `/rules` passam pelo middleware de `server/lib/catalog_read_guard.dart`, que bloqueia e conta qualquer cliente HTTP aberto numa leitura (inclusive o do `package:http`) antes de conectar; `/health/metrics` publica `catalog_read_guard.upstream_blocked`, e o avaliador de SLO alerta com uma só tentativa (`catalog_read_upstream`, crítico); (2) a escrita nas tabelas do catálogo fora do job é vigiada no PostgreSQL, qualquer que seja a origem: o avaliador compara as linhas inseridas, atualizadas e apagadas em `cards`, `sets` e `card_legalities` (`pg_stat_user_tables`) com a avaliação anterior e alerta (`catalog_written_outside_job`, crítico) quando elas mudam sem execução do job no intervalo (`sync_log` com `catalog_reference`); (3) o `EndpointCache` tem teto de 10.000 entradas por réplica (no teto saem as vencidas e depois as gravadas há mais tempo; o teto e `endpoint_cache_evictions` saem em `/health/metrics`); (4) o `await` do contador distribuído ficou dentro do `try` (`distributedAllowedOrNull` em `server/lib/rate_limit_middleware.dart`): falha do PostgreSQL cai no contador em memória em vez de virar 500. Achado corrigido junto: o `catalog_stale` do avaliador do `BT-OBS-001` lia os tipos antigos do `sync_log` (`cards` e `card_legalities`), que o job ativo não grava (ele grava `catalog_reference:*`), e alertaria sempre depois de ligado; agora lê o frescor pela regra do job (`catalog_reference_source_updated_at` e, sem ela, `cards_last_sync_at`, em `sync_state`). Evidência (`docs/qa/execution/2026-09-28/BT-CAT-03-guarda-e-alertas-do-catalogo.md`): `server/test/catalog_read_guard_test.dart` (5), `server/test/endpoint_cache_cap_test.dart` (4), os testes de rate limit, métricas e guarda das rotas atualizados, `server/test/slo_alerts_test.py` (24) e `server/test/slo_alerts_db_live_test.py` (2, `RUN_SCHEMA_DB_TESTS=1`); 16 mutações falham como esperado. Segue aberto: as regras só valem na produção com o ops configurado (`BT-OBS-001`); o `sync=true` que o app ainda envia é da raia do app.",
       "section": "P0",
       "source_line": 444
     },
@@ -7148,6 +7148,7 @@
         }
       ],
       "flow_producers": [
+        "server/lib/catalog_read_guard.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
@@ -7182,6 +7183,7 @@
         }
       ],
       "flow_producers": [
+        "server/lib/catalog_read_guard.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
@@ -7216,6 +7218,7 @@
         }
       ],
       "flow_producers": [
+        "server/lib/catalog_read_guard.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
@@ -9207,6 +9210,7 @@
       "flow_id": "card_collection",
       "entrypoint": "GET /cards",
       "flow_producers": [
+        "server/lib/catalog_read_guard.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
@@ -9219,6 +9223,7 @@
       "flow_id": "card_collection",
       "entrypoint": "GET /sets",
       "flow_producers": [
+        "server/lib/catalog_read_guard.dart",
         "server/routes/cards/index.dart",
         "server/routes/sets/index.dart"
       ],
@@ -9943,5 +9948,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "c7200927cc0344ecb7981d9489906a36ba094132873cae15f5ba511727549fc3"
+  "project_logic_source_digest_sha256": "9e619238a120f430057e01b5dda33b62ca4056d73f407aa79d8ff7e4e019b15c"
 }
