@@ -1,0 +1,822 @@
+{
+  "schema_version": 1,
+  "kind": "brewtact-capacity-service-specs",
+  "fonte": {
+    "receipt": "docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md",
+    "section": "## Leitura de capacidade (D-14, 09:13 UTC, somente leitura)",
+    "nota": "Specs gravadas dos serviços do projeto evolution, montadas com o que a leitura do BT-CAP-001 registrou: 4 vCPU e 7.941 MB, os dois XMage em 0 réplicas e os únicos com limite (4 GiB), os consumos por serviço e as imagens que os receipts de 2026-09-23 publicaram. O resto da forma (env, políticas de update, rótulos, digests que os receipts não trazem inteiros) é modelo, sem valor real e sem segredo: as variáveis marcadas 'modelo-nao-e-segredo' servem para provar que nenhum valor de env chega ao receipt."
+  },
+  "lido": [
+    {
+      "campo": "vCPU",
+      "value": 4,
+      "evidence": "4 vCPU"
+    },
+    {
+      "campo": "memória total (MB)",
+      "value": 7941,
+      "evidence": "RAM de 7.941 MB"
+    },
+    {
+      "campo": "limite de memória de cada XMage (GiB)",
+      "value": 4,
+      "evidence": "com limite de 4 GiB cada"
+    },
+    {
+      "campo": "memória do PostgreSQL (MiB)",
+      "value": 212,
+      "evidence": "`manaloom-postgres` (212 MiB)"
+    },
+    {
+      "campo": "backend, ops, site, /app e forge abaixo de (MiB)",
+      "value": 50,
+      "evidence": "ficavam abaixo de 50 MiB cada"
+    },
+    {
+      "campo": "memória disponível depois do reinício (MB)",
+      "value": 6484,
+      "evidence": "memória disponível 6.484 MB"
+    }
+  ],
+  "snapshot_host_raw": "### date\n{MEASURED_AT}\n### nproc\n4\n### meminfo\nMemTotal:        8131584 kB\nMemFree:          812000 kB\nMemAvailable:    6639616 kB\nSwapTotal:             0 kB\nSwapFree:              0 kB\n### loadavg\n0.42 0.38 0.35 2/412 123456\n### uptime\n8640000.00 30000000.00\n### kernel\n6.8.0-139-generic\n### df\nFilesystem     1-blocks         Used    Available Capacity Mounted on\n/dev/sda1  171798691840 115964116992 51539607552      70% /\n### docker_stats\n{\"CPUPerc\": \"0.10%\", \"MemUsage\": \"45.1MiB / 7.755GiB\", \"Name\": \"evolution_cartinhas.1.abcdefghijklmnopqrstuvwxy\"}\n{\"CPUPerc\": \"0.05%\", \"MemUsage\": \"38.4MiB / 7.755GiB\", \"Name\": \"evolution_manaloom-ops.1.bcdefghijklmnopqrstuvwxyz\"}\n{\"CPUPerc\": \"0.00%\", \"MemUsage\": \"9.2MiB / 7.755GiB\", \"Name\": \"evolution_manaloom-web-public.1.cdefghijklmnopqrstuvwxyzz\"}\n{\"CPUPerc\": \"0.00%\", \"MemUsage\": \"8.7MiB / 7.755GiB\", \"Name\": \"evolution_manaloom-app.1.defghijklmnopqrstuvwxyzzz\"}\n{\"CPUPerc\": \"0.00%\", \"MemUsage\": \"7.9MiB / 7.755GiB\", \"Name\": \"evolution_manaloom-releases.1.efghijklmnopqrstuvwxyzzzz\"}\n{\"CPUPerc\": \"0.20%\", \"MemUsage\": \"44.0MiB / 7.755GiB\", \"Name\": \"evolution_forge-sidecar.1.fghijklmnopqrstuvwxyzzzzz\"}\n{\"CPUPerc\": \"0.52%\", \"MemUsage\": \"212.3MiB / 7.755GiB\", \"Name\": \"evolution_manaloom-postgres.1.ghijklmnopqrstuvwxyzzzzzz\"}\n{\"CPUPerc\": \"0.30%\", \"MemUsage\": \"110MiB / 7.755GiB\", \"Name\": \"easypanel.1.hijklmnopqrstuvwxyzzzzzzz\"}\n{\"CPUPerc\": \"1.20%\", \"MemUsage\": \"300MiB / 7.755GiB\", \"Name\": \"carmatch_worker.1.ijklmnopqrstuvwxyzzzzzzzz\"}\n### docker_services\n{\"Name\": \"evolution_cartinhas\", \"Image\": \"localhost:5000/manaloom/cartinhas@sha256:0903537b8c6ef8142e63a88c71dea17d5db67709b589ae76deb4fa5c84ab0406\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"evolution_manaloom-ops\", \"Image\": \"localhost:5000/manaloom/ops@sha256:db4a409ad1361ebe78a7b96f70e81ab780c9db0e7e374ca407287c50858f95a1\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"evolution_manaloom-web-public\", \"Image\": \"localhost:5000/manaloom/web-public@sha256:320fca79b569f161d05d8ac3db52b180579c14fc16d28279e11cd2a1a8ae56eb\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"evolution_manaloom-app\", \"Image\": \"localhost:5000/manaloom/app-web@sha256:f94930bc00000000000000000000000000000000000000000000000000000000\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"evolution_manaloom-releases\", \"Image\": \"localhost:5000/manaloom/releases@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"evolution_forge-sidecar\", \"Image\": \"localhost:5000/manaloom/forge-sidecar@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"evolution_xmage-sidecar\", \"Image\": \"localhost:5000/manaloom/xmage-sidecar@sha256:70b87efe7beb7287d7d094c8abe940e0a2f1e944cb4f064eff4f9907a11e2f67\", \"Mode\": \"replicated\", \"Replicas\": \"0/0\"}\n{\"Name\": \"evolution_xmage-interactive\", \"Image\": \"localhost:5000/manaloom/xmage-sidecar@sha256:70b87efe7beb7287d7d094c8abe940e0a2f1e944cb4f064eff4f9907a11e2f67\", \"Mode\": \"replicated\", \"Replicas\": \"0/0\"}\n{\"Name\": \"evolution_manaloom-postgres\", \"Image\": \"postgres:17.10-alpine\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"easypanel\", \"Image\": \"easypanel/easypanel:latest\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n{\"Name\": \"carmatch_worker\", \"Image\": \"carmatch/worker:latest\", \"Mode\": \"replicated\", \"Replicas\": \"1/1\"}\n### docker_resources\nevolution_cartinhas\t{\"Limits\": {}, \"Reservations\": {}}\nevolution_manaloom-ops\t{\"Limits\": {}, \"Reservations\": {}}\nevolution_manaloom-web-public\t{\"Limits\": {}, \"Reservations\": {}}\nevolution_manaloom-app\t{\"Limits\": {}, \"Reservations\": {}}\nevolution_manaloom-releases\t{\"Limits\": {}, \"Reservations\": {}}\nevolution_forge-sidecar\t{\"Limits\": {}, \"Reservations\": {}}\nevolution_xmage-sidecar\t{\"Limits\": {\"MemoryBytes\": 4294967296, \"NanoCPUs\": 2000000000}, \"Reservations\": {\"MemoryBytes\": 536870912, \"NanoCPUs\": 250000000}}\nevolution_xmage-interactive\t{\"Limits\": {\"MemoryBytes\": 4294967296, \"NanoCPUs\": 2000000000}, \"Reservations\": {\"MemoryBytes\": 536870912, \"NanoCPUs\": 250000000}}\nevolution_manaloom-postgres\t{\"Limits\": {}, \"Reservations\": {}}\neasypanel\t{}\ncarmatch_worker\t{\"Limits\": {\"MemoryBytes\": 1073741824, \"NanoCPUs\": 1000000000}, \"Reservations\": {\"MemoryBytes\": 268435456, \"NanoCPUs\": 250000000}}\n### end\n",
+  "postgres_raw": "transaction_read_only\ton\nserver_version\t17.10\nmax_connections\t100\nshared_buffers\t128MB\neffective_cache_size\t4GB\nwork_mem\t4MB\ndatabase_size_bytes\t734003200\nconnections_total\t7\nconnections_state:active\t1\nconnections_state:idle\t6\n",
+  "easypanel": {
+    "json": {
+      "projects": [
+        {
+          "name": "evolution"
+        },
+        {
+          "name": "carmatch"
+        }
+      ],
+      "services": [
+        {
+          "projectName": "evolution",
+          "name": "cartinhas",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/cartinhas@sha256:0903537b8c6ef8142e63a88c71dea17d5db67709b589ae76deb4fa5c84ab0406"
+          },
+          "env": "PORT=8080\nENVIRONMENT=production\nMANALOOM_TRUSTED_PROXY_HOPS=1\nMANALOOM_TRUSTED_PROXY_PEERS=10.11.0.14/32\nJWT_SECRET=modelo-nao-e-segredo-9f1c7e\nDB_PASS=modelo-nao-e-segredo-44aa01",
+          "deploy": {
+            "replicas": 1,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 0,
+            "memoryLimit": 0,
+            "cpuReservation": 0,
+            "cpuLimit": 0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "manaloom-ops",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/ops@sha256:db4a409ad1361ebe78a7b96f70e81ab780c9db0e7e374ca407287c50858f95a1"
+          },
+          "env": "PORT=8080\nMANALOOM_OPS_API_KEY=modelo-nao-e-segredo-0b7d33",
+          "deploy": {
+            "replicas": 1,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 0,
+            "memoryLimit": 0,
+            "cpuReservation": 0,
+            "cpuLimit": 0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "manaloom-web-public",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/web-public@sha256:320fca79b569f161d05d8ac3db52b180579c14fc16d28279e11cd2a1a8ae56eb"
+          },
+          "env": "PORT=80",
+          "deploy": {
+            "replicas": 1,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 0,
+            "memoryLimit": 0,
+            "cpuReservation": 0,
+            "cpuLimit": 0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "manaloom-app",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/app-web@sha256:f94930bc00000000000000000000000000000000000000000000000000000000"
+          },
+          "env": "PORT=80",
+          "deploy": {
+            "replicas": 1,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 0,
+            "memoryLimit": 0,
+            "cpuReservation": 0,
+            "cpuLimit": 0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "manaloom-releases",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/releases@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "env": "PORT=80",
+          "deploy": {
+            "replicas": 1,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 0,
+            "memoryLimit": 0,
+            "cpuReservation": 0,
+            "cpuLimit": 0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "forge-sidecar",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/forge-sidecar@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          },
+          "env": "PORT=8080",
+          "deploy": {
+            "replicas": 1,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 0,
+            "memoryLimit": 0,
+            "cpuReservation": 0,
+            "cpuLimit": 0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "xmage-sidecar",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "localhost:5000/manaloom/xmage-sidecar@sha256:70b87efe7beb7287d7d094c8abe940e0a2f1e944cb4f064eff4f9907a11e2f67"
+          },
+          "env": "PORT=8080\nXMAGE_RUNTIME_MODE=batch",
+          "deploy": {
+            "replicas": 0,
+            "command": null,
+            "zeroDowntime": false
+          },
+          "resources": {
+            "memoryReservation": 512,
+            "memoryLimit": 4096,
+            "cpuReservation": 0.25,
+            "cpuLimit": 2.0
+          }
+        },
+        {
+          "projectName": "evolution",
+          "name": "manaloom-postgres",
+          "type": "postgres"
+        },
+        {
+          "projectName": "carmatch",
+          "name": "worker",
+          "type": "app",
+          "source": {
+            "type": "image",
+            "image": "carmatch/worker:latest"
+          },
+          "resources": {
+            "memoryReservation": 256,
+            "memoryLimit": 1024,
+            "cpuReservation": 0.25,
+            "cpuLimit": 1
+          }
+        }
+      ]
+    }
+  },
+  "swarm": {
+    "evolution_cartinhas": {
+      "ID": "svc01",
+      "Version": {
+        "Index": 1001
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_cartinhas",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "cartinhas"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/cartinhas@sha256:0903537b8c6ef8142e63a88c71dea17d5db67709b589ae76deb4fa5c84ab0406",
+            "Env": [
+              "PORT=8080",
+              "ENVIRONMENT=production",
+              "MANALOOM_TRUSTED_PROXY_HOPS=1",
+              "MANALOOM_TRUSTED_PROXY_PEERS=10.11.0.14/32",
+              "JWT_SECRET=modelo-nao-e-segredo-9f1c7e",
+              "DB_PASS=modelo-nao-e-segredo-44aa01"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {},
+            "Reservations": {}
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 1
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_manaloom-ops": {
+      "ID": "svc02",
+      "Version": {
+        "Index": 1002
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_manaloom-ops",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "manaloom-ops"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/ops@sha256:db4a409ad1361ebe78a7b96f70e81ab780c9db0e7e374ca407287c50858f95a1",
+            "Env": [
+              "PORT=8080",
+              "MANALOOM_OPS_API_KEY=modelo-nao-e-segredo-0b7d33"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {},
+            "Reservations": {}
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 1
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_manaloom-web-public": {
+      "ID": "svc03",
+      "Version": {
+        "Index": 1003
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_manaloom-web-public",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "manaloom-web-public"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/web-public@sha256:320fca79b569f161d05d8ac3db52b180579c14fc16d28279e11cd2a1a8ae56eb",
+            "Env": [
+              "PORT=80"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {},
+            "Reservations": {}
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 1
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_manaloom-app": {
+      "ID": "svc04",
+      "Version": {
+        "Index": 1004
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_manaloom-app",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "manaloom-app"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/app-web@sha256:f94930bc00000000000000000000000000000000000000000000000000000000",
+            "Env": [
+              "PORT=80"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {},
+            "Reservations": {}
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 1
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_manaloom-releases": {
+      "ID": "svc05",
+      "Version": {
+        "Index": 1005
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_manaloom-releases",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "manaloom-releases"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/releases@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "Env": [
+              "PORT=80"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {},
+            "Reservations": {}
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 1
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_forge-sidecar": {
+      "ID": "svc06",
+      "Version": {
+        "Index": 1006
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_forge-sidecar",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "forge-sidecar"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/forge-sidecar@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "Env": [
+              "PORT=8080"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {},
+            "Reservations": {}
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 1
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_xmage-sidecar": {
+      "ID": "svc07",
+      "Version": {
+        "Index": 1007
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_xmage-sidecar",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "xmage-sidecar"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/xmage-sidecar@sha256:70b87efe7beb7287d7d094c8abe940e0a2f1e944cb4f064eff4f9907a11e2f67",
+            "Env": [
+              "PORT=8080",
+              "XMAGE_RUNTIME_MODE=batch"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {
+              "MemoryBytes": 4294967296,
+              "NanoCPUs": 2000000000
+            },
+            "Reservations": {
+              "MemoryBytes": 536870912,
+              "NanoCPUs": 250000000
+            }
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 0
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    },
+    "evolution_xmage-interactive": {
+      "ID": "svc08",
+      "Version": {
+        "Index": 1008
+      },
+      "CreatedAt": "2026-09-23T09:00:00Z",
+      "UpdatedAt": "2026-09-23T11:01:00Z",
+      "Spec": {
+        "Name": "evolution_xmage-interactive",
+        "Labels": {
+          "easypanel.project": "evolution",
+          "easypanel.service": "xmage-interactive"
+        },
+        "TaskTemplate": {
+          "ContainerSpec": {
+            "Image": "localhost:5000/manaloom/xmage-sidecar@sha256:70b87efe7beb7287d7d094c8abe940e0a2f1e944cb4f064eff4f9907a11e2f67",
+            "Env": [
+              "PORT=8080",
+              "XMAGE_RUNTIME_MODE=interactive"
+            ],
+            "Init": false,
+            "StopGracePeriod": 10000000000
+          },
+          "Resources": {
+            "Limits": {
+              "MemoryBytes": 4294967296,
+              "NanoCPUs": 2000000000
+            },
+            "Reservations": {
+              "MemoryBytes": 536870912,
+              "NanoCPUs": 250000000
+            }
+          },
+          "RestartPolicy": {
+            "Condition": "any",
+            "Delay": 5000000000,
+            "MaxAttempts": 0
+          },
+          "Placement": {},
+          "Networks": [
+            {
+              "Target": "easypanel"
+            }
+          ],
+          "ForceUpdate": 0,
+          "Runtime": "container"
+        },
+        "Mode": {
+          "Replicated": {
+            "Replicas": 0
+          }
+        },
+        "UpdateConfig": {
+          "Parallelism": 1,
+          "FailureAction": "rollback",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "RollbackConfig": {
+          "Parallelism": 1,
+          "FailureAction": "pause",
+          "Monitor": 30000000000,
+          "MaxFailureRatio": 0,
+          "Order": "stop-first"
+        },
+        "EndpointSpec": {
+          "Mode": "vip"
+        }
+      },
+      "UpdateStatus": {
+        "State": "completed"
+      }
+    }
+  },
+  "tasks": {
+    "evolution_cartinhas": [
+      {
+        "image": "localhost:5000/manaloom/cartinhas@sha256:0903537b8c6ef8142e63a88c71dea17d5db67709b589ae76deb4fa5c84ab0406",
+        "state": "Running 3 days ago"
+      }
+    ],
+    "evolution_manaloom-ops": [
+      {
+        "image": "localhost:5000/manaloom/ops@sha256:db4a409ad1361ebe78a7b96f70e81ab780c9db0e7e374ca407287c50858f95a1",
+        "state": "Running 3 days ago"
+      }
+    ],
+    "evolution_manaloom-web-public": [
+      {
+        "image": "localhost:5000/manaloom/web-public@sha256:320fca79b569f161d05d8ac3db52b180579c14fc16d28279e11cd2a1a8ae56eb",
+        "state": "Running 3 days ago"
+      }
+    ],
+    "evolution_manaloom-app": [
+      {
+        "image": "localhost:5000/manaloom/app-web@sha256:f94930bc00000000000000000000000000000000000000000000000000000000",
+        "state": "Running 3 days ago"
+      }
+    ],
+    "evolution_manaloom-releases": [
+      {
+        "image": "localhost:5000/manaloom/releases@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "state": "Running 3 days ago"
+      }
+    ],
+    "evolution_forge-sidecar": [
+      {
+        "image": "localhost:5000/manaloom/forge-sidecar@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "state": "Running 3 days ago"
+      }
+    ],
+    "evolution_xmage-sidecar": [],
+    "evolution_xmage-interactive": []
+  }
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy": "brewtact-capacity",
-  "version": "2026-09-24.1",
+  "version": "2026-09-28.1",
   "task": "BT-CAP-001",
   "decisions": [
     "D-14"
@@ -132,8 +132,157 @@
   },
   "reservations_and_limits": {
     "owner_task": "BT-CAP-002",
-    "status": "não definidos nesta política",
-    "note": "D-14: limites e reservas por serviço saem da leitura do BT-CAP-001. Na leitura de 2026-09-23, só os dois XMage tinham limite (4 GiB cada)."
+    "status": "derivada_da_leitura_D-14_aplicacao_no_lote",
+    "note": "D-14: limites e reservas por serviço saem da leitura do BT-CAP-001. Os valores abaixo aplicam no lote de deploy, um serviço por vez, com a palavra do dono, por scripts/manaloom_capacity_resources.sh.",
+    "rules": {
+      "unreserved_margin_mb": 2048,
+      "limit_headroom_factor": 4,
+      "rationale": {
+        "unreserved_margin_mb": "O host é dividido com outros projetos sem reserva e roda o build das imagens e o pg_dump do backup: a soma das reservas do nó fica ao menos 2 GiB abaixo da memória total, o mesmo piso de memória livre do preflight.",
+        "limit_headroom_factor": "O limite de memória fica ao menos 4 vezes acima do uso lido no snapshot: um limite perto do uso mata o contêiner (OOM) no primeiro pico."
+      }
+    },
+    "services": {
+      "cartinhas": {
+        "surface": "backend",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_capacity_resources.sh",
+        "memory_reservation_mb": 256,
+        "memory_limit_mb": 1536,
+        "cpu_reservation": 0.25,
+        "cpu_limit": 2.0,
+        "observed": {
+          "memory_mib_below": {
+            "value": 50,
+            "evidence": "ficavam abaixo de 50 MiB cada"
+          }
+        },
+        "rationale": "API Dart: abaixo de 50 MiB parada, com pico de análise e Optimize. A reserva garante o agendamento; o limite de 1,5 GiB cobre o pico com folga e impede que um vazamento derrube o host; 2 vCPU deixam metade do host para o resto."
+      },
+      "manaloom-ops": {
+        "surface": "ops",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_capacity_resources.sh",
+        "memory_reservation_mb": 256,
+        "memory_limit_mb": 2048,
+        "cpu_reservation": 0.1,
+        "cpu_limit": 1.0,
+        "observed": {
+          "memory_mib_below": {
+            "value": 50,
+            "evidence": "ficavam abaixo de 50 MiB cada"
+          }
+        },
+        "rationale": "Daemon de jobs: parado abaixo de 50 MiB, mas o refresh diário do catálogo lê o bulk da Scryfall (632 MB aberto, em streaming) e monta o plano de 813 mil legalidades em memória; o pico não foi medido, então o limite fica em 2 GiB. 1 vCPU impede que um job dispute o processador com a API."
+      },
+      "manaloom-web-public": {
+        "surface": "site",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_capacity_resources.sh",
+        "memory_reservation_mb": 32,
+        "memory_limit_mb": 256,
+        "cpu_reservation": 0.05,
+        "cpu_limit": 0.5,
+        "observed": {
+          "memory_mib_below": {
+            "value": 50,
+            "evidence": "ficavam abaixo de 50 MiB cada"
+          }
+        },
+        "rationale": "nginx de arquivos estáticos: abaixo de 50 MiB; 256 MiB e meio vCPU sobram."
+      },
+      "manaloom-app": {
+        "surface": "app_web",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_capacity_resources.sh",
+        "memory_reservation_mb": 32,
+        "memory_limit_mb": 256,
+        "cpu_reservation": 0.05,
+        "cpu_limit": 0.5,
+        "observed": {
+          "memory_mib_below": {
+            "value": 50,
+            "evidence": "ficavam abaixo de 50 MiB cada"
+          }
+        },
+        "rationale": "nginx do /app (Flutter Web estático): abaixo de 50 MiB; 256 MiB e meio vCPU sobram."
+      },
+      "manaloom-releases": {
+        "surface": "android_release_host",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_capacity_resources.sh",
+        "memory_reservation_mb": 32,
+        "memory_limit_mb": 256,
+        "cpu_reservation": 0.05,
+        "cpu_limit": 0.5,
+        "observed": {},
+        "rationale": "nginx do APK da primeira coorte (D-13): não aparece na leitura de 2026-09-23; os valores são os dos outros nginx, e o preflight só aplica se o snapshot mostrar o serviço."
+      },
+      "xmage-sidecar": {
+        "surface": "battle",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_deploy_battle_sidecars.sh",
+        "memory_reservation_mb": 512,
+        "memory_limit_mb": 4096,
+        "cpu_reservation": 0.25,
+        "cpu_limit": 2.0,
+        "observed": {
+          "memory_gib": {
+            "value": 1.0,
+            "evidence": "o XMage batch 1,00 GiB"
+          }
+        },
+        "rationale": "Dono é o deploy do Battle, que grava os recursos a cada deploy (0 réplicas desde a D-57). Os valores espelham o script; esta ferramenta recusa aplicar."
+      },
+      "xmage-interactive": {
+        "surface": "battle",
+        "plane": "swarm_only",
+        "applied_by": "scripts/manaloom_deploy_battle_sidecars.sh",
+        "memory_reservation_mb": 512,
+        "memory_limit_mb": 4096,
+        "cpu_reservation": 0.25,
+        "cpu_limit": 2.0,
+        "observed": {
+          "memory_gib": {
+            "value": 1.36,
+            "evidence": "o XMage interativo ocupava 1,36 GiB"
+          }
+        },
+        "rationale": "Criado direto no Swarm pelo deploy do Battle (0 réplicas desde a D-57). Os valores espelham o script; esta ferramenta recusa aplicar."
+      },
+      "forge-sidecar": {
+        "surface": "battle",
+        "plane": "easypanel_app",
+        "applied_by": "scripts/manaloom_deploy_battle_sidecars.sh",
+        "memory_reservation_mb": 512,
+        "memory_limit_mb": 2560,
+        "cpu_reservation": 0.25,
+        "cpu_limit": 2.0,
+        "observed": {
+          "memory_mib_below": {
+            "value": 50,
+            "evidence": "ficavam abaixo de 50 MiB cada"
+          }
+        },
+        "rationale": "Dono é o deploy do Battle (limite padrão de 2.560 MB). Os valores espelham o script; esta ferramenta recusa aplicar."
+      },
+      "manaloom-postgres": {
+        "surface": "postgres",
+        "plane": "easypanel_postgres",
+        "applied_by": "pendente_do_dono",
+        "memory_reservation_mb": 512,
+        "memory_limit_mb": 0,
+        "cpu_reservation": 0.5,
+        "cpu_limit": 0.0,
+        "observed": {
+          "memory_mib": {
+            "value": 212,
+            "evidence": "`manaloom-postgres` (212 MiB)"
+          }
+        },
+        "rationale": "PostgreSQL de 212 MiB com shared_buffers padrão. Proposta: reserva de 512 MiB e nenhum limite (um limite mata o banco no pico e força recuperação). Mudar recursos reinicia o banco: fica para uma janela com a palavra do dono, e esta ferramenta não aplica (o EasyPanel guarda os recursos do Postgres por outra API)."
+      }
+    }
   },
   "how_to_measure": "A coordenação roda scripts/manaloom_capacity_snapshot.sh --execute --out <arquivo> (só leitura, D-14) e depois scripts/manaloom_capacity_policy.py preflight --snapshot <arquivo>."
 }

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "0a12bec6e481fd49c74ecea6a0fdf4e5fdd43f3c8eb60569febf955477f02183",
+  "source_digest_sha256": "fde0daeca955f2b8772c0e39a482331d7f0c870604d09000ceb132eb644d7586",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,9 +79,9 @@
     "database_tables": 86,
     "database_views": 6,
     "migrations": 67,
-    "scripts_and_jobs": 699,
-    "environment_variables": 717,
-    "tests": 1277,
+    "scripts_and_jobs": 701,
+    "environment_variables": 720,
+    "tests": 1278,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 245,
@@ -266044,8 +266044,31 @@
     {
       "path": "scripts/manaloom_capacity_policy.py",
       "role": "operation",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": []
+    },
+    {
+      "path": "scripts/manaloom_capacity_resources.py",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/manaloom_capacity_resources.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "EASYPANEL_PROJECT_NAME",
+        "EASYPANEL_SSH_KEY",
+        "MANALOOM_CAPACITY_WAIT_ATTEMPTS",
+        "MANALOOM_CAPACITY_WAIT_SECONDS",
+        "MANALOOM_EASYPANEL_SSH_HOST",
+        "MANALOOM_EASYPANEL_SSH_KEY",
+        "MANALOOM_NEW_SERVER_ENV",
+        "PROJECT",
+        "SWARM_SERVICE",
+        "TMPDIR"
+      ]
     },
     {
       "path": "scripts/manaloom_capacity_snapshot.sh",
@@ -269426,6 +269449,7 @@
       "name": "EASYPANEL_PROJECT_NAME",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
@@ -269460,6 +269484,7 @@
       "sources": [
         "scripts/manaloom_ai_generation_benchmark.sh",
         "scripts/manaloom_ai_paywall_e2e.sh",
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_commercial_quality_gate.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -271183,6 +271208,22 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_CAPACITY_WAIT_ATTEMPTS",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_capacity_resources.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_CAPACITY_WAIT_SECONDS",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_capacity_resources.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_CARD_DATA_GAP_REVIEW_CRON",
       "classification": "configuration",
       "sources": [
@@ -271508,6 +271549,7 @@
       "sources": [
         "scripts/manaloom_ai_generation_benchmark.sh",
         "scripts/manaloom_ai_paywall_e2e.sh",
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_commercial_quality_gate.sh",
         "scripts/manaloom_deploy_backend_image.sh",
@@ -271529,6 +271571,7 @@
       "sources": [
         "scripts/manaloom_ai_generation_benchmark.sh",
         "scripts/manaloom_ai_paywall_e2e.sh",
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_commercial_quality_gate.sh",
         "scripts/manaloom_deploy_backend_image.sh",
@@ -272455,6 +272498,7 @@
       "sources": [
         "scripts/manaloom_ai_generation_benchmark.sh",
         "scripts/manaloom_ai_paywall_e2e.sh",
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_commercial_quality_gate.sh",
         "scripts/manaloom_deck_ai_learning_gate.sh",
         "scripts/manaloom_deck_ai_learning_release_receipt.sh",
@@ -274300,6 +274344,7 @@
       "classification": "configuration",
       "sources": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/xmage_execution_contract_audit.py",
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
         "scripts/manaloom_publish_android_release.sh"
@@ -274844,6 +274889,14 @@
       "value_captured": false
     },
     {
+      "name": "SWARM_SERVICE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_capacity_resources.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "SYNC_COMBOS_ARGS",
       "classification": "configuration",
       "sources": [
@@ -274942,6 +274995,7 @@
         "scripts/manaloom_battle_learning_visual_qa.sh",
         "scripts/manaloom_battle_product_gate.sh",
         "scripts/manaloom_binder_import_visual_qa.sh",
+        "scripts/manaloom_capacity_resources.sh",
         "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_capture_android_platform_view.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
@@ -276263,6 +276317,7 @@
     "server/test/candidate_quality_data_support_test.dart",
     "server/test/canonicalize_learned_deck_metadata_cli_test.dart",
     "server/test/capacity_policy_test.py",
+    "server/test/capacity_resources_test.py",
     "server/test/card_cli_schema_guard_test.py",
     "server/test/card_identity_backfill_support_test.dart",
     "server/test/card_identity_support_test.dart",
@@ -277412,6 +277467,10 @@
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_capacity_snapshot.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_resources.py",
         "server/bin/migrate.dart",
         "server/lib/migration_preflight.dart",
         "server/lib/health_readiness_support.dart",
@@ -277429,6 +277488,8 @@
         "server/test/ops_sidecar_digest_release_contract_test.dart",
         "server/test/release_sbom_scope_test.py",
         "server/test/backup_cadence_test.py",
+        "server/test/capacity_policy_test.py",
+        "server/test/capacity_resources_test.py",
         "server/test/migration_preflight_test.dart",
         "server/test/migration_rehearsal_test.py",
         "server/test/flutter_web_deploy_contract_test.dart",
@@ -277919,7 +277980,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "04c34481f377422ed3642e8ed142b0114a771260f8815b00765fcb2ae143c54e"
+      "sha256": "0e53ea8e58ecb8b51de6533c615eb469a21899578c0da32ea807619e313cd61c"
     },
     "required_task_fields": [
       "id",
@@ -280616,12 +280677,12 @@
       {
         "id": "BT-CAP-002",
         "priority": "P0 CORE",
-        "status": "BLOCKED_BY_P0",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Aplicar/provar reservations/limits e rollback exato de resources.",
         "depends_on": [
           "BT-CAP-001"
         ],
-        "acceptance": "Preflight antes de mutação; rollback restaura image/env/resources/deploy. Decisão do dono em 2026-09-22: D-14, limites e reservas por serviço definidos a partir da leitura do `BT-CAP-001`.",
+        "acceptance": "Preflight antes de mutação; rollback restaura image/env/resources/deploy. Decisão do dono em 2026-09-22: D-14, limites e reservas por serviço definidos a partir da leitura do `BT-CAP-001`. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção. `server/config/capacity_policy.json` (versão `2026-09-28.1`) ganhou `reservations_and_limits`: reserva e limite de memória e de CPU por serviço, quem aplica e o uso lido com a evidência do receipt de 2026-09-23. O validador exige reserva até o limite, CPU dentro dos 4 vCPU e limite de ao menos 4 vezes o uso lido; soma das reservas (2.656 MiB) até a memória menos 2 GiB; banco só com o dono. `scripts/manaloom_capacity_resources.sh` aplica em um serviço por vez (backend, ops, site, `/app` e release host). Os três do Battle ficam com o deploy dele, e o PostgreSQL fica pendente do dono. Só muda com PASS do plano: preflight do `BT-CAP-001` fresco; serviço convergido e com imagem por digest; EasyPanel e Swarm concordando em imagem e recursos; soma das reservas no teto do nó. Grava nos dois lugares (`services.app.updateResources` sem deploy e `docker service update` só com as flags de recursos). Confere pela impressão digital da spec que só `Resources` mudou e que imagem, env e deploy do EasyPanel ficaram iguais. O rollback é automático na falha ou na parada no meio, e manual pelo receipt. Só roda se a nossa mudança ainda for a última nos dois lugares, e prova spec inteira e EasyPanel iguais aos de antes; outro deploy no meio nunca é sobrescrito. O receipt fica em diretório durável, com status `blocked` inclusive, e as leituras passam por um redator: nenhum valor de env chega ao disco. Evidência: `server/test/capacity_resources_test.py` (37 testes). Ele usa a spec gravada `server/test/fixtures/capacity/evolution_services_2026-09-23.json`, montada com a leitura do `BT-CAP-001`, e um Swarm e um EasyPanel falsos com defeitos injetáveis; nenhuma conexão sai da máquina. O teste está ligado em `scripts/manaloom_release_ops_contract_test.sh`, e 52 mutações falham como esperado; receipt em `docs/qa/execution/2026-09-28/BT-CAP-002-reservas-e-limites.md`. Segue aberto: aplicar na produção no passo do lote, com a palavra do dono; o primeiro plano confirma que o EasyPanel devolve os recursos na lista. Também seguem abertas as decisões do dono sobre o PostgreSQL, os limites do Battle e o pico do ops.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 673
       },
@@ -287416,6 +287477,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287440,6 +287505,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287464,6 +287533,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287488,6 +287561,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287512,6 +287589,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287536,6 +287617,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287560,6 +287645,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287584,6 +287673,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287608,6 +287701,10 @@
           "scripts/manaloom_backup_cadence.py",
           "scripts/manaloom_backup_cycle.sh",
           "scripts/manaloom_build_beta_release.sh",
+          "scripts/manaloom_capacity_policy.py",
+          "scripts/manaloom_capacity_resources.py",
+          "scripts/manaloom_capacity_resources.sh",
+          "scripts/manaloom_capacity_snapshot.sh",
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
@@ -287865,7 +287962,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "0a12bec6e481fd49c74ecea6a0fdf4e5fdd43f3c8eb60569febf955477f02183"
+    "project_logic_source_digest_sha256": "fde0daeca955f2b8772c0e39a482331d7f0c870604d09000ceb132eb644d7586"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -289999,6 +290096,8 @@
       "scripts/manaloom_build_android_release.sh",
       "scripts/manaloom_build_beta_release.sh",
       "scripts/manaloom_capacity_policy.py",
+      "scripts/manaloom_capacity_resources.py",
+      "scripts/manaloom_capacity_resources.sh",
       "scripts/manaloom_capacity_snapshot.sh",
       "scripts/manaloom_capture_android_platform_view.sh",
       "scripts/manaloom_chromedriver_bootstrap.sh",
@@ -290743,6 +290842,7 @@
       "server/test/candidate_quality_data_support_test.dart",
       "server/test/canonicalize_learned_deck_metadata_cli_test.dart",
       "server/test/capacity_policy_test.py",
+      "server/test/capacity_resources_test.py",
       "server/test/card_cli_schema_guard_test.py",
       "server/test/card_identity_backfill_support_test.dart",
       "server/test/card_identity_support_test.dart",

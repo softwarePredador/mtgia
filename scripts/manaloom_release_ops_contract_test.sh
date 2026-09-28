@@ -126,6 +126,7 @@ SHELL_SCRIPTS=(
   scripts/manaloom_backup_cycle.sh
   scripts/manaloom_build_android_release.sh
   scripts/manaloom_capacity_snapshot.sh
+  scripts/manaloom_capacity_resources.sh
   scripts/manaloom_build_beta_release.sh
   scripts/manaloom_battle_product_gate.sh
   scripts/manaloom_deploy_battle_sidecars.sh
@@ -201,6 +202,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py" \
     "$ROOT_DIR/scripts/manaloom_backup_cadence.py" \
     "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
+    "$ROOT_DIR/scripts/manaloom_capacity_resources.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_migration_rehearsal.py" \
@@ -213,6 +215,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/backup_cadence_test.py" \
     "$ROOT_DIR/server/test/backup_cycle_db_live_test.py" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
+    "$ROOT_DIR/server/test/capacity_resources_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
@@ -235,6 +238,10 @@ PYTHONDONTWRITEBYTECODE=1 \
 # BT-CAP-001: política de capacidade, snapshot só de leitura e preflight.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/capacity_policy_test.py"
+# BT-CAP-002: reservas e limites por serviço, com preflight e rollback exato,
+# contra a spec gravada e um plano de controle falso (nenhuma conexão sai).
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/capacity_resources_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
