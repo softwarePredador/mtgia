@@ -196,7 +196,7 @@
       "writes": [],
       "external_providers": [],
       "substitute": null,
-      "notes": "o id \"latest\" devolve o último trabalho da conta"
+      "notes": "o id \"latest\" devolve o último trabalho da conta, ou 200 {\"job\": null} quando não há (BT-AI-031)"
     },
     {
       "method": "DELETE",

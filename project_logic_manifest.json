@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "a430dfd2dd236e9391346a481f273a3b2ed0820bf510f5f0917d45e9f8ae2bdd",
+  "source_digest_sha256": "c56b11b24b204658aa131d309277a06e1a9e68545409bf30e59d353a2d907050",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -70,7 +70,7 @@
     "semantic_resolved_files": 702,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 43120,
-    "semantic_resolved_call_sites": 68377,
+    "semantic_resolved_call_sites": 68378,
     "semantic_resolved_type_references": 16382,
     "modules": 159,
     "app_routes": 46,
@@ -81,7 +81,7 @@
     "migrations": 62,
     "scripts_and_jobs": 695,
     "environment_variables": 717,
-    "tests": 1271,
+    "tests": 1273,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -42084,7 +42084,7 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 43120,
-    "resolved_call_site_count": 68377,
+    "resolved_call_site_count": 68378,
     "workspace_call_edge_count": 13575,
     "unresolved_call_edge_count": 560,
     "unresolved_call_site_count": 776,
@@ -177172,7 +177172,7 @@
       },
       {
         "source": "server/routes/ai/generate/jobs/[id].dart",
-        "line": 53,
+        "line": 59,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -177183,7 +177183,7 @@
       },
       {
         "source": "server/routes/ai/generate/jobs/[id].dart",
-        "line": 60,
+        "line": 66,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "e",
@@ -177194,7 +177194,7 @@
       },
       {
         "source": "server/routes/ai/generate/jobs/[id].dart",
-        "line": 61,
+        "line": 67,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -191553,7 +191553,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 498,
-        "occurrences": 972
+        "occurrences": 973
       },
       {
         "target_scope": "dependency",
@@ -236275,7 +236275,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 275,
-        "occurrences": 1132
+        "occurrences": 1133
       },
       {
         "target_scope": "dependency",
@@ -277136,6 +277136,8 @@
     "server/test/forge_battle_client_test.dart",
     "server/test/functional_card_tags_commander_probe_test.dart",
     "server/test/functional_card_tags_test.dart",
+    "server/test/generate_job_latest_db_live_test.dart",
+    "server/test/generate_job_latest_e2e_live_test.dart",
     "server/test/generate_provider_repair_policy_test.dart",
     "server/test/generate_reference_structural_repair_support_test.dart",
     "server/test/generated_deck_validation_service_test.dart",
@@ -278657,7 +278659,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "c32d12d524b3b64d1760b44017061b108db4e20e3463c9af9a37f338bfe247e7"
+      "sha256": "ff2585a76fa49d182e7c8124c84c58ba63c33afaf81119f0721c2204f833e7cd"
     },
     "required_task_fields": [
       "id",
@@ -280227,7 +280229,7 @@
         "depends_on": [
           "BT-AI-021"
         ],
-        "acceptance": "Modo solicitado/política/tamanho produzem decisão explícita; zero segundo job órfão; parity de gates e quota por modo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (achado do gate no `BT-UIEV-001`): `GET /ai/optimize/jobs/latest` sem job ativo responde 200 `{\"job\": null}`, e não mais 404, que o navegador registrava como erro no console a cada abertura da folha de otimização; o 404 (`deck_not_found`) fica para o `deck_id` de outra conta, inexistente ou que não é UUID, que antes dava 500. A conferência de dono é a do `POST /ai/optimize`. O app atual já aceita a resposta: sem `job_id`, não oferece retomar. Evidência: `server/test/optimize_job_latest_db_live_test.dart` (7 testes, handler da rota contra PostgreSQL descartável) e `server/test/optimize_job_latest_e2e_live_test.dart` (3/3 por HTTP sob a guarda de egress); 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-031-latest-sem-job.md`.",
+        "acceptance": "Modo solicitado/política/tamanho produzem decisão explícita; zero segundo job órfão; parity de gates e quota por modo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (achado do gate no `BT-UIEV-001`): `GET /ai/optimize/jobs/latest` sem job ativo responde 200 `{\"job\": null}`, e não mais 404, que o navegador registrava como erro no console a cada abertura da folha de otimização; o 404 (`deck_not_found`) fica para o `deck_id` de outra conta, inexistente ou que não é UUID, que antes dava 500. A conferência de dono é a do `POST /ai/optimize`. O app atual já aceita a resposta: sem `job_id`, não oferece retomar. Evidência: `server/test/optimize_job_latest_db_live_test.dart` (7 testes, handler da rota contra PostgreSQL descartável) e `server/test/optimize_job_latest_e2e_live_test.dart` (3/3 por HTTP sob a guarda de egress); 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-031-latest-sem-job.md`. Na mesma data, o `GET /ai/generate/jobs/latest` (rota do `DCK-P0-04` no registry) ganhou o mesmo conserto: sem job, 200 `{\"job\": null}`; o Generate não tem deck, a busca é da conta, e o id concreto que não existe ou é de outra conta segue 404. O app atual segue compatível (o único chamador só retoma com `job_id`). Evidência: `server/test/generate_job_latest_db_live_test.dart` (7 testes) e `server/test/generate_job_latest_e2e_live_test.dart` (3/3 por HTTP sob a guarda de egress); 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-031-generate-latest-sem-job.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 513
       },
@@ -288539,7 +288541,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "a430dfd2dd236e9391346a481f273a3b2ed0820bf510f5f0917d45e9f8ae2bdd"
+    "project_logic_source_digest_sha256": "c56b11b24b204658aa131d309277a06e1a9e68545409bf30e59d353a2d907050"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -291519,6 +291521,8 @@
       "server/test/forge_battle_client_test.dart",
       "server/test/functional_card_tags_commander_probe_test.dart",
       "server/test/functional_card_tags_test.dart",
+      "server/test/generate_job_latest_db_live_test.dart",
+      "server/test/generate_job_latest_e2e_live_test.dart",
       "server/test/generate_provider_repair_policy_test.dart",
       "server/test/generate_reference_structural_repair_support_test.dart",
       "server/test/generated_deck_validation_service_test.dart",
