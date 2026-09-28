@@ -224,6 +224,14 @@ erDiagram
         datetime updated_at
         uuid user_id PK
     }
+    analysis_sources {
+        string commander_name
+        string hash
+        uuid id PK
+        datetime imported_at
+        string source_file
+        string source_type
+    }
     archetype_counters {
         string archetype
         string color_identity
@@ -236,6 +244,23 @@ erDiagram
         datetime last_synced_at
         string notes
         number priority
+    }
+    archetype_patterns {
+        string archetype
+        string core_cards
+        string data_sources
+        json flex_options
+        string format
+        uuid id PK
+        string ideal_avg_cmc
+        number ideal_land_count
+        datetime last_analyzed_at
+        number sample_size
+        string typical_draw
+        string typical_finishers
+        string typical_ramp
+        string typical_removal
+        string win_conditions
     }
     battle_job_live_records {
         boolean content_truncated
@@ -404,6 +429,7 @@ erDiagram
         string common_archetypes
         string common_formats
         datetime created_at
+        uuid id
         datetime last_updated_at
         string learned_role
         number meta_deck_count
@@ -463,6 +489,7 @@ erDiagram
         string color_identity
         string colors
         datetime created_at
+        number edhrec_rank
         boolean foil
         uuid id PK
         string image_url
@@ -479,7 +506,6 @@ erDiagram
         datetime price_updated_at
         number price_usd
         number price_usd_foil
-        string rarity
     }
     combo_cards {
         string card_name
@@ -860,6 +886,17 @@ erDiagram
         string source_url
         string strategy_archetype
     }
+    ml_learning_state {
+        json active_rules
+        string avg_effectiveness_score
+        datetime created_at
+        uuid id PK
+        boolean is_active
+        datetime last_updated_at
+        string model_version
+        string prompt_template_hash
+        number total_optimizations
+    }
     ml_prompt_feedback {
         string archetype
         string cards_accepted
@@ -892,6 +929,32 @@ erDiagram
         string title
         string type
         uuid user_id
+    }
+    optimization_analysis_logs {
+        number additions_count
+        json additions_list
+        string after_avg_cmc
+        number after_creature_count
+        number after_land_count
+        string algorithm_version
+        json alternative_approaches
+        string before_avg_cmc
+        number before_creature_count
+        number before_land_count
+        number color_identity_violations
+        string commander_colors
+        string commander_name
+        datetime created_at
+        json decisions_reasoning
+        string deck_format
+        string detected_theme
+        number edhrec_not_validated_count
+        string edhrec_themes
+        number edhrec_validated_count
+        string effectiveness_score
+        number execution_time_ms
+        number final_card_count
+        boolean hybrid_mode_used
     }
     optimize_rejection_penalties {
         string archetype
@@ -1015,6 +1078,31 @@ erDiagram
         datetime updated_at
         string value
     }
+    synergy_packages {
+        string card_names
+        string confidence_score
+        datetime created_at
+        uuid id PK
+        number occurrence_count
+        string package_name
+        string package_type
+        string primary_archetype
+        string supported_formats
+    }
+    theme_contextual_rules {
+        json conditions
+        datetime created_at
+        string description
+        string function
+        uuid id PK
+        number ideal_count
+        number max_count
+        number min_count
+        string priority
+        string source
+        string theme
+        datetime updated_at
+    }
     trade_items {
         number agreed_price
         uuid binder_item_id
@@ -1137,4 +1225,4 @@ erDiagram
     }
 ```
 
-Tabelas: 80; views: 6; migrations: 64 (latest `074`).
+Tabelas: 86; views: 6; migrations: 66 (latest `076`).

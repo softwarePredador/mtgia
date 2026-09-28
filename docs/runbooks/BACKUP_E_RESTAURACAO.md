@@ -1,12 +1,15 @@
 # Runbook — backup local e ensaio de restauração (`BT-DR-001`)
 
-- **Política:** `server/config/backup_policy.json` (D-12, D-23 e D-81).
+- **Política:** `server/config/backup_policy.json` (D-12, D-23, D-81, D-83 e D-84).
 - **Objetivos (D-12):** RPO de 24 h e RTO de 4 h.
 - **Onde fica o backup (D-81):** em `backups/manaloom-postgres/` na máquina de operação que
   roda o ciclo, fora do git. Não há cópia fora do servidor. Risco aceito: perder juntos a
   máquina do backup e o servidor.
-- **Pendências do dono:** cifrar o backup local (D-12 pedia `age`) e o prazo de rotação dos
-  dumps (D-23).
+- **Cifra e guarda (D-84, 2026-09-28):**
+  - a cifra em repouso do MVP é o FileVault do disco da máquina de operação; o `age` volta
+    quando houver cópia fora da máquina;
+  - cada dump fica 30 dias;
+  - o dump mais novo com ensaio aprovado fica sempre, e o mais novo de todos também.
 
 ## Cadência
 
@@ -16,14 +19,29 @@
 | Ensaio de restauração isolado | no máximo a cada 7 dias, e antes de aplicar migration na produção | `scripts/manaloom_backup_cycle.sh --execute --drill` |
 | Conferência da cadência | a qualquer momento | `python3 scripts/manaloom_backup_cadence.py check --backup-dir <dir>` |
 
-- O intervalo do backup sai do RPO. A cadência semanal do ensaio é proposta desta tarefa,
-  igual ao check semanal do instalador de cron remoto, e fica para o dono confirmar.
+- O intervalo do backup sai do RPO. A cadência semanal do ensaio e o ensaio antes de toda
+  migration na produção foram aceitos pelo dono (D-83). A semana é a mesma do check semanal do
+  instalador de cron remoto.
 - O ciclo lê a produção por `pg_dump`, pela aprovação live do próprio
   `scripts/manaloom_easypanel_backup.sh`. O ensaio roda num PostgreSQL 17 local e sem rede
   (`scripts/manaloom_full_restore_drill.sh`, que pede `MANALOOM_RESTORE_DRILL_EXECUTE=1`).
 - Defina `MANALOOM_BACKUP_DIR` num diretório durável, o mesmo de todos os ciclos, para a
   cadência enxergar o histórico. Com `--execute`, o ciclo para sem essa variável e recusa
   `/tmp` e worktree temporária.
+
+## Guarda de 30 dias (D-84)
+
+- **Quais dumps estão vencidos:** `python3 scripts/manaloom_backup_cadence.py check --backup-dir <dir>`
+  lista, em `retention`, os que passaram de 30 dias (`expired`) e os que ficam de qualquer jeito
+  (`keep`):
+  - o dump mais novo com ensaio aprovado;
+  - o dump mais novo de todos.
+- **O check não apaga nada.** Apagar dump pede o sim do dono na hora, até a rotação ser
+  automatizada:
+  1. mostrar ao dono a lista `expired`;
+  2. ele confirma;
+  3. apagar só esses arquivos;
+  4. registrar no receipt do ciclo.
 
 ## Antes de migration na produção (lote de deploy)
 

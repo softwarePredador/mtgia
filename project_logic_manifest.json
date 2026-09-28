@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "36c8ca507b9f423336cabe08bb97e11c137da0766946388de48c726800bb89da",
+  "source_digest_sha256": "bb50b141c956846db5852502ce04c47559f2fe54c1cf4aa6805c1a3be3ac30e2",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -70,18 +70,18 @@
     "semantic_resolved_files": 705,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 43126,
-    "semantic_resolved_call_sites": 68569,
+    "semantic_resolved_call_sites": 68571,
     "semantic_resolved_type_references": 16352,
     "modules": 162,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
-    "database_tables": 80,
+    "database_tables": 86,
     "database_views": 6,
-    "migrations": 64,
+    "migrations": 66,
     "scripts_and_jobs": 699,
     "environment_variables": 717,
-    "tests": 1275,
+    "tests": 1277,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 245,
@@ -19874,7 +19874,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 6362,
+      "line": 7004,
       "members": [
         "fullName"
       ]
@@ -19883,61 +19883,61 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 6426
+      "line": 7068
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6471
+      "line": 7117
     },
     {
       "name": "_printPreflightRefusal",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6520
+      "line": 7166
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6382
+      "line": 7024
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6378
+      "line": 7020
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6386
+      "line": 7028
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6530
+      "line": 7176
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6393
+      "line": 7035
     },
     {
       "name": "migrationIdentities",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6515
+      "line": 7161
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6428
+      "line": 7070
     },
     {
       "name": "_assertPostMigration",
@@ -34581,115 +34581,115 @@
       "name": "_validBattleLiveHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1006
+      "line": 1010
     },
     {
       "name": "_validInteractiveBattleHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1272
+      "line": 1276
     },
     {
       "name": "buildReadinessResponseBody",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1743
+      "line": 1747
     },
     {
       "name": "disabledReleaseCapabilityReadinessCheck",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1730
+      "line": 1734
     },
     {
       "name": "evaluateAiJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 722
+      "line": 726
     },
     {
       "name": "evaluateAiRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1642
+      "line": 1646
     },
     {
       "name": "evaluateBattleJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 817
+      "line": 821
     },
     {
       "name": "evaluateBattleJobWorkerReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1306
+      "line": 1310
     },
     {
       "name": "evaluateBattleLiveSpectatorReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 920
+      "line": 924
     },
     {
       "name": "evaluateBattleRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1505
+      "line": 1509
     },
     {
       "name": "evaluateCollectionAvailabilitySchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1373
+      "line": 1377
     },
     {
       "name": "evaluateDeckValidationSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1475
+      "line": 1479
     },
     {
       "name": "evaluateInteractiveBattleReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1183
+      "line": 1187
     },
     {
       "name": "evaluateReleaseCapabilityRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1662
+      "line": 1666
     },
     {
       "name": "evaluateReleaseSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 647
+      "line": 651
     },
     {
       "name": "probeBattleLiveSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 911
+      "line": 915
     },
     {
       "name": "probeBattleSidecarHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1613
+      "line": 1617
     },
     {
       "name": "probeInteractiveBattleSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1174
+      "line": 1178
     },
     {
       "name": "readinessStatusCode",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1761
+      "line": 1765
     },
     {
       "name": "apiError",
@@ -41900,7 +41900,7 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 43126,
-    "resolved_call_site_count": 68569,
+    "resolved_call_site_count": 68571,
     "workspace_call_edge_count": 13516,
     "unresolved_call_edge_count": 562,
     "unresolved_call_site_count": 773,
@@ -114053,11 +114053,11 @@
         "target": "Migration.Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 64
+        "occurrences": 66
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6407,
+        "line": 7049,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -114068,7 +114068,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6472,
+        "line": 7118,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -114079,7 +114079,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6569,
+        "line": 7215,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -114090,7 +114090,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6570,
+        "line": 7216,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -114101,7 +114101,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6581,
+        "line": 7227,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -114112,7 +114112,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6584,
+        "line": 7230,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -114123,7 +114123,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6613,
+        "line": 7259,
         "caller": "main",
         "kind": "method",
         "lexical_target": "runMigrationPreflight",
@@ -114134,7 +114134,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6615,
+        "line": 7261,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationIdentities",
@@ -114145,7 +114145,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6617,
+        "line": 7263,
         "caller": "main",
         "kind": "method",
         "lexical_target": "toJson",
@@ -114156,7 +114156,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6660,
+        "line": 7306,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_printPreflightRefusal",
@@ -114167,7 +114167,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6702,
+        "line": 7348,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -114178,7 +114178,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6703,
+        "line": 7349,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -161016,7 +161016,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1196,
+        "line": 1200,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleReadiness",
@@ -161027,7 +161027,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1226,
+        "line": 1230,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleConfiguration.fromEnvironment",
@@ -161038,7 +161038,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1235,
+        "line": 1239,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -161049,7 +161049,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1244,
+        "line": 1248,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "_validInteractiveBattleHealth",
@@ -161060,7 +161060,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1317,
+        "line": 1321,
         "caller": "evaluateBattleJobWorkerReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobWorkerReadiness",
@@ -161071,7 +161071,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1382,
+        "line": 1386,
         "caller": "evaluateCollectionAvailabilitySchemaReadiness",
         "kind": "constructor",
         "lexical_target": "CollectionAvailabilitySchemaReadiness",
@@ -161082,7 +161082,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1485,
+        "line": 1489,
         "caller": "evaluateDeckValidationSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "DeckValidationSchemaReadiness",
@@ -161093,7 +161093,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1515,
+        "line": 1519,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -161104,7 +161104,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1531,
+        "line": 1535,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleRuntimeReadiness",
@@ -161115,7 +161115,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1576,
+        "line": 1580,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -161126,7 +161126,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1643,
+        "line": 1647,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "OpenAiRuntimeConfig",
@@ -161137,7 +161137,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1649,
+        "line": 1653,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "AiRuntimeReadiness",
@@ -161148,7 +161148,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1674,
+        "line": 1678,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -161159,7 +161159,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1675,
+        "line": 1679,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleJobWorkerReadiness",
@@ -161170,7 +161170,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1679,
+        "line": 1683,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleRuntimeReadiness",
@@ -161181,7 +161181,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1683,
+        "line": 1687,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "disabledReleaseCapabilityReadinessCheck",
@@ -161192,7 +161192,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1695,
+        "line": 1699,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateAiRuntimeReadiness",
@@ -161203,7 +161203,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1706,
+        "line": 1710,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleLiveSpectatorReadiness",
@@ -161214,7 +161214,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1717,
+        "line": 1721,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateInteractiveBattleReadiness",
@@ -161225,7 +161225,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1727,
+        "line": 1731,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityRuntimeReadiness",
@@ -161236,7 +161236,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1734,
+        "line": 1738,
         "caller": "disabledReleaseCapabilityReadinessCheck",
         "kind": "method",
         "lexical_target": "entry",
@@ -161247,7 +161247,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 655,
+        "line": 659,
         "caller": "evaluateReleaseSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseSchemaReadiness",
@@ -161258,7 +161258,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 730,
+        "line": 734,
         "caller": "evaluateAiJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "AiJobSchemaReadiness",
@@ -161269,7 +161269,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 827,
+        "line": 831,
         "caller": "evaluateBattleJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobSchemaReadiness",
@@ -161280,7 +161280,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 927,
+        "line": 931,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "battleLiveSpectatorEnabledValue",
@@ -161291,7 +161291,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 933,
+        "line": 937,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleLiveSpectatorReadiness",
@@ -161302,7 +161302,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 957,
+        "line": 961,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -161313,7 +161313,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 974,
+        "line": 978,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -161324,7 +161324,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 981,
+        "line": 985,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "_validBattleLiveHealth",
@@ -195202,7 +195202,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 10,
-        "occurrences": 76
+        "occurrences": 78
       },
       {
         "target_scope": "workspace",
@@ -199864,7 +199864,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1231,
+        "line": 1235,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -199872,7 +199872,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1233,
+        "line": 1237,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -199880,7 +199880,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1563,
+        "line": 1567,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -199888,7 +199888,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 948,
+        "line": 952,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -199896,7 +199896,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 972,
+        "line": 976,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -222540,11 +222540,11 @@
         "target": "Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 67
+        "occurrences": 69
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6428,
+        "line": 7070,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
@@ -222554,7 +222554,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6515,
+        "line": 7161,
         "lexical_type": "MigrationIdentity",
         "resolved_type": "({String name, String version})",
         "target": "MigrationIdentity",
@@ -222564,7 +222564,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6520,
+        "line": 7166,
         "lexical_type": "MigrationPreflightResult",
         "resolved_type": "MigrationPreflightResult",
         "target": "MigrationPreflightResult",
@@ -230284,7 +230284,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1183,
+        "line": 1187,
         "lexical_type": "InteractiveBattleReadiness",
         "resolved_type": "InteractiveBattleReadiness",
         "target": "InteractiveBattleReadiness",
@@ -230294,7 +230294,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1187,
+        "line": 1191,
         "lexical_type": "InteractiveBattleSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "InteractiveBattleSchemaProbe",
@@ -230304,7 +230304,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1226,
+        "line": 1230,
         "lexical_type": "InteractiveBattleConfiguration",
         "resolved_type": "InteractiveBattleConfiguration",
         "target": "InteractiveBattleConfiguration",
@@ -230314,7 +230314,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1306,
+        "line": 1310,
         "lexical_type": "BattleJobWorkerReadiness",
         "resolved_type": "BattleJobWorkerReadiness",
         "target": "BattleJobWorkerReadiness",
@@ -230324,7 +230324,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1373,
+        "line": 1377,
         "lexical_type": "CollectionAvailabilitySchemaReadiness",
         "resolved_type": "CollectionAvailabilitySchemaReadiness",
         "target": "CollectionAvailabilitySchemaReadiness",
@@ -230334,7 +230334,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1475,
+        "line": 1479,
         "lexical_type": "DeckValidationSchemaReadiness",
         "resolved_type": "DeckValidationSchemaReadiness",
         "target": "DeckValidationSchemaReadiness",
@@ -230344,7 +230344,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1509,
+        "line": 1513,
         "lexical_type": "BattleRuntimeReadiness",
         "resolved_type": "BattleRuntimeReadiness",
         "target": "BattleRuntimeReadiness",
@@ -230354,7 +230354,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1530,
+        "line": 1534,
         "lexical_type": "BattleEngineConfigurationException",
         "resolved_type": "BattleEngineConfigurationException",
         "target": "BattleEngineConfigurationException",
@@ -230364,7 +230364,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1642,
+        "line": 1646,
         "lexical_type": "AiRuntimeReadiness",
         "resolved_type": "AiRuntimeReadiness",
         "target": "AiRuntimeReadiness",
@@ -230374,7 +230374,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1643,
+        "line": 1647,
         "lexical_type": "OpenAiRuntimeConfig",
         "resolved_type": "OpenAiRuntimeConfig",
         "target": "OpenAiRuntimeConfig",
@@ -230384,7 +230384,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1665,
+        "line": 1669,
         "lexical_type": "ReleaseCapabilityRuntimeReadiness",
         "resolved_type": "ReleaseCapabilityRuntimeReadiness",
         "target": "ReleaseCapabilityRuntimeReadiness",
@@ -230394,7 +230394,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1667,
+        "line": 1671,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -230404,7 +230404,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 647,
+        "line": 651,
         "lexical_type": "ReleaseSchemaReadiness",
         "resolved_type": "ReleaseSchemaReadiness",
         "target": "ReleaseSchemaReadiness",
@@ -230414,7 +230414,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 722,
+        "line": 726,
         "lexical_type": "AiJobSchemaReadiness",
         "resolved_type": "AiJobSchemaReadiness",
         "target": "AiJobSchemaReadiness",
@@ -230424,7 +230424,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 817,
+        "line": 821,
         "lexical_type": "BattleJobSchemaReadiness",
         "resolved_type": "BattleJobSchemaReadiness",
         "target": "BattleJobSchemaReadiness",
@@ -230434,7 +230434,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 920,
+        "line": 924,
         "lexical_type": "BattleLiveSpectatorReadiness",
         "resolved_type": "BattleLiveSpectatorReadiness",
         "target": "BattleLiveSpectatorReadiness",
@@ -230444,7 +230444,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 923,
+        "line": 927,
         "lexical_type": "BattleSidecarProbe",
         "resolved_type": "Future<Map<String, dynamic>?> Function(String, Uri)",
         "target": "BattleSidecarProbe",
@@ -230454,7 +230454,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 924,
+        "line": 928,
         "lexical_type": "BattleLiveSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "BattleLiveSchemaProbe",
@@ -230464,7 +230464,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 957,
+        "line": 961,
         "lexical_type": "BattleEngineConfig",
         "resolved_type": "BattleEngineConfig",
         "target": "BattleEngineConfig",
@@ -238806,7 +238806,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 2,
-        "occurrences": 68
+        "occurrences": 70
       },
       {
         "target_scope": "workspace",
@@ -240126,7 +240126,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6471,
+        "line": 7117,
         "lexical_type": "void",
         "occurrences": 3
       },
@@ -254692,8 +254692,8 @@
       "server/bin/migrate.dart",
       "server/bin/migration_038_040_isolated_support.dart"
     ],
-    "migration_count": 64,
-    "latest_migration": "074",
+    "migration_count": 66,
+    "latest_migration": "076",
     "migrations": [
       {
         "version": "001",
@@ -255013,6 +255013,16 @@
       {
         "version": "074",
         "name": "reinstall_active_user_triggers",
+        "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "075",
+        "name": "adopt_production_ml_tables_and_shapes",
+        "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "076",
+        "name": "align_message_and_trade_history_user_fks",
         "source": "server/bin/migrate.dart"
       }
     ],
@@ -255675,6 +255685,47 @@
         ]
       },
       {
+        "name": "analysis_sources",
+        "columns": [
+          {
+            "name": "commander_name",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "hash",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "imported_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "source_file",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "source_type",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          }
+        ]
+      },
+      {
         "name": "archetype_counters",
         "columns": [
           {
@@ -255740,6 +255791,101 @@
           {
             "name": "priority",
             "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          }
+        ]
+      },
+      {
+        "name": "archetype_patterns",
+        "columns": [
+          {
+            "name": "archetype",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "core_cards",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "data_sources",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "flex_options",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "format",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "ideal_avg_cmc",
+            "type": "DOUBLE PRECISION",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "ideal_land_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "last_analyzed_at",
+            "type": "TIMESTAMP",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "sample_size",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "typical_draw",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "typical_finishers",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "typical_ramp",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "typical_removal",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "win_conditions",
+            "type": "TEXT[]",
             "primary_key": false,
             "nullable": true
           }
@@ -256849,6 +256995,12 @@
             "nullable": false
           },
           {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
             "name": "last_updated_at",
             "type": "TIMESTAMP WITH TIME ZONE",
             "primary_key": false,
@@ -257171,6 +257323,12 @@
           {
             "name": "created_at",
             "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "edhrec_rank",
+            "type": "INTEGER",
             "primary_key": false,
             "nullable": true
           },
@@ -259459,6 +259617,65 @@
         ]
       },
       {
+        "name": "ml_learning_state",
+        "columns": [
+          {
+            "name": "active_rules",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "avg_effectiveness_score",
+            "type": "DOUBLE PRECISION",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "is_active",
+            "type": "BOOLEAN",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "last_updated_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "model_version",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "prompt_template_hash",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "total_optimizations",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          }
+        ]
+      },
+      {
         "name": "ml_prompt_feedback",
         "columns": [
           {
@@ -259632,6 +259849,263 @@
             "type": "UUID",
             "primary_key": false,
             "nullable": false
+          }
+        ]
+      },
+      {
+        "name": "optimization_analysis_logs",
+        "columns": [
+          {
+            "name": "additions_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "additions_list",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "after_avg_cmc",
+            "type": "DOUBLE PRECISION",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "after_creature_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "after_land_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "algorithm_version",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "alternative_approaches",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "before_avg_cmc",
+            "type": "DOUBLE PRECISION",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "before_creature_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "before_land_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "color_identity_violations",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "commander_colors",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "commander_name",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "decisions_reasoning",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "deck_format",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "detected_theme",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "edhrec_not_validated_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "edhrec_themes",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "edhrec_validated_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "effectiveness_score",
+            "type": "DOUBLE PRECISION",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "execution_time_ms",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "final_card_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "hybrid_mode_used",
+            "type": "BOOLEAN",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "improvements_achieved",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "initial_card_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "lessons_learned",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "operation_mode",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "potential_issues",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "removals_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "removals_list",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "role_delta",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "swap_analysis",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "target_archetype",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "test_number",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "test_run_id",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "test_timestamp",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "theme_match",
+            "type": "BOOLEAN",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "validation_score",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "validation_verdict",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "validation_warnings",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
           }
         ]
       },
@@ -260264,6 +260738,142 @@
           {
             "name": "value",
             "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          }
+        ]
+      },
+      {
+        "name": "synergy_packages",
+        "columns": [
+          {
+            "name": "card_names",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "confidence_score",
+            "type": "DOUBLE PRECISION",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "occurrence_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "package_name",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "package_type",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "primary_archetype",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "supported_formats",
+            "type": "TEXT[]",
+            "primary_key": false,
+            "nullable": true
+          }
+        ]
+      },
+      {
+        "name": "theme_contextual_rules",
+        "columns": [
+          {
+            "name": "conditions",
+            "type": "JSONB",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "created_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "description",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "function",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "id",
+            "type": "UUID",
+            "primary_key": true,
+            "nullable": true
+          },
+          {
+            "name": "ideal_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "max_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "min_count",
+            "type": "INTEGER",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "priority",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "source",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "theme",
+            "type": "TEXT",
+            "primary_key": false,
+            "nullable": false
+          },
+          {
+            "name": "updated_at",
+            "type": "TIMESTAMP WITH TIME ZONE",
             "primary_key": false,
             "nullable": true
           }
@@ -275925,6 +276535,8 @@
     "server/test/product_retention_report_contract_test.dart",
     "server/test/product_shape_live_test.dart",
     "server/test/production_ai_mock_fallback_policy_test.dart",
+    "server/test/production_shape_adoption_db_live_test.dart",
+    "server/test/production_shape_adoption_test.dart",
     "server/test/profile_community_live_test.dart",
     "server/test/public_site_url_test.dart",
     "server/test/public_web_product_contract_test.dart",
@@ -276817,6 +277429,7 @@
         "server/test/flutter_web_deploy_contract_test.dart",
         "server/test/data_model_migration_test.dart",
         "server/test/active_user_trigger_rule_test.dart",
+        "server/test/production_shape_adoption_test.dart",
         "server/test/release_capability_policy_test.dart",
         "app/test/core/config/release_capabilities_test.dart",
         "app/test/core/config/release_capability_surface_contract_test.dart",
@@ -277301,7 +277914,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "d432b1befced1dd595ce94e5970f0a7bc3c284095fcdd417e15dc1f483555634"
+      "sha256": "b15e2913464ab7379cc3fd7c073935c45a84ae9ad10bf1ea05133693e53f8697"
     },
     "required_task_fields": [
       "id",
@@ -279950,12 +280563,12 @@
       {
         "id": "BT-DB-005",
         "priority": "P0 AI",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Classificar relações ML suplementares consumidas mas ausentes do baseline.",
         "depends_on": [
           "BT-DB-001"
         ],
-        "acceptance": "Para `optimization_analysis_logs`, `theme_contextual_rules`, `synergy_packages`, `archetype_patterns`, `ml_learning_state` e demais extras: migrar com contrato ou remover consumer; fresh baseline não degrada silenciosamente. Leitura da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 7 tabelas usadas pelo código não nascem de migration — `optimization_analysis_logs`, `synergy_packages`, `archetype_patterns`, `theme_contextual_rules`, `ml_learning_state`, `card_rulings_legacy`, `analysis_sources`. Decisão do dono em 2026-09-22: D-48, a 059 cria as 7 tabelas que o código usa sem migration e reconcilia as colunas divergentes, sem perfil de live-drift.",
+        "acceptance": "Para `optimization_analysis_logs`, `theme_contextual_rules`, `synergy_packages`, `archetype_patterns`, `ml_learning_state` e demais extras: migrar com contrato ou remover consumer; fresh baseline não degrada silenciosamente. Leitura da produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 7 tabelas usadas pelo código não nascem de migration — `optimization_analysis_logs`, `synergy_packages`, `archetype_patterns`, `theme_contextual_rules`, `ml_learning_state`, `card_rulings_legacy`, `analysis_sources`. Decisão do dono em 2026-09-22: D-48, a 059 cria as 7 tabelas que o código usa sem migration e reconcilia as colunas divergentes, sem perfil de live-drift. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção (migrations 075 e 076, aplicadas só em bancos descartáveis; a 059 ficou com a D-66); decisão do dono em 2026-09-28, D-83: aceita a regra da 075 e a 076 com `RESTRICT`. A 075 cria `optimization_analysis_logs`, `synergy_packages`, `archetype_patterns`, `ml_learning_state`, `theme_contextual_rules` e `analysis_sources` com a forma da produção (definições do repositório e, onde só a produção tinha, a leitura só da definição no dump local, autorizada pela coordenação; nenhum dado), adota nos dois bancos as formas de coluna, índice e CHECK da produção onde ela é mais estrita e leva para a produção só metadado (dois defaults e os três índices de `ml_prompt_feedback`); nenhum NOT NULL do banco novo foi afrouxado (D-67). A 076 deixa `RESTRICT` as chaves `direct_messages.sender_id`, `trade_messages.sender_id` e `trade_status_history.changed_by`, como a D-66, com o laço dos gatilhos de conta ativa no fim. Lista fechada da deriva de 94 para 73 itens; inventário de retenção com as 6 tabelas. Evidência (`docs/qa/execution/2026-09-28/BT-DB-005-tabelas-e-formas-da-producao.md`): `server/test/production_shape_adoption_test.dart` (12), `server/test/production_shape_adoption_db_live_test.dart` (5, `RUN_SCHEMA_DB_TESTS=1`), `server/test/migration_rehearsal_test.py` (10), o ensaio dos fixtures (5 de 5) e o ensaio na estrutura da produção (PASS até a 076, todas as diferenças na lista fechada); 17 mutações falham como esperado. Segue aberto: no lote de deploy, com a contagem e o sim do dono (D-85), validar os três CHECK que a produção não tem (contagem só de leitura em `server/sql/readonly/bt_db_005_check_violations.sql`), arquivar e apagar `card_rulings_legacy` e `poststatus`, as chaves da D-50, os NOT NULL da D-67 e aplicar a 075 e a 076; `card_meta_insights.created_at` (dono); `ml_prompt_feedback.user_rating` (exportação, `BT-PRIV-001`); `deck_weakness_reports` e `deck_matchups` (descarte recomendado pelo `BT-AI-029`).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 669
       },
@@ -280052,7 +280665,7 @@
         "depends_on": [
           "BT-DB-001"
         ],
-        "acceptance": "Cadência documentada; checksum do dump e do ensaio; RPO/RTO medidos; dados e schema validados; sem destino externo (D-81). Escopo até 2026-09-24: backup fresco criptografado off-site, fetch do objeto exato e restore isolado, com manifest, checksum e versão do objeto. Decisão do dono em 2026-09-22: D-12, dump cifrado com `age` e chave sob custódia do dono; bucket S3-compatível em região no Brasil, com contrato de tratamento de dados (confirmar com advogado); RPO de 24 h e RTO de 4 h; o primeiro backup sai antes da 058, no `BT-REL-000`. D-26: testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono na hora. Em 2026-09-23 (`BT-REL-000`): primeiro backup com ensaio de restauração completo aprovado (99 tabelas, 1.181 contas, 51 s); sem cifra e sem cópia fora da máquina, porque o dono vetou criar bucket. Decisão do dono em 2026-09-24: D-81, sem backup fora do servidor; a tarefa fica com o backup local e o ensaio de restauração isolado, com cadência e receipt. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção: `server/config/backup_policy.json` fixa o RPO de 24 h e o RTO de 4 h da D-12 (o validador confere o texto da decisão), o destino `backups/manaloom-postgres/` sem cópia fora (D-81), o ensaio isolado sem rede, a cadência (backup a cada 24 h no máximo, pelo RPO; ensaio a cada 7 dias e antes de migration na produção, proposta pendente de confirmação) e o primeiro ciclo ligado ao receipt da `BT-REL-000`. `scripts/manaloom_backup_cycle.sh --execute [--drill]` roda o backup e o ensaio existentes, exige `MANALOOM_BACKUP_DIR` num diretório durável, grava o receipt na pasta `receipts/` do diretório de backup e sai 3 se a cadência não estiver cumprida; `scripts/manaloom_backup_cadence.py check` confere a idade do backup contra o RPO, a idade e a duração do último ensaio contra a cadência e o RTO e se o dump ensaiado é o mesmo arquivo, e recusa diretório em `/tmp` ou worktree. Runbook: `docs/runbooks/BACKUP_E_RESTAURACAO.md`, com o passo do lote de deploy, o que cada etapa confere e a restauração da produção passo a passo. Evidência (`docs/qa/execution/2026-09-28/BT-DR-001-backup-local-e-ensaio.md`): `server/test/backup_cadence_test.py` (15, com shims do backup e do ensaio e o contrato com a interface dos scripts reais), ligado em `scripts/manaloom_release_ops_contract_test.sh`; `server/test/backup_cycle_db_live_test.py` (`RUN_SCHEMA_DB_TESTS=1`): o ciclo, com o script de ensaio real, restaura por inteiro um dump do PostgreSQL descartável (80 tabelas, 100 chaves estrangeiras e as quatro contagens) e grava receipt PASS; 18 mutações falham como esperado. Segue aberto: o ciclo na produção, no lote de deploy e com o Docker de pé (coordenação, com a palavra do dono; hoje a cadência está BLOCKED: último backup de 2026-09-23 e nenhum ensaio registrado no diretório); cifrar o backup local e o prazo de rotação (D-12 e D-23, decisão do dono).",
+        "acceptance": "Cadência documentada; checksum do dump e do ensaio; RPO/RTO medidos; dados e schema validados; sem destino externo (D-81). Escopo até 2026-09-24: backup fresco criptografado off-site, fetch do objeto exato e restore isolado, com manifest, checksum e versão do objeto. Decisão do dono em 2026-09-22: D-12, dump cifrado com `age` e chave sob custódia do dono; bucket S3-compatível em região no Brasil, com contrato de tratamento de dados (confirmar com advogado); RPO de 24 h e RTO de 4 h; o primeiro backup sai antes da 058, no `BT-REL-000`. D-26: testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono na hora. Em 2026-09-23 (`BT-REL-000`): primeiro backup com ensaio de restauração completo aprovado (99 tabelas, 1.181 contas, 51 s); sem cifra e sem cópia fora da máquina, porque o dono vetou criar bucket. Decisão do dono em 2026-09-24: D-81, sem backup fora do servidor; a tarefa fica com o backup local e o ensaio de restauração isolado, com cadência e receipt. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção: `server/config/backup_policy.json` fixa o RPO de 24 h e o RTO de 4 h da D-12 (o validador confere o texto da decisão), o destino `backups/manaloom-postgres/` sem cópia fora (D-81), o ensaio isolado sem rede, a cadência (backup a cada 24 h no máximo, pelo RPO; ensaio a cada 7 dias e antes de migration na produção, proposta pendente de confirmação) e o primeiro ciclo ligado ao receipt da `BT-REL-000`. `scripts/manaloom_backup_cycle.sh --execute [--drill]` roda o backup e o ensaio existentes, exige `MANALOOM_BACKUP_DIR` num diretório durável, grava o receipt na pasta `receipts/` do diretório de backup e sai 3 se a cadência não estiver cumprida; `scripts/manaloom_backup_cadence.py check` confere a idade do backup contra o RPO, a idade e a duração do último ensaio contra a cadência e o RTO e se o dump ensaiado é o mesmo arquivo, e recusa diretório em `/tmp` ou worktree. Runbook: `docs/runbooks/BACKUP_E_RESTAURACAO.md`, com o passo do lote de deploy, o que cada etapa confere e a restauração da produção passo a passo. Evidência (`docs/qa/execution/2026-09-28/BT-DR-001-backup-local-e-ensaio.md`): `server/test/backup_cadence_test.py` (15, com shims do backup e do ensaio e o contrato com a interface dos scripts reais), ligado em `scripts/manaloom_release_ops_contract_test.sh`; `server/test/backup_cycle_db_live_test.py` (`RUN_SCHEMA_DB_TESTS=1`): o ciclo, com o script de ensaio real, restaura por inteiro um dump do PostgreSQL descartável (80 tabelas, 100 chaves estrangeiras e as quatro contagens) e grava receipt PASS; 18 mutações falham como esperado. Decisões do dono em 2026-09-28: D-83, ensaio semanal e antes de toda migration na produção; D-84, cifra em repouso pelo FileVault e 30 dias de guarda, com o dump mais novo que teve ensaio aprovado guardado sempre, e apagar dump pede o sim do dono na hora até a rotação ser automatizada. Feito no mesmo dia: política `2026-09-28.1` com as duas decisões, o `check` lista em `retention` os dumps vencidos e os que ficam, sem apagar nada, e o runbook ganhou a seção da guarda (`docs/qa/execution/2026-09-28/BT-DR-001-d84-guarda-de-30-dias.md`). Segue aberto: o ciclo na produção, no lote de deploy e com o Docker de pé (coordenação, com a palavra do dono; hoje a cadência está BLOCKED: último backup de 2026-09-23 e nenhum ensaio registrado no diretório).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 677
       },
@@ -287247,7 +287860,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "36c8ca507b9f423336cabe08bb97e11c137da0766946388de48c726800bb89da"
+    "project_logic_source_digest_sha256": "bb50b141c956846db5852502ce04c47559f2fe54c1cf4aa6805c1a3be3ac30e2"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -290402,6 +291015,8 @@
       "server/test/product_retention_report_contract_test.dart",
       "server/test/product_shape_live_test.dart",
       "server/test/production_ai_mock_fallback_policy_test.dart",
+      "server/test/production_shape_adoption_db_live_test.dart",
+      "server/test/production_shape_adoption_test.dart",
       "server/test/profile_community_live_test.dart",
       "server/test/public_site_url_test.dart",
       "server/test/public_web_product_contract_test.dart",

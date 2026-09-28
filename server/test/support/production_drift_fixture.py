@@ -21,6 +21,7 @@ import re
 from pathlib import Path
 
 AUDIT = Path("docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.saida.json")
+ALLOWLIST = Path("server/config/schema_drift_allowlist.json")
 SNAPSHOT_058 = {
     "public.trade_items.item_snapshot",
     "public.trade_items.snapshot_captured_at",
@@ -83,7 +84,13 @@ def drift_groups(repo_root: Path) -> tuple[list[tuple[str, list[str]]], list[tup
     diffs = audit["diferencas"]
     groups: list[tuple[str, list[str]]] = []
     skipped: list[tuple[str, str]] = []
-    extra_tables = set(diffs["tabelas"]["sobrando"])
+    # As tabelas só da produção que uma migration passou a criar (a 075) nascem
+    # dela nos dois bancos: o fixture não as modela, e a forma real da produção é
+    # conferida pelo ensaio na estrutura do dump.
+    allowlist = json.loads((repo_root / ALLOWLIST).read_text(encoding="utf-8"))
+    adopted = {name for names in allowlist["reconciliado_pelas_migrations"].values()
+               if isinstance(names, list) for name in names}
+    extra_tables = set(diffs["tabelas"]["sobrando"]) - adopted
 
     for schema in diffs["schemas"]["sobrando"]:
         groups.append((f"schemas sobrando {schema}", [
@@ -200,7 +207,7 @@ def drift_groups(repo_root: Path) -> tuple[list[tuple[str, list[str]]], list[tup
     for item in diffs["indices"]["faltando"]:
         groups.append((f"indices faltando {item['objeto']}", [f"DROP INDEX {_q(item['objeto'])}"]))
     for item in diffs["indices"]["sobrando"]:
-        if item["alvo"]["tabela"] in extra_tables:
+        if item["alvo"]["tabela"] in extra_tables | adopted:
             continue
         groups.append((f"indices sobrando {item['objeto']}",
                        [_named_index(item["objeto"].split(".", 1)[1], item["alvo"]["definicao"])]))

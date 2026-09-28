@@ -193,7 +193,7 @@ class PayloadTest(unittest.TestCase):
 
 
 class ClosedListTest(unittest.TestCase):
-    """A lista fechada casa com a auditoria e com as migrations 064 e 065."""
+    """A lista fechada casa com a auditoria e com as migrations 064, 065, 075 e 076."""
 
     def setUp(self) -> None:
         self.allowlist = rehearsal.load_allowlist(ALLOWLIST)
@@ -207,7 +207,13 @@ class ClosedListTest(unittest.TestCase):
                    for item in items}
         for key, entry in self.entries.items():
             with self.subTest(entrada=key):
-                self.assertTrue(key in audited or entry["motivo"].startswith("inferido"), key)
+                if "origem" in entry:
+                    # Achado de um ensaio (só nomes): o receipt tem de citar o objeto.
+                    receipt = (REPO_ROOT / entry["origem"]).read_text(encoding="utf-8")
+                    self.assertIn(entry["no_receipt"], receipt, key)
+                    self.assertNotIn(key, audited, key)
+                else:
+                    self.assertTrue(key in audited or entry["motivo"].startswith("inferido"), key)
         self.assertEqual(self.allowlist["status"], "proposta_pendente_do_dono")
 
     def test_every_audited_difference_is_listed_covered_or_reconciled(self) -> None:
@@ -224,8 +230,20 @@ class ClosedListTest(unittest.TestCase):
         self.assertEqual(set(reconciled["064"]), adopted("064"))
         self.assertEqual(set(reconciled["065"]), adopted("065"))
         adopted_names = {"public." + name for name in reconciled["064"] + reconciled["065"]}
+        # 075 e 076 (BT-DB-005) listam o objeto inteiro: a migration tem de citá-lo, e ele
+        # sai da lista fechada.
+        for version in ("075", "076"):
+            block = migrate[migrate.index(f"version: '{version}'"):]
+            for name in reconciled[version]:
+                with self.subTest(reconciliado=(version, name)):
+                    short = re.split(r"[.:]", name.split(": ", 1)[0].split(".", 1)[1])[-1] \
+                        if ": " in name else name.rsplit(".", 1)[-1]
+                    self.assertIn(short, block[:block.index("\n  ),\n")], name)
+                    self.assertNotIn(name, {e["objeto"] for e in self.allowlist["itens"]})
+            adopted_names |= set(reconciled[version])
         extra_tables = {e["objeto"] for e in self.allowlist["itens"]
                         if e["categoria"] == "tabelas" and e["tipo"] == "sobrando"}
+        extra_tables |= set(reconciled["075"]) & set(self.audit["tabelas"]["sobrando"])
         since_058 = {"public.trade_items.item_snapshot", "public.trade_items.snapshot_captured_at",
                      "public.trade_items.snapshot_schema_version",
                      "public.trade_items.snapshot_status", "058"}
@@ -244,6 +262,25 @@ class ClosedListTest(unittest.TestCase):
                         continue
                     with self.subTest(diferenca=(mine, kind, name)):
                         self.assertIn((mine, kind, name), self.entries)
+
+    def test_every_finding_of_the_structure_rehearsal_is_reconciled_or_listed(self) -> None:
+        """Os achados do ensaio na estrutura do dump (receipt só com nomes) têm destino."""
+        receipt = (REPO_ROOT / "docs/qa/execution/2026-09-28/"
+                   "BT-DB-003-ensaio-na-estrutura-da-producao.md").read_text(encoding="utf-8")
+        rows = [line for line in receipt.splitlines()
+                if re.match(r"^\| (restrições|gatilhos|tipos) \|", line)]
+        self.assertEqual(len(rows), 10)
+        reconciled = set(self.allowlist["reconciliado_pelas_migrations"]["075"])
+        listed = {e["objeto"] for e in self.allowlist["itens"]}
+        for row in rows:
+            name = re.findall(r"`([^`]+)`", row)[0]
+            with self.subTest(achado=name):
+                table = name.split(".", 1)[0].rstrip(":")
+                if row.startswith("| gatilhos |"):
+                    self.assertTrue(any(obj.startswith(f"public.{table}: CREATE TRIGGER")
+                                        for obj in listed), name)
+                else:
+                    self.assertIn(f"public.{name}", reconciled | listed)
 
 
 if __name__ == "__main__":

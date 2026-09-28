@@ -179,7 +179,11 @@ class MigrationRehearsalOnDisposablePostgresTest(unittest.TestCase):
         self.assertGreaterEqual(steps["base"]["catalogo"]["colunas"], 900)
         self.assertGreaterEqual(steps["base"]["catalogo"]["gatilhos"], 40)
         payload = steps["payload"]
-        self.assertEqual(payload["iguais"], payload["tabelas"])
+        # A única mudança de linha é a declarada na lista fechada: a 075 troca o tipo de
+        # card_meta_insights.versatility_score para o da produção.
+        self.assertEqual([item["tabela"] for item in payload["mudancas_declaradas"]],
+                         ["public.card_meta_insights"])
+        self.assertEqual(payload["iguais"] + 1, payload["tabelas"])
         self.assertGreaterEqual(payload["linhas"], 15)
         self.assertTrue(steps["reaplicacao"]["sem_mudanca"])
         self.assertTrue(steps["rollback_por_restore"]["identico_a_antes"])
@@ -191,14 +195,18 @@ class MigrationRehearsalOnDisposablePostgresTest(unittest.TestCase):
         check = report["etapas"]["pos_checagem"]
         self.assertEqual((code, report["resultado"]), (0, "PASS"), json.dumps(check)[:4000])
         self.assertEqual(check["inesperadas"], [])
-        self.assertGreaterEqual(check["aceitas"], 150)
+        # 186 diferenças aceitas na 074; a 075 e a 076 reconciliam 65 delas.
+        self.assertGreaterEqual(check["aceitas"], 110)
         allowlist = json.loads(ALLOWLIST.read_text(encoding="utf-8"))
         # O que as migrations reconciliam some depois do upgrade.
         reconciled = allowlist["reconciliado_pelas_migrations"]
-        self.assertFalse({"public." + name for name in reconciled["064"] + reconciled["065"]}
+        self.assertFalse(({"public." + name for name in reconciled["064"] + reconciled["065"]}
+                          | set(reconciled["075"]) | set(reconciled["076"]))
                          & {entry["objeto"] for entry in allowlist["itens"]})
-        # Só fica sem ocorrência o que o fixture não reproduz sem a produção.
+        # Só fica sem ocorrência o que o fixture não reproduz sem a produção: o que ele
+        # não modela e o que só o ensaio na estrutura do dump achou (origem no receipt).
         not_modeled = {label.split(" ", 2)[2] for label, _ in self.not_modeled}
+        not_modeled |= {entry["objeto"] for entry in allowlist["itens"] if "origem" in entry}
         self.assertTrue(
             {entry["objeto"] for entry in check["entradas_sem_ocorrencia"]} <= not_modeled,
             check["entradas_sem_ocorrencia"],

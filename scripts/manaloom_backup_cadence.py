@@ -101,8 +101,10 @@ def policy_problems(policy: dict[str, Any], repo_root: Path = REPO_ROOT) -> list
         retention = backup.get("retention_days")
         if retention is not None and (not isinstance(retention, int) or retention <= 0):
             problems.append("backup.retention_days deve ser nulo (não decidido) ou positivo")
-        if retention is None and not backup.get("retention_note"):
-            problems.append("backup.retention_note deve dizer por que não há prazo")
+        if not backup.get("retention_note"):
+            problems.append(
+                "backup.retention_note deve dizer a decisão do prazo ou por que não há prazo"
+            )
     drill = policy.get("drill")
     if not isinstance(drill, dict) or drill.get("script") != "scripts/manaloom_full_restore_drill.sh":
         problems.append("drill.script deve ser scripts/manaloom_full_restore_drill.sh")
@@ -306,9 +308,45 @@ def check(backup_dir: Path, policy: dict[str, Any], now: dt.datetime) -> dict[st
         min_tables = policy["drill"]["min_tables"]
         if not isinstance(latest.get("table_count"), int) or latest["table_count"] < min_tables:
             reasons.append(f"o ensaio restaurou menos de {min_tables} tabelas")
+    result["retention"] = retention_report(backups, passed, policy, now)
     result["status"] = "PASS" if not reasons else "BLOCKED"
     result["reasons"] = reasons
     return result
+
+
+def retention_report(
+    backups: list[tuple[dt.datetime, Path]],
+    passed: list[dict[str, Any]],
+    policy: dict[str, Any],
+    now: dt.datetime,
+) -> dict[str, Any] | None:
+    """D-84: os dumps vencidos pela guarda, só listados.
+
+    Ficam sempre o dump mais novo e o mais novo com ensaio aprovado. Nada é
+    apagado aqui: apagar pede o sim do dono na hora, até a rotação ser
+    automatizada.
+    """
+    days = policy["backup"].get("retention_days")
+    if not isinstance(days, int):
+        return None
+    drilled = {str((drill.get("backup") or {}).get("file")) for drill in passed
+               if isinstance(drill.get("backup"), dict)}
+    keep: set[str] = set()
+    if backups:
+        keep.add(backups[-1][1].name)
+    newest_drilled = [path.name for _, path in backups if path.name in drilled]
+    if newest_drilled:
+        keep.add(newest_drilled[-1])
+    expired = [
+        path.name for stamp, path in backups
+        if (now - stamp).total_seconds() > days * 86400 and path.name not in keep
+    ]
+    return {
+        "days": days,
+        "keep": sorted(keep),
+        "expired": expired,
+        "delete": "só com o sim do dono na hora (D-84); este check não apaga nada",
+    }
 
 
 def build_receipt(

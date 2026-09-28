@@ -513,6 +513,31 @@
         "user_id": "person_ref"
       }
     },
+    "analysis_sources": {
+      "category": "operational",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Arquivos de análise importados pelo laboratório Hermes (caminho, tipo, comandante e hash); nasce da migration 075.",
+      "owner": "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
     "archetype_counters": {
       "category": "reference",
       "subject_kind": "none",
@@ -520,6 +545,31 @@
       "subject_link": null,
       "purpose": "Contra-estratégias por arquétipo.",
       "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "archetype_patterns": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Padrões de construção por arquétipo e formato; nasce da migration 075.",
+      "owner": "server/lib/ml_knowledge_service.dart; server/bin/extract_meta_insights.dart",
       "retention": {
         "class": "not_personal",
         "period": "acompanha o ciclo do catalogo e das referencias",
@@ -1921,6 +1971,31 @@
       },
       "legal_exception": null
     },
+    "ml_learning_state": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Estado do aprendizado por versão do modelo; nasce da migration 075.",
+      "owner": "server/routes/ai/ml-status/index.dart; server/bin/extract_meta_insights.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
     "ml_prompt_feedback": {
       "category": "user_activity",
       "subject_kind": "account_holder",
@@ -2016,6 +2091,31 @@
         "type": "include",
         "user_id": "person_ref"
       }
+    },
+    "optimization_analysis_logs": {
+      "category": "ai_runtime",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Log de análise do Optimize (nome do comandante, listas de cartas e métricas), sem user_id nem deck_id; nasce da migration 075 (BT-DB-005).",
+      "owner": "server/lib/ai/optimize_analysis_support.dart; server/routes/ai/ml-status/index.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "sem prazo: nenhum job apaga; sem vínculo com conta",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
     },
     "optimize_rejection_penalties": {
       "category": "reference",
@@ -2382,6 +2482,56 @@
       "retention": {
         "class": "not_personal",
         "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "synergy_packages": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Pacotes de sinergia aprendidos (nomes de cartas e arquétipo); nasce da migration 075.",
+      "owner": "server/lib/ml_knowledge_service.dart; server/bin/extract_meta_insights.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "theme_contextual_rules": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Regras de contagem por tema e função de carta, importadas do THEMES.md do laboratório Hermes; nasce da migration 075.",
+      "owner": "server/lib/ai/theme_contextual_rules_service.dart; docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
         "decision": null,
         "enforced_by": null,
         "gap": null
@@ -2810,37 +2960,7 @@
     }
   },
   "production_only_tables": {
-    "optimization_analysis_logs": {
-      "group": "used_by_code_without_migration",
-      "personal_data": false,
-      "note": "Log de análise do Optimize com nome do comandante e listas de cartas, sem user_id nem deck_id (server/lib/ai/optimize_analysis_support.dart:206); fora da exportação e da exclusão por não ter vínculo com conta."
-    },
-    "synergy_packages": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "archetype_patterns": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "theme_contextual_rules": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "ml_learning_state": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
     "card_rulings_legacy": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "analysis_sources": {
       "group": "used_by_code_without_migration",
       "personal_data": null,
       "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
@@ -2915,14 +3035,6 @@
     "ml_prompt_feedback.user_rating": {
       "personal_data": true,
       "note": "Nota do usuário sobre a sugestão da IA; existe só na produção (receipt de 2026-09-22) e nenhum código a usa. Fica fora da exportação, e a exclusão apaga a linha inteira do titular."
-    },
-    "cards.edhrec_rank": {
-      "personal_data": false,
-      "note": "Catálogo; existe só na produção e é lida pelo Optimize (server/lib/ai/otimizacao.dart:563)."
-    },
-    "card_meta_insights.id": {
-      "personal_data": false,
-      "note": "Catálogo; na produção a tabela tem id e não tem created_at."
     }
   },
   "artifacts": {

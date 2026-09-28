@@ -6357,6 +6357,648 @@ DROP VIEW IF EXISTS collection_availability_snapshot;
     ''',
     down: 'SELECT 1;',
   ),
+  Migration(
+    version: '075',
+    name: 'adopt_production_ml_tables_and_shapes',
+    // BT-DB-005 (D-48): o que o código usa e só a produção tinha passa a nascer
+    // de migration, com a forma dela (auditoria BT-DB-001 e o ensaio na estrutura
+    // do dump de 2026-09-23, só nomes e resultados). Na produção, tudo aqui é
+    // nulo ou só confere, menos três coisas que ela não tinha e o código usa:
+    // os índices de ml_prompt_feedback e os defaults de prompt_version e de
+    // battle_simulations.simulation_type (só metadado). Onde a produção é mais
+    // estrita (tipos, NOT NULL, chave primária), o banco novo adota. O que pede
+    // olhar dado (NOT NULL da D-67, chaves da D-50, CHECK que a produção não tem)
+    // fica na lista fechada da deriva, pendente do dono. 075 e 076 são da frente
+    // de banco.
+    up: r'''
+      CREATE TABLE IF NOT EXISTS optimization_analysis_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        test_run_id TEXT NOT NULL,
+        test_number INTEGER NOT NULL,
+        test_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        commander_name TEXT NOT NULL,
+        commander_colors TEXT[] NOT NULL,
+        deck_format TEXT DEFAULT 'commander',
+        initial_card_count INTEGER NOT NULL,
+        final_card_count INTEGER NOT NULL,
+        operation_mode TEXT NOT NULL,
+        target_archetype TEXT,
+        detected_theme TEXT,
+        edhrec_themes TEXT[],
+        theme_match BOOLEAN DEFAULT false,
+        hybrid_mode_used BOOLEAN DEFAULT false,
+        before_avg_cmc DOUBLE PRECISION,
+        before_land_count INTEGER,
+        before_creature_count INTEGER,
+        after_avg_cmc DOUBLE PRECISION,
+        after_land_count INTEGER,
+        after_creature_count INTEGER,
+        removals_count INTEGER DEFAULT 0,
+        additions_count INTEGER DEFAULT 0,
+        removals_list JSONB,
+        additions_list JSONB,
+        validation_score INTEGER,
+        validation_verdict TEXT,
+        color_identity_violations INTEGER DEFAULT 0,
+        edhrec_validated_count INTEGER DEFAULT 0,
+        edhrec_not_validated_count INTEGER DEFAULT 0,
+        validation_warnings JSONB,
+        decisions_reasoning JSONB,
+        swap_analysis JSONB,
+        role_delta JSONB,
+        execution_time_ms INTEGER,
+        effectiveness_score DOUBLE PRECISION,
+        improvements_achieved JSONB,
+        potential_issues JSONB,
+        alternative_approaches JSONB,
+        lessons_learned TEXT,
+        algorithm_version TEXT DEFAULT 'v1.1-hybrid',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_oal_test_run ON optimization_analysis_logs USING btree (test_run_id);
+      CREATE INDEX IF NOT EXISTS idx_oal_commander ON optimization_analysis_logs USING btree (commander_name);
+      CREATE INDEX IF NOT EXISTS idx_oal_mode ON optimization_analysis_logs USING btree (operation_mode);
+      CREATE INDEX IF NOT EXISTS idx_oal_effectiveness ON optimization_analysis_logs USING btree (effectiveness_score);
+      CREATE INDEX IF NOT EXISTS idx_oal_timestamp ON optimization_analysis_logs USING btree (test_timestamp);
+      CREATE INDEX IF NOT EXISTS idx_opt_analysis_test_run ON optimization_analysis_logs USING btree (test_run_id);
+
+      CREATE TABLE IF NOT EXISTS synergy_packages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        package_name TEXT NOT NULL,
+        package_type TEXT NOT NULL,
+        card_names TEXT[] NOT NULL,
+        primary_archetype TEXT,
+        supported_formats TEXT[] DEFAULT '{}',
+        occurrence_count INTEGER DEFAULT 0,
+        confidence_score DOUBLE PRECISION DEFAULT 0.5,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT unique_package UNIQUE (package_name)
+      );
+
+      CREATE TABLE IF NOT EXISTS archetype_patterns (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        archetype TEXT NOT NULL,
+        format TEXT NOT NULL,
+        ideal_land_count INTEGER,
+        ideal_avg_cmc DOUBLE PRECISION,
+        typical_ramp TEXT[] DEFAULT '{}',
+        typical_draw TEXT[] DEFAULT '{}',
+        typical_removal TEXT[] DEFAULT '{}',
+        typical_finishers TEXT[] DEFAULT '{}',
+        core_cards TEXT[] DEFAULT '{}',
+        flex_options JSONB DEFAULT '{}',
+        win_conditions TEXT[] DEFAULT '{}',
+        sample_size INTEGER DEFAULT 0,
+        last_analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        data_sources TEXT[] DEFAULT '{}',
+        CONSTRAINT unique_archetype_format UNIQUE (archetype, format)
+      );
+
+      CREATE TABLE IF NOT EXISTS ml_learning_state (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        model_version TEXT NOT NULL,
+        prompt_template_hash TEXT,
+        total_optimizations INTEGER DEFAULT 0,
+        avg_effectiveness_score DOUBLE PRECISION DEFAULT 0.0,
+        active_rules JSONB DEFAULT '{}',
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT unique_model_version UNIQUE (model_version)
+      );
+
+      CREATE TABLE IF NOT EXISTS theme_contextual_rules (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        theme TEXT NOT NULL,
+        function TEXT NOT NULL,
+        min_count INTEGER,
+        max_count INTEGER,
+        ideal_count INTEGER,
+        priority TEXT CHECK (priority IN ('essential', 'high', 'medium', 'low')),
+        conditions JSONB DEFAULT '{}'::jsonb,
+        description TEXT,
+        source TEXT DEFAULT 'themes_md',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        CONSTRAINT theme_contextual_rules_theme_function_key UNIQUE (theme, function)
+      );
+      CREATE INDEX IF NOT EXISTS idx_theme_rules_theme ON theme_contextual_rules USING btree (theme);
+
+      CREATE TABLE IF NOT EXISTS analysis_sources (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        source_file TEXT NOT NULL,
+        source_type TEXT NOT NULL,
+        commander_name TEXT,
+        hash TEXT,
+        imported_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        CONSTRAINT analysis_sources_source_file_key UNIQUE (source_file)
+      );
+      CREATE INDEX IF NOT EXISTS idx_analysis_sources_commander ON analysis_sources USING btree (commander_name);
+      CREATE INDEX IF NOT EXISTS idx_analysis_sources_type ON analysis_sources USING btree (source_type);
+
+      -- Colunas: a forma da produção (auditoria BT-DB-001). Na produção, tudo
+      -- abaixo é nulo ou só confere; o banco novo passa a ser igual.
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS edhrec_rank INTEGER;
+
+      ALTER TABLE ml_prompt_feedback
+        ALTER COLUMN prompt_version SET DEFAULT 'v1.1-hybrid';
+      CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_user_created
+        ON ml_prompt_feedback (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_deck_created
+        ON ml_prompt_feedback (deck_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_archetype_created
+        ON ml_prompt_feedback (LOWER(archetype), created_at DESC);
+
+      ALTER TABLE battle_simulations ALTER COLUMN simulation_type SET DEFAULT 'legacy';
+
+      ALTER TABLE commander_learned_decks ALTER COLUMN created_at SET DEFAULT now();
+      ALTER TABLE commander_learned_decks ALTER COLUMN created_at SET NOT NULL;
+      ALTER TABLE commander_learned_decks ALTER COLUMN updated_at SET DEFAULT now();
+      ALTER TABLE commander_learned_decks ALTER COLUMN updated_at SET NOT NULL;
+
+      ALTER TABLE card_meta_insights
+        ADD COLUMN IF NOT EXISTS id UUID NOT NULL DEFAULT gen_random_uuid();
+
+      -- Trocas que a produção já tem: só rodam onde a forma ainda é a antiga.
+      DO $adopt_production_shapes$
+      BEGIN
+        IF EXISTS (
+          SELECT 1
+          FROM pg_constraint constraint_row
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = constraint_row.conrelid
+           AND attribute_row.attnum = ANY (constraint_row.conkey)
+          WHERE constraint_row.conrelid = 'public.card_meta_insights'::regclass
+            AND constraint_row.contype = 'p'
+            AND attribute_row.attname = 'card_name'
+        ) THEN
+          ALTER TABLE card_meta_insights DROP CONSTRAINT card_meta_insights_pkey;
+          ALTER TABLE card_meta_insights
+            ADD CONSTRAINT card_meta_insights_pkey PRIMARY KEY (id);
+        END IF;
+
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.card_meta_insights'::regclass
+            AND attname = 'versatility_score'
+        ) <> 'double precision' THEN
+          ALTER TABLE card_meta_insights
+            ALTER COLUMN versatility_score TYPE DOUBLE PRECISION;
+          ALTER TABLE card_meta_insights ALTER COLUMN versatility_score SET DEFAULT 0.0;
+        END IF;
+
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.users'::regclass AND attname = 'location_city'
+        ) <> 'character varying(100)' THEN
+          ALTER TABLE users ALTER COLUMN location_city TYPE VARCHAR(100);
+        END IF;
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.users'::regclass AND attname = 'location_state'
+        ) <> 'character varying(2)' THEN
+          ALTER TABLE users ALTER COLUMN location_state TYPE VARCHAR(2);
+        END IF;
+
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.user_binder_items'::regclass
+            AND attname = 'list_type'
+        ) <> 'character varying(4)' THEN
+          DROP VIEW IF EXISTS binder_item_availability;
+          DROP VIEW IF EXISTS collection_availability_snapshot;
+          ALTER TABLE user_binder_items ALTER COLUMN list_type TYPE VARCHAR(4);
+          ALTER TABLE user_binder_items ALTER COLUMN list_type SET DEFAULT 'have';
+    CREATE VIEW collection_availability_snapshot AS
+    WITH owned AS (
+      SELECT
+        bi.user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
+      FROM user_binder_items bi
+      JOIN cards c ON c.id = bi.card_id
+      WHERE bi.list_type = 'have'
+      GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+    ),
+    allocated AS (
+      SELECT
+        d.user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(dc.quantity), 0)::int AS allocated_quantity
+      FROM decks d
+      JOIN deck_cards dc ON dc.deck_id = d.id
+      JOIN cards c ON c.id = dc.card_id
+      WHERE d.deleted_at IS NULL
+      GROUP BY d.user_id, COALESCE(c.oracle_id, c.id)
+    ),
+    committed AS (
+      SELECT
+        ti.owner_id AS user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(ti.quantity), 0)::int AS committed_trade_quantity
+      FROM trade_items ti
+      JOIN trade_offers trade ON trade.id = ti.trade_offer_id
+      JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+      JOIN cards c ON c.id = bi.card_id
+      WHERE trade.status IN (
+        'pending', 'accepted', 'shipped', 'delivered', 'disputed'
+      )
+        AND bi.list_type = 'have'
+      GROUP BY ti.owner_id, COALESCE(c.oracle_id, c.id)
+    ),
+    wanted AS (
+      SELECT
+        bi.user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(bi.quantity), 0)::int AS wanted_quantity
+      FROM user_binder_items bi
+      JOIN cards c ON c.id = bi.card_id
+      WHERE bi.list_type = 'want'
+      GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+    ),
+    identities AS (
+      SELECT user_id, playable_card_id FROM owned
+      UNION
+      SELECT user_id, playable_card_id FROM allocated
+      UNION
+      SELECT user_id, playable_card_id FROM committed
+      UNION
+      SELECT user_id, playable_card_id FROM wanted
+    )
+    SELECT
+      identity.user_id,
+      identity.playable_card_id,
+      COALESCE(
+        owned.canonical_name,
+        allocated.canonical_name,
+        committed.canonical_name,
+        wanted.canonical_name
+      ) AS canonical_name,
+      COALESCE(owned.owned_quantity, 0)::int AS owned_quantity,
+      COALESCE(allocated.allocated_quantity, 0)::int AS allocated_quantity,
+      COALESCE(committed.committed_trade_quantity, 0)::int
+        AS committed_trade_quantity,
+      GREATEST(
+        COALESCE(owned.owned_quantity, 0)
+          - COALESCE(allocated.allocated_quantity, 0)
+          - COALESCE(committed.committed_trade_quantity, 0),
+        0
+      )::int AS free_quantity,
+      GREATEST(
+        COALESCE(allocated.allocated_quantity, 0)
+          - COALESCE(owned.owned_quantity, 0),
+        0
+      )::int AS missing_quantity,
+      COALESCE(wanted.wanted_quantity, 0)::int AS wanted_quantity,
+      GREATEST(
+        COALESCE(wanted.wanted_quantity, 0)
+          - COALESCE(owned.owned_quantity, 0),
+        0
+      )::int AS wanted_missing_quantity
+    FROM identities identity
+    LEFT JOIN owned USING (user_id, playable_card_id)
+    LEFT JOIN allocated USING (user_id, playable_card_id)
+    LEFT JOIN committed USING (user_id, playable_card_id)
+    LEFT JOIN wanted USING (user_id, playable_card_id);
+
+    CREATE VIEW binder_item_availability AS
+    WITH item_priority AS (
+      SELECT
+        bi.id AS binder_item_id,
+        bi.user_id,
+        bi.card_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        bi.quantity AS item_quantity,
+        COALESCE(
+          SUM(bi.quantity) OVER (
+            PARTITION BY bi.user_id, COALESCE(c.oracle_id, c.id)
+            ORDER BY
+              CASE WHEN bi.for_trade OR bi.for_sale THEN 0 ELSE 1 END,
+              bi.updated_at,
+              bi.id
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+          ),
+          0
+        )::int AS prior_item_quantity
+      FROM user_binder_items bi
+      JOIN cards c ON c.id = bi.card_id
+      WHERE bi.list_type = 'have'
+    )
+    SELECT
+      item.binder_item_id,
+      item.user_id,
+      item.card_id,
+      item.playable_card_id,
+      item.item_quantity,
+      availability.owned_quantity,
+      availability.allocated_quantity,
+      availability.committed_trade_quantity,
+      availability.free_quantity,
+      availability.missing_quantity,
+      GREATEST(
+        LEAST(
+          item.item_quantity,
+          availability.free_quantity - item.prior_item_quantity
+        ),
+        0
+      )::int AS available_quantity
+    FROM item_priority item
+    JOIN collection_availability_snapshot availability
+      ON availability.user_id = item.user_id
+     AND availability.playable_card_id = item.playable_card_id;
+        END IF;
+
+        IF to_regclass('public.idx_trade_history_offer') IS NULL
+           OR pg_get_indexdef(to_regclass('public.idx_trade_history_offer'))
+              <> 'CREATE INDEX idx_trade_history_offer ON public.trade_status_history USING btree (trade_offer_id)' THEN
+          DROP INDEX IF EXISTS idx_trade_history_offer;
+          CREATE INDEX idx_trade_history_offer ON trade_status_history (trade_offer_id);
+        END IF;
+        IF to_regclass('public.idx_trade_messages_offer') IS NULL
+           OR pg_get_indexdef(to_regclass('public.idx_trade_messages_offer'))
+              <> 'CREATE INDEX idx_trade_messages_offer ON public.trade_messages USING btree (trade_offer_id)' THEN
+          DROP INDEX IF EXISTS idx_trade_messages_offer;
+          CREATE INDEX idx_trade_messages_offer ON trade_messages (trade_offer_id);
+        END IF;
+
+        -- CHECK com o nome da produção (o ensaio na estrutura dela, 2026-09-28).
+        IF EXISTS (
+          SELECT 1 FROM pg_constraint
+          WHERE conrelid = 'public.account_deletion_receipts'::regclass
+            AND conname = 'account_deletion_receipts_deletion_mode_check'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM pg_constraint
+          WHERE conrelid = 'public.account_deletion_receipts'::regclass
+            AND conname = 'chk_account_deletion_mode'
+        ) THEN
+          ALTER TABLE account_deletion_receipts
+            RENAME CONSTRAINT account_deletion_receipts_deletion_mode_check
+            TO chk_account_deletion_mode;
+        END IF;
+        -- O CHECK de list_type com o nome e o texto da produção: refeito sobre
+        -- o varchar(4) onde ainda não é o dela.
+        IF COALESCE((
+          SELECT pg_get_constraintdef(oid, true)
+          FROM pg_constraint
+          WHERE conrelid = 'public.user_binder_items'::regclass
+            AND conname = 'chk_list_type'
+        ), '') <> 'CHECK (list_type::text = ANY (ARRAY[''have''::character varying::text, ''want''::character varying::text]))' THEN
+          ALTER TABLE user_binder_items
+            DROP CONSTRAINT IF EXISTS user_binder_items_list_type_check;
+          ALTER TABLE user_binder_items DROP CONSTRAINT IF EXISTS chk_list_type;
+          ALTER TABLE user_binder_items
+            ADD CONSTRAINT chk_list_type CHECK (list_type::text = ANY (ARRAY['have'::character varying::text, 'want'::character varying::text]));
+        END IF;
+      END;
+      $adopt_production_shapes$;
+
+      -- A mesma regra de chk_post_game_notes_revision (038), repetida no bootstrap.
+      ALTER TABLE post_game_notes DROP CONSTRAINT IF EXISTS post_game_notes_revision_check;
+    ''',
+    // Rollback só por plano manual: a 075 adota o que a produção já tem, e um
+    // down automático tiraria dela tabelas e formas anteriores à migration.
+    down: 'SELECT 1;',
+  ),
+  Migration(
+    version: '076',
+    name: 'align_message_and_trade_history_user_fks',
+    // BT-DB-005: direct_messages.sender_id, trade_messages.sender_id e
+    // trade_status_history.changed_by estão sem ação na produção e com RESTRICT
+    // nas migrations (auditoria BT-DB-001). Como a 059 fez com trade_items
+    // (D-66), os dois bancos ficam com RESTRICT: apagar a linha de users de quem
+    // mandou mensagem ou mudou uma troca é recusado. A exclusão de conta do
+    // produto não apaga users (pseudonimiza). Refazer a chave troca o OID dela:
+    // sai o gatilho de conta ativa antigo, e o laço canônico refaz o de cada
+    // chave (regra da 074).
+    up: r'''
+      DO $align_user_fks$
+      DECLARE
+        wanted RECORD;
+      BEGIN
+        FOR wanted IN
+          SELECT *
+          FROM (VALUES
+            ('direct_messages', 'sender_id', 'direct_messages_sender_id_fkey'),
+            ('trade_messages', 'sender_id', 'trade_messages_sender_id_fkey'),
+            ('trade_status_history', 'changed_by', 'trade_status_history_changed_by_fkey')
+          ) AS key_row (table_name, column_name, constraint_name)
+        LOOP
+          IF EXISTS (
+            SELECT 1
+            FROM pg_constraint
+            WHERE conrelid = format('public.%I', wanted.table_name)::regclass
+              AND conname = wanted.constraint_name
+              AND contype = 'f'
+              AND confdeltype <> 'r'
+          ) THEN
+            EXECUTE format(
+              'ALTER TABLE public.%I DROP CONSTRAINT %I',
+              wanted.table_name,
+              wanted.constraint_name
+            );
+            EXECUTE format(
+              'ALTER TABLE public.%I ADD CONSTRAINT %I '
+              'FOREIGN KEY (%I) REFERENCES users(id) ON DELETE RESTRICT',
+              wanted.table_name,
+              wanted.constraint_name,
+              wanted.column_name
+            );
+          END IF;
+        END LOOP;
+      END;
+      $align_user_fks$;
+
+      -- Refazer a chave troca o OID dela, e o gatilho de conta ativa com o OID
+      -- antigo ficaria para trás (a 059 fez o mesmo em trade_items).
+      DO $drop_stale_active_user_triggers$
+      DECLARE
+        stale RECORD;
+      BEGIN
+        FOR stale IN
+          SELECT trigger_row.tgname, relation_row.relname
+          FROM pg_trigger trigger_row
+          JOIN pg_class relation_row ON relation_row.oid = trigger_row.tgrelid
+          WHERE NOT trigger_row.tgisinternal
+            AND left(trigger_row.tgname, 21) = 'manaloom_active_user_'
+            AND relation_row.relnamespace = 'public'::regnamespace
+            AND NOT EXISTS (
+              SELECT 1
+              FROM pg_constraint constraint_row
+              WHERE constraint_row.conrelid = trigger_row.tgrelid
+                AND constraint_row.contype = 'f'
+                AND 'manaloom_active_user_' || constraint_row.oid = trigger_row.tgname
+            )
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.%I',
+            stale.tgname,
+            stale.relname
+          );
+        END LOOP;
+      END;
+      $drop_stale_active_user_triggers$;
+
+      DO $active_user_triggers$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      $active_user_triggers$;
+    ''',
+    down: r'''
+      DO $restore_user_fks$
+      DECLARE
+        wanted RECORD;
+      BEGIN
+        FOR wanted IN
+          SELECT *
+          FROM (VALUES
+            ('direct_messages', 'sender_id', 'direct_messages_sender_id_fkey'),
+            ('trade_messages', 'sender_id', 'trade_messages_sender_id_fkey'),
+            ('trade_status_history', 'changed_by', 'trade_status_history_changed_by_fkey')
+          ) AS key_row (table_name, column_name, constraint_name)
+        LOOP
+          IF EXISTS (
+            SELECT 1
+            FROM pg_constraint
+            WHERE conrelid = format('public.%I', wanted.table_name)::regclass
+              AND conname = wanted.constraint_name
+              AND contype = 'f'
+              AND confdeltype <> 'a'
+          ) THEN
+            EXECUTE format(
+              'ALTER TABLE public.%I DROP CONSTRAINT %I',
+              wanted.table_name,
+              wanted.constraint_name
+            );
+            EXECUTE format(
+              'ALTER TABLE public.%I ADD CONSTRAINT %I '
+              'FOREIGN KEY (%I) REFERENCES users(id)',
+              wanted.table_name,
+              wanted.constraint_name,
+              wanted.column_name
+            );
+          END IF;
+        END LOOP;
+      END;
+      $restore_user_fks$;
+
+      -- Refazer a chave troca o OID dela, e o gatilho de conta ativa com o OID
+      -- antigo ficaria para trás (a 059 fez o mesmo em trade_items).
+      DO $drop_stale_active_user_triggers$
+      DECLARE
+        stale RECORD;
+      BEGIN
+        FOR stale IN
+          SELECT trigger_row.tgname, relation_row.relname
+          FROM pg_trigger trigger_row
+          JOIN pg_class relation_row ON relation_row.oid = trigger_row.tgrelid
+          WHERE NOT trigger_row.tgisinternal
+            AND left(trigger_row.tgname, 21) = 'manaloom_active_user_'
+            AND relation_row.relnamespace = 'public'::regnamespace
+            AND NOT EXISTS (
+              SELECT 1
+              FROM pg_constraint constraint_row
+              WHERE constraint_row.conrelid = trigger_row.tgrelid
+                AND constraint_row.contype = 'f'
+                AND 'manaloom_active_user_' || constraint_row.oid = trigger_row.tgname
+            )
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.%I',
+            stale.tgname,
+            stale.relname
+          );
+        END LOOP;
+      END;
+      $drop_stale_active_user_triggers$;
+
+      DO $active_user_triggers$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      $active_user_triggers$;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -6464,7 +7106,11 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       // down automático tiraria da produção objetos anteriores à migration.
       '063' ||
       '064' ||
-      '065' => MigrationRollbackPolicy.manualOnly,
+      '065' ||
+      // A 075 adota tabelas e formas da produção, e a 076 alinha três chaves
+      // que na produção estavam sem ação: o down automático mudaria a produção.
+      '075' ||
+      '076' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 

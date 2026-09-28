@@ -91,10 +91,13 @@ void main() {
   });
 
   test('sem a 074, a regra acusa as chaves criadas depois do último laço', () {
-    final withoutTheFix = [
-      for (final migration in migrate.migrations)
-        if (migration.version != '074') migration,
-    ];
+    // A lista até a 074, sem ela: uma migration posterior com o laço (a 076)
+    // também cobriria as chaves, mas o banco migrado fica sem a trava entre
+    // uma e outra.
+    final withoutTheFix =
+        migrate.migrations
+            .takeWhile((migration) => migration.version != '074')
+            .toList();
     final flagged = activeUserRuleViolations(withoutTheFix, canonicalLoop);
     expect(flagged, isNotEmpty);
     for (final violation in flagged) {

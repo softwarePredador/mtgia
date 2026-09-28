@@ -138,6 +138,8 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '064': 'adopt_production_unique_indexes',
   '065': 'adopt_production_indexes_from_database_indexes_sql',
   '074': 'reinstall_active_user_triggers',
+  '075': 'adopt_production_ml_tables_and_shapes',
+  '076': 'align_message_and_trade_history_user_fks',
 };
 
 const releaseSchemaReadinessSql = '''
@@ -169,11 +171,13 @@ const releaseSchemaReadinessSql = '''
       ('063', 'recreate_commander_learning_snapshot_view'),
       ('064', 'adopt_production_unique_indexes'),
       ('065', 'adopt_production_indexes_from_database_indexes_sql'),
-      ('074', 'reinstall_active_user_triggers')
+      ('074', 'reinstall_active_user_triggers'),
+      ('075', 'adopt_production_ml_tables_and_shapes'),
+      ('076', 'align_message_and_trade_history_user_fks')
   )
   SELECT
     (
-      SELECT COUNT(*) = 27
+      SELECT COUNT(*) = 29
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
@@ -182,7 +186,7 @@ const releaseSchemaReadinessSql = '''
     COALESCE(
       (SELECT MAX(version) FROM public.schema_migrations),
       ''
-    ) = '074' AS latest_migration_ready,
+    ) = '076' AS latest_migration_ready,
     (
       SELECT COUNT(*)
       FROM pg_class
@@ -656,8 +660,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: healthy,
       check: {
         'status': healthy ? 'healthy' : 'unhealthy',
-        'required_range': '038-074',
-        'latest_migration': '074',
+        'required_range': '038-076',
+        'latest_migration': '076',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -669,8 +673,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: false,
       check: {
         'status': 'unhealthy',
-        'required_range': '038-074',
-        'latest_migration': '074',
+        'required_range': '038-076',
+        'latest_migration': '076',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),

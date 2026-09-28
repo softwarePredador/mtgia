@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `36c8ca507b9f423336cabe08bb97e11c137da0766946388de48c726800bb89da`
+**Digest das fontes:** `bb50b141c956846db5852502ce04c47559f2fe54c1cf4aa6805c1a3be3ac30e2`
 
 ## Fontes de verdade
 
@@ -22,18 +22,18 @@
 | `semantic_resolved_files` | 705 |
 | `semantic_unresolved_files` | 0 |
 | `semantic_resolved_call_edges` | 43126 |
-| `semantic_resolved_call_sites` | 68569 |
+| `semantic_resolved_call_sites` | 68571 |
 | `semantic_resolved_type_references` | 16352 |
 | `modules` | 162 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
 | `api_routes` | 121 |
-| `database_tables` | 80 |
+| `database_tables` | 86 |
 | `database_views` | 6 |
-| `migrations` | 64 |
+| `migrations` | 66 |
 | `scripts_and_jobs` | 699 |
 | `environment_variables` | 717 |
-| `tests` | 1275 |
+| `tests` | 1277 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
 | `tasks` | 245 |

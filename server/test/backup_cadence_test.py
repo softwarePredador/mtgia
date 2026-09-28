@@ -103,14 +103,22 @@ def _write_drill(
 
 
 class PolicyTest(unittest.TestCase):
-    def test_versioned_policy_follows_d12_and_d81(self) -> None:
+    def test_versioned_policy_follows_d12_d81_d83_and_d84(self) -> None:
         policy = _policy()
         self.assertEqual(cadence.policy_problems(policy), [])
         self.assertEqual(policy["objectives"]["rpo_hours"], 24)
         self.assertEqual(policy["objectives"]["rto_hours"], 4)
         self.assertIs(policy["backup"]["offsite_copy"], False)
         self.assertEqual(policy["backup"]["destination"], "backups/manaloom-postgres/")
-        self.assertIsNone(policy["backup"]["retention_days"])
+        # D-84: 30 dias de guarda e a cifra em repouso pelo FileVault.
+        self.assertEqual(policy["backup"]["retention_days"], 30)
+        self.assertIn("FileVault", policy["backup"]["encryption"])
+        self.assertIn("D-84", policy["backup"]["retention_note"])
+        self.assertIn("sim do dono", policy["backup"]["retention_note"])
+        # D-83: ensaio semanal e antes de toda migration na produção.
+        self.assertEqual(policy["cadence"]["drill_max_interval_days"], 7)
+        self.assertIs(policy["cadence"]["drill_after_production_migration"], True)
+        self.assertEqual(policy["cadence"]["status"], "decidida_D-12_e_D-83")
         self.assertEqual(policy["drill"]["network"], "none")
         self.assertEqual(policy["cadence"]["backup_max_interval_hours"], 24)
 
@@ -211,6 +219,24 @@ class CheckTest(unittest.TestCase):
         result = self._check()
         self.assertEqual(result["status"], "BLOCKED")
         self.assertTrue(any("nenhum ensaio" in r for r in result["reasons"]))
+
+    def test_lists_dumps_past_the_retention_and_keeps_the_newest_drilled_one(self) -> None:
+        # D-84: 30 dias. O mais novo com ensaio aprovado fica, mesmo vencido;
+        # o mais novo de todos também. Nada é apagado.
+        oldest = _write_backup(self.backup_dir, NOW - dt.timedelta(days=45))
+        drilled = _write_backup(self.backup_dir, NOW - dt.timedelta(days=35))
+        _write_drill(self.backup_dir, drilled, NOW - dt.timedelta(days=34))
+        recent = _write_backup(self.backup_dir, NOW - dt.timedelta(days=10))
+        newest = _write_backup(self.backup_dir, NOW - dt.timedelta(hours=3))
+        failed = _write_backup(self.backup_dir, NOW - dt.timedelta(days=31))
+        _write_drill(self.backup_dir, failed, NOW - dt.timedelta(days=30), status="failed")
+        retention = self._check()["retention"]
+        self.assertEqual(retention["days"], 30)
+        self.assertEqual(retention["keep"], sorted([drilled.name, newest.name]))
+        self.assertEqual(retention["expired"], [oldest.name, failed.name])
+        self.assertIn("sim do dono", retention["delete"])
+        for path in (oldest, drilled, recent, newest, failed):
+            self.assertTrue(path.exists(), path.name)
 
     def test_refuses_temporary_backup_directories(self) -> None:
         for path in (

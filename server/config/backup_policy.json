@@ -1,12 +1,14 @@
 {
   "schema_version": 1,
   "policy": "brewtact-backup",
-  "version": "2026-09-24.1",
+  "version": "2026-09-28.1",
   "task": "BT-DR-001",
   "decisions": [
     "D-12",
     "D-23",
-    "D-81"
+    "D-81",
+    "D-83",
+    "D-84"
   ],
   "objectives": {
     "rpo_hours": 24,
@@ -22,10 +24,10 @@
     "format": "pg_dump -Fc do banco halder, conferido por pg_restore --list",
     "offsite_copy": false,
     "offsite_note": "D-81: o MVP não tem cópia fora do servidor. Risco aceito: perder juntos a máquina do backup e o servidor.",
-    "encryption": "nenhuma",
-    "encryption_note": "D-12 pedia age com a chave sob custódia do dono; o único caminho de cifra do repositório exige o bucket que o dono vetou. Cifrar o backup local é decisão pendente.",
-    "retention_days": null,
-    "retention_note": "D-23 manda o prazo de rotação dos backups entrar na política; o prazo ainda não foi decidido."
+    "encryption": "cifra do disco em repouso (FileVault) na máquina de operação",
+    "encryption_note": "D-84: a cifra em repouso do MVP é o FileVault do disco da máquina de operação; o age volta quando houver cópia fora da máquina (D-12).",
+    "retention_days": 30,
+    "retention_note": "D-84: cada dump fica 30 dias, e o mais novo com ensaio aprovado fica sempre, com o mais novo de todos. Apagar dump pede o sim do dono na hora até a rotação ser automatizada: o check só lista os vencidos."
   },
   "drill": {
     "script": "scripts/manaloom_full_restore_drill.sh",
@@ -36,14 +38,14 @@
     "measures": "o tempo de restaurar o dump num PostgreSQL 17 isolado e conferir tabelas, chaves e contagens; o RTO inteiro soma provisionar o banco e religar a API (runbook)"
   },
   "cadence": {
-    "status": "derivada_de_D-12_com_ensaio_proposto",
+    "status": "decidida_D-12_e_D-83",
     "backup_max_interval_hours": 24,
     "drill_max_interval_days": 7,
     "drill_after_production_migration": true,
     "rationale": {
       "backup_max_interval_hours": "O RPO de 24 h (D-12) só vale com um backup a cada 24 h no máximo.",
-      "drill_max_interval_days": "Proposta: um ensaio por semana, a mesma cadência do check semanal de scripts/manaloom_install_remote_backup_cron.sh. Prova que o dump restaura e mede o tempo contra o RTO.",
-      "drill_after_production_migration": "Precedente da 058 na BT-REL-000: backup e ensaio antes de aplicar migration na produção."
+      "drill_max_interval_days": "D-83: um ensaio por semana, a mesma cadência do check semanal de scripts/manaloom_install_remote_backup_cron.sh. Prova que o dump restaura e mede o tempo contra o RTO.",
+      "drill_after_production_migration": "D-83: ensaio antes de toda migration na produção (precedente da 058 na BT-REL-000)."
     }
   },
   "receipts": "backups/manaloom-postgres/receipts/<carimbo>.json, gravado por scripts/manaloom_backup_cycle.sh",
