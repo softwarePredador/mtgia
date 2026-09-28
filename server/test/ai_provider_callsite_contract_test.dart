@@ -3,17 +3,32 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 void main() {
+  test('the provider URL lives only in OpenAiRuntimeConfig (D-83)', () {
+    final withUrl = <String>[];
+    for (final root in [Directory('lib'), Directory('routes')]) {
+      for (final entity in root.listSync(recursive: true)) {
+        if (entity is! File || !entity.path.endsWith('.dart')) continue;
+        if (entity.readAsStringSync().contains('api.openai.com')) {
+          withUrl.add(entity.path.replaceAll(r'\', '/'));
+        }
+      }
+    }
+    expect(withUrl, ['lib/openai_runtime_config.dart']);
+  });
+
   test('every direct OpenAI call is bounded and identifies users safely', () {
+    // Toda chamada ao provedor usa o endpoint do OpenAiRuntimeConfig.
     final callsites = <File>[];
     for (final root in [Directory('lib'), Directory('routes')]) {
       for (final entity in root.listSync(recursive: true)) {
         if (entity is! File || !entity.path.endsWith('.dart')) continue;
+        if (entity.path.endsWith('openai_runtime_config.dart')) continue;
         final source = entity.readAsStringSync();
-        if (source.contains('api.openai.com')) callsites.add(entity);
+        if (source.contains('chatCompletionsUri')) callsites.add(entity);
       }
     }
 
-    expect(callsites, isNotEmpty);
+    expect(callsites, hasLength(7));
     for (final file in callsites) {
       final source = file.readAsStringSync();
       expect(

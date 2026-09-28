@@ -875,7 +875,7 @@ class DeckOptimizerService {
     try {
       final response = await http
           .post(
-            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            aiConfig.chatCompletionsUri,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $openAiKey',
@@ -1045,7 +1045,7 @@ class DeckOptimizerService {
     try {
       final response = await http
           .post(
-            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            aiConfig.chatCompletionsUri,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $openAiKey',

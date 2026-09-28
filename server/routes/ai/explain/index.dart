@@ -164,7 +164,7 @@ Future<Response> onRequest(RequestContext context) async {
     try {
       response = await http
           .post(
-            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            aiConfig.chatCompletionsUri,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $apiKey',

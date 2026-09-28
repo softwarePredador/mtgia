@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
+import 'package:dotenv/dotenv.dart';
 import 'package:test/test.dart';
 
 import '../lib/legal_acceptance_middleware.dart';
+import '../lib/openai_runtime_config.dart';
 import '../lib/release_capability_policy.dart';
 import '../routes/ai/_middleware.dart' as ai_middleware;
 
@@ -206,41 +208,49 @@ void main() {
       final openAi = providers['openai_chat_completions'] as Map;
       final declared = (openAi['callsites'] as List).cast<String>().toSet();
       final url = openAi['url'] as String;
+      final marker = openAi['callsite_marker'] as String;
+      final urlSource = openAi['url_source'] as String;
       final occurrences = (openAi['callsite_occurrences'] as Map).map(
         (file, count) => MapEntry(file as String, count as int),
       );
       final found = <String, int>{};
+      final withHost = <String>{};
+      final readsBaseUrl = <String>{};
       for (final root in ['lib', 'routes']) {
         for (final file in Directory(root)
             .listSync(recursive: true)
             .whereType<File>()
             .where((file) => file.path.endsWith('.dart'))) {
-          final count = url.allMatches(file.readAsStringSync()).length;
-          if (count > 0) {
-            found['server/${file.path.replaceAll(r'\', '/')}'] = count;
-          }
+          final source = file.readAsStringSync();
+          final path = 'server/${file.path.replaceAll(r'\', '/')}';
+          if (source.contains(Uri.parse(url).host)) withHost.add(path);
+          if (source.contains('OPENAI_BASE_URL')) readsBaseUrl.add(path);
+          if (path == urlSource) continue;
+          final count = marker.allMatches(source).length;
+          if (count > 0) found[path] = count;
         }
       }
       expect(found.keys.toSet(), declared, reason: 'chamada nova ao provedor');
-      // Cada ponto com a URL fixa conta: a sessão do gate achou quatro em
-      // server/lib, e um ponto novo num arquivo já registrado também falha.
-      expect(found, occurrences, reason: 'ponto novo com a URL fixa');
-      if (openAi['url_configurable'] == false) {
-        // A URL fica fixa no código (a fixture exporta OPENAI_BASE_URL, mas
-        // nenhum código lê). Se alguém passar a ler, o registry muda junto.
-        for (final root in ['lib', 'routes']) {
-          for (final file in Directory(root)
-              .listSync(recursive: true)
-              .whereType<File>()
-              .where((file) => file.path.endsWith('.dart'))) {
-            expect(
-              file.readAsStringSync(),
-              isNot(contains('OPENAI_BASE_URL')),
-              reason: file.path,
-            );
-          }
-        }
+      // Cada ponto conta: um ponto novo num arquivo já registrado também
+      // falha (a sessão do gate achou quatro em server/lib).
+      expect(found, occurrences, reason: 'ponto novo de chamada ao provedor');
+      // D-83: a URL mora num lugar só, e só ele lê OPENAI_BASE_URL.
+      expect(withHost, {urlSource}, reason: 'URL fixa fora do config');
+      if (openAi['url_configurable'] == true) {
+        expect(readsBaseUrl, {urlSource}, reason: 'quem lê OPENAI_BASE_URL');
+        expect(openAi['url_env'], 'OPENAI_BASE_URL');
+        expect(_text(openAi['url_rule']), isNotEmpty);
+      } else {
+        expect(readsBaseUrl, isEmpty, reason: 'quem lê OPENAI_BASE_URL');
       }
+      // A URL registrada é a que a produção usa, mesmo com a variável.
+      final production = OpenAiRuntimeConfig(
+        DotEnv()..addAll({
+          'ENVIRONMENT': 'production',
+          'OPENAI_BASE_URL': 'http://127.0.0.1:9/v1',
+        }),
+      );
+      expect(production.chatCompletionsUri.toString(), url);
     });
 
     test('as chamadas ao provedor de uma rota apontam para um ponto '
