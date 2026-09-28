@@ -728,7 +728,10 @@ server/bin/run_local_battle_replay_audit.sh
 
 That runner:
 
-1. loads `server/.env` when present;
+1. loads `server/.env` when present (or the file named in `MANALOOM_POSTGRES_ENV`);
+   the PostgreSQL mirror goes through `db_helper.py`, which never looks for a
+   `.env` by itself and refuses a database outside loopback unless
+   `MANALOOM_CONFIRM_POSTGRES_READS=I_HAVE_EXPLICIT_APPROVAL` is set for the run;
 2. mirrors reviewed `card_battle_rules` from PostgreSQL into the local Hermes
    SQLite cache;
 3. runs `battle_replay_v10_3.py`;

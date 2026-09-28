@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "034e27d759969f46faedd19075ca9084bf419b030e0bd8ace8c5022ddc2b3bb8",
+  "source_digest_sha256": "9811b22e2fb341aec77ca8bf20c104a2e174e0016c15a8d16a568e7f8ad4d951",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,8 +80,8 @@
     "database_views": 6,
     "migrations": 62,
     "scripts_and_jobs": 695,
-    "environment_variables": 718,
-    "tests": 1275,
+    "environment_variables": 720,
+    "tests": 1276,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -263779,19 +263779,10 @@
     {
       "path": "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
       "role": "operation",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": [
-        "DATABASE_URL",
-        "DB_HOST",
-        "DB_NAME",
-        "DB_PASS",
-        "DB_PORT",
-        "DB_USER",
-        "PGDATABASE",
-        "PGHOST",
-        "PGPASSWORD",
-        "PGPORT",
-        "PGUSER"
+        "PGHOSTADDR",
+        "PGSERVICE"
       ]
     },
     {
@@ -269585,7 +269576,6 @@
       "classification": "sensitive_name_only",
       "sources": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/audit_handcrafted_battle_rule_canonicalization.py",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_hidden_retreat_unblock_readiness.py",
@@ -269605,7 +269595,6 @@
       "name": "DB_HOST",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -269638,7 +269627,6 @@
       "name": "DB_NAME",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -269666,7 +269654,6 @@
       "name": "DB_PASS",
       "classification": "sensitive_name_only",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -269695,7 +269682,6 @@
       "name": "DB_PORT",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -269729,7 +269715,6 @@
       "name": "DB_USER",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -274632,7 +274617,6 @@
       "name": "PGDATABASE",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -274655,7 +274639,6 @@
       "name": "PGHOST",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -274674,10 +274657,17 @@
       "value_captured": false
     },
     {
+      "name": "PGHOSTADDR",
+      "classification": "configuration",
+      "sources": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PGPASSWORD",
       "classification": "sensitive_name_only",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -274696,7 +274686,6 @@
       "name": "PGPORT",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -274716,10 +274705,17 @@
       "value_captured": false
     },
     {
+      "name": "PGSERVICE",
+      "classification": "configuration",
+      "sources": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PGUSER",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -276257,6 +276253,7 @@
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_cloud_key_runtime.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_commander_deckbuilding_flow_research_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper_pg_live.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_digital_color_count_runtime.py",
@@ -278374,7 +278371,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "56a4311c45460038eb00ec95f9be2b1e8b7978e39ce719c2962c958ab67c8375"
+      "sha256": "8967a7aece285b4dbd18a97533a52702f86f00b3b1fa8c5fef19412917dcb87e"
     },
     "required_task_fields": [
       "id",
@@ -279932,7 +279929,7 @@
           "DCK-P0-05",
           "BT-PRIV-002"
         ],
-        "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (D-83, item 3 das decisões do `BT-PRIV-002`): o `sync_pg_target_deck_to_hermes.py` ganhou a proteção do alimentador; com `--apply`, pega o lock de escrita do SQLite (`BEGIN IMMEDIATE`, espera de 30 s) e só então confirma no PostgreSQL que o deck existe e não está na lixeira; deck sumido faz rollback e `DeckGoneError` sem o id na mensagem, e a cópia anterior fica para o expurgo, que pega o mesmo lock. Evidência: `test_sync_pg_target_deck_to_hermes.py` 17/17 (5 novos) e `test_sync_pg_target_deck_to_hermes_pg_live.py` 2/2 contra PostgreSQL descartável, sob a guarda de egress e com `DATABASE_URL` explícita em loopback; 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-sync-do-deck-alvo-sob-o-lock.md`. O resto do item (opt-out, leases, contribuição agregada) segue aberto.",
+        "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (D-83, item 3 das decisões do `BT-PRIV-002`): o `sync_pg_target_deck_to_hermes.py` ganhou a proteção do alimentador; com `--apply`, pega o lock de escrita do SQLite (`BEGIN IMMEDIATE`, espera de 30 s) e só então confirma no PostgreSQL que o deck existe e não está na lixeira; deck sumido faz rollback e `DeckGoneError` sem o id na mensagem, e a cópia anterior fica para o expurgo, que pega o mesmo lock. Evidência: `test_sync_pg_target_deck_to_hermes.py` 17/17 (5 novos) e `test_sync_pg_target_deck_to_hermes_pg_live.py` 2/2 contra PostgreSQL descartável, sob a guarda de egress e com `DATABASE_URL` explícita em loopback; 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-sync-do-deck-alvo-sob-o-lock.md`. O resto do item (opt-out, leases, contribuição agregada) segue aberto. Achado da mesma rodada, corrigido em 2026-09-28: o `db_helper.py` do Hermes carregava, sem configuração no ambiente, o primeiro `.env` achado subindo diretórios (do worktree, o `server/.env` do checkout principal); agora só aceita `DATABASE_URL`, `DB_*`/`PG*` no ambiente ou o arquivo nomeado em `MANALOOM_POSTGRES_ENV`, exige `MANALOOM_CONFIRM_POSTGRES_READS` (ou a de escrita) para host fora do loopback, contando as sobreposições do libpq, exige a de escrita para escrever por `run_sql`, e falha fechado sem mostrar URL, host ou senha; o daemon de ops confirma só a leitura para os jobs dele, e a produção segue recebendo o banco pelo ambiente do serviço. Evidência: `test_db_helper.py` 14 testes, `test_db_helper_pg_live.py` 2/2 contra PostgreSQL descartável, `server/test/manaloom_ops_daemon_test.py` 27/27 (2 novos), os 16 testes do Hermes que importam usuários do helper, 9 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-db-helper-sem-env-implicito.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 512
       },
@@ -288256,7 +288253,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "034e27d759969f46faedd19075ca9084bf419b030e0bd8ace8c5022ddc2b3bb8"
+    "project_logic_source_digest_sha256": "9811b22e2fb341aec77ca8bf20c104a2e174e0016c15a8d16a568e7f8ad4d951"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -289948,6 +289945,7 @@
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_cloud_key_runtime.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_commander_deckbuilding_flow_research_audit.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper.py",
+      "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper_pg_live.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_digital_color_count_runtime.py",
