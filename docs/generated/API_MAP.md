@@ -18,6 +18,8 @@
 | `/ai/explain` | `POST` | `server/routes/ai/explain/index.dart` | 2 | `source` |
 | `/ai/generate` | `POST` | `server/routes/ai/generate/index.dart` | 2 | `source` |
 | `/ai/generate/jobs/{id}` | `DELETE, GET` | `server/routes/ai/generate/jobs/[id].dart` | 2 | `source` |
+| `/ai/generate/requests/{id}` | `GET` | `server/routes/ai/generate/requests/[id]/index.dart` | 2 | `source` |
+| `/ai/generate/requests/{id}/materialize` | `POST` | `server/routes/ai/generate/requests/[id]/materialize.dart` | 2 | `source` |
 | `/ai/ml-status` | `GET` | `server/routes/ai/ml-status/index.dart` | 2 | `source` |
 | `/ai/optimize` | `POST` | `server/routes/ai/optimize/index.dart` | 2 | `source` |
 | `/ai/optimize/jobs/{id}` | `DELETE, GET` | `server/routes/ai/optimize/jobs/[id].dart` | 2 | `source` |
@@ -62,30 +64,32 @@
 | `/conversations/{id}/messages` | `GET, POST` | `server/routes/conversations/[id]/messages.dart` | 2 | `source` |
 | `/conversations/{id}/read` | `PUT` | `server/routes/conversations/[id]/read.dart` | 2 | `source` |
 | `/decks` | `GET, POST` | `server/routes/decks/index.dart` | 2 | `source` |
-| `/decks/{id}` | `DELETE, GET, PATCH, PUT` | `server/routes/decks/[id]/index.dart` | 2 | `source` |
-| `/decks/{id}/ai-analysis` | `POST` | `server/routes/decks/[id]/ai-analysis/index.dart` | 3 | `source` |
-| `/decks/{id}/analysis` | `GET` | `server/routes/decks/[id]/analysis/index.dart` | 2 | `source` |
-| `/decks/{id}/battle-preflight` | `GET` | `server/routes/decks/[id]/battle-preflight/index.dart` | 2 | `source` |
-| `/decks/{id}/battle-replays` | `GET` | `server/routes/decks/[id]/battle-replays/index.dart` | 2 | `source` |
-| `/decks/{id}/battle-replays/{replayId}` | `GET` | `server/routes/decks/[id]/battle-replays/[replayId]/index.dart` | 2 | `source` |
-| `/decks/{id}/battle-replays/{replayId}/annotations` | `GET, POST` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart` | 2 | `source` |
-| `/decks/{id}/battle-replays/{replayId}/annotations/{annotationId}` | `DELETE` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/[annotationId].dart` | 2 | `source` |
-| `/decks/{id}/cards` | `POST` | `server/routes/decks/[id]/cards/index.dart` | 2 | `source` |
-| `/decks/{id}/cards/bulk` | `POST` | `server/routes/decks/[id]/cards/bulk/index.dart` | 2 | `source` |
-| `/decks/{id}/cards/remove` | `POST` | `server/routes/decks/[id]/cards/remove/index.dart` | 2 | `source` |
-| `/decks/{id}/cards/replace` | `POST` | `server/routes/decks/[id]/cards/replace/index.dart` | 2 | `source` |
-| `/decks/{id}/cards/set` | `POST` | `server/routes/decks/[id]/cards/set/index.dart` | 2 | `source` |
-| `/decks/{id}/changes` | `GET` | `server/routes/decks/[id]/changes/index.dart` | 2 | `source` |
-| `/decks/{id}/changes/{eventId}/undo` | `POST` | `server/routes/decks/[id]/changes/[eventId]/undo/index.dart` | 2 | `source` |
-| `/decks/{id}/export` | `GET` | `server/routes/decks/[id]/export/index.dart` | 2 | `source` |
-| `/decks/{id}/optimizations` | `GET` | `server/routes/decks/[id]/optimizations/index.dart` | 2 | `source` |
-| `/decks/{id}/optimizations/{eventId}/rollback` | `POST` | `server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart` | 2 | `source` |
-| `/decks/{id}/post-game-notes` | `GET, POST` | `server/routes/decks/[id]/post-game-notes/index.dart` | 2 | `source` |
-| `/decks/{id}/post-game-notes/{noteId}` | `DELETE` | `server/routes/decks/[id]/post-game-notes/[noteId].dart` | 2 | `source` |
-| `/decks/{id}/post-game-timeline` | `GET` | `server/routes/decks/[id]/post-game-timeline/index.dart` | 2 | `source` |
-| `/decks/{id}/pricing` | `POST` | `server/routes/decks/[id]/pricing/index.dart` | 2 | `source` |
-| `/decks/{id}/reports` | `POST` | `server/routes/decks/[id]/reports/index.dart` | 2 | `source` |
-| `/decks/{id}/validate` | `POST` | `server/routes/decks/[id]/validate/index.dart` | 2 | `source` |
+| `/decks/trash` | `GET` | `server/routes/decks/trash/index.dart` | 2 | `source` |
+| `/decks/{id}` | `DELETE, GET, PATCH, PUT` | `server/routes/decks/[id]/index.dart` | 3 | `source` |
+| `/decks/{id}/ai-analysis` | `POST` | `server/routes/decks/[id]/ai-analysis/index.dart` | 4 | `source` |
+| `/decks/{id}/analysis` | `GET` | `server/routes/decks/[id]/analysis/index.dart` | 3 | `source` |
+| `/decks/{id}/battle-preflight` | `GET` | `server/routes/decks/[id]/battle-preflight/index.dart` | 3 | `source` |
+| `/decks/{id}/battle-replays` | `GET` | `server/routes/decks/[id]/battle-replays/index.dart` | 3 | `source` |
+| `/decks/{id}/battle-replays/{replayId}` | `GET` | `server/routes/decks/[id]/battle-replays/[replayId]/index.dart` | 3 | `source` |
+| `/decks/{id}/battle-replays/{replayId}/annotations` | `GET, POST` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart` | 3 | `source` |
+| `/decks/{id}/battle-replays/{replayId}/annotations/{annotationId}` | `DELETE` | `server/routes/decks/[id]/battle-replays/[replayId]/annotations/[annotationId].dart` | 3 | `source` |
+| `/decks/{id}/cards` | `POST` | `server/routes/decks/[id]/cards/index.dart` | 3 | `source` |
+| `/decks/{id}/cards/bulk` | `POST` | `server/routes/decks/[id]/cards/bulk/index.dart` | 3 | `source` |
+| `/decks/{id}/cards/remove` | `POST` | `server/routes/decks/[id]/cards/remove/index.dart` | 3 | `source` |
+| `/decks/{id}/cards/replace` | `POST` | `server/routes/decks/[id]/cards/replace/index.dart` | 3 | `source` |
+| `/decks/{id}/cards/set` | `POST` | `server/routes/decks/[id]/cards/set/index.dart` | 3 | `source` |
+| `/decks/{id}/changes` | `GET` | `server/routes/decks/[id]/changes/index.dart` | 3 | `source` |
+| `/decks/{id}/changes/{eventId}/undo` | `POST` | `server/routes/decks/[id]/changes/[eventId]/undo/index.dart` | 3 | `source` |
+| `/decks/{id}/export` | `GET` | `server/routes/decks/[id]/export/index.dart` | 3 | `source` |
+| `/decks/{id}/optimizations` | `GET` | `server/routes/decks/[id]/optimizations/index.dart` | 3 | `source` |
+| `/decks/{id}/optimizations/{eventId}/rollback` | `POST` | `server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart` | 3 | `source` |
+| `/decks/{id}/post-game-notes` | `GET, POST` | `server/routes/decks/[id]/post-game-notes/index.dart` | 3 | `source` |
+| `/decks/{id}/post-game-notes/{noteId}` | `DELETE` | `server/routes/decks/[id]/post-game-notes/[noteId].dart` | 3 | `source` |
+| `/decks/{id}/post-game-timeline` | `GET` | `server/routes/decks/[id]/post-game-timeline/index.dart` | 3 | `source` |
+| `/decks/{id}/pricing` | `POST` | `server/routes/decks/[id]/pricing/index.dart` | 3 | `source` |
+| `/decks/{id}/reports` | `POST` | `server/routes/decks/[id]/reports/index.dart` | 3 | `source` |
+| `/decks/{id}/restore` | `POST` | `server/routes/decks/[id]/restore/index.dart` | 3 | `source` |
+| `/decks/{id}/validate` | `POST` | `server/routes/decks/[id]/validate/index.dart` | 3 | `source` |
 | `/health` | `GET` | `server/routes/health/index.dart` | 2 | `source` |
 | `/health/ai-history` | `GET` | `server/routes/health/ai-history/index.dart` | 2 | `source` |
 | `/health/commercial` | `GET` | `server/routes/health/commercial/index.dart` | 2 | `source` |

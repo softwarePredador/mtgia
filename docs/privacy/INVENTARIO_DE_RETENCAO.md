@@ -8,7 +8,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 - `server/test/privacy_data_inventory_test.dart` roda na suíte do servidor e compara o JSON com
   `project_logic_manifest.json#/database`, que o gerador de project logic extrai do baseline, das
-  61 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
+  63 migrations e do SQL do backend. Tabela ou coluna nova sem classificação faz o teste falhar.
   Ele também confere os prazos decididos pelo dono e se o modo de exclusão declarado bate com
   `server/lib/user_data_privacy_service.dart`.
 - `server/test/privacy_data_inventory_db_live_test.dart` confere o mesmo JSON contra o
@@ -20,14 +20,14 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## O que está no inventário
 
-- **87 tabelas** do schema versionado. **45 têm dado pessoal**: 43 de titulares de conta, 1 da
+- **88 tabelas** do schema versionado. **46 têm dado pessoal**: 44 de titulares de conta, 1 da
   equipe de moderação e 1 com nome público de jogador de torneio externo. As outras 42 são
   catálogo, referência, controle ou operação (seis delas vieram com a migration 075, da
   `BT-DB-005`: `optimization_analysis_logs`, `synergy_packages`, `archetype_patterns`,
   `ml_learning_state`, `theme_contextual_rules` e `analysis_sources`, sem dado pessoal).
 - Para cada tabela: finalidade, dono no código, prazo, quem apaga, se entra na exportação e como
   sai na exclusão, e a exceção legal quando há.
-- Para as **40 tabelas exportadas**, a classificação de cada uma das 532 colunas: `include`,
+- Para as **41 tabelas exportadas**, a classificação de cada uma das 550 colunas: `include`,
   `person_ref` ou `deck_ref` (pseudônimo quando é de outra pessoa), `entity_ref`, ou `omit_*`
   (segredo, hash, estado interno, conteúdo de terceiro, UUID do catálogo).
 - **6 views**, **14 tabelas e 1 coluna que só existem na produção** (receipt de 2026-09-22; a
@@ -41,8 +41,8 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | Decisão | Regra | Onde | Situação em `47dc3b698` |
 | --- | --- | --- | --- |
 | D-23 | caches com TTL de até 24 h | `ai_optimize_cache`, EndpointCache | cache do Optimize vence em 6 h; o EndpointCache não tem teto e guarda entradas vencidas |
-| D-29 | prompt bruto do Generate por 30 dias, fora de `decks.description` | `decks.description`, `ai_generate_jobs.result` | o app grava o prompt na descrição do deck; armazenamento com prazo é o `DCK-P0-04` |
-| D-30 | purga da lixeira em 30 dias | `decks.deleted_at` | não existe; é o `DCK-P0-06` |
+| D-29 | prompt bruto do Generate por 30 dias, fora de `decks.description` | `decks.description`, `ai_generate_jobs.result`, `ai_generate_requests.prompt`, descrição no `deck_change_events` | o servidor guarda o prompt em `ai_generate_requests` e a limpeza por prazo o apaga em 30 dias, junto com o texto de descrição do ledger (`DCK-P0-04`); o deck materializado nasce sem o prompt; o app antigo ainda grava o prompt na descrição pelo `POST /decks` |
+| D-30 | purga da lixeira em 30 dias | `decks.deleted_at`, `shared_deck_reports`, `deck_learning_events` | o `DELETE` manda o deck para a lixeira, que some das superfícies, não conta em limite nem em aprendizado e entra na exportação; o restaurar devolve o deck privado, sem republicar relatório; a limpeza por prazo apaga de vez em 30 dias o deck, os relatórios e os eventos de aprendizado dele (`DCK-P0-06`); a tela da lixeira é da raia do app |
 | D-32 | jobs de IA por 24 h | `ai_generate_jobs`, `ai_optimize_jobs` | o código apaga em 30 min; é o `BT-AI-032` |
 | D-23 | backups não são reescritos; rotação entra na política | backups | prazo de rotação ainda não decidido |
 | D-78 | logs de pedido de exportação (`MANALOOM_PRIVACY_EXPORT_REQUEST`) por 90 dias | log da API, artefato `privacy_export_request_log` | a linha não existia; existe desde a D-71, e a rotação de 90 dias no host não está aplicada (configuração do dono) |
@@ -54,7 +54,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | Conta | `users`, `user_plans`, `ai_user_preferences` | enquanto a conta existir | exclusão de conta | sim | `users` pseudonimizada, o resto apagado |
 | Conteúdo | `decks`, `deck_cards`, `deck_change_events`, `user_binder_items`, `post_game_notes`, `shared_deck_reports`, `deck_comments`, `deck_matchups`, `deck_weakness_reports` | enquanto a conta existir | exclusão de conta e cascata por deck | sim | apagado |
 | Atividade | `activation_funnel_events`, `deck_optimization_events`, `deck_learning_events`, `ml_prompt_feedback`, `ai_optimize_fallback_telemetry` | sem prazo, exceto telemetria (180 dias) | exclusão de conta; job de limpeza | sim | apagado |
-| IA em execução | `ai_logs`, `ai_generate_jobs`, `ai_optimize_jobs`, `ai_optimize_cache` | 180 dias; 24 h decidido para jobs; 6 h no cache | job de limpeza e o próprio serviço | sim, sem hashes | apagado |
+| IA em execução | `ai_logs`, `ai_generate_jobs`, `ai_generate_requests`, `ai_optimize_jobs`, `ai_optimize_cache` | 180 dias; 24 h decidido para jobs; 6 h no cache | job de limpeza e o próprio serviço | sim, sem hashes | apagado |
 | Battle e replays | `battle_simulations`, `battle_simulation_attempts`, `battle_jobs`, `battle_job_live_records`, `interactive_battle_sessions`, `interactive_battle_records`, `battle_replay_annotations` | sem prazo | exclusão de conta | sim, sem hashes nem payload interno | apagado; as simulações de outras pessoas contra o deck do titular ficam com elas, anonimizadas (D-23) |
 | Social | `user_follows`, `user_blocks`, `user_block_events`, `conversations`, `direct_messages`, `notifications` | enquanto as contas existirem | exclusão de conta | sim, com pseudônimo para a outra pessoa | seguir, bloqueios e notificações apagados; mensagens do titular substituídas; trilha de bloqueios sem a pessoa |
 | Trocas | `trade_offers`, `trade_items`, `trade_messages`, `trade_status_history` | mantidas depois da exclusão, menos os itens do titular em oferta aberta | exclusão de conta, para esses itens | sim | oferta aberta (`pending`) cancelada e sem os itens do titular (D-66); o resto, inclusive troca em andamento (D-76), anonimizado, porque é registro entre duas partes, e o item do titular sem o vínculo com o fichário |
@@ -113,6 +113,12 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
   persistente do host da API.
 - Ligar a limpeza por prazo em produção (D-70): é exclusão em produção. Os prazos de partida da
   D-69 (notificações, feedback de IA, replays, analytics) só entram no job depois do advogado.
+- Trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) quando uma das partes
+  exclui a conta: seguem com a outra pessoa, como as concluídas. A D-66 manda apagar só os itens
+  de oferta aberta.
+- Correção governada das linhas de `activation_funnel_events` gravadas antes do catálogo
+  `activation_events_v1` (BT-KPI-001): o metadado delas pode ter a chave de idempotência com o
+  ID do usuário, IDs de deck e de nota e o nome livre do arquétipo. É escrita em produção.
 - Prazo de retenção de analytics (`activation_funnel_events`), replays e simulações,
   notificações e feedback de IA.
 - Prazo de retenção de trocas e registros de moderação mantidos depois da exclusão, e base legal

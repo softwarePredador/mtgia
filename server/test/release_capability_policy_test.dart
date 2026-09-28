@@ -198,6 +198,11 @@ void main() {
         'PATCH /decks/deck': 'decks_private',
         'POST /decks/deck/cards/bulk': 'decks_private',
         'POST /decks/deck/cards/set': 'decks_private',
+        // DCK-P0-06 (D-30): apagar, ver a lixeira e restaurar ficam em
+        // decks_private.
+        'DELETE /decks/deck': 'decks_private',
+        'GET /decks/trash': 'decks_private',
+        'POST /decks/deck/restore': 'decks_private',
         'PUT /decks/deck': 'deck_replace_all',
         'POST /decks/deck/cards/replace': 'deck_replace_all',
         'POST /import/to-deck': 'deck_replace_all',
@@ -209,6 +214,8 @@ void main() {
         'GET /ai/optimize/jobs/job': 'ai_analyze_optimize_advisory',
         'POST /ai/generate': 'ai_generate_rebuild',
         'GET /ai/generate/jobs/job': 'ai_generate_rebuild',
+        'GET /ai/generate/requests/latest': 'ai_generate_rebuild',
+        'POST /ai/generate/requests/req/materialize': 'ai_generate_rebuild',
         'GET /ai/battle/jobs': 'battle_batch',
         'POST /ai/battle/jobs': 'battle_batch',
         'DELETE /ai/battle/jobs/job': 'battle_batch',

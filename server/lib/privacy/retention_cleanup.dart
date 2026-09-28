@@ -54,12 +54,22 @@ enum RetentionCleanupMode {
 }
 
 /// Um prazo do inventário. O filtro é SQL fixo do código, nunca entrada.
+///
+/// A regra apaga a linha vencida, ou, com [redactSet], só apaga o campo
+/// com prazo dela (D-29: o prompt bruto e o texto de descrição do ledger
+/// saem em 30 dias; a linha fica). [sessionSetting] marca a transação para
+/// a redação que um gatilho só aceita assim (o ledger é só de acréscimo).
+/// O prazo conta de [ageColumn] (`created_at`, ou `deleted_at` na lixeira de
+/// decks da D-30).
 class RetentionCleanupRule {
   const RetentionCleanupRule({
     required this.id,
     required this.table,
     required this.maxAge,
     this.filter,
+    this.redactSet,
+    this.sessionSetting,
+    this.ageColumn = 'created_at',
   });
 
   final String id;
@@ -67,13 +77,25 @@ class RetentionCleanupRule {
   final Duration maxAge;
   final String? filter;
 
+  /// A coluna de onde o prazo conta.
+  final String ageColumn;
+
+  /// `SET` da redação (SQL fixo do código); nulo para regra que apaga.
+  final String? redactSet;
+
+  /// (nome, valor) do `set_config` local que a redação precisa.
+  final (String, String)? sessionSetting;
+
+  bool get isRedaction => redactSet != null;
+
   String get _where =>
       '${filter == null ? '' : '$filter AND '}'
-      'created_at < CURRENT_TIMESTAMP - '
+      '$ageColumn < CURRENT_TIMESTAMP - '
       'make_interval(mins => ${maxAge.inMinutes})';
 
   String get countSql => 'SELECT COUNT(*)::int FROM $table WHERE $_where';
   String get deleteSql => 'DELETE FROM $table WHERE $_where';
+  String get redactSql => 'UPDATE $table SET $redactSet WHERE $_where';
 }
 
 /// Os prazos que o inventário manda aplicar, na ordem do recibo. O teste
@@ -112,7 +134,71 @@ const retentionCleanupRules = <RetentionCleanupRule>[
     table: 'ai_optimize_jobs',
     maxAge: Duration(hours: 24),
   ),
+  // D-29 (DCK-P0-04): o prompt bruto do Generate e a impressão que
+  // deriva dele saem em 30 dias; o pedido fica, com o resultado.
+  RetentionCleanupRule(
+    id: 'ai_generate_requests_prompt_30d',
+    table: 'ai_generate_requests',
+    maxAge: Duration(days: 30),
+    filter: 'prompt IS NOT NULL',
+    redactSet:
+        'prompt = NULL, request_fingerprint = NULL, '
+        'prompt_purged_at = CURRENT_TIMESTAMP, '
+        'updated_at = CURRENT_TIMESTAMP',
+  ),
+  // D-29 (DCK-P0-04): o texto de descrição copiado no ledger de mudanças
+  // sai em 30 dias (a descrição pode trazer o prompt que o app antigo
+  // gravava ali); fica só que a descrição mudou.
+  RetentionCleanupRule(
+    id: 'deck_change_events_description_30d',
+    table: 'deck_change_events',
+    maxAge: Duration(days: 30),
+    filter:
+        "description_redacted_at IS NULL AND (metadata_before ? 'description' "
+        "OR metadata_after ? 'description')",
+    redactSet:
+        "metadata_before = CASE WHEN metadata_before ? 'description' "
+        "THEN jsonb_set(metadata_before, '{description}', 'null'::jsonb) "
+        'ELSE metadata_before END, '
+        "metadata_after = CASE WHEN metadata_after ? 'description' "
+        "THEN jsonb_set(metadata_after, '{description}', 'null'::jsonb) "
+        'ELSE metadata_after END, '
+        'description_redacted_at = CURRENT_TIMESTAMP',
+    sessionSetting: ('manaloom.deck_ledger_redaction', 'd29_prompt_retention'),
+  ),
+  // D-30 (DCK-P0-06): deck com mais de 30 dias na lixeira sai de vez. Antes
+  // dele, na mesma transação, as cópias que não pendem do deck por chave
+  // estrangeira em cascata: os relatórios (despublicados desde a ida para a
+  // lixeira) e os eventos de aprendizado.
+  RetentionCleanupRule(
+    id: 'shared_deck_reports_trashed_deck_30d',
+    table: 'shared_deck_reports',
+    maxAge: Duration(days: 30),
+    filter: 'deck_id IN ($_decksTrashedOver30Days)',
+  ),
+  RetentionCleanupRule(
+    id: 'deck_learning_events_trashed_deck_30d',
+    table: 'deck_learning_events',
+    maxAge: Duration(days: 30),
+    filter: 'deck_id IN ($_decksTrashedOver30Days)',
+  ),
+  // A cascata leva cartas, ledger, notas, comentários, confrontos e o resto
+  // que pende do deck; as referências com SET NULL ficam sem o deck, como
+  // no DELETE de antes da lixeira.
+  RetentionCleanupRule(
+    id: 'decks_trash_30d',
+    table: 'decks',
+    maxAge: Duration(days: 30),
+    filter: 'deleted_at IS NOT NULL',
+    ageColumn: 'deleted_at',
+  ),
 ];
+
+/// Decks com mais de 30 dias na lixeira (D-30), para as regras das cópias
+/// que saem antes do deck.
+const _decksTrashedOver30Days =
+    'SELECT id FROM decks WHERE deleted_at IS NOT NULL AND '
+    'deleted_at < CURRENT_TIMESTAMP - make_interval(mins => 43200)';
 
 /// Lê `--mode <modo>` (ou `--mode=<modo>`), `--dry-run` e `--output-dir`.
 /// Qualquer outra coisa, inclusive as flags de prazo antigas
@@ -273,6 +359,25 @@ class RetentionCleanupRunner {
       for (final rule in retentionCleanupRules) {
         final eligible =
             (await session.execute(rule.countSql)).single.single! as int;
+        if (rule.isRedaction) {
+          final setting = rule.sessionSetting;
+          if (setting != null) {
+            await session.execute(
+              Sql.named('SELECT set_config(@name, @value, true)'),
+              parameters: {'name': setting.$1, 'value': setting.$2},
+            );
+          }
+          final redacted = await session.execute(rule.redactSql);
+          rules.add(
+            _ruleReceipt(
+              rule,
+              eligible: eligible,
+              deleted: 0,
+              redacted: redacted.affectedRows,
+            ),
+          );
+          continue;
+        }
         final deleted = await session.execute(rule.deleteSql);
         rules.add(
           _ruleReceipt(rule, eligible: eligible, deleted: deleted.affectedRows),
@@ -307,12 +412,15 @@ class RetentionCleanupRunner {
     RetentionCleanupRule rule, {
     required int eligible,
     required int deleted,
+    int redacted = 0,
   }) => {
     'id': rule.id,
     'table': rule.table,
     'max_age_minutes': rule.maxAge.inMinutes,
+    'action': rule.isRedaction ? 'redact' : 'delete',
     'eligible': eligible,
     'deleted': deleted,
+    if (rule.isRedaction) 'redacted': redacted,
   };
 }
 

@@ -38,7 +38,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       Sql.named('''
         SELECT id::text, operation, revision_before, revision_after,
                undo_of_event_id::text, created_at, cards_before, cards_after,
-               metadata_before, metadata_after
+               metadata_before, metadata_after, description_redacted_at
         FROM deck_change_events
         WHERE deck_id = CAST(@deckId AS uuid)
           AND (CAST(@beforeRevision AS bigint) IS NULL
@@ -97,7 +97,16 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
               'cards_after': cards(row['cards_after']),
               'metadata_before': _jsonMap(row['metadata_before']),
               'metadata_after': _jsonMap(row['metadata_after']),
-              'can_undo': row['revision_after'] == revision,
+              // D-29: o texto de descrição saiu do ledger depois de 30 dias.
+              'description_redacted': row['description_redacted_at'] != null,
+              'can_undo':
+                  row['revision_after'] == revision &&
+                  // DCK-P0-06: lixeira e restaurar não se desfazem aqui.
+                  !deckLifecycleOperations.contains(row['operation']) &&
+                  !(row['description_redacted_at'] != null &&
+                      _jsonMap(
+                        row['metadata_before'],
+                      ).containsKey('description')),
             },
         ],
         if (rows.length == limit)

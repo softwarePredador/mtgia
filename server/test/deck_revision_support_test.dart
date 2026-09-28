@@ -122,9 +122,37 @@ void main() {
 
     test('operação fora do ledger é erro de programação', () {
       expect(
-        () => request(const {}, operation: 'deck_delete'),
+        () => request(const {}, operation: 'deck_rename'),
         throwsArgumentError,
       );
+    });
+
+    test('lixeira e restaurar entram no ledger, mas não como mudança de '
+        'conteúdo (DCK-P0-06)', () {
+      expect(deckChangeOperations, containsAll(deckLifecycleOperations));
+      expect(
+        deckContentOperations.intersection(deckLifecycleOperations),
+        isEmpty,
+      );
+      for (final operation in deckLifecycleOperations) {
+        expect(
+          () => request(const {}, operation: operation),
+          throwsArgumentError,
+          reason: operation,
+        );
+      }
+      // O CHECK da 072 aceita exatamente as operações do código.
+      final migrate = File('bin/migrate.dart').readAsStringSync();
+      final start = migrate.indexOf("version: '072'");
+      final check =
+          RegExp(
+            r"chk_deck_change_events_operation CHECK \(operation IN \(([^)]*)\)",
+          ).firstMatch(migrate.substring(start))!;
+      final fromMigration = {
+        for (final match in RegExp(r"'([a-z_]+)'").allMatches(check.group(1)!))
+          match.group(1)!,
+      };
+      expect(fromMigration, deckChangeOperations);
     });
   });
 

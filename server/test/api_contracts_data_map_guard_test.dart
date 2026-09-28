@@ -35,6 +35,57 @@ void main() {
       }
     });
 
+    test('documents the typed post-game errors (LC-P0-06)', () {
+      final upsert = _contractRowFor(
+        contracts,
+        'POST /decks/:id/post-game-notes',
+      );
+      final delete = _contractRowFor(
+        contracts,
+        'DELETE /decks/:id/post-game-notes/:noteId',
+      );
+      final list = _contractRowFor(
+        contracts,
+        'GET /decks/:id/post-game-notes?include_deleted=&since=',
+      );
+      for (final code in const [
+        'post_game_play_session_conflict',
+        'post_game_note_deleted',
+        'post_game_revision_conflict',
+        'post_game_note_not_found',
+        'deck_not_found',
+      ]) {
+        expect(upsert, contains(code), reason: code);
+      }
+      expect(delete, contains('post_game_note_not_found'));
+      expect(delete, contains('post_game_revision_conflict'));
+      expect(list, contains('deck_not_found'));
+      expect(upsert, contains('post_game_error_contract.dart'));
+    });
+
+    test('documents the activation event catalog and user-based KPIs', () {
+      // BT-KPI-001 (D-47).
+      final collector = _contractRowFor(
+        contracts,
+        'POST /users/me/activation-events',
+      );
+      expect(collector, contains('catalog `activation_events_v1`'));
+      expect(collector, contains('activation_event_field_not_allowed'));
+      expect(collector, contains('404 `deck_not_found`'));
+      expect(collector, contains('`dropped_fields`'));
+      expect(collector, contains('catalog_version, duplicate: true}`'));
+      expect(collector, contains('No decklist, card list, deck name'));
+      expect(collector, contains('Requires migration 073.'));
+      final commercial = _contractRowFor(contracts, 'GET /health/commercial');
+      expect(commercial, contains('`activation_kpi_v1`'));
+      expect(commercial, contains('counts distinct users'));
+      expect(commercial, contains('within 24 h of signup'));
+      expect(commercial, contains('between days 7 and 14'));
+      expect(commercial, contains('`guardrails` v1'));
+      expect(commercial, contains('The old `activation_funnel`'));
+      expect(commercial, contains('activation_kpi_db_live_test.dart'));
+    });
+
     test('documents the beta kill switch of trade and sale offers', () {
       // SCOPE-P0-TRD-00 (D-39 e D-38).
       final create = _contractRowFor(contracts, 'POST /binder');
@@ -83,6 +134,55 @@ void main() {
       expect(create, contains('`is_public` defaults to `false`'));
       expect(replace, contains('`deck_replace_all`, off in the beta'));
       expect(rebuild, contains('defaults to `preview_only`'));
+    });
+
+    test('documents the deck trash, restore and purge', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final delete = _contractRowFor(contracts, 'DELETE /decks/:id');
+      final trash = _contractRowFor(contracts, 'GET /decks/trash');
+      final restore = _contractRowFor(contracts, 'POST /decks/:id/restore');
+
+      expect(delete, contains('Moves the deck to the trash'));
+      expect(delete, contains('restoring does not republish them'));
+      expect(trash, contains('`purge_after`'));
+      expect(restore, contains('404 `deck_not_in_trash`'));
+      expect(restore, contains('whole and private'));
+      for (final phrase in const [
+        '## Deck Trash, Restore and Governed Purge — 2026-09-28',
+        '`decks_trash_30d`',
+        '`shared_deck_reports_trashed_deck_30d`',
+        '`deck_learning_events_trashed_deck_30d`',
+        '409 `deck_undo_unsupported`',
+        '409 `generate_deck_in_trash`',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
+    test('documents the durable Generate request and materialization', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final read = _contractRowFor(contracts, 'GET /ai/generate/requests/:id');
+      final materialize = _contractRowFor(
+        contracts,
+        'POST /ai/generate/requests/:id/materialize',
+      );
+
+      expect(read, contains('kind `generate_materialize`'));
+      expect(read, contains('null after the 30 days of D-29'));
+      expect(materialize, contains('No cards and no controls'));
+      expect(materialize, contains('`constraints_mismatch`'));
+      expect(materialize, contains('`replayed: true`'));
+      for (final phrase in const [
+        '## Generate Request and Server-side Materialization — 2026-09-28',
+        '`generate_materialize_required`',
+        '`ai_generate_requests_prompt_30d`',
+        '`deck_change_events_description_30d`',
+        '409 `deck_undo_redacted`',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
     });
 
     test('documents strict validation per revision and legality', () {
@@ -363,7 +463,8 @@ void main() {
       expect(deckDetail, contains('Root-level deck fields'));
       expect(deckDetail, contains('there is no nested root `deck` wrapper'));
       expect(deckDetail, contains('deterministic `deck_snapshot_hash`'));
-      expect(deckDetail, contains('response-capture `deck_version_at`'));
+      expect(deckDetail, contains('revision-time `deck_version_at`'));
+      expect(deckDetail, contains('It is never the request time.'));
       expect(
         deckDetail,
         contains('carries the returned snapshot identity through Life Counter'),

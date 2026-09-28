@@ -6,8 +6,26 @@ class DeckSnapshotIdentity {
   const DeckSnapshotIdentity({required this.hash, required this.capturedAt});
 
   final String hash;
+
+  /// O instante da versão do deck ([deckVersionAtSql]), não o da leitura.
   final DateTime capturedAt;
 }
+
+/// `deck_version_at` (LC-P0-05, achado 3 dos fluxos): o instante da revisão
+/// atual do deck, não o da requisição. É o `created_at` do evento do ledger
+/// que levou o deck à revisão de agora (DCK-P0-01), ou a criação do deck na
+/// revisão 1. Ler de novo a mesma revisão devolve o mesmo instante; mudar o
+/// deck muda a revisão e o instante. Deck sem data de criação (legado) fica
+/// com um instante fixo, também estável.
+///
+/// Fragmento SQL sobre uma linha de `decks` com o apelido [alias].
+String deckVersionAtSql(String alias) =>
+    'COALESCE(('
+    'SELECT version_event.created_at FROM deck_change_events version_event '
+    'WHERE version_event.deck_id = $alias.id '
+    'AND version_event.revision_after = $alias.revision'
+    '), $alias.created_at, '
+    "TIMESTAMPTZ '1970-01-01 00:00:00+00')";
 
 /// Builds the stable gameplay identity of a saved deck version.
 ///

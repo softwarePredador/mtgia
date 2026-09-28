@@ -119,17 +119,21 @@
       "rule": "prompt bruto do Generate retido por 30 dias, fora de decks.description",
       "applies_to": [
         "decks.description",
-        "ai_generate_jobs.result"
+        "ai_generate_jobs.result",
+        "ai_generate_requests.prompt",
+        "deck_change_events.metadata_before"
       ],
-      "status": "não implementado: o app grava o prompt em decks.description e o job que o ecoa some em 30 min; o armazenamento do prompt com prazo é o DCK-P0-04"
+      "status": "implementado no servidor (DCK-P0-04): o pedido do Generate guarda o prompt em ai_generate_requests.prompt e a limpeza por prazo (retention_cleanup_apply_v1) o apaga em 30 dias, junto com o texto de descrição copiado no ledger; o deck materializado no servidor nasce sem o prompt na descrição. Falta: o app antigo ainda grava o prompt em decks.description ao salvar pelo POST /decks, e o prompt que já está em descrições de decks existentes fica como está (pendente de decisão do dono)"
     },
     {
       "decision": "D-30",
       "rule": "purga da lixeira de decks em 30 dias",
       "applies_to": [
-        "decks.deleted_at"
+        "decks.deleted_at",
+        "shared_deck_reports",
+        "deck_learning_events"
       ],
-      "status": "não implementado: DCK-P0-06"
+      "status": "implementado no servidor (DCK-P0-06): DELETE /decks/:id manda o deck para a lixeira (decks.deleted_at) sem apagar nada, tira o deck da galeria e despublica os relatórios; o deck na lixeira some das superfícies, não conta em limite nem em aprendizado e entra na exportação; POST /decks/:id/restore devolve o deck íntegro e privado, sem republicar relatório; a limpeza por prazo (retention_cleanup_apply_v1) apaga de vez, em 30 dias, o deck, os relatórios e os eventos de aprendizado dele. Falta: a tela da lixeira no app e a ativação da limpeza na produção (decisão do dono)"
     },
     {
       "decision": "D-32",
@@ -204,6 +208,43 @@
         "max_age_minutes": 1440,
         "scope": "todas as linhas",
         "decision": "D-32"
+      },
+      {
+        "id": "ai_generate_requests_prompt_30d",
+        "table": "ai_generate_requests",
+        "max_age_minutes": 43200,
+        "scope": "só o prompt bruto e a impressão derivada dele (a linha fica)",
+        "decision": "D-29",
+        "action": "redact"
+      },
+      {
+        "id": "deck_change_events_description_30d",
+        "table": "deck_change_events",
+        "max_age_minutes": 43200,
+        "scope": "só o texto de descrição copiado no ledger (a linha fica, com description_redacted_at)",
+        "decision": "D-29",
+        "action": "redact"
+      },
+      {
+        "id": "shared_deck_reports_trashed_deck_30d",
+        "table": "shared_deck_reports",
+        "max_age_minutes": 43200,
+        "scope": "relatórios de deck com mais de 30 dias na lixeira (já despublicados desde a ida para a lixeira); sai antes do deck",
+        "decision": "D-30"
+      },
+      {
+        "id": "deck_learning_events_trashed_deck_30d",
+        "table": "deck_learning_events",
+        "max_age_minutes": 43200,
+        "scope": "eventos de aprendizado de deck com mais de 30 dias na lixeira (sem chave estrangeira para o deck); sai antes do deck",
+        "decision": "D-30"
+      },
+      {
+        "id": "decks_trash_30d",
+        "table": "decks",
+        "max_age_minutes": 43200,
+        "scope": "deck com mais de 30 dias na lixeira, contado de deleted_at; a cascata leva o que pende do deck",
+        "decision": "D-30"
       }
     ]
   },
@@ -263,14 +304,14 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "user_id",
-      "purpose": "Funil de ativação (eventos do onboarding e do primeiro deck).",
+      "purpose": "Funil de ativação (BT-KPI-001, D-47): eventos do catálogo activation_events_v1, com metadado só de enumerados, inteiros com faixa e booleanos; nenhuma decklist, texto livre nem ID interno. As métricas de ativação contam usuários distintos e não leem o metadado.",
       "owner": "server/routes/users/me/activation-events/index.dart",
       "retention": {
         "class": "account_lifetime",
         "period": "sem prazo: nenhum job apaga eventos antigos",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "prazo de retenção de analytics não decidido; o job de limpeza não toca a tabela (BT-KPI-001)"
+        "gap": "prazo de retenção de analytics não decidido (D-69: entra no job depois do advogado); o job de limpeza não toca a tabela. Linhas gravadas antes do catálogo v1 podem ter no metadado a chave de idempotência (com o ID do usuário), IDs de deck e de nota e o nome livre do arquétipo (BT-KPI-001)"
       },
       "export": {
         "section": "data.activation_events"
@@ -284,6 +325,7 @@
       "columns": {
         "created_at": "include",
         "deck_id": "deck_ref",
+        "dedupe_key": "omit_hash",
         "event_name": "include",
         "format": "include",
         "id": "include",
@@ -330,6 +372,61 @@
         "stage_number": "include",
         "status": "include",
         "total_stages": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
+    "ai_generate_requests": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Pedido durável do Generate (DCK-P0-04): a entrada original (prompt e controles), a impressão do pedido, o resultado quando o job termina e o deck que o servidor materializou a partir dele.",
+      "owner": "server/lib/ai/ai_generate_request_store.dart; server/routes/ai/generate/**",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "o pedido fica enquanto a conta existir; o prompt bruto e a impressão derivada dele, 30 dias",
+        "decision": "D-29",
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null,
+        "redactions": [
+          {
+            "rule": "ai_generate_requests_prompt_30d",
+            "columns": [
+              "prompt",
+              "request_fingerprint"
+            ],
+            "period": "30 dias",
+            "decision": "D-29",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
+      },
+      "export": {
+        "section": "data.ai_activity.generate_requests"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "can_materialize": "include",
+        "controls": "include",
+        "created_at": "include",
+        "format": "include",
+        "id": "include",
+        "job_id": "omit_internal",
+        "materialized_at": "include",
+        "materialized_deck_id": "deck_ref",
+        "prompt": "include",
+        "prompt_purged_at": "include",
+        "request_fingerprint": "omit_hash",
+        "request_key": "omit_hash",
+        "result_deck": "include",
+        "result_fingerprint": "omit_hash",
+        "status": "include",
         "updated_at": "include",
         "user_id": "person_ref"
       }
@@ -1549,10 +1646,22 @@
       "owner": "server/lib/decks/deck_revision_support.dart",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto o deck existir",
+        "period": "enquanto o deck existir; o texto de descrição copiado no ledger, 30 dias (D-29)",
         "decision": null,
         "enforced_by": "FK deck_change_events.deck_id ON DELETE CASCADE",
-        "gap": "quando a descrição do deck muda, o texto anterior fica no ledger enquanto o deck existir; se a descrição tiver o prompt bruto do Generate (hoje o app o grava ali), essa cópia não segue os 30 dias da D-29 até o DCK-P0-04 tirar o prompt da descrição"
+        "gap": null,
+        "redactions": [
+          {
+            "rule": "deck_change_events_description_30d",
+            "columns": [
+              "metadata_before.description",
+              "metadata_after.description"
+            ],
+            "period": "30 dias",
+            "decision": "D-29",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.deck_change_events"
@@ -1560,7 +1669,7 @@
       "deletion": {
         "mode": "cascade",
         "by": "FK deck_change_events.deck_id -> decks ON DELETE CASCADE",
-        "notes": "O ledger só recebe INSERT: o gatilho manaloom_deck_change_events_append_only recusa UPDATE e DELETE direto e deixa passar só a cascata do deck ou da conta."
+        "notes": "O ledger só recebe INSERT: o gatilho manaloom_deck_change_events_append_only recusa DELETE direto e deixa passar só a cascata do deck ou da conta; o único UPDATE aceito é a redação governada da descrição (D-29), com a sessão marcada pela limpeza por prazo."
       },
       "legal_exception": null,
       "columns": {
@@ -1568,6 +1677,7 @@
         "cards_before": "include",
         "created_at": "include",
         "deck_id": "deck_ref",
+        "description_redacted_at": "include",
         "id": "include",
         "idempotency_key": "omit_hash",
         "metadata_after": "include",
@@ -1622,10 +1732,19 @@
       "owner": "server/lib/ai/deck_learning_event_support.dart; server/bin/pull_learning_events.py (cópia para o SQLite Hermes)",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto o deck existir",
+        "period": "enquanto o deck existir; evento de deck na lixeira não vai para o Hermes (D-30) e sai com o deck purgado",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)"
+        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)",
+        "purges": [
+          {
+            "rule": "deck_learning_events_trashed_deck_30d",
+            "scope": "evento de deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.deck_learning_events"
@@ -1770,10 +1889,19 @@
       "owner": "server/routes/decks/**; server/routes/import/**",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e deveria ser purgado em 30 dias",
+        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e sai de vez em 30 dias (D-30)",
         "decision": "D-30",
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "a purga da lixeira em 30 dias ainda não existe (DCK-P0-06); o prompt bruto em decks.description contraria a D-29 (DCK-P0-04)"
+        "gap": "o prompt bruto em decks.description de decks salvos pelo app antigo contraria a D-29 (DCK-P0-04; decks existentes pendentes de decisão do dono)",
+        "purges": [
+          {
+            "rule": "decks_trash_30d",
+            "scope": "deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.decks"
@@ -2521,10 +2649,19 @@
       "owner": "server/lib/reports/shareable_report_service.dart",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck é apagado (D-19)",
+        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck vai para a lixeira, e não volta com o restaurar (D-19, D-30); sai com o deck purgado",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas"
+        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas",
+        "purges": [
+          {
+            "rule": "shared_deck_reports_trashed_deck_30d",
+            "scope": "relatório de deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.shared_deck_reports"

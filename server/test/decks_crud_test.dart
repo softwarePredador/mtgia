@@ -457,7 +457,7 @@ void main() {
       expect(response.statusCode, equals(401));
     });
 
-    test('should cascade delete deck cards', () async {
+    test('moves a deck with cards to the trash (DCK-P0-06)', () async {
       // Arrange: Cria deck com cartas
       testDeckId = await createTestDeck(authToken!);
       final validCard = await getValidCard(authToken!);
@@ -490,9 +490,9 @@ void main() {
       // Assert
       expect(response.statusCode, equals(204));
 
-      // NOTA: As cartas do deck devem ser deletadas via CASCADE no banco
-      // Se não houver CASCADE, o código em routes/decks/[id]/index.dart
-      // deveria ter um DELETE manual de deck_cards (comentado na linha 42-46)
+      // DCK-P0-06 (D-30): o DELETE manda o deck para a lixeira; as cartas
+      // ficam até a purga por prazo de 30 dias. A prova no banco está em
+      // deck_trash_db_live_test.dart.
 
       testDeckId = null;
     });

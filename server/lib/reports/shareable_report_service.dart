@@ -120,6 +120,7 @@ class ShareableReportService {
         FROM decks
         WHERE id = CAST(@deckId AS uuid)
           AND user_id = CAST(@userId AS uuid)
+          AND deleted_at IS NULL
         LIMIT 1
       '''
             : '''
@@ -127,6 +128,7 @@ class ShareableReportService {
         FROM decks
         WHERE id = CAST(@deckId AS uuid)
           AND user_id = CAST(@userId AS uuid)
+          AND deleted_at IS NULL
         LIMIT 1
       ''',
       ),

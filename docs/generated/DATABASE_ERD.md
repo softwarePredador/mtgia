@@ -9,6 +9,8 @@ erDiagram
     decks ||--o{ activation_funnel_events : "deck_id -> id"
     users ||--o{ activation_funnel_events : "user_id -> id"
     users ||--o{ ai_generate_jobs : "user_id -> id"
+    decks ||--o{ ai_generate_requests : "materialized_deck_id -> id"
+    users ||--o{ ai_generate_requests : "user_id -> id"
     decks ||--o{ ai_logs : "deck_id -> id"
     users ||--o{ ai_logs : "user_id -> id"
     decks ||--o{ ai_optimize_cache : "deck_id -> id"
@@ -136,6 +138,7 @@ erDiagram
     activation_funnel_events {
         datetime created_at
         uuid deck_id
+        string dedupe_key
         string event_name
         string format
         uuid id PK
@@ -158,6 +161,25 @@ erDiagram
         number stage_number
         string status
         number total_stages
+        datetime updated_at
+        uuid user_id
+    }
+    ai_generate_requests {
+        boolean can_materialize
+        json controls
+        datetime created_at
+        string format
+        uuid id PK
+        string job_id
+        datetime materialized_at
+        uuid materialized_deck_id
+        string prompt
+        datetime prompt_purged_at
+        string request_fingerprint
+        string request_key
+        json result_deck
+        string result_fingerprint
+        string status
         datetime updated_at
         uuid user_id
     }
@@ -715,6 +737,7 @@ erDiagram
         json cards_before
         datetime created_at
         uuid deck_id
+        datetime description_redacted_at
         uuid id PK
         string idempotency_key
         json metadata_after
@@ -1280,4 +1303,4 @@ erDiagram
     }
 ```
 
-Tabelas: 90; views: 6; migrations: 71 (latest `076`).
+Tabelas: 91; views: 6; migrations: 74 (latest `076`).

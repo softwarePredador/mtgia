@@ -142,6 +142,9 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '066': 'adopt_remaining_production_only_indexes',
   '067': 'create_deck_revision_ledger',
   '068': 'demote_decks_on_legality_change',
+  '069': 'create_ai_generate_requests',
+  '072': 'deck_trash_lifecycle',
+  '073': 'activation_events_dedupe',
   '074': 'reinstall_active_user_triggers',
   '075': 'adopt_production_ml_tables_and_shapes',
   '076': 'align_message_and_trade_history_user_fks',
@@ -181,13 +184,16 @@ const releaseSchemaReadinessSql = '''
       ('066', 'adopt_remaining_production_only_indexes'),
       ('067', 'create_deck_revision_ledger'),
       ('068', 'demote_decks_on_legality_change'),
+      ('069', 'create_ai_generate_requests'),
+      ('072', 'deck_trash_lifecycle'),
+      ('073', 'activation_events_dedupe'),
       ('074', 'reinstall_active_user_triggers'),
       ('075', 'adopt_production_ml_tables_and_shapes'),
       ('076', 'align_message_and_trade_history_user_fks')
   )
   SELECT
     (
-      SELECT COUNT(*) = 34
+      SELECT COUNT(*) = 37
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version

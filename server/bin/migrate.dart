@@ -6737,6 +6737,196 @@ DROP VIEW IF EXISTS collection_availability_snapshot;
     ''',
   ),
   Migration(
+    version: '069',
+    name: 'create_ai_generate_requests',
+    // DCK-P0-04 (decisão D-29 do dono): o pedido do Generate fica durável,
+    // fora da fila de jobs (que dura 24 h pela D-32): entrada original,
+    // impressão, resultado e o deck materializado no servidor. O prompt
+    // bruto fica 30 dias e a limpeza por prazo (retention_cleanup_apply_v1)
+    // o apaga, junto com a impressão derivada dele. A mesma limpeza tira do
+    // ledger o texto de descrição com mais de 30 dias: o gatilho do ledger
+    // passa a aceitar só essa redação, com a sessão marcada. 067 a 069 são
+    // da frente de deck.
+    up: '''
+      CREATE TABLE IF NOT EXISTS ai_generate_requests (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        request_key TEXT NOT NULL,
+        request_fingerprint TEXT,
+        job_id TEXT,
+        format TEXT NOT NULL,
+        controls JSONB NOT NULL DEFAULT '{}'::jsonb,
+        prompt TEXT,
+        prompt_purged_at TIMESTAMP WITH TIME ZONE,
+        status TEXT NOT NULL DEFAULT 'pending',
+        result_deck JSONB,
+        result_fingerprint TEXT,
+        can_materialize BOOLEAN NOT NULL DEFAULT FALSE,
+        materialized_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+        materialized_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT uq_ai_generate_requests_user_key UNIQUE (user_id, request_key),
+        CONSTRAINT chk_ai_generate_requests_status
+          CHECK (status IN ('pending', 'completed', 'failed', 'cancelled')),
+        CONSTRAINT chk_ai_generate_requests_prompt_purge
+          CHECK (
+            prompt_purged_at IS NULL
+            OR (prompt IS NULL AND request_fingerprint IS NULL)
+          ),
+        CONSTRAINT chk_ai_generate_requests_result
+          CHECK ((result_deck IS NULL) = (result_fingerprint IS NULL)),
+        CONSTRAINT chk_ai_generate_requests_materialize
+          CHECK (NOT can_materialize OR result_deck IS NOT NULL)
+      );
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_user_created
+        ON ai_generate_requests (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_job
+        ON ai_generate_requests (job_id)
+        WHERE job_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_materialized_deck
+        ON ai_generate_requests (materialized_deck_id)
+        WHERE materialized_deck_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_prompt_retention
+        ON ai_generate_requests (created_at)
+        WHERE prompt IS NOT NULL;
+
+      ALTER TABLE deck_change_events
+        ADD COLUMN IF NOT EXISTS description_redacted_at TIMESTAMP WITH TIME ZONE;
+
+      CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_change_events_append_only\$
+      BEGIN
+        IF TG_OP = 'UPDATE' THEN
+          -- A única mudança aceita é a redação governada da D-29: a limpeza por
+          -- prazo tira o texto da descrição de antes e de depois e marca
+          -- description_redacted_at, com todo o resto igual.
+          IF current_setting('manaloom.deck_ledger_redaction', true)
+               = 'd29_prompt_retention'
+             AND OLD.description_redacted_at IS NULL
+             AND NEW.description_redacted_at IS NOT NULL
+             AND NEW.id = OLD.id
+             AND NEW.deck_id = OLD.deck_id
+             AND NEW.user_id = OLD.user_id
+             AND NEW.revision_before = OLD.revision_before
+             AND NEW.revision_after = OLD.revision_after
+             AND NEW.operation = OLD.operation
+             AND NEW.cards_before IS NOT DISTINCT FROM OLD.cards_before
+             AND NEW.cards_after IS NOT DISTINCT FROM OLD.cards_after
+             AND NEW.undo_of_event_id IS NOT DISTINCT FROM OLD.undo_of_event_id
+             AND NEW.idempotency_key IS NOT DISTINCT FROM OLD.idempotency_key
+             AND NEW.request_fingerprint IS NOT DISTINCT FROM OLD.request_fingerprint
+             AND NEW.created_at = OLD.created_at
+             AND (NEW.metadata_before - 'description')
+               = (OLD.metadata_before - 'description')
+             AND (NEW.metadata_after - 'description')
+               = (OLD.metadata_after - 'description')
+             AND COALESCE(NEW.metadata_before -> 'description', 'null'::jsonb)
+               = 'null'::jsonb
+             AND COALESCE(NEW.metadata_after -> 'description', 'null'::jsonb)
+               = 'null'::jsonb
+          THEN
+            RETURN NEW;
+          END IF;
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        -- DELETE só em cascata (deck ou conta apagados), que chega por um gatilho
+        -- de integridade: profundidade 2 ou mais.
+        IF pg_trigger_depth() <= 1 THEN
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        RETURN OLD;
+      END;
+      \$deck_change_events_append_only\$;
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS ai_generate_requests;
+      CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_change_events_append_only\$
+      BEGIN
+        IF TG_OP = 'UPDATE' OR pg_trigger_depth() <= 1 THEN
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        RETURN OLD;
+      END;
+      \$deck_change_events_append_only\$;
+      ALTER TABLE deck_change_events DROP COLUMN IF EXISTS description_redacted_at;
+    ''',
+  ),
+  Migration(
+    version: '072',
+    name: 'deck_trash_lifecycle',
+    // DCK-P0-06 (decisões D-30 e D-19 do dono): apagar deck vira ir para a
+    // lixeira (decks.deleted_at, que existe desde a 003); restaurar volta o
+    // deck privado. As duas mudanças entram no ledger (deck_delete e
+    // deck_restore). A purga em 30 dias é a limpeza por prazo
+    // (retention_cleanup_apply_v1), desligada até a ativação supervisionada.
+    // 067 a 069 e 072 a 073 são da frente de deck.
+    up: '''
+      -- O ledger passa a registrar ir para a lixeira e voltar dela: cada uma sobe a
+      -- revisão do deck como as outras mudanças do dono.
+      ALTER TABLE deck_change_events
+        DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+      ALTER TABLE deck_change_events
+        ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+        'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+        'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+        'optimization_rollback', 'undo',
+        'deck_delete', 'deck_restore'
+      ));
+      -- A lixeira de cada dono, da mais nova para a mais velha; a limpeza por prazo
+      -- lê o mesmo índice parcial (só decks na lixeira).
+      CREATE INDEX IF NOT EXISTS idx_decks_user_trash
+        ON decks (user_id, deleted_at DESC)
+        WHERE deleted_at IS NOT NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_decks_user_trash;
+      ALTER TABLE deck_change_events
+        DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+      ALTER TABLE deck_change_events
+        ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+        'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+        'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+        'optimization_rollback', 'undo'
+      ));
+    ''',
+  ),
+  Migration(
+    version: '073',
+    name: 'activation_events_dedupe',
+    // BT-KPI-001 (decisão D-47 do dono): o coletor de eventos de ativação
+    // guarda só o hash SHA-256 da chave de idempotência do app, que carrega o
+    // ID do usuário, e a mesma chave do mesmo usuário grava uma vez só. Não
+    // cria tabela: o laço dos gatilhos de conta ativa não muda. 067 a 069 e
+    // 072 a 073 são da frente de deck.
+    up: '''
+      ALTER TABLE activation_funnel_events
+        ADD COLUMN IF NOT EXISTS dedupe_key TEXT;
+      ALTER TABLE activation_funnel_events
+        DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+      ALTER TABLE activation_funnel_events
+        ADD CONSTRAINT chk_activation_funnel_events_dedupe_key
+        CHECK (dedupe_key IS NULL OR dedupe_key ~ '^[0-9a-f]{64}\$');
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_activation_funnel_events_dedupe
+        ON activation_funnel_events (user_id, dedupe_key)
+        WHERE dedupe_key IS NOT NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS uq_activation_funnel_events_dedupe;
+      ALTER TABLE activation_funnel_events
+        DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+      ALTER TABLE activation_funnel_events DROP COLUMN IF EXISTS dedupe_key;
+    ''',
+  ),
+  Migration(
     version: '074',
     name: 'reinstall_active_user_triggers',
     // BT-DB-007 (Frente C): refaz a trava de conta ativa
@@ -7515,11 +7705,18 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       // compromisso com quem o recebeu, e a trilha de auditoria vai junto.
       // A 067 cria o ledger de mudanças do deck: o down só roda sem nenhum
       // evento e com todo deck ainda na revisão 1.
+      // A 069 cria os pedidos duráveis do Generate: o down só roda sem pedido
+      // gravado e sem descrição redigida no ledger.
+      // A 072 abre a lixeira de decks: o down só roda sem deck na lixeira e
+      // sem evento de lixeira no ledger (o código de antes mostraria o deck
+      // apagado como vivo, e o CHECK antigo recusaria os eventos).
       '033' ||
       '035' ||
       '060' ||
       '061' ||
-      '067' => MigrationRollbackPolicy.emptyOnly,
+      '067' ||
+      '069' ||
+      '072' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
       '034' ||
@@ -7610,6 +7807,26 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
         SELECT
           EXISTS (SELECT 1 FROM deck_change_events)
           OR EXISTS (SELECT 1 FROM decks WHERE revision <> 1)
+      ''')).first[0] ==
+          true,
+    '069' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM ai_generate_requests)
+          OR EXISTS (
+            SELECT 1 FROM deck_change_events
+            WHERE description_redacted_at IS NOT NULL
+          )
+      ''')).first[0] ==
+          true,
+    '072' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM decks WHERE deleted_at IS NOT NULL)
+          OR EXISTS (
+            SELECT 1 FROM deck_change_events
+            WHERE operation IN ('deck_delete', 'deck_restore')
+          )
       ''')).first[0] ==
           true,
     _ => false,

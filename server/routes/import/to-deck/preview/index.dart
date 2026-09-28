@@ -56,7 +56,8 @@ Future<Response> onRequest(RequestContext context) async {
   // Verifica se o deck pertence ao usuário
   final deckCheck = await pool.execute(
     Sql.named(
-      'SELECT id, format FROM decks WHERE id = @id AND user_id = @userId',
+      'SELECT id, format FROM decks '
+      'WHERE id = @id AND user_id = @userId AND deleted_at IS NULL',
     ),
     parameters: {'id': deckId, 'userId': userId},
   );
@@ -210,6 +211,7 @@ Future<Response> onRequest(RequestContext context) async {
             FROM decks
             WHERE id = CAST(@deckId AS uuid)
               AND user_id = CAST(@userId AS uuid)
+              AND deleted_at IS NULL
           '''),
           parameters: {'deckId': deckId, 'userId': userId},
         );
