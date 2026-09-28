@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "b45db8e9115ae9d0e89ab1132ecca032b096c2c3f0e05cada5079b92bf9090e2"
+    "sha256": "47e5a5c7930ed0fe3aba5153e1dab219e3d4746a2ac97e205a8c1ca153f69f32"
   },
   "required_task_fields": [
     "id",
@@ -1432,7 +1432,7 @@
         "BT-AI-003",
         "DCK-P0-04"
       ],
-      "acceptance": "Server Generate/cache/save e persistência de AI Analysis estão contidos; falta o app manter `source/is_mock/persisted` em estado preview separado e reconciliar o canônico por revision. Estado rebaixado em 2026-09-22: nenhum receipt/commit citado na linha (regra l.738; `docs/verdade/FATOS.md` 4.5) — voltar ao estado anterior exige o link.",
+      "acceptance": "Server Generate/cache/save e persistência de AI Analysis estão contidos; falta o app manter `source/is_mock/persisted` em estado preview separado e reconciliar o canônico por revision. Estado rebaixado em 2026-09-22: nenhum receipt/commit citado na linha (regra l.738; `docs/verdade/FATOS.md` 4.5) — voltar ao estado anterior exige o link. Decisão do dono em 2026-09-28: D-82, sem provedor de IA configurado o `POST /ai/optimize` entrega as trocas determinísticas quando a shortlist existe, em vez da prévia falsa. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`: com shortlist e sem chave, a resposta sai de `buildDeterministicOptimizeResponse` e passa pela mesma validação, prévia assinada e confirmação (D-27, D-29); nenhuma chamada ao provedor é tentada (a tentativa primária, o fallback por IA e o Critic IA são pulados); a resposta leva `ai_provider: {configured: false, attempted: false}`, a telemetria de outcome leva a mesma proveniência, e o resultado não entra no cache de optimize; sem shortlist continua o mock `mock_non_actionable`; com chave nada muda; na produção sem chave segue o 503 `provider_unavailable`. Evidência: `server/test/optimize_without_provider_db_live_test.dart` (PostgreSQL descartável, com o `HttpClient` do processo trocado por um que registra e recusa toda conexão: sem chave, zero saída de rede; com chave falsa, a tentativa ao provedor aparece), `server/test/optimize_without_provider_e2e_live_test.dart` (HTTP contra a API local sem chave, sob `sandbox-exec` só loopback: 2/2, zero tentativa ao provedor; com chave falsa, o controle mostra a tentativa) e `server/test/optimize_learning_pipeline_test.dart`; 8 mutações falham; receipt `docs/qa/execution/2026-09-28/D-82-optimize-sem-provedor.md`.",
       "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
       "source_line": 502
     },
@@ -9884,5 +9884,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "cbadc9eb7472915963ea489f9255d232fff37485c20159a67bdc79e23a589b01"
+  "project_logic_source_digest_sha256": "927949ad0ecb40541e22f420aa307a5f1744edef7afc790417dec321e11aa86f"
 }
