@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "c101399f5ba2b2563d2141a995adb009913ad000542cc6a4001579e58c4fe70b"
+    "sha256": "a4f0bb3f695e128edb9ac50d4848cc7ef3f65df5e30910eed9de344a688fdc8a"
   },
   "required_task_fields": [
     "id",
@@ -396,13 +396,13 @@
     {
       "id": "DCK-P0-03",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Importar em deck existente em duas fases, diff completo e undo.",
       "depends_on": [
         "DCK-P0-01",
         "DCK-P0-02"
       ],
-      "acceptance": "Zero delete/insert antes de confirmar; falha preserva original; stale retorna 409. Decisão do dono em 2026-09-22: D-29, o preview de import em deck existente, que não grava nada, fica sob `decks_private`; o commit continua sob `deck_replace_all`; na beta, o import entra por deck novo (`/import`).",
+      "acceptance": "Zero delete/insert antes de confirmar; falha preserva original; stale retorna 409. Decisão do dono em 2026-09-22: D-29, o preview de import em deck existente, que não grava nada, fica sob `decks_private`; o commit continua sob `deck_replace_all`; na beta, o import entra por deck novo (`/import`). Parte do servidor feita em 2026-09-24 na branch `deck/rodada2-2026-09-24`, ainda fora do ar, sem migration: `POST /import/to-deck/preview` (sob `decks_private`) lê e resolve a lista, calcula a lista final (soma ou troca, com o comandante mantido quando a troca não traz um), a diferença completa (o que entra, sai e muda, com nome, quantidade, papel e condição, e os totais) e a validação da lista final numa transação só de leitura, e emite o `DeckReviewArtifact v1` do tipo `import_to_deck`, que carrega a lista final e liga dono, deck, revisão e conteúdo. `POST /import/to-deck` (sob `deck_replace_all`) só aplica com esse artefato: sem ele responde 428 `import_review_required`; deck mudado depois da prévia dá 409 `import_preview_stale`; artefato adulterado, expirado ou de outro deck dá 409 `import_review_invalid`; regra que passou a falhar depois da prévia dá 400; em todos, nada é escrito. Confirmado, grava só as linhas que mudam e o evento `import_to_deck` do ledger, que o desfazer universal volta. Evidência: `server/test/import_to_deck_two_phase_db_live_test.dart` (PostgreSQL descartável, 9 casos: prévia sem escrita, commit exato, comandante mantido, stale, adulterado, expirado, de outro deck, sem artefato, regra que falha depois, desfazer exato, deck de outra pessoa e lista sem mudança), `server/test/import_to_deck_merge_support_test.dart` e 11 mutações derrubadas. Falta: o app pedir a prévia, mostrar a diferença, confirmar com o artefato e oferecer o desfazer (raia do app; o app de hoje manda a lista direto e recebe 428).",
       "section": "P0 do ciclo",
       "source_line": 338
     },
@@ -494,12 +494,12 @@
     {
       "id": "DCK-P1-04",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Uma única verdade de validação/readiness estrita por revisão.",
       "depends_on": [
         "DCK-P0-01"
       ],
-      "acceptance": "UI nunca diz “pronto” sem strict atual; ausência de legalidade não vira legal. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade pode andar hoje (H4/H7); tornar legalidade ausente bloqueante pode rebaixar decks validados e é decisão do dono. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 de 15 decks validados seriam rebaixados se legalidade ausente passasse a bloquear. Decisão do dono em 2026-09-22: D-28, tornar bloqueante agora; medido na produção, 0 de 15 decks validados seriam rebaixados.",
+      "acceptance": "UI nunca diz “pronto” sem strict atual; ausência de legalidade não vira legal. Medição de 2026-09-22 (`docs/flows/_p0/deck-core.md`): metade pode andar hoje (H4/H7); tornar legalidade ausente bloqueante pode rebaixar decks validados e é decisão do dono. Produção em 2026-09-22 (`docs/qa/execution/2026-09-22/prod-readonly-estrutura-e-contagens.md`): 0 de 15 decks validados seriam rebaixados se legalidade ausente passasse a bloquear. Decisão do dono em 2026-09-22: D-28, tornar bloqueante agora; medido na produção, 0 de 15 decks validados seriam rebaixados. Parte do servidor feita em 2026-09-24 na branch `deck/rodada2-2026-09-24`, ainda fora do ar, com a migration 068 proposta e não aplicada. D-28: na validação estrita, carta sem linha de legalidade no formato recusa com `legality_unknown` (o `/validate` persiste o motivo; criar deck e importar deck novo gravam `draft` com ele); montar o deck segue aceitando a carta. Strict atual: a 068 põe gatilhos por comando em `card_legalities` (inserir, mudar e apagar), e o deck `validated` do formato que tem a carta volta a `draft` com `card_legality_changed` na mesma transação, qualquer que seja o escritor; regravar o mesmo status não rebaixa. Mesma resposta: todo recibo de mudança de deck traz `readiness` lido na transação da mudança; troca 1 por 1 de edição e mudança de cartas ou formato voltam `draft` pelos gatilhos, e mudar só o nome mantém `validated`. A análise (`GET /decks/:id/analysis`) não diz válido sem o estado estrito (`awaiting_strict_validation`, `strict_validated`) e trata legalidade ausente e `not_legal` como erro. Os seletores de candidatos do Optimize (12 filtros em 3 arquivos e o filtro por nome) deixaram de admitir carta sem linha legal ou restrita, como a D-28 pediu. Evidência: `server/test/deck_strict_readiness_db_live_test.dart` (PostgreSQL descartável, 7 casos), `server/test/deck_readiness_contract_test.dart`, `server/test/deck_validation_route_support_test.dart` e `server/test/optimize_legality_selectors_contract_test.dart`, com as 8 mutações do grupo `dck104` e 5 mutações dos gatilhos da 068 (banco refeito de uma cópia mutada) derrubadas. Falta: o app não dizer pronto sem `deck_state=validated` (painel de diagnóstico, H3), rotular a lista pelo estado do servidor (H5), usar o `readiness` do recibo e traduzir os motivos novos (raia do app); o receipt do live histórico (`deck_validation_state_live_test.dart`) com política isolada fica para a sessão do gate; aplicar a 068 na produção pede a palavra do dono.",
       "section": "P1 do ciclo",
       "source_line": 351
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "7ff9a1ecb4da2da70cdde3d9b39c5b6d158c01a029fb97e72678ff415261d9ec"
+  "project_logic_source_digest_sha256": "c4ec96cfe418d3f9c1ccc0c70197a9f92b358f7f5681837ac711d0b9fce46945"
 }

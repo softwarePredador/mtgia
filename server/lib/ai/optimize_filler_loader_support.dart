@@ -98,7 +98,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonBasicLandFillers({
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted')
           AND COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)'
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^[:alpha:]])basic[[:space:]]+(snow[[:space:]]+)?land([^[:alpha:]]|\$)')
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
@@ -705,7 +705,7 @@ Future<List<Map<String, dynamic>>> loadMetaInsightFillers({
       JOIN cards c ON LOWER(c.name) = LOWER(mi.card_name)
       LEFT JOIN card_legalities cl
         ON cl.card_id = c.id AND cl.format = @legality_format
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+      WHERE (cl.status = 'legal' OR cl.status = 'restricted')
         AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
         AND c.name NOT LIKE 'A-%'
         AND c.name NOT LIKE '\\_%' ESCAPE '\\'
@@ -819,7 +819,7 @@ Future<List<Map<String, dynamic>>> loadBroadCommanderNonLandFillers({
       LEFT JOIN card_legalities cl
         ON cl.card_id = c.id AND cl.format = @legality_format
       LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-      WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+      WHERE (cl.status = 'legal' OR cl.status = 'restricted')
         AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
         AND c.name NOT LIKE 'A-%'
         AND c.name NOT LIKE '\\_%' ESCAPE '\\'
@@ -1025,7 +1025,7 @@ Future<List<Map<String, dynamic>>> loadCommanderWipeFloorCandidates({
           ON LOWER(cmi.card_name) = LOWER(c.name)
         LEFT JOIN card_intelligence_snapshot cis ON cis.card_id = c.id
         WHERE
-          (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+          (cl.status = 'legal' OR cl.status = 'restricted')
           AND LOWER(c.name) NOT IN (
             SELECT LOWER(unnest(@exclude::text[]))
           )
@@ -1285,7 +1285,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted')
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
@@ -1355,7 +1355,7 @@ Future<List<Map<String, dynamic>>> loadCompetitiveNonLandFillers({
         FROM cards c
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted')
           AND LOWER(c.name) IN (SELECT LOWER(unnest(@names::text[])))
           AND (
             c.color_identity <@ @identity::text[]
@@ -1451,7 +1451,7 @@ Future<List<Map<String, dynamic>>> loadEmergencyNonBasicFillers({
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted')
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
@@ -1573,7 +1573,7 @@ Future<List<Map<String, dynamic>>> loadIdentitySafeNonLandFillers({
         LEFT JOIN card_legalities cl
           ON cl.card_id = c.id AND cl.format = @legality_format
         LEFT JOIN card_meta_insights cmi ON LOWER(cmi.card_name) = LOWER(c.name)
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted')
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'
           AND c.name NOT LIKE '\\_%' ESCAPE '\\'
@@ -1681,7 +1681,7 @@ Future<List<Map<String, dynamic>>> loadPreferredNameFillers({
       LEFT JOIN card_legalities cl
         ON cl.card_id = c.id AND cl.format = @legality_format
       WHERE LOWER(name) = ANY(@preferred::text[])
-        AND (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        AND (cl.status = 'legal' OR cl.status = 'restricted')
         AND NOT (COALESCE(type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
       ORDER BY COALESCE(cmi.meta_deck_count, 0) DESC,
                COALESCE(cmi.usage_count, 0) DESC,

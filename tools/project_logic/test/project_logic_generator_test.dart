@@ -39,7 +39,7 @@ void main() {
     expect(stats['api_routes'] as int, greaterThanOrEqualTo(95));
     expect(stats['database_tables'], 81);
     expect(stats['database_views'], 6);
-    expect(stats['migrations'], 61);
+    expect(stats['migrations'], 62);
     expect(stats['flows'], 13);
   });
 
@@ -1176,7 +1176,7 @@ ${rows.join('\n')}
     expect(policy['cache_and_laboratory'], contains('never product source'));
     final database = result.manifest['database'] as Map<String, Object?>;
     expect(database['source_of_truth'], 'PostgreSQL/backend');
-    expect(database['latest_migration'], '067');
+    expect(database['latest_migration'], '068');
   });
 
   test('does not capture environment values', () {

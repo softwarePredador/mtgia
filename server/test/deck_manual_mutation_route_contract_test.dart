@@ -65,20 +65,28 @@ void main() {
       },
     );
 
-    test('import serializes with every other deck-card writer', () {
-      final source =
-          File('routes/import/to-deck/index.dart').readAsStringSync();
-      final deckLock = source.indexOf('SELECT format');
-      final cardRead = source.indexOf(
-        'SELECT card_id::text, quantity::int, is_commander, condition',
-        deckLock,
-      );
+    test(
+      'import commit locks the deck and checks the review before writing',
+      () {
+        // DCK-P0-03: o commit trava o deck (lockDeckForMutation, com
+        // FOR UPDATE), confere o artefato da prévia e só então escreve.
+        final source =
+            File('routes/import/to-deck/index.dart').readAsStringSync();
+        final lock = source.indexOf('lockDeckForMutation(');
+        final review = source.indexOf('verifyDeckReviewArtifact(');
+        final rules = source.indexOf('DeckRulesService(session)');
+        final write = source.indexOf('replaceDeckCardRows(');
 
-      expect(deckLock, greaterThanOrEqualTo(0));
-      expect(source.indexOf('FROM decks', deckLock), greaterThan(deckLock));
-      expect(source.indexOf('FOR UPDATE', deckLock), lessThan(cardRead));
-      expect(cardRead, greaterThan(deckLock));
-      expect(source, contains("'error_code': 'import_deck_changed'"));
-    });
+        expect(lock, greaterThanOrEqualTo(0));
+        expect(review, greaterThan(lock));
+        expect(rules, greaterThan(review));
+        expect(write, greaterThan(rules));
+        expect(source, contains("'import_review_required'"));
+        expect(source, isNot(contains('DELETE FROM deck_cards WHERE deck_id')));
+        final lib =
+            File('lib/decks/deck_revision_support.dart').readAsStringSync();
+        expect(lib, contains('FOR UPDATE'));
+      },
+    );
   });
 }

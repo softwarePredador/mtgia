@@ -2,7 +2,7 @@ import 'deck_rules_service.dart';
 import 'deck_validation_state_support.dart';
 
 const deckValidationOwnerScopeSql = '''
-  SELECT id::text, format
+  SELECT id::text, format, validation_reasons
   FROM decks
   WHERE id = @deckId AND user_id = @userId
   LIMIT 1
@@ -24,20 +24,34 @@ const deckValidationMarkSuccessSql = '''
   RETURNING validation_state, validation_reasons, validation_updated_at
 ''';
 
+/// Recusa estrita: os motivos que o deck já tinha, mais
+/// `strict_validation_failed` e o motivo específico da recusa (ex.:
+/// `legality_unknown`, D-28), calculados por
+/// [deckValidationFailureReasons].
 const deckValidationMarkFailureSql = '''
   UPDATE decks
   SET validation_state = 'draft',
-      validation_reasons = CASE
-        WHEN COALESCE(validation_reasons, '[]'::jsonb)
-             ? 'strict_validation_failed'
-          THEN COALESCE(validation_reasons, '[]'::jsonb)
-        ELSE COALESCE(validation_reasons, '[]'::jsonb)
-             || '["strict_validation_failed"]'::jsonb
-      END,
+      validation_reasons = CAST(@reasons AS jsonb),
       validation_updated_at = CURRENT_TIMESTAMP
   WHERE id = @deckId AND user_id = @userId
   RETURNING validation_state, validation_reasons, validation_updated_at
 ''';
+
+/// Os motivos persistidos numa recusa estrita.
+List<String> deckValidationFailureReasons(
+  Object? persistedReasons,
+  DeckRulesException error,
+) {
+  final reasons = normalizeDeckValidationReasons(
+    persistedReasons,
+  ).toList(growable: true);
+  for (final reason in [deckValidationReasonStrictFailed, error.reason]) {
+    if (reason != null && reason.isNotEmpty && !reasons.contains(reason)) {
+      reasons.add(reason);
+    }
+  }
+  return List<String>.unmodifiable(reasons);
+}
 
 Map<String, dynamic> buildDeckValidationSuccessBody({
   required String deckId,
@@ -51,9 +65,7 @@ Map<String, dynamic> buildDeckValidationSuccessBody({
     'deck_state': 'validated',
     'requires_review': false,
     'review_reasons': const <String>[],
-    'validation_updated_at': deckValidationTimestampToJson(
-      validationUpdatedAt,
-    ),
+    'validation_updated_at': deckValidationTimestampToJson(validationUpdatedAt),
   };
 }
 
@@ -86,9 +98,7 @@ Map<String, dynamic> buildDeckValidationRuleErrorBody(
     'deck_state': 'draft',
     'requires_review': true,
     'review_reasons': List<String>.unmodifiable(reasons),
-    'validation_updated_at': deckValidationTimestampToJson(
-      validationUpdatedAt,
-    ),
+    'validation_updated_at': deckValidationTimestampToJson(validationUpdatedAt),
     if (e.cardName != null) 'card_name': e.cardName,
   };
 }

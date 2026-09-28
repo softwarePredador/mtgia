@@ -17,6 +17,20 @@ void main() {
       expect(contract['review_reasons'], isEmpty);
     });
 
+    test('names the specific strict refusal (D-28 legality_unknown)', () {
+      final contract = buildDeckReadinessContract(
+        format: 'modern',
+        cardCount: 60,
+        hasCommander: false,
+        strictValidationPassed: false,
+        strictValidationError: 'sem legalidade conhecida',
+        strictValidationReason: 'legality_unknown',
+      );
+
+      expect(contract['state'], 'draft');
+      expect(contract['review_reasons'], ['legality_unknown']);
+    });
+
     test('makes an empty manual deck an explicit reviewable draft', () {
       final contract = buildDeckReadinessContract(
         format: 'commander',

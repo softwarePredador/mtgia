@@ -19,6 +19,7 @@ import '../routes/decks/[id]/changes/[eventId]/undo/index.dart' as undo_route;
 import '../routes/decks/[id]/changes/index.dart' as changes_route;
 import '../routes/decks/[id]/index.dart' as deck_route;
 import '../routes/import/to-deck/index.dart' as import_route;
+import '../routes/import/to-deck/preview/index.dart' as import_preview_route;
 import 'support/release_capability_matrix.dart';
 import 'support/scripted_pool.dart';
 
@@ -338,11 +339,20 @@ void main() {
         ),
         'deck_replace',
       );
+      // DCK-P0-03: o import em deck existente é prévia + commit.
+      final importPreview = await json(
+        await import_preview_route.onRequest(
+          context('POST', '/import/to-deck/preview', {
+            'deck_id': deckId,
+            'list': '2 Llanowar Elves $suffix',
+          }),
+        ),
+      );
       await expectStep(
         await import_route.onRequest(
           context('POST', '/import/to-deck', {
             'deck_id': deckId,
-            'list': '2 Llanowar Elves $suffix',
+            'review_artifact': importPreview['review_artifact'],
           }, headers: ifMatch(revision)),
         ),
         'import_to_deck',

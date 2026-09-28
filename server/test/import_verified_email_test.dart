@@ -61,6 +61,7 @@ void main() {
     for (final path in const [
       '/import',
       '/import/to-deck',
+      '/import/to-deck/preview',
       '/import/validate',
     ]) {
       Database.useConnectionForTesting(accountLookups(verified: false));

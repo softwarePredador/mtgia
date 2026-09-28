@@ -99,6 +99,7 @@
 | `/health/ready` | `GET` | `server/routes/health/ready/index.dart` | 2 | `source` |
 | `/import` | `POST` | `server/routes/import/index.dart` | 2 | `source` |
 | `/import/to-deck` | `POST` | `server/routes/import/to-deck/index.dart` | 2 | `source` |
+| `/import/to-deck/preview` | `POST` | `server/routes/import/to-deck/preview/index.dart` | 2 | `source` |
 | `/import/validate` | `POST` | `server/routes/import/validate/index.dart` | 2 | `source` |
 | `/market/card/{cardId}` | `GET` | `server/routes/market/card/[cardId].dart` | 1 | `source` |
 | `/market/movers` | `GET` | `server/routes/market/movers/index.dart` | 1 | `source` |

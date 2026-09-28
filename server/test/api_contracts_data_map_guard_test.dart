@@ -85,6 +85,44 @@ void main() {
       expect(rebuild, contains('defaults to `preview_only`'));
     });
 
+    test('documents strict validation per revision and legality', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final validate = _contractRowFor(contracts, 'POST /decks/:id/validate');
+
+      expect(validate, contains('`legality_unknown`'));
+      for (final phrase in const [
+        '## Strict Validation per Revision and Legality — 2026-09-24',
+        '`card_legality_changed`',
+        'carries `readiness`',
+        '`awaiting_strict_validation`',
+        'no longer admit a card without a',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
+    test('documents the two-phase import into an existing deck', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final preview = _contractRowFor(
+        contracts,
+        'POST /import/to-deck/preview',
+      );
+      final commit = _contractRowFor(contracts, 'POST /import/to-deck');
+
+      expect(
+        preview,
+        contains('under `decks_private` because it writes nothing'),
+      );
+      expect(preview, contains('the full `diff`'));
+      expect(preview, contains('kind `import_to_deck`'));
+      expect(commit, contains('428 `import_review_required`'));
+      expect(commit, contains('409 `import_preview_stale`'));
+      expect(commit, contains('writes only the rows that change'));
+      expect(commit, contains('universal undo reverts exactly'));
+    });
+
     test('documents the deck revision, change ledger and undo', () {
       final contracts =
           File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();

@@ -133,35 +133,12 @@ Future<Response> onRequest(
         ],
       );
 
-      if (touched.isNotEmpty) {
-        await session.execute(
-          Sql.named('''
-            DELETE FROM deck_cards
-            WHERE deck_id = CAST(@deckId AS uuid)
-              AND card_id = ANY(CAST(@cardIds AS uuid[]))
-          '''),
-          parameters: {'deckId': deckId, 'cardIds': touched.toList()},
-        );
-        for (final card in cardsBefore ?? const <Map<String, dynamic>>[]) {
-          await session.execute(
-            Sql.named('''
-              INSERT INTO deck_cards (
-                deck_id, card_id, quantity, is_commander, condition
-              ) VALUES (
-                CAST(@deckId AS uuid), CAST(@cardId AS uuid), @quantity,
-                @isCommander, @condition
-              )
-            '''),
-            parameters: {
-              'deckId': deckId,
-              'cardId': '${card['card_id']}',
-              'quantity': (card['quantity'] as num).toInt(),
-              'isCommander': card['is_commander'] == true,
-              'condition': card['condition']?.toString() ?? 'NM',
-            },
-          );
-        }
-      }
+      await replaceDeckCardRows(
+        session,
+        deckId: deckId,
+        touchedCardIds: touched,
+        rows: cardsBefore ?? const <Map<String, dynamic>>[],
+      );
       await session.execute(
         Sql.named('''
           UPDATE decks
