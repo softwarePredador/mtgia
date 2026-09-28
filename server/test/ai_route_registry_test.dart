@@ -16,7 +16,7 @@ import '../routes/ai/_middleware.dart' as ai_middleware;
 /// rota cujo handler fala com o provedor direto. Rota nova assim, fora do
 /// registry, faz o primeiro teste falhar até alguém registrar consumidor,
 /// escritas, capability, dono e substituto. As quatro rotas que a D-31
-/// removeu não podem voltar.
+/// removeu e a que a D-83 removeu pela mesma regra não podem voltar.
 void main() {
   final registry =
       jsonDecode(File('config/ai_route_registry.json').readAsStringSync())
@@ -290,13 +290,19 @@ void main() {
       }
     });
 
-    test('as quatro rotas removidas pela D-31 não voltam', () {
-      expect(removed, hasLength(4));
+    test('as rotas removidas pela regra da D-31 não voltam', () {
+      // As quatro da D-31 e o GET /ai/optimize/telemetry, que a D-83 removeu
+      // pela mesma regra (sem consumidor e com substituto).
+      expect(removed, hasLength(5));
+      expect(
+        removed.where((entry) => entry['decision'] == 'D-83').map(key),
+        ['GET /ai/optimize/telemetry'],
+      );
       final live = entries.map(key).toSet();
       for (final entry in removed) {
         final id = key(entry);
         final path = entry['path'] as String;
-        expect(entry['decision'], 'D-31', reason: id);
+        expect(entry['decision'], anyOf('D-31', 'D-83'), reason: id);
         expect(_text(entry['substitute']), isNotEmpty, reason: id);
         expect(_text(entry['after_removal']), isNotEmpty, reason: id);
         expect(live, isNot(contains(id)), reason: id);

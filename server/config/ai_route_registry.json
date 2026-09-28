@@ -39,7 +39,7 @@
       "authOnly"
     ]
   },
-  "rule": "D-31: rota sem consumidor no app, no site e nos scripts, e com substituto, sai junto com os testes que a tratam como recurso. Uma rota nova de IA entra aqui antes de ganhar capability.",
+  "rule": "D-31: rota sem consumidor no app, no site e nos scripts, e com substituto, sai junto com os testes que a tratam como recurso. A D-83 aplicou a mesma regra ao GET /ai/optimize/telemetry. Uma rota nova de IA entra aqui antes de ganhar capability.",
   "providers": {
     "openai_chat_completions": {
       "url": "https://api.openai.com/v1/chat/completions",
@@ -333,23 +333,6 @@
       "writes_note": "cancela o trabalho",
       "external_providers": [],
       "substitute": null
-    },
-    {
-      "method": "GET",
-      "path": "/ai/optimize/telemetry",
-      "handler": "server/routes/ai/optimize/telemetry/index.dart",
-      "status": "legacy_off",
-      "capability": "legacy_ai_routes",
-      "access_policy": "rateLimitedAuxiliary",
-      "legal_reacceptance": false,
-      "owner": "BT-AI-018",
-      "lane": "deck_e_ia",
-      "consumers": [],
-      "consumer_note": "nenhum consumidor no app, no site, nos scripts nem no ops; só o teste ao vivo de contrato",
-      "writes": [],
-      "external_providers": [],
-      "substitute": "consulta de operação ao PostgreSQL (ai_optimize_fallback_telemetry) e o painel de /health/dashboard",
-      "rule_verdict": "pela regra da D-31 (sem consumidor, com substituto) a rota sairia; a D-31 listou só as quatro e disse que esta segue off sob legacy_ai_routes, então a remoção ficou em decisoes-pendentes"
     },
     {
       "method": "POST",
@@ -954,6 +937,16 @@
         "card_combos",
         "combo_cards"
       ],
+      "after_removal": "404 capability_route_unclassified"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/optimize/telemetry",
+      "handler": "server/routes/ai/optimize/telemetry/index.dart",
+      "decision": "D-83",
+      "removed_on": "2026-09-28",
+      "substitute": "consulta de operação ao PostgreSQL (ai_optimize_fallback_telemetry) e o painel de /health/dashboard",
+      "writes_left_behind": [],
       "after_removal": "404 capability_route_unclassified"
     }
   ]

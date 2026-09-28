@@ -14396,6 +14396,13 @@ Validação de schema:
 
 ## 61. Endpoint dedicado de monitoramento: `GET /ai/optimize/telemetry`
 
+> **Removido em 2026-09-28 (D-83, pela regra da D-31).** A rota não tinha
+> consumidor no app, no site, nos scripts nem no ops. O handler e o teste de
+> contrato ao vivo saíram; quem ainda chamar recebe 404
+> `capability_route_unclassified`. O substituto é a consulta de operação ao
+> PostgreSQL (`ai_optimize_fallback_telemetry`, que continua) e o
+> `/health/dashboard`. As seções 61 e 62 ficam como histórico.
+
 ### 61.1 O Porquê
 
 Mesmo com telemetria persistida no `/ai/optimize`, faltava um endpoint dedicado para consumo por painel/monitoramento sem depender de acionar fluxo de otimização.

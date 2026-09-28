@@ -63,7 +63,6 @@ presets:
       - test/ai_archetypes_flow_test.dart
       - test/ai_generate_create_optimize_flow_test.dart
       - test/ai_optimize_flow_test.dart
-      - test/ai_optimize_telemetry_contract_test.dart
       - test/auth_flow_integration_test.dart
       - test/battle_product_e2e_test.dart
       - test/commander_reference_atraxa_test.dart

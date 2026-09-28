@@ -23,7 +23,6 @@ const rateLimitedAuxiliaryAiPaths = <String>{
   '/ai/simulate',
   '/ai/commander-reference',
   '/ai/ml-status',
-  '/ai/optimize/telemetry',
 };
 
 AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
