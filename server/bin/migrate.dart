@@ -6286,6 +6286,67 @@ DROP VIEW IF EXISTS collection_availability_snapshot;
       DROP INDEX IF EXISTS idx_cards_colors;
     ''',
   ),
+  Migration(
+    version: '074',
+    name: 'reinstall_active_user_triggers',
+    // BT-DB-007 (Frente C): refaz a trava de conta ativa
+    // (manaloom_active_user_<oid>, migration 038) em toda chave de uma coluna
+    // para users, com o mesmo laço da 056. A 067 (deck_change_events) e a 069
+    // (ai_generate_requests), da frente de deck, criam chave para users sem
+    // rodar o laço. No banco novo o gatilho existe, porque o bootstrap já tem
+    // as tabelas quando o laço roda; no banco migrado, que é o caminho da
+    // produção, ele faltava, e o ensaio de upgrade (BT-DB-003) no código
+    // integrado acusou a diferença. O laço refaz todas as chaves, então cobre
+    // qualquer tabela nova que venha antes desta. Daqui em diante, toda
+    // migration com chave para users roda o laço no fim
+    // (test/active_user_trigger_rule_test.dart). O down é neutro: os gatilhos
+    // são a trava da 038, que o banco já devia ter, e tirá-los reabriria o
+    // buraco.
+    up: '''
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+    ''',
+    down: 'SELECT 1;',
+  ),
 ];
 
 class Migration {

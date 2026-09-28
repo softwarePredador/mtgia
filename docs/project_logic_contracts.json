@@ -848,6 +848,7 @@
         "server/test/backup_cadence_test.py",
         "server/test/flutter_web_deploy_contract_test.dart",
         "server/test/data_model_migration_test.dart",
+        "server/test/active_user_trigger_rule_test.dart",
         "server/test/release_capability_policy_test.dart",
         "app/test/core/config/release_capabilities_test.dart",
         "app/test/core/config/release_capability_surface_contract_test.dart",

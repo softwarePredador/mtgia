@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `528a42147477a0d5ca7e49fef7d8865f6670f13f447324196af79ed53d219af4`
+**Digest das fontes:** `d76c5f01dd33162bc9b38efe4149d220ad93f662f5566d96eb4c1b0ce331b55f`
 
 ## Fontes de verdade
 
@@ -22,7 +22,7 @@
 | `semantic_resolved_files` | 700 |
 | `semantic_unresolved_files` | 0 |
 | `semantic_resolved_call_edges` | 43088 |
-| `semantic_resolved_call_sites` | 68507 |
+| `semantic_resolved_call_sites` | 68508 |
 | `semantic_resolved_type_references` | 16317 |
 | `modules` | 160 |
 | `app_routes` | 46 |
@@ -30,14 +30,14 @@
 | `api_routes` | 121 |
 | `database_tables` | 80 |
 | `database_views` | 6 |
-| `migrations` | 63 |
+| `migrations` | 64 |
 | `scripts_and_jobs` | 698 |
 | `environment_variables` | 717 |
-| `tests` | 1268 |
+| `tests` | 1270 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
-| `tasks` | 244 |
-| `task_dependency_edges` | 435 |
+| `tasks` | 245 |
+| `task_dependency_edges` | 436 |
 | `route_consumer_bindings` | 57 |
 | `receipt_contracts` | 6 |
 
