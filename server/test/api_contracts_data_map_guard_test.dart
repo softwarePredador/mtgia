@@ -35,6 +35,34 @@ void main() {
       }
     });
 
+    test('documents the typed post-game errors (LC-P0-06)', () {
+      final upsert = _contractRowFor(
+        contracts,
+        'POST /decks/:id/post-game-notes',
+      );
+      final delete = _contractRowFor(
+        contracts,
+        'DELETE /decks/:id/post-game-notes/:noteId',
+      );
+      final list = _contractRowFor(
+        contracts,
+        'GET /decks/:id/post-game-notes?include_deleted=&since=',
+      );
+      for (final code in const [
+        'post_game_play_session_conflict',
+        'post_game_note_deleted',
+        'post_game_revision_conflict',
+        'post_game_note_not_found',
+        'deck_not_found',
+      ]) {
+        expect(upsert, contains(code), reason: code);
+      }
+      expect(delete, contains('post_game_note_not_found'));
+      expect(delete, contains('post_game_revision_conflict'));
+      expect(list, contains('deck_not_found'));
+      expect(upsert, contains('post_game_error_contract.dart'));
+    });
+
     test('documents the activation event catalog and user-based KPIs', () {
       // BT-KPI-001 (D-47).
       final collector = _contractRowFor(

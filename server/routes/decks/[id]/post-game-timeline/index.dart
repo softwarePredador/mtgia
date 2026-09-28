@@ -2,6 +2,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/http_responses.dart';
+import '../../../../lib/retention/post_game_error_contract.dart';
 import '../../../../lib/retention/post_game_note_service.dart';
 
 Future<Response> onRequest(RequestContext context, String id) async {
@@ -14,7 +15,7 @@ Future<Response> onRequest(RequestContext context, String id) async {
 
   try {
     if (!await service.ownsDeck(userId: userId, deckId: id)) {
-      return notFound('Deck nao encontrado.');
+      return postGameDeckNotFound();
     }
     final timeline = await service.buildTimeline(userId: userId, deckId: id);
     return Response.json(body: timeline);

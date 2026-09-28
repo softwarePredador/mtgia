@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:postgres/postgres.dart';
 
 import '../deck_snapshot_contract.dart';
+import 'post_game_error_contract.dart';
 
 class PostGameNotePage {
   const PostGameNotePage({required this.notes, required this.syncCursor});
@@ -12,9 +13,15 @@ class PostGameNotePage {
 }
 
 class PostGameConflictException implements Exception {
-  const PostGameConflictException(this.currentNote);
+  const PostGameConflictException(
+    this.currentNote, {
+    this.code = postGameRevisionConflictCode,
+  });
 
   final Map<String, dynamic>? currentNote;
+
+  /// Motivo estável do 409 (`post_game_error_contract.dart`).
+  final String code;
 }
 
 class PostGameValidationException implements Exception {
@@ -23,7 +30,13 @@ class PostGameValidationException implements Exception {
   final String message;
 }
 
-class PostGameNoteNotFoundException implements Exception {}
+class PostGameNoteNotFoundException implements Exception {
+  const PostGameNoteNotFoundException({this.code = postGameNoteNotFoundCode});
+
+  /// `post_game_note_not_found` (o id é de outra conta ou de outro deck) ou
+  /// `deck_not_found` (o deck sumiu no meio do upsert).
+  final String code;
+}
 
 class PostGameNoteService {
   PostGameNoteService(this.pool);
@@ -385,7 +398,10 @@ class PostGameNoteService {
         }
         final currentJson = _rowToJson(currentRow);
         if (currentMap['deleted_at'] != null) {
-          throw PostGameConflictException(currentJson);
+          throw PostGameConflictException(
+            currentJson,
+            code: postGameNoteDeletedCode,
+          );
         }
         final currentRevision = _asInt(currentMap['revision'], fallback: 1);
         if (baseRevision != null && baseRevision != currentRevision) {
@@ -437,7 +453,10 @@ class PostGameNoteService {
       });
     } on ServerException catch (error) {
       if (error.code == '23505') {
-        throw const PostGameConflictException(null);
+        throw PostGameConflictException(
+          null,
+          code: postGameConflictCodeForUniqueViolation(error.constraintName),
+        );
       }
       rethrow;
     }
@@ -547,7 +566,9 @@ class PostGameNoteService {
       '''),
       parameters: {'deckId': deckId, 'userId': userId},
     );
-    if (rows.isEmpty) throw PostGameNoteNotFoundException();
+    if (rows.isEmpty) {
+      throw const PostGameNoteNotFoundException(code: postGameDeckNotFoundCode);
+    }
 
     final first = rows.first.toColumnMap();
     return DeckSnapshotIdentity(

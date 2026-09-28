@@ -12,6 +12,8 @@ void main() {
         File(
           'routes/decks/[id]/post-game-notes/[noteId].dart',
         ).readAsStringSync();
+    final errorContract =
+        File('lib/retention/post_game_error_contract.dart').readAsStringSync();
 
     test('persists session and deck snapshot metadata', () {
       for (final field in const [
@@ -82,9 +84,17 @@ void main() {
 
     test('optimistic concurrency remains optional for legacy clients', () {
       expect(service, contains('if (baseRevision != null'));
-      expect(listRoute, contains("'error': 'post_game_conflict'"));
+      // O 409 mantém `error: post_game_conflict` para o cliente antigo e
+      // leva o motivo em `error_code` (LC-P0-06).
+      expect(
+        errorContract,
+        contains("postGameConflictCode = 'post_game_conflict'"),
+      );
+      expect(errorContract, contains("'error': postGameConflictCode"));
+      expect(listRoute, contains('postGameConflict('));
       expect(deleteRoute, contains("'if-match'"));
-      expect(deleteRoute, contains('HttpStatus.conflict'));
+      expect(deleteRoute, contains('postGameConflict('));
+      expect(deleteRoute, contains('deleting: true'));
     });
 
     test('exact card evidence is canonicalized inside the owned deck', () {

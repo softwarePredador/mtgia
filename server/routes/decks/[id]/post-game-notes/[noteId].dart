@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/http_responses.dart';
+import '../../../../lib/retention/post_game_error_contract.dart';
 import '../../../../lib/retention/post_game_note_service.dart';
 
 Future<Response> onRequest(
@@ -20,7 +21,7 @@ Future<Response> onRequest(
 
   try {
     if (!await service.ownsDeck(userId: userId, deckId: deckId)) {
-      return notFound('Deck nao encontrado.');
+      return postGameDeckNotFound();
     }
     final deleted = await service.deleteNote(
       userId: userId,
@@ -28,19 +29,15 @@ Future<Response> onRequest(
       noteId: noteId,
       baseRevision: _ifMatchRevision(context.request.headers),
     );
-    if (!deleted) return notFound('Nota pos-jogo nao encontrada.');
+    if (!deleted) return postGameNoteNotFound();
     return Response(statusCode: HttpStatus.noContent);
   } on PostGameValidationException catch (error) {
     return badRequest(error.message);
   } on PostGameConflictException catch (error) {
-    return Response.json(
-      statusCode: HttpStatus.conflict,
-      body: {
-        'error': 'post_game_conflict',
-        'message':
-            'A nota mudou em outro dispositivo. Atualize antes de excluir.',
-        if (error.currentNote != null) 'current_note': error.currentNote,
-      },
+    return postGameConflict(
+      code: error.code,
+      currentNote: error.currentNote,
+      deleting: true,
     );
   } catch (error) {
     return internalServerError(

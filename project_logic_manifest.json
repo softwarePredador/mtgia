@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "f95069f35a27a5f5e59553dc155dce055ccd7e37d9420d5d44aca8632e2dc2cb",
+  "source_digest_sha256": "633dda2fbd107a38f824c0d0126ac518e5f53ab7a055abf047243f37b64545ae",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,15 +63,15 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 717,
+    "dart_source_files": 718,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5404,
-    "semantic_resolved_files": 717,
+    "dart_symbols": 5410,
+    "semantic_resolved_files": 718,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43633,
-    "semantic_resolved_call_sites": 69402,
-    "semantic_resolved_type_references": 16626,
+    "semantic_resolved_call_edges": 43643,
+    "semantic_resolved_call_sites": 69410,
+    "semantic_resolved_type_references": 16632,
     "modules": 161,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 65,
     "scripts_and_jobs": 693,
     "environment_variables": 715,
-    "tests": 1280,
+    "tests": 1282,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -2028,10 +2028,11 @@
       "id": "server/lib/retention",
       "layer": "server",
       "files": [
+        "server/lib/retention/post_game_error_contract.dart",
         "server/lib/retention/post_game_note_service.dart"
       ],
-      "file_count": 1,
-      "symbol_count": 5,
+      "file_count": 2,
+      "symbol_count": 12,
       "providers": [],
       "services": [
         "PostGameNoteService"
@@ -2356,7 +2357,7 @@
         "server/routes/decks/trash/index.dart"
       ],
       "file_count": 33,
-      "symbol_count": 117,
+      "symbol_count": 116,
       "providers": [],
       "services": []
     },
@@ -35067,13 +35068,13 @@
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 452
+      "line": 832
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 832
+      "line": 452
     },
     {
       "name": "AiJobSchemaReadiness",
@@ -38016,28 +38017,70 @@
       "line": 49
     },
     {
+      "name": "_conflictMessage",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 72
+    },
+    {
+      "name": "_notFound",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 88
+    },
+    {
+      "name": "postGameConflict",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 55
+    },
+    {
+      "name": "postGameConflictCodeForUniqueViolation",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 33
+    },
+    {
+      "name": "postGameDeckNotFound",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 42
+    },
+    {
+      "name": "postGameNotFoundFor",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 48
+    },
+    {
+      "name": "postGameNoteNotFound",
+      "kind": "function",
+      "source": "server/lib/retention/post_game_error_contract.dart",
+      "line": 45
+    },
+    {
       "name": "PostGameConflictException",
       "kind": "class",
       "source": "server/lib/retention/post_game_note_service.dart",
-      "line": 14
+      "line": 15
     },
     {
       "name": "PostGameNoteNotFoundException",
       "kind": "class",
       "source": "server/lib/retention/post_game_note_service.dart",
-      "line": 26
+      "line": 33
     },
     {
       "name": "PostGameNotePage",
       "kind": "class",
       "source": "server/lib/retention/post_game_note_service.dart",
-      "line": 7
+      "line": 8
     },
     {
       "name": "PostGameNoteService",
       "kind": "class",
       "source": "server/lib/retention/post_game_note_service.dart",
-      "line": 28,
+      "line": 41,
       "members": [
         "_asInt",
         "_boundedCardEvidenceList",
@@ -38076,7 +38119,7 @@
       "name": "PostGameValidationException",
       "kind": "class",
       "source": "server/lib/retention/post_game_note_service.dart",
-      "line": 20
+      "line": 27
     },
     {
       "name": "loadRuntimeEnvironment",
@@ -40913,43 +40956,37 @@
       "name": "_ifMatchRevision",
       "kind": "function",
       "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-      "line": 53
+      "line": 50
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-      "line": 9
-    },
-    {
-      "name": "_conflict",
-      "kind": "function",
-      "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-      "line": 89
+      "line": 10
     },
     {
       "name": "_list",
       "kind": "function",
       "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-      "line": 19
+      "line": 20
     },
     {
       "name": "_upsert",
       "kind": "function",
       "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-      "line": 57
+      "line": 58
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-      "line": 9
+      "line": 10
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-      "line": 7
+      "line": 8
     },
     {
       "name": "_isoDate",
@@ -41807,7 +41844,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 717,
+    "resolved_file_count": 718,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -42371,6 +42408,7 @@
       "server/lib/reports/shareable_report_service.dart",
       "server/lib/request_metrics_service.dart",
       "server/lib/request_trace.dart",
+      "server/lib/retention/post_game_error_contract.dart",
       "server/lib/retention/post_game_note_service.dart",
       "server/lib/runtime_environment.dart",
       "server/lib/schema_audit/schema_audit.dart",
@@ -42533,9 +42571,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43633,
-    "resolved_call_site_count": 69402,
-    "workspace_call_edge_count": 13780,
+    "resolved_call_edge_count": 43643,
+    "resolved_call_site_count": 69410,
+    "workspace_call_edge_count": 13789,
     "unresolved_call_edge_count": 560,
     "unresolved_call_site_count": 773,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -169613,8 +169651,74 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/retention/post_game_error_contract.dart",
+        "line": 43,
+        "caller": "postGameDeckNotFound",
+        "kind": "method",
+        "lexical_target": "_notFound",
+        "target": "_notFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_error_contract.dart",
+        "line": 46,
+        "caller": "postGameNoteNotFound",
+        "kind": "method",
+        "lexical_target": "_notFound",
+        "target": "_notFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_error_contract.dart",
+        "line": 52,
+        "caller": "postGameNotFoundFor",
+        "kind": "method",
+        "lexical_target": "postGameDeckNotFound",
+        "target": "postGameDeckNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_error_contract.dart",
+        "line": 53,
+        "caller": "postGameNotFoundFor",
+        "kind": "method",
+        "lexical_target": "postGameNoteNotFound",
+        "target": "postGameNoteNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_error_contract.dart",
+        "line": 66,
+        "caller": "postGameConflict",
+        "kind": "method",
+        "lexical_target": "_conflictMessage",
+        "target": "_conflictMessage",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 103,
+        "line": 105,
+        "caller": "PostGameNoteService.listNotes",
+        "kind": "constructor",
+        "lexical_target": "PostGameNotePage",
+        "target": "PostGameNotePage.PostGameNotePage",
+        "target_library": "package:server/retention/post_game_note_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_note_service.dart",
+        "line": 116,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "listNotes",
@@ -169625,7 +169729,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 111,
+        "line": 124,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "_stringList",
@@ -169636,7 +169740,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 114,
+        "line": 127,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "_cardEvidenceNames",
@@ -169647,7 +169751,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 122,
+        "line": 135,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "_weekKey",
@@ -169658,7 +169762,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 127,
+        "line": 140,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "_top",
@@ -169669,7 +169773,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 139,
+        "line": 152,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "_diagnostics",
@@ -169680,7 +169784,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 140,
+        "line": 153,
         "caller": "PostGameNoteService.buildTimeline",
         "kind": "method",
         "lexical_target": "_nextActions",
@@ -169691,7 +169795,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 170,
+        "line": 183,
         "caller": "PostGameNoteService.loadOptimizeEvidence",
         "kind": "method",
         "lexical_target": "_rowToJson",
@@ -169702,7 +169806,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 171,
+        "line": 184,
         "caller": "PostGameNoteService.loadOptimizeEvidence",
         "kind": "method",
         "lexical_target": "_captureDeckSnapshot",
@@ -169713,7 +169817,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 176,
+        "line": 189,
         "caller": "PostGameNoteService.loadOptimizeEvidence",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169724,7 +169828,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 177,
+        "line": 190,
         "caller": "PostGameNoteService.loadOptimizeEvidence",
         "kind": "method",
         "lexical_target": "_cardEvidenceList",
@@ -169735,7 +169839,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 193,
+        "line": 206,
         "caller": "PostGameNoteService.loadOptimizeEvidence",
         "kind": "method",
         "lexical_target": "_stringList",
@@ -169746,7 +169850,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 223,
+        "line": 236,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_boundedString",
@@ -169757,7 +169861,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 226,
+        "line": 239,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_optionalDate",
@@ -169768,7 +169872,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 230,
+        "line": 243,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_boundedCardEvidenceList",
@@ -169779,7 +169883,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 238,
+        "line": 251,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_boundedList",
@@ -169790,7 +169894,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 239,
+        "line": 252,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_optionalBoundedString",
@@ -169801,7 +169905,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 255,
+        "line": 268,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169812,7 +169916,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 259,
+        "line": 272,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_optionalDeckSnapshotHash",
@@ -169823,7 +169927,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 272,
+        "line": 285,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_optionalRevision",
@@ -169834,7 +169938,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 276,
+        "line": 289,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_reserveSyncWatermark",
@@ -169845,7 +169949,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 277,
+        "line": 290,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_captureDeckSnapshot",
@@ -169856,7 +169960,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 282,
+        "line": 295,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_canonicalizeDeckCardEvidence",
@@ -169867,7 +169971,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 308,
+        "line": 321,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169878,7 +169982,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 313,
+        "line": 326,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "constructor",
         "lexical_target": "DeckSnapshotIdentity",
@@ -169889,7 +169993,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 334,
+        "line": 347,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "constructor",
         "lexical_target": "PostGameConflictException",
@@ -169900,7 +170004,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 377,
+        "line": 390,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_rowToJson",
@@ -169911,7 +170015,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 384,
+        "line": 397,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "constructor",
         "lexical_target": "PostGameNoteNotFoundException",
@@ -169922,7 +170026,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 390,
+        "line": 406,
         "caller": "PostGameNoteService.upsertNote",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -169933,7 +170037,18 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 453,
+        "line": 458,
+        "caller": "PostGameNoteService.upsertNote",
+        "kind": "method",
+        "lexical_target": "postGameConflictCodeForUniqueViolation",
+        "target": "postGameConflictCodeForUniqueViolation",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_note_service.dart",
+        "line": 472,
         "caller": "PostGameNoteService.deleteNote",
         "kind": "method",
         "lexical_target": "_reserveSyncWatermark",
@@ -169944,7 +170059,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 470,
+        "line": 489,
         "caller": "PostGameNoteService.deleteNote",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -169955,7 +170070,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 472,
+        "line": 491,
         "caller": "PostGameNoteService.deleteNote",
         "kind": "constructor",
         "lexical_target": "PostGameConflictException",
@@ -169966,7 +170081,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 472,
+        "line": 491,
         "caller": "PostGameNoteService.deleteNote",
         "kind": "method",
         "lexical_target": "_rowToJson",
@@ -169977,7 +170092,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 541,
+        "line": 560,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "method",
         "lexical_target": "deckVersionAtSql",
@@ -169988,7 +170103,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 550,
+        "line": 570,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "constructor",
         "lexical_target": "PostGameNoteNotFoundException",
@@ -169999,7 +170114,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 553,
+        "line": 574,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "constructor",
         "lexical_target": "DeckSnapshotIdentity",
@@ -170010,7 +170125,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 554,
+        "line": 575,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -170021,7 +170136,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 566,
+        "line": 587,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_dateString",
@@ -170032,7 +170147,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 570,
+        "line": 591,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -170043,7 +170158,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 583,
+        "line": 604,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_cardEvidenceList",
@@ -170054,7 +170169,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 585,
+        "line": 606,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_stringList",
@@ -170065,7 +170180,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 586,
+        "line": 607,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -170076,7 +170191,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 602,
+        "line": 623,
         "caller": "PostGameNoteService._boundedString",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170087,7 +170202,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 615,
+        "line": 636,
         "caller": "PostGameNoteService._optionalBoundedString",
         "kind": "method",
         "lexical_target": "_boundedString",
@@ -170098,7 +170213,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 624,
+        "line": 645,
         "caller": "PostGameNoteService._optionalDate",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170109,7 +170224,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 633,
+        "line": 654,
         "caller": "PostGameNoteService._optionalRevision",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170120,18 +170235,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 64,
-        "caller": "PostGameNoteService.listNotes",
-        "kind": "method",
-        "lexical_target": "_reserveSyncWatermark",
-        "target": "PostGameNoteService._reserveSyncWatermark",
-        "target_library": "package:server/retention/post_game_note_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 644,
+        "line": 665,
         "caller": "PostGameNoteService._optionalDeckSnapshotHash",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170142,7 +170246,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 652,
+        "line": 673,
         "caller": "PostGameNoteService._boundedList",
         "kind": "method",
         "lexical_target": "_stringList",
@@ -170153,7 +170257,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 654,
+        "line": 675,
         "caller": "PostGameNoteService._boundedList",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170164,7 +170268,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 660,
+        "line": 681,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "method",
         "lexical_target": "_decodeJsonList",
@@ -170175,7 +170279,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 663,
+        "line": 684,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170186,7 +170290,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 672,
+        "line": 693,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -170197,7 +170301,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 673,
+        "line": 694,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "method",
         "lexical_target": "_boundedString",
@@ -170208,7 +170312,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 711,
+        "line": 732,
         "caller": "PostGameNoteService._canonicalizeDeckCardEvidence",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -170219,7 +170323,18 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 749,
+        "line": 77,
+        "caller": "PostGameNoteService.listNotes",
+        "kind": "method",
+        "lexical_target": "_reserveSyncWatermark",
+        "target": "PostGameNoteService._reserveSyncWatermark",
+        "target_library": "package:server/retention/post_game_note_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_note_service.dart",
+        "line": 770,
         "caller": "PostGameNoteService._canonicalizeDeckCardEvidence",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -170230,7 +170345,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 754,
+        "line": 775,
         "caller": "PostGameNoteService._canonicalizeDeckCardEvidence",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -170241,7 +170356,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 785,
+        "line": 806,
         "caller": "PostGameNoteService._stringList",
         "kind": "method",
         "lexical_target": "_decodeJsonList",
@@ -170252,7 +170367,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 795,
+        "line": 816,
         "caller": "PostGameNoteService._cardEvidenceList",
         "kind": "method",
         "lexical_target": "_decodeJsonList",
@@ -170263,7 +170378,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 806,
+        "line": 827,
         "caller": "PostGameNoteService._cardEvidenceList",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -170274,7 +170389,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 812,
+        "line": 833,
         "caller": "PostGameNoteService._cardEvidenceNames",
         "kind": "method",
         "lexical_target": "_cardEvidenceList",
@@ -170285,7 +170400,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 816,
+        "line": 837,
         "caller": "PostGameNoteService._cardEvidenceNames",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -170296,7 +170411,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 850,
+        "line": 871,
         "caller": "PostGameNoteService._diagnostics",
         "kind": "method",
         "lexical_target": "_issueLabel",
@@ -170307,7 +170422,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 851,
+        "line": 872,
         "caller": "PostGameNoteService._diagnostics",
         "kind": "method",
         "lexical_target": "_issueDiagnostic",
@@ -170318,22 +170433,11 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 868,
+        "line": 889,
         "caller": "PostGameNoteService._nextActions",
         "kind": "method",
         "lexical_target": "_issueAction",
         "target": "PostGameNoteService._issueAction",
-        "target_library": "package:server/retention/post_game_note_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 92,
-        "caller": "PostGameNoteService.listNotes",
-        "kind": "constructor",
-        "lexical_target": "PostGameNotePage",
-        "target": "PostGameNotePage.PostGameNotePage",
         "target_library": "package:server/retention/post_game_note_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -188754,7 +188858,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 15,
+        "line": 16,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -188765,7 +188869,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 19,
+        "line": 20,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "PostGameNoteService",
@@ -188776,7 +188880,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 22,
+        "line": 23,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "ownsDeck",
@@ -188787,18 +188891,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 23,
+        "line": 24,
         "caller": "onRequest",
         "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
+        "lexical_target": "postGameDeckNotFound",
+        "target": "postGameDeckNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 25,
+        "line": 26,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "deleteNote",
@@ -188809,7 +188913,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 29,
+        "line": 30,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_ifMatchRevision",
@@ -188820,7 +188924,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 34,
+        "line": 32,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "postGameNoteNotFound",
+        "target": "postGameNoteNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
+        "line": 35,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -188831,7 +188946,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 46,
+        "line": 37,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "postGameConflict",
+        "target": "postGameConflict",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
+        "line": 43,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -188842,7 +188968,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 65,
+        "line": 62,
         "caller": "_ifMatchRevision",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -188853,7 +188979,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 11,
+        "line": 12,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_list",
@@ -188864,7 +188990,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 14,
+        "line": 15,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_upsert",
@@ -188875,7 +189001,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 16,
+        "line": 17,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -188886,7 +189012,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 21,
+        "line": 22,
         "caller": "_list",
         "kind": "constructor",
         "lexical_target": "PostGameNoteService",
@@ -188897,7 +189023,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 24,
+        "line": 25,
         "caller": "_list",
         "kind": "method",
         "lexical_target": "ownsDeck",
@@ -188908,18 +189034,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 25,
+        "line": 26,
         "caller": "_list",
         "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
+        "lexical_target": "postGameDeckNotFound",
+        "target": "postGameDeckNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 35,
+        "line": 36,
         "caller": "_list",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -188930,7 +189056,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 37,
+        "line": 38,
         "caller": "_list",
         "kind": "method",
         "lexical_target": "listNotes",
@@ -188941,7 +189067,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 50,
+        "line": 51,
         "caller": "_list",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -188952,7 +189078,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 59,
+        "line": 60,
         "caller": "_upsert",
         "kind": "constructor",
         "lexical_target": "PostGameNoteService",
@@ -188963,7 +189089,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 65,
+        "line": 66,
         "caller": "_upsert",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -188974,7 +189100,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 69,
+        "line": 70,
         "caller": "_upsert",
         "kind": "method",
         "lexical_target": "ownsDeck",
@@ -188985,18 +189111,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 70,
+        "line": 71,
         "caller": "_upsert",
         "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
+        "lexical_target": "postGameDeckNotFound",
+        "target": "postGameDeckNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 72,
+        "line": 73,
         "caller": "_upsert",
         "kind": "method",
         "lexical_target": "upsertNote",
@@ -189007,18 +189133,29 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 81,
+        "line": 82,
         "caller": "_upsert",
         "kind": "method",
-        "lexical_target": "_conflict",
-        "target": "_conflict",
-        "target_library": "workspace:server/routes/decks/[id]/post-game-notes/index.dart",
+        "lexical_target": "postGameConflict",
+        "target": "postGameConflict",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 85,
+        "line": 84,
+        "caller": "_upsert",
+        "kind": "method",
+        "lexical_target": "postGameNotFoundFor",
+        "target": "postGameNotFoundFor",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/post-game-notes/index.dart",
+        "line": 86,
         "caller": "_upsert",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -189029,7 +189166,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 13,
+        "line": 10,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "methodNotAllowed",
+        "target": "methodNotAllowed",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
+        "line": 14,
         "caller": "onRequest",
         "kind": "constructor",
         "lexical_target": "PostGameNoteService",
@@ -189040,7 +189188,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 16,
+        "line": 17,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "ownsDeck",
@@ -189051,18 +189199,18 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 17,
+        "line": 18,
         "caller": "onRequest",
         "kind": "method",
-        "lexical_target": "notFound",
-        "target": "notFound",
-        "target_library": "package:server/http_responses.dart",
+        "lexical_target": "postGameDeckNotFound",
+        "target": "postGameDeckNotFound",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 19,
+        "line": 20,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "buildTimeline",
@@ -189073,22 +189221,11 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 22,
+        "line": 23,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "internalServerError",
         "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 9,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
         "target_library": "package:server/http_responses.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -194149,8 +194286,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14501,
-        "occurrences": 25143
+        "unique_references": 14502,
+        "occurrences": 25144
       },
       {
         "target_scope": "dart_sdk",
@@ -198259,8 +198396,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/http_responses.dart",
-        "unique_references": 171,
-        "occurrences": 258
+        "unique_references": 167,
+        "occurrences": 252
       },
       {
         "target_scope": "workspace",
@@ -198543,6 +198680,12 @@
         "target_library": "package:server/request_trace.dart",
         "unique_references": 5,
         "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/retention/post_game_error_contract.dart",
+        "unique_references": 14,
+        "occurrences": 14
       },
       {
         "target_scope": "workspace",
@@ -199267,8 +199410,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/routes/decks/[id]/post-game-notes/index.dart",
-        "unique_references": 3,
-        "occurrences": 3
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "workspace",
@@ -203909,7 +204052,7 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16626,
+    "resolved_type_reference_count": 16632,
     "workspace_type_reference_count": 3516,
     "unresolved_type_reference_count": 359,
     "resolved_type_references_scope": "workspace_targets_only",
@@ -235496,7 +235639,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 255,
+        "line": 268,
         "lexical_type": "PostGameValidationException",
         "resolved_type": "PostGameValidationException",
         "target": "PostGameValidationException",
@@ -235506,7 +235649,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 313,
+        "line": 326,
         "lexical_type": "DeckSnapshotIdentity",
         "resolved_type": "DeckSnapshotIdentity",
         "target": "DeckSnapshotIdentity",
@@ -235516,7 +235659,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 334,
+        "line": 347,
         "lexical_type": "PostGameConflictException",
         "resolved_type": "PostGameConflictException",
         "target": "PostGameConflictException",
@@ -235526,7 +235669,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 384,
+        "line": 397,
         "lexical_type": "PostGameNoteNotFoundException",
         "resolved_type": "PostGameNoteNotFoundException",
         "target": "PostGameNoteNotFoundException",
@@ -235536,7 +235679,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 57,
+        "line": 70,
         "lexical_type": "PostGameNotePage",
         "resolved_type": "PostGameNotePage",
         "target": "PostGameNotePage",
@@ -238326,7 +238469,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 19,
+        "line": 20,
         "lexical_type": "PostGameNoteService",
         "resolved_type": "PostGameNoteService",
         "target": "PostGameNoteService",
@@ -238336,7 +238479,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 33,
+        "line": 34,
         "lexical_type": "PostGameValidationException",
         "resolved_type": "PostGameValidationException",
         "target": "PostGameValidationException",
@@ -238346,7 +238489,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/[noteId].dart",
-        "line": 35,
+        "line": 36,
         "lexical_type": "PostGameConflictException",
         "resolved_type": "PostGameConflictException",
         "target": "PostGameConflictException",
@@ -238356,7 +238499,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 21,
+        "line": 22,
         "lexical_type": "PostGameNoteService",
         "resolved_type": "PostGameNoteService",
         "target": "PostGameNoteService",
@@ -238366,7 +238509,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 78,
+        "line": 79,
         "lexical_type": "PostGameValidationException",
         "resolved_type": "PostGameValidationException",
         "target": "PostGameValidationException",
@@ -238376,17 +238519,17 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 80,
+        "line": 81,
         "lexical_type": "PostGameConflictException",
         "resolved_type": "PostGameConflictException",
         "target": "PostGameConflictException",
         "target_library": "package:server/retention/post_game_note_service.dart",
         "target_scope": "workspace",
-        "occurrences": 2
+        "occurrences": 1
       },
       {
         "source": "server/routes/decks/[id]/post-game-notes/index.dart",
-        "line": 82,
+        "line": 83,
         "lexical_type": "PostGameNoteNotFoundException",
         "resolved_type": "PostGameNoteNotFoundException",
         "target": "PostGameNoteNotFoundException",
@@ -238396,7 +238539,7 @@
       },
       {
         "source": "server/routes/decks/[id]/post-game-timeline/index.dart",
-        "line": 13,
+        "line": 14,
         "lexical_type": "PostGameNoteService",
         "resolved_type": "PostGameNoteService",
         "target": "PostGameNoteService",
@@ -239103,8 +239246,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6469,
-        "occurrences": 40707
+        "unique_references": 6473,
+        "occurrences": 40721
       },
       {
         "target_scope": "dart_sdk",
@@ -239187,8 +239330,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 294,
-        "occurrences": 1181
+        "unique_references": 295,
+        "occurrences": 1185
       },
       {
         "target_scope": "dependency",
@@ -240573,8 +240716,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 418,
-        "occurrences": 4829
+        "unique_references": 419,
+        "occurrences": 4830
       },
       {
         "target_scope": "workspace",
@@ -242896,7 +243039,7 @@
         "target_scope": "workspace",
         "target_library": "package:server/retention/post_game_note_service.dart",
         "unique_references": 14,
-        "occurrences": 34
+        "occurrences": 33
       },
       {
         "target_scope": "workspace",
@@ -246636,7 +246779,7 @@
       "name": "PostGameNoteService",
       "kind": "class",
       "source": "server/lib/retention/post_game_note_service.dart",
-      "line": 28,
+      "line": 41,
       "members": [
         "_asInt",
         "_boundedCardEvidenceList",
@@ -280552,6 +280695,8 @@
     "server/test/plan_oracle_text_backfill_test.py",
     "server/test/plan_service_test.dart",
     "server/test/play_vs_ai_real_xmage_e2e_test.dart",
+    "server/test/post_game_error_contract_test.dart",
+    "server/test/post_game_note_error_codes_db_live_test.dart",
     "server/test/post_game_note_sync_contract_test.dart",
     "server/test/post_game_two_client_live_test.dart",
     "server/test/premium_visual_audit_test.py",
@@ -281926,7 +282071,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "e76d19e255fc6cdff50dc1c8c8cafa08e7c55c131a1ee0a311939a3a3f3ad04b"
+      "sha256": "fba49b4d6f9b1b9de7e413fb2f0376675396ef5f27ab9258f6abe836ec590c52"
     },
     "required_task_fields": [
       "id",
@@ -284055,7 +284200,7 @@
         "depends_on": [
           "LC-P0-01"
         ],
-        "acceptance": "A segunda nota do mesmo pós-jogo mostra o conflito; nota apagada não ressuscita; teste de store.",
+        "acceptance": "A segunda nota do mesmo pós-jogo mostra o conflito; nota apagada não ressuscita; teste de store. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration (decisão 23 da coordenação): os 404 e 409 do pós-jogo levam o motivo em `error_code`, no contrato de erro tipado do `BT-AUTH-001` (`deck_not_found`, `post_game_note_not_found`, `post_game_play_session_conflict`, `post_game_note_deleted` e `post_game_revision_conflict`, em `server/lib/retention/post_game_error_contract.dart`), e o 409 mantém `error: post_game_conflict`. Evidência: `server/test/post_game_note_error_codes_db_live_test.dart` (PostgreSQL descartável), `server/test/post_game_error_contract_test.dart` e as mutações do grupo `lc06err` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-06-codigos-de-erro-do-pos-jogo.md`. Falta: a raia do app (o store tipado e a tela), que tem rascunho pronto e já lê esses códigos.",
         "section": "Épico H — Life Counter, partida e pós-jogo",
         "source_line": 594
       },
@@ -291810,7 +291955,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "f95069f35a27a5f5e59553dc155dce055ccd7e37d9420d5d44aca8632e2dc2cb"
+    "project_logic_source_digest_sha256": "633dda2fbd107a38f824c0d0126ac518e5f53ab7a055abf047243f37b64545ae"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -294431,6 +294576,7 @@
       "server/lib/reports/shareable_report_service.dart",
       "server/lib/request_metrics_service.dart",
       "server/lib/request_trace.dart",
+      "server/lib/retention/post_game_error_contract.dart",
       "server/lib/retention/post_game_note_service.dart",
       "server/lib/runtime_environment.dart",
       "server/lib/schema_audit/schema_audit.dart",
@@ -294960,6 +295106,8 @@
       "server/test/plan_oracle_text_backfill_test.py",
       "server/test/plan_service_test.dart",
       "server/test/play_vs_ai_real_xmage_e2e_test.dart",
+      "server/test/post_game_error_contract_test.dart",
+      "server/test/post_game_note_error_codes_db_live_test.dart",
       "server/test/post_game_note_sync_contract_test.dart",
       "server/test/post_game_two_client_live_test.dart",
       "server/test/premium_visual_audit_test.py",

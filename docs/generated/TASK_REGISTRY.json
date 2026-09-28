@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "e76d19e255fc6cdff50dc1c8c8cafa08e7c55c131a1ee0a311939a3a3f3ad04b"
+    "sha256": "fba49b4d6f9b1b9de7e413fb2f0376675396ef5f27ab9258f6abe836ec590c52"
   },
   "required_task_fields": [
     "id",
@@ -2131,7 +2131,7 @@
       "depends_on": [
         "LC-P0-01"
       ],
-      "acceptance": "A segunda nota do mesmo pós-jogo mostra o conflito; nota apagada não ressuscita; teste de store.",
+      "acceptance": "A segunda nota do mesmo pós-jogo mostra o conflito; nota apagada não ressuscita; teste de store. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration (decisão 23 da coordenação): os 404 e 409 do pós-jogo levam o motivo em `error_code`, no contrato de erro tipado do `BT-AUTH-001` (`deck_not_found`, `post_game_note_not_found`, `post_game_play_session_conflict`, `post_game_note_deleted` e `post_game_revision_conflict`, em `server/lib/retention/post_game_error_contract.dart`), e o 409 mantém `error: post_game_conflict`. Evidência: `server/test/post_game_note_error_codes_db_live_test.dart` (PostgreSQL descartável), `server/test/post_game_error_contract_test.dart` e as mutações do grupo `lc06err` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-06-codigos-de-erro-do-pos-jogo.md`. Falta: a raia do app (o store tipado e a tela), que tem rascunho pronto e já lê esses códigos.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 594
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "f95069f35a27a5f5e59553dc155dce055ccd7e37d9420d5d44aca8632e2dc2cb"
+  "project_logic_source_digest_sha256": "633dda2fbd107a38f824c0d0126ac518e5f53ab7a055abf047243f37b64545ae"
 }
