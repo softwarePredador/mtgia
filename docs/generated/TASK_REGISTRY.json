@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "e46424b668ef1ced5bd64d96f0337aa90892a1ee1c545c9c4b37f89d29363d5c"
+    "sha256": "2430126a18fcca23e09fcd0a46a2fba31087b87368e73941e60d541b2d982bc2"
   },
   "required_task_fields": [
     "id",
@@ -2116,10 +2116,10 @@
     {
       "id": "LC-P0-05",
       "priority": "P0 LIFE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "`deck_version_at` deixa de ser o horário da requisição (achado 3 dos fluxos).",
       "depends_on": [],
-      "acceptance": "O seletor de cartas do pós-jogo funciona em partida de mais de 5 minutos; teste de servidor fixa `deck_version_at` na revisão do deck.",
+      "acceptance": "O seletor de cartas do pós-jogo funciona em partida de mais de 5 minutos; teste de servidor fixa `deck_version_at` na revisão do deck. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration: o `GET /decks/:id` devolve em `deck_version_at` o instante da revisão atual (o `created_at` do evento do ledger que levou o deck a ela, ou a criação do deck na revisão 1), o mesmo a cada leitura da mesma revisão, e a nota do pós-jogo criada sem a versão do app grava o mesmo instante (`deckVersionAtSql` em `server/lib/deck_snapshot_contract.dart`). Evidência: `server/test/deck_version_at_db_live_test.dart` (PostgreSQL descartável), `server/test/deck_snapshot_contract_test.dart` e as mutações do grupo `lc05` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-05-deck-version-at-da-revisao.md`. Falta: a prova de runtime do seletor numa partida de mais de 5 minutos no app (raia do app); o app não precisa mudar, porque já compara com `isAtSameMomentAs`. O servidor ainda aceita o par hash/versão que o app manda sem conferir (achado A17 do fluxo do pós-jogo), fora desta tarefa.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 593
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "87967e431bd66c9d62b3bb852ee8976a6f62ddd0c86f90882c339439f1d9b4c6"
+  "project_logic_source_digest_sha256": "fbe6e0802c77ce2606bce960ef8950d45aa0b289d9b7a83a82ffda86a6204731"
 }

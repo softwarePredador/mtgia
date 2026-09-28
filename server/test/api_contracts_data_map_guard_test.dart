@@ -435,7 +435,8 @@ void main() {
       expect(deckDetail, contains('Root-level deck fields'));
       expect(deckDetail, contains('there is no nested root `deck` wrapper'));
       expect(deckDetail, contains('deterministic `deck_snapshot_hash`'));
-      expect(deckDetail, contains('response-capture `deck_version_at`'));
+      expect(deckDetail, contains('revision-time `deck_version_at`'));
+      expect(deckDetail, contains('It is never the request time.'));
       expect(
         deckDetail,
         contains('carries the returned snapshot identity through Life Counter'),

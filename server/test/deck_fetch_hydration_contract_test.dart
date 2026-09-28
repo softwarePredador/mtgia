@@ -55,8 +55,10 @@ void main() {
         expect(source, contains("'main_board': groupedMainBoard"));
         expect(source, contains("'all_cards_flat': cardsList"));
         expect(source, contains('body: responseBody,'));
-        // DCK-P0-01: o GET devolve a revisão no corpo e no ETag.
-        expect(source, contains("'created_at, revision'"));
+        // DCK-P0-01: o GET devolve a revisão no corpo e no ETag; LC-P0-05:
+        // o deck_version_at é o instante dessa revisão.
+        expect(source, contains("'created_at, revision,'"));
+        expect(source, contains("deckVersionAtSql('decks')"));
         expect(
           source,
           contains('headers: deckRevisionHeadersOf(responseBody)'),

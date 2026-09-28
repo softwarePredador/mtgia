@@ -537,7 +537,8 @@ class PostGameNoteService {
       Sql.named('''
         SELECT d.name, d.format, dc.card_id::text AS card_id,
                COALESCE(dc.quantity, 0)::int AS quantity,
-               COALESCE(dc.is_commander, FALSE) AS is_commander
+               COALESCE(dc.is_commander, FALSE) AS is_commander,
+               ${deckVersionAtSql('d')} AS deck_version_at
         FROM decks d
         LEFT JOIN deck_cards dc ON dc.deck_id = d.id
         WHERE d.id = CAST(@deckId AS uuid)
@@ -555,7 +556,8 @@ class PostGameNoteService {
         format: first['format']?.toString() ?? '',
         cards: rows.map((row) => row.toColumnMap()),
       ),
-      capturedAt: DateTime.now().toUtc(),
+      // LC-P0-05: a versão do deck, não o instante desta leitura.
+      capturedAt: (first['deck_version_at'] as DateTime).toUtc(),
     );
   }
 

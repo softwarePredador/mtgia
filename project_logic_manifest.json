@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "87967e431bd66c9d62b3bb852ee8976a6f62ddd0c86f90882c339439f1d9b4c6",
+  "source_digest_sha256": "fbe6e0802c77ce2606bce960ef8950d45aa0b289d9b7a83a82ffda86a6204731",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,11 +66,11 @@
     "dart_source_files": 715,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5376,
+    "dart_symbols": 5377,
     "semantic_resolved_files": 715,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 43566,
-    "semantic_resolved_call_sites": 69256,
+    "semantic_resolved_call_sites": 69257,
     "semantic_resolved_type_references": 16585,
     "modules": 160,
     "app_routes": 46,
@@ -81,7 +81,7 @@
     "migrations": 64,
     "scripts_and_jobs": 693,
     "environment_variables": 715,
-    "tests": 1272,
+    "tests": 1273,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1469,7 +1469,7 @@
         "server/lib/deck_snapshot_contract.dart"
       ],
       "file_count": 1,
-      "symbol_count": 3,
+      "symbol_count": 4,
       "providers": [],
       "services": []
     },
@@ -27044,13 +27044,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -33956,13 +33956,19 @@
       "name": "_quantity",
       "kind": "function",
       "source": "server/lib/deck_snapshot_contract.dart",
-      "line": 58
+      "line": 76
     },
     {
       "name": "buildDeckSnapshotHash",
       "kind": "function",
       "source": "server/lib/deck_snapshot_contract.dart",
-      "line": 12
+      "line": 30
+    },
+    {
+      "name": "deckVersionAtSql",
+      "kind": "function",
+      "source": "server/lib/deck_snapshot_contract.dart",
+      "line": 14
     },
     {
       "name": "buildDeckValidationHandlerErrorBody",
@@ -40579,7 +40585,7 @@
       "name": "_OptimizationPreviewConflict",
       "kind": "class",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1148
+      "line": 1154
     },
     {
       "name": "_deckCardCount",
@@ -40603,7 +40609,7 @@
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1157
+      "line": 1163
     },
     {
       "name": "_patchDeck",
@@ -40621,19 +40627,19 @@
       "name": "_validateCardCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1140
+      "line": 1146
     },
     {
       "name": "calculateCmc",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1029
+      "line": 1035
     },
     {
       "name": "getMainType",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1015
+      "line": 1021
     },
     {
       "name": "onRequest",
@@ -42348,8 +42354,8 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 43566,
-    "resolved_call_site_count": 69256,
-    "workspace_call_edge_count": 13742,
+    "resolved_call_site_count": 69257,
+    "workspace_call_edge_count": 13744,
     "unresolved_call_edge_count": 560,
     "unresolved_call_site_count": 773,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -159737,7 +159743,7 @@
       },
       {
         "source": "server/lib/deck_snapshot_contract.dart",
-        "line": 26,
+        "line": 44,
         "caller": "buildDeckSnapshotHash",
         "kind": "method",
         "lexical_target": "_quantity",
@@ -169428,7 +169434,18 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 549,
+        "line": 541,
+        "caller": "PostGameNoteService._captureDeckSnapshot",
+        "kind": "method",
+        "lexical_target": "deckVersionAtSql",
+        "target": "deckVersionAtSql",
+        "target_library": "package:server/deck_snapshot_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/retention/post_game_note_service.dart",
+        "line": 550,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "constructor",
         "lexical_target": "PostGameNoteNotFoundException",
@@ -169439,7 +169456,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 552,
+        "line": 553,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "constructor",
         "lexical_target": "DeckSnapshotIdentity",
@@ -169450,7 +169467,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 553,
+        "line": 554,
         "caller": "PostGameNoteService._captureDeckSnapshot",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -169461,7 +169478,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 564,
+        "line": 566,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_dateString",
@@ -169472,7 +169489,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 568,
+        "line": 570,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -169483,7 +169500,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 581,
+        "line": 583,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_cardEvidenceList",
@@ -169494,7 +169511,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 583,
+        "line": 585,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_stringList",
@@ -169505,7 +169522,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 584,
+        "line": 586,
         "caller": "PostGameNoteService._rowToJson",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169516,7 +169533,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 600,
+        "line": 602,
         "caller": "PostGameNoteService._boundedString",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169527,7 +169544,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 613,
+        "line": 615,
         "caller": "PostGameNoteService._optionalBoundedString",
         "kind": "method",
         "lexical_target": "_boundedString",
@@ -169538,7 +169555,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 622,
+        "line": 624,
         "caller": "PostGameNoteService._optionalDate",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169549,7 +169566,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 631,
+        "line": 633,
         "caller": "PostGameNoteService._optionalRevision",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169571,7 +169588,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 642,
+        "line": 644,
         "caller": "PostGameNoteService._optionalDeckSnapshotHash",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169582,7 +169599,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 650,
+        "line": 652,
         "caller": "PostGameNoteService._boundedList",
         "kind": "method",
         "lexical_target": "_stringList",
@@ -169593,7 +169610,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 652,
+        "line": 654,
         "caller": "PostGameNoteService._boundedList",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169604,7 +169621,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 658,
+        "line": 660,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "method",
         "lexical_target": "_decodeJsonList",
@@ -169615,7 +169632,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 661,
+        "line": 663,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169626,7 +169643,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 670,
+        "line": 672,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169637,7 +169654,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 671,
+        "line": 673,
         "caller": "PostGameNoteService._boundedCardEvidenceList",
         "kind": "method",
         "lexical_target": "_boundedString",
@@ -169648,7 +169665,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 709,
+        "line": 711,
         "caller": "PostGameNoteService._canonicalizeDeckCardEvidence",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169659,7 +169676,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 747,
+        "line": 749,
         "caller": "PostGameNoteService._canonicalizeDeckCardEvidence",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -169670,7 +169687,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 752,
+        "line": 754,
         "caller": "PostGameNoteService._canonicalizeDeckCardEvidence",
         "kind": "constructor",
         "lexical_target": "PostGameValidationException",
@@ -169681,7 +169698,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 783,
+        "line": 785,
         "caller": "PostGameNoteService._stringList",
         "kind": "method",
         "lexical_target": "_decodeJsonList",
@@ -169692,7 +169709,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 793,
+        "line": 795,
         "caller": "PostGameNoteService._cardEvidenceList",
         "kind": "method",
         "lexical_target": "_decodeJsonList",
@@ -169703,7 +169720,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 804,
+        "line": 806,
         "caller": "PostGameNoteService._cardEvidenceList",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169714,7 +169731,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 810,
+        "line": 812,
         "caller": "PostGameNoteService._cardEvidenceNames",
         "kind": "method",
         "lexical_target": "_cardEvidenceList",
@@ -169725,7 +169742,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 814,
+        "line": 816,
         "caller": "PostGameNoteService._cardEvidenceNames",
         "kind": "method",
         "lexical_target": "_nullableString",
@@ -169736,7 +169753,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 848,
+        "line": 850,
         "caller": "PostGameNoteService._diagnostics",
         "kind": "method",
         "lexical_target": "_issueLabel",
@@ -169747,7 +169764,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 849,
+        "line": 851,
         "caller": "PostGameNoteService._diagnostics",
         "kind": "method",
         "lexical_target": "_issueDiagnostic",
@@ -169758,7 +169775,7 @@
       },
       {
         "source": "server/lib/retention/post_game_note_service.dart",
-        "line": 866,
+        "line": 868,
         "caller": "PostGameNoteService._nextActions",
         "kind": "method",
         "lexical_target": "_issueAction",
@@ -186753,7 +186770,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1017,
+        "line": 1023,
         "caller": "getMainType",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -186775,7 +186792,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1062,
+        "line": 1068,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "getMainType",
@@ -186786,7 +186803,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1073,
+        "line": 1079,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -186797,7 +186814,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1074,
+        "line": 1080,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "calculateCmc",
@@ -186808,7 +186825,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1108,
+        "line": 1114,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -186830,7 +186847,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1132,
+        "line": 1138,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "deckRevisionHeadersOf",
@@ -186841,7 +186858,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1136,
+        "line": 1142,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -187743,7 +187760,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 916,
+        "line": 909,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "deckVersionAtSql",
+        "target": "deckVersionAtSql",
+        "target_library": "package:server/deck_snapshot_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 917,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "notFound",
@@ -187754,7 +187782,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 934,
+        "line": 940,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -187765,7 +187793,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 987,
+        "line": 993,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "normalizeScryfallImageUrl",
@@ -193545,8 +193573,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14475,
-        "occurrences": 25110
+        "unique_references": 14473,
+        "occurrences": 25109
       },
       {
         "target_scope": "dart_sdk",
@@ -197511,8 +197539,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/deck_snapshot_contract.dart",
-        "unique_references": 5,
-        "occurrences": 7
+        "unique_references": 7,
+        "occurrences": 9
       },
       {
         "target_scope": "workspace",
@@ -238358,7 +238386,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6440,
-        "occurrences": 40553
+        "occurrences": 40555
       },
       {
         "target_scope": "dart_sdk",
@@ -279617,6 +279645,7 @@
     "server/test/deck_validation_state_route_contract_test.dart",
     "server/test/deck_validation_state_support_test.dart",
     "server/test/deck_validation_test.dart",
+    "server/test/deck_version_at_db_live_test.dart",
     "server/test/deck_write_verified_email_test.dart",
     "server/test/decks_crud_test.dart",
     "server/test/decks_incremental_add_test.dart",
@@ -281151,7 +281180,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "e46424b668ef1ced5bd64d96f0337aa90892a1ee1c545c9c4b37f89d29363d5c"
+      "sha256": "2430126a18fcca23e09fcd0a46a2fba31087b87368e73941e60d541b2d982bc2"
     },
     "required_task_fields": [
       "id",
@@ -283265,10 +283294,10 @@
       {
         "id": "LC-P0-05",
         "priority": "P0 LIFE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "`deck_version_at` deixa de ser o horário da requisição (achado 3 dos fluxos).",
         "depends_on": [],
-        "acceptance": "O seletor de cartas do pós-jogo funciona em partida de mais de 5 minutos; teste de servidor fixa `deck_version_at` na revisão do deck.",
+        "acceptance": "O seletor de cartas do pós-jogo funciona em partida de mais de 5 minutos; teste de servidor fixa `deck_version_at` na revisão do deck. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration: o `GET /decks/:id` devolve em `deck_version_at` o instante da revisão atual (o `created_at` do evento do ledger que levou o deck a ela, ou a criação do deck na revisão 1), o mesmo a cada leitura da mesma revisão, e a nota do pós-jogo criada sem a versão do app grava o mesmo instante (`deckVersionAtSql` em `server/lib/deck_snapshot_contract.dart`). Evidência: `server/test/deck_version_at_db_live_test.dart` (PostgreSQL descartável), `server/test/deck_snapshot_contract_test.dart` e as mutações do grupo `lc05` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-05-deck-version-at-da-revisao.md`. Falta: a prova de runtime do seletor numa partida de mais de 5 minutos no app (raia do app); o app não precisa mudar, porque já compara com `isAtSameMomentAs`. O servidor ainda aceita o par hash/versão que o app manda sem conferir (achado A17 do fluxo do pós-jogo), fora desta tarefa.",
         "section": "Épico H — Life Counter, partida e pós-jogo",
         "source_line": 593
       },
@@ -291035,7 +291064,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "87967e431bd66c9d62b3bb852ee8976a6f62ddd0c86f90882c339439f1d9b4c6"
+    "project_logic_source_digest_sha256": "fbe6e0802c77ce2606bce960ef8950d45aa0b289d9b7a83a82ffda86a6204731"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -294015,6 +294044,7 @@
       "server/test/deck_validation_state_route_contract_test.dart",
       "server/test/deck_validation_state_support_test.dart",
       "server/test/deck_validation_test.dart",
+      "server/test/deck_version_at_db_live_test.dart",
       "server/test/deck_write_verified_email_test.dart",
       "server/test/decks_crud_test.dart",
       "server/test/decks_incremental_add_test.dart",

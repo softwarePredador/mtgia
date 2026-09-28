@@ -905,7 +905,8 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
           hasPricing
               ? 'pricing_currency, pricing_total, pricing_missing_cards, ${hasPricingSource ? 'pricing_source' : 'NULL::text AS pricing_source'}, pricing_updated_at,'
               : "NULL::text as pricing_currency, NULL::numeric as pricing_total, 0::int as pricing_missing_cards, NULL::text as pricing_source, NULL::timestamptz as pricing_updated_at,",
-          'created_at, revision',
+          'created_at, revision,',
+          '${deckVersionAtSql('decks')} AS deck_version_at',
           'FROM decks WHERE id = @deckId AND user_id = @userId',
         ].join(' '),
       ),
@@ -919,6 +920,11 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
     }
 
     final deckInfo = deckResult.first.toColumnMap();
+    // LC-P0-05: o instante da revisão atual, estável entre leituras.
+    final deckVersionAt =
+        (deckInfo.remove('deck_version_at') as DateTime)
+            .toUtc()
+            .toIso8601String();
     if (deckInfo['created_at'] is DateTime) {
       deckInfo['created_at'] =
           (deckInfo['created_at'] as DateTime).toIso8601String();
@@ -1110,7 +1116,7 @@ Future<Response> _getDeckById(RequestContext context, String deckId) async {
         format: deckInfo['format']?.toString() ?? '',
         cards: cardsList,
       ),
-      'deck_version_at': DateTime.now().toUtc().toIso8601String(),
+      'deck_version_at': deckVersionAt,
       'color_identity': deckColorIdentity.toList(),
       'color_identity_known': true,
       'stats': {
