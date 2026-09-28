@@ -7,6 +7,7 @@ import 'card_validation_service.dart';
 import 'color_identity.dart';
 import 'deck_rules_service.dart';
 import 'import_card_lookup_service.dart';
+import 'logger.dart';
 
 abstract class GeneratedDeckRepository {
   Future<Map<String, Map<String, dynamic>>> resolveCardNames(
@@ -19,6 +20,20 @@ abstract class GeneratedDeckRepository {
     required String format,
     required List<Map<String, dynamic>> cards,
   });
+}
+
+/// Frase pública quando a validação falha por erro que não é de regra (banco
+/// fora, timeout): a lista de erros vai para o cliente, então o texto da
+/// exceção fica só no log (BT-AUTH-001).
+const generatedDeckValidationUnavailableMessage =
+    'Não foi possível validar o deck agora. Tente de novo em instantes.';
+
+String _validationFailure(Object error) {
+  Log.e(
+    '[generated_deck_validation] falha fora das regras '
+    'type=${error.runtimeType}',
+  );
+  return generatedDeckValidationUnavailableMessage;
 }
 
 class PostgresGeneratedDeckRepository implements GeneratedDeckRepository {
@@ -349,7 +364,7 @@ class GeneratedDeckValidationService {
           } on DeckRulesException catch (e2) {
             errors.add(e2.message);
           } catch (e2) {
-            errors.add(e2.toString());
+            errors.add(_validationFailure(e2));
           }
         } else if (!requiresCommander) {
           final constructedRepair = await _tryAutoRepairConstructedAfterFailure(
@@ -368,7 +383,7 @@ class GeneratedDeckValidationService {
             } on DeckRulesException catch (e2) {
               errors.add(e2.message);
             } catch (e2) {
-              errors.add(e2.toString());
+              errors.add(_validationFailure(e2));
             }
           } else {
             errors.add(e.message);
@@ -377,7 +392,7 @@ class GeneratedDeckValidationService {
           errors.add(e.message);
         }
       } catch (e) {
-        errors.add(e.toString());
+        errors.add(_validationFailure(e));
       }
     }
 

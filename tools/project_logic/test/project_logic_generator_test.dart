@@ -37,9 +37,9 @@ void main() {
     expect(stats['web_routes'] as int, greaterThanOrEqualTo(10));
     expect(stats['non_dart_product_files'] as int, greaterThanOrEqualTo(45));
     expect(stats['api_routes'] as int, greaterThanOrEqualTo(95));
-    expect(stats['database_tables'], 81);
+    expect(stats['database_tables'], 83);
     expect(stats['database_views'], 6);
-    expect(stats['migrations'], 65);
+    expect(stats['migrations'], 66);
     expect(stats['flows'], 13);
   });
 

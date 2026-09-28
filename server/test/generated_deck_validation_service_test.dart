@@ -7,6 +7,31 @@ import '../lib/generated_deck_validation_service.dart';
 
 void main() {
   group('GeneratedDeckValidationService', () {
+    test('falha fora das regras não põe texto de exceção nos erros', () async {
+      // BT-AUTH-001: a lista de erros vai para o cliente.
+      final service = GeneratedDeckValidationService(
+        _FakeGeneratedDeckRepository(
+          cardsByName: {'mountain': _basicLand('mountain-id', 'Mountain', 'R')},
+          validationFailure: Exception(
+            'Severity.error 57014: canceling statement due to statement '
+            'timeout',
+          ),
+        ),
+      );
+
+      final result = await service.validate(
+        format: 'standard',
+        cards: [
+          {'name': 'Mountain', 'quantity': 60},
+        ],
+      );
+
+      expect(result.isValid, isFalse);
+      expect(result.errors, [generatedDeckValidationUnavailableMessage]);
+      expect(result.errors.join(' '), isNot(contains('Severity')));
+      expect(result.errors.join(' '), isNot(contains('Exception')));
+    });
+
     test(
       'keeps a valid 60-card deck even when one unknown card is removed',
       () async {
@@ -430,10 +455,12 @@ class _FakeGeneratedDeckRepository implements GeneratedDeckRepository {
   _FakeGeneratedDeckRepository({
     required this.cardsByName,
     this.suggestionsByName = const {},
+    this.validationFailure,
   });
 
   final Map<String, Map<String, dynamic>> cardsByName;
   final Map<String, List<String>> suggestionsByName;
+  final Object? validationFailure;
   List<Map<String, dynamic>> lastResolvedItems = const [];
 
   @override
@@ -469,6 +496,8 @@ class _FakeGeneratedDeckRepository implements GeneratedDeckRepository {
     required String format,
     required List<Map<String, dynamic>> cards,
   }) async {
+    final failure = validationFailure;
+    if (failure != null) throw failure;
     final normalizedFormat = format.trim().toLowerCase();
     final total = cards.fold<int>(
       0,

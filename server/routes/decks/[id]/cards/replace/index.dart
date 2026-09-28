@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../../lib/deck_request_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
 import '../../../../../lib/decks/deck_revision_support.dart';
+import '../../../../../lib/http_responses.dart';
 
 /// POST /decks/:id/cards/replace
 /// Body: { "old_card_id": "...", "new_card_id": "..." }
@@ -71,7 +73,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
       final format = (deckResult.first[0] as String).toLowerCase();
 
@@ -240,11 +242,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       statusCode: HttpStatus.badRequest,
       body: {'error': e.message},
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } catch (e) {
     print('[ERROR] handler: $e');
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': e.toString()},
-    );
+    return internalServerError('Falha ao substituir as cartas do deck');
   }
 }

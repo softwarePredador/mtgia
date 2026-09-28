@@ -10,7 +10,9 @@ import '../lib/cors_policy.dart';
 import '../lib/database.dart';
 import '../lib/logger.dart';
 import '../lib/observability.dart';
+import '../lib/public_error_contract.dart';
 import '../lib/request_metrics_service.dart';
+import '../lib/request_body_limits.dart';
 import '../lib/request_trace.dart';
 import '../lib/release_capability_policy.dart';
 import '../lib/runtime_environment.dart';
@@ -43,9 +45,13 @@ const _securityHeaders = {
 };
 
 Handler middleware(Handler handler) {
-  return middlewareWithReleaseCapabilityPolicy(
-    handler,
-    releaseCapabilityPolicy: _releaseCapabilityPolicy,
+  // BT-AUTH-002: o corpo em partes (o shelf_io tira o Transfer-Encoding dos
+  // cabeçalhos) falha no primeiro byte, antes de qualquer alocação.
+  return guardBodyWithoutLength(
+    middlewareWithReleaseCapabilityPolicy(
+      handler,
+      releaseCapabilityPolicy: _releaseCapabilityPolicy,
+    ),
   );
 }
 
@@ -71,7 +77,7 @@ Handler middlewareWithReleaseCapabilityPolicy(
     if (!_corsPolicy.isAllowed(origin)) {
       return Response.json(
         statusCode: HttpStatus.forbidden,
-        body: {'error': 'cors_origin_denied'},
+        body: {'error': 'cors_origin_denied', 'request_id': requestId},
         headers: {...responseHeaders, 'x-request-id': requestId},
       );
     }
@@ -92,13 +98,26 @@ Handler middlewareWithReleaseCapabilityPolicy(
       if (!validPreflight) {
         return Response.json(
           statusCode: HttpStatus.forbidden,
-          body: {'error': 'cors_preflight_rejected'},
+          body: {'error': 'cors_preflight_rejected', 'request_id': requestId},
           headers: {...responseHeaders, 'x-request-id': requestId},
         );
       }
       return Response(
         statusCode: HttpStatus.noContent,
         headers: {...responseHeaders, 'x-request-id': requestId},
+      );
+    }
+
+    // BT-AUTH-002: URL longa demais nem chega à decisão de capability.
+    final uriRejection = checkRequestUri(context.request.uri);
+    if (uriRejection != null) {
+      return _requestLimitResponse(
+        uriRejection,
+        requestId: requestId,
+        endpoint: endpoint,
+        startedAt: startedAt,
+        responseHeaders: responseHeaders,
+        closeConnection: true,
       );
     }
 
@@ -134,12 +153,45 @@ Handler middlewareWithReleaseCapabilityPolicy(
           'policy_version': releaseCapabilityPolicy.policyVersion,
           'policy_digest_sha256': releaseCapabilityPolicy.policyDigestSha256,
           'offer_mode': releaseCapabilityPolicy.offerMode,
+          'request_id': requestId,
         },
         headers: {
           ...responseHeaders,
           'Cache-Control': 'no-store',
           'x-request-id': requestId,
         },
+      );
+    }
+
+    // BT-AUTH-002: corpo comprimido, em partes ou acima do limite é recusado
+    // pelos cabeçalhos, sem ler nada; o corpo dentro do limite é lido uma vez
+    // (o dart_frog guarda o texto para o handler) e conferido por campo,
+    // profundidade e itens. Tudo antes da observabilidade, do banco e do
+    // handler: nada acima do limite é alocado nem gravado.
+    final headerRejection = checkRequestHeaders(
+      path: context.request.uri.path,
+      headers: context.request.headers,
+    );
+    if (headerRejection != null) {
+      return _requestLimitResponse(
+        headerRejection,
+        requestId: requestId,
+        endpoint: endpoint,
+        startedAt: startedAt,
+        responseHeaders: responseHeaders,
+        closeConnection: true,
+      );
+    }
+    final bodyRejection = await checkRequestBody(context.request);
+    if (bodyRejection != null) {
+      return _requestLimitResponse(
+        bodyRejection,
+        requestId: requestId,
+        endpoint: endpoint,
+        startedAt: startedAt,
+        responseHeaders: responseHeaders,
+        // O corpo em partes para no primeiro byte: o resto não é lido.
+        closeConnection: bodyRejection.statusCode == HttpStatus.lengthRequired,
       );
     }
 
@@ -152,7 +204,11 @@ Handler middlewareWithReleaseCapabilityPolicy(
           if (!_db.isConnected) {
             return Response.json(
               statusCode: HttpStatus.serviceUnavailable,
-              body: {'error': 'Serviço temporariamente indisponível (DB)'},
+              body: publicErrorBody(
+                code: serviceDatabaseUnavailableCode,
+                message: serviceDatabaseUnavailableMessage,
+                requestId: requestId,
+              ),
               headers: {...responseHeaders, 'x-request-id': requestId},
             );
           }
@@ -189,6 +245,27 @@ Handler middlewareWithReleaseCapabilityPolicy(
           headers: response.headers,
         );
       }
+
+      // BT-AUTH-001: nenhum erro sai com texto de exceção, SQL ou stack.
+      final unsanitizedStatus = response.statusCode;
+      response = await sanitizePublicErrorResponse(
+        response,
+        requestId: requestId,
+        onSanitized: (reason, original) {
+          // O corpo original fica só no log, truncado, para achar a causa
+          // pelo request-id.
+          final compact = original.replaceAll(RegExp(r'\s+'), ' ');
+          final shown =
+              compact.length > 500
+                  ? '${compact.substring(0, 500)}...'
+                  : compact;
+          Log.w(
+            '[public_error] sanitized reason=$reason endpoint=$endpoint '
+            'status=$unsanitizedStatus request_id=$requestId '
+            'original=$shown',
+          );
+        },
+      );
 
       final mergedHeaders = <String, Object>{
         ...response.headers,
@@ -236,7 +313,11 @@ Handler middlewareWithReleaseCapabilityPolicy(
 
       return Response.json(
         statusCode: HttpStatus.internalServerError,
-        body: {'error': 'Erro interno do servidor'},
+        body: publicErrorBody(
+          code: serverInternalErrorCode,
+          message: serverInternalErrorMessage,
+          requestId: requestId,
+        ),
         headers: {...responseHeaders, 'x-request-id': requestId},
       );
     }
@@ -252,6 +333,38 @@ bool isDatabaseIndependentHealthPath(String path) {
       path == '/health/' ||
       path == '/health/live' ||
       path == '/health/live/';
+}
+
+/// Recusa de limite (BT-AUTH-002): código estável, frase e request-id. Quando
+/// o corpo não foi lido, a conexão fecha em vez de drenar o resto.
+Response _requestLimitResponse(
+  RequestLimitRejection rejection, {
+  required String requestId,
+  required String endpoint,
+  required DateTime startedAt,
+  required Map<String, Object> responseHeaders,
+  required bool closeConnection,
+}) {
+  RequestMetricsService.instance.record(
+    endpoint: 'REQUEST_LIMIT_REJECTION ${rejection.code}',
+    statusCode: rejection.statusCode,
+    latencyMs: DateTime.now().difference(startedAt).inMilliseconds,
+  );
+  final shown =
+      endpoint.length > 160 ? '${endpoint.substring(0, 160)}...' : endpoint;
+  Log.w(
+    '[request_limit] rejected code=${rejection.code} '
+    'status=${rejection.statusCode} endpoint=$shown request_id=$requestId',
+  );
+  return Response.json(
+    statusCode: rejection.statusCode,
+    body: rejection.toJson(requestId: requestId),
+    headers: {
+      ...responseHeaders,
+      'x-request-id': requestId,
+      if (closeConnection) HttpHeaders.connectionHeader: 'close',
+    },
+  );
 }
 
 String? _header(Map<String, String> headers, String name) {

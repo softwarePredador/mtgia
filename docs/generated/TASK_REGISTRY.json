@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "b4a9da2c5d8adf5b234065080dcf891ee74113ff8713f94e02160f829b951752"
+    "sha256": "e3bc71b1c8d6e0855ae6fa9a42344b16834161ac05e8b32c8bf2176d13ff732b"
   },
   "required_task_fields": [
     "id",
@@ -167,20 +167,20 @@
     {
       "id": "BT-AUTH-001",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Padronizar erros públicos tipados e impedir exception/SQL/stack cru.",
       "depends_on": [],
-      "acceptance": "Corpus de falhas retorna código estável e request-id; zero detalhe interno. Decisão do dono em 2026-09-22: D-21, códigos `dominio_motivo` em snake_case acompanham a frase em português, sem substituí-la. Achado de 2026-09-23 (frente de segurança): `GET /reports/:id` devolve o texto da exceção em `details` quando o banco falha (`server/routes/reports/[id].dart:19`).",
+      "acceptance": "Corpus de falhas retorna código estável e request-id; zero detalhe interno. Decisão do dono em 2026-09-22: D-21, códigos `dominio_motivo` em snake_case acompanham a frase em português, sem substituí-la. Achado de 2026-09-23 (frente de segurança): `GET /reports/:id` devolve o texto da exceção em `details` quando o banco falha (`server/routes/reports/[id].dart:19`). Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24`: o middleware raiz passa todo 4xx e 5xx do handler por `server/lib/public_error_contract.dart`. Corpo com texto de exceção, SQL ou stack vira a frase genérica, com o código da rota (ou o do status) e o request-id; 5xx só passa com código estável em `error`; envelope 4xx sem código ganha `code` pelo status (400 `request_invalid`, 404 `resource_not_found`, 429 `rate_limited`...) e todo envelope ganha `request_id` (o header `x-request-id` já saía sempre); a frase fica onde a rota pôs, sem substituição. Fontes corrigidas: `apiError` e `internalServerError` não serializam exceção (inclui o achado de `/reports/:id`), as rotas de cartas do deck e `PUT /decks/:id` respondem 404 `deck_not_found` em vez de 500 com a exceção, o cadastro responde `auth_username_taken`, `auth_email_taken` e, na corrida que bate no índice único, `auth_account_taken`, e a validação do deck gerado não põe `e.toString()` na lista de erros. Evidência: `server/test/public_error_contract_test.dart` (corpus pelo middleware raiz e fontes sem ele), `server/test/public_error_db_live_test.dart` (corrida de cadastro em PostgreSQL descartável) e `server/test/public_error_e2e_live_test.dart` (10 casos por HTTP contra a API local); 16 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-001-erros-publicos.md`. O código de domínio por rota fica incremental: as frases antigas recebem o código pelo status.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 311
     },
     {
       "id": "BT-AUTH-002",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Limites globais de body antes do parse e limites por campo/URL.",
       "depends_on": [],
-      "acceptance": "Oversize/chunked/compressed rejeitado antes de alocar/gravar; DB não cresce. Decisão do dono em 2026-09-22: D-21, teto de body de 1 MB, maior só no import.",
+      "acceptance": "Oversize/chunked/compressed rejeitado antes de alocar/gravar; DB não cresce. Decisão do dono em 2026-09-22: D-21, teto de body de 1 MB, maior só no import. Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24` (`server/lib/request_body_limits.dart`): o middleware raiz confere a URL antes da capability (acima de 8 KiB, 414) e, depois dela, os cabeçalhos, antes da observabilidade, do banco e do handler: `Content-Encoding` diferente de `identity` dá 415 (nada é descomprimido), corpo em partes dá 411 (o `shelf_io` tira o `Transfer-Encoding` dos cabeçalhos, então a guarda de entrada `guardBodyWithoutLength` troca o corpo sem `Content-Length` por um stream que falha no primeiro pedaço e descarta o resto sem guardar, até 1 MiB, para o 411 chegar ao cliente; achado no E2E e corrigido depois do primeiro commit), `Content-Length` inválido dá 400 e acima do limite dá 413 sem ler o corpo (a conexão fecha). Tetos: 1 MiB por padrão, 5 MiB nas cinco rotas de import, 16 KiB em `/auth`. O corpo dentro do limite é lido uma vez (o handler recebe o mesmo texto) e o JSON é conferido: texto de campo ou chave acima de 32 K caracteres fora do import, mais de 32 níveis (varredura linear, antes de decodificar) ou mais de 50 mil itens dão 413; corpo que não é UTF-8 dá 400. No cadastro, campo de tipo errado é 400 (antes era 500), nome de usuário até 30 e e-mail com formato e até 254; no login, e-mail até 254 e senha até 1024. Todas as recusas têm código estável e `request_id`. Evidência: `server/test/request_body_limits_test.dart` (o corpo recusado pelos cabeçalhos não é lido), `server/test/request_limits_db_live_test.dart` (cadeia real de `POST /decks` em PostgreSQL descartável: o banco não cresce) e `server/test/request_limits_e2e_live_test.dart` (por HTTP com clientes de verdade: corpo de 2 MiB, corpo em partes, gzip, campo, profundidade e URL; roda com o build da API da tarefa seguinte); 18 mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-002-limites.md`.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 312
     },
@@ -221,14 +221,14 @@
     {
       "id": "BT-AUTH-006",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Admissão controlada de contas antes de promover `account_registration`.",
       "depends_on": [
         "BT-AUTH-001",
         "BT-AUTH-002",
         "BT-SCP-001"
       ],
-      "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`).",
+      "acceptance": "Convite/allowlist server-side single-use, expirável e revogável; rate limit distribuído, idempotência e auditoria; negação ocorre antes de criar usuário ou enviar email; E2E cobre válido, inválido, expirado, replay e concorrência. Decisão do dono em 2026-09-22: D-16, convite de uso único emitido pelo dono, em lotes de 20 a 30, entregue por e-mail, com expiração e revogável; sem lista de espera; o convite deixa de ser exigido quando o cadastro abrir. Decisão do dono em 2026-09-23: aceitar o convite enviado ao e-mail conta como verificação do e-mail, porque escrever deck, importar, usar o fichário e publicar exigem e-mail verificado (`BT-AUTH-010`). Feito em 2026-09-24, na branch `servidor/rodada2-2026-09-24`, com a migration 061 (`beta_invites` e `beta_invite_events`: só o hash do código e o digest do e-mail, um convite aberto por e-mail, auditoria sem dado pessoal): no modo `invite` (`MANALOOM_REGISTRATION_ADMISSION`, padrão da produção; `open` abre o cadastro), `POST /auth/register` exige `invite_code` e nega antes de criar a conta ou enviar e-mail (`invite_required`, `invite_invalid`, `invite_expired`, `invite_revoked`, `invite_already_used`); o convite é travado com `FOR UPDATE` e marcado aceito na transação que cria a conta, que já nasce com e-mail verificado; limites por IP, por e-mail e por código, distribuídos na produção. O dono emite, reenvia, revoga e lista pelo `server/bin/beta_invites.dart` (simulação por padrão, até 30 por lote, idempotente). Evidência: `server/test/beta_invite_policy_test.dart`, `server/test/beta_invite_registration_route_test.dart`, `server/test/beta_invite_db_live_test.dart` e `server/test/beta_invite_e2e_live_test.dart` (válido, sem convite, inválido, expirado, replay e 10 cadastros simultâneos com uma conta só, por HTTP); seis mutações falham; receipt `docs/qa/execution/2026-09-24/BT-AUTH-006-convites.md`. A capability `account_registration` segue desligada: ligá-la é do dono.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 316
     },
@@ -9892,5 +9892,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "421bd62a29672c692bcae186fce8e2d51333b0e4bcbe68ce24e877861e235ff8"
+  "project_logic_source_digest_sha256": "50854643561b7f80b8551653ae2d1b4b9d3119ee76dc3f49843890475afb77cb"
 }
