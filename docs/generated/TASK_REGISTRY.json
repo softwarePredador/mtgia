@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "2430126a18fcca23e09fcd0a46a2fba31087b87368e73941e60d541b2d982bc2"
+    "sha256": "70ed5a6867468f672f49ab4a2ff7973c4e3d844d8a7d2d86cad7ea47ee345e49"
   },
   "required_task_fields": [
     "id",
@@ -143,12 +143,12 @@
     {
       "id": "BT-KPI-001",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Definir eventos, coortes, métricas de ativação, guardrails e política de privacidade de telemetria.",
       "depends_on": [
         "BT-GOV-001"
       ],
-      "acceptance": "Métricas contam usuários/loops de valor, não apenas eventos; nenhum decklist/UGC em analytics. Medição de 2026-09-22 (`docs/flows/_p0/privacidade-telemetria.md`): o código atual faz o que o aceite proíbe (conta eventos e divide por signups) e testes consagram isso (`commercial_metrics_service_test.dart:8-18`) — há retrabalho, não só trabalho novo. Decisão do dono em 2026-09-22: D-47, ativação é o primeiro deck criado ou importado em até 24 h do cadastro; retenção é a volta na segunda semana; guardrails de custo de IA e de taxa de erro; nenhuma decklist em analytics; política de privacidade atualizada quando a telemetria entrar.",
+      "acceptance": "Métricas contam usuários/loops de valor, não apenas eventos; nenhum decklist/UGC em analytics. Medição de 2026-09-22 (`docs/flows/_p0/privacidade-telemetria.md`): o código atual faz o que o aceite proíbe (conta eventos e divide por signups) e testes consagram isso (`commercial_metrics_service_test.dart:8-18`) — há retrabalho, não só trabalho novo. Decisão do dono em 2026-09-22: D-47, ativação é o primeiro deck criado ou importado em até 24 h do cadastro; retenção é a volta na segunda semana; guardrails de custo de IA e de taxa de erro; nenhuma decklist em analytics; política de privacidade atualizada quando a telemetria entrar. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar (migration 073): o catálogo único `activation_events_v1` (`server/lib/analytics/activation_event_catalog.dart`) tem os 12 eventos que o app emite, com a origem, `deck_id` só do próprio usuário e metadado só de enumerados, inteiros com faixa e booleanos; o coletor recusa sem gravar evento fora do catálogo, decklist, texto livre e deck de outra pessoa, descarta os IDs internos e o arquétipo livre que o app atual manda e deduplica pela chave do app guardada como hash; o `GET /health/commercial` troca o funil de eventos por coortes semanais em usuários distintos, com a ativação da D-47 (deck em 24 h), a volta na segunda semana (ação registrada no servidor do 7º ao 14º dia), os loops de valor, o funil por coorte e os guardrails v1 de custo de IA e de taxa de erro. Evidência: `activation_event_catalog_test.dart`, `activation_events_contract_test.dart` (paridade com os emissores do app), `activation_events_db_live_test.dart`, `activation_kpi_db_live_test.dart` e as mutações do grupo `kpi01` derrubadas; receipt em `docs/qa/execution/2026-09-28/BT-KPI-001-eventos-coortes-e-ativacao.md`. Falta: a raia do app (parar de mandar o arquétipo livre e os IDs internos), a política pública quando a telemetria entrar (com o reaceite do `BT-LEGAL-ACCEPT-001`), o prazo de retenção de analytics (D-69), o agregado que sobrevive à exclusão e a baseline depois da primeira coorte.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 285
     },
@@ -160,7 +160,7 @@
       "depends_on": [
         "BT-KPI-001"
       ],
-      "acceptance": "Os eventos `onboarding_goal_selected`, `onboarding_experience_selected`, `onboarding_build_mode_selected` e `onboarding_task_started` entram no allowlist ou saem do app; nenhum descarte silencioso.",
+      "acceptance": "Os eventos `onboarding_goal_selected`, `onboarding_experience_selected`, `onboarding_build_mode_selected` e `onboarding_task_started` entram no allowlist ou saem do app; nenhum descarte silencioso. Servidor em 2026-09-28 (`BT-KPI-001`): os quatro eventos entraram no catálogo `activation_events_v1`, com metadado só de enumerados; falta o app não descartar em silêncio a recusa do servidor.",
       "section": "Épico A — Verdade de produto, escopo e documentação",
       "source_line": 286
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "fbe6e0802c77ce2606bce960ef8950d45aa0b289d9b7a83a82ffda86a6204731"
+  "project_logic_source_digest_sha256": "c7c37f078d362f29b00ddba37f9f2eba6eaa44f3b48409656fee0f98daf587d7"
 }

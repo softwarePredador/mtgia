@@ -294,14 +294,14 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "user_id",
-      "purpose": "Funil de ativação (eventos do onboarding e do primeiro deck).",
+      "purpose": "Funil de ativação (BT-KPI-001, D-47): eventos do catálogo activation_events_v1, com metadado só de enumerados, inteiros com faixa e booleanos; nenhuma decklist, texto livre nem ID interno. As métricas de ativação contam usuários distintos e não leem o metadado.",
       "owner": "server/routes/users/me/activation-events/index.dart",
       "retention": {
         "class": "account_lifetime",
         "period": "sem prazo: nenhum job apaga eventos antigos",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "prazo de retenção de analytics não decidido; o job de limpeza não toca a tabela (BT-KPI-001)"
+        "gap": "prazo de retenção de analytics não decidido (D-69: entra no job depois do advogado); o job de limpeza não toca a tabela. Linhas gravadas antes do catálogo v1 podem ter no metadado a chave de idempotência (com o ID do usuário), IDs de deck e de nota e o nome livre do arquétipo (BT-KPI-001)"
       },
       "export": {
         "section": "data.activation_events"
@@ -315,6 +315,7 @@
       "columns": {
         "created_at": "include",
         "deck_id": "deck_ref",
+        "dedupe_key": "omit_hash",
         "event_name": "include",
         "format": "include",
         "id": "include",

@@ -135,6 +135,7 @@ erDiagram
     activation_funnel_events {
         datetime created_at
         uuid deck_id
+        string dedupe_key
         string event_name
         string format
         uuid id PK
@@ -1179,4 +1180,4 @@ erDiagram
     }
 ```
 
-Tabelas: 82; views: 6; migrations: 64 (latest `072`).
+Tabelas: 82; views: 6; migrations: 65 (latest `073`).

@@ -88,9 +88,9 @@ void main() {
 
         expect(requiredReleaseSchemaMigrations, migrationsFromSource);
         expect(requiredReleaseSchemaMigrations.keys.first, '038');
-        expect(requiredReleaseSchemaMigrations.keys.last, '072');
+        expect(requiredReleaseSchemaMigrations.keys.last, '073');
         expect(releaseSchemaReadinessSql, contains("MAX(version)"));
-        expect(releaseSchemaReadinessSql, contains(") = '072'"));
+        expect(releaseSchemaReadinessSql, contains(") = '073'"));
         for (final entry in requiredReleaseSchemaMigrations.entries) {
           expect(
             releaseSchemaReadinessSql,

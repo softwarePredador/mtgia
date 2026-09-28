@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "fbe6e0802c77ce2606bce960ef8950d45aa0b289d9b7a83a82ffda86a6204731",
+  "source_digest_sha256": "c7c37f078d362f29b00ddba37f9f2eba6eaa44f3b48409656fee0f98daf587d7",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 715,
+    "dart_source_files": 717,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5377,
-    "semantic_resolved_files": 715,
+    "dart_symbols": 5404,
+    "semantic_resolved_files": 717,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43566,
-    "semantic_resolved_call_sites": 69257,
-    "semantic_resolved_type_references": 16585,
-    "modules": 160,
+    "semantic_resolved_call_edges": 43633,
+    "semantic_resolved_call_sites": 69402,
+    "semantic_resolved_type_references": 16626,
+    "modules": 161,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 129,
     "database_tables": 82,
     "database_views": 6,
-    "migrations": 64,
+    "migrations": 65,
     "scripts_and_jobs": 693,
     "environment_variables": 715,
-    "tests": 1273,
+    "tests": 1277,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -932,6 +932,18 @@
       ],
       "file_count": 1,
       "symbol_count": 2,
+      "providers": [],
+      "services": []
+    },
+    {
+      "id": "server/lib/analytics",
+      "layer": "server",
+      "files": [
+        "server/lib/analytics/activation_event_catalog.dart",
+        "server/lib/analytics/activation_kpi.dart"
+      ],
+      "file_count": 2,
+      "symbol_count": 27,
       "providers": [],
       "services": []
     },
@@ -19876,7 +19888,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 4534,
+      "line": 4561,
       "members": [
         "fullName"
       ]
@@ -19885,49 +19897,49 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 4598
+      "line": 4625
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4649
+      "line": 4676
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4554
+      "line": 4581
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4550
+      "line": 4577
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4558
+      "line": 4585
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4720
+      "line": 4747
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4565
+      "line": 4592
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 4600
+      "line": 4627
     },
     {
       "name": "_assertPostMigration",
@@ -27044,13 +27056,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -30234,6 +30246,174 @@
       "line": 4
     },
     {
+      "name": "ActivationBoolRule",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 47
+    },
+    {
+      "name": "ActivationEnumRule",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 40
+    },
+    {
+      "name": "ActivationEventRecord",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 241
+    },
+    {
+      "name": "ActivationEventRejection",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 270,
+      "members": [
+        "toJson"
+      ]
+    },
+    {
+      "name": "ActivationEventSpec",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 68
+    },
+    {
+      "name": "ActivationEventValidation",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 288,
+      "members": [
+        "isValid"
+      ]
+    },
+    {
+      "name": "ActivationIntRule",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 51
+    },
+    {
+      "name": "ActivationMetadataRule",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 36
+    },
+    {
+      "name": "ActivationObjectRule",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 59
+    },
+    {
+      "name": "_reject",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 306
+    },
+    {
+      "name": "_validateObject",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 460
+    },
+    {
+      "name": "activationEventDedupeKey",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 456
+    },
+    {
+      "name": "validateActivationEvent",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_event_catalog.dart",
+      "line": 315
+    },
+    {
+      "name": "ActivationKpiActivitySource",
+      "kind": "class",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 28
+    },
+    {
+      "name": "activationKpiAiActionsCriticalAt",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 370
+    },
+    {
+      "name": "activationKpiAiActionsPer30Days",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 329
+    },
+    {
+      "name": "activationKpiAiActionsWarningAt",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 365
+    },
+    {
+      "name": "activationKpiCohortJson",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 192
+    },
+    {
+      "name": "activationKpiCohortSql",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 73
+    },
+    {
+      "name": "activationKpiDefinition",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 251
+    },
+    {
+      "name": "activationKpiFunnelSql",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 161
+    },
+    {
+      "name": "activationKpiGuardrailsStatus",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 320
+    },
+    {
+      "name": "activationKpiOptionalTables",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 54
+    },
+    {
+      "name": "activationKpiRate",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 67
+    },
+    {
+      "name": "evaluateActivationKpiGuardrail",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 288
+    },
+    {
+      "name": "exists",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 76
+    },
+    {
+      "name": "share",
+      "kind": "function",
+      "source": "server/lib/analytics/activation_kpi.dart",
+      "line": 199
+    },
+    {
       "name": "ArchetypeCountersService",
       "kind": "class",
       "source": "server/lib/archetype_counters_service.dart",
@@ -33410,20 +33590,18 @@
       "name": "CommercialMetricsService",
       "kind": "class",
       "source": "server/lib/commercial_metrics_service.dart",
-      "line": 5,
+      "line": 7,
       "members": [
-        "_activationFunnel",
         "_aiActionUsage",
         "_aiPerformance",
-        "_columnExists",
-        "_countUsers",
         "_missing",
         "_planMix",
         "_retention",
         "_sharedReports",
         "_tableExists",
+        "activationGuardrails",
+        "activationKpi",
         "aiPerformanceHistory",
-        "countAiActivationEvents",
         "isPlanActionTelemetryEndpoint",
         "isProviderTelemetryEndpoint",
         "normalizeHistoryBucket",
@@ -33436,13 +33614,13 @@
       "name": "_dateIso",
       "kind": "function",
       "source": "server/lib/commercial_metrics_service.dart",
-      "line": 448
+      "line": 532
     },
     {
       "name": "_ratio",
       "kind": "function",
       "source": "server/lib/commercial_metrics_service.dart",
-      "line": 456
+      "line": 540
     },
     {
       "name": "CommunityEngagementService",
@@ -34967,115 +35145,115 @@
       "name": "_validBattleLiveHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1006
+      "line": 1008
     },
     {
       "name": "_validInteractiveBattleHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1272
+      "line": 1274
     },
     {
       "name": "buildReadinessResponseBody",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1743
+      "line": 1745
     },
     {
       "name": "disabledReleaseCapabilityReadinessCheck",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1730
+      "line": 1732
     },
     {
       "name": "evaluateAiJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 722
+      "line": 724
     },
     {
       "name": "evaluateAiRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1642
+      "line": 1644
     },
     {
       "name": "evaluateBattleJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 817
+      "line": 819
     },
     {
       "name": "evaluateBattleJobWorkerReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1306
+      "line": 1308
     },
     {
       "name": "evaluateBattleLiveSpectatorReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 920
+      "line": 922
     },
     {
       "name": "evaluateBattleRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1505
+      "line": 1507
     },
     {
       "name": "evaluateCollectionAvailabilitySchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1373
+      "line": 1375
     },
     {
       "name": "evaluateDeckValidationSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1475
+      "line": 1477
     },
     {
       "name": "evaluateInteractiveBattleReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1183
+      "line": 1185
     },
     {
       "name": "evaluateReleaseCapabilityRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1662
+      "line": 1664
     },
     {
       "name": "evaluateReleaseSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 647
+      "line": 649
     },
     {
       "name": "probeBattleLiveSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 911
+      "line": 913
     },
     {
       "name": "probeBattleSidecarHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1613
+      "line": 1615
     },
     {
       "name": "probeInteractiveBattleSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1174
+      "line": 1176
     },
     {
       "name": "readinessStatusCode",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1761
+      "line": 1763
     },
     {
       "name": "apiError",
@@ -41533,19 +41711,19 @@
       "name": "_getSummary",
       "kind": "function",
       "source": "server/routes/users/me/activation-events/index.dart",
-      "line": 92
+      "line": 111
     },
     {
       "name": "_postEvent",
       "kind": "function",
       "source": "server/routes/users/me/activation-events/index.dart",
-      "line": 35
+      "line": 23
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/users/me/activation-events/index.dart",
-      "line": 24
+      "line": 12
     },
     {
       "name": "onRequest",
@@ -41629,7 +41807,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 715,
+    "resolved_file_count": 717,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -42051,6 +42229,8 @@
       "server/lib/ai_provider_runtime_support.dart",
       "server/lib/ai_provider_usage_support.dart",
       "server/lib/ai_telemetry_contract.dart",
+      "server/lib/analytics/activation_event_catalog.dart",
+      "server/lib/analytics/activation_kpi.dart",
       "server/lib/archetype_counters_service.dart",
       "server/lib/auth_middleware.dart",
       "server/lib/auth_runtime_policy.dart",
@@ -42353,9 +42533,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43566,
-    "resolved_call_site_count": 69257,
-    "workspace_call_edge_count": 13744,
+    "resolved_call_edge_count": 43633,
+    "resolved_call_site_count": 69402,
+    "workspace_call_edge_count": 13780,
     "unresolved_call_edge_count": 560,
     "unresolved_call_site_count": 773,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -114507,11 +114687,11 @@
         "target": "Migration.Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 64
+        "occurrences": 65
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4579,
+        "line": 4606,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -114522,7 +114702,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4650,
+        "line": 4677,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -114533,7 +114713,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4739,
+        "line": 4766,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -114544,7 +114724,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4740,
+        "line": 4767,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -114555,7 +114735,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4751,
+        "line": 4778,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -114566,7 +114746,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4754,
+        "line": 4781,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -114577,7 +114757,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4853,
+        "line": 4880,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -114588,7 +114768,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4854,
+        "line": 4881,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -146905,6 +147085,237 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 101,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ActivationIntRule",
+        "target": "ActivationIntRule.ActivationIntRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 102,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ActivationBoolRule",
+        "target": "ActivationBoolRule.ActivationBoolRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 104,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ActivationObjectRule",
+        "target": "ActivationObjectRule.ActivationObjectRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 114,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventSpec",
+        "target": "ActivationEventSpec.ActivationEventSpec",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 12
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 310,
+        "caller": "_reject",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventValidation._",
+        "target": "ActivationEventValidation.ActivationEventValidation._",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 312,
+        "caller": "_reject",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventRejection",
+        "target": "ActivationEventRejection.ActivationEventRejection",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 319,
+        "caller": "validateActivationEvent",
+        "kind": "method",
+        "lexical_target": "_reject",
+        "target": "_reject",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 10
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 358,
+        "caller": "validateActivationEvent",
+        "kind": "method",
+        "lexical_target": "normalizeSupportedDeckFormat",
+        "target": "normalizeSupportedDeckFormat",
+        "target_library": "package:server/deck_format_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 428,
+        "caller": "validateActivationEvent",
+        "kind": "method",
+        "lexical_target": "activationEventDedupeKey",
+        "target": "activationEventDedupeKey",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 432,
+        "caller": "validateActivationEvent",
+        "kind": "method",
+        "lexical_target": "_validateObject",
+        "target": "_validateObject",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 439,
+        "caller": "validateActivationEvent",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventValidation._",
+        "target": "ActivationEventValidation.ActivationEventValidation._",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 443,
+        "caller": "validateActivationEvent",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventRecord",
+        "target": "ActivationEventRecord.ActivationEventRecord",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 478,
+        "caller": "_validateObject",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventRejection",
+        "target": "ActivationEventRejection.ActivationEventRejection",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 521,
+        "caller": "_validateObject",
+        "kind": "method",
+        "lexical_target": "_validateObject",
+        "target": "_validateObject",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 73,
+        "caller": "ActivationEventSpec.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "ActivationObjectRule",
+        "target": "ActivationObjectRule.ActivationObjectRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 88,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ActivationEnumRule",
+        "target": "ActivationEnumRule.ActivationEnumRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 10
+      },
+      {
+        "source": "server/lib/analytics/activation_kpi.dart",
+        "line": 128,
+        "caller": "activationKpiCohortSql",
+        "kind": "method",
+        "lexical_target": "exists",
+        "target": "exists",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/analytics/activation_kpi.dart",
+        "line": 201,
+        "caller": "share",
+        "kind": "method",
+        "lexical_target": "activationKpiRate",
+        "target": "activationKpiRate",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_kpi.dart",
+        "line": 210,
+        "caller": "activationKpiCohortJson",
+        "kind": "method",
+        "lexical_target": "activationKpiRate",
+        "target": "activationKpiRate",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/analytics/activation_kpi.dart",
+        "line": 224,
+        "caller": "activationKpiCohortJson",
+        "kind": "method",
+        "lexical_target": "share",
+        "target": "share",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/analytics/activation_kpi.dart",
+        "line": 40,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ActivationKpiActivitySource",
+        "target": "ActivationKpiActivitySource.ActivationKpiActivitySource",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
         "source": "server/lib/auth_middleware.dart",
         "line": 42,
         "caller": "authMiddleware",
@@ -158049,7 +158460,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 121,
+        "line": 117,
         "caller": "CommercialMetricsService.aiPerformanceHistory",
         "kind": "method",
         "lexical_target": "_dateIso",
@@ -158060,18 +158471,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 13,
-        "caller": "CommercialMetricsService.isProviderTelemetryEndpoint",
-        "kind": "method",
-        "lexical_target": "isAiProviderTelemetryEndpoint",
-        "target": "isAiProviderTelemetryEndpoint",
-        "target_library": "package:server/ai_telemetry_contract.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/commercial_metrics_service.dart",
-        "line": 151,
+        "line": 147,
         "caller": "CommercialMetricsService.aiPerformanceHistory",
         "kind": "method",
         "lexical_target": "_ratio",
@@ -158082,7 +158482,18 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 16,
+        "line": 15,
+        "caller": "CommercialMetricsService.isProviderTelemetryEndpoint",
+        "kind": "method",
+        "lexical_target": "isAiProviderTelemetryEndpoint",
+        "target": "isAiProviderTelemetryEndpoint",
+        "target_library": "package:server/ai_telemetry_contract.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 18,
         "caller": "CommercialMetricsService.isPlanActionTelemetryEndpoint",
         "kind": "method",
         "lexical_target": "isAiPlanActionTelemetryEndpoint",
@@ -158093,7 +158504,73 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 19,
+        "line": 193,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "normalizeWindowDays",
+        "target": "CommercialMetricsService.normalizeWindowDays",
+        "target_library": "package:server/commercial_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 194,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "_tableExists",
+        "target": "CommercialMetricsService._tableExists",
+        "target_library": "package:server/commercial_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 195,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "_missing",
+        "target": "CommercialMetricsService._missing",
+        "target_library": "package:server/commercial_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 198,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "activationKpiOptionalTables",
+        "target": "activationKpiOptionalTables",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 203,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "activationKpiCohortSql",
+        "target": "activationKpiCohortSql",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 209,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "activationKpiFunnelSql",
+        "target": "activationKpiFunnelSql",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 21,
         "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
         "lexical_target": "normalizeWindowDays",
@@ -158104,56 +158581,89 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 20,
+        "line": 22,
         "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
         "lexical_target": "_tableExists",
         "target": "CommercialMetricsService._tableExists",
         "target_library": "package:server/commercial_metrics_service.dart",
         "target_scope": "workspace",
-        "occurrences": 5
+        "occurrences": 4
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 210,
-        "caller": "CommercialMetricsService._activationFunnel",
+        "line": 241,
+        "caller": "CommercialMetricsService.activationKpi",
         "kind": "method",
-        "lexical_target": "_countUsers",
-        "target": "CommercialMetricsService._countUsers",
+        "lexical_target": "activationKpiCohortJson",
+        "target": "activationKpiCohortJson",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 252,
+        "caller": "CommercialMetricsService.activationKpi",
+        "kind": "method",
+        "lexical_target": "activationKpiDefinition",
+        "target": "activationKpiDefinition",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 265,
+        "caller": "CommercialMetricsService.activationGuardrails",
+        "kind": "method",
+        "lexical_target": "normalizeWindowDays",
+        "target": "CommercialMetricsService.normalizeWindowDays",
         "target_library": "package:server/commercial_metrics_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 212,
-        "caller": "CommercialMetricsService._activationFunnel",
+        "line": 268,
+        "caller": "CommercialMetricsService.activationGuardrails",
         "kind": "method",
-        "lexical_target": "countAiActivationEvents",
-        "target": "CommercialMetricsService.countAiActivationEvents",
-        "target_library": "package:server/commercial_metrics_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/commercial_metrics_service.dart",
-        "line": 222,
-        "caller": "CommercialMetricsService._activationFunnel",
-        "kind": "method",
-        "lexical_target": "_ratio",
-        "target": "_ratio",
+        "lexical_target": "_tableExists",
+        "target": "CommercialMetricsService._tableExists",
         "target_library": "package:server/commercial_metrics_service.dart",
         "target_scope": "workspace",
         "occurrences": 2
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 274,
-        "caller": "CommercialMetricsService._aiPerformance",
+        "line": 27,
+        "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
-        "lexical_target": "_ratio",
-        "target": "_ratio",
+        "lexical_target": "activationKpi",
+        "target": "CommercialMetricsService.activationKpi",
         "target_library": "package:server/commercial_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 277,
+        "caller": "CommercialMetricsService.activationGuardrails",
+        "kind": "method",
+        "lexical_target": "evaluateActivationKpiGuardrail",
+        "target": "evaluateActivationKpiGuardrail",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 279,
+        "caller": "CommercialMetricsService.activationGuardrails",
+        "kind": "method",
+        "lexical_target": "activationKpiRate",
+        "target": "activationKpiRate",
+        "target_library": "package:server/analytics/activation_kpi.dart",
         "target_scope": "workspace",
         "occurrences": 2
       },
@@ -158162,8 +158672,19 @@
         "line": 28,
         "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
-        "lexical_target": "_activationFunnel",
-        "target": "CommercialMetricsService._activationFunnel",
+        "lexical_target": "activationGuardrails",
+        "target": "CommercialMetricsService.activationGuardrails",
+        "target_library": "package:server/commercial_metrics_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 29,
+        "caller": "CommercialMetricsService.snapshot",
+        "kind": "method",
+        "lexical_target": "_aiPerformance",
+        "target": "CommercialMetricsService._aiPerformance",
         "target_library": "package:server/commercial_metrics_service.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -158177,22 +158698,22 @@
         "target": "CommercialMetricsService._missing",
         "target_library": "package:server/commercial_metrics_service.dart",
         "target_scope": "workspace",
-        "occurrences": 7
+        "occurrences": 6
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 30,
-        "caller": "CommercialMetricsService.snapshot",
+        "line": 298,
+        "caller": "CommercialMetricsService.activationGuardrails",
         "kind": "method",
-        "lexical_target": "_aiPerformance",
-        "target": "CommercialMetricsService._aiPerformance",
-        "target_library": "package:server/commercial_metrics_service.dart",
+        "lexical_target": "activationKpiAiActionsPer30Days",
+        "target": "activationKpiAiActionsPer30Days",
+        "target_library": "package:server/analytics/activation_kpi.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 31,
+        "line": 30,
         "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
         "lexical_target": "_planMix",
@@ -158203,7 +158724,29 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 34,
+        "line": 305,
+        "caller": "CommercialMetricsService.activationGuardrails",
+        "kind": "method",
+        "lexical_target": "activationKpiAiActionsWarningAt",
+        "target": "activationKpiAiActionsWarningAt",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 306,
+        "caller": "CommercialMetricsService.activationGuardrails",
+        "kind": "method",
+        "lexical_target": "activationKpiAiActionsCriticalAt",
+        "target": "activationKpiAiActionsCriticalAt",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 33,
         "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
         "lexical_target": "_sharedReports",
@@ -158214,7 +158757,18 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 37,
+        "line": 337,
+        "caller": "CommercialMetricsService.activationGuardrails",
+        "kind": "method",
+        "lexical_target": "activationKpiGuardrailsStatus",
+        "target": "activationKpiGuardrailsStatus",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/commercial_metrics_service.dart",
+        "line": 36,
         "caller": "CommercialMetricsService.snapshot",
         "kind": "method",
         "lexical_target": "_retention",
@@ -158225,25 +158779,14 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 402,
-        "caller": "CommercialMetricsService._countUsers",
+        "line": 391,
+        "caller": "CommercialMetricsService._aiPerformance",
         "kind": "method",
-        "lexical_target": "_tableExists",
-        "target": "CommercialMetricsService._tableExists",
+        "lexical_target": "_ratio",
+        "target": "_ratio",
         "target_library": "package:server/commercial_metrics_service.dart",
         "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/commercial_metrics_service.dart",
-        "line": 405,
-        "caller": "CommercialMetricsService._countUsers",
-        "kind": "method",
-        "lexical_target": "_columnExists",
-        "target": "CommercialMetricsService._columnExists",
-        "target_library": "package:server/commercial_metrics_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
@@ -158269,7 +158812,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 69,
+        "line": 65,
         "caller": "CommercialMetricsService.normalizeHistoryWindowDays",
         "kind": "method",
         "lexical_target": "normalizeHistoryBucket",
@@ -158280,7 +158823,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 78,
+        "line": 74,
         "caller": "CommercialMetricsService.aiPerformanceHistory",
         "kind": "method",
         "lexical_target": "normalizeHistoryBucket",
@@ -158291,7 +158834,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 79,
+        "line": 75,
         "caller": "CommercialMetricsService.aiPerformanceHistory",
         "kind": "method",
         "lexical_target": "normalizeHistoryWindowDays",
@@ -158302,7 +158845,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 80,
+        "line": 76,
         "caller": "CommercialMetricsService.aiPerformanceHistory",
         "kind": "method",
         "lexical_target": "_tableExists",
@@ -158313,7 +158856,7 @@
       },
       {
         "source": "server/lib/commercial_metrics_service.dart",
-        "line": 81,
+        "line": 77,
         "caller": "CommercialMetricsService.aiPerformanceHistory",
         "kind": "method",
         "lexical_target": "_missing",
@@ -162240,7 +162783,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1196,
+        "line": 1198,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleReadiness",
@@ -162251,7 +162794,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1226,
+        "line": 1228,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleConfiguration.fromEnvironment",
@@ -162262,7 +162805,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1235,
+        "line": 1237,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -162273,7 +162816,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1244,
+        "line": 1246,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "_validInteractiveBattleHealth",
@@ -162284,7 +162827,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1317,
+        "line": 1319,
         "caller": "evaluateBattleJobWorkerReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobWorkerReadiness",
@@ -162295,7 +162838,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1382,
+        "line": 1384,
         "caller": "evaluateCollectionAvailabilitySchemaReadiness",
         "kind": "constructor",
         "lexical_target": "CollectionAvailabilitySchemaReadiness",
@@ -162306,7 +162849,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1485,
+        "line": 1487,
         "caller": "evaluateDeckValidationSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "DeckValidationSchemaReadiness",
@@ -162317,7 +162860,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1515,
+        "line": 1517,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -162328,7 +162871,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1531,
+        "line": 1533,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleRuntimeReadiness",
@@ -162339,7 +162882,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1576,
+        "line": 1578,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -162350,7 +162893,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1643,
+        "line": 1645,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "OpenAiRuntimeConfig",
@@ -162361,7 +162904,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1649,
+        "line": 1651,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "AiRuntimeReadiness",
@@ -162372,7 +162915,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1674,
+        "line": 1676,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -162383,7 +162926,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1675,
+        "line": 1677,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleJobWorkerReadiness",
@@ -162394,7 +162937,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1679,
+        "line": 1681,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleRuntimeReadiness",
@@ -162405,7 +162948,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1683,
+        "line": 1685,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "disabledReleaseCapabilityReadinessCheck",
@@ -162416,7 +162959,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1695,
+        "line": 1697,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateAiRuntimeReadiness",
@@ -162427,7 +162970,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1706,
+        "line": 1708,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleLiveSpectatorReadiness",
@@ -162438,7 +162981,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1717,
+        "line": 1719,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateInteractiveBattleReadiness",
@@ -162449,7 +162992,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1727,
+        "line": 1729,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityRuntimeReadiness",
@@ -162460,7 +163003,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1734,
+        "line": 1736,
         "caller": "disabledReleaseCapabilityReadinessCheck",
         "kind": "method",
         "lexical_target": "entry",
@@ -162471,7 +163014,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 655,
+        "line": 657,
         "caller": "evaluateReleaseSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseSchemaReadiness",
@@ -162482,7 +163025,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 730,
+        "line": 732,
         "caller": "evaluateAiJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "AiJobSchemaReadiness",
@@ -162493,7 +163036,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 827,
+        "line": 829,
         "caller": "evaluateBattleJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobSchemaReadiness",
@@ -162504,7 +163047,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 927,
+        "line": 929,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "battleLiveSpectatorEnabledValue",
@@ -162515,7 +163058,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 933,
+        "line": 935,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleLiveSpectatorReadiness",
@@ -162526,7 +163069,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 957,
+        "line": 959,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -162537,7 +163080,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 974,
+        "line": 976,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -162548,7 +163091,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 981,
+        "line": 983,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "_validBattleLiveHealth",
@@ -192941,7 +193484,29 @@
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 120,
+        "line": 107,
+        "caller": "_postEvent",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/activation-events/index.dart",
+        "line": 112,
+        "caller": "_getSummary",
+        "kind": "method",
+        "lexical_target": "getUserId",
+        "target": "getUserId",
+        "target_library": "package:server/auth_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/activation-events/index.dart",
+        "line": 139,
         "caller": "_getSummary",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -192952,7 +193517,7 @@
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 27,
+        "line": 15,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_postEvent",
@@ -192963,7 +193528,7 @@
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 30,
+        "line": 18,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_getSummary",
@@ -192974,7 +193539,7 @@
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 32,
+        "line": 20,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -192985,7 +193550,7 @@
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 36,
+        "line": 30,
         "caller": "_postEvent",
         "kind": "method",
         "lexical_target": "getUserId",
@@ -192996,34 +193561,45 @@
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 43,
+        "line": 40,
         "caller": "_postEvent",
-        "kind": "method",
-        "lexical_target": "badRequest",
-        "target": "badRequest",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 85,
-        "caller": "_postEvent",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
+        "kind": "constructor",
+        "lexical_target": "ActivationEventRejection",
+        "target": "ActivationEventRejection.ActivationEventRejection",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/routes/users/me/activation-events/index.dart",
-        "line": 93,
-        "caller": "_getSummary",
+        "line": 40,
+        "caller": "_postEvent",
         "kind": "method",
-        "lexical_target": "getUserId",
-        "target": "getUserId",
-        "target_library": "package:server/auth_middleware.dart",
+        "lexical_target": "toJson",
+        "target": "ActivationEventRejection.toJson",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/users/me/activation-events/index.dart",
+        "line": 48,
+        "caller": "_postEvent",
+        "kind": "method",
+        "lexical_target": "validateActivationEvent",
+        "target": "validateActivationEvent",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/users/me/activation-events/index.dart",
+        "line": 69,
+        "caller": "_postEvent",
+        "kind": "method",
+        "lexical_target": "deckNotFoundResponse",
+        "target": "deckNotFoundResponse",
+        "target_library": "package:server/decks/deck_trash_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -193567,14 +194143,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 606,
-        "occurrences": 755
+        "unique_references": 607,
+        "occurrences": 756
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14473,
-        "occurrences": 25109
+        "unique_references": 14501,
+        "occurrences": 25143
       },
       {
         "target_scope": "dart_sdk",
@@ -193663,14 +194239,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/digest.dart",
-        "unique_references": 40,
-        "occurrences": 43
+        "unique_references": 41,
+        "occurrences": 44
       },
       {
         "target_scope": "dependency",
         "target_library": "package:crypto/src/hash.dart",
-        "unique_references": 41,
-        "occurrences": 45
+        "unique_references": 42,
+        "occurrences": 46
       },
       {
         "target_scope": "dependency",
@@ -193682,7 +194258,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 524,
-        "occurrences": 1031
+        "occurrences": 1033
       },
       {
         "target_scope": "dependency",
@@ -194936,7 +195512,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 1258,
-        "occurrences": 2060
+        "occurrences": 2071
       },
       {
         "target_scope": "dependency",
@@ -197118,6 +197694,18 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "unique_references": 18,
+        "occurrences": 62
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "unique_references": 16,
+        "occurrences": 32
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/archetype_counters_service.dart",
         "unique_references": 6,
         "occurrences": 7
@@ -197413,8 +198001,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/commercial_metrics_service.dart",
-        "unique_references": 30,
-        "occurrences": 44
+        "unique_references": 31,
+        "occurrences": 45
       },
       {
         "target_scope": "workspace",
@@ -197473,8 +198061,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/deck_format_support.dart",
-        "unique_references": 15,
-        "occurrences": 17
+        "unique_references": 16,
+        "occurrences": 18
       },
       {
         "target_scope": "workspace",
@@ -197593,8 +198181,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/decks/deck_trash_support.dart",
-        "unique_references": 6,
-        "occurrences": 9
+        "unique_references": 7,
+        "occurrences": 10
       },
       {
         "target_scope": "workspace",
@@ -197671,8 +198259,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/http_responses.dart",
-        "unique_references": 172,
-        "occurrences": 261
+        "unique_references": 171,
+        "occurrences": 258
       },
       {
         "target_scope": "workspace",
@@ -198182,7 +198770,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 8,
-        "occurrences": 71
+        "occurrences": 72
       },
       {
         "target_scope": "workspace",
@@ -202882,7 +203470,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1231,
+        "line": 1233,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -202890,7 +203478,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1233,
+        "line": 1235,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -202898,7 +203486,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1563,
+        "line": 1565,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -202906,7 +203494,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 948,
+        "line": 950,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -202914,7 +203502,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 972,
+        "line": 974,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -203321,8 +203909,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16585,
-    "workspace_type_reference_count": 3503,
+    "resolved_type_reference_count": 16626,
+    "workspace_type_reference_count": 3516,
     "unresolved_type_reference_count": 359,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -225534,11 +226122,11 @@
         "target": "Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 67
+        "occurrences": 68
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4600,
+        "line": 4627,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
@@ -229617,6 +230205,126 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 101,
+        "lexical_type": "ActivationIntRule",
+        "resolved_type": "ActivationIntRule",
+        "target": "ActivationIntRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 102,
+        "lexical_type": "ActivationBoolRule",
+        "resolved_type": "ActivationBoolRule",
+        "target": "ActivationBoolRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 113,
+        "lexical_type": "ActivationEventSpec",
+        "resolved_type": "ActivationEventSpec",
+        "target": "ActivationEventSpec",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 13
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 291,
+        "lexical_type": "ActivationEventRecord?",
+        "resolved_type": "ActivationEventRecord?",
+        "target": "ActivationEventRecord",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 292,
+        "lexical_type": "ActivationEventRejection?",
+        "resolved_type": "ActivationEventRejection?",
+        "target": "ActivationEventRejection",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 306,
+        "lexical_type": "ActivationEventValidation",
+        "resolved_type": "ActivationEventValidation",
+        "target": "ActivationEventValidation",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 312,
+        "lexical_type": "ActivationEventRejection",
+        "resolved_type": "ActivationEventRejection",
+        "target": "ActivationEventRejection",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 41,
+        "lexical_type": "ActivationMetadataRule",
+        "resolved_type": "ActivationMetadataRule",
+        "target": "ActivationMetadataRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 443,
+        "lexical_type": "ActivationEventRecord",
+        "resolved_type": "ActivationEventRecord",
+        "target": "ActivationEventRecord",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 73,
+        "lexical_type": "ActivationObjectRule",
+        "resolved_type": "ActivationObjectRule",
+        "target": "ActivationObjectRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 12
+      },
+      {
+        "source": "server/lib/analytics/activation_event_catalog.dart",
+        "line": 88,
+        "lexical_type": "ActivationEnumRule",
+        "resolved_type": "ActivationEnumRule",
+        "target": "ActivationEnumRule",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 11
+      },
+      {
+        "source": "server/lib/analytics/activation_kpi.dart",
+        "line": 39,
+        "lexical_type": "ActivationKpiActivitySource",
+        "resolved_type": "ActivationKpiActivitySource",
+        "target": "ActivationKpiActivitySource",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "target_scope": "workspace",
+        "occurrences": 10
+      },
+      {
         "source": "server/lib/auth_middleware.dart",
         "line": 42,
         "lexical_type": "AuthService",
@@ -233378,7 +234086,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1183,
+        "line": 1185,
         "lexical_type": "InteractiveBattleReadiness",
         "resolved_type": "InteractiveBattleReadiness",
         "target": "InteractiveBattleReadiness",
@@ -233388,7 +234096,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1187,
+        "line": 1189,
         "lexical_type": "InteractiveBattleSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "InteractiveBattleSchemaProbe",
@@ -233398,7 +234106,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1226,
+        "line": 1228,
         "lexical_type": "InteractiveBattleConfiguration",
         "resolved_type": "InteractiveBattleConfiguration",
         "target": "InteractiveBattleConfiguration",
@@ -233408,7 +234116,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1306,
+        "line": 1308,
         "lexical_type": "BattleJobWorkerReadiness",
         "resolved_type": "BattleJobWorkerReadiness",
         "target": "BattleJobWorkerReadiness",
@@ -233418,7 +234126,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1373,
+        "line": 1375,
         "lexical_type": "CollectionAvailabilitySchemaReadiness",
         "resolved_type": "CollectionAvailabilitySchemaReadiness",
         "target": "CollectionAvailabilitySchemaReadiness",
@@ -233428,7 +234136,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1475,
+        "line": 1477,
         "lexical_type": "DeckValidationSchemaReadiness",
         "resolved_type": "DeckValidationSchemaReadiness",
         "target": "DeckValidationSchemaReadiness",
@@ -233438,7 +234146,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1509,
+        "line": 1511,
         "lexical_type": "BattleRuntimeReadiness",
         "resolved_type": "BattleRuntimeReadiness",
         "target": "BattleRuntimeReadiness",
@@ -233448,7 +234156,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1530,
+        "line": 1532,
         "lexical_type": "BattleEngineConfigurationException",
         "resolved_type": "BattleEngineConfigurationException",
         "target": "BattleEngineConfigurationException",
@@ -233458,7 +234166,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1642,
+        "line": 1644,
         "lexical_type": "AiRuntimeReadiness",
         "resolved_type": "AiRuntimeReadiness",
         "target": "AiRuntimeReadiness",
@@ -233468,7 +234176,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1643,
+        "line": 1645,
         "lexical_type": "OpenAiRuntimeConfig",
         "resolved_type": "OpenAiRuntimeConfig",
         "target": "OpenAiRuntimeConfig",
@@ -233478,7 +234186,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1665,
+        "line": 1667,
         "lexical_type": "ReleaseCapabilityRuntimeReadiness",
         "resolved_type": "ReleaseCapabilityRuntimeReadiness",
         "target": "ReleaseCapabilityRuntimeReadiness",
@@ -233488,7 +234196,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1667,
+        "line": 1669,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -233498,7 +234206,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 647,
+        "line": 649,
         "lexical_type": "ReleaseSchemaReadiness",
         "resolved_type": "ReleaseSchemaReadiness",
         "target": "ReleaseSchemaReadiness",
@@ -233508,7 +234216,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 722,
+        "line": 724,
         "lexical_type": "AiJobSchemaReadiness",
         "resolved_type": "AiJobSchemaReadiness",
         "target": "AiJobSchemaReadiness",
@@ -233518,7 +234226,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 817,
+        "line": 819,
         "lexical_type": "BattleJobSchemaReadiness",
         "resolved_type": "BattleJobSchemaReadiness",
         "target": "BattleJobSchemaReadiness",
@@ -233528,7 +234236,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 920,
+        "line": 922,
         "lexical_type": "BattleLiveSpectatorReadiness",
         "resolved_type": "BattleLiveSpectatorReadiness",
         "target": "BattleLiveSpectatorReadiness",
@@ -233538,7 +234246,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 923,
+        "line": 925,
         "lexical_type": "BattleSidecarProbe",
         "resolved_type": "Future<Map<String, dynamic>?> Function(String, Uri)",
         "target": "BattleSidecarProbe",
@@ -233548,7 +234256,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 924,
+        "line": 926,
         "lexical_type": "BattleLiveSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "BattleLiveSchemaProbe",
@@ -233558,7 +234266,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 957,
+        "line": 959,
         "lexical_type": "BattleEngineConfig",
         "resolved_type": "BattleEngineConfig",
         "target": "BattleEngineConfig",
@@ -238247,6 +238955,16 @@
         "occurrences": 1
       },
       {
+        "source": "server/routes/users/me/activation-events/index.dart",
+        "line": 40,
+        "lexical_type": "ActivationEventRejection",
+        "resolved_type": "ActivationEventRejection",
+        "target": "ActivationEventRejection",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/routes/users/me/blocks/index.dart",
         "line": 12,
         "lexical_type": "SocialSafetyService",
@@ -238367,8 +239085,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1112,
-        "occurrences": 2232
+        "unique_references": 1111,
+        "occurrences": 2231
       },
       {
         "target_scope": "dart_sdk",
@@ -238385,8 +239103,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6440,
-        "occurrences": 40555
+        "unique_references": 6469,
+        "occurrences": 40707
       },
       {
         "target_scope": "dart_sdk",
@@ -238470,7 +239188,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 294,
-        "occurrences": 1179
+        "occurrences": 1181
       },
       {
         "target_scope": "dependency",
@@ -239706,7 +240424,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
         "unique_references": 268,
-        "occurrences": 990
+        "occurrences": 993
       },
       {
         "target_scope": "dependency",
@@ -239856,7 +240574,7 @@
         "target_scope": "unknown",
         "target_library": "<unresolved>",
         "unique_references": 418,
-        "occurrences": 4831
+        "occurrences": 4829
       },
       {
         "target_scope": "workspace",
@@ -241528,6 +242246,18 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/analytics/activation_event_catalog.dart",
+        "unique_references": 12,
+        "occurrences": 64
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/analytics/activation_kpi.dart",
+        "unique_references": 1,
+        "occurrences": 10
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/archetype_counters_service.dart",
         "unique_references": 2,
         "occurrences": 3
@@ -242268,7 +242998,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 2,
-        "occurrences": 68
+        "occurrences": 69
       },
       {
         "target_scope": "workspace",
@@ -243612,7 +244342,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 4649,
+        "line": 4676,
         "lexical_type": "void",
         "occurrences": 2
       },
@@ -245682,20 +246412,18 @@
       "name": "CommercialMetricsService",
       "kind": "class",
       "source": "server/lib/commercial_metrics_service.dart",
-      "line": 5,
+      "line": 7,
       "members": [
-        "_activationFunnel",
         "_aiActionUsage",
         "_aiPerformance",
-        "_columnExists",
-        "_countUsers",
         "_missing",
         "_planMix",
         "_retention",
         "_sharedReports",
         "_tableExists",
+        "activationGuardrails",
+        "activationKpi",
         "aiPerformanceHistory",
-        "countAiActivationEvents",
         "isPlanActionTelemetryEndpoint",
         "isProviderTelemetryEndpoint",
         "normalizeHistoryBucket",
@@ -258399,8 +259127,8 @@
       "server/lib/collection_availability_contract.dart",
       "server/lib/import_card_lookup_service.dart"
     ],
-    "migration_count": 64,
-    "latest_migration": "072",
+    "migration_count": 65,
+    "latest_migration": "073",
     "migrations": [
       {
         "version": "001",
@@ -258721,6 +259449,11 @@
         "version": "072",
         "name": "deck_trash_lifecycle",
         "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "073",
+        "name": "activation_events_dedupe",
+        "source": "server/bin/migrate.dart"
       }
     ],
     "tables": [
@@ -258860,6 +259593,12 @@
           {
             "name": "deck_id",
             "type": "UUID",
+            "primary_key": false,
+            "nullable": true
+          },
+          {
+            "name": "dedupe_key",
+            "type": "TEXT",
             "primary_key": false,
             "nullable": true
           },
@@ -279448,7 +280187,11 @@
     "server/test/account_security_full_user_test.dart",
     "server/test/account_security_live_test.dart",
     "server/test/account_security_schema_contract_test.dart",
+    "server/test/activation_event_catalog_test.dart",
     "server/test/activation_events_contract_test.dart",
+    "server/test/activation_events_db_live_test.dart",
+    "server/test/activation_events_migration_test.dart",
+    "server/test/activation_kpi_db_live_test.dart",
     "server/test/admin_access_support_test.dart",
     "server/test/aggressive_candidate_meta_signal_support_test.dart",
     "server/test/ai/deck_quality_report_limits_test.dart",
@@ -281180,7 +281923,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "2430126a18fcca23e09fcd0a46a2fba31087b87368e73941e60d541b2d982bc2"
+      "sha256": "70ed5a6867468f672f49ab4a2ff7973c4e3d844d8a7d2d86cad7ea47ee345e49"
     },
     "required_task_fields": [
       "id",
@@ -281321,12 +282064,12 @@
       {
         "id": "BT-KPI-001",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Definir eventos, coortes, métricas de ativação, guardrails e política de privacidade de telemetria.",
         "depends_on": [
           "BT-GOV-001"
         ],
-        "acceptance": "Métricas contam usuários/loops de valor, não apenas eventos; nenhum decklist/UGC em analytics. Medição de 2026-09-22 (`docs/flows/_p0/privacidade-telemetria.md`): o código atual faz o que o aceite proíbe (conta eventos e divide por signups) e testes consagram isso (`commercial_metrics_service_test.dart:8-18`) — há retrabalho, não só trabalho novo. Decisão do dono em 2026-09-22: D-47, ativação é o primeiro deck criado ou importado em até 24 h do cadastro; retenção é a volta na segunda semana; guardrails de custo de IA e de taxa de erro; nenhuma decklist em analytics; política de privacidade atualizada quando a telemetria entrar.",
+        "acceptance": "Métricas contam usuários/loops de valor, não apenas eventos; nenhum decklist/UGC em analytics. Medição de 2026-09-22 (`docs/flows/_p0/privacidade-telemetria.md`): o código atual faz o que o aceite proíbe (conta eventos e divide por signups) e testes consagram isso (`commercial_metrics_service_test.dart:8-18`) — há retrabalho, não só trabalho novo. Decisão do dono em 2026-09-22: D-47, ativação é o primeiro deck criado ou importado em até 24 h do cadastro; retenção é a volta na segunda semana; guardrails de custo de IA e de taxa de erro; nenhuma decklist em analytics; política de privacidade atualizada quando a telemetria entrar. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar (migration 073): o catálogo único `activation_events_v1` (`server/lib/analytics/activation_event_catalog.dart`) tem os 12 eventos que o app emite, com a origem, `deck_id` só do próprio usuário e metadado só de enumerados, inteiros com faixa e booleanos; o coletor recusa sem gravar evento fora do catálogo, decklist, texto livre e deck de outra pessoa, descarta os IDs internos e o arquétipo livre que o app atual manda e deduplica pela chave do app guardada como hash; o `GET /health/commercial` troca o funil de eventos por coortes semanais em usuários distintos, com a ativação da D-47 (deck em 24 h), a volta na segunda semana (ação registrada no servidor do 7º ao 14º dia), os loops de valor, o funil por coorte e os guardrails v1 de custo de IA e de taxa de erro. Evidência: `activation_event_catalog_test.dart`, `activation_events_contract_test.dart` (paridade com os emissores do app), `activation_events_db_live_test.dart`, `activation_kpi_db_live_test.dart` e as mutações do grupo `kpi01` derrubadas; receipt em `docs/qa/execution/2026-09-28/BT-KPI-001-eventos-coortes-e-ativacao.md`. Falta: a raia do app (parar de mandar o arquétipo livre e os IDs internos), a política pública quando a telemetria entrar (com o reaceite do `BT-LEGAL-ACCEPT-001`), o prazo de retenção de analytics (D-69), o agregado que sobrevive à exclusão e a baseline depois da primeira coorte.",
         "section": "Épico A — Verdade de produto, escopo e documentação",
         "source_line": 285
       },
@@ -281338,7 +282081,7 @@
         "depends_on": [
           "BT-KPI-001"
         ],
-        "acceptance": "Os eventos `onboarding_goal_selected`, `onboarding_experience_selected`, `onboarding_build_mode_selected` e `onboarding_task_started` entram no allowlist ou saem do app; nenhum descarte silencioso.",
+        "acceptance": "Os eventos `onboarding_goal_selected`, `onboarding_experience_selected`, `onboarding_build_mode_selected` e `onboarding_task_started` entram no allowlist ou saem do app; nenhum descarte silencioso. Servidor em 2026-09-28 (`BT-KPI-001`): os quatro eventos entraram no catálogo `activation_events_v1`, com metadado só de enumerados; falta o app não descartar em silêncio a recusa do servidor.",
         "section": "Épico A — Verdade de produto, escopo e documentação",
         "source_line": 286
       },
@@ -291064,7 +291807,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "fbe6e0802c77ce2606bce960ef8950d45aa0b289d9b7a83a82ffda86a6204731"
+    "project_logic_source_digest_sha256": "c7c37f078d362f29b00ddba37f9f2eba6eaa44f3b48409656fee0f98daf587d7"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -293543,6 +294286,8 @@
       "server/lib/ai_provider_runtime_support.dart",
       "server/lib/ai_provider_usage_support.dart",
       "server/lib/ai_telemetry_contract.dart",
+      "server/lib/analytics/activation_event_catalog.dart",
+      "server/lib/analytics/activation_kpi.dart",
       "server/lib/archetype_counters_service.dart",
       "server/lib/auth_middleware.dart",
       "server/lib/auth_runtime_policy.dart",
@@ -293847,7 +294592,11 @@
       "server/test/account_security_full_user_test.dart",
       "server/test/account_security_live_test.dart",
       "server/test/account_security_schema_contract_test.dart",
+      "server/test/activation_event_catalog_test.dart",
       "server/test/activation_events_contract_test.dart",
+      "server/test/activation_events_db_live_test.dart",
+      "server/test/activation_events_migration_test.dart",
+      "server/test/activation_kpi_db_live_test.dart",
       "server/test/admin_access_support_test.dart",
       "server/test/aggressive_candidate_meta_signal_support_test.dart",
       "server/test/ai/deck_quality_report_limits_test.dart",

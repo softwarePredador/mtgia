@@ -2738,6 +2738,20 @@ CREATE INDEX IF NOT EXISTS idx_decks_user_trash
   ON decks (user_id, deleted_at DESC)
   WHERE deleted_at IS NOT NULL;
 
+-- BT-KPI-001 (migration 073): o coletor de eventos de ativação guarda só o
+-- hash SHA-256 da chave de idempotência do app (a chave carrega o ID do
+-- usuário), e a mesma chave do mesmo usuário grava uma vez só.
+ALTER TABLE activation_funnel_events
+  ADD COLUMN IF NOT EXISTS dedupe_key TEXT;
+ALTER TABLE activation_funnel_events
+  DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+ALTER TABLE activation_funnel_events
+  ADD CONSTRAINT chk_activation_funnel_events_dedupe_key
+  CHECK (dedupe_key IS NULL OR dedupe_key ~ '^[0-9a-f]{64}$');
+CREATE UNIQUE INDEX IF NOT EXISTS uq_activation_funnel_events_dedupe
+  ON activation_funnel_events (user_id, dedupe_key)
+  WHERE dedupe_key IS NOT NULL;
+
 -- ============================================================
 -- GROWTH: Relatorios compartilhaveis
 -- ============================================================

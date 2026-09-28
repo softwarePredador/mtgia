@@ -4529,6 +4529,33 @@ final migrations = <Migration>[
       ));
     ''',
   ),
+  Migration(
+    version: '073',
+    name: 'activation_events_dedupe',
+    // BT-KPI-001 (decisão D-47 do dono): o coletor de eventos de ativação
+    // guarda só o hash SHA-256 da chave de idempotência do app, que carrega o
+    // ID do usuário, e a mesma chave do mesmo usuário grava uma vez só. Não
+    // cria tabela: o laço dos gatilhos de conta ativa não muda. 067 a 069 e
+    // 072 a 073 são da frente de deck.
+    up: '''
+      ALTER TABLE activation_funnel_events
+        ADD COLUMN IF NOT EXISTS dedupe_key TEXT;
+      ALTER TABLE activation_funnel_events
+        DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+      ALTER TABLE activation_funnel_events
+        ADD CONSTRAINT chk_activation_funnel_events_dedupe_key
+        CHECK (dedupe_key IS NULL OR dedupe_key ~ '^[0-9a-f]{64}\$');
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_activation_funnel_events_dedupe
+        ON activation_funnel_events (user_id, dedupe_key)
+        WHERE dedupe_key IS NOT NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS uq_activation_funnel_events_dedupe;
+      ALTER TABLE activation_funnel_events
+        DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+      ALTER TABLE activation_funnel_events DROP COLUMN IF EXISTS dedupe_key;
+    ''',
+  ),
 ];
 
 class Migration {

@@ -35,6 +35,29 @@ void main() {
       }
     });
 
+    test('documents the activation event catalog and user-based KPIs', () {
+      // BT-KPI-001 (D-47).
+      final collector = _contractRowFor(
+        contracts,
+        'POST /users/me/activation-events',
+      );
+      expect(collector, contains('catalog `activation_events_v1`'));
+      expect(collector, contains('activation_event_field_not_allowed'));
+      expect(collector, contains('404 `deck_not_found`'));
+      expect(collector, contains('`dropped_fields`'));
+      expect(collector, contains('catalog_version, duplicate: true}`'));
+      expect(collector, contains('No decklist, card list, deck name'));
+      expect(collector, contains('Requires migration 073.'));
+      final commercial = _contractRowFor(contracts, 'GET /health/commercial');
+      expect(commercial, contains('`activation_kpi_v1`'));
+      expect(commercial, contains('counts distinct users'));
+      expect(commercial, contains('within 24 h of signup'));
+      expect(commercial, contains('between days 7 and 14'));
+      expect(commercial, contains('`guardrails` v1'));
+      expect(commercial, contains('The old `activation_funnel`'));
+      expect(commercial, contains('activation_kpi_db_live_test.dart'));
+    });
+
     test('documents the beta kill switch of trade and sale offers', () {
       // SCOPE-P0-TRD-00 (D-39 e D-38).
       final create = _contractRowFor(contracts, 'POST /binder');

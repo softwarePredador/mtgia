@@ -107,6 +107,9 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 - Trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) quando uma das partes
   exclui a conta: seguem com a outra pessoa, como as concluídas. A D-66 manda apagar só os itens
   de oferta aberta.
+- Correção governada das linhas de `activation_funnel_events` gravadas antes do catálogo
+  `activation_events_v1` (BT-KPI-001): o metadado delas pode ter a chave de idempotência com o
+  ID do usuário, IDs de deck e de nota e o nome livre do arquétipo. É escrita em produção.
 - Prazo de retenção de analytics (`activation_funnel_events`), replays e simulações,
   notificações e feedback de IA.
 - Prazo de retenção de trocas e registros de moderação mantidos depois da exclusão, e base legal
