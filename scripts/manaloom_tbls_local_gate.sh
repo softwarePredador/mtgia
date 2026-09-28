@@ -110,6 +110,19 @@ psql -X -v ON_ERROR_STOP=1 \
     "$DART_BIN" run bin/migrate.dart
 ) >"$RUN_DIR/migrate.log" 2>&1
 
+# BT-DB-003: ensaio de upgrade e de rollback por restore do mesmo dump nos
+# perfis canônico, deriva conhecida da produção e misto. Cada ensaio sobe o
+# próprio PostgreSQL 17 descartável e o apaga no fim.
+if ! MANALOOM_DART_BIN="$DART_BIN" \
+  MANALOOM_APPROVE_DISPOSABLE_POSTGRES="$APPROVAL_PHRASE" \
+  RUN_SCHEMA_DB_TESTS=1 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
+  >"$RUN_DIR/migration-rehearsal.log" 2>&1; then
+  tail -80 "$RUN_DIR/migration-rehearsal.log" >&2
+  exit 1
+fi
+
 if ! (
   cd "$ROOT_DIR/server"
   DB_HOST=127.0.0.1 \

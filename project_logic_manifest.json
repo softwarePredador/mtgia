@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "d76c5f01dd33162bc9b38efe4149d220ad93f662f5566d96eb4c1b0ce331b55f",
+  "source_digest_sha256": "c7200927cc0344ecb7981d9489906a36ba094132873cae15f5ba511727549fc3",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 700,
+    "dart_source_files": 701,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5290,
-    "semantic_resolved_files": 700,
+    "dart_symbols": 5298,
+    "semantic_resolved_files": 701,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43088,
-    "semantic_resolved_call_sites": 68508,
-    "semantic_resolved_type_references": 16317,
-    "modules": 160,
+    "semantic_resolved_call_edges": 43111,
+    "semantic_resolved_call_sites": 68553,
+    "semantic_resolved_type_references": 16340,
+    "modules": 161,
     "app_routes": 46,
     "web_routes": 11,
     "api_routes": 121,
     "database_tables": 80,
     "database_views": 6,
     "migrations": 64,
-    "scripts_and_jobs": 698,
+    "scripts_and_jobs": 699,
     "environment_variables": 717,
-    "tests": 1270,
+    "tests": 1273,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 245,
@@ -638,7 +638,7 @@
         "server/bin/verify_schema.dart"
       ],
       "file_count": 65,
-      "symbol_count": 686,
+      "symbol_count": 688,
       "providers": [],
       "services": []
     },
@@ -1742,6 +1742,17 @@
       ],
       "file_count": 12,
       "symbol_count": 182,
+      "providers": [],
+      "services": []
+    },
+    {
+      "id": "server/lib/migration_preflight",
+      "layer": "server",
+      "files": [
+        "server/lib/migration_preflight.dart"
+      ],
+      "file_count": 1,
+      "symbol_count": 6,
       "providers": [],
       "services": []
     },
@@ -19849,7 +19860,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 6352,
+      "line": 6362,
       "members": [
         "fullName"
       ]
@@ -19858,49 +19869,61 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 6416
+      "line": 6426
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6461
+      "line": 6471
+    },
+    {
+      "name": "_printPreflightRefusal",
+      "kind": "function",
+      "source": "server/bin/migrate.dart",
+      "line": 6520
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6372
+      "line": 6382
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6368
+      "line": 6378
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6376
+      "line": 6386
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6505
+      "line": 6530
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6383
+      "line": 6393
+    },
+    {
+      "name": "migrationIdentities",
+      "kind": "function",
+      "source": "server/bin/migrate.dart",
+      "line": 6515
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 6418
+      "line": 6428
     },
     {
       "name": "_assertPostMigration",
@@ -36177,6 +36200,46 @@
       "line": 127
     },
     {
+      "name": "MigrationLedgerState",
+      "kind": "class",
+      "source": "server/lib/migration_preflight.dart",
+      "line": 34
+    },
+    {
+      "name": "MigrationPreflightResult",
+      "kind": "class",
+      "source": "server/lib/migration_preflight.dart",
+      "line": 48,
+      "members": [
+        "accepted",
+        "toJson"
+      ]
+    },
+    {
+      "name": "MigrationSourceProfile",
+      "kind": "enum",
+      "source": "server/lib/migration_preflight.dart",
+      "line": 3
+    },
+    {
+      "name": "classifyMigrationSource",
+      "kind": "function",
+      "source": "server/lib/migration_preflight.dart",
+      "line": 87
+    },
+    {
+      "name": "readMigrationLedgerState",
+      "kind": "function",
+      "source": "server/lib/migration_preflight.dart",
+      "line": 172
+    },
+    {
+      "name": "runMigrationPreflight",
+      "kind": "function",
+      "source": "server/lib/migration_preflight.dart",
+      "line": 204
+    },
+    {
       "name": "ArchetypePattern",
       "kind": "class",
       "source": "server/lib/ml_knowledge_service.dart",
@@ -41059,7 +41122,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 700,
+    "resolved_file_count": 701,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41588,6 +41651,7 @@
       "server/lib/meta/meta_deck_format_support.dart",
       "server/lib/meta/meta_deck_reference_support.dart",
       "server/lib/meta/mtgtop8_meta_support.dart",
+      "server/lib/migration_preflight.dart",
       "server/lib/ml_knowledge_service.dart",
       "server/lib/mtg_data_integrity_support.dart",
       "server/lib/notification_service.dart",
@@ -41768,9 +41832,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43088,
-    "resolved_call_site_count": 68508,
-    "workspace_call_edge_count": 13501,
+    "resolved_call_edge_count": 43111,
+    "resolved_call_site_count": 68553,
+    "workspace_call_edge_count": 13508,
     "unresolved_call_edge_count": 560,
     "unresolved_call_site_count": 771,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -113915,7 +113979,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 26,
+        "line": 36,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "Migration",
@@ -113926,7 +113990,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6397,
+        "line": 6407,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -113937,7 +114001,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6462,
+        "line": 6472,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -113948,7 +114012,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6524,
+        "line": 6569,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -113959,7 +114023,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6525,
+        "line": 6570,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -113970,7 +114034,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6536,
+        "line": 6581,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -113981,7 +114045,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6539,
+        "line": 6584,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -113992,7 +114056,51 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6638,
+        "line": 6613,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "runMigrationPreflight",
+        "target": "runMigrationPreflight",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/bin/migrate.dart",
+        "line": 6615,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "migrationIdentities",
+        "target": "migrationIdentities",
+        "target_library": "workspace:server/bin/migrate.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/bin/migrate.dart",
+        "line": 6617,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "MigrationPreflightResult.toJson",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/migrate.dart",
+        "line": 6660,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_printPreflightRefusal",
+        "target": "_printPreflightRefusal",
+        "target_library": "workspace:server/bin/migrate.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/bin/migrate.dart",
+        "line": 6702,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -114003,7 +114111,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6639,
+        "line": 6703,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -164184,6 +164292,39 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 158,
+        "caller": "classifyMigrationSource",
+        "kind": "constructor",
+        "lexical_target": "MigrationPreflightResult",
+        "target": "MigrationPreflightResult.MigrationPreflightResult",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 201,
+        "caller": "readMigrationLedgerState",
+        "kind": "constructor",
+        "lexical_target": "MigrationLedgerState",
+        "target": "MigrationLedgerState.MigrationLedgerState",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 213,
+        "caller": "runMigrationPreflight",
+        "kind": "method",
+        "lexical_target": "classifyMigrationSource",
+        "target": "classifyMigrationSource",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/lib/ml_knowledge_service.dart",
         "line": 101,
         "caller": "MLKnowledgeService._getArchetypePattern",
@@ -190309,14 +190450,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 593,
-        "occurrences": 739
+        "unique_references": 594,
+        "occurrences": 740
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14359,
-        "occurrences": 24940
+        "unique_references": 14370,
+        "occurrences": 24963
       },
       {
         "target_scope": "dart_sdk",
@@ -190327,8 +190468,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 406,
-        "occurrences": 654
+        "unique_references": 407,
+        "occurrences": 657
       },
       {
         "target_scope": "dart_sdk",
@@ -191677,8 +191818,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1193,
-        "occurrences": 1917
+        "unique_references": 1196,
+        "occurrences": 1923
       },
       {
         "target_scope": "dependency",
@@ -194508,6 +194649,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/migration_preflight.dart",
+        "unique_references": 5,
+        "occurrences": 7
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/ml_knowledge_service.dart",
         "unique_references": 19,
         "occurrences": 24
@@ -194893,8 +195040,8 @@
       {
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
-        "unique_references": 8,
-        "occurrences": 71
+        "unique_references": 10,
+        "occurrences": 76
       },
       {
         "target_scope": "workspace",
@@ -200003,8 +200150,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16317,
-    "workspace_type_reference_count": 3451,
+    "resolved_type_reference_count": 16340,
+    "workspace_type_reference_count": 3457,
     "unresolved_type_reference_count": 357,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -222210,7 +222357,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 25,
+        "line": 35,
         "lexical_type": "Migration",
         "resolved_type": "Migration",
         "target": "Migration",
@@ -222220,11 +222367,31 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6418,
+        "line": 6428,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
         "target_library": "workspace:server/bin/migrate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/migrate.dart",
+        "line": 6515,
+        "lexical_type": "MigrationIdentity",
+        "resolved_type": "({String name, String version})",
+        "target": "MigrationIdentity",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/migrate.dart",
+        "line": 6520,
+        "lexical_type": "MigrationPreflightResult",
+        "resolved_type": "MigrationPreflightResult",
+        "target": "MigrationPreflightResult",
+        "target_library": "package:server/migration_preflight.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -230759,6 +230926,46 @@
         "occurrences": 1
       },
       {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 42,
+        "lexical_type": "MigrationIdentity",
+        "resolved_type": "({String name, String version})",
+        "target": "MigrationIdentity",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 59,
+        "lexical_type": "MigrationSourceProfile",
+        "resolved_type": "MigrationSourceProfile",
+        "target": "MigrationSourceProfile",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 88,
+        "lexical_type": "MigrationPreflightResult",
+        "resolved_type": "MigrationPreflightResult",
+        "target": "MigrationPreflightResult",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/migration_preflight.dart",
+        "line": 90,
+        "lexical_type": "MigrationLedgerState",
+        "resolved_type": "MigrationLedgerState",
+        "target": "MigrationLedgerState",
+        "target_library": "package:server/migration_preflight.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
         "source": "server/lib/ml_knowledge_service.dart",
         "line": 118,
         "lexical_type": "SynergyPackage",
@@ -234529,8 +234736,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1090,
-        "occurrences": 2201
+        "unique_references": 1092,
+        "occurrences": 2203
       },
       {
         "target_scope": "dart_sdk",
@@ -234547,8 +234754,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6296,
-        "occurrences": 39933
+        "unique_references": 6308,
+        "occurrences": 39965
       },
       {
         "target_scope": "dart_sdk",
@@ -235867,8 +236074,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 258,
-        "occurrences": 924
+        "unique_references": 261,
+        "occurrences": 927
       },
       {
         "target_scope": "dependency",
@@ -238170,6 +238377,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:server/migration_preflight.dart",
+        "unique_references": 6,
+        "occurrences": 12
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:server/ml_knowledge_service.dart",
         "unique_references": 8,
         "occurrences": 21
@@ -239720,9 +239933,9 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 6461,
+        "line": 6471,
         "lexical_type": "void",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "source": "server/bin/migration_038_040_isolated_support.dart",
@@ -265504,6 +265717,16 @@
       ]
     },
     {
+      "path": "scripts/manaloom_migration_rehearsal.py",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "MANALOOM_APPROVE_DISPOSABLE_POSTGRES",
+        "MANALOOM_DART_BIN",
+        "MANALOOM_PG17_BIN"
+      ]
+    },
+    {
       "path": "scripts/manaloom_migrations_038_040_isolated.sh",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -269490,6 +269713,7 @@
       "name": "MANALOOM_APPROVE_DISPOSABLE_POSTGRES",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_migration_rehearsal.py",
         "scripts/manaloom_schema_audit.sh",
         "scripts/manaloom_tbls_local_gate.sh"
       ],
@@ -270310,6 +270534,7 @@
         "scripts/manaloom_binder_import_visual_qa.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
         "scripts/manaloom_deck_workshop_visual_qa.sh",
+        "scripts/manaloom_migration_rehearsal.py",
         "scripts/manaloom_onboarding_intent_visual_qa.sh",
         "scripts/manaloom_social_trade_visual_qa.sh",
         "scripts/manaloom_visual_system_workspace_qa.sh",
@@ -271721,6 +271946,7 @@
       "name": "MANALOOM_PG17_BIN",
       "classification": "configuration",
       "sources": [
+        "scripts/manaloom_migration_rehearsal.py",
         "scripts/manaloom_schema_audit.sh"
       ],
       "value_captured": false
@@ -275385,6 +275611,9 @@
     "server/test/meta_deck_format_support_test.dart",
     "server/test/meta_deck_reference_support_test.dart",
     "server/test/migration_038_040_isolated_harness_contract_test.dart",
+    "server/test/migration_preflight_test.dart",
+    "server/test/migration_rehearsal_db_live_test.py",
+    "server/test/migration_rehearsal_test.py",
     "server/test/migration_sql_literal_test.dart",
     "server/test/ml_analyzer_test.dart",
     "server/test/mobile_release_contract_test.dart",
@@ -276355,7 +276584,9 @@
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_migration_rehearsal.py",
         "server/bin/migrate.dart",
+        "server/lib/migration_preflight.dart",
         "server/lib/health_readiness_support.dart",
         "server/routes/_middleware.dart",
         "server/lib/release_capability_policy.dart",
@@ -276371,6 +276602,8 @@
         "server/test/ops_sidecar_digest_release_contract_test.dart",
         "server/test/release_sbom_scope_test.py",
         "server/test/backup_cadence_test.py",
+        "server/test/migration_preflight_test.dart",
+        "server/test/migration_rehearsal_test.py",
         "server/test/flutter_web_deploy_contract_test.dart",
         "server/test/data_model_migration_test.dart",
         "server/test/active_user_trigger_rule_test.dart",
@@ -276858,7 +277091,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "47b50bfc0c1c0518f310876f88567ed426398bb9046c285469802a5da1151632"
+      "sha256": "0d1f61b2f9c20a6a3952019535c77b2ded587715392e5ab0d6e4c2784a96931f"
     },
     "required_task_fields": [
       "id",
@@ -279471,24 +279704,24 @@
       {
         "id": "BT-DB-002",
         "priority": "P0 CORE",
-        "status": "BLOCKED_BY_P0",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Próxima migration preservadora — `059` somente se ainda for o próximo número.",
         "depends_on": [
           "BT-DB-001"
         ],
-        "acceptance": "Perfis de origem fechados, preflight antes de DDL, payload preservado, postcheck exato.",
+        "acceptance": "Perfis de origem fechados, preflight antes de DDL, payload preservado, postcheck exato. Reconciliada em 2026-09-28 (Frente C): o número ficou obsoleto. A `059` foi a D-66 (chave de `trade_items.owner_id`, rodada 2 da privacidade), as seguintes já estão tomadas pelas frentes, e o conteúdo que a D-48 dava à 059 (as 7 tabelas que o código usa e as colunas divergentes) ficou com o `BT-DB-005`. A disciplina do aceite não existia no runner e entrou junto com o `BT-DB-003`, na branch `banco/rodada1-2026-09-24`, para toda migration: preflight de perfil antes de qualquer DDL, inclusive antes de criar `schema_migrations` (`server/lib/migration_preflight.dart`: `sem_ledger`, `canonico` ou `misto`; o misto para o runner com código 3 sem escrever), sem perfil de live-drift no runner (D-48), e payload tabela a tabela e pós-checagem exata do catálogo inteiro no ensaio `scripts/manaloom_migration_rehearsal.py`, contra a lista fechada da deriva. Evidência no receipt do `BT-DB-003` (`docs/qa/execution/2026-09-28/BT-DB-003-ensaio-de-upgrade.md`).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 666
       },
       {
         "id": "BT-DB-003",
         "priority": "P0 CORE",
-        "status": "BLOCKED_BY_P0",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Upgrade/rollback por restore do mesmo dump e testes de profile misto.",
         "depends_on": [
           "BT-DB-002"
         ],
-        "acceptance": "Canonical e live-drift suportados explicitamente; perfil misto falha antes de DDL.",
+        "acceptance": "Canonical e live-drift suportados explicitamente; perfil misto falha antes de DDL. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção e sem migration nova. Runner: o preflight classifica o banco pelo ledger antes de qualquer DDL, na aplicação e no rollback; `dart bin/migrate.dart --preflight` só lê, e `--target VERSÃO` aplica até a versão. Ensaio: `scripts/manaloom_migration_rehearsal.py` sobe um PostgreSQL 17 descartável (loopback, sem socket, `sandbox-exec`), restaura o dump duas vezes (modo `estrutura`, só estrutura e ledger, ou `completo`), roda o preflight (misto para sem DDL e com o banco igual), o banco novo, o upgrade, a pós-checagem do catálogo inteiro (schemas, extensões, tabelas, colunas, restrições, chaves, índices, views, funções, gatilhos, sequências, enums e ledger) contra o banco novo com a lista fechada `server/config/schema_drift_allowlist.json` (94 itens da auditoria BT-DB-001 menos o que a 058, a 059 e a 063 a 065 reconciliam, cada um com a decisão que o tira; proposta pendente do dono), o payload por tabela, a reaplicação, o rollback pelo restore do mesmo dump (idêntico ao de antes) e o reforward (igual ao upgrade). Evidência (`docs/qa/execution/2026-09-28/BT-DB-003-ensaio-de-upgrade.md`): `server/test/migration_preflight_test.dart` (10), `server/test/migration_rehearsal_test.py` (9) e `server/test/migration_rehearsal_db_live_test.py` (5, `RUN_SCHEMA_DB_TESTS=1`, ligado no gate de schema): o canônico (o bootstrap da produção em 41bab49c9 com as migrations até a 058) chega ao banco novo sem nenhuma diferença, com payload, rollback e reforward iguais; o live-drift (o canônico com a deriva publicada pela BT-DB-001) deixa só a lista fechada (186 diferenças, nenhuma inesperada); quatro perfis mistos param com código 3 e o banco intacto; 14 mutações falham como esperado. Segue aberto: o dono aprovar a lista fechada; o ensaio com a forma real da produção e o código integrado antes do lote (o roteiro da coordenação roda com o dump novo, no modo completo).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 667
       },
@@ -286354,9 +286587,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286376,9 +286611,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286398,9 +286635,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286420,9 +286659,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286442,9 +286683,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286464,9 +286707,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286486,9 +286731,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286508,9 +286755,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286530,9 +286779,11 @@
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_migration_rehearsal.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
+          "server/lib/migration_preflight.dart",
           "server/lib/release_capability_policy.dart",
           "server/routes/_middleware.dart",
           "server/routes/capabilities/index.dart"
@@ -286781,7 +287032,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "d76c5f01dd33162bc9b38efe4149d220ad93f662f5566d96eb4c1b0ce331b55f"
+    "project_logic_source_digest_sha256": "c7200927cc0344ecb7981d9489906a36ba094132873cae15f5ba511727549fc3"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -288948,6 +289199,7 @@
       "scripts/manaloom_install_remote_backup_cron.sh",
       "scripts/manaloom_live_credential_audit.py",
       "scripts/manaloom_local_ci.sh",
+      "scripts/manaloom_migration_rehearsal.py",
       "scripts/manaloom_migrations_038_040_isolated.sh",
       "scripts/manaloom_mobile_authenticated_qa.sh",
       "scripts/manaloom_offsite_backup.sh",
@@ -289372,6 +289624,7 @@
       "server/lib/meta/meta_deck_format_support.dart",
       "server/lib/meta/meta_deck_reference_support.dart",
       "server/lib/meta/mtgtop8_meta_support.dart",
+      "server/lib/migration_preflight.dart",
       "server/lib/ml_knowledge_service.dart",
       "server/lib/mtg_data_integrity_support.dart",
       "server/lib/notification_service.dart",
@@ -289822,6 +290075,9 @@
       "server/test/meta_deck_format_support_test.dart",
       "server/test/meta_deck_reference_support_test.dart",
       "server/test/migration_038_040_isolated_harness_contract_test.dart",
+      "server/test/migration_preflight_test.dart",
+      "server/test/migration_rehearsal_db_live_test.py",
+      "server/test/migration_rehearsal_test.py",
       "server/test/migration_sql_literal_test.dart",
       "server/test/ml_analyzer_test.dart",
       "server/test/mobile_release_contract_test.dart",

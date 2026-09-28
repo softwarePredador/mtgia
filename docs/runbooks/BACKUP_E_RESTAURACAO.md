@@ -52,6 +52,9 @@ tem de fixar o host, como em todo deploy.
 O ciclo sai com 0 quando tudo passa e com 3 quando a cadência não fecha; 1 e 2 são falha do
 backup ou do ensaio e entrada recusada. Qualquer código diferente de 0 para o lote.
 
+Com o ciclo em 0, o passo seguinte do lote, ainda antes da migration, é o ensaio do upgrade
+com o dump novo (`docs/runbooks/ENSAIO_DE_UPGRADE.md`, modo `completo`).
+
 ## Receipt
 
 Cada ciclo grava `<dir>/receipts/<carimbo>.json` com:

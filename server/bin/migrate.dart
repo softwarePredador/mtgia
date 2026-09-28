@@ -1,7 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:postgres/postgres.dart';
+import 'package:server/migration_preflight.dart';
 import 'package:server/runtime_environment.dart';
 import 'package:server/sql_statement_splitter.dart';
 
@@ -10,11 +12,19 @@ import 'package:server/sql_statement_splitter.dart';
 /// Gerencia migrações de banco de dados de forma ordenada e idempotente.
 /// Cada migração é executada apenas uma vez e registrada na tabela `schema_migrations`.
 ///
-/// Uso: dart run bin/migrate.dart [--status] [--rollback N]
+/// Uso: dart run bin/migrate.dart [--status | --preflight | --rollback N |
+///        --target VERSÃO]
 ///
 /// Opções:
 ///   --status    Mostra o status das migrações
+///   --preflight Só lê: classifica o banco (sem_ledger, canonico ou misto) e
+///               imprime o resultado em JSON; sai 3 quando o perfil é misto
 ///   --rollback N  Reverte, em transação, as últimas N migrações conhecidas
+///   --target VERSÃO  Aplica as pendentes só até essa versão (ensaios)
+///
+/// Antes de qualquer DDL, a aplicação e o rollback rodam o preflight
+/// (lib/migration_preflight.dart): um banco de perfil misto para ali, com
+/// código 3, sem escrever nada.
 
 const migrationWriteApprovalEnvironment = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
 const migrationLiveApprovalEnvironment = 'MANALOOM_CONFIRM_LIVE_MUTATIONS';
@@ -6502,9 +6512,43 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
   }
 }
 
+List<MigrationIdentity> migrationIdentities() => [
+  for (final migration in migrations)
+    (version: migration.version, name: migration.name),
+];
+
+void _printPreflightRefusal(MigrationPreflightResult preflight) {
+  stderr.writeln(
+    'BLOCKED: perfil de origem misto; nada foi escrito. '
+    'Recrie o banco ou reconcilie o ledger antes de migrar:',
+  );
+  for (final reason in preflight.reasons) {
+    stderr.writeln('  - $reason');
+  }
+}
+
 void main(List<String> args) async {
   final showStatus = args.contains('--status');
+  final showPreflight = args.contains('--preflight');
   final rollbackRequested = args.contains('--rollback');
+  String? targetVersion;
+  if (args.contains('--target')) {
+    final targetIndex = args.indexOf('--target');
+    targetVersion =
+        targetIndex + 1 < args.length ? args[targetIndex + 1] : null;
+    if (targetVersion == null ||
+        showStatus ||
+        showPreflight ||
+        rollbackRequested ||
+        !migrations.any((item) => item.version == targetVersion)) {
+      stderr.writeln(
+        'Uso inválido: --target exige uma versão desta lista e não combina '
+        'com --status, --preflight ou --rollback. Nenhuma conexão foi aberta.',
+      );
+      exitCode = 2;
+      return;
+    }
+  }
   int? rollbackCount;
   if (rollbackRequested) {
     final rollbackIndex = args.indexOf('--rollback');
@@ -6520,7 +6564,8 @@ void main(List<String> args) async {
     }
   }
 
-  if (!showStatus &&
+  final readOnlyRequested = showStatus || showPreflight;
+  if (!readOnlyRequested &&
       (!hasMigrationWriteApproval(Platform.environment) ||
           !hasMigrationLiveApproval(Platform.environment))) {
     stderr.writeln(
@@ -6542,7 +6587,7 @@ void main(List<String> args) async {
         if (env[key] case final value?) key: value,
     },
     callerEnvironment: Platform.environment,
-    writeRequested: !showStatus,
+    writeRequested: !readOnlyRequested,
   );
   if (destinationViolation != null) {
     stderr.writeln(
@@ -6564,6 +6609,16 @@ void main(List<String> args) async {
   );
 
   try {
+    if (showPreflight) {
+      final preflight = await runMigrationPreflight(
+        connection,
+        migrationIdentities(),
+      );
+      print(jsonEncode(preflight.toJson()));
+      if (!preflight.accepted) exitCode = 3;
+      return;
+    }
+
     if (showStatus) {
       Set<String> executedVersions;
       try {
@@ -6597,6 +6652,15 @@ void main(List<String> args) async {
     }
 
     if (rollbackRequested) {
+      final preflight = await runMigrationPreflight(
+        connection,
+        migrationIdentities(),
+      );
+      if (!preflight.accepted) {
+        _printPreflightRefusal(preflight);
+        exitCode = 3;
+        return;
+      }
       final executedResult = await connection.execute(
         Sql.named('''
           SELECT version, name
@@ -6652,7 +6716,19 @@ void main(List<String> args) async {
     }
 
     // Apply mode only. Reaching this branch requires the explicit textual
-    // PostgreSQL approval check above, before Connection.open.
+    // PostgreSQL approval check above, before Connection.open. O preflight
+    // vem antes de qualquer DDL, inclusive a criação de schema_migrations.
+    final preflight = await runMigrationPreflight(
+      connection,
+      migrationIdentities(),
+    );
+    if (!preflight.accepted) {
+      _printPreflightRefusal(preflight);
+      exitCode = 3;
+      return;
+    }
+    print('🔎 Preflight: perfil ${preflight.profile.code}');
+
     await connection.execute('''
       CREATE TABLE IF NOT EXISTS schema_migrations (
         version TEXT PRIMARY KEY,
@@ -6671,6 +6747,11 @@ void main(List<String> args) async {
     var migratedCount = 0;
 
     for (final migration in migrations) {
+      if (targetVersion != null &&
+          migration.version.compareTo(targetVersion) > 0) {
+        print('⏹️  Parando na $targetVersion (--target).');
+        break;
+      }
       if (executedVersions.contains(migration.version)) {
         print('⏭️  ${migration.fullName} (já executada)');
         continue;

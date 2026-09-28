@@ -1,0 +1,705 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-schema-drift-allowlist",
+  "version": "2026-09-28.1",
+  "task": "BT-DB-003",
+  "status": "proposta_pendente_do_dono",
+  "fonte": "docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.saida.json",
+  "regra": "Lista fechada da deriva aceita da produção depois do upgrade. O ensaio (scripts/manaloom_migration_rehearsal.py) falha em qualquer diferença contra o banco novo que não esteja aqui. Uma entrada de schema ou de tabela sobrando cobre também o que está dentro dela. Tirar a entrada quando a decisão ou a tarefa fechar.",
+  "reconciliado_pelas_migrations": {
+    "058": "as 4 colunas de snapshot de trade_items e o ledger (BT-REL-000)",
+    "059": "public.trade_items: FOREIGN KEY (owner_id) REFERENCES users(id) (D-66)",
+    "063": "public.commander_learning_snapshot (D-65)",
+    "064": [
+      "card_rulings_pkey1",
+      "idx_card_battle_rules_name_rule_key",
+      "unique_card_insight",
+      "uq_conversation",
+      "uq_conversation_pair"
+    ],
+    "065": [
+      "idx_binder_marketplace_available_created",
+      "idx_binder_user_list_name_filters",
+      "idx_cards_colors",
+      "idx_cards_lower_name",
+      "idx_conversations_user_a_last",
+      "idx_conversations_user_b_last",
+      "idx_deck_cards_card_id",
+      "idx_decks_format",
+      "idx_direct_messages_conversation_created",
+      "idx_direct_messages_unread_by_conversation",
+      "idx_notifications_user_created",
+      "idx_notifications_user_unread_created",
+      "idx_trade_history_offer_created",
+      "idx_trade_items_offer_direction",
+      "idx_trade_messages_offer_created",
+      "idx_trade_offers_receiver_status_updated",
+      "idx_trade_offers_receiver_updated",
+      "idx_trade_offers_sender_status_updated",
+      "idx_trade_offers_sender_updated",
+      "idx_users_email",
+      "idx_users_username"
+    ]
+  },
+  "itens": [
+    {
+      "categoria": "schemas",
+      "tipo": "sobrando",
+      "objeto": "manaloom_deploy_audit",
+      "motivo": "schema de auditoria dos pacotes aplicados à mão (1.033 tabelas); exportar para o arquivo cifrado e apagar depois do backup, com aprovação por execução",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.analysis_sources",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.archetype_patterns",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_battle_rules_backup_pg780b_hash_new_server",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_battle_rules_backup_pg814_hash_new_server",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_deck_profiles",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_extended",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_rulings_legacy",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.ml_learning_state",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.optimization_analysis_logs",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg252_manual_runtime_waiver_promotions_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg253_existing_focused_runtime_rule_promotions_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg254_blink_static_legacy_runtime_promotions_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg255_fast_mana_runtime_promotions_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg256_treasonous_ogre_life_payment_mana_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg257_phyrexian_censor_static_runtime_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg596b_oracle_hash_backfill_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.posts",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.search_subjects",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.synergy_packages",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.theme_contextual_rules",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "faltando",
+      "objeto": "public.card_meta_insights.created_at",
+      "motivo": "coluna da migration que a produção não tem; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "sobrando",
+      "objeto": "public.card_meta_insights.id",
+      "motivo": "coluna só da produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "sobrando",
+      "objeto": "public.cards.edhrec_rank",
+      "motivo": "coluna só da produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "sobrando",
+      "objeto": "public.ml_prompt_feedback.user_rating",
+      "motivo": "coluna só da produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.battle_simulations.simulation_type",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.common_archetypes",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.common_formats",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.last_updated_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.meta_deck_count",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.top_pairs",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.usage_count",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.versatility_score",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.commander_learned_decks.created_at",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.commander_learned_decks.updated_at",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.conversations.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.direct_messages.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.archetype",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.cards_accepted",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.cards_rejected",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.prompt_version",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.notifications.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_messages.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_offers.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_offers.payment_currency",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_offers.updated_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_status_history.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.currency",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.for_sale",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.for_trade",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.is_foil",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.language",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.list_type",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.updated_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.users.location_city",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.users.location_state",
+      "motivo": "tipo, default ou nulidade diferente na produção; reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "views",
+      "tipo": "divergente",
+      "objeto": "public.binder_item_availability",
+      "motivo": "o texto difere só pelo cast de user_binder_items.list_type, varchar(4) na produção; some quando a coluna for reconciliada",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "views",
+      "tipo": "divergente",
+      "objeto": "public.collection_availability_snapshot",
+      "motivo": "o texto difere só pelo cast de user_binder_items.list_type, varchar(4) na produção; some quando a coluna for reconciliada",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "restricoes",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.user_binder_items_list_type_check",
+      "motivo": "inferido da coluna: o texto difere só pelo cast de list_type, varchar(4) na produção (a auditoria da BT-DB-001 não lê CHECK); some quando a coluna for reconciliada",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "faltando",
+      "objeto": "public.ml_prompt_feedback: FOREIGN KEY (deck_id) REFERENCES decks(id)",
+      "motivo": "chave que falta na produção; contar os órfãos, criar como NOT VALID e validar, com aprovação por execução",
+      "decisao": "D-50"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "faltando",
+      "objeto": "public.ml_prompt_feedback: FOREIGN KEY (user_id) REFERENCES users(id)",
+      "motivo": "chave que falta na produção; contar os órfãos, criar como NOT VALID e validar, com aprovação por execução",
+      "decisao": "D-50"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "divergente",
+      "objeto": "public.direct_messages: FOREIGN KEY (sender_id) REFERENCES users(id)",
+      "motivo": "RESTRICT na migration e sem ação na produção; alinhar como a 059 fez com trade_items (pendente de decisão)",
+      "decisao": "pendente: BT-DB-005"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "divergente",
+      "objeto": "public.trade_messages: FOREIGN KEY (sender_id) REFERENCES users(id)",
+      "motivo": "RESTRICT na migration e sem ação na produção; alinhar como a 059 fez com trade_items (pendente de decisão)",
+      "decisao": "pendente: BT-DB-005"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "divergente",
+      "objeto": "public.trade_status_history: FOREIGN KEY (changed_by) REFERENCES users(id)",
+      "motivo": "RESTRICT na migration e sem ação na produção; alinhar como a 059 fez com trade_items (pendente de decisão)",
+      "decisao": "pendente: BT-DB-005"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "faltando",
+      "objeto": "public.idx_ml_prompt_feedback_archetype_created",
+      "motivo": "índice da migration que a produção não tem; criar pela migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "faltando",
+      "objeto": "public.idx_ml_prompt_feedback_deck_created",
+      "motivo": "índice da migration que a produção não tem; criar pela migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "faltando",
+      "objeto": "public.idx_ml_prompt_feedback_user_created",
+      "motivo": "índice da migration que a produção não tem; criar pela migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights_pkey",
+      "motivo": "definição diferente na produção (chave primária trocada ou tabela renomeada); reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "divergente",
+      "objeto": "public.card_rulings_pkey",
+      "motivo": "definição diferente na produção (chave primária trocada ou tabela renomeada); reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "divergente",
+      "objeto": "public.idx_trade_history_offer",
+      "motivo": "definição diferente na produção (chave primária trocada ou tabela renomeada); reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "divergente",
+      "objeto": "public.idx_trade_messages_offer",
+      "motivo": "definição diferente na produção (chave primária trocada ou tabela renomeada); reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_battle_simulations_created_at",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_battle_simulations_deck_a_id",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_battle_simulations_deck_b_id",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_battle_simulations_winner_deck_id",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_binder_list_type",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_card_legalities_card_id",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_card_legalities_format",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_card_legalities_status",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_cards_collector_set",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_cards_set_code",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_deck_cards_is_commander",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_deck_matchups_deck_id",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_deck_matchups_opponent_deck_id",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_deck_matchups_win_rate",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_decks_created_at",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_decks_is_public",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_decks_user_public",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_meta_decks_commander_name",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_meta_decks_partner_commander_name",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_users_display_name_lower",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.idx_users_username_lower",
+      "motivo": "índice só da produção fora do database_indexes.sql; proposta da 066, retirada até a decisão do dono",
+      "decisao": "pendente: BT-DB-004 (066)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.uq_binder_user_card_cond_foil_list",
+      "motivo": "UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); não adotado pela 064",
+      "decisao": "pendente: BT-DB-004"
+    }
+  ],
+  "payload": []
+}

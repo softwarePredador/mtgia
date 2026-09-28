@@ -203,6 +203,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
+    "$ROOT_DIR/scripts/manaloom_migration_rehearsal.py" \
     "$ROOT_DIR/scripts/manaloom_osv_scan_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_read_env.py" \
     "$ROOT_DIR/scripts/manaloom_validate_production_origins.py" \
@@ -210,10 +211,14 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/bin/manaloom_slo_alerts.py" \
     "$ROOT_DIR/server/test/card_cli_schema_guard_test.py" \
     "$ROOT_DIR/server/test/backup_cadence_test.py" \
+    "$ROOT_DIR/server/test/backup_cycle_db_live_test.py" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
+    "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
+    "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
-    "$ROOT_DIR/server/test/slo_alerts_test.py"
+    "$ROOT_DIR/server/test/slo_alerts_test.py" \
+    "$ROOT_DIR/server/test/support/production_drift_fixture.py"
 
 # BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
 # conferem o schema do PostgreSQL e param; não o alteram.
@@ -224,6 +229,9 @@ PYTHONDONTWRITEBYTECODE=1 \
 # BT-DR-001: cadência do backup local e do ensaio de restauração isolado.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/backup_cadence_test.py"
+# BT-DB-003: catálogo, lista fechada da deriva e payload do ensaio de upgrade.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/migration_rehearsal_test.py"
 # BT-CAP-001: política de capacidade, snapshot só de leitura e preflight.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/capacity_policy_test.py"
