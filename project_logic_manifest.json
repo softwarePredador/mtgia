@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "b3d0f380a28112f5115f79d20a18e41d4a94bc7f03d8c0c3f2655e07fd80f570",
+  "source_digest_sha256": "a430dfd2dd236e9391346a481f273a3b2ed0820bf510f5f0917d45e9f8ae2bdd",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -66,12 +66,12 @@
     "dart_source_files": 702,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5331,
+    "dart_symbols": 5333,
     "semantic_resolved_files": 702,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43111,
-    "semantic_resolved_call_sites": 68365,
-    "semantic_resolved_type_references": 16380,
+    "semantic_resolved_call_edges": 43120,
+    "semantic_resolved_call_sites": 68377,
+    "semantic_resolved_type_references": 16382,
     "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 62,
     "scripts_and_jobs": 695,
     "environment_variables": 717,
-    "tests": 1269,
+    "tests": 1271,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -2168,7 +2168,7 @@
         "server/routes/ai/simulate/index.dart"
       ],
       "file_count": 20,
-      "symbol_count": 185,
+      "symbol_count": 187,
       "providers": [],
       "services": []
     },
@@ -39374,10 +39374,22 @@
       "line": 116
     },
     {
+      "name": "_deckNotFound",
+      "kind": "function",
+      "source": "server/routes/ai/optimize/jobs/[id].dart",
+      "line": 102
+    },
+    {
+      "name": "_latest",
+      "kind": "function",
+      "source": "server/routes/ai/optimize/jobs/[id].dart",
+      "line": 107
+    },
+    {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/ai/optimize/jobs/[id].dart",
-      "line": 10
+      "line": 12
     },
     {
       "name": "_TelemetryQuery",
@@ -42071,9 +42083,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43111,
-    "resolved_call_site_count": 68365,
-    "workspace_call_edge_count": 13571,
+    "resolved_call_edge_count": 43120,
+    "resolved_call_site_count": 68377,
+    "workspace_call_edge_count": 13575,
     "unresolved_call_edge_count": 560,
     "unresolved_call_site_count": 776,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -179547,8 +179559,30 @@
       },
       {
         "source": "server/routes/ai/optimize/jobs/[id].dart",
-        "line": 40,
-        "caller": "onRequest",
+        "line": 117,
+        "caller": "_latest",
+        "kind": "method",
+        "lexical_target": "_deckNotFound",
+        "target": "_deckNotFound",
+        "target_library": "workspace:server/routes/ai/optimize/jobs/[id].dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/ai/optimize/jobs/[id].dart",
+        "line": 119,
+        "caller": "_latest",
+        "kind": "method",
+        "lexical_target": "verifyOptimizeDeckAccess",
+        "target": "verifyOptimizeDeckAccess",
+        "target_library": "package:server/ai/optimize_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/jobs/[id].dart",
+        "line": 129,
+        "caller": "_latest",
         "kind": "method",
         "lexical_target": "latestForUser",
         "target": "OptimizeJobStore.latestForUser",
@@ -179558,7 +179592,29 @@
       },
       {
         "source": "server/routes/ai/optimize/jobs/[id].dart",
-        "line": 48,
+        "line": 142,
+        "caller": "_latest",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "OptimizeJob.toJson",
+        "target_library": "package:server/ai/optimize_job.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/jobs/[id].dart",
+        "line": 49,
+        "caller": "onRequest",
+        "kind": "method",
+        "lexical_target": "_latest",
+        "target": "_latest",
+        "target_library": "workspace:server/routes/ai/optimize/jobs/[id].dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/ai/optimize/jobs/[id].dart",
+        "line": 53,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "cancel",
@@ -179569,7 +179625,7 @@
       },
       {
         "source": "server/routes/ai/optimize/jobs/[id].dart",
-        "line": 49,
+        "line": 54,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "get",
@@ -179580,7 +179636,7 @@
       },
       {
         "source": "server/routes/ai/optimize/jobs/[id].dart",
-        "line": 71,
+        "line": 76,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "toJson",
@@ -179591,7 +179647,7 @@
       },
       {
         "source": "server/routes/ai/optimize/jobs/[id].dart",
-        "line": 78,
+        "line": 83,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "e",
@@ -179602,7 +179658,7 @@
       },
       {
         "source": "server/routes/ai/optimize/jobs/[id].dart",
-        "line": 79,
+        "line": 84,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "captureRouteException",
@@ -191388,8 +191444,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14267,
-        "occurrences": 24580
+        "unique_references": 14270,
+        "occurrences": 24583
       },
       {
         "target_scope": "dart_sdk",
@@ -191496,8 +191552,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 496,
-        "occurrences": 968
+        "unique_references": 498,
+        "occurrences": 972
       },
       {
         "target_scope": "dependency",
@@ -194580,8 +194636,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimize_job.dart",
-        "unique_references": 29,
-        "occurrences": 46
+        "unique_references": 30,
+        "occurrences": 47
       },
       {
         "target_scope": "workspace",
@@ -194610,8 +194666,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimize_request_support.dart",
-        "unique_references": 12,
-        "occurrences": 13
+        "unique_references": 13,
+        "occurrences": 14
       },
       {
         "target_scope": "workspace",
@@ -196244,6 +196300,12 @@
         "target_library": "workspace:server/routes/ai/optimize/index.dart",
         "unique_references": 21,
         "occurrences": 57
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "workspace:server/routes/ai/optimize/jobs/[id].dart",
+        "unique_references": 2,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -201094,8 +201156,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16380,
-    "workspace_type_reference_count": 3499,
+    "resolved_type_reference_count": 16382,
+    "workspace_type_reference_count": 3500,
     "unresolved_type_reference_count": 364,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -234230,6 +234292,16 @@
         "occurrences": 1
       },
       {
+        "source": "server/routes/ai/optimize/jobs/[id].dart",
+        "line": 124,
+        "lexical_type": "OptimizeDeckContextException",
+        "resolved_type": "OptimizeDeckContextException",
+        "target": "OptimizeDeckContextException",
+        "target_library": "package:server/ai/optimize_request_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "server/routes/ai/optimize/telemetry/index.dart",
         "line": 276,
         "lexical_type": "_TelemetryQuery",
@@ -236101,7 +236173,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
         "unique_references": 1091,
-        "occurrences": 2216
+        "occurrences": 2217
       },
       {
         "target_scope": "dart_sdk",
@@ -236118,8 +236190,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6308,
-        "occurrences": 39792
+        "unique_references": 6309,
+        "occurrences": 39794
       },
       {
         "target_scope": "dart_sdk",
@@ -236203,7 +236275,7 @@
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
         "unique_references": 275,
-        "occurrences": 1125
+        "occurrences": 1132
       },
       {
         "target_scope": "dependency",
@@ -237451,7 +237523,7 @@
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
         "unique_references": 201,
-        "occurrences": 471
+        "occurrences": 472
       },
       {
         "target_scope": "dependency",
@@ -239028,8 +239100,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimize_request_support.dart",
-        "unique_references": 6,
-        "occurrences": 10
+        "unique_references": 7,
+        "occurrences": 11
       },
       {
         "target_scope": "workspace",
@@ -277160,6 +277232,8 @@
     "server/test/optimize_filler_loader_support_test.dart",
     "server/test/optimize_format_legality_support_test.dart",
     "server/test/optimize_functional_role_support_test.dart",
+    "server/test/optimize_job_latest_db_live_test.dart",
+    "server/test/optimize_job_latest_e2e_live_test.dart",
     "server/test/optimize_learning_pipeline_test.dart",
     "server/test/optimize_mana_base_floor_test.dart",
     "server/test/optimize_payload_parser_test.dart",
@@ -278583,7 +278657,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "9b3a21c3e0a3a7e5c276cde7362dd9b276654aa1aa6d65ffb434f8b761714f27"
+      "sha256": "c32d12d524b3b64d1760b44017061b108db4e20e3463c9af9a37f338bfe247e7"
     },
     "required_task_fields": [
       "id",
@@ -280153,7 +280227,7 @@
         "depends_on": [
           "BT-AI-021"
         ],
-        "acceptance": "Modo solicitado/política/tamanho produzem decisão explícita; zero segundo job órfão; parity de gates e quota por modo.",
+        "acceptance": "Modo solicitado/política/tamanho produzem decisão explícita; zero segundo job órfão; parity de gates e quota por modo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (achado do gate no `BT-UIEV-001`): `GET /ai/optimize/jobs/latest` sem job ativo responde 200 `{\"job\": null}`, e não mais 404, que o navegador registrava como erro no console a cada abertura da folha de otimização; o 404 (`deck_not_found`) fica para o `deck_id` de outra conta, inexistente ou que não é UUID, que antes dava 500. A conferência de dono é a do `POST /ai/optimize`. O app atual já aceita a resposta: sem `job_id`, não oferece retomar. Evidência: `server/test/optimize_job_latest_db_live_test.dart` (7 testes, handler da rota contra PostgreSQL descartável) e `server/test/optimize_job_latest_e2e_live_test.dart` (3/3 por HTTP sob a guarda de egress); 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-031-latest-sem-job.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 513
       },
@@ -288465,7 +288539,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "b3d0f380a28112f5115f79d20a18e41d4a94bc7f03d8c0c3f2655e07fd80f570"
+    "project_logic_source_digest_sha256": "a430dfd2dd236e9391346a481f273a3b2ed0820bf510f5f0917d45e9f8ae2bdd"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -291541,6 +291615,8 @@
       "server/test/optimize_filler_loader_support_test.dart",
       "server/test/optimize_format_legality_support_test.dart",
       "server/test/optimize_functional_role_support_test.dart",
+      "server/test/optimize_job_latest_db_live_test.dart",
+      "server/test/optimize_job_latest_e2e_live_test.dart",
       "server/test/optimize_learning_pipeline_test.dart",
       "server/test/optimize_mana_base_floor_test.dart",
       "server/test/optimize_payload_parser_test.dart",
