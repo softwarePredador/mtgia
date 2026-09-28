@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "560da81fa91bbce9aa018f253aa5d6830a4f5dee8c441ee25ca188cdc93d0848"
+    "sha256": "d0692f40931b923c6c6386c8f2fdc350891f62cf5191265f63271d391265669d"
   },
   "required_task_fields": [
     "id",
@@ -2736,12 +2736,12 @@
     {
       "id": "BT-DR-001",
       "priority": "P0 CORE",
-      "status": "TODO",
-      "delivery": "Backup fresco criptografado off-site + fetch do objeto exato + restore isolado.",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+      "delivery": "Backup local com cadência e ensaio de restauração isolado, com receipt (reescopo da D-81).",
       "depends_on": [
         "BT-DB-001"
       ],
-      "acceptance": "Manifest/checksum/object version; RPO/RTO medidos; dados e schema validados. Decisão do dono em 2026-09-22: D-12, dump cifrado com `age` e chave sob custódia do dono; bucket S3-compatível em região no Brasil, com contrato de tratamento de dados (confirmar com advogado); RPO de 24 h e RTO de 4 h; o primeiro backup sai antes da 058, no `BT-REL-000`. D-26: testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono na hora. Em 2026-09-23 (`BT-REL-000`): primeiro backup com ensaio de restauração completo aprovado (99 tabelas, 1.181 contas, 51 s); sem cifra e sem cópia fora da máquina, porque o dono vetou criar bucket.",
+      "acceptance": "Cadência documentada; checksum do dump e do ensaio; RPO/RTO medidos; dados e schema validados; sem destino externo (D-81). Escopo até 2026-09-24: backup fresco criptografado off-site, fetch do objeto exato e restore isolado, com manifest, checksum e versão do objeto. Decisão do dono em 2026-09-22: D-12, dump cifrado com `age` e chave sob custódia do dono; bucket S3-compatível em região no Brasil, com contrato de tratamento de dados (confirmar com advogado); RPO de 24 h e RTO de 4 h; o primeiro backup sai antes da 058, no `BT-REL-000`. D-26: testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono na hora. Em 2026-09-23 (`BT-REL-000`): primeiro backup com ensaio de restauração completo aprovado (99 tabelas, 1.181 contas, 51 s); sem cifra e sem cópia fora da máquina, porque o dono vetou criar bucket. Decisão do dono em 2026-09-24: D-81, sem backup fora do servidor; a tarefa fica com o backup local e o ensaio de restauração isolado, com cadência e receipt. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção: `server/config/backup_policy.json` fixa o RPO de 24 h e o RTO de 4 h da D-12 (o validador confere o texto da decisão), o destino `backups/manaloom-postgres/` sem cópia fora (D-81), o ensaio isolado sem rede, a cadência (backup a cada 24 h no máximo, pelo RPO; ensaio a cada 7 dias e antes de migration na produção, proposta pendente de confirmação) e o primeiro ciclo ligado ao receipt da `BT-REL-000`. `scripts/manaloom_backup_cycle.sh --execute [--drill]` roda o backup e o ensaio existentes, exige `MANALOOM_BACKUP_DIR` num diretório durável, grava o receipt na pasta `receipts/` do diretório de backup e sai 3 se a cadência não estiver cumprida; `scripts/manaloom_backup_cadence.py check` confere a idade do backup contra o RPO, a idade e a duração do último ensaio contra a cadência e o RTO e se o dump ensaiado é o mesmo arquivo, e recusa diretório em `/tmp` ou worktree. Runbook: `docs/runbooks/BACKUP_E_RESTAURACAO.md`, com o passo do lote de deploy, o que cada etapa confere e a restauração da produção passo a passo. Evidência (`docs/qa/execution/2026-09-28/BT-DR-001-backup-local-e-ensaio.md`): `server/test/backup_cadence_test.py` (15, com shims do backup e do ensaio e o contrato com a interface dos scripts reais), ligado em `scripts/manaloom_release_ops_contract_test.sh`; `server/test/backup_cycle_db_live_test.py` (`RUN_SCHEMA_DB_TESTS=1`): o ciclo, com o script de ensaio real, restaura por inteiro um dump do PostgreSQL descartável (80 tabelas, 100 chaves estrangeiras e as quatro contagens) e grava receipt PASS; 18 mutações falham como esperado. Segue aberto: o ciclo na produção, no lote de deploy e com o Docker de pé (coordenação, com a palavra do dono; hoje a cadência está BLOCKED: último backup de 2026-09-23 e nenhum ensaio registrado no diretório); cifrar o backup local e o prazo de rotação (D-12 e D-23, decisão do dono).",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 676
     },
@@ -9474,6 +9474,8 @@
       "flow_id": "release_operations",
       "entrypoint": "GET /",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9494,6 +9496,8 @@
       "flow_id": "release_operations",
       "entrypoint": "GET /capabilities",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9514,6 +9518,8 @@
       "flow_id": "release_operations",
       "entrypoint": "GET /health",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9534,6 +9540,8 @@
       "flow_id": "release_operations",
       "entrypoint": "GET /health/live",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9554,6 +9562,8 @@
       "flow_id": "release_operations",
       "entrypoint": "GET /health/ready",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9574,6 +9584,8 @@
       "flow_id": "release_operations",
       "entrypoint": "GET /ready",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9594,6 +9606,8 @@
       "flow_id": "release_operations",
       "entrypoint": "scripts/manaloom_build_beta_release.sh",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9614,6 +9628,8 @@
       "flow_id": "release_operations",
       "entrypoint": "scripts/manaloom_local_ci.sh",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9634,6 +9650,8 @@
       "flow_id": "release_operations",
       "entrypoint": "scripts/quality_gate.sh",
       "flow_producers": [
+        "scripts/manaloom_backup_cadence.py",
+        "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
@@ -9890,5 +9908,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "a0672006b9bb039e1f5ead0109500ecc5d844940f7054e478859399d5f151b8c"
+  "project_logic_source_digest_sha256": "528a42147477a0d5ca7e49fef7d8865f6670f13f447324196af79ed53d219af4"
 }

@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-backup",
+  "version": "2026-09-24.1",
+  "task": "BT-DR-001",
+  "decisions": [
+    "D-12",
+    "D-23",
+    "D-81"
+  ],
+  "objectives": {
+    "rpo_hours": 24,
+    "rto_hours": 4,
+    "evidence": "RPO de 24 h e RTO de 4 h",
+    "source": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md"
+  },
+  "backup": {
+    "script": "scripts/manaloom_easypanel_backup.sh",
+    "destination": "backups/manaloom-postgres/",
+    "machine": "a máquina de operação que roda o script, fora do git (D-81); o servidor não guarda cópia",
+    "file_pattern": "manaloom-postgres-AAAAMMDDTHHMMSSZ.dump",
+    "format": "pg_dump -Fc do banco halder, conferido por pg_restore --list",
+    "offsite_copy": false,
+    "offsite_note": "D-81: o MVP não tem cópia fora do servidor. Risco aceito: perder juntos a máquina do backup e o servidor.",
+    "encryption": "nenhuma",
+    "encryption_note": "D-12 pedia age com a chave sob custódia do dono; o único caminho de cifra do repositório exige o bucket que o dono vetou. Cifrar o backup local é decisão pendente.",
+    "retention_days": null,
+    "retention_note": "D-23 manda o prazo de rotação dos backups entrar na política; o prazo ainda não foi decidido."
+  },
+  "drill": {
+    "script": "scripts/manaloom_full_restore_drill.sh",
+    "runner": "isolated_local_docker",
+    "network": "none",
+    "evidence": "backups/manaloom-postgres/drills/<carimbo>/restore-result.json",
+    "min_tables": 80,
+    "measures": "o tempo de restaurar o dump num PostgreSQL 17 isolado e conferir tabelas, chaves e contagens; o RTO inteiro soma provisionar o banco e religar a API (runbook)"
+  },
+  "cadence": {
+    "status": "derivada_de_D-12_com_ensaio_proposto",
+    "backup_max_interval_hours": 24,
+    "drill_max_interval_days": 7,
+    "drill_after_production_migration": true,
+    "rationale": {
+      "backup_max_interval_hours": "O RPO de 24 h (D-12) só vale com um backup a cada 24 h no máximo.",
+      "drill_max_interval_days": "Proposta: um ensaio por semana, a mesma cadência do check semanal de scripts/manaloom_install_remote_backup_cron.sh. Prova que o dump restaura e mede o tempo contra o RTO.",
+      "drill_after_production_migration": "Precedente da 058 na BT-REL-000: backup e ensaio antes de aplicar migration na produção."
+    }
+  },
+  "receipts": "backups/manaloom-postgres/receipts/<carimbo>.json, gravado por scripts/manaloom_backup_cycle.sh",
+  "runbook": "docs/runbooks/BACKUP_E_RESTAURACAO.md",
+  "first_cycle": {
+    "receipt": "docs/qa/execution/2026-09-23/BT-REL-000-linha-de-base-contida.md",
+    "backup_file": {
+      "value": "manaloom-postgres-20260923T005128Z.dump",
+      "evidence": "manaloom-postgres-20260923T005128Z.dump"
+    },
+    "backup_bytes": {
+      "value": 315645906,
+      "evidence": "315.645.906 bytes"
+    },
+    "backup_sha256": {
+      "value": "2df51b464f28b9068ba1f492931999fa48f1b5275a18ab4e9a3e69ed2f13f836",
+      "evidence": "sha256 `2df51b464f28b9068ba1f492931999fa48f1b5275a18ab4e9a3e69ed2f13f836`"
+    },
+    "drill_seconds": {
+      "value": 51,
+      "evidence": "**passed**, 51 s"
+    },
+    "drill_table_count": {
+      "value": 99,
+      "evidence": "99 tabelas"
+    }
+  }
+}
