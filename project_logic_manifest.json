@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "024f36d97307b8ccc083c1a674489be981ad24eb7160f981ad1d69dfdaa02d02",
+  "source_digest_sha256": "b3d0f380a28112f5115f79d20a18e41d4a94bc7f03d8c0c3f2655e07fd80f570",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,15 +63,15 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 701,
+    "dart_source_files": 702,
     "non_dart_product_files": 50,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5319,
-    "semantic_resolved_files": 701,
+    "dart_symbols": 5331,
+    "semantic_resolved_files": 702,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43070,
-    "semantic_resolved_call_sites": 68302,
-    "semantic_resolved_type_references": 16336,
+    "semantic_resolved_call_edges": 43111,
+    "semantic_resolved_call_sites": 68365,
+    "semantic_resolved_type_references": 16380,
     "modules": 159,
     "app_routes": 46,
     "web_routes": 11,
@@ -79,9 +79,9 @@
     "database_tables": 83,
     "database_views": 6,
     "migrations": 62,
-    "scripts_and_jobs": 694,
-    "environment_variables": 716,
-    "tests": 1266,
+    "scripts_and_jobs": 695,
+    "environment_variables": 717,
+    "tests": 1269,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -1888,13 +1888,14 @@
       "files": [
         "server/lib/privacy/account_deletion_outbox.dart",
         "server/lib/privacy/deleted_deck_anonymizer.dart",
+        "server/lib/privacy/hermes_learning_purge.dart",
         "server/lib/privacy/privacy_export_allowlist.dart",
         "server/lib/privacy/privacy_export_pseudonymizer.dart",
         "server/lib/privacy/privacy_export_request_log.dart",
         "server/lib/privacy/retention_cleanup.dart"
       ],
-      "file_count": 6,
-      "symbol_count": 33,
+      "file_count": 7,
+      "symbol_count": 45,
       "providers": [],
       "services": []
     },
@@ -36948,19 +36949,19 @@
       "name": "AccountDeletionOutboxConsumer",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 39
+      "line": 44
     },
     {
       "name": "AccountDeletionOutboxHandling",
       "kind": "enum",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 24
+      "line": 25
     },
     {
       "name": "AccountDeletionOutboxMissing",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 474,
+      "line": 625,
       "members": [
         "toString"
       ]
@@ -36969,19 +36970,19 @@
       "name": "AccountDeletionOutboxOutcome",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 189
+      "line": 286
     },
     {
       "name": "AccountDeletionOutboxRow",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 176
+      "line": 268
     },
     {
       "name": "AccountDeletionOutboxWorker",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 255,
+      "line": 367,
       "members": [
         "retryDelay",
         "runOnce"
@@ -36991,37 +36992,49 @@
       "name": "OutboxDone",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 194
+      "line": 291
     },
     {
       "name": "OutboxFailed",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 207
+      "line": 308
     },
     {
       "name": "OutboxNotYet",
       "kind": "class",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 200
+      "line": 301
+    },
+    {
+      "name": "_bump",
+      "kind": "function",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 264
+    },
+    {
+      "name": "_consumerPlanParameters",
+      "kind": "function",
+      "source": "server/lib/privacy/account_deletion_outbox.dart",
+      "line": 172
     },
     {
       "name": "accountDeletionOutboxReceiptLine",
       "kind": "function",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 483
+      "line": 634
     },
     {
       "name": "defaultAccountDeletionOutboxHandlers",
       "kind": "function",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 221
+      "line": 322
     },
     {
       "name": "enqueueAccountDeletionOutbox",
       "kind": "function",
       "source": "server/lib/privacy/account_deletion_outbox.dart",
-      "line": 123
+      "line": 129
     },
     {
       "name": "anonymizeDeletedDeckReferences",
@@ -37040,6 +37053,80 @@
       "kind": "function",
       "source": "server/lib/privacy/deleted_deck_anonymizer.dart",
       "line": 35
+    },
+    {
+      "name": "HermesKnowledgeDbConfig",
+      "kind": "class",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 42
+    },
+    {
+      "name": "HermesLearningPurge",
+      "kind": "class",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 269,
+      "members": [
+        "_runSweep",
+        "handle"
+      ]
+    },
+    {
+      "name": "HermesPurgeCall",
+      "kind": "class",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 80
+    },
+    {
+      "name": "HermesPurgeHelper",
+      "kind": "class",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 98,
+      "members": [
+        "list",
+        "purge"
+      ]
+    },
+    {
+      "name": "HermesPurgeStatus",
+      "kind": "enum",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 78
+    },
+    {
+      "name": "ProcessHermesPurgeHelper",
+      "kind": "class",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 105,
+      "members": [
+        "_parse",
+        "_run",
+        "list",
+        "purge"
+      ]
+    },
+    {
+      "name": "_HermesSweep",
+      "kind": "class",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 249
+    },
+    {
+      "name": "deletedDeckIdsAmong",
+      "kind": "function",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 179
+    },
+    {
+      "name": "outboxRowDecksAbsent",
+      "kind": "function",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 208
+    },
+    {
+      "name": "value",
+      "kind": "function",
+      "source": "server/lib/privacy/hermes_learning_purge.dart",
+      "line": 57
     },
     {
       "name": "PrivacyExportField",
@@ -41273,7 +41360,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 701,
+    "resolved_file_count": 702,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -41821,6 +41908,7 @@
       "server/lib/pricing_contract.dart",
       "server/lib/privacy/account_deletion_outbox.dart",
       "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "server/lib/privacy/hermes_learning_purge.dart",
       "server/lib/privacy/privacy_export_allowlist.dart",
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "server/lib/privacy/privacy_export_request_log.dart",
@@ -41983,11 +42071,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43070,
-    "resolved_call_site_count": 68302,
-    "workspace_call_edge_count": 13550,
-    "unresolved_call_edge_count": 558,
-    "unresolved_call_site_count": 773,
+    "resolved_call_edge_count": 43111,
+    "resolved_call_site_count": 68365,
+    "workspace_call_edge_count": 13571,
+    "unresolved_call_edge_count": 560,
+    "unresolved_call_site_count": 776,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -166875,7 +166963,18 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 242,
+        "line": 167,
+        "caller": "enqueueAccountDeletionOutbox",
+        "kind": "method",
+        "lexical_target": "_consumerPlanParameters",
+        "target": "_consumerPlanParameters",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 348,
         "caller": "defaultAccountDeletionOutboxHandlers",
         "kind": "constructor",
         "lexical_target": "OutboxDone",
@@ -166886,7 +166985,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 243,
+        "line": 349,
         "caller": "defaultAccountDeletionOutboxHandlers",
         "kind": "constructor",
         "lexical_target": "OutboxNotYet",
@@ -166897,7 +166996,29 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 265,
+        "line": 356,
+        "caller": "defaultAccountDeletionOutboxHandlers",
+        "kind": "constructor",
+        "lexical_target": "HermesLearningPurge",
+        "target": "HermesLearningPurge.HermesLearningPurge",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 357,
+        "caller": "defaultAccountDeletionOutboxHandlers",
+        "kind": "constructor",
+        "lexical_target": "HermesKnowledgeDbConfig.fromEnvironment",
+        "target": "HermesKnowledgeDbConfig.HermesKnowledgeDbConfig.fromEnvironment",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 379,
         "caller": "AccountDeletionOutboxWorker.<constructor>",
         "kind": "method",
         "lexical_target": "defaultAccountDeletionOutboxHandlers",
@@ -166908,7 +167029,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 287,
+        "line": 406,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "constructor",
         "lexical_target": "AccountDeletionOutboxMissing",
@@ -166919,7 +167040,18 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 357,
+        "line": 429,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "method",
+        "lexical_target": "_consumerPlanParameters",
+        "target": "_consumerPlanParameters",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 491,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "constructor",
         "lexical_target": "AccountDeletionOutboxRow",
@@ -166930,7 +167062,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 373,
+        "line": 508,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "constructor",
         "lexical_target": "OutboxFailed",
@@ -166941,7 +167073,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 422,
+        "line": 557,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "method",
         "lexical_target": "retryDelay",
@@ -166952,7 +167084,18 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 88,
+        "line": 577,
+        "caller": "AccountDeletionOutboxWorker.runOnce",
+        "kind": "method",
+        "lexical_target": "_bump",
+        "target": "_bump",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 94,
         "caller": "<top-level>",
         "kind": "constructor",
         "lexical_target": "AccountDeletionOutboxConsumer",
@@ -166993,6 +167136,182 @@
         "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
         "target_scope": "workspace",
         "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 111,
+        "caller": "ProcessHermesPurgeHelper.list",
+        "kind": "method",
+        "lexical_target": "_run",
+        "target": "ProcessHermesPurgeHelper._run",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 115,
+        "caller": "ProcessHermesPurgeHelper.purge",
+        "kind": "method",
+        "lexical_target": "_run",
+        "target": "ProcessHermesPurgeHelper._run",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 131,
+        "caller": "ProcessHermesPurgeHelper._run",
+        "kind": "constructor",
+        "lexical_target": "HermesPurgeCall",
+        "target": "HermesPurgeCall.HermesPurgeCall",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 148,
+        "caller": "ProcessHermesPurgeHelper._run",
+        "kind": "method",
+        "lexical_target": "_parse",
+        "target": "ProcessHermesPurgeHelper._parse",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 168,
+        "caller": "ProcessHermesPurgeHelper._parse",
+        "kind": "constructor",
+        "lexical_target": "HermesPurgeCall",
+        "target": "HermesPurgeCall.HermesPurgeCall",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 279,
+        "caller": "HermesLearningPurge.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "ProcessHermesPurgeHelper",
+        "target": "ProcessHermesPurgeHelper.ProcessHermesPurgeHelper",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 302,
+        "caller": "HermesLearningPurge.handle",
+        "kind": "method",
+        "lexical_target": "_runSweep",
+        "target": "HermesLearningPurge._runSweep",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 304,
+        "caller": "HermesLearningPurge.handle",
+        "kind": "constructor",
+        "lexical_target": "OutboxFailed",
+        "target": "OutboxFailed.OutboxFailed",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 305,
+        "caller": "HermesLearningPurge.handle",
+        "kind": "constructor",
+        "lexical_target": "OutboxDone",
+        "target": "OutboxDone.OutboxDone",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 317,
+        "caller": "HermesLearningPurge._runSweep",
+        "kind": "constructor",
+        "lexical_target": "_HermesSweep.failed",
+        "target": "_HermesSweep._HermesSweep.failed",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 322,
+        "caller": "HermesLearningPurge._runSweep",
+        "kind": "constructor",
+        "lexical_target": "_HermesSweep.absent",
+        "target": "_HermesSweep._HermesSweep.absent",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 325,
+        "caller": "HermesLearningPurge._runSweep",
+        "kind": "method",
+        "lexical_target": "list",
+        "target": "HermesPurgeHelper.list",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 341,
+        "caller": "HermesLearningPurge._runSweep",
+        "kind": "method",
+        "lexical_target": "purge",
+        "target": "HermesPurgeHelper.purge",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 356,
+        "caller": "HermesLearningPurge._runSweep",
+        "kind": "constructor",
+        "lexical_target": "_HermesSweep.clean",
+        "target": "_HermesSweep._HermesSweep.clean",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 62,
+        "caller": "HermesKnowledgeDbConfig.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "HermesKnowledgeDbConfig",
+        "target": "HermesKnowledgeDbConfig.HermesKnowledgeDbConfig",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 63,
+        "caller": "HermesKnowledgeDbConfig.<constructor>",
+        "kind": "method",
+        "lexical_target": "value",
+        "target": "value",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
       },
       {
         "source": "server/lib/privacy/privacy_export_allowlist.dart",
@@ -191051,8 +191370,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 519,
-        "occurrences": 665
+        "unique_references": 523,
+        "occurrences": 669
       },
       {
         "target_scope": "dart_sdk",
@@ -191063,14 +191382,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:convert",
-        "unique_references": 594,
-        "occurrences": 741
+        "unique_references": 596,
+        "occurrences": 743
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14263,
-        "occurrences": 24576
+        "unique_references": 14267,
+        "occurrences": 24580
       },
       {
         "target_scope": "dart_sdk",
@@ -191081,8 +191400,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 412,
-        "occurrences": 675
+        "unique_references": 418,
+        "occurrences": 682
       },
       {
         "target_scope": "dart_sdk",
@@ -192431,8 +192750,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1204,
-        "occurrences": 1965
+        "unique_references": 1208,
+        "occurrences": 1971
       },
       {
         "target_scope": "dependency",
@@ -195353,14 +195672,20 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/privacy/account_deletion_outbox.dart",
-        "unique_references": 12,
-        "occurrences": 17
+        "unique_references": 17,
+        "occurrences": 26
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/privacy/deleted_deck_anonymizer.dart",
         "unique_references": 4,
         "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "unique_references": 16,
+        "occurrences": 31
       },
       {
         "target_scope": "workspace",
@@ -200514,11 +200839,27 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 370,
+        "line": 505,
         "caller": "AccountDeletionOutboxWorker.runOnce",
         "kind": "function_expression",
         "lexical_target": "handlers[row.consumer]!",
         "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 306,
+        "caller": "HermesLearningPurge.handle",
+        "kind": "function_expression",
+        "lexical_target": "rowCheck",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 336,
+        "caller": "HermesLearningPurge._runSweep",
+        "kind": "function_expression",
+        "lexical_target": "matcher",
+        "occurrences": 2
       },
       {
         "source": "server/lib/privacy/privacy_export_pseudonymizer.dart",
@@ -200753,9 +201094,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16336,
-    "workspace_type_reference_count": 3480,
-    "unresolved_type_reference_count": 363,
+    "resolved_type_reference_count": 16380,
+    "workspace_type_reference_count": 3499,
+    "unresolved_type_reference_count": 364,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -232000,7 +232341,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 195,
+        "line": 292,
         "lexical_type": "AccountDeletionOutboxOutcome",
         "resolved_type": "AccountDeletionOutboxOutcome",
         "target": "AccountDeletionOutboxOutcome",
@@ -232010,7 +232351,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 218,
+        "line": 319,
         "lexical_type": "AccountDeletionOutboxRow",
         "resolved_type": "AccountDeletionOutboxRow",
         "target": "AccountDeletionOutboxRow",
@@ -232020,7 +232361,7 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 222,
+        "line": 326,
         "lexical_type": "AccountDeletionOutboxHandler",
         "resolved_type": "Future<AccountDeletionOutboxOutcome> Function(Session, AccountDeletionOutboxRow)",
         "target": "AccountDeletionOutboxHandler",
@@ -232030,27 +232371,67 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 242,
+        "line": 327,
+        "lexical_type": "HermesKnowledgeDbConfig?",
+        "resolved_type": "HermesKnowledgeDbConfig?",
+        "target": "HermesKnowledgeDbConfig",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 328,
+        "lexical_type": "HermesPurgeHelper?",
+        "resolved_type": "HermesPurgeHelper?",
+        "target": "HermesPurgeHelper",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 348,
         "lexical_type": "OutboxDone",
         "resolved_type": "OutboxDone",
         "target": "OutboxDone",
         "target_library": "package:server/privacy/account_deletion_outbox.dart",
         "target_scope": "workspace",
-        "occurrences": 4
+        "occurrences": 6
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 243,
+        "line": 349,
         "lexical_type": "OutboxNotYet",
         "resolved_type": "OutboxNotYet",
         "target": "OutboxNotYet",
         "target_library": "package:server/privacy/account_deletion_outbox.dart",
         "target_scope": "workspace",
-        "occurrences": 4
+        "occurrences": 5
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 287,
+        "line": 356,
+        "lexical_type": "HermesLearningPurge",
+        "resolved_type": "HermesLearningPurge",
+        "target": "HermesLearningPurge",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 357,
+        "lexical_type": "HermesKnowledgeDbConfig",
+        "resolved_type": "HermesKnowledgeDbConfig",
+        "target": "HermesKnowledgeDbConfig",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/account_deletion_outbox.dart",
+        "line": 406,
         "lexical_type": "AccountDeletionOutboxMissing",
         "resolved_type": "AccountDeletionOutboxMissing",
         "target": "AccountDeletionOutboxMissing",
@@ -232060,17 +232441,17 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 373,
+        "line": 508,
         "lexical_type": "OutboxFailed",
         "resolved_type": "OutboxFailed",
         "target": "OutboxFailed",
         "target_library": "package:server/privacy/account_deletion_outbox.dart",
         "target_scope": "workspace",
-        "occurrences": 4
+        "occurrences": 5
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 51,
+        "line": 56,
         "lexical_type": "AccountDeletionOutboxHandling",
         "resolved_type": "AccountDeletionOutboxHandling",
         "target": "AccountDeletionOutboxHandling",
@@ -232080,13 +232461,163 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 83,
+        "line": 88,
         "lexical_type": "AccountDeletionOutboxConsumer",
         "resolved_type": "AccountDeletionOutboxConsumer",
         "target": "AccountDeletionOutboxConsumer",
         "target_library": "package:server/privacy/account_deletion_outbox.dart",
         "target_scope": "workspace",
         "occurrences": 6
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 101,
+        "lexical_type": "HermesPurgeCall",
+        "resolved_type": "HermesPurgeCall",
+        "target": "HermesPurgeCall",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 12
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 105,
+        "lexical_type": "HermesPurgeHelper",
+        "resolved_type": "HermesPurgeHelper",
+        "target": "HermesPurgeHelper",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 275,
+        "lexical_type": "HermesPurgeHelper?",
+        "resolved_type": "HermesPurgeHelper?",
+        "target": "HermesPurgeHelper",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 277,
+        "lexical_type": "DeletedDeckMatcher?",
+        "resolved_type": "Future<List<String>> Function(Session, List<String>)?",
+        "target": "DeletedDeckMatcher",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 278,
+        "lexical_type": "OutboxRowDeckCheck?",
+        "resolved_type": "Future<bool> Function(Session, String, List<String>)?",
+        "target": "OutboxRowDeckCheck",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 279,
+        "lexical_type": "ProcessHermesPurgeHelper",
+        "resolved_type": "ProcessHermesPurgeHelper",
+        "target": "ProcessHermesPurgeHelper",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 286,
+        "lexical_type": "DeletedDeckMatcher",
+        "resolved_type": "Future<List<String>> Function(Session, List<String>)",
+        "target": "DeletedDeckMatcher",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 287,
+        "lexical_type": "OutboxRowDeckCheck",
+        "resolved_type": "Future<bool> Function(Session, String, List<String>)",
+        "target": "OutboxRowDeckCheck",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 290,
+        "lexical_type": "_HermesSweep",
+        "resolved_type": "_HermesSweep",
+        "target": "_HermesSweep",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 13
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 293,
+        "lexical_type": "AccountDeletionOutboxOutcome",
+        "resolved_type": "AccountDeletionOutboxOutcome",
+        "target": "AccountDeletionOutboxOutcome",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 295,
+        "lexical_type": "AccountDeletionOutboxRow",
+        "resolved_type": "AccountDeletionOutboxRow",
+        "target": "AccountDeletionOutboxRow",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 304,
+        "lexical_type": "OutboxFailed",
+        "resolved_type": "OutboxFailed",
+        "target": "OutboxFailed",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 305,
+        "lexical_type": "OutboxDone",
+        "resolved_type": "OutboxDone",
+        "target": "OutboxDone",
+        "target_library": "package:server/privacy/account_deletion_outbox.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 62,
+        "lexical_type": "HermesKnowledgeDbConfig",
+        "resolved_type": "HermesKnowledgeDbConfig",
+        "target": "HermesKnowledgeDbConfig",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 88,
+        "lexical_type": "HermesPurgeStatus",
+        "resolved_type": "HermesPurgeStatus",
+        "target": "HermesPurgeStatus",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/lib/privacy/privacy_export_allowlist.dart",
@@ -235569,8 +236100,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1085,
-        "occurrences": 2204
+        "unique_references": 1091,
+        "occurrences": 2216
       },
       {
         "target_scope": "dart_sdk",
@@ -235587,14 +236118,14 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6295,
-        "occurrences": 39697
+        "unique_references": 6308,
+        "occurrences": 39792
       },
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 89,
-        "occurrences": 192
+        "unique_references": 92,
+        "occurrences": 195
       },
       {
         "target_scope": "dart_sdk",
@@ -236907,8 +237438,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 258,
-        "occurrences": 949
+        "unique_references": 260,
+        "occurrences": 958
       },
       {
         "target_scope": "dependency",
@@ -237057,8 +237588,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 404,
-        "occurrences": 4705
+        "unique_references": 405,
+        "occurrences": 4706
       },
       {
         "target_scope": "workspace",
@@ -239283,8 +239814,14 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/privacy/account_deletion_outbox.dart",
-        "unique_references": 11,
-        "occurrences": 33
+        "unique_references": 15,
+        "occurrences": 43
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:server/privacy/hermes_learning_purge.dart",
+        "unique_references": 15,
+        "occurrences": 41
       },
       {
         "target_scope": "workspace",
@@ -241624,7 +242161,13 @@
       },
       {
         "source": "server/lib/privacy/account_deletion_outbox.dart",
-        "line": 125,
+        "line": 131,
+        "lexical_type": "void",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/privacy/hermes_learning_purge.dart",
+        "line": 135,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -267844,6 +268387,14 @@
       ]
     },
     {
+      "path": "server/bin/hermes_learning_purge.py",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "HERMES_PURGE_BUSY_TIMEOUT_MS"
+      ]
+    },
+    {
       "path": "server/bin/hermes_mana_base_validator.py",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -270287,6 +270838,14 @@
       "sources": [
         "server/bin/hermes_lab_entrypoint.sh",
         "server/bin/hermes_lab_runtime_probe.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "HERMES_PURGE_BUSY_TIMEOUT_MS",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/hermes_learning_purge.py"
       ],
       "value_captured": false
     },
@@ -276516,6 +277075,8 @@
     "server/test/hermes_lab_entrypoint_test.py",
     "server/test/hermes_lab_healthcheck_test.py",
     "server/test/hermes_lab_runtime_probe_test.py",
+    "server/test/hermes_learning_purge_test.dart",
+    "server/test/hermes_learning_purge_test.py",
     "server/test/hermes_mana_base_validator_test.py",
     "server/test/import_list_service_test.dart",
     "server/test/import_parser_test.dart",
@@ -276670,6 +277231,7 @@
     "server/test/public_error_e2e_live_test.dart",
     "server/test/public_site_url_test.dart",
     "server/test/public_web_product_contract_test.dart",
+    "server/test/pull_learning_events_deletion_test.py",
     "server/test/pull_learning_events_schema_test.py",
     "server/test/push_notification_service_live_test.dart",
     "server/test/push_notification_service_test.dart",
@@ -278021,7 +278583,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "caea445e7f339e36182f2ca4f1106cae43d22b946b4402ed63c2dddef0fc9ac1"
+      "sha256": "9b3a21c3e0a3a7e5c276cde7362dd9b276654aa1aa6d65ffb434f8b761714f27"
     },
     "required_task_fields": [
       "id",
@@ -278325,7 +278887,7 @@
           "BT-AUTH-004",
           "BT-PRIV-003"
         ],
-        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Decisão do dono em 2026-09-24, D-76: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; nada muda no código. Aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar (o sidecar deixou de recebê-los na D-77), e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (até a D-77, abaixo) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Decisão do dono em 2026-09-24, D-77: o sidecar é dado como limpo depois do tempo máximo da sessão, sem rota de confirmação. Aplicar a 060 na produção pede a palavra do dono. D-70 feita em 2026-09-23, na mesma branch, sem migration: o job `manaloom_ai_runtime_cleanup` saiu de `ai_analyze_optimize_advisory` e roda sem capability, sob o contrato `retention_cleanup_apply_v1` (em `PRIVACY_CONTROL_JOBS`, fechado com política inválida); apaga só os prazos da nova seção `retention_cleanup` do inventário (telemetria do Optimize e `ai_logs` em 180 dias, reservas de cota não confirmadas em 10 min, igual ao TTL do `PlanService`, `rate_limit_events` em 24 h e jobs de IA em 24 h, pela D-32), sem variável de ambiente nem flag de prazo, e deixa um recibo por execução (`MANALOOM_RETENTION_CLEANUP`, só contagens). Desligado por padrão: o agendado só conta até uma execução supervisionada com `MANALOOM_CONFIRM_POSTGRES_WRITES` (`--mode activate`) registrar a ativação em `sync_state`; `--mode deactivate` pausa, e outra execução em andamento faz a atual parar sem apagar. O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/retention_cleanup_test.dart` (10 testes; cruza as regras com o inventário nos dois sentidos), `server/test/retention_cleanup_db_live_test.dart` (6 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 16 mutações falham como esperado. Pendente de decisão: ligar em produção (`--mode activate`) é exclusão em produção e pede a palavra do dono; os prazos de partida da D-69 só entram no job depois do advogado. D-77 feita em 2026-09-24, na branch `privacidade/rodada3-2026-09-24`, sem migration: o consumidor `interactive_battle_sidecar` do outbox fecha pelo tempo, como o `endpoint_cache`, 7200 s + 10 min contados da exclusão (o maior TTL de sessão do contrato do Battle mais a retenção terminal do sidecar), com o motivo `expired_by_max_session_lifetime` no recibo da execução, e deixa de receber os tokens de deck; ficam abertos só `hermes_learning_sqlite` e `backups`. Evidência: `server/test/account_deletion_outbox_test.dart` (9 testes; lê o limite de `ttl_seconds` e a retenção terminal do próprio `InteractiveBattleRegistry.java`) e `server/test/privacy_deletion_outbox_db_live_test.dart` (12 testes verdes contra PostgreSQL descartável: aberto com 2 h 9 min, fechado com 2 h 11 min); 9 mutações falham como esperado. Rodada 2 integrada em `81841e234` e ainda não implantada: o deploy, com as migrations 059 e 060, espera as recapturas do gate, por decisão do dono em 2026-09-24.",
+        "acceptance": "Nenhum runtime ativo recria dado; retry idempotente; receipt por consumidor. Decisão do dono em 2026-09-22: D-23, exclusão por outbox; caches com TTL de até 24 h; Sentry sem ID do usuário e retenção do provedor documentada; backups não são reescritos, com prazo de rotação na política; simulações de terceiros contra deck público de quem saiu anonimizadas. D-25: depende do inventário do `BT-PRIV-003`. Feito em 2026-09-23, na branch `privacidade/2026-09-23`, sem migration: a exclusão confere antes da primeira escrita todas as relações que toca e para se faltar alguma; apaga bloqueios e tokens de recuperação e de verificação do titular; tira o titular dos eventos de bloqueio, dos recursos (o texto vira um marcador), das ações de moderação e da evidência da denúncia; simulações e tentativas que outra pessoa rodou contra o deck público do titular ficam com ela, com o UUID e o nome do deck trocados no replay e o hash do lado dele nulo, e as dele saem; o recibo leva a política `brewtact-beta-privacy-v2` e um resumo que diz isso. O `EndpointCache` ganhou teto de 24 h e limpa as entradas vencidas a cada acesso depois de 1 min. O Sentry do servidor não recebe mais o ID do usuário: nenhum evento leva o usuário e todo UUID de caminho, título, tag, exceção e contexto vira `:id`, com o `request_id` preservado. Evidência: `server/test/privacy_account_deletion_test.dart` (7 testes), `server/test/endpoint_cache_ttl_test.dart` (4), `server/test/observability_test.dart` (2 testes novos e 1 corrigido, que consagrava o ID cru) e `server/test/privacy_account_deletion_db_live_test.dart` (9 testes verdes contra PostgreSQL descartável com três contas); 10 mutações falham como esperado. Segue aberto: o outbox da D-23, com receipt por consumidor e retry idempotente, exige tabela nova, e a proposta de DDL foi relatada à coordenação (migration é decisão do dono); jobs e sessões de Jogar contra IA que outra pessoa rodou contra o deck de quem saiu guardam o hash e a lista do deck (`BT-BAT-002`); o SQLite do Hermes (`BT-AI-030`); o Sentry do app e a limpeza do aparelho (raia do app); a retenção do plano Sentry, que o dono confere no painel. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisões do dono em 2026-09-23: D-66 (itens de troca na exclusão), D-68 (outbox aprovado; a migration pede a palavra do dono na execução) e D-70 (limpeza por prazo sem depender de capability, ligada só com a palavra do dono). D-66 feita em 2026-09-23, na branch `privacidade/rodada2-2026-09-23`, com migration proposta e não aplicada: a oferta de troca aberta (`pending`) do titular, enviada ou recebida, é cancelada com uma linha no histórico e perde os itens dele, e os da outra pessoa ficam; nas outras trocas o item do titular fica com a troca, sem o vínculo com o fichário; o recibo passa à política `brewtact-beta-privacy-v3`, com `open_trade_offers`. A migration 059 deixa `trade_items.owner_id` em `RESTRICT` nos dois bancos, como as outras chaves de troca e mensagem, e reinstala o trigger de conta ativa; o baseline acompanha, e a prontidão e o deploy passam a exigir a 059. Medição que corrige o problema descrito na D-66: a exclusão do produto não falha na produção, porque pseudonimiza a conta sem apagar a linha de `users`; o que falha é o `DELETE` direto nessa linha, que só scripts de limpeza de teste usam. Evidência: `server/test/privacy_trade_items_db_live_test.dart` (8 testes verdes contra PostgreSQL descartável: com a chave sem ação, como na produção, o `DELETE` direto falha; com `CASCADE`, passa e leva os itens da outra parte; com a 059, falha igual; a exclusão do produto passa nas três formas e trata os itens), `server/test/privacy_account_deletion_test.dart` (9 testes) e `server/test/privacy_data_inventory_test.dart` (modo `partial_delete`); 16 mutações falham como esperado. Decisão do dono em 2026-09-24, D-76: as trocas em andamento (`accepted`, `shipped`, `delivered`, `disputed`) seguem com a outra pessoa, como as concluídas; nada muda no código. Aplicar a 059 na produção pede a palavra do dono. D-68 feita em 2026-09-23, na mesma branch, com a migration 060 proposta e não aplicada: `account_deletion_outbox` com o DDL aprovado; a exclusão grava uma linha por consumidor fora do banco na mesma transação do recibo (política `brewtact-beta-privacy-v4`), com os decks só como o HMAC dos tombstones e só para o Hermes e o sidecar (o sidecar deixou de recebê-los na D-77), e volta inteira se o outbox falhar. O job `manaloom_account_deletion_outbox` roda a cada 15 min sem capability, sob o contrato `account_deletion_outbox_v1` e fechado com política inválida, com lease, nova tentativa com intervalo crescente até 24 h, teto de 20 tentativas e recibo por execução sem identificador; conclui `endpoint_cache` depois do teto de 24 h e `sentry` na hora, porque os eventos do servidor não levam o usuário. Ficam abertos com o motivo em `last_error_code`, sem gastar tentativa: `hermes_learning_sqlite` (falta o consumidor na imagem de ops que calcule o HMAC dos `deck_id` do `knowledge.db`), `interactive_battle_sidecar` (até a D-77, abaixo) e `backups` (falta a rotação de 30 dias da D-69). O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/account_deletion_outbox_test.dart` (8 testes), `server/test/privacy_deletion_outbox_db_live_test.dart` (11 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 22 mutações falham como esperado. Decisão do dono em 2026-09-24, D-77: o sidecar é dado como limpo depois do tempo máximo da sessão, sem rota de confirmação. Aplicar a 060 na produção pede a palavra do dono. D-70 feita em 2026-09-23, na mesma branch, sem migration: o job `manaloom_ai_runtime_cleanup` saiu de `ai_analyze_optimize_advisory` e roda sem capability, sob o contrato `retention_cleanup_apply_v1` (em `PRIVACY_CONTROL_JOBS`, fechado com política inválida); apaga só os prazos da nova seção `retention_cleanup` do inventário (telemetria do Optimize e `ai_logs` em 180 dias, reservas de cota não confirmadas em 10 min, igual ao TTL do `PlanService`, `rate_limit_events` em 24 h e jobs de IA em 24 h, pela D-32), sem variável de ambiente nem flag de prazo, e deixa um recibo por execução (`MANALOOM_RETENTION_CLEANUP`, só contagens). Desligado por padrão: o agendado só conta até uma execução supervisionada com `MANALOOM_CONFIRM_POSTGRES_WRITES` (`--mode activate`) registrar a ativação em `sync_state`; `--mode deactivate` pausa, e outra execução em andamento faz a atual parar sem apagar. O teste que fixa as capabilities dos demais jobs segue igual. Evidência: `server/test/retention_cleanup_test.dart` (10 testes; cruza as regras com o inventário nos dois sentidos), `server/test/retention_cleanup_db_live_test.dart` (6 testes verdes contra PostgreSQL descartável) e `server/test/manaloom_ops_daemon_test.py`; 16 mutações falham como esperado. Pendente de decisão: ligar em produção (`--mode activate`) é exclusão em produção e pede a palavra do dono; os prazos de partida da D-69 só entram no job depois do advogado. D-77 feita em 2026-09-24, na branch `privacidade/rodada3-2026-09-24`, sem migration: o consumidor `interactive_battle_sidecar` do outbox fecha pelo tempo, como o `endpoint_cache`, 7200 s + 10 min contados da exclusão (o maior TTL de sessão do contrato do Battle mais a retenção terminal do sidecar), com o motivo `expired_by_max_session_lifetime` no recibo da execução, e deixa de receber os tokens de deck; ficam abertos só `hermes_learning_sqlite` e `backups`. Evidência: `server/test/account_deletion_outbox_test.dart` (9 testes; lê o limite de `ttl_seconds` e a retenção terminal do próprio `InteractiveBattleRegistry.java`) e `server/test/privacy_deletion_outbox_db_live_test.dart` (12 testes verdes contra PostgreSQL descartável: aberto com 2 h 9 min, fechado com 2 h 11 min); 9 mutações falham como esperado. Rodada 2 integrada em `81841e234` e ainda não implantada: o deploy, com as migrations 059 e 060, espera as recapturas do gate, por decisão do dono em 2026-09-24. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`, sem migration, sobre a rodada 3 da privacidade (merge de `24553dd62`): o consumidor `hermes_learning_sqlite` deixa de ser bloqueado. O job varre o knowledge.db (`server/bin/hermes_learning_purge.py`), acha no PostgreSQL, pelo HMAC dos tombstones, os decks apagados e apaga os eventos e as cópias de deck sob o lock de escrita do SQLite, conferindo sob o mesmo lock o que ficou (`server/lib/privacy/hermes_learning_purge.dart`); o alimentador `pull_learning_events.py` só grava evento que ainda existe no PostgreSQL, conferido sob o mesmo lock, então nenhum runtime recria o dado; cada execução reconcilia, criando a linha que falta para todo recibo com o prazo contado da exclusão (exclusões de antes da 060 entram), e o recibo da execução leva, por consumidor, `reconciled`, `done_by`, `failed_by` e `purged`, sem identificador. Lista de consumidores com estado e lacuna no receipt `docs/qa/execution/2026-09-28/BT-PRIV-002-orquestracao-da-exclusao.md` (os cinco do outbox, os jobs do daemon de ops, o que roda na API, caches em memória, arquivos e provedores); inventário com `optimize_job_memory` e `ops_artifacts`. Evidência: `server/test/privacy_deletion_outbox_db_live_test.dart` (PostgreSQL descartável e SQLite temporário: expurgo só dos decks da conta, retry idempotente, falha reconciliada, reconciliação de recibo sem linha e varredura do que sobrou), `server/test/hermes_learning_purge_test.dart`, `server/test/account_deletion_outbox_test.dart`, `server/test/hermes_learning_purge_test.py` e `server/test/pull_learning_events_deletion_test.py`; 17 mutações falham como esperado. Segue aberto: `backups` (rotação da D-69 não aplicada, decisão do dono), `BT-BAT-002`, o Sentry do app e a limpeza do aparelho (raia do app).",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 323
       },
@@ -287903,7 +288465,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "024f36d97307b8ccc083c1a674489be981ad24eb7160f981ad1d69dfdaa02d02"
+    "project_logic_source_digest_sha256": "b3d0f380a28112f5115f79d20a18e41d4a94bc7f03d8c0c3f2655e07fd80f570"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -290175,6 +290737,7 @@
       "server/bin/hermes_lab_entrypoint.sh",
       "server/bin/hermes_lab_healthcheck.sh",
       "server/bin/hermes_lab_runtime_probe.py",
+      "server/bin/hermes_learning_purge.py",
       "server/bin/hermes_mana_base_validator.py",
       "server/bin/hermes_mana_base_validator.sh",
       "server/bin/hermes_master_watchdog.sh",
@@ -290508,6 +291071,7 @@
       "server/lib/pricing_contract.dart",
       "server/lib/privacy/account_deletion_outbox.dart",
       "server/lib/privacy/deleted_deck_anonymizer.dart",
+      "server/lib/privacy/hermes_learning_purge.dart",
       "server/lib/privacy/privacy_export_allowlist.dart",
       "server/lib/privacy/privacy_export_pseudonymizer.dart",
       "server/lib/privacy/privacy_export_request_log.dart",
@@ -290892,6 +291456,8 @@
       "server/test/hermes_lab_entrypoint_test.py",
       "server/test/hermes_lab_healthcheck_test.py",
       "server/test/hermes_lab_runtime_probe_test.py",
+      "server/test/hermes_learning_purge_test.dart",
+      "server/test/hermes_learning_purge_test.py",
       "server/test/hermes_mana_base_validator_test.py",
       "server/test/import_list_service_test.dart",
       "server/test/import_parser_test.dart",
@@ -291046,6 +291612,7 @@
       "server/test/public_error_e2e_live_test.dart",
       "server/test/public_site_url_test.dart",
       "server/test/public_web_product_contract_test.dart",
+      "server/test/pull_learning_events_deletion_test.py",
       "server/test/pull_learning_events_schema_test.py",
       "server/test/push_notification_service_live_test.dart",
       "server/test/push_notification_service_test.dart",
