@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "43f6d66428d67b4902a9f86b861eee843304c66e28efd8ac9ad1345a0871e830"
+    "sha256": "e46424b668ef1ced5bd64d96f0337aa90892a1ee1c545c9c4b37f89d29363d5c"
   },
   "required_task_fields": [
     "id",
@@ -435,12 +435,12 @@
     {
       "id": "DCK-P0-06",
       "priority": "P0 CORE",
-      "status": "IN_PROGRESS_CONTAINED",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Soft-delete, lixeira, restore e purge posterior governado.",
       "depends_on": [
         "BT-DB-001"
       ],
-      "acceptance": "DELETE não apaga cards imediatamente; some de todas as superfícies; restore íntegro e privado. Decisão do dono em 2026-09-22: D-30, purge em 30 dias; deck na lixeira não conta em limite nem em aprendizado e entra na exportação; restaurar não republica relatório. D-19: `/reports/:id` segue público, mas é invalidado quando o deck é apagado. Parte da D-19 (buraco 4) feita localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `getPublicReport` só serve o relatório com o deck vivo e fora da lixeira (JOIN em `decks` com `deleted_at IS NULL`), sem migração; vale também para os relatórios de decks apagados antes da correção. Evidência: `server/test/shareable_report_deleted_deck_test.dart` e `server/test/shareable_report_deleted_deck_db_live_test.dart` (PostgreSQL descartável: deck apagado e deck na lixeira deixam de servir, o de deck vivo segue 200; a versão da base falha nos dois). Soft-delete, lixeira, restore e purge continuam abertos; quando o restore existir, ele precisa manter o relatório invalidado (D-30), porque o filtro de leitura sozinho voltaria a servi-lo. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Só a parte da D-19; a lixeira segue aberta.",
+      "acceptance": "DELETE não apaga cards imediatamente; some de todas as superfícies; restore íntegro e privado. Decisão do dono em 2026-09-22: D-30, purge em 30 dias; deck na lixeira não conta em limite nem em aprendizado e entra na exportação; restaurar não republica relatório. D-19: `/reports/:id` segue público, mas é invalidado quando o deck é apagado. Parte da D-19 (buraco 4) feita localmente em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `getPublicReport` só serve o relatório com o deck vivo e fora da lixeira (JOIN em `decks` com `deleted_at IS NULL`), sem migração; vale também para os relatórios de decks apagados antes da correção. Evidência: `server/test/shareable_report_deleted_deck_test.dart` e `server/test/shareable_report_deleted_deck_db_live_test.dart` (PostgreSQL descartável: deck apagado e deck na lixeira deixam de servir, o de deck vivo segue 200; a versão da base falha nos dois). No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`). Parte do servidor da lixeira feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar, com a migration 072 proposta e não aplicada. O `DELETE /decks/:id` manda o deck para a lixeira (`decks.deleted_at`) sem apagar nada, tira o deck da galeria, despublica os relatórios de vez e grava `deck_delete` no ledger. O deck na lixeira some de todas as superfícies: as rotas de `/decks/:id` respondem 404 pelo guarda de `routes/decks/[id]/_middleware.dart`, a mudança de conteúdo o recusa dentro da trava da linha, e as leituras de fora (lista, prévia do import, Optimize, arquétipos, rebuild, rotas legadas, relatório novo, repetição da materialização do Generate) filtram `deleted_at`; não conta em aprendizado (`ml_extract_features.dart` e o pull do Hermes só levam deck vivo; não há limite de decks no servidor) e entra na exportação. `GET /decks/trash` lista a lixeira com a data da purga; `POST /decks/:id/restore` devolve o deck íntegro e privado, sem republicar o relatório, e grava `deck_restore`. A purga em 30 dias é a limpeza por prazo (`retention_cleanup_apply_v1`, D-70), com as regras `shared_deck_reports_trashed_deck_30d`, `deck_learning_events_trashed_deck_30d` e `decks_trash_30d`, desligada até a ativação supervisionada. Evidência: `server/test/deck_trash_db_live_test.dart` (PostgreSQL descartável), `server/test/deck_trash_surface_guard_test.dart`, `server/test/retention_cleanup_test.dart` e `server/test/retention_cleanup_db_live_test.dart` com as regras novas, e `server/test/shareable_report_deleted_deck_db_live_test.dart` com o restaurar; receipt em `docs/qa/execution/2026-09-28/DCK-P0-06-lixeira-de-decks.md`. Falta: a tela da lixeira, o restaurar e o texto de confirmação no app (raia do app); aplicar a 072 e ativar a limpeza na produção pedem a palavra do dono.",
       "section": "P0 do ciclo",
       "source_line": 341
     },
@@ -9886,5 +9886,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "e4a7568d2266d3f8aa1a4c5aea53c0e7013786df8c92cb33d22718f2063d993b"
+  "project_logic_source_digest_sha256": "87967e431bd66c9d62b3bb852ee8976a6f62ddd0c86f90882c339439f1d9b4c6"
 }

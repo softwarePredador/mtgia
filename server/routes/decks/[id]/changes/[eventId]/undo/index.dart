@@ -59,7 +59,7 @@ Future<Response> onRequest(
           isDeckUuid(eventId)
               ? await session.execute(
                 Sql.named('''
-                  SELECT revision_after, cards_before, cards_after,
+                  SELECT revision_after, operation, cards_before, cards_after,
                          metadata_before, description_redacted_at
                   FROM deck_change_events
                   WHERE id = CAST(@eventId AS uuid)
@@ -81,6 +81,17 @@ Future<Response> onRequest(
           HttpStatus.conflict,
           'deck_undo_conflict',
           'O deck mudou depois desta mudança. Desfaça a mais recente primeiro.',
+          currentRevision: baseline.revision,
+        );
+      }
+
+      // DCK-P0-06: ir para a lixeira e voltar dela não se desfazem aqui;
+      // voltar é o restaurar, apagar de novo é o DELETE.
+      if (deckLifecycleOperations.contains(row['operation'])) {
+        throw _UndoRefusal(
+          HttpStatus.conflict,
+          'deck_undo_unsupported',
+          'Esta mudança não se desfaz pelo histórico.',
           currentRevision: baseline.revision,
         );
       }

@@ -40,9 +40,12 @@ void main() {
 
     test('só apaga tabela com prazo (ttl) que o inventário põe neste job', () {
       for (final rule in retentionCleanupRules) {
-        // A redação (D-29) tem a declaração dela no inventário.
+        // A redação (D-29) e a purga da lixeira (D-30) têm a declaração
+        // delas no inventário.
         if (rule.isRedaction) continue;
         final retention = tables[rule.table]!['retention'] as Map;
+        final purges = (retention['purges'] as List? ?? const []).cast<Map>();
+        if (purges.any((purge) => purge['rule'] == rule.id)) continue;
         expect(retention['class'], 'ttl', reason: rule.table);
         expect(
           '${retention['enforced_by']}',
@@ -86,6 +89,58 @@ void main() {
           expect(redaction['decision'], 'D-29', reason: name);
         }
       }
+    });
+
+    test('toda purga da lixeira declarada no inventário tem regra, e '
+        'vice-versa (D-30)', () {
+      final declared = <String>{
+        for (final MapEntry(key: name, value: entry) in tables.entries)
+          for (final purge
+              in ((entry['retention'] as Map)['purges'] as List? ?? const [])
+                  .cast<Map>())
+            '$name:${purge['rule']}',
+      };
+      final fromCode = {
+        for (final rule in retentionCleanupRules)
+          if (rule.id.contains('trash')) '${rule.table}:${rule.id}',
+      };
+      expect(fromCode, declared);
+      expect(fromCode, {
+        'shared_deck_reports:shared_deck_reports_trashed_deck_30d',
+        'deck_learning_events:deck_learning_events_trashed_deck_30d',
+        'decks:decks_trash_30d',
+      });
+      for (final MapEntry(key: name, value: entry) in tables.entries) {
+        for (final purge
+            in ((entry['retention'] as Map)['purges'] as List? ?? const [])
+                .cast<Map>()) {
+          expect(
+            '${purge['enforced_by']}',
+            allOf(
+              contains(retentionCleanupJobName),
+              contains(retentionCleanupContract),
+            ),
+            reason: name,
+          );
+          expect(purge['decision'], 'D-30', reason: name);
+        }
+      }
+      // O deck sai por último: as cópias sem cascata saem antes, enquanto o
+      // deck ainda existe para dizer há quanto tempo está na lixeira.
+      final order = [for (final rule in retentionCleanupRules) rule.id];
+      expect(
+        order.indexOf('decks_trash_30d'),
+        greaterThan(order.indexOf('shared_deck_reports_trashed_deck_30d')),
+      );
+      expect(
+        order.indexOf('decks_trash_30d'),
+        greaterThan(order.indexOf('deck_learning_events_trashed_deck_30d')),
+      );
+      final decksRule = retentionCleanupRules.singleWhere(
+        (rule) => rule.id == 'decks_trash_30d',
+      );
+      expect(decksRule.ageColumn, 'deleted_at');
+      expect(decksRule.maxAge, const Duration(days: 30));
     });
 
     test('toda tabela que o inventário põe neste job tem regra', () {
@@ -143,10 +198,17 @@ void main() {
                 : 'DELETE FROM ${rule.table} WHERE ',
           ),
         );
+        // O prazo conta da criação; só a lixeira de decks (D-30) conta de
+        // quando o deck foi apagado.
+        expect(
+          rule.ageColumn,
+          rule.id == 'decks_trash_30d' ? 'deleted_at' : 'created_at',
+          reason: rule.id,
+        );
         expect(
           sql,
           endsWith(
-            'created_at < CURRENT_TIMESTAMP - '
+            '${rule.ageColumn} < CURRENT_TIMESTAMP - '
             'make_interval(mins => ${rule.maxAge.inMinutes})',
           ),
         );

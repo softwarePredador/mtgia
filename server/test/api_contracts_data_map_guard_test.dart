@@ -85,6 +85,30 @@ void main() {
       expect(rebuild, contains('defaults to `preview_only`'));
     });
 
+    test('documents the deck trash, restore and purge', () {
+      final contracts =
+          File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();
+      final delete = _contractRowFor(contracts, 'DELETE /decks/:id');
+      final trash = _contractRowFor(contracts, 'GET /decks/trash');
+      final restore = _contractRowFor(contracts, 'POST /decks/:id/restore');
+
+      expect(delete, contains('Moves the deck to the trash'));
+      expect(delete, contains('restoring does not republish them'));
+      expect(trash, contains('`purge_after`'));
+      expect(restore, contains('404 `deck_not_in_trash`'));
+      expect(restore, contains('whole and private'));
+      for (final phrase in const [
+        '## Deck Trash, Restore and Governed Purge — 2026-09-28',
+        '`decks_trash_30d`',
+        '`shared_deck_reports_trashed_deck_30d`',
+        '`deck_learning_events_trashed_deck_30d`',
+        '409 `deck_undo_unsupported`',
+        '409 `generate_deck_in_trash`',
+      ]) {
+        expect(contracts, contains(phrase), reason: phrase);
+      }
+    });
+
     test('documents the durable Generate request and materialization', () {
       final contracts =
           File('doc/API_CONTRACTS_AND_DATA_MAP.md').readAsStringSync();

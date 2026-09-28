@@ -136,6 +136,7 @@ Future<Map<String, dynamic>?> _getDeckData(
         SELECT id, name, format
         FROM decks
         WHERE id = CAST(@id AS uuid)
+          AND deleted_at IS NULL
           AND (
             user_id = CAST(@user_id AS uuid)
             OR (CAST(@allow_public AS boolean) AND is_public = true)

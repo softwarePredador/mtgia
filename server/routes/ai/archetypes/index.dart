@@ -57,6 +57,7 @@ Future<Response> onRequest(RequestContext context) async {
         FROM decks
         WHERE id = @id
           AND user_id = CAST(@user_id AS uuid)
+          AND deleted_at IS NULL
       '''),
       parameters: {'id': deckId, 'user_id': userId},
     );

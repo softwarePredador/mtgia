@@ -46,7 +46,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
   return methodNotAllowed();
 }
 
-/// Deleta um deck.
+/// Apaga um deck: ele vai para a lixeira (DCK-P0-06), some de todas as
+/// superfícies e pode voltar por `POST /decks/:id/restore` até a purga por
+/// prazo (30 dias, D-30). Continua respondendo 204.
 Future<Response> _deleteDeck(RequestContext context, String deckId) async {
   final userId = context.read<String>();
   final conn = context.read<Pool>();

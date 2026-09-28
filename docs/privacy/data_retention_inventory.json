@@ -127,9 +127,11 @@
       "decision": "D-30",
       "rule": "purga da lixeira de decks em 30 dias",
       "applies_to": [
-        "decks.deleted_at"
+        "decks.deleted_at",
+        "shared_deck_reports",
+        "deck_learning_events"
       ],
-      "status": "não implementado: DCK-P0-06"
+      "status": "implementado no servidor (DCK-P0-06): DELETE /decks/:id manda o deck para a lixeira (decks.deleted_at) sem apagar nada, tira o deck da galeria e despublica os relatórios; o deck na lixeira some das superfícies, não conta em limite nem em aprendizado e entra na exportação; POST /decks/:id/restore devolve o deck íntegro e privado, sem republicar relatório; a limpeza por prazo (retention_cleanup_apply_v1) apaga de vez, em 30 dias, o deck, os relatórios e os eventos de aprendizado dele. Falta: a tela da lixeira no app e a ativação da limpeza na produção (decisão do dono)"
     },
     {
       "decision": "D-32",
@@ -212,6 +214,27 @@
         "scope": "só o texto de descrição copiado no ledger (a linha fica, com description_redacted_at)",
         "decision": "D-29",
         "action": "redact"
+      },
+      {
+        "id": "shared_deck_reports_trashed_deck_30d",
+        "table": "shared_deck_reports",
+        "max_age_minutes": 43200,
+        "scope": "relatórios de deck com mais de 30 dias na lixeira (já despublicados desde a ida para a lixeira); sai antes do deck",
+        "decision": "D-30"
+      },
+      {
+        "id": "deck_learning_events_trashed_deck_30d",
+        "table": "deck_learning_events",
+        "max_age_minutes": 43200,
+        "scope": "eventos de aprendizado de deck com mais de 30 dias na lixeira (sem chave estrangeira para o deck); sai antes do deck",
+        "decision": "D-30"
+      },
+      {
+        "id": "decks_trash_30d",
+        "table": "decks",
+        "max_age_minutes": 43200,
+        "scope": "deck com mais de 30 dias na lixeira, contado de deleted_at; a cascata leva o que pende do deck",
+        "decision": "D-30"
       }
     ]
   },
@@ -1598,10 +1621,19 @@
       "owner": "server/lib/ai/deck_learning_event_support.dart; server/bin/pull_learning_events.py (cópia para o SQLite Hermes)",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto o deck existir",
+        "period": "enquanto o deck existir; evento de deck na lixeira não vai para o Hermes (D-30) e sai com o deck purgado",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)"
+        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)",
+        "purges": [
+          {
+            "rule": "deck_learning_events_trashed_deck_30d",
+            "scope": "evento de deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.deck_learning_events"
@@ -1746,10 +1778,19 @@
       "owner": "server/routes/decks/**; server/routes/import/**",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e deveria ser purgado em 30 dias",
+        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e sai de vez em 30 dias (D-30)",
         "decision": "D-30",
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "a purga da lixeira em 30 dias ainda não existe (DCK-P0-06); o prompt bruto em decks.description contraria a D-29 (DCK-P0-04)"
+        "gap": "o prompt bruto em decks.description de decks salvos pelo app antigo contraria a D-29 (DCK-P0-04; decks existentes pendentes de decisão do dono)",
+        "purges": [
+          {
+            "rule": "decks_trash_30d",
+            "scope": "deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.decks"
@@ -2447,10 +2488,19 @@
       "owner": "server/lib/reports/shareable_report_service.dart",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck é apagado (D-19)",
+        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck vai para a lixeira, e não volta com o restaurar (D-19, D-30); sai com o deck purgado",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas"
+        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas",
+        "purges": [
+          {
+            "rule": "shared_deck_reports_trashed_deck_30d",
+            "scope": "relatório de deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.shared_deck_reports"

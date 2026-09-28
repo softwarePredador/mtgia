@@ -4490,6 +4490,45 @@ final migrations = <Migration>[
       ALTER TABLE deck_change_events DROP COLUMN IF EXISTS description_redacted_at;
     ''',
   ),
+  Migration(
+    version: '072',
+    name: 'deck_trash_lifecycle',
+    // DCK-P0-06 (decisões D-30 e D-19 do dono): apagar deck vira ir para a
+    // lixeira (decks.deleted_at, que existe desde a 003); restaurar volta o
+    // deck privado. As duas mudanças entram no ledger (deck_delete e
+    // deck_restore). A purga em 30 dias é a limpeza por prazo
+    // (retention_cleanup_apply_v1), desligada até a ativação supervisionada.
+    // 067 a 069 e 072 a 073 são da frente de deck.
+    up: '''
+      -- O ledger passa a registrar ir para a lixeira e voltar dela: cada uma sobe a
+      -- revisão do deck como as outras mudanças do dono.
+      ALTER TABLE deck_change_events
+        DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+      ALTER TABLE deck_change_events
+        ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+        'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+        'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+        'optimization_rollback', 'undo',
+        'deck_delete', 'deck_restore'
+      ));
+      -- A lixeira de cada dono, da mais nova para a mais velha; a limpeza por prazo
+      -- lê o mesmo índice parcial (só decks na lixeira).
+      CREATE INDEX IF NOT EXISTS idx_decks_user_trash
+        ON decks (user_id, deleted_at DESC)
+        WHERE deleted_at IS NOT NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_decks_user_trash;
+      ALTER TABLE deck_change_events
+        DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+      ALTER TABLE deck_change_events
+        ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+        'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+        'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+        'optimization_rollback', 'undo'
+      ));
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4566,11 +4605,15 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       // evento e com todo deck ainda na revisão 1.
       // A 069 cria os pedidos duráveis do Generate: o down só roda sem pedido
       // gravado e sem descrição redigida no ledger.
+      // A 072 abre a lixeira de decks: o down só roda sem deck na lixeira e
+      // sem evento de lixeira no ledger (o código de antes mostraria o deck
+      // apagado como vivo, e o CHECK antigo recusaria os eventos).
       '033' ||
       '035' ||
       '060' ||
       '067' ||
-      '069' => MigrationRollbackPolicy.emptyOnly,
+      '069' ||
+      '072' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
       '034' ||
@@ -4650,6 +4693,16 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
           OR EXISTS (
             SELECT 1 FROM deck_change_events
             WHERE description_redacted_at IS NOT NULL
+          )
+      ''')).first[0] ==
+          true,
+    '072' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM decks WHERE deleted_at IS NOT NULL)
+          OR EXISTS (
+            SELECT 1 FROM deck_change_events
+            WHERE operation IN ('deck_delete', 'deck_restore')
           )
       ''')).first[0] ==
           true,

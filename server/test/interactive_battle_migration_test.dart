@@ -82,7 +82,7 @@ void main() {
       requiredReleaseSchemaMigrations['056'],
       'create_interactive_battle_sessions',
     );
-    expect(releaseSchemaReadinessSql, contains("= '069'"));
+    expect(releaseSchemaReadinessSql, contains("= '072'"));
     expect(
       releaseSchemaReadinessSql,
       contains("to_regclass('public.interactive_battle_sessions')"),

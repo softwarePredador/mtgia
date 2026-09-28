@@ -92,6 +92,24 @@ void main() {
     );
 
     var ledgerRevision = 0;
+    var trashCount = 0;
+
+    /// D-30: deck na lixeira há [age] (o prazo conta de deleted_at).
+    Future<String> trashedDeck(Duration age) => one(
+      '''
+      INSERT INTO decks (user_id, name, format, created_at, deleted_at)
+      VALUES (CAST(@user AS uuid), @name, 'commander',
+              CAST(@at AS timestamptz) - INTERVAL '1 day',
+              CAST(@at AS timestamptz))
+      RETURNING id::text
+      ''',
+      {
+        'user': user,
+        'name': 'Lixeira $suffix ${++trashCount}',
+        'at': DateTime.now().toUtc().subtract(age),
+      },
+    );
+
     Future<String> row(
       String table,
       Duration age, {
@@ -173,6 +191,38 @@ void main() {
             'at': at,
           },
         ),
+        // D-30: o deck, o relatório e o evento de aprendizado de um deck na
+        // lixeira há [age]; a cópia nasceu antes de o deck ir para lá.
+        'decks' => trashedDeck(age),
+        'shared_deck_reports' => trashedDeck(age).then(
+          (trashed) => one(
+            '''
+            INSERT INTO shared_deck_reports (
+              id, user_id, deck_id, title, payload, is_public, created_at,
+              updated_at
+            ) VALUES (
+              @id, CAST(@user AS uuid), CAST(@deck AS uuid), 'relatório',
+              '{}'::jsonb, FALSE, @at, @at
+            ) RETURNING id
+            ''',
+            {
+              'id': 'rpt_retencao_${suffix}_$trashCount',
+              'user': user,
+              'deck': trashed,
+              'at': at.subtract(const Duration(days: 2)),
+            },
+          ),
+        ),
+        'deck_learning_events' => trashedDeck(age).then(
+          (trashed) => one(
+            '''
+            INSERT INTO deck_learning_events (deck_id, format, created_at)
+            VALUES (CAST(@deck AS uuid), 'commander', @at)
+            RETURNING id::text
+            ''',
+            {'deck': trashed, 'at': at.subtract(const Duration(days: 2))},
+          ),
+        ),
         _ => throw ArgumentError(table),
       };
     }
@@ -218,6 +268,46 @@ void main() {
         ),
       ),
     ];
+    // D-30: deck vivo antigo, com relatório e evento antigos, fica.
+    final oldAlive = await one(
+      '''
+      INSERT INTO decks (user_id, name, format, created_at)
+      VALUES (CAST(@user AS uuid), @name, 'commander',
+              CURRENT_TIMESTAMP - INTERVAL '400 days')
+      RETURNING id::text
+      ''',
+      {'user': user, 'name': 'Vivo antigo $suffix'},
+    );
+    kept
+      ..add(('decks', oldAlive))
+      ..add((
+        'shared_deck_reports',
+        await one(
+          '''
+          INSERT INTO shared_deck_reports (
+            id, user_id, deck_id, title, payload, is_public, created_at,
+            updated_at
+          ) VALUES (
+            @id, CAST(@user AS uuid), CAST(@deck AS uuid), 'vivo',
+            '{}'::jsonb, TRUE, CURRENT_TIMESTAMP - INTERVAL '400 days',
+            CURRENT_TIMESTAMP - INTERVAL '400 days'
+          ) RETURNING id
+          ''',
+          {'id': 'rpt_vivo_$suffix', 'user': user, 'deck': oldAlive},
+        ),
+      ))
+      ..add((
+        'deck_learning_events',
+        await one(
+          '''
+          INSERT INTO deck_learning_events (deck_id, format, created_at)
+          VALUES (CAST(@deck AS uuid), 'commander',
+                  CURRENT_TIMESTAMP - INTERVAL '400 days')
+          RETURNING id::text
+          ''',
+          {'deck': oldAlive},
+        ),
+      ));
     return (byRule: byRule, kept: kept);
   }
 

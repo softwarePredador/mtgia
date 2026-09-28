@@ -59,6 +59,8 @@ enum RetentionCleanupMode {
 /// com prazo dela (D-29: o prompt bruto e o texto de descrição do ledger
 /// saem em 30 dias; a linha fica). [sessionSetting] marca a transação para
 /// a redação que um gatilho só aceita assim (o ledger é só de acréscimo).
+/// O prazo conta de [ageColumn] (`created_at`, ou `deleted_at` na lixeira de
+/// decks da D-30).
 class RetentionCleanupRule {
   const RetentionCleanupRule({
     required this.id,
@@ -67,12 +69,16 @@ class RetentionCleanupRule {
     this.filter,
     this.redactSet,
     this.sessionSetting,
+    this.ageColumn = 'created_at',
   });
 
   final String id;
   final String table;
   final Duration maxAge;
   final String? filter;
+
+  /// A coluna de onde o prazo conta.
+  final String ageColumn;
 
   /// `SET` da redação (SQL fixo do código); nulo para regra que apaga.
   final String? redactSet;
@@ -84,7 +90,7 @@ class RetentionCleanupRule {
 
   String get _where =>
       '${filter == null ? '' : '$filter AND '}'
-      'created_at < CURRENT_TIMESTAMP - '
+      '$ageColumn < CURRENT_TIMESTAMP - '
       'make_interval(mins => ${maxAge.inMinutes})';
 
   String get countSql => 'SELECT COUNT(*)::int FROM $table WHERE $_where';
@@ -160,7 +166,39 @@ const retentionCleanupRules = <RetentionCleanupRule>[
         'description_redacted_at = CURRENT_TIMESTAMP',
     sessionSetting: ('manaloom.deck_ledger_redaction', 'd29_prompt_retention'),
   ),
+  // D-30 (DCK-P0-06): deck com mais de 30 dias na lixeira sai de vez. Antes
+  // dele, na mesma transação, as cópias que não pendem do deck por chave
+  // estrangeira em cascata: os relatórios (despublicados desde a ida para a
+  // lixeira) e os eventos de aprendizado.
+  RetentionCleanupRule(
+    id: 'shared_deck_reports_trashed_deck_30d',
+    table: 'shared_deck_reports',
+    maxAge: Duration(days: 30),
+    filter: 'deck_id IN ($_decksTrashedOver30Days)',
+  ),
+  RetentionCleanupRule(
+    id: 'deck_learning_events_trashed_deck_30d',
+    table: 'deck_learning_events',
+    maxAge: Duration(days: 30),
+    filter: 'deck_id IN ($_decksTrashedOver30Days)',
+  ),
+  // A cascata leva cartas, ledger, notas, comentários, confrontos e o resto
+  // que pende do deck; as referências com SET NULL ficam sem o deck, como
+  // no DELETE de antes da lixeira.
+  RetentionCleanupRule(
+    id: 'decks_trash_30d',
+    table: 'decks',
+    maxAge: Duration(days: 30),
+    filter: 'deleted_at IS NOT NULL',
+    ageColumn: 'deleted_at',
+  ),
 ];
+
+/// Decks com mais de 30 dias na lixeira (D-30), para as regras das cópias
+/// que saem antes do deck.
+const _decksTrashedOver30Days =
+    'SELECT id FROM decks WHERE deleted_at IS NOT NULL AND '
+    'deleted_at < CURRENT_TIMESTAMP - make_interval(mins => 43200)';
 
 /// Lê `--mode <modo>` (ou `--mode=<modo>`), `--dry-run` e `--output-dir`.
 /// Qualquer outra coisa, inclusive as flags de prazo antigas

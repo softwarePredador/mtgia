@@ -52,6 +52,20 @@ PG_PASS = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASS") or ""
 MIN_TRAINING_CARD_COUNT = int(os.environ.get("HERMES_MIN_TRAINING_CARD_COUNT", "90"))
 USER_CREATED_SOURCE = "user_created"
 
+# DCK-P0-06 (decisao D-30 do dono): deck na lixeira nao conta em aprendizado.
+# So sai evento de deck vivo: o de deck na lixeira espera (volta a sair se o
+# deck for restaurado) e o de deck apagado de vez nunca sai; a limpeza por
+# prazo apaga os eventos do deck purgado.
+PENDING_EVENTS_SQL = """
+        SELECT e.id, e.deck_id, e.commander_name, e.format, e.card_count,
+               e.source, e.event_data, e.created_at
+        FROM deck_learning_events e
+        JOIN decks d ON d.id = e.deck_id AND d.deleted_at IS NULL
+        WHERE e.synced_to_hermes = FALSE
+        ORDER BY e.created_at ASC
+        LIMIT 500
+    """
+
 
 def main():
     print("=== Pull deck_learning_events from PG ===")
@@ -90,15 +104,8 @@ def main():
         print(f"PG connection failed: {e}")
         return 1
 
-    # Busca eventos nao sincronizados (ultimos 500)
-    cur.execute("""
-        SELECT id, deck_id, commander_name, format, card_count, source,
-               event_data, created_at
-        FROM deck_learning_events
-        WHERE synced_to_hermes = FALSE
-        ORDER BY created_at ASC
-        LIMIT 500
-    """)
+    # Busca eventos nao sincronizados (ultimos 500), so de deck vivo.
+    cur.execute(PENDING_EVENTS_SQL)
     events = cur.fetchall()
 
     sqlite = sqlite3.connect(SQLITE_DB)

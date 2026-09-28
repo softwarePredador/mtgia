@@ -198,6 +198,11 @@ void main() {
         'PATCH /decks/deck': 'decks_private',
         'POST /decks/deck/cards/bulk': 'decks_private',
         'POST /decks/deck/cards/set': 'decks_private',
+        // DCK-P0-06 (D-30): apagar, ver a lixeira e restaurar ficam em
+        // decks_private.
+        'DELETE /decks/deck': 'decks_private',
+        'GET /decks/trash': 'decks_private',
+        'POST /decks/deck/restore': 'decks_private',
         'PUT /decks/deck': 'deck_replace_all',
         'POST /decks/deck/cards/replace': 'deck_replace_all',
         'POST /import/to-deck': 'deck_replace_all',

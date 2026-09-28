@@ -39,7 +39,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | --- | --- | --- | --- |
 | D-23 | caches com TTL de até 24 h | `ai_optimize_cache`, EndpointCache | cache do Optimize vence em 6 h; o EndpointCache não tem teto e guarda entradas vencidas |
 | D-29 | prompt bruto do Generate por 30 dias, fora de `decks.description` | `decks.description`, `ai_generate_jobs.result`, `ai_generate_requests.prompt`, descrição no `deck_change_events` | o servidor guarda o prompt em `ai_generate_requests` e a limpeza por prazo o apaga em 30 dias, junto com o texto de descrição do ledger (`DCK-P0-04`); o deck materializado nasce sem o prompt; o app antigo ainda grava o prompt na descrição pelo `POST /decks` |
-| D-30 | purga da lixeira em 30 dias | `decks.deleted_at` | não existe; é o `DCK-P0-06` |
+| D-30 | purga da lixeira em 30 dias | `decks.deleted_at`, `shared_deck_reports`, `deck_learning_events` | o `DELETE` manda o deck para a lixeira, que some das superfícies, não conta em limite nem em aprendizado e entra na exportação; o restaurar devolve o deck privado, sem republicar relatório; a limpeza por prazo apaga de vez em 30 dias o deck, os relatórios e os eventos de aprendizado dele (`DCK-P0-06`); a tela da lixeira é da raia do app |
 | D-32 | jobs de IA por 24 h | `ai_generate_jobs`, `ai_optimize_jobs` | o código apaga em 30 min; é o `BT-AI-032` |
 | D-23 | backups não são reescritos; rotação entra na política | backups | prazo de rotação ainda não decidido |
 

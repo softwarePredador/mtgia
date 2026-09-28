@@ -105,7 +105,17 @@ Future<Map<String, Object?>> materializeAiGenerateRequest(
   final existingDeckId = row['materialized_deck_id'] as String?;
   if (existingDeckId != null) {
     final existing = await _readDeck(session, existingDeckId, userId);
-    if (existing != null) return {'replayed': true, 'deck': existing};
+    // DCK-P0-06: o deck deste resultado foi para a lixeira; volta pelo
+    // restaurar, sem criar outro.
+    if (existing != null && existing.inTrash) {
+      throw AiGenerateMaterializeRefusal(
+        HttpStatus.conflict,
+        'generate_deck_in_trash',
+        'O deck deste resultado está na lixeira. Restaure-o de lá.',
+        details: {'deck_id': existingDeckId},
+      );
+    }
+    if (existing != null) return {'replayed': true, 'deck': existing.deck};
   }
 
   if (AiGenerateRequestStore.effectiveStatus(row) != 'completed' ||
@@ -313,11 +323,11 @@ Future<Map<String, Object?>> materializeAiGenerateRequest(
   );
   return {
     'replayed': false,
-    'deck': (await _readDeck(session, deckId, userId))!,
+    'deck': (await _readDeck(session, deckId, userId))!.deck,
   };
 }
 
-Future<Map<String, dynamic>?> _readDeck(
+Future<({Map<String, dynamic> deck, bool inTrash})?> _readDeck(
   Session session,
   String deckId,
   String userId,
@@ -326,7 +336,7 @@ Future<Map<String, dynamic>?> _readDeck(
     Sql.named('''
       SELECT id::text, name, format, description, bracket, is_public,
              revision, validation_state, validation_reasons,
-             validation_updated_at, created_at
+             validation_updated_at, created_at, deleted_at
       FROM decks
       WHERE id = CAST(@deckId AS uuid) AND user_id = CAST(@userId AS uuid)
     '''),
@@ -334,10 +344,11 @@ Future<Map<String, dynamic>?> _readDeck(
   );
   if (result.isEmpty) return null;
   final deck = result.first.toColumnMap();
+  final inTrash = deck.remove('deleted_at') != null;
   if (deck['created_at'] is DateTime) {
     deck['created_at'] = (deck['created_at'] as DateTime).toIso8601String();
   }
-  return exposeDeckValidationState(deck);
+  return (deck: exposeDeckValidationState(deck), inTrash: inTrash);
 }
 
 Map<String, dynamic> _jsonMap(Object? raw) {

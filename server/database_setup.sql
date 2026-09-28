@@ -2719,6 +2719,25 @@ BEGIN
 END;
 $deck_change_events_append_only$;
 
+-- DCK-P0-06 (migration 072): lixeira de decks (D-30), com os eventos de
+-- lixeira no ledger e o índice parcial da lixeira.
+-- O ledger passa a registrar ir para a lixeira e voltar dela: cada uma sobe a
+-- revisão do deck como as outras mudanças do dono.
+ALTER TABLE deck_change_events
+  DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+ALTER TABLE deck_change_events
+  ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+  'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+  'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+  'optimization_rollback', 'undo',
+  'deck_delete', 'deck_restore'
+));
+-- A lixeira de cada dono, da mais nova para a mais velha; a limpeza por prazo
+-- lê o mesmo índice parcial (só decks na lixeira).
+CREATE INDEX IF NOT EXISTS idx_decks_user_trash
+  ON decks (user_id, deleted_at DESC)
+  WHERE deleted_at IS NOT NULL;
+
 -- ============================================================
 -- GROWTH: Relatorios compartilhaveis
 -- ============================================================

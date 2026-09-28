@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "e4a7568d2266d3f8aa1a4c5aea53c0e7013786df8c92cb33d22718f2063d993b",
+  "x-manaloom-source-digest-sha256": "87967e431bd66c9d62b3bb852ee8976a6f62ddd0c86f90882c339439f1d9b4c6",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -2670,6 +2670,34 @@
         }
       }
     },
+    "/decks/trash": {
+      "get": {
+        "operationId": "getDecksTrash",
+        "summary": "GET /decks/trash",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/trash/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
     "/decks/{id}": {
       "delete": {
         "operationId": "deleteDecksId",
@@ -3796,6 +3824,44 @@
           "decks"
         ],
         "x-manaloom-source": "server/routes/decks/[id]/reports/index.dart",
+        "x-manaloom-contract-level": "structural_generated",
+        "x-manaloom-tests": [
+          "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",
+          "server/test/auto_promote_learned_decks_test.py",
+          "server/test/auto_sync_learned_decks_test.py",
+          "server/test/decks_crud_test.dart",
+          "server/test/decks_incremental_add_test.dart"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Shape is governed by server/doc/API_CONTRACTS_AND_DATA_MAP.md and route tests."
+          }
+        }
+      }
+    },
+    "/decks/{id}/restore": {
+      "post": {
+        "operationId": "postDecksIdRestore",
+        "summary": "POST /decks/{id}/restore",
+        "tags": [
+          "decks"
+        ],
+        "x-manaloom-source": "server/routes/decks/[id]/restore/index.dart",
         "x-manaloom-contract-level": "structural_generated",
         "x-manaloom-tests": [
           "docs/hermes-analysis/manaloom-knowledge/scripts/test_import_lorehold_decks_multi_roles.py",

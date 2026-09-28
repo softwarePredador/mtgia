@@ -78,6 +78,7 @@ Future<Response> onRequest(RequestContext context) async {
           d.bracket::int
         FROM decks d
         WHERE d.id = @deckId AND d.user_id = @userId
+          AND d.deleted_at IS NULL
         LIMIT 1
       '''),
       parameters: {'deckId': deckId, 'userId': userId},

@@ -101,6 +101,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
               'description_redacted': row['description_redacted_at'] != null,
               'can_undo':
                   row['revision_after'] == revision &&
+                  // DCK-P0-06: lixeira e restaurar não se desfazem aqui.
+                  !deckLifecycleOperations.contains(row['operation']) &&
                   !(row['description_redacted_at'] != null &&
                       _jsonMap(
                         row['metadata_before'],

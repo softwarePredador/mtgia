@@ -86,6 +86,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       '''
@@ -121,6 +122,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       ''')
@@ -157,6 +159,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       '''
@@ -192,6 +195,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       ''');
@@ -258,7 +262,8 @@ Future<Response> _listDecks(RequestContext context) async {
             JOIN cards c ON c.id = dc.card_id
             CROSS JOIN LATERAL unnest(COALESCE(c.color_identity, '{}')) AS unnested
             WHERE dc.deck_id = ANY(
-              SELECT id FROM decks WHERE user_id = @userId
+              SELECT id FROM decks
+              WHERE user_id = @userId AND deleted_at IS NULL
             )
             GROUP BY dc.deck_id
           '''),

@@ -28,6 +28,10 @@ const _deckRouteClassification = <String, bool>{
   // DCK-P0-00 (D-27): edição incremental sob decks_private.
   'PATCH /decks/sample': true,
   'DELETE /decks/sample': false,
+  // DCK-P0-06 (D-30): a lixeira é leitura; restaurar volta o deck a ser
+  // escrito, e rota nova sob /decks nasce exigindo.
+  'GET /decks/trash': false,
+  'POST /decks/sample/restore': true,
   'POST /decks/sample/cards': true,
   'POST /decks/sample/cards/bulk': true,
   'POST /decks/sample/cards/remove': true,

@@ -9,14 +9,18 @@ import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
 import '../lib/battle/interactive_battle_deck_lifecycle.dart';
+import '../lib/decks/deck_trash_support.dart';
 import '../lib/reports/shareable_report_service.dart';
 import '../routes/reports/[id].dart' as report_route;
 import 'support/scripted_pool.dart';
 
 /// Buraco 4 da D-19 (parte do DCK-P0-06), em PostgreSQL descartável: o
 /// relatório compartilhável continua público, mas deixa de ser servido
-/// quando o deck é apagado, pela exclusão de hoje (`DELETE`, que zera
-/// `deck_id`) ou pela lixeira (`decks.deleted_at`).
+/// quando o deck é apagado. Desde a lixeira (DCK-P0-06), apagar despublica
+/// o relatório e marca `decks.deleted_at`, e restaurar não o republica
+/// (D-30). O filtro de leitura segue valendo para o estoque antigo: deck
+/// removido do banco (a exclusão de antes, que zerava `deck_id`) e deck
+/// marcado na lixeira por fora da rota.
 ///
 /// Requer `RUN_SHAREABLE_REPORT_DB_TESTS=1` e as variáveis `DB_*` de um banco
 /// descartável já migrado.
@@ -104,12 +108,14 @@ void main() {
         expect(await service.getPublicReport(id), isNotNull, reason: id);
       }
 
-      final deletion = await deleteDeckAfterBattleGuard(
-        pool,
-        userId: userId,
-        deckId: deletedDeck,
+      // O estoque de antes da lixeira: o deck saiu do banco e o FK zerou
+      // deck_id, com o relatório ainda marcado público.
+      await pool.execute(
+        Sql.named('DELETE FROM decks WHERE id = CAST(@deckId AS uuid)'),
+        parameters: {'deckId': deletedDeck},
       );
-      expect(deletion, InteractiveBattleDeckDeleteResult.deleted);
+      // Deck marcado na lixeira por fora da rota: o relatório segue marcado
+      // público, e o JOIN o esconde.
       await pool.execute(
         Sql.named('''
           UPDATE decks SET deleted_at = NOW()
@@ -118,8 +124,6 @@ void main() {
         parameters: {'deckId': trashedDeck},
       );
 
-      // A linha do relatório continua no banco (deck_id zerado pelo FK),
-      // mas não é mais servida.
       final orphan = await pool.execute(
         Sql.named(
           'SELECT deck_id, is_public FROM shared_deck_reports WHERE id = @id',
@@ -132,6 +136,36 @@ void main() {
       expect(await service.getPublicReport(deletedReport), isNull);
       expect(await service.getPublicReport(trashedReport), isNull);
       expect(await service.getPublicReport(keptReport), isNotNull);
+
+      // DCK-P0-06: apagar pela rota despublica o relatório de vez; restaurar
+      // devolve o deck, não o link (D-30).
+      final restoredDeck = await insertDeck(userId, 'Deck restaurado $suffix');
+      final restoredReport = await share(restoredDeck);
+      expect(await service.getPublicReport(restoredReport), isNotNull);
+      final deletion = await deleteDeckAfterBattleGuard(
+        pool,
+        userId: userId,
+        deckId: restoredDeck,
+      );
+      expect(deletion, InteractiveBattleDeckDeleteResult.deleted);
+      final unpublished = await pool.execute(
+        Sql.named(
+          'SELECT deck_id::text, is_public FROM shared_deck_reports '
+          'WHERE id = @id',
+        ),
+        parameters: {'id': restoredReport},
+      );
+      expect(unpublished.single[0], restoredDeck);
+      expect(unpublished.single[1], isFalse);
+      expect(await service.getPublicReport(restoredReport), isNull);
+      final restored = await restoreDeckFromTrash(
+        pool,
+        userId: userId,
+        deckId: restoredDeck,
+      );
+      expect(restored.result, DeckRestoreResult.restored);
+      expect(await service.getPublicReport(restoredReport), isNull);
+      expect((await getReport(restoredReport)).statusCode, HttpStatus.notFound);
 
       final gone = await getReport(deletedReport);
       expect(gone.statusCode, HttpStatus.notFound);

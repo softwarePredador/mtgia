@@ -76,6 +76,7 @@ Future<OptimizeStoredDeckSettings?> loadOptimizeStoredDeckSettings({
       FROM decks
       WHERE id = CAST(@id AS uuid)
         AND user_id = CAST(@user_id AS uuid)
+        AND deleted_at IS NULL
       LIMIT 1
     '''),
     parameters: {'id': deckId, 'user_id': userId},
@@ -113,6 +114,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
             FROM decks
             WHERE id = CAST(@id AS uuid)
               AND user_id = CAST(@user_id AS uuid)
+              AND deleted_at IS NULL
           '''),
               parameters: {'id': deckId, 'user_id': userId},
             ),
@@ -123,6 +125,7 @@ Future<OptimizeDeckContextData> loadOptimizeDeckContext({
           FROM decks
           WHERE id = CAST(@id AS uuid)
             AND user_id = CAST(@user_id AS uuid)
+            AND deleted_at IS NULL
         '''),
             parameters: {'id': deckId, 'user_id': userId},
           ));
@@ -420,6 +423,7 @@ Future<void> verifyOptimizeDeckAccess({
       FROM decks
       WHERE id = CAST(@id AS uuid)
         AND user_id = CAST(@user_id AS uuid)
+        AND deleted_at IS NULL
       LIMIT 1
     '''),
     parameters: {'id': deckId, 'user_id': userId},

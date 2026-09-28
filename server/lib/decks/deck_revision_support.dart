@@ -36,8 +36,15 @@ const deckIfMatchMissingWarning = 'if_match_missing';
 const deckIfMatchRequiredEnvironment = 'MANALOOM_DECK_IF_MATCH_REQUIRED';
 const deckIdempotencyKeyMaxLength = 200;
 
-/// Operações que o ledger aceita (CHECK da migration 067).
+/// Operações que o ledger aceita (CHECK das migrations 067 e 072).
 const deckChangeOperations = <String>{
+  ...deckContentOperations,
+  ...deckLifecycleOperations,
+};
+
+/// Mudanças do conteúdo do deck: passam por [DeckMutationRequest] e
+/// [recordDeckMutation], com `Idempotency-Key`, e o desfazer universal volta.
+const deckContentOperations = <String>{
   'card_add',
   'card_bulk',
   'card_set',
@@ -50,6 +57,12 @@ const deckChangeOperations = <String>{
   'optimization_rollback',
   'undo',
 };
+
+/// Ir para a lixeira e voltar dela (DCK-P0-06, migration 072). Entram no
+/// ledger e sobem a revisão ([recordDeckLifecycleEvent]), mas não se
+/// desfazem pelo desfazer universal: voltar da lixeira é
+/// `POST /decks/:id/restore`, e apagar de novo é o `DELETE`.
+const deckLifecycleOperations = <String>{'deck_delete', 'deck_restore'};
 
 /// Metadados do deck que o ledger acompanha e o desfazer restaura.
 const deckLedgerMetadataFields = <String>[
@@ -172,7 +185,7 @@ class DeckMutationRequest {
     Object? body,
     String? target,
   }) {
-    if (!deckChangeOperations.contains(operation)) {
+    if (!deckContentOperations.contains(operation)) {
       throw ArgumentError.value(operation, 'operation', 'fora do ledger');
     }
     String? header(String name) {
@@ -394,10 +407,13 @@ Future<DeckMutationBaseline?> lockDeckForMutation(
              validation_state, validation_reasons, validation_updated_at
       FROM decks
       WHERE id = CAST(@deckId AS uuid) AND user_id = CAST(@userId AS uuid)
+        AND deleted_at IS NULL
       FOR UPDATE
     '''),
     parameters: {'deckId': deckId, 'userId': userId},
   );
+  // Deck na lixeira (DCK-P0-06) não muda: a trava da linha também fecha a
+  // corrida com o DELETE, que precisa dela para marcar `deleted_at`.
   if (deck.isEmpty) return null;
   final row = deck.first.toColumnMap();
   final revision = (row['revision'] as num).toInt();
@@ -473,7 +489,7 @@ Future<DeckMutationReceipt> recordDeckMutation(
   String? undoOfEventId,
 }) async {
   final resolvedOperation = operation ?? baseline.request.operation;
-  if (!deckChangeOperations.contains(resolvedOperation)) {
+  if (!deckContentOperations.contains(resolvedOperation)) {
     throw ArgumentError.value(resolvedOperation, 'operation', 'fora do ledger');
   }
   final cardsAfter = await readDeckCardsSnapshot(session, baseline.deckId);
@@ -548,6 +564,56 @@ Future<DeckMutationReceipt> recordDeckMutation(
     ifMatchMissing: ifMatchMissing,
     readiness: readiness,
   );
+}
+
+/// Grava no ledger a ida para a lixeira ou a volta dela (DCK-P0-06), na
+/// transação que já trava o deck: sobe a revisão em 1 e acrescenta o evento
+/// mesmo sem carta nem metadado mudado, porque o estado do deck mudou para o
+/// dono. Os metadados levam só a visibilidade, quando ela muda.
+Future<({int revision, String eventId})> recordDeckLifecycleEvent(
+  Session session, {
+  required String deckId,
+  required String userId,
+  required int revisionBefore,
+  required String operation,
+  Map<String, Object?> metadataBefore = const {},
+  Map<String, Object?> metadataAfter = const {},
+}) async {
+  if (!deckLifecycleOperations.contains(operation)) {
+    throw ArgumentError.value(operation, 'operation', 'fora da lixeira');
+  }
+  final bumped = await session.execute(
+    Sql.named('''
+      UPDATE decks SET revision = revision + 1
+      WHERE id = CAST(@deckId AS uuid)
+      RETURNING revision
+    '''),
+    parameters: {'deckId': deckId},
+  );
+  final revision = (bumped.first[0] as num).toInt();
+  final event = await session.execute(
+    Sql.named('''
+      INSERT INTO deck_change_events (
+        deck_id, user_id, revision_before, revision_after, operation,
+        metadata_before, metadata_after
+      ) VALUES (
+        CAST(@deckId AS uuid), CAST(@userId AS uuid), @revisionBefore,
+        @revisionAfter, @operation,
+        CAST(@metadataBefore AS jsonb), CAST(@metadataAfter AS jsonb)
+      )
+      RETURNING id::text
+    '''),
+    parameters: {
+      'deckId': deckId,
+      'userId': userId,
+      'revisionBefore': revisionBefore,
+      'revisionAfter': revision,
+      'operation': operation,
+      'metadataBefore': jsonEncode(metadataBefore),
+      'metadataAfter': jsonEncode(metadataAfter),
+    },
+  );
+  return (revision: revision, eventId: event.first[0] as String);
 }
 
 /// A prontidão persistida do deck, no formato que as rotas expõem. Uma
