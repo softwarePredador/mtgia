@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "4c7614b949619adf9c3d259276a12397aeddac17b7212d64a23cccd6ed9a2fd6",
+  "source_digest_sha256": "98764e2dd665a64c5186d9339b368030c989940b52b1ff39c745bf75fec0a2de",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -268065,7 +268065,7 @@
     {
       "path": "server/bin/manaloom_slo_alerts.py",
       "role": "operation",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": [
         "MANALOOM_REPO"
       ]
@@ -278053,7 +278053,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "497877cdf4ed60668ed6b3610aef9dea85992d33db5d6eb04fcabaefbdae951f"
+      "sha256": "d2e742dc97561be90777512656aa1d3d80b9e7f1d7fa0c8223413f6cd057ee99"
     },
     "required_task_fields": [
       "id",
@@ -280786,13 +280786,13 @@
       {
         "id": "BT-OBS-003",
         "priority": "P0 CORE",
-        "status": "BLOCKED_BY_P0",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Alerta de release, separado do `BT-OBS-001` (D-51).",
         "depends_on": [
           "BT-REL-002",
           "BT-OBS-001"
         ],
-        "acceptance": "Divergência de SHA, digest ou capability entre o release e a produção dispara alerta para o dono, com runbook ligado.",
+        "acceptance": "Divergência de SHA, digest ou capability entre o release e a produção dispara alerta para o dono, com runbook ligado. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção. O avaliador do `BT-OBS-001` (`server/bin/manaloom_slo_alerts.py`, job de 5 minutos do ops) lê a identidade de release de cada superfície com o portão do `BT-REL-002`: o backend pela URL interna; o site, o `/app` e o APK pela origem pública da política ou por `MANALOOM_RELEASE_PUBLIC_BASE_URL`. A âncora é o próprio ops, que sai na mesma promoção (`GIT_SHA` e a matriz do image). `server/config/slo_alert_policy.json` (`2026-09-28.2`) traz quatro regras com `task: BT-OBS-003`, separadas (D-51), cada limite justificado: `release_identity_unreadable` (aviso, 2 avaliações), `release_identity_mixed` (aviso, 12 avaliações, o tempo de uma promoção), `release_capabilities_divergent` (crítico, 2 avaliações: no mesmo SHA, outro digest, modo, produto, superfície, flag ou identidade) e `release_android_behind` (aviso, 24 h de carência, D-13). O runbook `docs/runbooks/SLO_E_ALERTAS.md` ganhou uma seção por alerta, e o image do ops passou a levar o portão de identidade. Evidência: `server/test/slo_alerts_test.py` (33, com HTTP falso servindo as identidades); 17 mutações falham como esperado; receipt em `docs/qa/execution/2026-09-28/BT-OBS-003-alerta-de-release.md`. Segue aberto: a configuração do ops (receptor e, se preciso, a origem pública) e o teste de alerta reconhecido pelo dono, como no `BT-OBS-001`; a primeira promoção com os scripts do `BT-REL-002` grava as identidades novas.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 676
       },
@@ -288062,7 +288062,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "4c7614b949619adf9c3d259276a12397aeddac17b7212d64a23cccd6ed9a2fd6"
+    "project_logic_source_digest_sha256": "98764e2dd665a64c5186d9339b368030c989940b52b1ff39c745bf75fec0a2de"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """BT-OBS-001 (D-47, D-51): SLOs e alertas de API, PostgreSQL, jobs, cache e catálogo.
+BT-OBS-003 (D-51): o alerta de release, separado, com as regras `release_*`.
 
 Roda como job do daemon de ops a cada 5 minutos. Só lê:
 - `GET /health/live` e `GET /health/ready` da API;
 - `GET /health/metrics` (janelas de 5 e 60 minutos e o cache), com a chave de ops;
 - o PostgreSQL numa transação READ ONLY (conexões e frescor do catálogo);
 - o manifesto de jobs do próprio daemon.
+Do BT-OBS-003, lê a identidade de release de cada superfície (BT-REL-002: as fontes
+de `server/config/release_promotion.json`) e compara com a do próprio ops, que sai
+na mesma promoção: SHA e a matriz de capabilities do image.
 Avalia as regras de `server/config/slo_alert_policy.json`, grava a observação
 da janela e o estado dos alertas abertos no volume do ops e avisa o dono pelo
 canal configurado: e-mail (Resend) ou Telegram. Sem receptor configurado, a
@@ -20,13 +24,16 @@ Subcomandos:
 
 Ambiente: MANALOOM_SLO_API_BASE_URL, MANALOOM_OPS_API_KEY, DB_HOST, DB_PORT,
 DB_NAME, DB_USER, DB_PASS, MANALOOM_OPS_DATA_DIR, MANALOOM_OPS_JOBS_JSON e o
-receptor (MANALOOM_ALERT_CHANNEL e as variáveis do canal, na política).
+receptor (MANALOOM_ALERT_CHANNEL e as variáveis do canal, na política). Do
+BT-OBS-003: GIT_SHA e MANALOOM_RELEASE_CAPABILITIES_FILE (os do ops) e, opcional,
+MANALOOM_RELEASE_PUBLIC_BASE_URL (a origem pública do site, do /app e do APK).
 """
 
 from __future__ import annotations
 
 import argparse
 import datetime as dt
+import importlib.util
 import json
 import os
 import re
@@ -43,6 +50,19 @@ REPO_ROOT = Path(
 DEFAULT_POLICY = REPO_ROOT / "server" / "config" / "slo_alert_policy.json"
 RUNBOOK = REPO_ROOT / "docs" / "runbooks" / "SLO_E_ALERTAS.md"
 DECISION_SOURCE = REPO_ROOT / "docs" / "BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md"
+# BT-OBS-003: o portão de identidade do BT-REL-002 e a política de promoção, que o deploy
+# do ops leva no image, e a matriz de capabilities do próprio ops.
+IDENTITY_MODULE = REPO_ROOT / "scripts" / "manaloom_release_identity_gate.py"
+RELEASE_CONFIG = REPO_ROOT / "server" / "config" / "release_promotion.json"
+CAPABILITIES_FILE = REPO_ROOT / "server" / "config" / "release_capabilities.json"
+# Problemas de leitura do portão de identidade que contam como ilegível, não divergência.
+UNREADABLE_MARKS = ("respondeu", "fonte sem leitura", "nenhuma fonte", "próprio")
+RELEASE_ALERTS = {
+    "release_identity_unreadable",
+    "release_identity_mixed",
+    "release_capabilities_divergent",
+    "release_android_behind",
+}
 OPS_HEADER = "x-manaloom-ops-key"
 HTTP_TIMEOUT_SECONDS = 10
 KNOWN_ALERTS = {
@@ -60,7 +80,7 @@ KNOWN_ALERTS = {
     "endpoint_cache_large",
     "catalog_written_outside_job",
     "catalog_read_upstream",
-}
+} | RELEASE_ALERTS
 SEVERITIES = ("critical", "warning")
 # BT-CAT-03: o frescor é o do job de catálogo (BT-CAT-01), pela mesma regra dele:
 # a data da fonte aplicada e, sem ela, o último sync de cartas (sync_state).
@@ -129,6 +149,28 @@ def policy_problems(policy: dict[str, Any]) -> list[str]:
             problems.append(f"alerts.{code}.summary ausente")
         if not isinstance(rule.get("runbook"), str) or not rule["runbook"]:
             problems.append(f"alerts.{code}.runbook ausente")
+    # D-51: o alerta de release é do BT-OBS-003, separado; os outros são do BT-OBS-001.
+    for code, rule in alerts.items():
+        if isinstance(rule, dict) and (rule.get("task") == "BT-OBS-003") != (code in RELEASE_ALERTS):
+            problems.append(f"alerts.{code}.task deve ser BT-OBS-003 só nos alertas de release")
+    release = policy.get("release")
+    if not isinstance(release, dict) or release.get("task") != "BT-OBS-003":
+        problems.append("release deve ser do BT-OBS-003 (D-51)")
+    else:
+        if release.get("identity_config") != "server/config/release_promotion.json":
+            problems.append("release.identity_config deve ser a política de promoção")
+        if not isinstance(release.get("anchor"), str) or not release["anchor"].strip():
+            problems.append("release.anchor ausente")
+    behind = alerts.get("release_android_behind")
+    if isinstance(behind, dict) and (
+            not isinstance(behind.get("grace_hours"), int) or behind["grace_hours"] <= 0):
+        problems.append("alerts.release_android_behind.grace_hours inválido")
+    for code in ("release_identity_unreadable", "release_identity_mixed",
+                 "release_capabilities_divergent"):
+        rule = alerts.get(code)
+        if isinstance(rule, dict) and (
+                not isinstance(rule.get("consecutive"), int) or rule["consecutive"] < 1):
+            problems.append(f"alerts.{code}.consecutive inválido")
     receiver = policy.get("receiver")
     if not isinstance(receiver, dict) or set(receiver.get("channels", {})) != {"email", "telegram"}:
         problems.append("receiver.channels deve ter email e telegram (D-47)")
@@ -415,7 +457,76 @@ def collect_signals(
     except (OSError, json.JSONDecodeError):
         jobs = []
     signals["jobs"] = jobs
+    signals["release"] = collect_release(env, fetch)
     return signals
+
+
+def _identity_module() -> Any:
+    spec = importlib.util.spec_from_file_location("bt_obs_003_identity", IDENTITY_MODULE)
+    if spec is None or spec.loader is None:
+        raise ImportError(str(IDENTITY_MODULE))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def _rewrite(url: str, surface_id: str, api_base: str, public_base: str) -> str:
+    """Troca a origem: a API pela interna do Swarm; o resto pela pública configurada."""
+    match = re.match(r"^https://[^/]+(/.*)?$", url)
+    path = (match.group(1) or "") if match else ""
+    if surface_id == "backend" and api_base:
+        return api_base + path
+    if surface_id != "backend" and public_base:
+        return public_base + path
+    return url
+
+
+def collect_release(env: dict[str, str], fetch: Fetch) -> dict[str, Any]:
+    """BT-OBS-003: a identidade de cada superfície e a do próprio ops (a âncora)."""
+    try:
+        gate = _identity_module()
+        config = json.loads(RELEASE_CONFIG.read_text(encoding="utf-8"))
+        surfaces = config["surfaces"]
+    except (OSError, ImportError, SyntaxError, json.JSONDecodeError, KeyError, TypeError):
+        return {"ok": False, "reason": "o image do ops não tem o portão de identidade"}
+    own_sha = env.get("GIT_SHA", "").strip()
+    capabilities_file = Path(env.get("MANALOOM_RELEASE_CAPABILITIES_FILE") or CAPABILITIES_FILE)
+    try:
+        expected = gate.expected_identity(own_sha, capabilities_file.read_bytes())
+    except (OSError, gate.InvalidInput):
+        return {"ok": False, "reason": "o ops não tem identidade própria (GIT_SHA ou matriz)"}
+    api_base = env.get("MANALOOM_SLO_API_BASE_URL", "").rstrip("/")
+    public_base = env.get("MANALOOM_RELEASE_PUBLIC_BASE_URL", "").rstrip("/")
+    if public_base and not re.fullmatch(r"https://[A-Za-z0-9.\-]+(:[0-9]+)?", public_base):
+        return {"ok": False, "reason": "MANALOOM_RELEASE_PUBLIC_BASE_URL inválida"}
+    identities: dict[str, Any] = {}
+    for surface in surfaces:
+        readings = []
+        for index, source in enumerate(surface["identity"]["sources"]):
+            if source["kind"] == "http_json":
+                status, body = fetch(_rewrite(source["url"], surface["id"], api_base,
+                                              public_base), {})
+                try:
+                    parsed = json.loads(body) if status == 200 else None
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    parsed = None
+                readings.append({"kind": "http_json", "index": index, "status": status,
+                                 "body": parsed})
+            elif source["kind"] == "self":
+                readings.append({"kind": "self", "index": index, "git_sha": own_sha,
+                                 "capabilities_digest": expected["capabilities_digest"]})
+        identities[surface["id"]] = gate.surface_identity(
+            surface["id"], surface["identity"], readings, {"http_json", "self"})
+    scope = [surface["id"] for surface in surfaces]
+    result = gate.gate(expected, identities, scope)
+    return {
+        "ok": True,
+        "expected": result["expected"],
+        "core": [surface["id"] for surface in surfaces if surface["identity"]["same_sha"]],
+        "identities": identities,
+        "results": result["surfaces"],
+    }
 
 
 # ---------------------------------------------------------------- avaliação
@@ -647,9 +758,68 @@ def evaluate(
             )
     listed = {str(job.get("name") or "") for job in signals["jobs"]}
     first_seen = {name: seen for name, seen in first_seen.items() if name in listed}
+
+    # BT-OBS-003 (D-51): release e produção divergem.
+    android_since = memory.get("release_android_behind_since")
+    release = signals.get("release") or {"ok": False, "reason": "sem leitura de release"}
+    unreadable: list[str] = []
+    mixed: list[str] = []
+    divergent: list[str] = []
+    android_behind: str | None = None
+    if not release["ok"]:
+        unreadable.append(f"ops ({release.get('reason')})")
+    else:
+        expected_sha = release["expected"]["git_sha"]
+        for surface_id, identity in release["identities"].items():
+            if surface_id == "backend" and not live["ok"]:
+                continue  # a queda da API já é o api_down
+            # Fonte que não responde é ilegível; fonte que responde sem a identidade
+            # (campo ausente) ou fontes que discordam são divergência.
+            reading = [problem for problem in identity["problems"]
+                       if any(mark in problem for mark in UNREADABLE_MARKS)]
+            if reading:
+                unreadable.append(surface_id)
+                continue
+            if identity["problems"]:
+                divergent.append(surface_id)
+                continue
+            sha = identity["fields"].get("git_sha")
+            if sha != expected_sha:
+                if surface_id in release["core"]:
+                    mixed.append(f"{surface_id}:{str(sha)[:12]}")
+                else:
+                    android_behind = f"{surface_id}:{str(sha)[:12]}"
+                continue
+            if release["results"][surface_id]["problems"]:
+                divergent.append(surface_id)
+    if streak("release_identity_unreadable", bool(unreadable)):
+        alerts.append(_alert("release_identity_unreadable", rules["release_identity_unreadable"],
+                             ", ".join(sorted(unreadable)), "identidade legível"))
+    anchor = release["expected"]["git_sha"][:12] if release["ok"] else None
+    if streak("release_identity_mixed", bool(mixed)):
+        alerts.append(_alert("release_identity_mixed", rules["release_identity_mixed"],
+                             ", ".join(sorted(mixed)), f"ops:{anchor}"))
+    if streak("release_capabilities_divergent", bool(divergent)):
+        alerts.append(_alert("release_capabilities_divergent",
+                             rules["release_capabilities_divergent"],
+                             ", ".join(sorted(divergent)), f"matriz do SHA {anchor}"))
+    behind_rule = rules["release_android_behind"]
+    if android_behind is None:
+        android_since = None
+    else:
+        since = parse_instant(android_since)
+        if since is None:
+            android_since = _stamp(now)
+        elif now - since >= dt.timedelta(hours=behind_rule["grace_hours"]):
+            hours = int((now - since).total_seconds() // 3600)
+            alerts.append(_alert("release_android_behind", behind_rule,
+                                 f"{android_behind} há {hours} h", f"ops:{anchor}"))
+
     memory_out: dict[str, Any] = {"consecutive": counters, "jobs_first_seen": first_seen}
     if isinstance(catalog_writes, dict):
         memory_out["catalog_writes"] = catalog_writes
+    if android_since is not None:
+        memory_out["release_android_behind_since"] = android_since
     return alerts, memory_out
 
 
@@ -698,7 +868,7 @@ def plan_notifications(
         f"[BrewTact] {'CRÍTICO' if worst else 'Aviso'}: "
         f"{len(opened)} novo(s), {len(repeated)} aberto(s), {len(resolved)} resolvido(s)"
     )
-    lines = [f"Avaliação de {stamp} (BT-OBS-001, política {policy.get('version')})."]
+    lines = [f"Avaliação de {stamp} (BT-OBS-001 e BT-OBS-003, política {policy.get('version')})."]
     for title, group in (("Novos", opened), ("Ainda abertos", repeated)):
         if group:
             lines.append("")
