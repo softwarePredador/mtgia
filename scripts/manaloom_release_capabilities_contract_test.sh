@@ -31,7 +31,10 @@ IDENTITY_JSON="$(
 EXPECTED_DIGEST="$(shasum -a 256 "$REPO/server/config/release_capabilities.json" | awk '{print $1}')"
 EXPECTED_COUNT="$(jq -r '.capabilities | length' "$REPO/server/config/release_capabilities.json")"
 [[ "$EXPECTED_DIGEST" == \
-  "ace782b3969a9ba5a2691f5ca3d97360927919739cd16c796d7b36e8124d754d" ]]
+  "ace782b3969a9ba5a2691f5ca3d97360927919739cd16c796d7b36e8124d754d" ]] || {
+  echo "digest de server/config/release_capabilities.json mudou: $EXPECTED_DIGEST" >&2
+  exit 1
+}
 jq -e \
   --arg sha "$SHA" \
   --arg digest "$EXPECTED_DIGEST" \

@@ -414,7 +414,11 @@ if [[ "$EASYPANEL_SOURCE_MANAGED" == "1" ]]; then
 fi
 
 HEALTH_BODY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/healthz")"
-[[ "$HEALTH_BODY" == "ok" ]]
+# BT-CI-002: barra de forma explicita; no /bin/bash 3.2 um [[ ]] solto nao encerra.
+[[ "$HEALTH_BODY" == "ok" ]] || {
+  echo "healthz publico do site nao respondeu ok depois do deploy" >&2
+  exit 1
+}
 SERVED_SITE_IDENTITY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/release.json")"
 if ! jq -e --arg sha "$SHA" \
     '.product == "brewtact" and .surface == "site" and .git_sha == $sha' \

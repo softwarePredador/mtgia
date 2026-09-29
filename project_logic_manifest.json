@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "98764e2dd665a64c5186d9339b368030c989940b52b1ff39c745bf75fec0a2de",
+  "source_digest_sha256": "6eea8240a4b8f5d3884dea7ba7a524c58286c376dfe197de4a2eb4395336d400",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,13 +79,13 @@
     "database_tables": 86,
     "database_views": 6,
     "migrations": 67,
-    "scripts_and_jobs": 705,
+    "scripts_and_jobs": 706,
     "environment_variables": 723,
-    "tests": 1280,
+    "tests": 1281,
     "flows": 13,
     "traceability_rules": 12,
-    "tasks": 245,
-    "task_dependency_edges": 436,
+    "tasks": 246,
+    "task_dependency_edges": 437,
     "route_consumer_bindings": 57,
     "receipt_contracts": 6
   },
@@ -266426,6 +266426,12 @@
       ]
     },
     {
+      "path": "scripts/manaloom_errexit_lint.py",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_external_engine_capability_audit.sh",
       "role": "audit",
       "mutation_class": "read_only_or_unknown",
@@ -276489,6 +276495,7 @@
     "server/test/email_verification_live_test.dart",
     "server/test/endpoint_cache_cap_test.dart",
     "server/test/endpoint_cache_ttl_test.dart",
+    "server/test/errexit_postdeploy_test.py",
     "server/test/error_contract_test.dart",
     "server/test/experimental_deck_ai_authorization_source_test.dart",
     "server/test/external_commander_deck_expansion_support_test.dart",
@@ -277542,6 +277549,8 @@
         "scripts/manaloom_promote_release.sh",
         "scripts/manaloom_promote_release.py",
         "scripts/manaloom_release_identity_gate.py",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "server/bin/migrate.dart",
         "server/lib/migration_preflight.dart",
         "server/lib/health_readiness_support.dart",
@@ -277563,6 +277572,7 @@
         "server/test/capacity_resources_test.py",
         "server/test/release_promotion_test.py",
         "server/test/release_identity_gate_test.py",
+        "server/test/errexit_postdeploy_test.py",
         "server/test/migration_preflight_test.dart",
         "server/test/migration_rehearsal_test.py",
         "server/test/flutter_web_deploy_contract_test.dart",
@@ -278053,7 +278063,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "d2e742dc97561be90777512656aa1d3d80b9e7f1d7fa0c8223413f6cd057ee99"
+      "sha256": "1f226cadbb4945be55445f2cf8d833a3f6f1aecaeeba58f5816921f452b5d159"
     },
     "required_task_fields": [
       "id",
@@ -278063,7 +278073,7 @@
       "depends_on",
       "acceptance"
     ],
-    "task_count": 245,
+    "task_count": 246,
     "tasks": [
       {
         "id": "BT-GOV-001",
@@ -280886,6 +280896,7 @@
           "BT-CAT-03",
           "BT-CAT-04",
           "BT-CI-001",
+          "BT-CI-002",
           "BT-DB-003",
           "BT-DB-004",
           "BT-DOC-006",
@@ -281009,6 +281020,16 @@
         "source_line": 691
       },
       {
+        "id": "BT-CI-002",
+        "priority": "P0 CORE",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+        "delivery": "Checagens de shell barram também no `/bin/bash` 3.2 do macOS, de onde a coordenação roda deploy, promoção, ops e backup.",
+        "depends_on": [],
+        "acceptance": "Um `[[ ]]` ou `(( ))` solto que falha não encerra o script com `set -e` no bash anterior ao 4.1, e um `!` solto não encerra em versão nenhuma. A checagem automática entra no contrato de release, e as checagens pós-deploy do `/app` e do site barram sob o `/bin/bash` 3.2 com divergência injetada. Linha registrada em 2026-09-28, a pedido da coordenação (rodada 5), a partir do achado da mutação W04 do `BT-REL-002`. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção. As 13 checagens soltas fora das raízes do digest de UI barram agora: 5 no pós-deploy do `/app` (`manaloom_deploy_flutter_web.sh`), o `healthz` do site (`manaloom_deploy_public_web.sh`), o digest da matriz em `manaloom_release_capabilities_contract_test.sh` e 6 no contrato de release (os `! grep` viraram `forbid_text`). A varredura é `scripts/manaloom_errexit_lint.py`, sobre `scripts/` e `server/bin/` com `set -e` e as bibliotecas; roda no `manaloom_release_ops_contract_test.sh`. As 21 checagens soltas das raízes do digest de UI (`manaloom_play_vs_ai_e2e.sh` e `manaloom_authenticated_visual_qa_isolated.sh`) ficam em `scripts/manaloom_errexit_lint_pending.json`, uma lista fechada que só encolhe; o conserto delas está em rascunho, sem commit, sobre a árvore do gate `679f0d35f`. Evidência: `server/test/errexit_postdeploy_test.py` (10 testes). Antes do conserto, as 5 divergências do `/app` e o `healthz` \"degraded\" passavam; depois, todas barram. 24 mutações derrubadas. Receipt `docs/qa/execution/2026-09-28/BT-CI-002-checagens-soltas-no-bash-3-2.md`. Segue aberto: aplicar o rascunho das raízes do digest com a prova de UI.",
+        "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
+        "source_line": 692
+      },
+      {
         "id": "BT-UIEV-001",
         "priority": "P0 CORE",
         "status": "IN_PROGRESS_CONTAINED",
@@ -281016,7 +281037,7 @@
         "depends_on": [],
         "acceptance": "`manaloom_local_ci.sh quick` passa sem --no-verify; os 23 manifests de docs/qa/ui-live/latest.json no digest corrente e latest.json reescrito. Evidência: b397f477b, 9a9ba66de, d08c18717; receipt docs/qa/execution/2026-09-21/btuiev001-chromedriver-e-recaptura.md (22/23 em 8bba809c). Não depende de `BT-SCP-001` — é o inverso: o gate amplo de `BT-SCP-001` depende deste ID (dependência invertida corrigida em 2026-09-22; ela criava impasse). Decisão do dono em 2026-09-22: D-03 (recaptura em lote, depois das correções de UI da D-04); D-40 (o pack 05 fica rotulado como evidência de capability futura, fora da contagem da beta). Decisões de 2026-09-24: o dono escolheu consertar o que o app precisa e recapturar os 34 pacotes de uma vez. D-79: `battle-coach-web-keyboard` roda no ambiente local. D-80: a procedência de cada captura registra o agente e o navegador da corrida. `card-details-navigation-web` e `optimization-card-reader-web` seguem exigindo navegador real (WebDriver).",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-        "source_line": 692
+        "source_line": 693
       },
       {
         "id": "BT-WEB-001",
@@ -281030,7 +281051,7 @@
         ],
         "acceptance": "Sem Pro/market/social/Battle prometidos quando OFF; screenshots e release metadata corretos. Decisão do dono em 2026-09-22: D-46, tirar do título e da descrição do site \"Commander com IA explicável\" e \"relatórios compartilháveis\"; textos que já dizem \"quando esse recurso estiver habilitado\" podem ficar.",
         "section": "Épico K — Site público, ativação e aprendizado de produto",
-        "source_line": 698
+        "source_line": 699
       },
       {
         "id": "BT-WEB-002",
@@ -281043,7 +281064,7 @@
         ],
         "acceptance": "Deep link/reload/back preservam intenção; sem bypass de auth/capability.",
         "section": "Épico K — Site público, ativação e aprendizado de produto",
-        "source_line": 699
+        "source_line": 700
       },
       {
         "id": "BT-WEB-003",
@@ -281053,7 +281074,7 @@
         "depends_on": [],
         "acceptance": "`npm audit` sem `critical`/`high`; `lint`, `build` e `scripts/manaloom_public_web_surface_contract_test.sh` verdes; `scripts/manaloom_local_ci.sh full` passa do estágio `npm audit`. Bump autorizado pelo dono em 2026-09-21; linha registrada em 2026-09-22. Decisão do dono em 2026-09-22: D-01, bump confirmado direto pelo dono. Implementado em 2026-09-22 pela sessão coordenadora: `next` e `eslint-config-next` 15.5.25, `overrides.sharp` 0.35.4 e `npm audit fix` sem `--force` nas ferramentas de build; `npm audit` com 0 vulnerabilidades (completo e `--omit=dev`); lint, build, `free-beta-offer-contract`, `manaloom_public_web_surface_contract_test.sh` e `manaloom_public_web_smoke.sh` verdes na árvore de trabalho; falta o receipt same-SHA. No ar no site público desde 2026-09-23 (`87fd5a2e6`).",
         "section": "Épico K — Site público, ativação e aprendizado de produto",
-        "source_line": 700
+        "source_line": 701
       },
       {
         "id": "BT-ACT-001",
@@ -281067,7 +281088,7 @@
         ],
         "acceptance": "Funnel por usuário/coorte; erro tem recuperação; abandono mensurado.",
         "section": "Épico K — Site público, ativação e aprendizado de produto",
-        "source_line": 701
+        "source_line": 702
       },
       {
         "id": "BT-ACT-002",
@@ -281082,7 +281103,7 @@
         ],
         "acceptance": "Cada etapa tem CTA único e receipt; eventos não contam preview como apply.",
         "section": "Épico K — Site público, ativação e aprendizado de produto",
-        "source_line": 702
+        "source_line": 703
       },
       {
         "id": "BT-ACT-003",
@@ -281097,7 +281118,7 @@
         ],
         "acceptance": "Decisão GO/ITERATE/STOP pré-registrada; metas só depois da baseline.",
         "section": "Épico K — Site público, ativação e aprendizado de produto",
-        "source_line": 703
+        "source_line": 704
       },
       {
         "id": "BT-LEGAL-001",
@@ -281111,7 +281132,7 @@
         ],
         "acceptance": "Inventário fechado e reproduzível; perguntas e decisões do owner explícitas.",
         "section": "Épico L — Jurídico e comercial",
-        "source_line": 721
+        "source_line": 722
       },
       {
         "id": "BT-LEGAL-002",
@@ -281123,7 +281144,7 @@
         ],
         "acceptance": "Profissional/jurisdição/data/escopo/ressalvas/próxima revisão; receipt/hash seguro.",
         "section": "Épico L — Jurídico e comercial",
-        "source_line": 722
+        "source_line": 723
       },
       {
         "id": "BT-COM-001",
@@ -281136,7 +281157,7 @@
         ],
         "acceptance": "Backend é autoridade; checkout/webhook/refund/reconciliação e kill switch.",
         "section": "Épico L — Jurídico e comercial",
-        "source_line": 723
+        "source_line": 724
       },
       {
         "id": "BT-COM-002",
@@ -281150,7 +281171,7 @@
         ],
         "acceptance": "Margem observada; custo p50/p95; Battle/Coach com budget; nenhum subsídio oculto.",
         "section": "Épico L — Jurídico e comercial",
-        "source_line": 724
+        "source_line": 725
       },
       {
         "id": "BT-COM-003",
@@ -281162,7 +281183,7 @@
         ],
         "acceptance": "Plano vencido não conserva quota Pro; webhook/reconciler/retry concorrente e clock boundaries comprovados.",
         "section": "Épico L — Jurídico e comercial",
-        "source_line": 725
+        "source_line": 726
       }
     ],
     "dependency_edges": [
@@ -281656,6 +281677,10 @@
       },
       {
         "from": "BT-CI-001",
+        "to": "BT-DEC-001"
+      },
+      {
+        "from": "BT-CI-002",
         "to": "BT-DEC-001"
       },
       {
@@ -282931,6 +282956,7 @@
       "BT-BAT-EVD-002",
       "BT-CAT-04",
       "BT-CI-001",
+      "BT-CI-002",
       "BT-DB-001",
       "BT-AI-021",
       "BT-AI-022",
@@ -287557,6 +287583,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287588,6 +287616,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287619,6 +287649,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287650,6 +287682,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287681,6 +287715,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287712,6 +287748,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287743,6 +287781,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287774,6 +287814,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -287805,6 +287847,8 @@
           "scripts/manaloom_deploy_backend_image.sh",
           "scripts/manaloom_deploy_battle_sidecars.sh",
           "scripts/manaloom_deploy_flutter_web.sh",
+          "scripts/manaloom_errexit_lint.py",
+          "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
@@ -288062,7 +288106,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "98764e2dd665a64c5186d9339b368030c989940b52b1ff39c745bf75fec0a2de"
+    "project_logic_source_digest_sha256": "6eea8240a4b8f5d3884dea7ba7a524c58286c376dfe197de4a2eb4395336d400"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -290220,6 +290264,7 @@
       "scripts/manaloom_deploy_public_web.sh",
       "scripts/manaloom_e2e_suite.sh",
       "scripts/manaloom_easypanel_backup.sh",
+      "scripts/manaloom_errexit_lint.py",
       "scripts/manaloom_external_engine_capability_audit.sh",
       "scripts/manaloom_external_engine_delta_audit.sh",
       "scripts/manaloom_external_engine_delta_weekly.sh",
@@ -291052,6 +291097,7 @@
       "server/test/email_verification_live_test.dart",
       "server/test/endpoint_cache_cap_test.dart",
       "server/test/endpoint_cache_ttl_test.dart",
+      "server/test/errexit_postdeploy_test.py",
       "server/test/error_contract_test.dart",
       "server/test/experimental_deck_ai_authorization_source_test.dart",
       "server/test/external_commander_deck_expansion_support_test.dart",

@@ -703,6 +703,14 @@ if [[ "$CONFIGURED_IMAGE" != "$IMAGE_DIGEST_REF" ]]; then
   exit 2
 fi
 
+# BT-CI-002: cada checagem pos-deploy barra de forma explicita. No /bin/bash 3.2 do
+# macOS, de onde a coordenacao roda o deploy, um [[ ]] solto que falha nao encerra o
+# script com set -e: o deploy seguia e se dava por concluido com o /app fora do ar.
+postdeploy_fail() {
+  echo "checagem pos-deploy do /app falhou: $*" >&2
+  exit 1
+}
+
 for _ in $(seq 1 30); do
   APP_CODE="$(curl -sS -o /tmp/manaloom_app_web_index.html -w '%{http_code}' "$PUBLIC_BASE_URL/app/")"
   if [[ "$APP_CODE" == "200" ]] && grep -Fq '<base href="/app/">' /tmp/manaloom_app_web_index.html; then
@@ -711,17 +719,18 @@ for _ in $(seq 1 30); do
   sleep 2
 done
 
-[[ "$APP_CODE" == "200" ]]
+[[ "$APP_CODE" == "200" ]] || postdeploy_fail "/app/ respondeu HTTP $APP_CODE"
 grep -Fq '<base href="/app/">' /tmp/manaloom_app_web_index.html
 BOOTSTRAP_CODE="$(curl -sS -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL/app/flutter_bootstrap.js")"
 RELEASE_HEADERS="$(mktemp /tmp/manaloom_app_release_headers.XXXXXX)"
 RELEASE_CODE="$(curl -sS -D "$RELEASE_HEADERS" -o /tmp/manaloom_app_release.json -w '%{http_code}' "$PUBLIC_BASE_URL/app/release.json")"
 DEEP_LINK_CODE="$(curl -sS -o /tmp/manaloom_app_web_deep.html -w '%{http_code}' "$PUBLIC_BASE_URL/app/decks")"
 ROOT_CODE="$(curl -sS -o /dev/null -w '%{http_code}' "$PUBLIC_BASE_URL/")"
-[[ "$BOOTSTRAP_CODE" == "200" ]]
-[[ "$RELEASE_CODE" == "200" ]]
-[[ "$DEEP_LINK_CODE" == "200" ]]
-[[ "$ROOT_CODE" == "200" ]]
+[[ "$BOOTSTRAP_CODE" == "200" ]] ||
+  postdeploy_fail "/app/flutter_bootstrap.js respondeu HTTP $BOOTSTRAP_CODE"
+[[ "$RELEASE_CODE" == "200" ]] || postdeploy_fail "/app/release.json respondeu HTTP $RELEASE_CODE"
+[[ "$DEEP_LINK_CODE" == "200" ]] || postdeploy_fail "/app/decks respondeu HTTP $DEEP_LINK_CODE"
+[[ "$ROOT_CODE" == "200" ]] || postdeploy_fail "/ respondeu HTTP $ROOT_CODE"
 grep -Fq '<base href="/app/">' /tmp/manaloom_app_web_deep.html
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \

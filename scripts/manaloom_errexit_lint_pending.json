@@ -1,0 +1,91 @@
+{
+  "schema_version": "manaloom_errexit_lint_pending_v1",
+  "task": "BT-CI-002",
+  "reason": "Checagens soltas conhecidas nas raízes do digest de UI (SOURCE_ROOTS de scripts/manaloom_ui_source_digest.sh). Essas raízes só mudam com a prova de UI da coordenação, então o conserto delas foi em rascunho. A lista só encolhe: checagem solta nova numa raiz falha, e a entrada consertada tem de sair daqui no mesmo commit do conserto.",
+  "pending": [
+    {
+      "file": "scripts/manaloom_authenticated_visual_qa_isolated.sh",
+      "statement": "[[ \"$INACTIVE_BATCH_PORT\" =~ ^[0-9]+$ && \"$INACTIVE_INTERACTIVE_PORT\" =~ ^[0-9]+$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_authenticated_visual_qa_isolated.sh",
+      "statement": "[[ \"$INACTIVE_BATCH_PORT\" != \"$INACTIVE_INTERACTIVE_PORT\" ]]"
+    },
+    {
+      "file": "scripts/manaloom_authenticated_visual_qa_isolated.sh",
+      "statement": "[[ \"$(listener_count \"$INACTIVE_BATCH_PORT\")\" == 0 ]]"
+    },
+    {
+      "file": "scripts/manaloom_authenticated_visual_qa_isolated.sh",
+      "statement": "[[ \"$(listener_count \"$INACTIVE_INTERACTIVE_PORT\")\" == 0 ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$BROWSER_UI_SOURCE_DIGEST\" =~ ^[0-9a-f]{64}$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ -n \"$browser_token\" ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$browser_human_deck_id\" =~ ^[0-9a-f-]{36}$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$browser_ai_deck_id\" =~ ^[0-9a-f-]{36}$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ -s \"$BROWSER_WEB_BUILD_DIR/main.dart.js\" ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$browser_session_id\" =~ ^[0-9a-f-]{36}$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$(jq -r '.session_id' \"$BROWSER_DONE_FILE\")\" == \"$browser_session_id\" ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$browser_action_records\" =~ ^[0-9]+$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$browser_prompt_records\" =~ ^[0-9]+$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$browser_record_total\" =~ ^[0-9]+$ ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "((browser_action_records >= 8))"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "((browser_prompt_records >= 8))"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "((browser_session_requests >= 2))"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "((browser_replay_requests >= 1))"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$(listener_count \"$BROWSER_WEB_PORT\")\" == \"0\" ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ -s \"$SIDECAR_JAR\" ]]"
+    },
+    {
+      "file": "scripts/manaloom_play_vs_ai_e2e.sh",
+      "statement": "[[ \"$(jq -r '.sidecar_process_id' \"$BATCH_HEALTH\")\" != \\"
+    }
+  ]
+}
