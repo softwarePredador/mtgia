@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "b2f625327d50ae9e12cbcd9e34fbb72da248c5df26ae85650b5ec88156dca048",
+  "source_digest_sha256": "88226169930a1565feff0d759a165fa2afa8f84c15274a916c5817dbdddc20e9",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -81,7 +81,7 @@
     "migrations": 62,
     "scripts_and_jobs": 695,
     "environment_variables": 720,
-    "tests": 1276,
+    "tests": 1277,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 244,
@@ -276949,6 +276949,7 @@
     "server/test/goldfish_simulator_test.dart",
     "server/test/health_readiness_support_test.dart",
     "server/test/hermes_cron_governor_report_test.py",
+    "server/test/hermes_db_python_contracts_test.dart",
     "server/test/hermes_docs_branch_sync_test.py",
     "server/test/hermes_lab_cron_bootstrap_test.py",
     "server/test/hermes_lab_entrypoint_test.py",
@@ -278465,7 +278466,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "4fe103204ddb83890d5bb6691696f0a3e361c450f6672709632f81b7d6919963"
+      "sha256": "60884d1c5d67dea270d7735feb866a6a40c47dd8c4afeb4527e1069f92b5219d"
     },
     "required_task_fields": [
       "id",
@@ -280023,7 +280024,7 @@
           "DCK-P0-05",
           "BT-PRIV-002"
         ],
-        "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (D-83, item 3 das decisões do `BT-PRIV-002`): o `sync_pg_target_deck_to_hermes.py` ganhou a proteção do alimentador; com `--apply`, pega o lock de escrita do SQLite (`BEGIN IMMEDIATE`, espera de 30 s) e só então confirma no PostgreSQL que o deck existe e não está na lixeira; deck sumido faz rollback e `DeckGoneError` sem o id na mensagem, e a cópia anterior fica para o expurgo, que pega o mesmo lock. Evidência: `test_sync_pg_target_deck_to_hermes.py` 17/17 (5 novos) e `test_sync_pg_target_deck_to_hermes_pg_live.py` 2/2 contra PostgreSQL descartável, sob a guarda de egress e com `DATABASE_URL` explícita em loopback; 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-sync-do-deck-alvo-sob-o-lock.md`. O resto do item (opt-out, leases, contribuição agregada) segue aberto. Achado da mesma rodada, corrigido em 2026-09-28: o `db_helper.py` do Hermes carregava, sem configuração no ambiente, o primeiro `.env` achado subindo diretórios (do worktree, o `server/.env` do checkout principal); agora só aceita `DATABASE_URL`, `DB_*`/`PG*` no ambiente ou o arquivo nomeado em `MANALOOM_POSTGRES_ENV`, exige `MANALOOM_CONFIRM_POSTGRES_READS` (ou a de escrita) para host fora do loopback, contando as sobreposições do libpq, exige a de escrita para escrever por `run_sql`, e falha fechado sem mostrar URL, host ou senha; o daemon de ops confirma só a leitura para os jobs dele, e a produção segue recebendo o banco pelo ambiente do serviço. Evidência: `test_db_helper.py` 14 testes, `test_db_helper_pg_live.py` 2/2 contra PostgreSQL descartável, `server/test/manaloom_ops_daemon_test.py` 27/27 (2 novos), os 16 testes do Hermes que importam usuários do helper, 9 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-db-helper-sem-env-implicito.md`.",
+        "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (D-83, item 3 das decisões do `BT-PRIV-002`): o `sync_pg_target_deck_to_hermes.py` ganhou a proteção do alimentador; com `--apply`, pega o lock de escrita do SQLite (`BEGIN IMMEDIATE`, espera de 30 s) e só então confirma no PostgreSQL que o deck existe e não está na lixeira; deck sumido faz rollback e `DeckGoneError` sem o id na mensagem, e a cópia anterior fica para o expurgo, que pega o mesmo lock. Evidência: `test_sync_pg_target_deck_to_hermes.py` 17/17 (5 novos) e `test_sync_pg_target_deck_to_hermes_pg_live.py` 2/2 contra PostgreSQL descartável, sob a guarda de egress e com `DATABASE_URL` explícita em loopback; 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-sync-do-deck-alvo-sob-o-lock.md`. O resto do item (opt-out, leases, contribuição agregada) segue aberto. Achado da mesma rodada, corrigido em 2026-09-28: o `db_helper.py` do Hermes carregava, sem configuração no ambiente, o primeiro `.env` achado subindo diretórios (do worktree, o `server/.env` do checkout principal); agora só aceita `DATABASE_URL`, `DB_*`/`PG*` no ambiente ou o arquivo nomeado em `MANALOOM_POSTGRES_ENV`, exige `MANALOOM_CONFIRM_POSTGRES_READS` (ou a de escrita) para host fora do loopback, contando as sobreposições do libpq, exige a de escrita para escrever por `run_sql`, e falha fechado sem mostrar URL, host ou senha; o daemon de ops confirma só a leitura para os jobs dele, e a produção segue recebendo o banco pelo ambiente do serviço. Evidência: `test_db_helper.py` 14 testes, `test_db_helper_pg_live.py` 2/2 contra PostgreSQL descartável, `server/test/manaloom_ops_daemon_test.py` 27/27 (2 novos), os 16 testes do Hermes que importam usuários do helper, 9 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-db-helper-sem-env-implicito.md`. Os testes Python desse trabalho entraram no gate pela suíte do servidor, como os contratos do expurgo e do alimentador: `server/test/hermes_db_python_contracts_test.dart` roda `test_db_helper.py`, `test_db_helper_pg_live.py`, `test_sync_pg_target_deck_to_hermes.py` e `test_sync_pg_target_deck_to_hermes_pg_live.py` (os dois contra PostgreSQL pulam, com as chaves vazias de propósito), no `full` (`quality_gate.sh full`), no `pre-push` e em todo commit; o `scripts/manaloom_local_ci.sh` ficou como estava, porque ele é do plano de controle do escopo staged, e commit nele exige a prova de UI, que falha até a recaptura. Evidência: o wrapper passa; 4 mutações (duas do `db_helper`, duas do sync) derrubam a suíte; receipt `docs/qa/execution/2026-09-28/BT-AI-030-testes-python-no-gate.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 512
       },
@@ -288347,7 +288348,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "b2f625327d50ae9e12cbcd9e34fbb72da248c5df26ae85650b5ec88156dca048"
+    "project_logic_source_digest_sha256": "88226169930a1565feff0d759a165fa2afa8f84c15274a916c5817dbdddc20e9"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -291336,6 +291337,7 @@
       "server/test/goldfish_simulator_test.dart",
       "server/test/health_readiness_support_test.dart",
       "server/test/hermes_cron_governor_report_test.py",
+      "server/test/hermes_db_python_contracts_test.dart",
       "server/test/hermes_docs_branch_sync_test.py",
       "server/test/hermes_lab_cron_bootstrap_test.py",
       "server/test/hermes_lab_entrypoint_test.py",
