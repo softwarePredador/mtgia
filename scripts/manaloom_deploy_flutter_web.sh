@@ -313,6 +313,13 @@ if [[ "$BUILD_ONLY" == "1" ]]; then
   manaloom_resolve_public_app_release_mode "$RELEASE_CAPABILITIES_JSON"
 fi
 RELEASE_MODE="$MANALOOM_PUBLIC_APP_RELEASE_MODE"
+# BT-REL-002 (D-13): a matriz do SHA vai compilada no código. O app compara o digest
+# que o backend manda com ela e nega o que este artefato não liberou. No Flutter Web
+# o asset é buscado no servidor em tempo de execução e pode ser mais novo que o código
+# em cache; por isso a comparação usa só o que está compilado (dart-define).
+RELEASE_CAPABILITIES_DIGEST="$(jq -er '.policy_digest_sha256' <<<"$RELEASE_CAPABILITIES_JSON")"
+RELEASE_CAPABILITIES_ALLOWED="$(jq -r '.capabilities | to_entries |
+  map(select(.value.allowed == true) | .key) | sort | join(",")' <<<"$RELEASE_CAPABILITIES_JSON")"
 IMAGE="$IMAGE_REPO:$SHORT_SHA"
 RELEASE_DIR="${MANALOOM_RELEASE_DIR:-$HOME/.manaloom/releases/$VERSION/$SHORT_SHA}"
 WORKTREE_DIR="$(mktemp -d /tmp/manaloom-app-web-source.XXXXXX)"
@@ -331,6 +338,10 @@ build_args=(
   --dart-define="SENTRY_RELEASE=manaloom-web@$SHORT_SHA"
   --dart-define="ENABLE_BATTLE_LIVE_SPECTATOR=$BATTLE_LIVE_SPECTATOR_DART_DEFINE"
   --dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"
+  --dart-define="RELEASE_GIT_SHA=$SHA"
+  --dart-define="RELEASE_SURFACE=app"
+  --dart-define="RELEASE_CAPABILITIES_DIGEST=$RELEASE_CAPABILITIES_DIGEST"
+  --dart-define="RELEASE_CAPABILITIES_ALLOWED=$RELEASE_CAPABILITIES_ALLOWED"
   --no-version-check
   --no-pub
 )
@@ -352,6 +363,33 @@ if [[ -n "$SENTRY_RELEASE_DSN" ]]; then
   build_args+=(--dart-define="SENTRY_DSN=$SENTRY_RELEASE_DSN")
 fi
 
+# BT-REL-002: a identidade embarcada, na mesma forma da do Android, conferível de fora
+# pelo asset servido (a promoção e o BT-OBS-003 a leem).
+jq -n \
+  --arg git_sha "$SHA" \
+  --arg version "$VERSION" \
+  --arg api_base_url "$API_BASE_URL" \
+  --arg release_mode "$RELEASE_MODE" \
+  --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
+  --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
+  '{
+    schema_version: 1,
+    status: "release",
+    release_identity_embedded: true,
+    product: "brewtact",
+    surface: "app",
+    git_sha: $git_sha,
+    version: $version,
+    release_mode: $release_mode,
+    features: {
+      battle_live_spectator_enabled: $battle_live_spectator_enabled,
+      interactive_battle_enabled: $interactive_battle_enabled
+    },
+    release_capabilities: $release_capabilities,
+    api_base_url: $api_base_url
+  }' > "$WORKTREE_DIR/app/assets/release/release-identity.json"
+
 (
   cd "$WORKTREE_DIR/app"
   "$MANALOOM_FLUTTER_BIN_RESOLVED" pub get --enforce-lockfile
@@ -359,6 +397,13 @@ fi
 )
 
 grep -Fq '<base href="/app/">' "$WORKTREE_DIR/app/build/web/index.html"
+EMBEDDED_IDENTITY_FILE="$WORKTREE_DIR/app/build/web/assets/assets/release/release-identity.json"
+if [[ "$(jq -cS . "$EMBEDDED_IDENTITY_FILE")" != \
+      "$(jq -cS . "$WORKTREE_DIR/app/assets/release/release-identity.json")" ]]; then
+  echo "identidade embarcada do /app diverge da identidade do SHA" >&2
+  exit 1
+fi
+EMBEDDED_IDENTITY_SHA256="$(shasum -a 256 "$EMBEDDED_IDENTITY_FILE" | awk '{print $1}')"
 BUILT_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 FLUTTER_SDK_JSON="$("$MANALOOM_FLUTTER_BIN_RESOLVED" --version --machine)"
 FLUTTER_VERSION="$(jq -er '.frameworkVersion' <<<"$FLUTTER_SDK_JSON")"
@@ -407,6 +452,7 @@ jq -n \
   --arg lotus_index_sha256 "$LOTUS_INDEX_SHA256" \
   --arg lotus_app_sha256 "$LOTUS_APP_SHA256" \
   --arg lotus_styles_sha256 "$LOTUS_STYLES_SHA256" \
+  --arg embedded_identity_sha256 "$EMBEDDED_IDENTITY_SHA256" \
   --argjson sentry_configured "$([[ -n "$SENTRY_RELEASE_DSN" ]] && printf true || printf false)" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
@@ -414,7 +460,8 @@ jq -n \
   --arg release_mode "$RELEASE_MODE" \
   '{
     schema_version: 1,
-    product: "manaloom",
+    product: "brewtact",
+    surface: "app",
     platform: "web",
     version: $version,
     git_sha: $git_sha,
@@ -445,8 +492,10 @@ jq -n \
       "osv-scan.json": $osv_scan_sha256,
       "assets/assets/lotus/index.html": $lotus_index_sha256,
       "assets/assets/lotus/js/app.min.js": $lotus_app_sha256,
-      "assets/assets/lotus/css/styles.min.css": $lotus_styles_sha256
-    }
+      "assets/assets/lotus/css/styles.min.css": $lotus_styles_sha256,
+      "assets/assets/release/release-identity.json": $embedded_identity_sha256
+    },
+    embedded_identity_sha256: $embedded_identity_sha256
   }' > "$WORKTREE_DIR/app/build/web/release.json"
 jq -e --arg sha "$SHA" --arg version "$VERSION" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
@@ -454,6 +503,7 @@ jq -e --arg sha "$SHA" --arg version "$VERSION" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '.git_sha == $sha and .version == $version and .platform == "web" and
+   .product == "brewtact" and .surface == "app" and
    .release_capabilities == $release_capabilities and
    .release_mode == $release_mode and
    .features.battle_live_spectator_enabled == $battle_live_spectator_enabled and
@@ -679,11 +729,18 @@ jq -e --arg sha "$SHA" --arg version "$VERSION" \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   '.git_sha == $sha and .version == $version and .platform == "web" and
+   .product == "brewtact" and .surface == "app" and
    .release_capabilities == $release_capabilities and
    .release_mode == $release_mode and
    .features.battle_live_spectator_enabled == $battle_live_spectator_enabled and
    .features.interactive_battle_enabled == $interactive_battle_enabled' \
   /tmp/manaloom_app_release.json >/dev/null
+# BT-REL-002: a identidade que o /app serve é a embarcada no build deste SHA.
+SERVED_IDENTITY="$(curl -fsS "$PUBLIC_BASE_URL/app/assets/assets/release/release-identity.json")"
+if [[ "$(jq -cS . <<<"$SERVED_IDENTITY")" != "$(jq -cS . "$EMBEDDED_IDENTITY_FILE")" ]]; then
+  echo "identidade servida pelo /app diverge da embarcada no build" >&2
+  exit 1
+fi
 grep -Eqi '^cache-control:[[:space:]]*no-cache, no-store, must-revalidate' "$RELEASE_HEADERS"
 APP_HEADERS="$(mktemp /tmp/manaloom_app_headers.XXXXXX)"
 curl -fsS -D "$APP_HEADERS" -o /dev/null "$PUBLIC_BASE_URL/app/"

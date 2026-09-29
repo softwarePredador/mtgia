@@ -205,6 +205,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
     "$ROOT_DIR/scripts/manaloom_capacity_resources.py" \
     "$ROOT_DIR/scripts/manaloom_promote_release.py" \
+    "$ROOT_DIR/scripts/manaloom_release_identity_gate.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_migration_rehearsal.py" \
@@ -219,6 +220,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
     "$ROOT_DIR/server/test/capacity_resources_test.py" \
     "$ROOT_DIR/server/test/release_promotion_test.py" \
+    "$ROOT_DIR/server/test/release_identity_gate_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
@@ -249,6 +251,10 @@ PYTHONDONTWRITEBYTECODE=1 \
 # e a falha que nunca some, contra um plano de controle falso e deploys de mentira.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/release_promotion_test.py"
+# BT-REL-002 (D-13): identidade por superfície e o portão same-SHA (mixed SHA ou
+# digest falha fechado); o resolvedor em Python confere com o da biblioteca shell.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/release_identity_gate_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
@@ -324,6 +330,8 @@ if (( flutter_app_gate_line >= flutter_approval_line ||
   exit 1
 fi
 grep -Fq '"/app/release.json" "no-cache, no-store, must-revalidate"' "$NGINX"
+# BT-REL-002: identidade por superfície nos scripts de build e deploy.
+bash "$ROOT_DIR/scripts/manaloom_release_identity_contract_test.sh"
 grep -Fq '"/app/flutter_bootstrap.js" "no-cache, must-revalidate"' "$NGINX"
 grep -Fq '"/app/main.dart.js" "no-cache, must-revalidate"' "$NGINX"
 grep -Fq '~*^/app/assets/assets/lotus/ "no-cache, must-revalidate"' "$NGINX"

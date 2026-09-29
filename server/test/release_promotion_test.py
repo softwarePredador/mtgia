@@ -62,11 +62,20 @@ DEPLOYS = {
 PUBLIC = "https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
 PROBES = {
     "https://evolution-cartinhas.2ta7qx.easypanel.host/health": "backend",
+    "https://evolution-cartinhas.2ta7qx.easypanel.host/capabilities": "backend",
     f"{PUBLIC}/healthz": "site",
+    f"{PUBLIC}/release.json": "site",
     f"{PUBLIC}/app/release.json": "app",
     f"{PUBLIC}/app/flutter_bootstrap.js": "app",
+    f"{PUBLIC}/app/assets/assets/release/release-identity.json": "app",
     f"{PUBLIC}/downloads/release.json": "android",
 }
+# A matriz que as imagens antigas servem (outra, de um SHA anterior).
+OLD_DIGEST = "0" * 64
+# O asset embarcado de um build sem identidade (o arquivo commitado do app).
+DEVELOPMENT_IDENTITY = {"schema_version": 1, "status": "development_build",
+                        "release_identity_embedded": False}
+FLAGS_OFF = {"battle_live_spectator_enabled": False, "interactive_battle_enabled": False}
 REMOTE_ALLOWED = {
     "inspect": re.compile(r"docker service inspect '(evolution_[a-z0-9-]+)'"),
     "ps": re.compile(
@@ -172,19 +181,45 @@ def probe_response(plane: dict[str, Any], url: str) -> tuple[int, str]:
     if not tasks or not all(task["state"].startswith("Running") for task in tasks):
         return 502, "bad gateway"
     image = _current_image(plane, surface)
+    # Identidade que a imagem leva (BT-REL-002); as imagens antigas não têm.
+    ident = plane.get("identity", {}).get(image)
+    digest = (ident or {}).get("digest", OLD_DIGEST)
     if surface == "backend":
+        if url.endswith("/capabilities"):
+            return 200, json.dumps({"product": "brewtact", "policy_digest_sha256": digest,
+                                    "configuration_status": "valid"})
         return 200, json.dumps({"status": "healthy", "git_sha": plane["image_sha"].get(image),
+                                "release_capabilities": {"policy_digest_sha256": digest},
                                 "timestamp": dt.datetime.now().isoformat()})
     if surface == "site":
+        if url.endswith("/release.json"):
+            if ident is None:
+                return 404, "not found"
+            return 200, json.dumps({"schema_version": 1, "product": "brewtact",
+                                    "surface": "site", "git_sha": ident["sha"]})
         return 200, "ok"
     if url.endswith("/app/release.json"):
         if image not in plane["release_json_images"]:
             return 404, "not found"
         return 200, json.dumps({"git_sha": plane["image_sha"].get(image), "image": image,
-                                "release_mode": "control_plane"})
+                                "product": "brewtact", "surface": "app",
+                                "release_mode": "control_plane",
+                                "release_capabilities": {"policy_digest_sha256": digest},
+                                "features": (ident or {}).get("flags", FLAGS_OFF)})
+    if url.endswith("release-identity.json"):
+        if ident is None:
+            return 200, json.dumps(DEVELOPMENT_IDENTITY)
+        return 200, json.dumps({"schema_version": 1, "status": ident["status"],
+                                "product": "brewtact", "surface": "app",
+                                "git_sha": ident["sha"], "release_mode": "control_plane",
+                                "features": ident["flags"],
+                                "release_capabilities": {"policy_digest_sha256": digest}})
     if url.endswith("flutter_bootstrap.js"):
         return 200, f"// bootstrap {image}"
-    return 200, json.dumps({"image": image, "git_sha": plane["image_sha"].get(image)})
+    return 200, json.dumps({"image": image, "git_sha": plane["image_sha"].get(image),
+                            "product": "brewtact", "surface": "android",
+                            "release_mode": "control_plane",
+                            "release_capabilities": {"policy_digest_sha256": digest}})
 
 
 def _scan_for_leaks(state_dir: Path, plane: dict[str, Any]) -> None:
@@ -309,6 +344,17 @@ def _fake_deploy(surface: str, state_dir: Path) -> int:
         plane.setdefault("frozen", {}).update(
             {url: list(probe_response(plane, url)) for url in urls})
     plane["image_sha"][image] = sha
+    identity = {"sha": sha, "digest": plane["policy_digest"], "flags": dict(FLAGS_OFF),
+                "status": "release"}
+    if "wrong_digest" in faults:
+        identity["digest"] = "e" * 64
+    if "flag_on" in faults:
+        identity["flags"]["interactive_battle_enabled"] = True
+    if "dev_identity" in faults:
+        identity["status"] = "development_build"
+    if "stale_identity" in faults:
+        identity["sha"] = OLD_SHA
+    plane.setdefault("identity", {})[image] = identity
     if surface == "app":
         plane["release_json_images"].append(image)
     if surface in TWO_UPDATES:
@@ -325,7 +371,8 @@ def _fake_deploy(surface: str, state_dir: Path) -> int:
     else:
         def change(spec: dict[str, Any]) -> None:
             spec["TaskTemplate"]["ContainerSpec"]["Image"] = image
-            _set_env(spec, "GIT_SHA", sha)
+            if "stale_env" not in faults:
+                _set_env(spec, "GIT_SHA", sha)
         swarm_update(plane, name, change)
         entry = easypanel_entry(plane, surface)
         if entry is not None and surface != "ops" and "skip_easypanel" not in faults:
@@ -396,6 +443,7 @@ def _load_module():
 promote = _load_module()
 resources = promote.resources
 capacity = resources.capacity
+identity_gate = promote.identity
 
 
 def _config() -> dict[str, Any]:
@@ -415,6 +463,10 @@ def initial_plane() -> dict[str, Any]:
         "faults": {},
         "image_sha": {},
         "release_json_images": [],
+        "identity": {},
+        # O digest da matriz commitada (o arquivo que a ferramenta lê no SHA).
+        "policy_digest": hashlib.sha256(
+            (REPO_ROOT / "server/config/release_capabilities.json").read_bytes()).hexdigest(),
     }
     for surface in ORDER:
         name = swarm_name(surface)
@@ -500,6 +552,8 @@ class ConfigTest(unittest.TestCase):
             "all_or_nothing": lambda c: c["transaction"].update(all_or_nothing=False),
             "citar a D-13": lambda c: c.update(decisions=[]),
             "service repetido": lambda c: c["surfaces"][1].update(service="cartinhas"),
+            "identity ausente": lambda c: c["surfaces"][0].pop("identity"),
+            "identity_gate deve ser do BT-REL-002": lambda c: c.pop("identity_gate"),
         }
         for expected, mutate in cases.items():
             with self.subTest(expected=expected):
@@ -800,6 +854,7 @@ class ToolTest(unittest.TestCase):
     FILES = (
         "scripts/manaloom_promote_release.sh",
         "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_release_identity_gate.py",
         "scripts/manaloom_capacity_resources.py",
         "scripts/manaloom_capacity_policy.py",
         "scripts/manaloom_read_env.py",
@@ -1032,7 +1087,60 @@ class ToolTest(unittest.TestCase):
         plane = load_plane(self.state)
         for surface in ORDER:
             self.assertEqual(_current_image(plane, surface), new_image(surface, self.sha))
+        # BT-REL-002: o same-SHA leu cada superfície e todas mostram o release.
+        identity = records[-2]["data"]["identity"]
+        self.assertEqual(identity["scope"], list(ORDER))
+        self.assertEqual(identity["expected"], {
+            "git_sha": self.sha, "capabilities_digest": plane["policy_digest"],
+            "release_mode": "control_plane"})
+        for surface in ("backend", "site", "app", "android"):
+            self.assertEqual(identity["surfaces"][surface]["git_sha"], self.sha, surface)
+        for surface in ("backend", "app", "android"):
+            self.assertEqual(identity["surfaces"][surface]["capabilities_digest"],
+                             plane["policy_digest"], surface)
+        self.assertEqual(identity["surfaces"]["ops"]["git_sha_hashed"],
+                         identity_gate.hashed(self.sha))
+        self.assertEqual(identity["surfaces"]["app"]["status"], "release")
         self.assert_contract_kept()
+
+    def test_a_mixed_identity_after_the_deploys_undoes_the_promotion(self) -> None:
+        cases = (
+            ("site", "stale_identity", "site: mixed SHA"),
+            ("ops", "stale_env", "ops: mixed SHA (GIT_SHA da spec é outro)"),
+            ("backend", "wrong_digest", "backend: mixed digest"),
+            ("app", "flag_on", "app: flag interactive_battle_enabled ligada"),
+            ("app", "dev_identity", "app: identidade embarcada com status 'development_build'"),
+        )
+        for surface, fault, expected in cases:
+            with self.subTest(fault=fault):
+                self.tearDown()
+                self.setUp()
+                self.faults(**{surface: fault})
+                result = self.promote()
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertIn("same-SHA falhou", result.stderr)
+                self.assertEqual(self.deployed(), list(ORDER))
+                _, records = self.journal()
+                failed = next(record for record in records if record["event"] == "surface_failed")
+                self.assertEqual(failed["data"]["surface"], "*")
+                self.assertEqual(failed["data"]["identity"]["status"], "FAIL")
+                self.assertTrue(any(problem.startswith(expected)
+                                    for problem in failed["data"]["identity"]["problems"]),
+                                failed["data"]["identity"]["problems"])
+                self.assertNotIn("converged", [record["event"] for record in records])
+                self.assertEqual(records[-1]["data"]["status"], "rolled_back")
+                self.assert_at_baseline()
+                self.assert_contract_kept()
+
+    def test_android_can_follow_in_its_own_transaction(self) -> None:
+        self.assertEqual(self.promote("backend,ops,site,app").returncode, 0)
+        result = self.promote("android")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        journals = sorted(self.receipts.glob("promocao-*.jsonl"))
+        self.assertEqual(len(journals), 2)
+        records = promote.parse_journal(journals[-1])
+        self.assertEqual(records[-2]["data"]["identity"]["scope"], list(ORDER))
+        self.assertEqual(self.deployed(), list(ORDER))
 
     def test_a_failure_undoes_the_promoted_surfaces_in_reverse(self) -> None:
         self.faults(app="fail_after")
@@ -1269,11 +1377,19 @@ class ToolTest(unittest.TestCase):
         self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
         self.assertEqual(self.deployed(), [])
 
-    def test_a_subset_follows_the_order(self) -> None:
+    def test_a_subset_follows_the_order_and_cannot_leave_the_stack_mixed(self) -> None:
+        # O subconjunto sobe na ordem, mas o núcleo do same-SHA (ops e site ficaram no SHA
+        # antigo) não mostra o release: a transação desfaz o que promoveu (BT-REL-002).
         result = self.promote("app,backend")
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
         self.assertEqual(self.deployed(), ["backend", "app"])
-        self.assert_at_baseline(("ops", "site", "android"))
+        _, records = self.journal()
+        failed = next(record for record in records if record["event"] == "surface_failed")
+        problems = failed["data"]["identity"]["problems"]
+        self.assertTrue(any(problem.startswith("ops: mixed SHA") for problem in problems))
+        self.assertTrue(any(problem.startswith("site: ") for problem in problems))
+        self.assertEqual(records[-1]["data"]["status"], "rolled_back")
+        self.assert_at_baseline()
 
     def test_refusals_before_anything_happens(self) -> None:
         env = dict(self.env)

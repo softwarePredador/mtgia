@@ -28,6 +28,8 @@ Subcomandos:
   check-restored --surface ID --baseline V0 --view V
   check-converged --surface ID --committed C --view V
   journal-append --journal J --event E [--data-file F]
+  identity-sources --promoted a,b                superfície, fonte, tipo e URL (ou serviço)
+  identity-gate --sha SHA --policy-file F --dir D --promoted a,b   same-SHA (BT-REL-002)
   journal-status --journal J
   latest-open --dir D                           diário aberto mais novo, se houver
 
@@ -75,6 +77,14 @@ sys.modules[_spec.name] = resources
 _spec.loader.exec_module(resources)
 # Um só tipo de erro de entrada para a leitura (BT-CAP-002) e para o diário.
 InvalidInput = resources.InvalidInput
+
+_identity_spec = importlib.util.spec_from_file_location(
+    "bt_rel_002_identity", HERE / "manaloom_release_identity_gate.py"
+)
+identity = importlib.util.module_from_spec(_identity_spec)
+assert _identity_spec.loader is not None
+sys.modules[_identity_spec.name] = identity
+_identity_spec.loader.exec_module(identity)
 
 
 def _canonical(data: Any) -> str:
@@ -179,6 +189,10 @@ def config_problems(config: dict[str, Any], repo_root: Path = REPO_ROOT) -> list
                     problems.append(f"{label}.probe.field ausente")
         if not isinstance(surface.get("rationale"), str) or not surface["rationale"].strip():
             problems.append(f"{label}.rationale ausente")
+        problems += identity.identity_problems(surface_id, surface.get("identity"))
+    gate_config = config.get("identity_gate")
+    if not isinstance(gate_config, dict) or gate_config.get("task") != "BT-REL-002":
+        problems.append("identity_gate deve ser do BT-REL-002")
     positions = {surface_id: index for index, surface_id in enumerate(ids)}
     missing = [surface_id for surface_id in D13_ORDER if surface_id not in positions]
     if missing:
@@ -404,6 +418,79 @@ def check_converged(
     return {"status": "PASS" if not problems else "FAIL", "problems": problems}
 
 
+# ------------------------------------------------------------ same-SHA (BT-REL-002)
+
+
+def identity_scope(config: dict[str, Any], promoted: list[str]) -> list[str]:
+    """O núcleo do same-SHA e o que esta transação promoveu, na ordem da política."""
+    return [surface["id"] for surface in config["surfaces"]
+            if surface["identity"]["same_sha"] or surface["id"] in promoted]
+
+
+def identity_sources(config: dict[str, Any], scope: list[str]) -> list[tuple[str, int, str, str]]:
+    """As fontes que a promoção lê: URL HTTPS ou o serviço do Swarm (a spec)."""
+    rows = []
+    for surface_id in scope:
+        surface = surface_config(config, surface_id)
+        for index, source in enumerate(surface["identity"]["sources"]):
+            if source["kind"] == "http_json":
+                rows.append((surface_id, index, "http_json", source["url"]))
+            elif source["kind"] == "spec_env":
+                rows.append((surface_id, index, "spec_env", surface["swarm_service"]))
+    return rows
+
+
+def identity_readings(
+    config: dict[str, Any], scope: list[str], directory: Path,
+) -> dict[str, list[dict[str, Any]]]:
+    """As leituras gravadas pela promoção: status e corpo por URL; env da spec redigida."""
+    readings: dict[str, list[dict[str, Any]]] = {}
+    for surface_id, index, kind, _ in identity_sources(config, scope):
+        stem = f"{surface_id}.{index}"
+        if kind == "http_json":
+            try:
+                status = int((directory / f"{stem}.status").read_text().strip() or 0)
+            except (OSError, ValueError):
+                status = None
+            try:
+                body = json.loads((directory / f"{stem}.body").read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+                body = None
+            readings.setdefault(surface_id, []).append(
+                {"kind": kind, "index": index, "status": status, "body": body})
+        else:
+            env: dict[str, str] = {}
+            try:
+                service = resources.load_inspect(
+                    (directory / f"{stem}.inspect.json").read_text(encoding="utf-8"))
+                items = service["Spec"]["TaskTemplate"]["ContainerSpec"].get("Env") or []
+                for item in items:
+                    name, separator, value = str(item).partition("=")
+                    if separator:
+                        env[name] = value
+            except (OSError, InvalidInput, KeyError, TypeError):
+                env = {}
+            readings.setdefault(surface_id, []).append(
+                {"kind": kind, "index": index, "env": env})
+    return readings
+
+
+def identity_gate(
+    config: dict[str, Any], sha: str, policy_bytes: bytes, directory: Path,
+    promoted: list[str],
+) -> dict[str, Any]:
+    scope = identity_scope(config, promoted)
+    expected = identity.expected_identity(sha, policy_bytes)
+    readings = identity_readings(config, scope, directory)
+    identities = {
+        surface_id: identity.surface_identity(
+            surface_id, surface_config(config, surface_id)["identity"],
+            readings.get(surface_id, []), {"http_json", "spec_env"})
+        for surface_id in scope
+    }
+    return {**identity.gate(expected, identities, scope), "scope": scope}
+
+
 # ------------------------------------------------------------ diário
 
 
@@ -606,6 +693,13 @@ def main(argv: list[str] | None = None) -> int:
     status.add_argument("--journal", type=Path, required=True)
     opened = commands.add_parser("latest-open")
     opened.add_argument("--dir", type=Path, required=True)
+    sources = commands.add_parser("identity-sources")
+    sources.add_argument("--promoted", default="")
+    same_sha = commands.add_parser("identity-gate")
+    same_sha.add_argument("--sha", required=True)
+    same_sha.add_argument("--policy-file", type=Path, required=True)
+    same_sha.add_argument("--dir", type=Path, required=True)
+    same_sha.add_argument("--promoted", default="")
     args = parser.parse_args(argv)
 
     try:
@@ -628,6 +722,22 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "validate-config":
             print(json.dumps({"status": "valid", "version": config["version"]}))
             return 0
+        if args.command in {"identity-sources", "identity-gate"}:
+            promoted = [item for item in args.promoted.split(",") if item]
+            known = {surface["id"] for surface in config["surfaces"]}
+            if set(promoted) - known:
+                raise InvalidInput("superfícies promovidas desconhecidas: " + args.promoted)
+            if args.command == "identity-sources":
+                for row in identity_sources(config, identity_scope(config, promoted)):
+                    print("\t".join(str(item) for item in row))
+                return 0
+            try:
+                policy_bytes = args.policy_file.read_bytes()
+            except OSError as error:
+                raise InvalidInput(f"não li {args.policy_file}: {error}") from error
+            result = identity_gate(config, args.sha, policy_bytes, args.dir, promoted)
+            print(json.dumps(result, ensure_ascii=False))
+            return 0 if result["status"] == "PASS" else 1
         if args.command == "plan":
             for surface in selected_surfaces(config, args.surfaces):
                 probe = surface.get("probe") or {}

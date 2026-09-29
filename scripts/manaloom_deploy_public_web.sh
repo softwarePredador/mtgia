@@ -297,6 +297,12 @@ PREVIOUS_RELEASE_MARKER="$(public_web_release_marker)"
 git -C "$ROOT_DIR" archive "$SHA" web-public | \
   ssh -o BatchMode=yes -i "$SSH_KEY" \
     "$SSH_HOST" "rm -rf '$REMOTE_DIR' && mkdir -p '$REMOTE_DIR' && tar -x -C '$REMOTE_DIR'"
+# BT-REL-002: identidade pública do site (produto, superfície e SHA completo), servida
+# em /release.json e conferida depois do deploy; a promoção e o BT-OBS-003 a leem.
+SITE_IDENTITY="$(jq -cn --arg git_sha "$SHA" \
+  '{schema_version: 1, product: "brewtact", surface: "site", git_sha: $git_sha}')"
+ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" \
+  "cat > '$REMOTE_DIR/web-public/public/release.json'" <<<"$SITE_IDENTITY"
 
 api_arg="$(printf '%q' "$API_BASE_URL")"
 site_arg="$(printf '%q' "$SITE_URL")"
@@ -409,6 +415,13 @@ fi
 
 HEALTH_BODY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/healthz")"
 [[ "$HEALTH_BODY" == "ok" ]]
+SERVED_SITE_IDENTITY="$(curl -fsS --max-time 20 "$PUBLIC_BASE_URL/release.json")"
+if ! jq -e --arg sha "$SHA" \
+    '.product == "brewtact" and .surface == "site" and .git_sha == $sha' \
+    >/dev/null <<<"$SERVED_SITE_IDENTITY"; then
+  echo "identidade publica do site diverge do SHA do deploy" >&2
+  exit 1
+fi
 PROBE_DIR="$(mktemp -d /tmp/manaloom-public-web-probe.XXXXXX)"
 HEADERS_FILE="$PROBE_DIR/headers"
 while IFS= read -r route; do

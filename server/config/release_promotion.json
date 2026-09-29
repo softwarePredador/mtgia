@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy": "brewtact-release-promotion",
-  "version": "2026-09-28.1",
+  "version": "2026-09-28.2",
   "task": "BT-REL-001",
   "decisions": [
     "D-13"
@@ -12,6 +12,10 @@
   "transaction": {
     "all_or_nothing": true,
     "rationale": "Uma superfície que falha desfaz as já promovidas, na ordem inversa, até o estado de antes, provado por superfície. Uma falha antes do receipt fica no diário: o marcador de transação em andamento bloqueia a próxima promoção até o diário fechar ou ser resolvido com a palavra do dono."
+  },
+  "identity_gate": {
+    "task": "BT-REL-002",
+    "rationale": "Same-SHA (D-13): no fim da promoção, cada superfície com same_sha e cada superfície promovida mostram o SHA completo do release, o produto, a própria superfície, o digest da matriz commitada nesse SHA, o modo do /app e flags de build coerentes com a matriz. Qualquer divergência, ou uma identidade que não se lê, falha fechado e desfaz a promoção. O Android fica fora do same-SHA quando não entra na transação: o APK instalado segue a D-13 (nega o que não conhece e pede atualização)."
   },
   "surfaces": [
     {
@@ -29,6 +33,27 @@
         "url": "https://evolution-cartinhas.2ta7qx.easypanel.host/health",
         "field": "git_sha"
       },
+      "identity": {
+        "same_sha": true,
+        "sources": [
+          {
+            "kind": "http_json",
+            "url": "https://evolution-cartinhas.2ta7qx.easypanel.host/health",
+            "fields": {
+              "git_sha": "git_sha",
+              "capabilities_digest": "release_capabilities.policy_digest_sha256"
+            }
+          },
+          {
+            "kind": "http_json",
+            "url": "https://evolution-cartinhas.2ta7qx.easypanel.host/capabilities",
+            "fields": {
+              "product": "product",
+              "capabilities_digest": "policy_digest_sha256"
+            }
+          }
+        ]
+      },
       "compensation": [
         "swarm_rollback"
       ],
@@ -45,6 +70,19 @@
       ],
       "same_sha_field": "git_sha",
       "probe": null,
+      "identity": {
+        "same_sha": true,
+        "sources": [
+          {
+            "kind": "spec_env",
+            "key": "GIT_SHA",
+            "field": "git_sha"
+          },
+          {
+            "kind": "self"
+          }
+        ]
+      },
       "compensation": [
         "swarm_rollback"
       ],
@@ -63,6 +101,25 @@
       "probe": {
         "kind": "status_only",
         "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/healthz"
+      },
+      "identity": {
+        "same_sha": true,
+        "sources": [
+          {
+            "kind": "http_json",
+            "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/release.json",
+            "fields": {
+              "git_sha": "git_sha",
+              "product": "product",
+              "surface": "surface"
+            }
+          },
+          {
+            "kind": "spec_env",
+            "key": "GIT_SHA",
+            "field": "git_sha"
+          }
+        ]
       },
       "compensation": [
         "swarm_rollback"
@@ -84,6 +141,36 @@
         "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/release.json",
         "fallback_url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/flutter_bootstrap.js"
       },
+      "identity": {
+        "same_sha": true,
+        "sources": [
+          {
+            "kind": "http_json",
+            "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/release.json",
+            "fields": {
+              "git_sha": "git_sha",
+              "product": "product",
+              "surface": "surface",
+              "capabilities_digest": "release_capabilities.policy_digest_sha256",
+              "release_mode": "release_mode",
+              "flags": "features"
+            }
+          },
+          {
+            "kind": "http_json",
+            "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/app/assets/assets/release/release-identity.json",
+            "fields": {
+              "status": "status",
+              "git_sha": "git_sha",
+              "product": "product",
+              "surface": "surface",
+              "capabilities_digest": "release_capabilities.policy_digest_sha256",
+              "release_mode": "release_mode",
+              "flags": "features"
+            }
+          }
+        ]
+      },
       "compensation": [
         "swarm_rollback",
         "easypanel_redeploy"
@@ -103,6 +190,22 @@
       "probe": {
         "kind": "body_sha256",
         "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/downloads/release.json"
+      },
+      "identity": {
+        "same_sha": false,
+        "sources": [
+          {
+            "kind": "http_json",
+            "url": "https://evolution-manaloom-web-public.2ta7qx.easypanel.host/downloads/release.json",
+            "fields": {
+              "git_sha": "git_sha",
+              "product": "product",
+              "surface": "surface",
+              "capabilities_digest": "release_capabilities.policy_digest_sha256",
+              "release_mode": "release_mode"
+            }
+          }
+        ]
       },
       "compensation": [
         "swarm_rollback",

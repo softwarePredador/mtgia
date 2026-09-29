@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "efc1e1979f8b4fdd1d39ab2764d34c628709bb6fc52e528f6485cbddbc8a03ba",
+  "source_digest_sha256": "4c7614b949619adf9c3d259276a12397aeddac17b7212d64a23cccd6ed9a2fd6",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,9 +79,9 @@
     "database_tables": 86,
     "database_views": 6,
     "migrations": 67,
-    "scripts_and_jobs": 703,
+    "scripts_and_jobs": 705,
     "environment_variables": 723,
-    "tests": 1279,
+    "tests": 1280,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 245,
@@ -266827,6 +266827,18 @@
       ]
     },
     {
+      "path": "scripts/manaloom_release_identity_contract_test.sh",
+      "role": "test_or_gate",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/manaloom_release_identity_gate.py",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_release_observability_gate.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -276670,6 +276682,7 @@
     "server/test/reconcile_easypanel_services_test.py",
     "server/test/register_password_contract_test.dart",
     "server/test/release_capability_policy_test.dart",
+    "server/test/release_identity_gate_test.py",
     "server/test/release_promotion_test.py",
     "server/test/release_sbom_scope_test.py",
     "server/test/request_metrics_service_test.dart",
@@ -277528,6 +277541,7 @@
         "scripts/manaloom_capacity_resources.py",
         "scripts/manaloom_promote_release.sh",
         "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/migrate.dart",
         "server/lib/migration_preflight.dart",
         "server/lib/health_readiness_support.dart",
@@ -277548,6 +277562,7 @@
         "server/test/capacity_policy_test.py",
         "server/test/capacity_resources_test.py",
         "server/test/release_promotion_test.py",
+        "server/test/release_identity_gate_test.py",
         "server/test/migration_preflight_test.dart",
         "server/test/migration_rehearsal_test.py",
         "server/test/flutter_web_deploy_contract_test.dart",
@@ -278038,7 +278053,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "16d8d2c365aa06642d11428375c38ca0790a621558c7d89ab143c5d6d780bd82"
+      "sha256": "497877cdf4ed60668ed6b3610aef9dea85992d33db5d6eb04fcabaefbdae951f"
     },
     "required_task_fields": [
       "id",
@@ -280821,12 +280836,12 @@
       {
         "id": "BT-REL-002",
         "priority": "P0 CORE",
-        "status": "BLOCKED_BY_P0",
+        "status": "IN_PROGRESS_CONTAINED",
         "delivery": "Gate same-SHA e release identity por superfície.",
         "depends_on": [
           "BT-REL-001"
         ],
-        "acceptance": "SHA completo, product/surface e flags; app compara o digest recebido com a matriz embutida no próprio artefato; backend novo não habilita código antigo; mixed SHA/digest falha fechado. Decisão do dono em 2026-09-22: D-13, app com digest divergente nega as capabilities que não conhece e pede atualização.",
+        "acceptance": "SHA completo, product/surface e flags; app compara o digest recebido com a matriz embutida no próprio artefato; backend novo não habilita código antigo; mixed SHA/digest falha fechado. Decisão do dono em 2026-09-22: D-13, app com digest divergente nega as capabilities que não conhece e pede atualização. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção; o lado do app é rascunho sem commit, pela raia do app. Lado do servidor e dos scripts: `server/config/release_promotion.json` (`2026-09-28.2`) declara de onde vem a identidade de cada superfície e o núcleo same-SHA (backend, ops, site e `/app`); o Android entra no escopo quando é promovido. `scripts/manaloom_release_identity_gate.py` normaliza produto, superfície, SHA completo, digest da matriz, modo da D-13 e flags de build, e compara com o SHA e a matriz commitada nele. SHA, digest, produto, superfície, modo ou flag divergente, identidade embarcada de desenvolvimento e fonte ilegível falham fechado. O fim da promoção do `BT-REL-001` roda o portão e desfaz a transação quando ele falha; um subconjunto que deixe o núcleo misturado também falha. O `/app` e o Android compilam a matriz do SHA por dart-define e embarcam a identidade; a publicação do Android confere produto, superfície e modo; o site serve `/release.json`, conferido depois do deploy. Rascunho do app (`~/.manaloom/coordenacao/banco/app_draft/`, sobre a árvore do gate `679f0d35f`, sem tocar `release_capabilities.dart`): o portão entra como fetcher do provider. Libera só o que o backend e o artefato liberam, tira o que o código não conhece, nega o omitido e mostra a faixa \"Nova versão disponível\" quando o digest diverge. O rascunho tem 17 testes e 11 mutações derrubadas, e junta sem conflito com os rascunhos das Frentes A e B. Evidência: `server/test/release_identity_gate_test.py` (12), `server/test/release_promotion_test.py` (39, com as identidades no plano falso e cinco divergências que desfazem a promoção) e `scripts/manaloom_release_identity_contract_test.sh`, ligados no contrato de release; 32 mutações falham como esperado. Receipt em `docs/qa/execution/2026-09-28/BT-REL-002-identidade-e-same-sha.md`. Segue aberto: o rascunho do app entrar pela raia do app, com a prova de UI da faixa; a primeira promoção real grava as identidades novas.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 680
       },
@@ -287546,6 +287561,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287576,6 +287592,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287606,6 +287623,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287636,6 +287654,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287666,6 +287685,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287696,6 +287716,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287726,6 +287747,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287756,6 +287778,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -287786,6 +287809,7 @@
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
+          "scripts/manaloom_release_identity_gate.py",
           "server/bin/manaloom_ops_daemon.py",
           "server/bin/migrate.dart",
           "server/lib/health_readiness_support.dart",
@@ -288038,7 +288062,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "efc1e1979f8b4fdd1d39ab2764d34c628709bb6fc52e528f6485cbddbc8a03ba"
+    "project_logic_source_digest_sha256": "4c7614b949619adf9c3d259276a12397aeddac17b7212d64a23cccd6ed9a2fd6"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -290228,6 +290252,8 @@
       "scripts/manaloom_read_env.py",
       "scripts/manaloom_release_capabilities_contract_test.sh",
       "scripts/manaloom_release_identity.sh",
+      "scripts/manaloom_release_identity_contract_test.sh",
+      "scripts/manaloom_release_identity_gate.py",
       "scripts/manaloom_release_observability_gate.sh",
       "scripts/manaloom_release_ops_contract_test.sh",
       "scripts/manaloom_report_retention_audit.sh",
@@ -291219,6 +291245,7 @@
       "server/test/reconcile_easypanel_services_test.py",
       "server/test/register_password_contract_test.dart",
       "server/test/release_capability_policy_test.dart",
+      "server/test/release_identity_gate_test.py",
       "server/test/release_promotion_test.py",
       "server/test/release_sbom_scope_test.py",
       "server/test/request_metrics_service_test.dart",

@@ -622,7 +622,41 @@ if [[ "$converge_failed" != "0" ]]; then
   rollback_transaction || exit 1
   exit 1
 fi
-event converged "$(jq -cn --argjson surfaces "$(printf '%s\n' "${COMMITTED[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')" '{surfaces:$surfaces}')"
+
+# BT-REL-002: same-SHA. O núcleo (same_sha na política) e o que esta transação promoveu
+# mostram a identidade do release: SHA completo, produto, superfície, digest da matriz
+# commitada no SHA, modo do /app e flags de build. Divergência, ou identidade que não
+# se lê, falha fechado e desfaz a promoção.
+identity_dir="$RUN_DIR/identity"
+mkdir -p "$identity_dir"
+promoted_csv="$(IFS=,; printf '%s' "${COMMITTED[*]}")"
+git -C "$ROOT_DIR" show "$SHA:server/config/release_capabilities.json" >"$RUN_DIR/policy-at-sha.json"
+python3 "$LOGIC" identity-sources --promoted "$promoted_csv" >"$RUN_DIR/identity-sources.tsv"
+while IFS=$'\t' read -r id index kind target; do
+  [[ -n "$id" ]] || continue
+  if [[ "$kind" == "http_json" ]]; then
+    code="$(curl -sS --proto '=https' --max-time 20 -o "$identity_dir/$id.$index.body" \
+      -w '%{http_code}' "$target" 2>/dev/null || true)"
+    printf '%s' "${code:-000}" >"$identity_dir/$id.$index.status"
+  else
+    remote "$(inspect_cmd "$target")" |
+      python3 "$READER" redact-inspect >"$identity_dir/$id.$index.inspect.json" || true
+  fi
+done <"$RUN_DIR/identity-sources.tsv"
+identity_rc=0
+python3 "$LOGIC" identity-gate --sha "$SHA" --policy-file "$RUN_DIR/policy-at-sha.json" \
+  --dir "$identity_dir" --promoted "$promoted_csv" >"$RUN_DIR/identity.json" || identity_rc=$?
+if [[ "$identity_rc" != "0" ]]; then
+  event surface_failed "$(jq -ec '{surface:"*", identity:{status, scope, problems}}' \
+    "$RUN_DIR/identity.json" 2>/dev/null ||
+    jq -cn '{surface:"*", problems:["portão same-SHA ilegível"]}')"
+  echo "same-SHA falhou (BT-REL-002); desfazendo a promoção" >&2
+  rollback_transaction || exit 1
+  exit 1
+fi
+event converged "$(jq -c --argjson surfaces "$(printf '%s\n' "${COMMITTED[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')" \
+  '{surfaces:$surfaces, identity:{expected, scope, surfaces:(.surfaces | map_values(.fields))}}' \
+  "$RUN_DIR/identity.json")"
 end_transaction committed
 jq -cn --arg journal "$JOURNAL" --arg mode "$RELEASE_MODE" --arg sha "$SHA" \
   '{status:"committed", sha:$sha, release_mode:$mode, journal:$journal}'
