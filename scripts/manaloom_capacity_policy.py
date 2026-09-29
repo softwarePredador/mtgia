@@ -8,6 +8,10 @@ que o registrou) e os limites do preflight. O snapshot vem de
 produção; este módulo monta o JSON dele, confere a procedência e decide o
 preflight. Nada aqui abre conexão ou muda estado.
 
+A seção `reservations_and_limits` (BT-CAP-002) traz as reservas e os limites
+por serviço, com o uso lido de cada um; quem aplica é
+`scripts/manaloom_capacity_resources.sh`.
+
 Subcomandos:
   validate-policy [--policy P]
   snapshot --host-raw H --postgres-raw G --ssh-target T --host-key K
@@ -53,6 +57,17 @@ THRESHOLD_KEYS = {
     "postgres_connections_used_max_percent": (int, float),
     "snapshot_max_age_minutes": (int,),
 }
+
+
+RESOURCE_PLANES = {"easypanel_app", "swarm_only", "easypanel_postgres"}
+RESOURCE_APPLIERS = {
+    "scripts/manaloom_capacity_resources.sh",
+    "scripts/manaloom_deploy_battle_sidecars.sh",
+    "pendente_do_dono",
+}
+RESOURCE_TOOL = "scripts/manaloom_capacity_resources.sh"
+# Uso lido, com a unidade no nome da chave (como na linha de base).
+OBSERVED_MIB = {"memory_mib": 1.0, "memory_mib_below": 1.0, "memory_gib": 1024.0}
 
 
 class InvalidInput(ValueError):
@@ -202,6 +217,118 @@ def policy_problems(policy: dict[str, Any], repo_root: Path = REPO_ROOT) -> list
             problems.append("thresholds.rationale deve justificar cada limite")
         if not isinstance(thresholds.get("status"), str):
             problems.append("thresholds.status ausente")
+    cpu_count = None
+    memory_total = None
+    if isinstance(host, dict):
+        cpu_count = (host.get("cpu_count") or {}).get("value")
+        memory_total = (host.get("memory_total_mb") or {}).get("value")
+    problems += resources_problems(
+        policy.get("reservations_and_limits"), receipt_text, cpu_count, memory_total
+    )
+    return problems
+
+
+def observed_mib(entry: dict[str, Any]) -> float | None:
+    """Uso lido do serviço, em MiB; nulo quando a leitura não o cobriu."""
+    for key, factor in OBSERVED_MIB.items():
+        item = (entry.get("observed") or {}).get(key)
+        if isinstance(item, dict) and isinstance(item.get("value"), (int, float)):
+            return float(item["value"]) * factor
+    return None
+
+
+def resources_problems(
+    section: Any, receipt_text: str, cpu_count: Any, memory_total_mb: Any
+) -> list[str]:
+    """BT-CAP-002: reservas e limites por serviço, coerentes com a leitura."""
+    if not isinstance(section, dict):
+        return ["reservations_and_limits ausente"]
+    problems: list[str] = []
+    if section.get("owner_task") != "BT-CAP-002":
+        problems.append("reservations_and_limits.owner_task deve ser BT-CAP-002")
+    if not isinstance(section.get("status"), str) or not section["status"].strip():
+        problems.append("reservations_and_limits.status ausente")
+    rules = section.get("rules")
+    margin = factor = None
+    if not isinstance(rules, dict):
+        problems.append("reservations_and_limits.rules ausente")
+    else:
+        margin = rules.get("unreserved_margin_mb")
+        factor = rules.get("limit_headroom_factor")
+        if not isinstance(margin, int) or isinstance(margin, bool) or margin <= 0:
+            problems.append("rules.unreserved_margin_mb inválido")
+            margin = None
+        if not isinstance(factor, (int, float)) or isinstance(factor, bool) or factor < 2:
+            problems.append("rules.limit_headroom_factor deve ser 2 ou mais")
+            factor = None
+        rationale = rules.get("rationale")
+        if not isinstance(rationale, dict) or set(rationale) != {
+            "unreserved_margin_mb", "limit_headroom_factor"
+        }:
+            problems.append("rules.rationale deve justificar cada regra")
+    services = section.get("services")
+    if not isinstance(services, dict) or not services:
+        return problems + ["reservations_and_limits.services vazio"]
+    total_reservation = 0
+    for name, entry in services.items():
+        label = f"reservations_and_limits.services.{name}"
+        if not isinstance(entry, dict):
+            problems.append(f"{label} inválido")
+            continue
+        if not isinstance(entry.get("surface"), str) or not entry["surface"]:
+            problems.append(f"{label}.surface ausente")
+        if entry.get("plane") not in RESOURCE_PLANES:
+            problems.append(f"{label}.plane desconhecido")
+        applied_by = entry.get("applied_by")
+        if applied_by not in RESOURCE_APPLIERS:
+            problems.append(f"{label}.applied_by desconhecido")
+        # A ferramenta só aplica em app do EasyPanel; o banco espera o dono.
+        if applied_by == RESOURCE_TOOL and entry.get("plane") != "easypanel_app":
+            problems.append(f"{label}: a ferramenta só aplica recursos em app do EasyPanel")
+        if entry.get("plane") == "easypanel_postgres" and applied_by != "pendente_do_dono":
+            problems.append(f"{label}: recursos do PostgreSQL só com decisão do dono")
+        numbers = {}
+        for key in ("memory_reservation_mb", "memory_limit_mb", "cpu_reservation", "cpu_limit"):
+            value = entry.get(key)
+            if not isinstance(value, (int, float)) or isinstance(value, bool) or value < 0:
+                problems.append(f"{label}.{key} inválido")
+            else:
+                numbers[key] = value
+        if len(numbers) == 4:
+            total_reservation += numbers["memory_reservation_mb"]
+            unlimited = numbers["memory_limit_mb"] == 0
+            if unlimited and applied_by != "pendente_do_dono":
+                problems.append(f"{label}: sem limite de memória só com decisão pendente do dono")
+            if not unlimited and numbers["memory_reservation_mb"] > numbers["memory_limit_mb"]:
+                problems.append(f"{label}: reserva de memória acima do limite")
+            if numbers["cpu_limit"] and numbers["cpu_reservation"] > numbers["cpu_limit"]:
+                problems.append(f"{label}: reserva de CPU acima do limite")
+            if isinstance(cpu_count, (int, float)) and numbers["cpu_limit"] > cpu_count:
+                problems.append(f"{label}: limite de CPU acima dos {cpu_count} vCPU do host")
+            observed = observed_mib(entry)
+            if (applied_by == RESOURCE_TOOL and observed is not None and factor
+                    and numbers["memory_limit_mb"] < factor * observed):
+                problems.append(
+                    f"{label}: limite de {numbers['memory_limit_mb']} MiB abaixo de "
+                    f"{factor} vezes o uso lido ({observed:g} MiB)"
+                )
+        if not isinstance(entry.get("rationale"), str) or not entry["rationale"].strip():
+            problems.append(f"{label}.rationale ausente")
+        observed_entry = entry.get("observed")
+        if not isinstance(observed_entry, dict):
+            problems.append(f"{label}.observed deve ser um objeto (vazio se não lido)")
+        elif receipt_text:
+            for key, item in observed_entry.items():
+                if key not in OBSERVED_MIB:
+                    problems.append(f"{label}.observed.{key}: unidade desconhecida")
+                    continue
+                _check_evidence(problems, f"{label}.observed.{key}", item, receipt_text)
+    if (isinstance(memory_total_mb, (int, float)) and margin is not None
+            and total_reservation > memory_total_mb - margin):
+        problems.append(
+            f"a soma das reservas ({total_reservation} MiB) passa da memória do host menos a "
+            f"margem ({memory_total_mb} - {margin} MiB)"
+        )
     return problems
 
 

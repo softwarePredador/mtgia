@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """BT-OBS-001 (D-47, D-51): SLOs e alertas de API, PostgreSQL, jobs, cache e catálogo.
+BT-OBS-003 (D-51): o alerta de release, separado, com as regras `release_*`.
 
 O avaliador roda aqui contra sinais falsos (HTTP, PostgreSQL e manifesto de
 jobs) e um canal falso: nenhuma requisição sai da máquina. Cobre a política
@@ -11,6 +12,7 @@ from __future__ import annotations
 
 import copy
 import datetime as dt
+import hashlib
 import importlib.util
 import io
 import json
@@ -28,6 +30,14 @@ NOW = dt.datetime(2026, 9, 24, 12, 0, tzinfo=dt.timezone.utc)
 LOCAL_NOW = dt.datetime(2026, 9, 24, 12, 0)
 OPS_KEY = "k" * 40
 USER_ID = "0f8fad5b-d9cb-469f-a165-70867728950e"
+# BT-OBS-003: o release que o ops traz (GIT_SHA e a matriz do image).
+RELEASE_SHA = "a1" * 20
+OLD_SHA = "b2" * 20
+POLICY_DIGEST = hashlib.sha256(
+    (REPO_ROOT / "server" / "config" / "release_capabilities.json").read_bytes()).hexdigest()
+API = "http://evolution_cartinhas:8080"
+PUBLIC = "https://evolution-manaloom-web-public.2ta7qx.easypanel.host"
+FLAGS_OFF = {"battle_live_spectator_enabled": False, "interactive_battle_enabled": False}
 
 
 def _load_module():
@@ -69,9 +79,55 @@ class FakeHttp:
         self.cache_entries = 12
         self.upstream_blocked: object = 0
         self.calls: list[tuple[str, dict]] = []
+        # BT-OBS-003: a identidade que cada superfície serve.
+        self.sha = {"backend": RELEASE_SHA, "site": RELEASE_SHA, "app": RELEASE_SHA,
+                    "android": RELEASE_SHA}
+        self.digest = {"backend": POLICY_DIGEST, "capabilities": POLICY_DIGEST,
+                       "app": POLICY_DIGEST, "android": POLICY_DIGEST}
+        self.app_flags = dict(FLAGS_OFF)
+        self.app_embedded_status = "release"
+        self.down: set[str] = set()
+
+    def _identity(self, url: str) -> tuple[int | None, bytes] | None:
+        routes = {
+            f"{API}/health": "backend",
+            f"{API}/capabilities": "capabilities",
+            f"{PUBLIC}/release.json": "site",
+            f"{PUBLIC}/app/release.json": "app",
+            f"{PUBLIC}/app/assets/assets/release/release-identity.json": "embedded",
+            f"{PUBLIC}/downloads/release.json": "android",
+        }
+        route = routes.get(url)
+        if route is None:
+            return None
+        if route in self.down:
+            return 404, b"not found"
+        if route == "backend":
+            body = {"status": "healthy", "git_sha": self.sha["backend"],
+                    "release_capabilities": {"policy_digest_sha256": self.digest["backend"]}}
+        elif route == "capabilities":
+            body = {"product": "brewtact", "policy_digest_sha256": self.digest["capabilities"]}
+        elif route == "site":
+            body = {"product": "brewtact", "surface": "site", "git_sha": self.sha["site"]}
+        elif route == "embedded" and self.app_embedded_status != "release":
+            body = {"schema_version": 1, "status": self.app_embedded_status,
+                    "release_identity_embedded": False}
+        elif route in ("app", "embedded"):
+            body = {"status": "release", "product": "brewtact", "surface": "app",
+                    "git_sha": self.sha["app"], "release_mode": "control_plane",
+                    "features": self.app_flags,
+                    "release_capabilities": {"policy_digest_sha256": self.digest["app"]}}
+        else:
+            body = {"product": "brewtact", "surface": "android", "git_sha": self.sha["android"],
+                    "release_mode": "control_plane",
+                    "release_capabilities": {"policy_digest_sha256": self.digest["android"]}}
+        return 200, json.dumps(body).encode()
 
     def __call__(self, url: str, headers: dict[str, str]) -> tuple[int | None, bytes]:
         self.calls.append((url, dict(headers)))
+        identity = self._identity(url)
+        if identity is not None:
+            return identity
         if url.endswith("/health/live"):
             return self.live, b'{"status":"ok"}'
         if url.endswith("/health/ready"):
@@ -127,6 +183,7 @@ def _postgres(connections=10, max_connections=100, catalog_days=1, writes=1000,
 
 def _email_env(data_dir: Path, jobs: Path) -> dict[str, str]:
     return {
+        "GIT_SHA": RELEASE_SHA,
         "MANALOOM_SLO_API_BASE_URL": "http://evolution_cartinhas:8080",
         "MANALOOM_OPS_API_KEY": OPS_KEY,
         "MANALOOM_OPS_DATA_DIR": str(data_dir),
@@ -170,6 +227,28 @@ class PolicyTest(unittest.TestCase):
         policy = copy.deepcopy(base)
         policy["alerts"]["job_failed"]["severity"] = "info"
         cases.append((policy, "severity"))
+        # D-51: o alerta de release é do BT-OBS-003, e só ele.
+        policy = copy.deepcopy(base)
+        del policy["alerts"]["release_identity_mixed"]["task"]
+        cases.append((policy, "task deve ser BT-OBS-003 só nos alertas de release"))
+        policy = copy.deepcopy(base)
+        policy["alerts"]["api_down"]["task"] = "BT-OBS-003"
+        cases.append((policy, "task deve ser BT-OBS-003 só nos alertas de release"))
+        policy = copy.deepcopy(base)
+        del policy["release"]
+        cases.append((policy, "release deve ser do BT-OBS-003"))
+        policy = copy.deepcopy(base)
+        policy["release"]["identity_config"] = "server/config/outra.json"
+        cases.append((policy, "identity_config"))
+        policy = copy.deepcopy(base)
+        policy["alerts"]["release_android_behind"]["grace_hours"] = 0
+        cases.append((policy, "grace_hours"))
+        policy = copy.deepcopy(base)
+        policy["alerts"]["release_identity_mixed"]["consecutive"] = "doze"
+        cases.append((policy, "release_identity_mixed.consecutive"))
+        policy = copy.deepcopy(base)
+        policy["alerts"]["release_capabilities_divergent"]["runbook"] = "nao_existe"
+        cases.append((policy, "release_capabilities_divergent.runbook"))
         for policy, expected in cases:
             with self.subTest(expected=expected):
                 problems = slo.policy_problems(policy) + slo.provenance_problems(policy)
@@ -388,6 +467,145 @@ class EvaluateTest(unittest.TestCase):
         )
         # Recém-ligado: não conta atraso antes do primeiro horário dele.
         self.assertEqual(self._codes({}), {"job_failed:manaloom_account_deletion_outbox"})
+
+
+class ReleaseAlertTest(unittest.TestCase):
+    """BT-OBS-003 (D-51): release e produção divergem, contra a identidade do ops."""
+
+    def setUp(self) -> None:
+        self.policy = _policy()
+        self.http = FakeHttp()
+        self.tmp = tempfile.TemporaryDirectory()
+        self.jobs = Path(self.tmp.name) / "jobs.json"
+        self.jobs.write_text("[]", encoding="utf-8")
+        self.env = _email_env(Path(self.tmp.name), self.jobs)
+        self.memory: dict = {}
+
+    def tearDown(self) -> None:
+        self.tmp.cleanup()
+
+    def _evaluate(self, runs: int = 1, now: dt.datetime = NOW) -> dict[str, dict]:
+        alerts: list = []
+        for _ in range(runs):
+            signals = slo.collect_signals(self.env, self.http, _postgres(), self.jobs)
+            alerts, self.memory = slo.evaluate(self.policy, signals, self.memory, now, LOCAL_NOW)
+        return {alert["code"]: alert for alert in alerts if alert["code"].startswith("release_")}
+
+    def test_the_ops_image_carries_the_identity_gate(self) -> None:
+        # O deploy do ops empacota só server/, scripts/lib e poucos outros: o portão do
+        # BT-REL-002 tem de ir junto, senão o alerta de release fica cego no host.
+        deploy = (REPO_ROOT / "scripts" / "manaloom_deploy_ops_image.sh").read_text(
+            encoding="utf-8")
+        archive = next(line for line in deploy.splitlines()
+                       if line.startswith("git archive HEAD server"))
+        start = deploy.index(archive)
+        command = deploy[start:deploy.index("|", start)]
+        self.assertIn("scripts/manaloom_release_identity_gate.py", command)
+        self.assertEqual(slo.IDENTITY_MODULE,
+                         REPO_ROOT / "scripts" / "manaloom_release_identity_gate.py")
+        self.assertIn("MANALOOM_RELEASE_CAPABILITIES_FILE=/app/server/config/"
+                      "release_capabilities.json", deploy)
+        self.assertIn("--env-add GIT_SHA='$sha'", deploy)
+
+    def test_a_coherent_release_raises_nothing(self) -> None:
+        self.assertEqual(self._evaluate(runs=3), {})
+        urls = {url for url, _ in self.http.calls}
+        self.assertIn(f"{API}/health", urls)
+        self.assertIn(f"{API}/capabilities", urls)
+        self.assertIn(f"{PUBLIC}/app/assets/assets/release/release-identity.json", urls)
+
+    def test_a_mixed_core_warns_after_an_hour(self) -> None:
+        self.http.sha["site"] = OLD_SHA
+        self.assertEqual(self._evaluate(runs=11), {})
+        alert = self._evaluate(runs=1)["release_identity_mixed"]
+        self.assertEqual(alert["severity"], "warning")
+        self.assertEqual(alert["observed"], f"site:{OLD_SHA[:12]}")
+        self.assertEqual(alert["threshold"], f"ops:{RELEASE_SHA[:12]}")
+        self.http.sha["site"] = RELEASE_SHA
+        self.assertEqual(self._evaluate(runs=1), {})
+
+    def test_a_divergent_matrix_at_the_same_sha_is_critical(self) -> None:
+        cases = {
+            "backend com outro digest": lambda: self.http.digest.update(
+                backend="e" * 64, capabilities="e" * 64),
+            "/health e /capabilities discordam": lambda: self.http.digest.update(
+                capabilities="e" * 64),
+            "/app com flag ligada": lambda: self.http.app_flags.update(
+                interactive_battle_enabled=True),
+            "/app com identidade de desenvolvimento": lambda: setattr(
+                self.http, "app_embedded_status", "development_build"),
+            "APK no mesmo SHA com outra matriz": lambda: self.http.digest.update(
+                android="e" * 64),
+        }
+        for label, mutate in cases.items():
+            with self.subTest(case=label):
+                self.tearDown()
+                self.setUp()
+                mutate()
+                self.assertEqual(self._evaluate(runs=1), {})
+                alerts = self._evaluate(runs=1)
+                self.assertEqual(set(alerts), {"release_capabilities_divergent"})
+                self.assertEqual(alerts["release_capabilities_divergent"]["severity"], "critical")
+
+    def test_an_unreadable_identity_warns_but_not_twice_for_a_dead_api(self) -> None:
+        self.http.down = {"site"}
+        alert = self._evaluate(runs=2)["release_identity_unreadable"]
+        self.assertEqual(alert["observed"], "site")
+        self.http.down = set()
+        self.http.live = None
+        self.http.down = {"backend", "capabilities"}
+        self.assertNotIn("release_identity_unreadable", self._evaluate(runs=2))
+
+    def test_the_ops_without_its_own_identity_is_unreadable(self) -> None:
+        del self.env["GIT_SHA"]
+        alert = self._evaluate(runs=2)["release_identity_unreadable"]
+        self.assertIn("ops", alert["observed"])
+        self.tearDown()
+        self.setUp()
+        missing = Path(self.tmp.name) / "nao_existe.py"
+        with mock.patch.object(slo, "IDENTITY_MODULE", missing):
+            alerts, _ = slo.evaluate(
+                self.policy, slo.collect_signals(self.env, self.http, _postgres(), self.jobs),
+                {"consecutive": {"release_identity_unreadable": 1}}, NOW, LOCAL_NOW)
+        codes = {alert["code"] for alert in alerts}
+        self.assertEqual(codes, {"release_identity_unreadable"},
+                         "o resto do BT-OBS-001 segue avaliando")
+
+    def test_the_android_may_lag_one_day(self) -> None:
+        self.http.sha["android"] = OLD_SHA
+        self.http.digest["android"] = "e" * 64
+        self.assertEqual(self._evaluate(runs=1), {})
+        self.assertEqual(self.memory["release_android_behind_since"], "2026-09-24T12:00:00Z")
+        later = NOW + dt.timedelta(hours=23)
+        self.assertEqual(self._evaluate(runs=1, now=later), {})
+        late = NOW + dt.timedelta(hours=24)
+        alert = self._evaluate(runs=1, now=late)["release_android_behind"]
+        self.assertEqual(alert["observed"], f"android:{OLD_SHA[:12]} há 24 h")
+        self.http.sha["android"] = RELEASE_SHA
+        self.http.digest["android"] = POLICY_DIGEST
+        self.assertEqual(self._evaluate(runs=1, now=late), {})
+        self.assertNotIn("release_android_behind_since", self.memory)
+
+    def test_the_public_origin_can_be_overridden(self) -> None:
+        self.env["MANALOOM_RELEASE_PUBLIC_BASE_URL"] = "https://interno.exemplo.invalid"
+        self.http.calls.clear()
+        self._evaluate(runs=1)
+        urls = {url for url, _ in self.http.calls}
+        self.assertIn("https://interno.exemplo.invalid/release.json", urls)
+        self.assertNotIn(f"{PUBLIC}/release.json", urls)
+        self.env["MANALOOM_RELEASE_PUBLIC_BASE_URL"] = "http://sem-tls.exemplo.invalid"
+        alert = self._evaluate(runs=2)["release_identity_unreadable"]
+        self.assertIn("MANALOOM_RELEASE_PUBLIC_BASE_URL", alert["observed"])
+
+    def test_the_message_carries_short_shas_and_the_runbook(self) -> None:
+        self.http.sha["site"] = OLD_SHA
+        alerts = list(self._evaluate(runs=12).values())
+        subject, text, _ = slo.plan_notifications(self.policy, alerts, {}, NOW)
+        self.assertIn("BT-OBS-003", text)
+        self.assertIn("docs/runbooks/SLO_E_ALERTAS.md#release_identity_mixed", text)
+        self.assertNotIn(OLD_SHA, slo.sanitize(text))
+        self.assertNotIn(RELEASE_SHA, slo.sanitize(text))
+        self.assertIn(OLD_SHA[:12], slo.sanitize(text))
 
 
 class NotificationTest(unittest.TestCase):

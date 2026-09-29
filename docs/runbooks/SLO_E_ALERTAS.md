@@ -187,3 +187,67 @@ Scryfall (D-35): a sincronização é só do job.
 
 1. Qual rota? O log da API tem `catalog_read_upstream_blocked` com o caminho.
 2. A contagem é da réplica desde o último início; o alerta fecha com o conserto e o redeploy.
+
+# Alertas de release (`BT-OBS-003`, D-51)
+
+As quatro regras `release_*` são do `BT-OBS-003`, separadas das acima (D-51), no mesmo
+avaliador e na mesma mensagem. A identidade de cada superfície é a do `BT-REL-002`:
+produto, superfície, SHA completo, digest da matriz de capabilities, modo da D-13 e flags de
+build. As fontes estão em `server/config/release_promotion.json`.
+
+- **Âncora:** o próprio ops. Ele sai na mesma promoção e traz no image o `GIT_SHA` e a
+  matriz do SHA (`MANALOOM_RELEASE_CAPABILITIES_FILE`).
+- **Leituras:** o backend pela URL interna (`MANALOOM_SLO_API_BASE_URL`: `/health` e
+  `/capabilities`). O site (`/release.json`), o `/app` (`/app/release.json` e a identidade
+  embarcada servida) e o APK (`/downloads/release.json`) pela origem pública da política. Se
+  o contêiner não alcançar a origem pública, defina `MANALOOM_RELEASE_PUBLIC_BASE_URL`.
+- **O diário da promoção:** `scripts/manaloom_promote_release.sh --status --receipt-dir <dir>`
+  mostra se há transação aberta; um alerta destes durante uma promoção em andamento é esperado
+  até ela terminar.
+
+## release_identity_unreadable
+
+A identidade de uma superfície não se lê: a fonte não respondeu 200, ou o próprio ops não tem
+`GIT_SHA`, a matriz ou o portão de identidade no image. O valor observado diz qual.
+
+1. Superfície fora do ar? `api_down` cobre o backend; para o site, o `/app` e o APK, abra a
+   URL da política.
+2. Imagens anteriores ao `BT-REL-002` não servem `/release.json` (site) nem a identidade
+   embarcada (`/app`): a primeira promoção com os scripts novos resolve.
+3. O ops sem identidade: o deploy do ops grava `GIT_SHA`; confira a spec do serviço.
+
+## release_identity_mixed
+
+Backend, ops, site e `/app` estão em SHAs diferentes há mais de uma hora. O valor observado
+lista cada superfície fora do SHA do ops.
+
+1. Há promoção aberta? `scripts/manaloom_promote_release.sh --status --receipt-dir <dir>` (4 ou
+   1 = transação aberta ou volta sem prova): siga o diário e resolva com o motivo.
+2. Sem promoção aberta, alguém fez deploy fora da transação. Refaça a promoção completa no
+   SHA do `origin/master` (`scripts/manaloom_promote_release.sh --execute --promote`), com a
+   palavra do dono.
+3. O app instalado continua protegido pela D-13: nega o que o artefato não liberou.
+
+## release_capabilities_divergent
+
+No mesmo SHA do release, uma superfície serve uma matriz de capabilities, um modo da D-13, um
+produto, uma superfície ou uma flag de build diferente do commitado, ou responde sem a
+identidade. É crítico: o que o usuário pode fazer diverge do release aprovado.
+
+1. Qual superfície? O valor observado lista. Leia a identidade dela e compare com
+   `server/config/release_capabilities.json` no SHA.
+2. Backend com `/health` e `/capabilities` discordando: réplica velha ou arquivo trocado no
+   contêiner; refaça o deploy do backend pela promoção.
+3. `/app` com identidade de desenvolvimento ou flag ligada: build fora dos scripts de release;
+   desfaça pela promoção.
+
+## release_android_behind
+
+O APK publicado no release host segue num SHA anterior ao do núcleo há mais de 24 horas.
+
+1. É o caso previsto da D-13: o Android sai em transação própria, com o APK do SHA
+   construído e a evidência do `BT-OBS-001`.
+2. Publique com `scripts/manaloom_promote_release.sh --execute --promote --surfaces android`,
+   no mesmo SHA do núcleo.
+3. Enquanto isso, os apps instalados negam as capabilities que não conhecem e pedem
+   atualização.

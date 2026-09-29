@@ -1,13 +1,14 @@
 {
   "schema_version": 1,
   "policy": "brewtact-slo-alerts",
-  "version": "2026-09-28.1",
+  "version": "2026-09-28.2",
   "task": "BT-OBS-001",
   "decisions": [
     "D-47",
-    "D-51"
+    "D-51",
+    "D-13"
   ],
-  "scope": "API, PostgreSQL, jobs do daemon de ops, cache e catálogo. O alerta de release fica no BT-OBS-003 (D-51); a queda vista de fora, no BT-OBS-002.",
+  "scope": "API, PostgreSQL, jobs do daemon de ops, cache e catálogo (BT-OBS-001) e, separado, o alerta de release (BT-OBS-003, D-51): as regras release_*. A queda vista de fora fica no BT-OBS-002.",
   "evaluation": {
     "job": "manaloom_slo_alerts",
     "schedule": "*/5 * * * *",
@@ -130,6 +131,38 @@
       "source": "catalog_read_guard.upstream_blocked de /health/metrics",
       "summary": "Uma leitura do catálogo tentou chamar um serviço de fora; a API bloqueou e contou.",
       "runbook": "catalog_read_upstream"
+    },
+    "release_identity_unreadable": {
+      "task": "BT-OBS-003",
+      "severity": "warning",
+      "source": "as fontes de identidade de cada superfície (server/config/release_promotion.json) e o GIT_SHA e a matriz do próprio ops",
+      "consecutive": 2,
+      "summary": "A identidade de release de uma superfície não se lê: a divergência entre o release e a produção fica sem medição.",
+      "runbook": "release_identity_unreadable"
+    },
+    "release_identity_mixed": {
+      "task": "BT-OBS-003",
+      "severity": "warning",
+      "source": "SHA do backend, do site e do /app contra o do ops (o núcleo same-SHA do BT-REL-002)",
+      "consecutive": 12,
+      "summary": "O núcleo do release (backend, ops, site e /app) está em SHAs diferentes há mais de uma hora: promoção pela metade ou deploy fora da transação.",
+      "runbook": "release_identity_mixed"
+    },
+    "release_capabilities_divergent": {
+      "task": "BT-OBS-003",
+      "severity": "critical",
+      "source": "digest da matriz, modo da D-13, produto, superfície e flags de cada superfície no SHA do ops",
+      "consecutive": 2,
+      "summary": "No mesmo SHA do release, uma superfície serve capabilities, modo, identidade ou flags diferentes dos commitados.",
+      "runbook": "release_capabilities_divergent"
+    },
+    "release_android_behind": {
+      "task": "BT-OBS-003",
+      "severity": "warning",
+      "source": "downloads/release.json do release host contra o SHA do ops",
+      "grace_hours": 24,
+      "summary": "O APK publicado segue num release anterior ao do núcleo há mais de 24 horas.",
+      "runbook": "release_android_behind"
     }
   },
   "thresholds_status": "proposta_pendente_do_dono",
@@ -143,7 +176,11 @@
     "endpoint_cache_large": "O cache é por réplica e tem teto de 10.000 entradas (as mais antigas saem primeiro, BT-CAT-03); acima de 5.000 respostas guardadas ele já pesa na memória da API.",
     "catalog_written_outside_job": "O contrato catalog_reference_apply_v1 (BT-CAT-01) deixa só o job escrever cards, sets e card_legalities, e as leituras não gravam (BT-CAT-02); qualquer linha escrita fora de uma execução do job é o que o aceite do BT-CAT-03 manda alertar.",
     "catalog_read_upstream": "Leitura do catálogo não chama a Scryfall (D-35); a API bloqueia a tentativa, e uma só já é o alerta do aceite do BT-CAT-03.",
-    "consecutive": "Duas avaliações seguidas (10 minutos) antes de acordar alguém por queda ou lentidão."
+    "consecutive": "Duas avaliações seguidas (10 minutos) antes de acordar alguém por queda ou lentidão.",
+    "release_identity_unreadable": "Duas avaliações seguidas (10 minutos), como a queda: uma leitura perdida não acorda ninguém.",
+    "release_identity_mixed": "Uma promoção do BT-REL-001 leva até uma hora, com o build de cada superfície no host; doze avaliações (60 minutos) deixam a transação terminar ou desfazer antes de avisar.",
+    "release_capabilities_divergent": "No mesmo SHA não há motivo legítimo para matriz, modo ou flag diferentes (BT-REL-002); duas avaliações seguidas bastam.",
+    "release_android_behind": "O APK da primeira coorte sai em transação própria depois do núcleo (D-13); 24 horas cobrem construir, assinar e publicar, e o app instalado já nega o que não conhece."
   },
   "receiver": {
     "human": "o dono do projeto (D-47)",
@@ -162,6 +199,16 @@
     "repeat_after_minutes": 60,
     "notify_resolved": true,
     "note": "O destino e as credenciais ficam só no ambiente do serviço de ops, nunca no repositório."
+  },
+  "release": {
+    "task": "BT-OBS-003",
+    "decisions": [
+      "D-51",
+      "D-13"
+    ],
+    "identity_config": "server/config/release_promotion.json",
+    "anchor": "O próprio ops: sai na mesma promoção (BT-REL-001) e traz o GIT_SHA e a matriz de capabilities do SHA no image. O backend é lido pela URL interna (MANALOOM_SLO_API_BASE_URL); o site, o /app e o APK pela origem pública da política, ou por MANALOOM_RELEASE_PUBLIC_BASE_URL.",
+    "classification": "Fonte que não responde: ilegível. Fonte que responde sem a identidade ou fontes que discordam: divergência. SHA diferente no núcleo: mixed; no Android: atraso. No mesmo SHA, digest, modo, produto, superfície ou flag diferente: divergência."
   },
   "pii": "As mensagens levam só o código do alerta, a severidade, números e o template da rota. Nenhum e-mail, UUID, token ou caminho cru sai do avaliador."
 }

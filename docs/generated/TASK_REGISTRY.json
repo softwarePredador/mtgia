@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "d1de8967ffdde142be87c9e60055d9f57d795e3dd1bc1f941b96bb1cc42fc94f"
+    "sha256": "0da4f39b3a7ce2d020d74068f2f68fa3a124c1257692cf418abc01fa28d770d2"
   },
   "required_task_fields": [
     "id",
@@ -12,7 +12,7 @@
     "depends_on",
     "acceptance"
   ],
-  "task_count": 245,
+  "task_count": 246,
   "tasks": [
     {
       "id": "BT-GOV-001",
@@ -2699,12 +2699,12 @@
     {
       "id": "BT-CAP-002",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Aplicar/provar reservations/limits e rollback exato de resources.",
       "depends_on": [
         "BT-CAP-001"
       ],
-      "acceptance": "Preflight antes de mutação; rollback restaura image/env/resources/deploy. Decisão do dono em 2026-09-22: D-14, limites e reservas por serviço definidos a partir da leitura do `BT-CAP-001`.",
+      "acceptance": "Preflight antes de mutação; rollback restaura image/env/resources/deploy. Decisão do dono em 2026-09-22: D-14, limites e reservas por serviço definidos a partir da leitura do `BT-CAP-001`. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção. `server/config/capacity_policy.json` (versão `2026-09-28.1`) ganhou `reservations_and_limits`: reserva e limite de memória e de CPU por serviço, quem aplica e o uso lido com a evidência do receipt de 2026-09-23. O validador exige reserva até o limite, CPU dentro dos 4 vCPU e limite de ao menos 4 vezes o uso lido; soma das reservas (2.656 MiB) até a memória menos 2 GiB; banco só com o dono. `scripts/manaloom_capacity_resources.sh` aplica em um serviço por vez (backend, ops, site, `/app` e release host). Os três do Battle ficam com o deploy dele, e o PostgreSQL fica pendente do dono. Só muda com PASS do plano: preflight do `BT-CAP-001` fresco; serviço convergido e com imagem por digest; EasyPanel e Swarm concordando em imagem e recursos; soma das reservas no teto do nó. Grava nos dois lugares (`services.app.updateResources` sem deploy e `docker service update` só com as flags de recursos). Confere pela impressão digital da spec que só `Resources` mudou e que imagem, env e deploy do EasyPanel ficaram iguais. O rollback é automático na falha ou na parada no meio, e manual pelo receipt. Só roda se a nossa mudança ainda for a última nos dois lugares, e prova spec inteira e EasyPanel iguais aos de antes; outro deploy no meio nunca é sobrescrito. O receipt fica em diretório durável, com status `blocked` inclusive, e as leituras passam por um redator: nenhum valor de env chega ao disco. Evidência: `server/test/capacity_resources_test.py` (37 testes). Ele usa a spec gravada `server/test/fixtures/capacity/evolution_services_2026-09-23.json`, montada com a leitura do `BT-CAP-001`, e um Swarm e um EasyPanel falsos com defeitos injetáveis; nenhuma conexão sai da máquina. O teste está ligado em `scripts/manaloom_release_ops_contract_test.sh`, e 52 mutações falham como esperado; receipt em `docs/qa/execution/2026-09-28/BT-CAP-002-reservas-e-limites.md`. Segue aberto: aplicar na produção no passo do lote, com a palavra do dono; o primeiro plano confirma que o EasyPanel devolve os recursos na lista. Também seguem abertas as decisões do dono sobre o PostgreSQL, os limites do Battle e o pico do ops.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 673
     },
@@ -2735,13 +2735,13 @@
     {
       "id": "BT-OBS-003",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Alerta de release, separado do `BT-OBS-001` (D-51).",
       "depends_on": [
         "BT-REL-002",
         "BT-OBS-001"
       ],
-      "acceptance": "Divergência de SHA, digest ou capability entre o release e a produção dispara alerta para o dono, com runbook ligado.",
+      "acceptance": "Divergência de SHA, digest ou capability entre o release e a produção dispara alerta para o dono, com runbook ligado. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção. O avaliador do `BT-OBS-001` (`server/bin/manaloom_slo_alerts.py`, job de 5 minutos do ops) lê a identidade de release de cada superfície com o portão do `BT-REL-002`: o backend pela URL interna; o site, o `/app` e o APK pela origem pública da política ou por `MANALOOM_RELEASE_PUBLIC_BASE_URL`. A âncora é o próprio ops, que sai na mesma promoção (`GIT_SHA` e a matriz do image). `server/config/slo_alert_policy.json` (`2026-09-28.2`) traz quatro regras com `task: BT-OBS-003`, separadas (D-51), cada limite justificado: `release_identity_unreadable` (aviso, 2 avaliações), `release_identity_mixed` (aviso, 12 avaliações, o tempo de uma promoção), `release_capabilities_divergent` (crítico, 2 avaliações: no mesmo SHA, outro digest, modo, produto, superfície, flag ou identidade) e `release_android_behind` (aviso, 24 h de carência, D-13). O runbook `docs/runbooks/SLO_E_ALERTAS.md` ganhou uma seção por alerta, e o image do ops passou a levar o portão de identidade. Evidência: `server/test/slo_alerts_test.py` (33, com HTTP falso servindo as identidades); 17 mutações falham como esperado; receipt em `docs/qa/execution/2026-09-28/BT-OBS-003-alerta-de-release.md`. Segue aberto: a configuração do ops (receptor e, se preciso, a origem pública) e o teste de alerta reconhecido pelo dono, como no `BT-OBS-001`; a primeira promoção com os scripts do `BT-REL-002` grava as identidades novas.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 676
     },
@@ -2770,7 +2770,7 @@
     {
       "id": "BT-REL-001",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Transação de promoção full-stack e rollback comprovado.",
       "depends_on": [
         "BT-SCP-001",
@@ -2778,19 +2778,19 @@
         "BT-DR-001",
         "BT-OBS-001"
       ],
-      "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível. Decisão do dono em 2026-09-22: D-13, `/app` implantável com as 29 capabilities off como release de plano de controle (a regra de ao menos uma on vale só quando uma capability abrir); ordem backend, site público, `/app` e Android; Android da primeira coorte por APK no release host, sem Play Store por enquanto. Em 2026-09-23 o `/app` seguia na imagem antiga (`app-web@sha256:f94930bc…`); o deploy do Flutter Web com tudo off continua bloqueado pela contradição entre o loader e o gate.",
+      "acceptance": "Backend, public Web, Flutter Web/Android e ops convergem; failure pre-receipt não fica invisível. Decisão do dono em 2026-09-22: D-13, `/app` implantável com as 29 capabilities off como release de plano de controle (a regra de ao menos uma on vale só quando uma capability abrir); ordem backend, site público, `/app` e Android; Android da primeira coorte por APK no release host, sem Play Store por enquanto. Em 2026-09-23 o `/app` seguia na imagem antiga (`app-web@sha256:f94930bc…`); o deploy do Flutter Web com tudo off continua bloqueado pela contradição entre o loader e o gate. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção. D-13 no `/app`: `manaloom_resolve_public_app_release_mode` (`scripts/lib/manaloom_release_capabilities_contract.sh`) devolve `control_plane` com a matriz toda off e, com alguma capability on, deixa o gate de abertura de sempre decidir. O deploy do Flutter Web chama o resolvedor antes da aprovação e grava e confere `release_mode` no `release.json`; o contrato shell e o contrato Dart provam o all-off e a matriz incoerente, sem nenhuma raiz do digest de UI. Transação: `scripts/manaloom_promote_release.sh` promove backend, ops, site, `/app` e Android na ordem da D-13 (`server/config/release_promotion.json`), tudo ou nada. O preflight só lê: SHA limpo no `origin/master`, matriz e modo da D-13, capacidade do `BT-CAP-001` e linha de base reversível de cada superfície. Cada passo entra num diário encadeado por SHA-256, em diretório durável, antes de acontecer. Cada deploy é conferido (spec, tarefa, origem do EasyPanel, mesmo SHA e sonda pública), e todas convergem juntas no fim. Uma falha desfaz o que começou na ordem inversa (spec anterior exata, ou redeploy pelo EasyPanel onde o env não vive na spec), provado por superfície como `exact` ou `identity`. Volta sem prova é CRITICAL; o marcador `EM_ANDAMENTO`, o diário sem fim e o `--status` (4 ou 1) deixam a falha antes do receipt sempre visível e bloqueiam a próxima promoção até o `--resolve` com o motivo. Evidência: `server/test/release_promotion_test.py` (37 testes, com a ferramenta de verdade num repositório descartável, um Swarm, um EasyPanel e sondas falsas, e stubs dos cinco deploys com falha antes e depois de mudar, rollback próprio, saída mentirosa, SHA errado, SIGTERM e SIGKILL). O teste está ligado em `scripts/manaloom_release_ops_contract_test.sh`, e 53 mutações falham como esperado; receipt em `docs/qa/execution/2026-09-28/BT-REL-001-transacao-de-promocao.md`. Segue aberto: rodar na produção pelo passo do lote, com a palavra do dono; o primeiro preflight confirma a lista do EasyPanel e a origem do site.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 679
     },
     {
       "id": "BT-REL-002",
       "priority": "P0 CORE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IN_PROGRESS_CONTAINED",
       "delivery": "Gate same-SHA e release identity por superfície.",
       "depends_on": [
         "BT-REL-001"
       ],
-      "acceptance": "SHA completo, product/surface e flags; app compara o digest recebido com a matriz embutida no próprio artefato; backend novo não habilita código antigo; mixed SHA/digest falha fechado. Decisão do dono em 2026-09-22: D-13, app com digest divergente nega as capabilities que não conhece e pede atualização.",
+      "acceptance": "SHA completo, product/surface e flags; app compara o digest recebido com a matriz embutida no próprio artefato; backend novo não habilita código antigo; mixed SHA/digest falha fechado. Decisão do dono em 2026-09-22: D-13, app com digest divergente nega as capabilities que não conhece e pede atualização. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, em modo ensaio, sem tocar a produção; o lado do app é rascunho sem commit, pela raia do app. Lado do servidor e dos scripts: `server/config/release_promotion.json` (`2026-09-28.2`) declara de onde vem a identidade de cada superfície e o núcleo same-SHA (backend, ops, site e `/app`); o Android entra no escopo quando é promovido. `scripts/manaloom_release_identity_gate.py` normaliza produto, superfície, SHA completo, digest da matriz, modo da D-13 e flags de build, e compara com o SHA e a matriz commitada nele. SHA, digest, produto, superfície, modo ou flag divergente, identidade embarcada de desenvolvimento e fonte ilegível falham fechado. O fim da promoção do `BT-REL-001` roda o portão e desfaz a transação quando ele falha; um subconjunto que deixe o núcleo misturado também falha. O `/app` e o Android compilam a matriz do SHA por dart-define e embarcam a identidade; a publicação do Android confere produto, superfície e modo; o site serve `/release.json`, conferido depois do deploy. Rascunho do app (`~/.manaloom/coordenacao/banco/app_draft/`, sobre a árvore do gate `679f0d35f`, sem tocar `release_capabilities.dart`): o portão entra como fetcher do provider. Libera só o que o backend e o artefato liberam, tira o que o código não conhece, nega o omitido e mostra a faixa \"Nova versão disponível\" quando o digest diverge. O rascunho tem 17 testes e 11 mutações derrubadas, e junta sem conflito com os rascunhos das Frentes A e B. Evidência: `server/test/release_identity_gate_test.py` (12), `server/test/release_promotion_test.py` (39, com as identidades no plano falso e cinco divergências que desfazem a promoção) e `scripts/manaloom_release_identity_contract_test.sh`, ligados no contrato de release; 32 mutações falham como esperado. Receipt em `docs/qa/execution/2026-09-28/BT-REL-002-identidade-e-same-sha.md`. Segue aberto: o rascunho do app entrar pela raia do app, com a prova de UI da faixa; a primeira promoção real grava as identidades novas.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 680
     },
@@ -2835,6 +2835,7 @@
         "BT-CAT-03",
         "BT-CAT-04",
         "BT-CI-001",
+        "BT-CI-002",
         "BT-DB-003",
         "BT-DB-004",
         "BT-DOC-006",
@@ -2958,6 +2959,16 @@
       "source_line": 691
     },
     {
+      "id": "BT-CI-002",
+      "priority": "P0 CORE",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
+      "delivery": "Checagens de shell barram também no `/bin/bash` 3.2 do macOS, de onde a coordenação roda deploy, promoção, ops e backup.",
+      "depends_on": [],
+      "acceptance": "Um `[[ ]]` ou `(( ))` solto que falha não encerra o script com `set -e` no bash anterior ao 4.1, e um `!` solto não encerra em versão nenhuma. A checagem automática entra no contrato de release, e as checagens pós-deploy do `/app` e do site barram sob o `/bin/bash` 3.2 com divergência injetada. Linha registrada em 2026-09-28, a pedido da coordenação (rodada 5), a partir do achado da mutação W04 do `BT-REL-002`. Feito em 2026-09-28, na branch `banco/rodada1-2026-09-24`, sem tocar a produção. As 13 checagens soltas fora das raízes do digest de UI barram agora: 5 no pós-deploy do `/app` (`manaloom_deploy_flutter_web.sh`), o `healthz` do site (`manaloom_deploy_public_web.sh`), o digest da matriz em `manaloom_release_capabilities_contract_test.sh` e 6 no contrato de release (os `! grep` viraram `forbid_text`). A varredura é `scripts/manaloom_errexit_lint.py`, sobre `scripts/` e `server/bin/` com `set -e` e as bibliotecas; roda no `manaloom_release_ops_contract_test.sh`. As 21 checagens soltas das raízes do digest de UI (`manaloom_play_vs_ai_e2e.sh` e `manaloom_authenticated_visual_qa_isolated.sh`) ficam em `scripts/manaloom_errexit_lint_pending.json`, uma lista fechada que só encolhe; o conserto delas está em rascunho, sem commit, sobre a árvore do gate `679f0d35f`. Evidência: `server/test/errexit_postdeploy_test.py` (10 testes). Antes do conserto, as 5 divergências do `/app` e o `healthz` \"degraded\" passavam; depois, todas barram. 24 mutações derrubadas. Receipt `docs/qa/execution/2026-09-28/BT-CI-002-checagens-soltas-no-bash-3-2.md`. Segue aberto: aplicar o rascunho das raízes do digest com a prova de UI.",
+      "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
+      "source_line": 692
+    },
+    {
       "id": "BT-UIEV-001",
       "priority": "P0 CORE",
       "status": "IN_PROGRESS_CONTAINED",
@@ -2965,7 +2976,7 @@
       "depends_on": [],
       "acceptance": "`manaloom_local_ci.sh quick` passa sem --no-verify; os 23 manifests de docs/qa/ui-live/latest.json no digest corrente e latest.json reescrito. Evidência: b397f477b, 9a9ba66de, d08c18717; receipt docs/qa/execution/2026-09-21/btuiev001-chromedriver-e-recaptura.md (22/23 em 8bba809c). Não depende de `BT-SCP-001` — é o inverso: o gate amplo de `BT-SCP-001` depende deste ID (dependência invertida corrigida em 2026-09-22; ela criava impasse). Decisão do dono em 2026-09-22: D-03 (recaptura em lote, depois das correções de UI da D-04); D-40 (o pack 05 fica rotulado como evidência de capability futura, fora da contagem da beta). Decisões de 2026-09-24: o dono escolheu consertar o que o app precisa e recapturar os 34 pacotes de uma vez. D-79: `battle-coach-web-keyboard` roda no ambiente local. D-80: a procedência de cada captura registra o agente e o navegador da corrida. `card-details-navigation-web` e `optimization-card-reader-web` seguem exigindo navegador real (WebDriver).",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
-      "source_line": 692
+      "source_line": 693
     },
     {
       "id": "BT-WEB-001",
@@ -2979,7 +2990,7 @@
       ],
       "acceptance": "Sem Pro/market/social/Battle prometidos quando OFF; screenshots e release metadata corretos. Decisão do dono em 2026-09-22: D-46, tirar do título e da descrição do site \"Commander com IA explicável\" e \"relatórios compartilháveis\"; textos que já dizem \"quando esse recurso estiver habilitado\" podem ficar.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 698
+      "source_line": 699
     },
     {
       "id": "BT-WEB-002",
@@ -2992,7 +3003,7 @@
       ],
       "acceptance": "Deep link/reload/back preservam intenção; sem bypass de auth/capability.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 699
+      "source_line": 700
     },
     {
       "id": "BT-WEB-003",
@@ -3002,7 +3013,7 @@
       "depends_on": [],
       "acceptance": "`npm audit` sem `critical`/`high`; `lint`, `build` e `scripts/manaloom_public_web_surface_contract_test.sh` verdes; `scripts/manaloom_local_ci.sh full` passa do estágio `npm audit`. Bump autorizado pelo dono em 2026-09-21; linha registrada em 2026-09-22. Decisão do dono em 2026-09-22: D-01, bump confirmado direto pelo dono. Implementado em 2026-09-22 pela sessão coordenadora: `next` e `eslint-config-next` 15.5.25, `overrides.sharp` 0.35.4 e `npm audit fix` sem `--force` nas ferramentas de build; `npm audit` com 0 vulnerabilidades (completo e `--omit=dev`); lint, build, `free-beta-offer-contract`, `manaloom_public_web_surface_contract_test.sh` e `manaloom_public_web_smoke.sh` verdes na árvore de trabalho; falta o receipt same-SHA. No ar no site público desde 2026-09-23 (`87fd5a2e6`).",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 700
+      "source_line": 701
     },
     {
       "id": "BT-ACT-001",
@@ -3016,7 +3027,7 @@
       ],
       "acceptance": "Funnel por usuário/coorte; erro tem recuperação; abandono mensurado.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 701
+      "source_line": 702
     },
     {
       "id": "BT-ACT-002",
@@ -3031,7 +3042,7 @@
       ],
       "acceptance": "Cada etapa tem CTA único e receipt; eventos não contam preview como apply.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 702
+      "source_line": 703
     },
     {
       "id": "BT-ACT-003",
@@ -3046,7 +3057,7 @@
       ],
       "acceptance": "Decisão GO/ITERATE/STOP pré-registrada; metas só depois da baseline.",
       "section": "Épico K — Site público, ativação e aprendizado de produto",
-      "source_line": 703
+      "source_line": 704
     },
     {
       "id": "BT-LEGAL-001",
@@ -3060,7 +3071,7 @@
       ],
       "acceptance": "Inventário fechado e reproduzível; perguntas e decisões do owner explícitas.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 721
+      "source_line": 722
     },
     {
       "id": "BT-LEGAL-002",
@@ -3072,7 +3083,7 @@
       ],
       "acceptance": "Profissional/jurisdição/data/escopo/ressalvas/próxima revisão; receipt/hash seguro.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 722
+      "source_line": 723
     },
     {
       "id": "BT-COM-001",
@@ -3085,7 +3096,7 @@
       ],
       "acceptance": "Backend é autoridade; checkout/webhook/refund/reconciliação e kill switch.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 723
+      "source_line": 724
     },
     {
       "id": "BT-COM-002",
@@ -3099,7 +3110,7 @@
       ],
       "acceptance": "Margem observada; custo p50/p95; Battle/Coach com budget; nenhum subsídio oculto.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 724
+      "source_line": 725
     },
     {
       "id": "BT-COM-003",
@@ -3111,7 +3122,7 @@
       ],
       "acceptance": "Plano vencido não conserva quota Pro; webhook/reconciler/retry concorrente e clock boundaries comprovados.",
       "section": "Épico L — Jurídico e comercial",
-      "source_line": 725
+      "source_line": 726
     }
   ],
   "dependency_edges": [
@@ -3605,6 +3616,10 @@
     },
     {
       "from": "BT-CI-001",
+      "to": "BT-DEC-001"
+    },
+    {
+      "from": "BT-CI-002",
       "to": "BT-DEC-001"
     },
     {
@@ -4880,6 +4895,7 @@
     "BT-BAT-EVD-002",
     "BT-CAT-04",
     "BT-CI-001",
+    "BT-CI-002",
     "BT-DB-001",
     "BT-AI-021",
     "BT-AI-022",
@@ -9501,11 +9517,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9525,11 +9550,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9549,11 +9583,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9573,11 +9616,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9597,11 +9649,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9621,11 +9682,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9645,11 +9715,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9669,11 +9748,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9693,11 +9781,20 @@
         "scripts/manaloom_backup_cadence.py",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_build_beta_release.sh",
+        "scripts/manaloom_capacity_policy.py",
+        "scripts/manaloom_capacity_resources.py",
+        "scripts/manaloom_capacity_resources.sh",
+        "scripts/manaloom_capacity_snapshot.sh",
         "scripts/manaloom_deploy_backend_image.sh",
         "scripts/manaloom_deploy_battle_sidecars.sh",
         "scripts/manaloom_deploy_flutter_web.sh",
+        "scripts/manaloom_errexit_lint.py",
+        "scripts/manaloom_errexit_lint_pending.json",
         "scripts/manaloom_generate_release_sbom.py",
         "scripts/manaloom_migration_rehearsal.py",
+        "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_promote_release.sh",
+        "scripts/manaloom_release_identity_gate.py",
         "server/bin/manaloom_ops_daemon.py",
         "server/bin/migrate.dart",
         "server/lib/health_readiness_support.dart",
@@ -9950,5 +10047,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "d2d60f7a9891599dcca6344edc8ab8656a019614c73ab7879bee7b18fac3f936"
+  "project_logic_source_digest_sha256": "eddfee4d7564a24691e38b4679ea89ded9352413b9a8c11c7327b4b811acaa18"
 }

@@ -211,6 +211,8 @@ jq -e \
   --arg apksigner_sha256 "$MANALOOM_ANDROID_APKSIGNER_SHA256" \
   --arg aapt_sha256 "$MANALOOM_ANDROID_AAPT_SHA256" \
   '.status == "release" and .release_identity_embedded == true and
+   .product == "brewtact" and .surface == "android" and
+   (.release_mode == "control_plane" or .release_mode == "product_open") and
    .git_sha == $git_sha and .version == $version and
    .release_capabilities == $release_capabilities and
    .api_base_url == $api_base_url and .sentry_dsn_sha256 == $sentry_dsn_sha256 and
@@ -229,6 +231,8 @@ jq -e \
   echo "identidade embarcada nao autentica source, runtime ou toolchain desta release" >&2
   exit 1
 }
+# BT-REL-002: o modo da D-13 publicado é o que o APK leva embarcado.
+RELEASE_MODE="$(jq -er '.release_mode' "$EMBEDDED_IDENTITY")"
 
 jq -e \
   --arg aab_sha256 "$AAB_HASH" \
@@ -506,11 +510,15 @@ jq -n \
   --arg api_base_url "$API_BASE_URL" \
   --arg sentry_dsn_sha256 "$MANALOOM_RELEASE_SENTRY_DSN_SHA256_RESOLVED" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --arg release_mode "$RELEASE_MODE" \
   '{
     schema_version: 1,
+    product: "brewtact",
+    surface: "android",
     version: $version,
     git_sha: $git_sha,
     release_capabilities: $release_capabilities,
+    release_mode: $release_mode,
     platform: "android",
     artifact: $artifact,
     sha256: $sha256,
@@ -683,7 +691,9 @@ if ! jq -e \
     --arg sha "$SOURCE_SHA" \
     --arg version "$VERSION" \
     --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+    --arg release_mode "$RELEASE_MODE" \
     '.git_sha == $sha and .version == $version and .platform == "android" and
+     .product == "brewtact" and .surface == "android" and .release_mode == $release_mode and
      .release_capabilities == $release_capabilities' \
     >/dev/null <<<"$PUBLIC_RELEASE_JSON"; then
   echo "release identity publica Android diverge do SHA/policy candidato" >&2

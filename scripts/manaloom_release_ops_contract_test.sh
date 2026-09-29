@@ -8,6 +8,16 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# BT-CI-002: um `! grep` solto nunca barra com set -e (em versao nenhuma do bash) e
+# um [[ ]] solto nao barra no /bin/bash 3.2 do macOS; checagem negativa usa isto.
+forbid_text() {
+  local text="$1" file="$2"
+  if grep -Fq -- "$text" "$file"; then
+    echo "texto proibido presente em $file: $text" >&2
+    exit 1
+  fi
+}
+
 # The contract and its SBOM must use the exact release SDK, never a Dart found
 # independently on PATH.
 # shellcheck source=scripts/lib/manaloom_flutter_release_sdk.sh
@@ -126,6 +136,8 @@ SHELL_SCRIPTS=(
   scripts/manaloom_backup_cycle.sh
   scripts/manaloom_build_android_release.sh
   scripts/manaloom_capacity_snapshot.sh
+  scripts/manaloom_capacity_resources.sh
+  scripts/manaloom_promote_release.sh
   scripts/manaloom_build_beta_release.sh
   scripts/manaloom_battle_product_gate.sh
   scripts/manaloom_deploy_battle_sidecars.sh
@@ -201,6 +213,10 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_battle_card_rules_pg_selection.py" \
     "$ROOT_DIR/scripts/manaloom_backup_cadence.py" \
     "$ROOT_DIR/scripts/manaloom_capacity_policy.py" \
+    "$ROOT_DIR/scripts/manaloom_capacity_resources.py" \
+    "$ROOT_DIR/scripts/manaloom_errexit_lint.py" \
+    "$ROOT_DIR/scripts/manaloom_promote_release.py" \
+    "$ROOT_DIR/scripts/manaloom_release_identity_gate.py" \
     "$ROOT_DIR/scripts/manaloom_generate_release_sbom.py" \
     "$ROOT_DIR/scripts/manaloom_live_credential_audit.py" \
     "$ROOT_DIR/scripts/manaloom_migration_rehearsal.py" \
@@ -213,6 +229,10 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/backup_cadence_test.py" \
     "$ROOT_DIR/server/test/backup_cycle_db_live_test.py" \
     "$ROOT_DIR/server/test/capacity_policy_test.py" \
+    "$ROOT_DIR/server/test/capacity_resources_test.py" \
+    "$ROOT_DIR/server/test/errexit_postdeploy_test.py" \
+    "$ROOT_DIR/server/test/release_promotion_test.py" \
+    "$ROOT_DIR/server/test/release_identity_gate_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
@@ -235,6 +255,18 @@ PYTHONDONTWRITEBYTECODE=1 \
 # BT-CAP-001: política de capacidade, snapshot só de leitura e preflight.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/capacity_policy_test.py"
+# BT-CAP-002: reservas e limites por serviço, com preflight e rollback exato,
+# contra a spec gravada e um plano de controle falso (nenhuma conexão sai).
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/capacity_resources_test.py"
+# BT-REL-001 (D-13): transação de promoção full-stack, com o diário, a volta provada
+# e a falha que nunca some, contra um plano de controle falso e deploys de mentira.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/release_promotion_test.py"
+# BT-REL-002 (D-13): identidade por superfície e o portão same-SHA (mixed SHA ou
+# digest falha fechado); o resolvedor em Python confere com o da biblioteca shell.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/release_identity_gate_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
@@ -242,6 +274,16 @@ PYTHONDONTWRITEBYTECODE=1 \
 # BT-OBS-001: SLOs, regras de alerta, receptor humano e teste de alerta.
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/slo_alerts_test.py"
+# BT-CI-002: no /bin/bash 3.2 do macOS, de onde a coordenação roda deploy, promoção,
+# ops e backup, um [[ ]] ou (( )) solto que falha não encerra o script com set -e (e um
+# `!` solto não encerra em versão nenhuma). A varredura acha o padrão nos scripts; as
+# raízes do digest de UI ficam numa lista fechada que só encolhe. A prova roda as
+# checagens pós-deploy do /app e do site sob o /bin/bash com divergência injetada.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/scripts/manaloom_errexit_lint.py" --scan "$ROOT_DIR" \
+    --pending "$ROOT_DIR/scripts/manaloom_errexit_lint_pending.json"
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/errexit_postdeploy_test.py"
 
 SAFE_ENV_FIXTURE="$TMP_DIR/safe.env"
 SAFE_ENV_MARKER="$TMP_DIR/env-code-executed"
@@ -297,8 +339,8 @@ done
 
 NGINX="$ROOT_DIR/app/web/nginx.conf"
 FLUTTER_WEB_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
-grep -Fq 'manaloom_require_public_app_release_open' "$FLUTTER_WEB_DEPLOY"
-flutter_app_gate_line="$(grep -n -m1 'manaloom_require_public_app_release_open' \
+grep -Fq 'manaloom_resolve_public_app_release_mode' "$FLUTTER_WEB_DEPLOY"
+flutter_app_gate_line="$(grep -n -m1 'manaloom_resolve_public_app_release_mode' \
   "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"
 flutter_approval_line="$(grep -n -m1 'require_live_mutation_approval "ManaLoom Flutter Web deployment"' \
   "$FLUTTER_WEB_DEPLOY" | cut -d: -f1)"
@@ -310,6 +352,8 @@ if (( flutter_app_gate_line >= flutter_approval_line ||
   exit 1
 fi
 grep -Fq '"/app/release.json" "no-cache, no-store, must-revalidate"' "$NGINX"
+# BT-REL-002: identidade por superfície nos scripts de build e deploy.
+bash "$ROOT_DIR/scripts/manaloom_release_identity_contract_test.sh"
 grep -Fq '"/app/flutter_bootstrap.js" "no-cache, must-revalidate"' "$NGINX"
 grep -Fq '"/app/main.dart.js" "no-cache, must-revalidate"' "$NGINX"
 grep -Fq '~*^/app/assets/assets/lotus/ "no-cache, must-revalidate"' "$NGINX"
@@ -539,15 +583,18 @@ for backend_flag in \
   grep -Fq 'deve permanecer 0 enquanto' "$backend_flag_error"
 done
 grep -Fq 'scanner_release_enabled: false' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
-! grep -Fq 'ENABLE_SCANNER_RELEASE=true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
-! grep -Fq 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+forbid_text 'ENABLE_SCANNER_RELEASE=true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+forbid_text 'scanner_release_enabled: true' "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
 grep -Fq 'android.permission.CAMERA' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
 grep -Fq 'android.hardware.camera.any' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
 grep -Fq 'tools:node="remove"' "$ROOT_DIR/app/android/app/src/release/AndroidManifest.xml"
 grep -Fq 'Scanner DEFERRED_BY_SCOPE' "$ROOT_DIR/scripts/manaloom_verify_android_release_artifacts.sh"
 grep -Fq 'manaloom_build_android_release.sh' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
 grep -Fq 'run_battle_gate' "$ROOT_DIR/scripts/manaloom_local_ci.sh"
-[[ ! -e "$ROOT_DIR/.github/workflows/manaloom-guardrails.yml" ]]
+[[ ! -e "$ROOT_DIR/.github/workflows/manaloom-guardrails.yml" ]] || {
+  echo "o projeto nao usa GitHub Actions: .github/workflows/manaloom-guardrails.yml voltou" >&2
+  exit 1
+}
 BACKEND_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'allowed_origins_b64="$(encode_remote_value "$ALLOWED_ORIGINS_CANONICAL")"' \
   "$BACKEND_DEPLOY"
@@ -573,7 +620,7 @@ grep -Fq 'disabled_by_policy(.checks.battle_live_spectator; "battle_live")' "$RO
 grep -Fq 'RELEASE_ENABLE_INTERACTIVE_BATTLE="${MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE:-0}"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq -- "--env-add INTERACTIVE_BATTLE_ENABLED='\$INTERACTIVE_BATTLE_ENABLED'" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'MANALOOM_RELEASE_ENABLE_INTERACTIVE_BATTLE deve permanecer 0' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-! grep -Fq "require_xmage_interactive_release_contract \"\$sha\"" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+forbid_text "require_xmage_interactive_release_contract \"\$sha\"" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'disabled_by_policy(.checks.interactive_battle; "battle_coach")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE="evolution_xmage-interactive"' "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 grep -Fq "'XMAGE_RUNTIME_MODE=interactive'" "$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
@@ -625,8 +672,8 @@ grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_
 grep -Fq 'disabled_by_policy(.checks.battle_job_worker; "battle_batch")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'disabled_by_policy(.checks.battle_runtime; "battle_batch")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'disabled_by_policy(.checks.ai_runtime; "ai_analyze_optimize_advisory")' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-! grep -Fq '.checks.ai_runtime.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-! grep -Fq '.checks.battle_runtime.engines.' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+forbid_text '.checks.ai_runtime.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+forbid_text '.checks.battle_runtime.engines.' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_runtime.mode == "auto"' "$ROOT_DIR/scripts/manaloom_product_smoke.sh"
 grep -Fq 'FROM dart:3.12.2@sha256:13140e26d84f4fda57cea31942222112aeb2eec10e5e6874c1c0f70beed189ab' "$ROOT_DIR/server/Dockerfile"
 grep -Fq 'RUN mkdir -p /out' "$ROOT_DIR/server/Dockerfile"

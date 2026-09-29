@@ -121,8 +121,15 @@ void main() {
     const approvalCall =
         'require_live_mutation_approval "ManaLoom Flutter Web deployment"';
     final buildOnlyBranch = deploy.indexOf(r'if [[ "$BUILD_ONLY" == "0" ]]');
+    // D-13: com a matriz all-OFF o /app sai como release de plano de controle;
+    // o resolvedor so exige capability on verificada quando alguma abrir.
     final capabilityGate = deploy.indexOf(
-      'manaloom_require_public_app_release_open',
+      'manaloom_resolve_public_app_release_mode',
+    );
+    expect(
+      deploy,
+      isNot(contains('\n  manaloom_require_public_app_release_open')),
+      reason: 'o deploy do /app nao pode exigir capability on com tudo off',
     );
     final approval = deploy.indexOf(approvalCall);
     final envLoad = deploy.indexOf(r'load_manaloom_env_keys "$ENV_FILE"');
@@ -171,14 +178,16 @@ void main() {
           'MANALOOM_CONFIRM_LIVE_MUTATIONS': '',
         },
       );
+      // D-13: a matriz all-OFF do SHA passa como plano de controle, e quem
+      // bloqueia e a falta de aprovacao live do processo chamador.
       expect(blocked.exitCode, 2);
       expect(
         blocked.stderr,
-        contains('BLOCKED: release capabilities: /app permanece inacessivel'),
+        contains('BLOCKED: ManaLoom Flutter Web deployment'),
       );
       expect(
         blocked.stderr,
-        contains('capability ON com verificacao live datada ausente'),
+        isNot(contains('/app permanece inacessivel')),
       );
 
       final buildOnly = Process.runSync(

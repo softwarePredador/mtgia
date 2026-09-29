@@ -68,6 +68,15 @@ SHORT_SHA="$(jq -r '.short_sha' <<<"$IDENTITY_JSON")"
 VERSION="$(jq -r '.version' <<<"$IDENTITY_JSON")"
 SOURCE_COMMITTED_AT="$(jq -r '.source_committed_at' <<<"$IDENTITY_JSON")"
 RELEASE_CAPABILITIES_JSON="$(jq -cer '.release_capabilities' <<<"$IDENTITY_JSON")"
+# BT-REL-002 (D-13): o modo do app sai do resolvedor, como no /app, e a matriz do SHA
+# vai compilada no código (o app nega o que este artefato não liberou).
+# shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
+source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
+manaloom_resolve_public_app_release_mode "$RELEASE_CAPABILITIES_JSON"
+RELEASE_MODE="$MANALOOM_PUBLIC_APP_RELEASE_MODE"
+RELEASE_CAPABILITIES_DIGEST="$(jq -er '.policy_digest_sha256' <<<"$RELEASE_CAPABILITIES_JSON")"
+RELEASE_CAPABILITIES_ALLOWED="$(jq -r '.capabilities | to_entries |
+  map(select(.value.allowed == true) | .key) | sort | join(",")' <<<"$RELEASE_CAPABILITIES_JSON")"
 VERSION_CODE="${VERSION##*+}"
 if [[ -n "${MANALOOM_ANDROID_MIN_VERSION_CODE:-}" &&
       ! "${MANALOOM_ANDROID_MIN_VERSION_CODE}" =~ ^[1-9][0-9]*$ ]]; then
@@ -138,10 +147,14 @@ jq -n \
   --argjson battle_live_spectator_enabled "$BATTLE_LIVE_SPECTATOR_DART_DEFINE" \
   --argjson interactive_battle_enabled "$INTERACTIVE_BATTLE_DART_DEFINE" \
   --argjson release_capabilities "$RELEASE_CAPABILITIES_JSON" \
+  --arg release_mode "$RELEASE_MODE" \
   '{
     schema_version: 1,
     status: "release",
     release_identity_embedded: true,
+    product: "brewtact",
+    surface: "android",
+    release_mode: $release_mode,
     features: {
       scanner_release_enabled: false,
       battle_live_spectator_enabled: $battle_live_spectator_enabled,
@@ -177,6 +190,9 @@ build_args=(
   --dart-define="RELEASE_GIT_SHA=$SHA"
   --dart-define="RELEASE_IDENTITY_SHA256=$EMBEDDED_IDENTITY_SOURCE_SHA256"
   --dart-define="RELEASE_STARTUP_PROOF=true"
+  --dart-define="RELEASE_SURFACE=android"
+  --dart-define="RELEASE_CAPABILITIES_DIGEST=$RELEASE_CAPABILITIES_DIGEST"
+  --dart-define="RELEASE_CAPABILITIES_ALLOWED=$RELEASE_CAPABILITIES_ALLOWED"
   --dart-define="ENABLE_SCANNER_RELEASE=false"
   --dart-define="ENABLE_BATTLE_LIVE_SPECTATOR=$BATTLE_LIVE_SPECTATOR_DART_DEFINE"
   --dart-define="ENABLE_INTERACTIVE_BATTLE=$INTERACTIVE_BATTLE_DART_DEFINE"

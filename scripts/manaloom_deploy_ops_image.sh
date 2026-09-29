@@ -268,7 +268,10 @@ fi
 PREVIOUS_HEALTH_CONTRACT="$previous_health_proof"
 
 REMOTE_DIR_CLEANUP_REQUIRED=1
-git archive HEAD server docs/hermes-analysis/manaloom-knowledge scripts/lib tools/manaloom_lints |
+# BT-OBS-003: o avaliador de alertas do ops lê a identidade de release com o portão do
+# BT-REL-002 (scripts/manaloom_release_identity_gate.py), que vai no image.
+git archive HEAD server docs/hermes-analysis/manaloom-knowledge scripts/lib tools/manaloom_lints \
+  scripts/manaloom_release_identity_gate.py |
   ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" \
     "rm -rf '$remote_dir' && mkdir -p '$remote_dir' && tar -x -C '$remote_dir'"
 
