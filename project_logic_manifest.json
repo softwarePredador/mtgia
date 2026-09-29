@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "eddfee4d7564a24691e38b4679ea89ded9352413b9a8c11c7327b4b811acaa18",
+  "source_digest_sha256": "84c325d2204195214a475343f6030720c84121663e9af95cff1896fc5519d99c",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,25 +63,25 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 725,
+    "dart_source_files": 724,
     "non_dart_product_files": 52,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5468,
-    "semantic_resolved_files": 725,
+    "dart_symbols": 5460,
+    "semantic_resolved_files": 724,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43736,
-    "semantic_resolved_call_sites": 69298,
-    "semantic_resolved_type_references": 16774,
+    "semantic_resolved_call_edges": 43711,
+    "semantic_resolved_call_sites": 69253,
+    "semantic_resolved_type_references": 16756,
     "modules": 164,
     "app_routes": 46,
     "web_routes": 11,
-    "api_routes": 126,
+    "api_routes": 125,
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
     "scripts_and_jobs": 708,
-    "environment_variables": 723,
-    "tests": 1324,
+    "environment_variables": 726,
+    "tests": 1328,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -787,7 +787,7 @@
         "server/lib/ai/xmage_battle_client.dart"
       ],
       "file_count": 102,
-      "symbol_count": 1084,
+      "symbol_count": 1086,
       "providers": [],
       "services": [
         "CommanderSpellbookService",
@@ -2226,12 +2226,11 @@
         "server/routes/ai/ml-status/index.dart",
         "server/routes/ai/optimize/index.dart",
         "server/routes/ai/optimize/jobs/[id].dart",
-        "server/routes/ai/optimize/telemetry/index.dart",
         "server/routes/ai/rebuild/index.dart",
         "server/routes/ai/simulate/index.dart"
       ],
-      "file_count": 22,
-      "symbol_count": 190,
+      "file_count": 21,
+      "symbol_count": 180,
       "providers": [],
       "services": []
     },
@@ -23191,67 +23190,67 @@
       "name": "_asInt",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 471
+      "line": 477
     },
     {
       "name": "_catalogRoles",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 184
+      "line": 186
     },
     {
       "name": "_liveEvalError",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 306
+      "line": 312
     },
     {
       "name": "_nearestRankPercentile",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 462
+      "line": 468
     },
     {
       "name": "_normalizeCardName",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 191
+      "line": 193
     },
     {
       "name": "_summarizeCommanderAiLiveEvalGroup",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 393
+      "line": 399
     },
     {
       "name": "buildCommanderAiLiveEvalPrompt",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 12
+      "line": 14
     },
     {
       "name": "buildCommanderAiLiveEvalSameLaneCandidates",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 88
+      "line": 90
     },
     {
       "name": "commanderAiLiveEvalShouldFail",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 327
+      "line": 333
     },
     {
       "name": "runCommanderAiLiveEvalCase",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 193
+      "line": 195
     },
     {
       "name": "summarizeCommanderAiLiveEvalResults",
       "kind": "function",
       "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-      "line": 340
+      "line": 346
     },
     {
       "name": "_applySwaps",
@@ -26650,7 +26649,7 @@
       "name": "FunctionalReport",
       "kind": "class",
       "source": "server/lib/ai/optimization_validator.dart",
-      "line": 978,
+      "line": 1055,
       "members": [
         "toJson"
       ]
@@ -26659,7 +26658,7 @@
       "name": "MonteCarloComparison",
       "kind": "class",
       "source": "server/lib/ai/optimization_validator.dart",
-      "line": 876,
+      "line": 953,
       "members": [
         "toJson"
       ]
@@ -26668,7 +26667,7 @@
       "name": "MulliganReport",
       "kind": "class",
       "source": "server/lib/ai/optimization_validator.dart",
-      "line": 916,
+      "line": 993,
       "members": [
         "toJson"
       ]
@@ -26677,9 +26676,10 @@
       "name": "OptimizationValidator",
       "kind": "class",
       "source": "server/lib/ai/optimization_validator.dart",
-      "line": 23,
+      "line": 24,
       "members": [
         "_analyzeFunctionalSwaps",
+        "_canonicalDeckOrder",
         "_computeDeckHealthScore",
         "_computeImprovementScore",
         "_computeVerdict",
@@ -26687,11 +26687,13 @@
         "_formatSwapsForCritic",
         "_getCmc",
         "_isLand",
+        "_monteCarloSeed",
         "_pressureRateForArchetype",
         "_runCriticAI",
         "_runMonteCarloComparison",
         "_simulateLondonMulligan",
         "_stableDeckSeed",
+        "isolatedMonteCarloSeed",
         "validate"
       ]
     },
@@ -26699,7 +26701,7 @@
       "name": "SwapFunctionalAnalysis",
       "kind": "class",
       "source": "server/lib/ai/optimization_validator.dart",
-      "line": 948,
+      "line": 1025,
       "members": [
         "toJson"
       ]
@@ -26708,10 +26710,22 @@
       "name": "ValidationReport",
       "kind": "class",
       "source": "server/lib/ai/optimization_validator.dart",
-      "line": 1010,
+      "line": 1087,
       "members": [
         "toJson"
       ]
+    },
+    {
+      "name": "group",
+      "kind": "function",
+      "source": "server/lib/ai/optimization_validator.dart",
+      "line": 83
+    },
+    {
+      "name": "text",
+      "kind": "function",
+      "source": "server/lib/ai/optimization_validator.dart",
+      "line": 81
     },
     {
       "name": "_extractDeckCardCount",
@@ -35178,13 +35192,13 @@
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 847
+      "line": 467
     },
     {
       "name": "toStrings",
       "kind": "function",
       "source": "server/lib/generated_deck_validation_service.dart",
-      "line": 467
+      "line": 847
     },
     {
       "name": "AiJobSchemaReadiness",
@@ -37324,22 +37338,27 @@
       "name": "OpenAiRuntimeConfig",
       "kind": "class",
       "source": "server/lib/openai_runtime_config.dart",
-      "line": 3,
+      "line": 5,
       "members": [
         "_clampTemp",
         "_profile",
+        "acceptedBaseUrlOverride",
         "allowsMockFallbacks",
         "analysisModel",
         "archetypesModel",
+        "chatCompletionsUri",
         "completeModel",
         "explainModel",
         "generateModel",
+        "ignoresBaseUrlOverride",
         "intFor",
+        "isLoopbackHost",
         "isProductionLike",
         "modelFor",
         "optimizationCriticModel",
         "optimizeModel",
         "profile",
+        "providerBaseUrl",
         "selectedModels",
         "shouldUseFallbackForInvalidApiKey",
         "temperatureFor",
@@ -39222,13 +39241,13 @@
       "name": "aiEndpointAccessPolicyForPath",
       "kind": "function",
       "source": "server/routes/ai/_middleware.dart",
-      "line": 29
+      "line": 28
     },
     {
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/ai/_middleware.dart",
-      "line": 54
+      "line": 53
     },
     {
       "name": "_annotateArchetypesPayload",
@@ -40207,69 +40226,6 @@
       "kind": "function",
       "source": "server/routes/ai/optimize/jobs/[id].dart",
       "line": 12
-    },
-    {
-      "name": "_TelemetryQuery",
-      "kind": "class",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 329,
-      "members": [
-        "toJson"
-      ]
-    },
-    {
-      "name": "_emptyAggregate",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 263
-    },
-    {
-      "name": "_isTelemetryTableAvailable",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 130
-    },
-    {
-      "name": "_isUuid",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 322
-    },
-    {
-      "name": "_loadAggregate",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 145
-    },
-    {
-      "name": "_loadByDay",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 195
-    },
-    {
-      "name": "_parseTelemetryQuery",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 276
-    },
-    {
-      "name": "_rowToAggregate",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 244
-    },
-    {
-      "name": "_toInt",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 361
-    },
-    {
-      "name": "onRequest",
-      "kind": "function",
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "line": 10
     },
     {
       "name": "_loadDeckCards",
@@ -42315,7 +42271,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 725,
+    "resolved_file_count": 724,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -42919,7 +42875,6 @@
       "server/routes/ai/ml-status/index.dart",
       "server/routes/ai/optimize/index.dart",
       "server/routes/ai/optimize/jobs/[id].dart",
-      "server/routes/ai/optimize/telemetry/index.dart",
       "server/routes/ai/rebuild/index.dart",
       "server/routes/ai/simulate/index.dart",
       "server/routes/auth/_middleware.dart",
@@ -43049,9 +43004,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43736,
-    "resolved_call_site_count": 69298,
-    "workspace_call_edge_count": 13914,
+    "resolved_call_edge_count": 43711,
+    "resolved_call_site_count": 69253,
+    "workspace_call_edge_count": 13903,
     "unresolved_call_edge_count": 566,
     "unresolved_call_site_count": 784,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -124645,7 +124600,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 103,
+        "line": 105,
         "caller": "buildCommanderAiLiveEvalSameLaneCandidates",
         "kind": "method",
         "lexical_target": "_normalizeCardName",
@@ -124656,7 +124611,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 134,
+        "line": 136,
         "caller": "buildCommanderAiLiveEvalSameLaneCandidates",
         "kind": "method",
         "lexical_target": "_catalogRoles",
@@ -124667,18 +124622,29 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 21,
-        "caller": "buildCommanderAiLiveEvalPrompt",
-        "kind": "method",
-        "lexical_target": "buildCommanderAiLiveEvalSameLaneCandidates",
-        "target": "buildCommanderAiLiveEvalSameLaneCandidates",
-        "target_library": "package:server/ai/commander_ai_live_eval_support.dart",
+        "line": 206,
+        "caller": "runCommanderAiLiveEvalCase",
+        "kind": "constructor",
+        "lexical_target": "OpenAiRuntimeConfig",
+        "target": "OpenAiRuntimeConfig.OpenAiRuntimeConfig",
+        "target_library": "package:server/openai_runtime_config.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 212,
+        "line": 206,
+        "caller": "runCommanderAiLiveEvalCase",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/commander_ai_live_eval_support.dart",
+        "line": 218,
         "caller": "runCommanderAiLiveEvalCase",
         "kind": "method",
         "lexical_target": "aiSafetyIdentifierPayload",
@@ -124689,7 +124655,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 218,
+        "line": 224,
         "caller": "runCommanderAiLiveEvalCase",
         "kind": "method",
         "lexical_target": "buildCommanderAiLiveEvalPrompt",
@@ -124700,7 +124666,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 222,
+        "line": 228,
         "caller": "runCommanderAiLiveEvalCase",
         "kind": "method",
         "lexical_target": "openAiTokenLimitPayload",
@@ -124711,7 +124677,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 223,
+        "line": 229,
         "caller": "runCommanderAiLiveEvalCase",
         "kind": "method",
         "lexical_target": "openAiStructuredResponseFormat",
@@ -124722,7 +124688,18 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 232,
+        "line": 23,
+        "caller": "buildCommanderAiLiveEvalPrompt",
+        "kind": "method",
+        "lexical_target": "buildCommanderAiLiveEvalSameLaneCandidates",
+        "target": "buildCommanderAiLiveEvalSameLaneCandidates",
+        "target_library": "package:server/ai/commander_ai_live_eval_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/commander_ai_live_eval_support.dart",
+        "line": 238,
         "caller": "runCommanderAiLiveEvalCase",
         "kind": "method",
         "lexical_target": "_liveEvalError",
@@ -124733,7 +124710,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 269,
+        "line": 275,
         "caller": "runCommanderAiLiveEvalCase",
         "kind": "method",
         "lexical_target": "evaluateCommanderAiPromptCase",
@@ -124744,7 +124721,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 363,
+        "line": 369,
         "caller": "summarizeCommanderAiLiveEvalResults",
         "kind": "method",
         "lexical_target": "_summarizeCommanderAiLiveEvalGroup",
@@ -124755,7 +124732,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 403,
+        "line": 409,
         "caller": "_summarizeCommanderAiLiveEvalGroup",
         "kind": "method",
         "lexical_target": "_asInt",
@@ -124766,7 +124743,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 419,
+        "line": 425,
         "caller": "_summarizeCommanderAiLiveEvalGroup",
         "kind": "constructor",
         "lexical_target": "AiProviderUsageTotals",
@@ -124777,7 +124754,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 429,
+        "line": 435,
         "caller": "_summarizeCommanderAiLiveEvalGroup",
         "kind": "method",
         "lexical_target": "estimateAiProviderCost",
@@ -124788,7 +124765,7 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 446,
+        "line": 452,
         "caller": "_summarizeCommanderAiLiveEvalGroup",
         "kind": "method",
         "lexical_target": "_nearestRankPercentile",
@@ -134688,18 +134665,18 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 102,
-        "caller": "OptimizationValidator.validate",
+        "line": 1075,
+        "caller": "FunctionalReport.toJson",
         "kind": "method",
-        "lexical_target": "_runCriticAI",
-        "target": "OptimizationValidator._runCriticAI",
+        "lexical_target": "toJson",
+        "target": "SwapFunctionalAnalysis.toJson",
         "target_library": "package:server/ai/optimization_validator.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 1038,
+        "line": 1115,
         "caller": "ValidationReport.toJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -134710,7 +134687,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 1039,
+        "line": 1116,
         "caller": "ValidationReport.toJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -134721,7 +134698,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 1041,
+        "line": 1118,
         "caller": "ValidationReport.toJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -134732,337 +134709,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 113,
-        "caller": "OptimizationValidator.validate",
-        "kind": "method",
-        "lexical_target": "_computeVerdict",
-        "target": "OptimizationValidator._computeVerdict",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 131,
-        "caller": "OptimizationValidator._runMonteCarloComparison",
-        "kind": "constructor",
-        "lexical_target": "GoldfishSimulator",
-        "target": "GoldfishSimulator.GoldfishSimulator",
-        "target_library": "package:server/ai/goldfish_simulator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 132,
-        "caller": "OptimizationValidator._runMonteCarloComparison",
-        "kind": "method",
-        "lexical_target": "simulate",
-        "target": "GoldfishSimulator.simulate",
-        "target_library": "package:server/ai/goldfish_simulator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 139,
-        "caller": "OptimizationValidator._runMonteCarloComparison",
-        "kind": "method",
-        "lexical_target": "_simulateLondonMulligan",
-        "target": "OptimizationValidator._simulateLondonMulligan",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 142,
-        "caller": "OptimizationValidator._runMonteCarloComparison",
-        "kind": "constructor",
-        "lexical_target": "MonteCarloComparison",
-        "target": "MonteCarloComparison.MonteCarloComparison",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 160,
-        "caller": "OptimizationValidator._simulateLondonMulligan",
-        "kind": "method",
-        "lexical_target": "_stableDeckSeed",
-        "target": "OptimizationValidator._stableDeckSeed",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 193,
-        "caller": "OptimizationValidator._simulateLondonMulligan",
-        "kind": "method",
-        "lexical_target": "_isLand",
-        "target": "OptimizationValidator._isLand",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 198,
-        "caller": "OptimizationValidator._simulateLondonMulligan",
-        "kind": "method",
-        "lexical_target": "_getCmc",
-        "target": "OptimizationValidator._getCmc",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 234,
-        "caller": "OptimizationValidator._simulateLondonMulligan",
-        "kind": "constructor",
-        "lexical_target": "MulliganReport",
-        "target": "MulliganReport.MulliganReport",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 282,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "_findCardByName",
-        "target": "OptimizationValidator._findCardByName",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 290,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "constructor",
-        "lexical_target": "SwapFunctionalAnalysis",
-        "target": "SwapFunctionalAnalysis.SwapFunctionalAnalysis",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 304,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "classifyOptimizationFunctionalRole",
-        "target": "classifyOptimizationFunctionalRole",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 306,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "optimizationFunctionalRolesForCard",
-        "target": "optimizationFunctionalRolesForCard",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 308,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "_isLand",
-        "target": "OptimizationValidator._isLand",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 312,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "_getCmc",
-        "target": "OptimizationValidator._getCmc",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 394,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "optimizationRampProfileForCard",
-        "target": "optimizationRampProfileForCard",
-        "target_library": "package:server/ai/optimization_ramp_profile.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 421,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "method",
-        "lexical_target": "buildOptimizationSemanticV2Diagnostics",
-        "target": "buildOptimizationSemanticV2Diagnostics",
-        "target_library": "package:server/ai/optimization_functional_roles.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 428,
-        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
-        "kind": "constructor",
-        "lexical_target": "FunctionalReport",
-        "target": "FunctionalReport.FunctionalReport",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 453,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 454,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "constructor",
-        "lexical_target": "OpenAiRuntimeConfig",
-        "target": "OpenAiRuntimeConfig.OpenAiRuntimeConfig",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 456,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "temperatureFor",
-        "target": "OpenAiRuntimeConfig.temperatureFor",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 472,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "_formatSwapsForCritic",
-        "target": "OptimizationValidator._formatSwapsForCritic",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 506,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "aiSafetyIdentifierPayload",
-        "target": "aiSafetyIdentifierPayload",
-        "target_library": "package:server/ai_provider_runtime_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 512,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "openAiTokenLimitPayload",
-        "target": "openAiTokenLimitPayload",
-        "target_library": "package:server/openai_structured_output_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 513,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "openAiStructuredResponseFormat",
-        "target": "openAiStructuredResponseFormat",
-        "target_library": "package:server/openai_structured_output_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 521,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "timeoutFor",
-        "target": "OpenAiRuntimeConfig.timeoutFor",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 531,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "recordAiProviderCall",
-        "target": "recordAiProviderCall",
-        "target_library": "package:server/ai_provider_usage_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 551,
-        "caller": "OptimizationValidator._runCriticAI",
-        "kind": "method",
-        "lexical_target": "w",
-        "target": "Log.w",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 597,
-        "caller": "OptimizationValidator._computeVerdict",
-        "kind": "method",
-        "lexical_target": "_computeDeckHealthScore",
-        "target": "OptimizationValidator._computeDeckHealthScore",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 601,
-        "caller": "OptimizationValidator._computeVerdict",
-        "kind": "method",
-        "lexical_target": "_computeImprovementScore",
-        "target": "OptimizationValidator._computeImprovementScore",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 62,
+        "line": 122,
         "caller": "OptimizationValidator.validate",
         "kind": "method",
         "lexical_target": "_runMonteCarloComparison",
@@ -135073,7 +134720,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 68,
+        "line": 128,
         "caller": "OptimizationValidator.validate",
         "kind": "method",
         "lexical_target": "_analyzeFunctionalSwaps",
@@ -135084,40 +134731,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 740,
-        "caller": "OptimizationValidator._computeVerdict",
-        "kind": "constructor",
-        "lexical_target": "ValidationReport",
-        "target": "ValidationReport.ValidationReport",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 759,
-        "caller": "OptimizationValidator._computeDeckHealthScore",
-        "kind": "method",
-        "lexical_target": "_pressureRateForArchetype",
-        "target": "OptimizationValidator._pressureRateForArchetype",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 794,
-        "caller": "OptimizationValidator._computeImprovementScore",
-        "kind": "method",
-        "lexical_target": "_pressureRateForArchetype",
-        "target": "OptimizationValidator._pressureRateForArchetype",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 85,
+        "line": 145,
         "caller": "OptimizationValidator.validate",
         "kind": "method",
         "lexical_target": "validateDeck",
@@ -135128,29 +134742,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 852,
-        "caller": "OptimizationValidator._isLand",
-        "kind": "method",
-        "lexical_target": "isLandTypeLine",
-        "target": "isLandTypeLine",
-        "target_library": "package:server/basic_land_utils.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 868,
-        "caller": "OptimizationValidator._getCmc",
-        "kind": "method",
-        "lexical_target": "safeCmcForOptimization",
-        "target": "safeCmcForOptimization",
-        "target_library": "package:server/ai/cmc_safety.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 89,
+        "line": 149,
         "caller": "OptimizationValidator.validate",
         "kind": "method",
         "lexical_target": "i",
@@ -135161,29 +134753,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 890,
-        "caller": "MonteCarloComparison.toJson",
-        "kind": "method",
-        "lexical_target": "toJson",
-        "target": "GoldfishResult.toJson",
-        "target_library": "package:server/ai/goldfish_simulator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 892,
-        "caller": "MonteCarloComparison.toJson",
-        "kind": "method",
-        "lexical_target": "toJson",
-        "target": "MulliganReport.toJson",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 95,
+        "line": 155,
         "caller": "OptimizationValidator.validate",
         "kind": "method",
         "lexical_target": "w",
@@ -135194,14 +134764,498 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 998,
-        "caller": "FunctionalReport.toJson",
+        "line": 162,
+        "caller": "OptimizationValidator.validate",
         "kind": "method",
-        "lexical_target": "toJson",
-        "target": "SwapFunctionalAnalysis.toJson",
+        "lexical_target": "_runCriticAI",
+        "target": "OptimizationValidator._runCriticAI",
         "target_library": "package:server/ai/optimization_validator.dart",
         "target_scope": "workspace",
         "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 173,
+        "caller": "OptimizationValidator.validate",
+        "kind": "method",
+        "lexical_target": "_computeVerdict",
+        "target": "OptimizationValidator._computeVerdict",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 192,
+        "caller": "OptimizationValidator._runMonteCarloComparison",
+        "kind": "method",
+        "lexical_target": "_monteCarloSeed",
+        "target": "OptimizationValidator._monteCarloSeed",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 194,
+        "caller": "OptimizationValidator._runMonteCarloComparison",
+        "kind": "method",
+        "lexical_target": "_canonicalDeckOrder",
+        "target": "OptimizationValidator._canonicalDeckOrder",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 199,
+        "caller": "OptimizationValidator._runMonteCarloComparison",
+        "kind": "constructor",
+        "lexical_target": "GoldfishSimulator",
+        "target": "GoldfishSimulator.GoldfishSimulator",
+        "target_library": "package:server/ai/goldfish_simulator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 204,
+        "caller": "OptimizationValidator._runMonteCarloComparison",
+        "kind": "method",
+        "lexical_target": "simulate",
+        "target": "GoldfishSimulator.simulate",
+        "target_library": "package:server/ai/goldfish_simulator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 215,
+        "caller": "OptimizationValidator._runMonteCarloComparison",
+        "kind": "method",
+        "lexical_target": "_simulateLondonMulligan",
+        "target": "OptimizationValidator._simulateLondonMulligan",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 218,
+        "caller": "OptimizationValidator._runMonteCarloComparison",
+        "kind": "constructor",
+        "lexical_target": "MonteCarloComparison",
+        "target": "MonteCarloComparison.MonteCarloComparison",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 237,
+        "caller": "OptimizationValidator._simulateLondonMulligan",
+        "kind": "method",
+        "lexical_target": "_stableDeckSeed",
+        "target": "OptimizationValidator._stableDeckSeed",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 270,
+        "caller": "OptimizationValidator._simulateLondonMulligan",
+        "kind": "method",
+        "lexical_target": "_isLand",
+        "target": "OptimizationValidator._isLand",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 275,
+        "caller": "OptimizationValidator._simulateLondonMulligan",
+        "kind": "method",
+        "lexical_target": "_getCmc",
+        "target": "OptimizationValidator._getCmc",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 311,
+        "caller": "OptimizationValidator._simulateLondonMulligan",
+        "kind": "constructor",
+        "lexical_target": "MulliganReport",
+        "target": "MulliganReport.MulliganReport",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 359,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "_findCardByName",
+        "target": "OptimizationValidator._findCardByName",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 367,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "constructor",
+        "lexical_target": "SwapFunctionalAnalysis",
+        "target": "SwapFunctionalAnalysis.SwapFunctionalAnalysis",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 381,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "classifyOptimizationFunctionalRole",
+        "target": "classifyOptimizationFunctionalRole",
+        "target_library": "package:server/ai/optimization_functional_roles.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 383,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "optimizationFunctionalRolesForCard",
+        "target": "optimizationFunctionalRolesForCard",
+        "target_library": "package:server/ai/optimization_functional_roles.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 385,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "_isLand",
+        "target": "OptimizationValidator._isLand",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 389,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "_getCmc",
+        "target": "OptimizationValidator._getCmc",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 471,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "optimizationRampProfileForCard",
+        "target": "optimizationRampProfileForCard",
+        "target_library": "package:server/ai/optimization_ramp_profile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 498,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "method",
+        "lexical_target": "buildOptimizationSemanticV2Diagnostics",
+        "target": "buildOptimizationSemanticV2Diagnostics",
+        "target_library": "package:server/ai/optimization_functional_roles.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 505,
+        "caller": "OptimizationValidator._analyzeFunctionalSwaps",
+        "kind": "constructor",
+        "lexical_target": "FunctionalReport",
+        "target": "FunctionalReport.FunctionalReport",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 530,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 531,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "constructor",
+        "lexical_target": "OpenAiRuntimeConfig",
+        "target": "OpenAiRuntimeConfig.OpenAiRuntimeConfig",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 533,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "temperatureFor",
+        "target": "OpenAiRuntimeConfig.temperatureFor",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 549,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "_formatSwapsForCritic",
+        "target": "OptimizationValidator._formatSwapsForCritic",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 583,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "aiSafetyIdentifierPayload",
+        "target": "aiSafetyIdentifierPayload",
+        "target_library": "package:server/ai_provider_runtime_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 589,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "openAiTokenLimitPayload",
+        "target": "openAiTokenLimitPayload",
+        "target_library": "package:server/openai_structured_output_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 590,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "openAiStructuredResponseFormat",
+        "target": "openAiStructuredResponseFormat",
+        "target_library": "package:server/openai_structured_output_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 598,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "timeoutFor",
+        "target": "OpenAiRuntimeConfig.timeoutFor",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 608,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "recordAiProviderCall",
+        "target": "recordAiProviderCall",
+        "target_library": "package:server/ai_provider_usage_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 628,
+        "caller": "OptimizationValidator._runCriticAI",
+        "kind": "method",
+        "lexical_target": "w",
+        "target": "Log.w",
+        "target_library": "package:server/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 67,
+        "caller": "OptimizationValidator._monteCarloSeed",
+        "kind": "method",
+        "lexical_target": "loadRuntimeEnvironment",
+        "target": "loadRuntimeEnvironment",
+        "target_library": "package:server/runtime_environment.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 674,
+        "caller": "OptimizationValidator._computeVerdict",
+        "kind": "method",
+        "lexical_target": "_computeDeckHealthScore",
+        "target": "OptimizationValidator._computeDeckHealthScore",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 678,
+        "caller": "OptimizationValidator._computeVerdict",
+        "kind": "method",
+        "lexical_target": "_computeImprovementScore",
+        "target": "OptimizationValidator._computeImprovementScore",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 68,
+        "caller": "OptimizationValidator._monteCarloSeed",
+        "kind": "method",
+        "lexical_target": "isolatedMonteCarloSeed",
+        "target": "OptimizationValidator.isolatedMonteCarloSeed",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 817,
+        "caller": "OptimizationValidator._computeVerdict",
+        "kind": "constructor",
+        "lexical_target": "ValidationReport",
+        "target": "ValidationReport.ValidationReport",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 836,
+        "caller": "OptimizationValidator._computeDeckHealthScore",
+        "kind": "method",
+        "lexical_target": "_pressureRateForArchetype",
+        "target": "OptimizationValidator._pressureRateForArchetype",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 84,
+        "caller": "group",
+        "kind": "method",
+        "lexical_target": "text",
+        "target": "text",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 86,
+        "caller": "OptimizationValidator._canonicalDeckOrder",
+        "kind": "method",
+        "lexical_target": "group",
+        "target": "group",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 871,
+        "caller": "OptimizationValidator._computeImprovementScore",
+        "kind": "method",
+        "lexical_target": "_pressureRateForArchetype",
+        "target": "OptimizationValidator._pressureRateForArchetype",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 88,
+        "caller": "OptimizationValidator._canonicalDeckOrder",
+        "kind": "method",
+        "lexical_target": "text",
+        "target": "text",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 929,
+        "caller": "OptimizationValidator._isLand",
+        "kind": "method",
+        "lexical_target": "isLandTypeLine",
+        "target": "isLandTypeLine",
+        "target_library": "package:server/basic_land_utils.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 945,
+        "caller": "OptimizationValidator._getCmc",
+        "kind": "method",
+        "lexical_target": "safeCmcForOptimization",
+        "target": "safeCmcForOptimization",
+        "target_library": "package:server/ai/cmc_safety.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 967,
+        "caller": "MonteCarloComparison.toJson",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "GoldfishResult.toJson",
+        "target_library": "package:server/ai/goldfish_simulator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 969,
+        "caller": "MonteCarloComparison.toJson",
+        "kind": "method",
+        "lexical_target": "toJson",
+        "target": "MulliganReport.toJson",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
       },
       {
         "source": "server/lib/ai/optimize_analysis_support.dart",
@@ -168557,29 +168611,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 145,
-        "caller": "OpenAiRuntimeConfig.temperatureFor",
-        "kind": "method",
-        "lexical_target": "_clampTemp",
-        "target": "OpenAiRuntimeConfig._clampTemp",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 6
-      },
-      {
-        "source": "server/lib/openai_runtime_config.dart",
-        "line": 33,
-        "caller": "OpenAiRuntimeConfig.generateModel",
-        "kind": "method",
-        "lexical_target": "modelFor",
-        "target": "OpenAiRuntimeConfig.modelFor",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/openai_runtime_config.dart",
-        "line": 41,
+        "line": 100,
         "caller": "OpenAiRuntimeConfig.archetypesModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -168590,7 +168622,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 49,
+        "line": 108,
         "caller": "OpenAiRuntimeConfig.explainModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -168601,7 +168633,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 57,
+        "line": 116,
         "caller": "OpenAiRuntimeConfig.analysisModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -168612,7 +168644,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 65,
+        "line": 124,
         "caller": "OpenAiRuntimeConfig.optimizeModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -168623,7 +168655,7 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 73,
+        "line": 132,
         "caller": "OpenAiRuntimeConfig.completeModel",
         "kind": "method",
         "lexical_target": "modelFor",
@@ -168634,8 +168666,41 @@
       },
       {
         "source": "server/lib/openai_runtime_config.dart",
-        "line": 81,
+        "line": 140,
         "caller": "OpenAiRuntimeConfig.optimizationCriticModel",
+        "kind": "method",
+        "lexical_target": "modelFor",
+        "target": "OpenAiRuntimeConfig.modelFor",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/openai_runtime_config.dart",
+        "line": 204,
+        "caller": "OpenAiRuntimeConfig.temperatureFor",
+        "kind": "method",
+        "lexical_target": "_clampTemp",
+        "target": "OpenAiRuntimeConfig._clampTemp",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 6
+      },
+      {
+        "source": "server/lib/openai_runtime_config.dart",
+        "line": 69,
+        "caller": "OpenAiRuntimeConfig.acceptedBaseUrlOverride",
+        "kind": "method",
+        "lexical_target": "isLoopbackHost",
+        "target": "OpenAiRuntimeConfig.isLoopbackHost",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/openai_runtime_config.dart",
+        "line": 92,
+        "caller": "OpenAiRuntimeConfig.generateModel",
         "kind": "method",
         "lexical_target": "modelFor",
         "target": "OpenAiRuntimeConfig.modelFor",
@@ -174244,7 +174309,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 68,
+        "line": 67,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "legalAcceptanceForWrites",
@@ -174255,7 +174320,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 69,
+        "line": 68,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "authMiddleware",
@@ -174266,7 +174331,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 71,
+        "line": 70,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiPollingRateLimit",
@@ -174277,7 +174342,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 75,
+        "line": 74,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiRateLimit",
@@ -174288,7 +174353,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 80,
+        "line": 79,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiPlanLimitMiddleware",
@@ -174299,7 +174364,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 86,
+        "line": 85,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "aiEndpointAccessPolicyForPath",
@@ -182568,237 +182633,6 @@
         "target_library": "package:server/observability.dart",
         "target_scope": "workspace",
         "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 119,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "e",
-        "target": "Log.e",
-        "target_library": "package:server/logger.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 12,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "methodNotAllowed",
-        "target": "methodNotAllowed",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 120,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "captureRouteException",
-        "target": "captureRouteException",
-        "target_library": "package:server/observability.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 126,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 142,
-        "caller": "_isTelemetryTableAvailable",
-        "kind": "method",
-        "lexical_target": "_toInt",
-        "target": "_toInt",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 18,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "loadRuntimeEnvironment",
-        "target": "loadRuntimeEnvironment",
-        "target_library": "package:server/runtime_environment.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 191,
-        "caller": "_loadAggregate",
-        "kind": "method",
-        "lexical_target": "_emptyAggregate",
-        "target": "_emptyAggregate",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 192,
-        "caller": "_loadAggregate",
-        "kind": "method",
-        "lexical_target": "_rowToAggregate",
-        "target": "_rowToAggregate",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 21,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_parseTelemetryQuery",
-        "target": "_parseTelemetryQuery",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 23,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "badRequest",
-        "target": "badRequest",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 239,
-        "caller": "_loadByDay",
-        "kind": "method",
-        "lexical_target": "_rowToAggregate",
-        "target": "_rowToAggregate",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 245,
-        "caller": "_rowToAggregate",
-        "kind": "method",
-        "lexical_target": "_toInt",
-        "target": "_toInt",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 26,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "isConfiguredAdminUser",
-        "target": "isConfiguredAdminUser",
-        "target_library": "package:server/admin_access_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 282,
-        "caller": "_parseTelemetryQuery",
-        "kind": "constructor",
-        "lexical_target": "_TelemetryQuery.error",
-        "target": "_TelemetryQuery._TelemetryQuery.error",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 5
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 304,
-        "caller": "_parseTelemetryQuery",
-        "kind": "method",
-        "lexical_target": "_isUuid",
-        "target": "_isUuid",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 313,
-        "caller": "_parseTelemetryQuery",
-        "kind": "constructor",
-        "lexical_target": "_TelemetryQuery",
-        "target": "_TelemetryQuery._TelemetryQuery",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 43,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_isTelemetryTableAvailable",
-        "target": "_isTelemetryTableAvailable",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 45,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_emptyAggregate",
-        "target": "_emptyAggregate",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 54,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "toJson",
-        "target": "_TelemetryQuery.toJson",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 63,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_loadAggregate",
-        "target": "_loadAggregate",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 3
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 70,
-        "caller": "onRequest",
-        "kind": "method",
-        "lexical_target": "_loadByDay",
-        "target": "_loadByDay",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
@@ -196127,8 +195961,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:collection",
-        "unique_references": 129,
-        "occurrences": 136
+        "unique_references": 128,
+        "occurrences": 135
       },
       {
         "target_scope": "dart_sdk",
@@ -196139,8 +195973,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14454,
-        "occurrences": 24842
+        "unique_references": 14450,
+        "occurrences": 24828
       },
       {
         "target_scope": "dart_sdk",
@@ -196151,8 +195985,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:io",
-        "unique_references": 419,
-        "occurrences": 685
+        "unique_references": 420,
+        "occurrences": 686
       },
       {
         "target_scope": "dart_sdk",
@@ -196163,8 +195997,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 97,
-        "occurrences": 125
+        "unique_references": 98,
+        "occurrences": 127
       },
       {
         "target_scope": "dart_sdk",
@@ -196247,8 +196081,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 534,
-        "occurrences": 1055
+        "unique_references": 532,
+        "occurrences": 1050
       },
       {
         "target_scope": "dependency",
@@ -197501,8 +197335,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 1236,
-        "occurrences": 2001
+        "unique_references": 1227,
+        "occurrences": 1992
       },
       {
         "target_scope": "dependency",
@@ -198989,8 +198823,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/admin_access_support.dart",
-        "unique_references": 11,
-        "occurrences": 11
+        "unique_references": 10,
+        "occurrences": 10
       },
       {
         "target_scope": "workspace",
@@ -199265,8 +199099,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/ai/optimization_validator.dart",
-        "unique_references": 33,
-        "occurrences": 46
+        "unique_references": 39,
+        "occurrences": 57
       },
       {
         "target_scope": "workspace",
@@ -200255,8 +200089,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/http_responses.dart",
-        "unique_references": 162,
-        "occurrences": 242
+        "unique_references": 159,
+        "occurrences": 239
       },
       {
         "target_scope": "workspace",
@@ -200315,8 +200149,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/logger.dart",
-        "unique_references": 182,
-        "occurrences": 307
+        "unique_references": 181,
+        "occurrences": 306
       },
       {
         "target_scope": "workspace",
@@ -200423,14 +200257,14 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/observability.dart",
-        "unique_references": 125,
-        "occurrences": 149
+        "unique_references": 124,
+        "occurrences": 148
       },
       {
         "target_scope": "workspace",
         "target_library": "package:server/openai_runtime_config.dart",
-        "unique_references": 36,
-        "occurrences": 42
+        "unique_references": 38,
+        "occurrences": 44
       },
       {
         "target_scope": "workspace",
@@ -200591,8 +200425,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/runtime_environment.dart",
-        "unique_references": 46,
-        "occurrences": 47
+        "unique_references": 47,
+        "occurrences": 48
       },
       {
         "target_scope": "workspace",
@@ -201079,12 +200913,6 @@
         "target_library": "workspace:server/routes/ai/optimize/jobs/[id].dart",
         "unique_references": 2,
         "occurrences": 3
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "unique_references": 14,
-        "occurrences": 27
       },
       {
         "target_scope": "workspace",
@@ -205106,7 +204934,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 81,
+        "line": 141,
         "caller": "OptimizationValidator.validate",
         "kind": "function_expression",
         "lexical_target": "themeValidator!",
@@ -205890,7 +205718,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 88,
+        "line": 87,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "costlyAiHandler",
@@ -205898,7 +205726,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 90,
+        "line": 89,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "rateLimitedAuxiliaryHandler",
@@ -205906,7 +205734,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 92,
+        "line": 91,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "pollingHandler",
@@ -205914,7 +205742,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 94,
+        "line": 93,
         "caller": "middleware",
         "kind": "function_expression",
         "lexical_target": "authOnlyHandler",
@@ -206001,7 +205829,7 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16774,
+    "resolved_type_reference_count": 16756,
     "workspace_type_reference_count": 3590,
     "unresolved_type_reference_count": 371,
     "resolved_type_references_scope": "workspace_targets_only",
@@ -229558,7 +229386,17 @@
       },
       {
         "source": "server/lib/ai/commander_ai_live_eval_support.dart",
-        "line": 409,
+        "line": 206,
+        "lexical_type": "OpenAiRuntimeConfig",
+        "resolved_type": "OpenAiRuntimeConfig",
+        "target": "OpenAiRuntimeConfig",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/commander_ai_live_eval_support.dart",
+        "line": 415,
         "lexical_type": "AiProviderUsageTotals",
         "resolved_type": "AiProviderUsageTotals",
         "target": "AiProviderUsageTotals",
@@ -230578,97 +230416,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 126,
-        "lexical_type": "MonteCarloComparison",
-        "resolved_type": "MonteCarloComparison",
-        "target": "MonteCarloComparison",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 131,
-        "lexical_type": "GoldfishSimulator",
-        "resolved_type": "GoldfishSimulator",
-        "target": "GoldfishSimulator",
-        "target_library": "package:server/ai/goldfish_simulator.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 156,
-        "lexical_type": "MulliganReport",
-        "resolved_type": "MulliganReport",
-        "target": "MulliganReport",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 18,
-        "lexical_type": "ThemeValidationResult",
-        "resolved_type": "ThemeValidationResult",
-        "target": "ThemeValidationResult",
-        "target_library": "package:server/ai/theme_contextual_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 267,
-        "lexical_type": "FunctionalReport",
-        "resolved_type": "FunctionalReport",
-        "target": "FunctionalReport",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 273,
-        "lexical_type": "SwapFunctionalAnalysis",
-        "resolved_type": "SwapFunctionalAnalysis",
-        "target": "SwapFunctionalAnalysis",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 4
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 36,
-        "lexical_type": "ThemeContextualRulesService?",
-        "resolved_type": "ThemeContextualRulesService?",
-        "target": "ThemeContextualRulesService",
-        "target_library": "package:server/ai/theme_contextual_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 37,
-        "lexical_type": "ThemeDeckValidationCallback?",
-        "resolved_type": "Future<ThemeValidationResult> Function({required String archetype, required List<Map<String, dynamic>> cards})?",
-        "target": "ThemeDeckValidationCallback",
-        "target_library": "package:server/ai/optimization_validator.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 454,
-        "lexical_type": "OpenAiRuntimeConfig",
-        "resolved_type": "OpenAiRuntimeConfig",
-        "target": "OpenAiRuntimeConfig",
-        "target_library": "package:server/openai_runtime_config.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/ai/optimization_validator.dart",
-        "line": 53,
+        "line": 113,
         "lexical_type": "ValidationReport",
         "resolved_type": "ValidationReport",
         "target": "ValidationReport",
@@ -230678,7 +230426,7 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 76,
+        "line": 136,
         "lexical_type": "ThemeValidationResult?",
         "resolved_type": "ThemeValidationResult?",
         "target": "ThemeValidationResult",
@@ -230688,13 +230436,103 @@
       },
       {
         "source": "server/lib/ai/optimization_validator.dart",
-        "line": 839,
+        "line": 186,
+        "lexical_type": "MonteCarloComparison",
+        "resolved_type": "MonteCarloComparison",
+        "target": "MonteCarloComparison",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 19,
+        "lexical_type": "ThemeValidationResult",
+        "resolved_type": "ThemeValidationResult",
+        "target": "ThemeValidationResult",
+        "target_library": "package:server/ai/theme_contextual_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 199,
+        "lexical_type": "GoldfishSimulator",
+        "resolved_type": "GoldfishSimulator",
+        "target": "GoldfishSimulator",
+        "target_library": "package:server/ai/goldfish_simulator.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 232,
+        "lexical_type": "MulliganReport",
+        "resolved_type": "MulliganReport",
+        "target": "MulliganReport",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 344,
+        "lexical_type": "FunctionalReport",
+        "resolved_type": "FunctionalReport",
+        "target": "FunctionalReport",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 350,
+        "lexical_type": "SwapFunctionalAnalysis",
+        "resolved_type": "SwapFunctionalAnalysis",
+        "target": "SwapFunctionalAnalysis",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 531,
+        "lexical_type": "OpenAiRuntimeConfig",
+        "resolved_type": "OpenAiRuntimeConfig",
+        "target": "OpenAiRuntimeConfig",
+        "target_library": "package:server/openai_runtime_config.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 916,
         "lexical_type": "GoldfishResult",
         "resolved_type": "GoldfishResult",
         "target": "GoldfishResult",
         "target_library": "package:server/ai/goldfish_simulator.dart",
         "target_scope": "workspace",
         "occurrences": 3
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 96,
+        "lexical_type": "ThemeContextualRulesService?",
+        "resolved_type": "ThemeContextualRulesService?",
+        "target": "ThemeContextualRulesService",
+        "target_library": "package:server/ai/theme_contextual_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/ai/optimization_validator.dart",
+        "line": 97,
+        "lexical_type": "ThemeDeckValidationCallback?",
+        "resolved_type": "Future<ThemeValidationResult> Function({required String archetype, required List<Map<String, dynamic>> cards})?",
+        "target": "ThemeDeckValidationCallback",
+        "target_library": "package:server/ai/optimization_validator.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "server/lib/ai/optimize_analysis_support.dart",
@@ -238568,7 +238406,7 @@
       },
       {
         "source": "server/routes/ai/_middleware.dart",
-        "line": 29,
+        "line": 28,
         "lexical_type": "AiEndpointAccessPolicy",
         "resolved_type": "AiEndpointAccessPolicy",
         "target": "AiEndpointAccessPolicy",
@@ -239625,16 +239463,6 @@
         "target_library": "package:server/ai/optimize_request_support.dart",
         "target_scope": "workspace",
         "occurrences": 1
-      },
-      {
-        "source": "server/routes/ai/optimize/telemetry/index.dart",
-        "line": 276,
-        "lexical_type": "_TelemetryQuery",
-        "resolved_type": "_TelemetryQuery",
-        "target": "_TelemetryQuery",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "target_scope": "workspace",
-        "occurrences": 7
       },
       {
         "source": "server/routes/ai/rebuild/index.dart",
@@ -241917,8 +241745,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1115,
-        "occurrences": 2233
+        "unique_references": 1111,
+        "occurrences": 2229
       },
       {
         "target_scope": "dart_sdk",
@@ -241935,8 +241763,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6526,
-        "occurrences": 40739
+        "unique_references": 6517,
+        "occurrences": 40718
       },
       {
         "target_scope": "dart_sdk",
@@ -241948,7 +241776,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
         "unique_references": 35,
-        "occurrences": 55
+        "occurrences": 57
       },
       {
         "target_scope": "dart_sdk",
@@ -242019,8 +241847,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:dart_frog/src/_internal.dart",
-        "unique_references": 295,
-        "occurrences": 1216
+        "unique_references": 293,
+        "occurrences": 1211
       },
       {
         "target_scope": "dependency",
@@ -243255,8 +243083,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/postgres.dart",
-        "unique_references": 277,
-        "occurrences": 982
+        "unique_references": 276,
+        "occurrences": 979
       },
       {
         "target_scope": "dependency",
@@ -243267,8 +243095,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:postgres/src/pool/pool_api.dart",
-        "unique_references": 211,
-        "occurrences": 482
+        "unique_references": 210,
+        "occurrences": 478
       },
       {
         "target_scope": "dependency",
@@ -243405,8 +243233,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 414,
-        "occurrences": 4762
+        "unique_references": 413,
+        "occurrences": 4755
       },
       {
         "target_scope": "workspace",
@@ -245649,8 +245477,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/openai_runtime_config.dart",
-        "unique_references": 9,
-        "occurrences": 12
+        "unique_references": 10,
+        "occurrences": 13
       },
       {
         "target_scope": "workspace",
@@ -245975,12 +245803,6 @@
         "target_library": "workspace:server/routes/ai/optimize/index.dart",
         "unique_references": 3,
         "occurrences": 8
-      },
-      {
-        "target_scope": "workspace",
-        "target_library": "workspace:server/routes/ai/optimize/telemetry/index.dart",
-        "unique_references": 1,
-        "occurrences": 7
       },
       {
         "target_scope": "workspace",
@@ -259900,32 +259722,6 @@
       "method_contract": "source"
     },
     {
-      "path": "/ai/optimize/telemetry",
-      "methods": [
-        "GET"
-      ],
-      "source": "server/routes/ai/optimize/telemetry/index.dart",
-      "middleware": [
-        "server/routes/_middleware.dart",
-        "server/routes/ai/_middleware.dart"
-      ],
-      "tests": [
-        "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
-        "app/test/core/widgets/horizontal_discovery_rail_test.dart",
-        "app/test/core/widgets/main_scaffold_test.dart",
-        "app/test/features/auth/screens/verify_email_screen_test.dart",
-        "app/test/features/cards/providers/card_provider_ai_test.dart",
-        "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
-        "app/test/features/commercial/ai_usage_gate_test.dart",
-        "app/test/features/commercial/ai_usage_meter_test.dart",
-        "app/test/features/community/screens/community_deck_detail_screen_test.dart",
-        "app/test/features/decks/models/deck_details_test.dart",
-        "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-        "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
-      ],
-      "method_contract": "source"
-    },
-    {
       "path": "/ai/rebuild",
       "methods": [
         "POST"
@@ -271099,19 +270895,10 @@
     {
       "path": "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
       "role": "operation",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": [
-        "DATABASE_URL",
-        "DB_HOST",
-        "DB_NAME",
-        "DB_PASS",
-        "DB_PORT",
-        "DB_USER",
-        "PGDATABASE",
-        "PGHOST",
-        "PGPASSWORD",
-        "PGPORT",
-        "PGUSER"
+        "PGHOSTADDR",
+        "PGSERVICE"
       ]
     },
     {
@@ -275359,6 +275146,7 @@
       "mutation_class": "read_only_or_unknown",
       "environment_variables": [
         "APP_DIR",
+        "MANALOOM_COMBO_SYNC_AUTHORIZED",
         "SYNC_COMBOS_ARGS"
       ]
     },
@@ -277018,7 +276806,6 @@
       "classification": "sensitive_name_only",
       "sources": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/audit_handcrafted_battle_rule_canonicalization.py",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/lorehold_hidden_retreat_unblock_readiness.py",
@@ -277038,7 +276825,6 @@
       "name": "DB_HOST",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -277071,7 +276857,6 @@
       "name": "DB_NAME",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -277099,7 +276884,6 @@
       "name": "DB_PASS",
       "classification": "sensitive_name_only",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -277128,7 +276912,6 @@
       "name": "DB_PORT",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -277162,7 +276945,6 @@
       "name": "DB_USER",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -277459,6 +277241,7 @@
         "scripts/manaloom_deploy_backend_image.sh",
         "server/bin/migrate.dart",
         "server/lib/account_email_delivery_transport.dart",
+        "server/lib/ai/optimization_validator.dart",
         "server/lib/auth_runtime_policy.dart",
         "server/lib/beta_invites/beta_invite_policy.dart",
         "server/lib/catalog_search_rate_limit.dart",
@@ -279200,6 +278983,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_COMBO_SYNC_AUTHORIZED",
+      "classification": "configuration",
+      "sources": [
+        "server/bin/cron_sync_combos.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_CONFIRM_CANDIDATE_LIMIT",
       "classification": "configuration",
       "sources": [
@@ -279393,6 +279184,7 @@
       "name": "MANALOOM_E2E_ISOLATED_RUNTIME",
       "classification": "configuration",
       "sources": [
+        "server/lib/ai/optimization_validator.dart",
         "server/lib/release_capability_policy.dart"
       ],
       "value_captured": false
@@ -282113,7 +281905,6 @@
       "name": "PGDATABASE",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -282136,7 +281927,6 @@
       "name": "PGHOST",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -282155,10 +281945,17 @@
       "value_captured": false
     },
     {
+      "name": "PGHOSTADDR",
+      "classification": "configuration",
+      "sources": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PGPASSWORD",
       "classification": "sensitive_name_only",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -282177,7 +281974,6 @@
       "name": "PGPORT",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -282197,10 +281993,17 @@
       "value_captured": false
     },
     {
+      "name": "PGSERVICE",
+      "classification": "configuration",
+      "sources": [
+        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PGUSER",
       "classification": "configuration",
       "sources": [
-        "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/generate_known_cards.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/kc_validator.py",
         "docs/hermes-analysis/manaloom-knowledge/scripts/known_cards_generator_cron.sh",
@@ -283752,6 +283555,7 @@
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_cloud_key_runtime.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_commander_deckbuilding_flow_research_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper_pg_live.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_digital_color_count_runtime.py",
@@ -284085,6 +283889,7 @@
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_legalities.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+    "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes_pg_live.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_taunt_from_the_rampart_runtime.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_terror_of_the_peaks_runtime.py",
     "docs/hermes-analysis/manaloom-knowledge/scripts/test_the_walls_of_ba_sing_se_runtime.py",
@@ -284169,7 +283974,6 @@
     "server/test/ai_optimize_authorization_source_test.dart",
     "server/test/ai_optimize_flow_test.dart",
     "server/test/ai_optimize_semantic_enforcement_route_contract_test.dart",
-    "server/test/ai_optimize_telemetry_contract_test.dart",
     "server/test/ai_plan_async_settlement_contract_test.dart",
     "server/test/ai_postgres_atomicity_live_test.dart",
     "server/test/ai_provider_callsite_contract_test.dart",
@@ -284264,6 +284068,7 @@
     "server/test/collection_availability_live_test.dart",
     "server/test/collection_availability_route_contract_test.dart",
     "server/test/color_identity_test.dart",
+    "server/test/combo_sync_pause_contract_test.dart",
     "server/test/commander_ai_live_eval_support_test.dart",
     "server/test/commander_ai_prompt_eval_suite_test.dart",
     "server/test/commander_ai_real_provider_lifecycle_live_test.dart",
@@ -284380,6 +284185,7 @@
     "server/test/goldfish_simulator_test.dart",
     "server/test/health_readiness_support_test.dart",
     "server/test/hermes_cron_governor_report_test.py",
+    "server/test/hermes_db_python_contracts_test.dart",
     "server/test/hermes_docs_branch_sync_test.py",
     "server/test/hermes_lab_cron_bootstrap_test.py",
     "server/test/hermes_lab_entrypoint_test.py",
@@ -284447,6 +284253,7 @@
     "server/test/native_battle_worker_test.py",
     "server/test/new_server_pg_caller_mode_contract_test.py",
     "server/test/observability_test.dart",
+    "server/test/openai_base_url_e2e_live_test.dart",
     "server/test/openai_runtime_config_test.dart",
     "server/test/openai_structured_output_support_test.dart",
     "server/test/operational_alerts_test.dart",
@@ -285951,7 +285758,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "0da4f39b3a7ce2d020d74068f2f68fa3a124c1257692cf418abc01fa28d770d2"
+      "sha256": "ab4a0649a528e1d963bf90007f2c2591c091c10e46cd579a6b45dd6ad7402497"
     },
     "required_task_fields": [
       "id",
@@ -287381,7 +287188,7 @@
           "BT-AI-003",
           "DCK-P0-04"
         ],
-        "acceptance": "Server Generate/cache/save e persistência de AI Analysis estão contidos; falta o app manter `source/is_mock/persisted` em estado preview separado e reconciliar o canônico por revision. Estado rebaixado em 2026-09-22: nenhum receipt/commit citado na linha (regra l.738; `docs/verdade/FATOS.md` 4.5) — voltar ao estado anterior exige o link. Decisão do dono em 2026-09-28: D-82, sem provedor de IA configurado o `POST /ai/optimize` entrega as trocas determinísticas quando a shortlist existe, em vez da prévia falsa. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`: com shortlist e sem chave, a resposta sai de `buildDeterministicOptimizeResponse` e passa pela mesma validação, prévia assinada e confirmação (D-27, D-29); nenhuma chamada ao provedor é tentada (a tentativa primária, o fallback por IA e o Critic IA são pulados); a resposta leva `ai_provider: {configured: false, attempted: false}`, a telemetria de outcome leva a mesma proveniência, e o resultado não entra no cache de optimize; sem shortlist continua o mock `mock_non_actionable`; com chave nada muda; na produção sem chave segue o 503 `provider_unavailable`. Evidência: `server/test/optimize_without_provider_db_live_test.dart` (PostgreSQL descartável, com o `HttpClient` do processo trocado por um que registra e recusa toda conexão: sem chave, zero saída de rede; com chave falsa, a tentativa ao provedor aparece), `server/test/optimize_without_provider_e2e_live_test.dart` (HTTP contra a API local sem chave, sob `sandbox-exec` só loopback: 2/2, zero tentativa ao provedor; com chave falsa, o controle mostra a tentativa) e `server/test/optimize_learning_pipeline_test.dart`; 8 mutações falham; receipt `docs/qa/execution/2026-09-28/D-82-optimize-sem-provedor.md`.",
+        "acceptance": "Server Generate/cache/save e persistência de AI Analysis estão contidos; falta o app manter `source/is_mock/persisted` em estado preview separado e reconciliar o canônico por revision. Estado rebaixado em 2026-09-22: nenhum receipt/commit citado na linha (regra l.738; `docs/verdade/FATOS.md` 4.5) — voltar ao estado anterior exige o link. Decisão do dono em 2026-09-28: D-82, sem provedor de IA configurado o `POST /ai/optimize` entrega as trocas determinísticas quando a shortlist existe, em vez da prévia falsa. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`: com shortlist e sem chave, a resposta sai de `buildDeterministicOptimizeResponse` e passa pela mesma validação, prévia assinada e confirmação (D-27, D-29); nenhuma chamada ao provedor é tentada (a tentativa primária, o fallback por IA e o Critic IA são pulados); a resposta leva `ai_provider: {configured: false, attempted: false}`, a telemetria de outcome leva a mesma proveniência, e o resultado não entra no cache de optimize; sem shortlist continua o mock `mock_non_actionable`; com chave nada muda; na produção sem chave segue o 503 `provider_unavailable`. Evidência: `server/test/optimize_without_provider_db_live_test.dart` (PostgreSQL descartável, com o `HttpClient` do processo trocado por um que registra e recusa toda conexão: sem chave, zero saída de rede; com chave falsa, a tentativa ao provedor aparece), `server/test/optimize_without_provider_e2e_live_test.dart` (HTTP contra a API local sem chave, sob `sandbox-exec` só loopback: 2/2, zero tentativa ao provedor; com chave falsa, o controle mostra a tentativa) e `server/test/optimize_learning_pipeline_test.dart`; 8 mutações falham; receipt `docs/qa/execution/2026-09-28/D-82-optimize-sem-provedor.md`. Em 2026-09-28, o teste de banco da D-82 ficou determinístico: o veredito passa pelo Monte Carlo do validador, cujo sorteio dependia da ordem das linhas do PostgreSQL (um `SELECT` sem `ORDER BY`) e comparava antes e depois com sorteios independentes; a nota variou entre 68 e 92 no mesmo deck. `OptimizationValidator.monteCarloSeedForTesting` (e `MANALOOM_ISOLATED_MONTE_CARLO_SEED` na API do E2E isolado, só com `MANALOOM_E2E_ISOLATED_RUNTIME=1` em desenvolvimento ou teste) roda antes e depois na mesma ordem canônica e com os mesmos números; sem semente, que é o caso da produção, nada muda, e o mínimo 70 é o mesmo. Evidência: nota 92 em 10/10 com semente (sem ela, de 73 a 92), 10 corridas seguidas verdes do teste de banco (duas rodadas cada), E2E 6/6 com a semente, `server/test/optimization_validator_test.dart` 22 testes (4 novos), foco de 60 arquivos/561 testes, 5 mutações falham; receipt `docs/qa/execution/2026-09-28/D-82-teste-sem-provedor-deterministico.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 502
       },
@@ -287496,7 +287303,7 @@
           "BT-SCP-001",
           "BT-DOC-004"
         ],
-        "acceptance": "Rotas sem consumer (`recommendations`, weakness, simulate-matchup e simulate legado) ficam OFF antes de PG/provider; telemetria decide adapter/410/remove. Medição de 2026-09-22 (`docs/flows/_p0/contencao-escopo.md`): a metade \"OFF antes do PG\" já foi entregue (`b2d3fc04f`, `406d7dd53`); faltam o registry com owner/substituto e a decisão adapter/410/remove. Decisão do dono em 2026-09-22: D-31, remover as quatro rotas sem consumidor (`POST /decks/:id/recommendations`, `GET /decks/:id/simulate`, `POST /ai/simulate-matchup`, `POST /ai/weakness-analysis`) e os testes que as tratam como recurso; substitutos: Optimize, Battle e Analyze; janela de telemetria em produção dispensada; `/ai/optimize/telemetry` segue off sob `legacy_ai_routes`, e o registry decide pela mesma regra. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`: registry machine-readable `server/config/ai_route_registry.json` com as 34 combinações de rota de IA (24 sob `/ai` e 10 de IA sob `/decks/:id`), cada uma com consumidor (arquivo e trecho que chama a rota), escritas, capability, política de acesso de `/ai`, trava do reaceite, dono (tarefa do backlog), raia, substituto, provedor externo, se a URL do provedor é configurável e o que acontece sem ele (a URL da OpenAI está fixa em 8 pontos de 7 arquivos, contados por arquivo; o servidor não lê o `OPENAI_BASE_URL` da fixture; o `POST /ai/optimize` registra os quatro pontos em que tenta o provedor, inclusive o Critic IA depois do caminho determinístico, e sem chave nenhum é tentado). `server/test/ai_route_registry_test.dart` falha quando surge rota de IA fora dele (rota sob `/ai`, com capability de IA ou que fala com o provedor), quando uma entrada diverge da política de capability, do handler ou do consumidor, quando uma chamada nova ao provedor aparece fora da lista ou um ponto novo com a URL surge num arquivo registrado, e quando uma chamada registrada do optimize deixa de gravar em `ai_logs` com o endpoint declarado. D-31 executada: as quatro rotas saíram com os testes que as tratavam como recurso e as seis bibliotecas que só elas usavam; as tabelas `deck_weakness_reports` e `deck_matchups` ficam (sem migration). Veredito da regra para `/ai/optimize/telemetry`: sem consumidor; segue off sob `legacy_ai_routes`, com a remoção em decisão do dono. Evidência: `server/test/ai_route_registry_test.dart` 6/6 e foco de 76 arquivos/647 testes; `server/test/ai_route_registry_e2e_live_test.dart` 2/2 (as quatro dão 404 por HTTP mesmo com `legacy_ai_routes` ligada, sob a guarda de egress só loopback), regressão E2E 25/25 e os testes de banco da frente com 78 verdes e 2 pulados (a rodada com chave da D-82); guardas de contrato atualizados; 15 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-029-registry-de-rotas-de-ia.md`.",
+        "acceptance": "Rotas sem consumer (`recommendations`, weakness, simulate-matchup e simulate legado) ficam OFF antes de PG/provider; telemetria decide adapter/410/remove. Medição de 2026-09-22 (`docs/flows/_p0/contencao-escopo.md`): a metade \"OFF antes do PG\" já foi entregue (`b2d3fc04f`, `406d7dd53`); faltam o registry com owner/substituto e a decisão adapter/410/remove. Decisão do dono em 2026-09-22: D-31, remover as quatro rotas sem consumidor (`POST /decks/:id/recommendations`, `GET /decks/:id/simulate`, `POST /ai/simulate-matchup`, `POST /ai/weakness-analysis`) e os testes que as tratam como recurso; substitutos: Optimize, Battle e Analyze; janela de telemetria em produção dispensada; `/ai/optimize/telemetry` segue off sob `legacy_ai_routes`, e o registry decide pela mesma regra. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24`: registry machine-readable `server/config/ai_route_registry.json` com as 34 combinações de rota de IA (24 sob `/ai` e 10 de IA sob `/decks/:id`), cada uma com consumidor (arquivo e trecho que chama a rota), escritas, capability, política de acesso de `/ai`, trava do reaceite, dono (tarefa do backlog), raia, substituto, provedor externo, se a URL do provedor é configurável e o que acontece sem ele (a URL da OpenAI está fixa em 8 pontos de 7 arquivos, contados por arquivo; o servidor não lê o `OPENAI_BASE_URL` da fixture; o `POST /ai/optimize` registra os quatro pontos em que tenta o provedor, inclusive o Critic IA depois do caminho determinístico, e sem chave nenhum é tentado). `server/test/ai_route_registry_test.dart` falha quando surge rota de IA fora dele (rota sob `/ai`, com capability de IA ou que fala com o provedor), quando uma entrada diverge da política de capability, do handler ou do consumidor, quando uma chamada nova ao provedor aparece fora da lista ou um ponto novo com a URL surge num arquivo registrado, e quando uma chamada registrada do optimize deixa de gravar em `ai_logs` com o endpoint declarado. D-31 executada: as quatro rotas saíram com os testes que as tratavam como recurso e as seis bibliotecas que só elas usavam; as tabelas `deck_weakness_reports` e `deck_matchups` ficam (sem migration). Veredito da regra para `/ai/optimize/telemetry`: sem consumidor; segue off sob `legacy_ai_routes`, com a remoção em decisão do dono. Evidência: `server/test/ai_route_registry_test.dart` 6/6 e foco de 76 arquivos/647 testes; `server/test/ai_route_registry_e2e_live_test.dart` 2/2 (as quatro dão 404 por HTTP mesmo com `legacy_ai_routes` ligada, sob a guarda de egress só loopback), regressão E2E 25/25 e os testes de banco da frente com 78 verdes e 2 pulados (a rodada com chave da D-82); guardas de contrato atualizados; 15 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-029-registry-de-rotas-de-ia.md`. Decisão do dono em 2026-09-28: D-83, aceitas em bloco as recomendações do `BT-AI-029`. Feito em 2026-09-28, na mesma branch: `GET /ai/optimize/telemetry` saiu pela regra da D-31, com o teste ao vivo que a tratava como recurso; quem ainda chamar recebe 404 `capability_route_unclassified`; o substituto é a consulta de operação a `ai_optimize_fallback_telemetry` (a tabela fica, sem migration) e o `/health/dashboard`; o registry leva a rota em `removed_routes` com a D-83. Evidência: foco de 11 arquivos/87 testes, `server/test/ai_route_registry_e2e_live_test.dart` por HTTP sob a guarda de egress (2/2, a telemetria dá 404 `capability_route_unclassified` mesmo com `legacy_ai_routes` ligada), 4 mutações falham; receipt `docs/qa/execution/2026-09-28/D-83-telemetria-do-optimize-removida.md`. Também pela D-83: a URL da OpenAI saiu dos 8 pontos em 7 arquivos e mora no `OpenAiRuntimeConfig` (`chatCompletionsUri`); na produção é sempre a fixa; fora dela, `OPENAI_BASE_URL` só vale em loopback (127.0.0.0/8, `::1` ou `localhost`), por http ou https, sem usuário, consulta ou fragmento, e outro valor é ignorado; o registry passou a `url_configurable: true` com a regra, e os testes do registry e dos pontos de chamada contam o endpoint do config e exigem a URL num lugar só. Evidência: `server/test/openai_runtime_config_test.dart` (grupo da base, 4 testes), foco de 14 arquivos/94 testes, `server/test/openai_base_url_e2e_live_test.dart` por HTTP sob a guarda de egress (loopback 1/1: `POST /ai/explain` respondeu com o provedor falso em 127.0.0.1, que recebeu a chave falsa; fora do loopback 1/1: a base foi ignorada, a URL fixa não saiu da máquina e o falso não recebeu nada), 7 mutações falham; receipt `docs/qa/execution/2026-09-28/D-83-url-da-openai-centralizada.md`. Ainda pela D-83, o job de sync de combos (`server/bin/cron_sync_combos.sh`, que alimentava `card_combos`/`combo_cards` para a weakness-analysis removida) está pausado: nenhum agendador do código o chamava (nem o `JOBS` do daemon de ops e o manifesto que ele gera, nem o bootstrap do Hermes, nem as imagens), e a pausa ficou no próprio script, que só roda com `MANALOOM_COMBO_SYNC_AUTHORIZED=1` e, sem ela, sai 0 com um recibo de pausa; o efeito na produção só vem no deploy do ops, a imagem que leva o script (um crontab de host, fora do código, vira recibo de pausa). Evidência: `server/test/combo_sync_pause_contract_test.dart` 4/4 (roda o script com um `dart` falso), 3 mutações falham; receipt `docs/qa/execution/2026-09-28/D-83-sync-de-combos-pausado.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 511
       },
@@ -287509,7 +287316,7 @@
           "DCK-P0-05",
           "BT-PRIV-002"
         ],
-        "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo.",
+        "acceptance": "Opt-out/delete revoga leases, remove/invalida eventos e contribuição agregada, emite receipts por sistema e impede regravação em voo. Feito em 2026-09-28, na branch `servidor/rodada2-2026-09-24` (D-83, item 3 das decisões do `BT-PRIV-002`): o `sync_pg_target_deck_to_hermes.py` ganhou a proteção do alimentador; com `--apply`, pega o lock de escrita do SQLite (`BEGIN IMMEDIATE`, espera de 30 s) e só então confirma no PostgreSQL que o deck existe e não está na lixeira; deck sumido faz rollback e `DeckGoneError` sem o id na mensagem, e a cópia anterior fica para o expurgo, que pega o mesmo lock. Evidência: `test_sync_pg_target_deck_to_hermes.py` 17/17 (5 novos) e `test_sync_pg_target_deck_to_hermes_pg_live.py` 2/2 contra PostgreSQL descartável, sob a guarda de egress e com `DATABASE_URL` explícita em loopback; 5 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-sync-do-deck-alvo-sob-o-lock.md`. O resto do item (opt-out, leases, contribuição agregada) segue aberto. Achado da mesma rodada, corrigido em 2026-09-28: o `db_helper.py` do Hermes carregava, sem configuração no ambiente, o primeiro `.env` achado subindo diretórios (do worktree, o `server/.env` do checkout principal); agora só aceita `DATABASE_URL`, `DB_*`/`PG*` no ambiente ou o arquivo nomeado em `MANALOOM_POSTGRES_ENV`, exige `MANALOOM_CONFIRM_POSTGRES_READS` (ou a de escrita) para host fora do loopback, contando as sobreposições do libpq, exige a de escrita para escrever por `run_sql`, e falha fechado sem mostrar URL, host ou senha; o daemon de ops confirma só a leitura para os jobs dele, e a produção segue recebendo o banco pelo ambiente do serviço. Evidência: `test_db_helper.py` 14 testes, `test_db_helper_pg_live.py` 2/2 contra PostgreSQL descartável, `server/test/manaloom_ops_daemon_test.py` 27/27 (2 novos), os 16 testes do Hermes que importam usuários do helper, 9 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-AI-030-db-helper-sem-env-implicito.md`. Os testes Python desse trabalho entraram no gate pela suíte do servidor, como os contratos do expurgo e do alimentador: `server/test/hermes_db_python_contracts_test.dart` roda `test_db_helper.py`, `test_db_helper_pg_live.py`, `test_sync_pg_target_deck_to_hermes.py` e `test_sync_pg_target_deck_to_hermes_pg_live.py` (os dois contra PostgreSQL pulam, com as chaves vazias de propósito), no `full` (`quality_gate.sh full`), no `pre-push` e em todo commit; o `scripts/manaloom_local_ci.sh` ficou como estava, porque ele é do plano de controle do escopo staged, e commit nele exige a prova de UI, que falha até a recaptura. Evidência: o wrapper passa; 4 mutações (duas do `db_helper`, duas do sync) derrubam a suíte; receipt `docs/qa/execution/2026-09-28/BT-AI-030-testes-python-no-gate.md`.",
         "section": "Épico F — Commander IA, Analyze, Optimize e aprendizado",
         "source_line": 512
       },
@@ -295996,7 +295803,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "eddfee4d7564a24691e38b4679ea89ded9352413b9a8c11c7327b4b811acaa18"
+    "project_logic_source_digest_sha256": "84c325d2204195214a475343f6030720c84121663e9af95cff1896fc5519d99c"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -297688,6 +297495,7 @@
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_cloud_key_runtime.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_commander_deckbuilding_flow_research_audit.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper.py",
+      "docs/hermes-analysis/manaloom-knowledge/scripts/test_db_helper_pg_live.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_deck_card_battle_rule_coherence_audit.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_derive_functional_tags_from_battle_rules.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_digital_color_count_runtime.py",
@@ -298021,6 +297829,7 @@
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_card_metadata_to_hermes.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_legalities.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes.py",
+      "docs/hermes-analysis/manaloom-knowledge/scripts/test_sync_pg_target_deck_to_hermes_pg_live.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_taunt_from_the_rampart_runtime.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_terror_of_the_peaks_runtime.py",
       "docs/hermes-analysis/manaloom-knowledge/scripts/test_the_walls_of_ba_sing_se_runtime.py",
@@ -298673,7 +298482,6 @@
       "server/routes/ai/ml-status/index.dart",
       "server/routes/ai/optimize/index.dart",
       "server/routes/ai/optimize/jobs/[id].dart",
-      "server/routes/ai/optimize/telemetry/index.dart",
       "server/routes/ai/rebuild/index.dart",
       "server/routes/ai/simulate/index.dart",
       "server/routes/auth/_middleware.dart",
@@ -298837,7 +298645,6 @@
       "server/test/ai_optimize_authorization_source_test.dart",
       "server/test/ai_optimize_flow_test.dart",
       "server/test/ai_optimize_semantic_enforcement_route_contract_test.dart",
-      "server/test/ai_optimize_telemetry_contract_test.dart",
       "server/test/ai_plan_async_settlement_contract_test.dart",
       "server/test/ai_postgres_atomicity_live_test.dart",
       "server/test/ai_provider_callsite_contract_test.dart",
@@ -298932,6 +298739,7 @@
       "server/test/collection_availability_live_test.dart",
       "server/test/collection_availability_route_contract_test.dart",
       "server/test/color_identity_test.dart",
+      "server/test/combo_sync_pause_contract_test.dart",
       "server/test/commander_ai_live_eval_support_test.dart",
       "server/test/commander_ai_prompt_eval_suite_test.dart",
       "server/test/commander_ai_real_provider_lifecycle_live_test.dart",
@@ -299048,6 +298856,7 @@
       "server/test/goldfish_simulator_test.dart",
       "server/test/health_readiness_support_test.dart",
       "server/test/hermes_cron_governor_report_test.py",
+      "server/test/hermes_db_python_contracts_test.dart",
       "server/test/hermes_docs_branch_sync_test.py",
       "server/test/hermes_lab_cron_bootstrap_test.py",
       "server/test/hermes_lab_entrypoint_test.py",
@@ -299115,6 +298924,7 @@
       "server/test/native_battle_worker_test.py",
       "server/test/new_server_pg_caller_mode_contract_test.py",
       "server/test/observability_test.dart",
+      "server/test/openai_base_url_e2e_live_test.dart",
       "server/test/openai_runtime_config_test.dart",
       "server/test/openai_structured_output_support_test.dart",
       "server/test/operational_alerts_test.dart",

@@ -53,7 +53,6 @@ void main() {
       '/ai/simulate',
       '/ai/commander-reference',
       '/ai/ml-status',
-      '/ai/optimize/telemetry',
     ]) {
       expect(
         ai_middleware.aiEndpointAccessPolicyForPath(path),

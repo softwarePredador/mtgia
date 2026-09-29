@@ -37,6 +37,9 @@ def _load_script(file_name: str):
 
 
 class ManaLoomOpsDaemonTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._saved_environ = dict(os.environ)
+
     def test_base_env_loads_database_values_from_env_file(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:
@@ -390,6 +393,77 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             module.JOBS = original_jobs
 
         self.assertNotIn(unexpected.name, names)
+
+    def test_base_env_confirms_postgres_reads_but_never_writes(self) -> None:
+        # O db_helper do Hermes recusa host fora do loopback sem confirmação.
+        # A produção passa o banco pelo ambiente do serviço (DB_* do Swarm,
+        # host evolution_manaloom-postgres); o daemon confirma só a leitura.
+        module = _load_module()
+        previous = os.environ.pop("MANALOOM_CONFIRM_POSTGRES_WRITES", None)
+        try:
+            env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        finally:
+            if previous is not None:
+                os.environ["MANALOOM_CONFIRM_POSTGRES_WRITES"] = previous
+        self.assertEqual(
+            env["MANALOOM_CONFIRM_POSTGRES_READS"], "I_HAVE_EXPLICIT_APPROVAL"
+        )
+        self.assertNotIn("MANALOOM_CONFIRM_POSTGRES_WRITES", env)
+
+    def test_hermes_db_helper_reads_the_production_database_under_the_daemon(
+        self,
+    ) -> None:
+        # A produção continua recebendo a URL como hoje: DB_* no ambiente do
+        # serviço, exportados pelo job. Com o ambiente do daemon, o db_helper
+        # lê o banco interno; sem ele, recusa; escrever exige outra aprovação.
+        root = Path(__file__).resolve().parents[2]
+        helper_path = (
+            root / "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py"
+        )
+        spec = importlib.util.spec_from_file_location("db_helper_ops", helper_path)
+        helper = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(helper)
+        module = _load_module()
+        service_env = {
+            "DB_HOST": "evolution_manaloom-postgres",
+            "DB_PORT": "5432",
+            "DB_NAME": "halder",
+            "DB_USER": "postgres",
+            "DB_PASS": "senha-do-servico",
+        }
+        keys = [
+            *service_env,
+            "DATABASE_URL",
+            "PGHOST",
+            "PGHOSTADDR",
+            "PGSERVICE",
+            "MANALOOM_POSTGRES_ENV",
+            "MANALOOM_CONFIRM_POSTGRES_READS",
+            "MANALOOM_CONFIRM_POSTGRES_WRITES",
+        ]
+        original_env_file = module.ENV_FILE
+        try:
+            for key in keys:
+                os.environ.pop(key, None)
+            os.environ.update(service_env)
+            with self.assertRaises(helper.DatabaseConfigError):
+                helper.get_database_url()
+
+            module.ENV_FILE = Path("/caminho/sem/env")
+            job_env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+            os.environ.clear()
+            os.environ.update(job_env)
+            self.assertEqual(
+                helper.sanitized_database_target(),
+                "evolution_manaloom-postgres:5432/halder",
+            )
+            with self.assertRaises(helper.DatabaseConfigError):
+                helper.get_database_url(access="write")
+        finally:
+            module.ENV_FILE = original_env_file
+            os.environ.clear()
+            os.environ.update(self._saved_environ)
 
     def test_base_env_neutralizes_legacy_true_flags(self) -> None:
         module = _load_module()

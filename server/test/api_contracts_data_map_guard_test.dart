@@ -330,7 +330,7 @@ void main() {
       expect(optimize, contains('optimize_cache_support_test.dart'));
     });
 
-    test('documents the four AI routes removed by D-31 only as removed', () {
+    test('documents the AI routes removed by the D-31 rule only as removed', () {
       final removedSection = contracts.substring(
         contracts.indexOf('### Removed AI routes (D-31, BT-AI-029)'),
         contracts.indexOf('### Market'),
@@ -341,6 +341,7 @@ void main() {
         ('GET /decks/:id/simulate', 'Battle'),
         ('POST /ai/simulate-matchup', 'Battle'),
         ('POST /ai/weakness-analysis', 'Analyze'),
+        ('GET /ai/optimize/telemetry', '/health/dashboard'),
       ]) {
         expect(
           liveContracts,

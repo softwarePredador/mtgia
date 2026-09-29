@@ -23,7 +23,6 @@
 | `/ai/ml-status` | `GET` | `server/routes/ai/ml-status/index.dart` | 2 | `source` |
 | `/ai/optimize` | `POST` | `server/routes/ai/optimize/index.dart` | 2 | `source` |
 | `/ai/optimize/jobs/{id}` | `DELETE, GET` | `server/routes/ai/optimize/jobs/[id].dart` | 2 | `source` |
-| `/ai/optimize/telemetry` | `GET` | `server/routes/ai/optimize/telemetry/index.dart` | 2 | `source` |
 | `/ai/rebuild` | `POST` | `server/routes/ai/rebuild/index.dart` | 2 | `source` |
 | `/ai/simulate` | `POST` | `server/routes/ai/simulate/index.dart` | 2 | `source` |
 | `/auth/change-password` | `POST` | `server/routes/auth/change-password.dart` | 2 | `source` |

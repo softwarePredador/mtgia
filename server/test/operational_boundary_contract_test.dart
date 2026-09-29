@@ -142,7 +142,6 @@ void main() {
       for (final relativePath in const [
         'server/test/ai_generate_create_optimize_flow_test.dart',
         'server/test/ai_optimize_flow_test.dart',
-        'server/test/ai_optimize_telemetry_contract_test.dart',
       ]) {
         final testSource = source(relativePath);
         expect(testSource, contains("'legal_accepted': true"));

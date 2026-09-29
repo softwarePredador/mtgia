@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart' show visibleForTesting;
 import '../ai_provider_runtime_support.dart';
 import '../ai_provider_usage_support.dart';
 import '../logger.dart';
@@ -31,6 +32,65 @@ typedef ThemeDeckValidationCallback =
 /// 2. Análise Funcional — Verifica se cada troca preserva o papel funcional
 /// 3. Critic IA — Segunda chamada à IA que CRITICA as trocas (auto-revisão)
 class OptimizationValidator {
+  /// Semente do Monte Carlo só para teste (D-82 estável).
+  ///
+  /// Com ela, antes e depois rodam com os mesmos números aleatórios e na mesma
+  /// ordem canônica (terrenos primeiro, depois nome). O veredito deixa de
+  /// depender da ordem das linhas do PostgreSQL e do sorteio: a diferença entre
+  /// os decks vem das trocas. Vale no teste em processo e, na API do E2E
+  /// isolado, por [isolatedMonteCarloSeedEnvironment]. Sem semente, que é o
+  /// caso da produção, nada muda.
+  @visibleForTesting
+  static int? monteCarloSeedForTesting;
+
+  /// Semente do Monte Carlo para a API do E2E isolado. Só vale com
+  /// `MANALOOM_E2E_ISOLATED_RUNTIME=1` e `ENVIRONMENT` development ou test.
+  static const isolatedMonteCarloSeedEnvironment =
+      'MANALOOM_ISOLATED_MONTE_CARLO_SEED';
+
+  /// A semente do E2E isolado, ou `null` fora dele.
+  @visibleForTesting
+  static int? isolatedMonteCarloSeed(Map<String, String?> environment) {
+    if (environment['MANALOOM_E2E_ISOLATED_RUNTIME']?.trim() != '1') {
+      return null;
+    }
+    final runtime = environment['ENVIRONMENT']?.trim().toLowerCase();
+    if (runtime != 'development' && runtime != 'test') return null;
+    return int.tryParse(
+      environment[isolatedMonteCarloSeedEnvironment]?.trim() ?? '',
+    );
+  }
+
+  static int? _monteCarloSeed() {
+    final inProcess = monteCarloSeedForTesting;
+    if (inProcess != null) return inProcess;
+    final env = loadRuntimeEnvironment();
+    return isolatedMonteCarloSeed({
+      for (final key in const [
+        'MANALOOM_E2E_ISOLATED_RUNTIME',
+        'ENVIRONMENT',
+        isolatedMonteCarloSeedEnvironment,
+      ])
+        key: env[key],
+    });
+  }
+
+  static List<Map<String, dynamic>> _canonicalDeckOrder(
+    List<Map<String, dynamic>> deck,
+  ) {
+    String text(Map<String, dynamic> card, String key) =>
+        (card[key] as String? ?? '').toLowerCase();
+    int group(Map<String, dynamic> card) =>
+        text(card, 'type_line').contains('land') ? 0 : 1;
+    return List<Map<String, dynamic>>.from(deck)..sort((a, b) {
+      final byGroup = group(a).compareTo(group(b));
+      if (byGroup != 0) return byGroup;
+      final byName = text(a, 'name').compareTo(text(b, 'name'));
+      if (byName != 0) return byName;
+      return text(a, 'type_line').compareTo(text(b, 'type_line'));
+    });
+  }
+
   final String? openAiKey;
   final String? safetyIdentifierSource;
   final ThemeContextualRulesService? themeService;
@@ -127,17 +187,33 @@ class OptimizationValidator {
     required List<Map<String, dynamic>> originalDeck,
     required List<Map<String, dynamic>> optimizedDeck,
   }) {
+    // Com a semente de teste, os dois decks usam a mesma ordem e os mesmos
+    // números aleatórios; sem ela, o comportamento de sempre.
+    final seed = _monteCarloSeed();
+    final before =
+        seed == null ? originalDeck : _canonicalDeckOrder(originalDeck);
+    final after =
+        seed == null ? optimizedDeck : _canonicalDeckOrder(optimizedDeck);
+
     // Simular Deck ORIGINAL
-    final beforeSim = GoldfishSimulator(originalDeck, simulations: 1000);
+    final beforeSim = GoldfishSimulator(
+      before,
+      simulations: 1000,
+      random: seed == null ? null : Random(seed),
+    );
     final beforeResult = beforeSim.simulate();
 
     // Simular Deck OTIMIZADO
-    final afterSim = GoldfishSimulator(optimizedDeck, simulations: 1000);
+    final afterSim = GoldfishSimulator(
+      after,
+      simulations: 1000,
+      random: seed == null ? null : Random(seed),
+    );
     final afterResult = afterSim.simulate();
 
     // London Mulligan Analysis
-    final beforeMulligan = _simulateLondonMulligan(originalDeck, runs: 500);
-    final afterMulligan = _simulateLondonMulligan(optimizedDeck, runs: 500);
+    final beforeMulligan = _simulateLondonMulligan(before, runs: 500, seed: seed);
+    final afterMulligan = _simulateLondonMulligan(after, runs: 500, seed: seed);
 
     return MonteCarloComparison(
       before: beforeResult,
@@ -156,8 +232,9 @@ class OptimizationValidator {
   MulliganReport _simulateLondonMulligan(
     List<Map<String, dynamic>> deck, {
     int runs = 500,
+    int? seed,
   }) {
-    final random = Random(_stableDeckSeed(deck, runs));
+    final random = Random(seed ?? _stableDeckSeed(deck, runs));
     var totalMulligans = 0;
     var keptAt7 = 0;
     var keptAt6 = 0;
@@ -497,7 +574,7 @@ SUA TAREFA: Avaliar se as trocas são REALMENTE boas. Retorne apenas JSON:
 
       final response = await http
           .post(
-            Uri.parse('https://api.openai.com/v1/chat/completions'),
+            aiConfig.chatCompletionsUri,
             headers: {
               'Content-Type': 'application/json',
               'Authorization': 'Bearer $openAiKey',

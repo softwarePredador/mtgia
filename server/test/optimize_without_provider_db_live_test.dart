@@ -8,6 +8,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
+import '../lib/ai/optimization_validator.dart';
 import '../lib/database.dart';
 import '../routes/ai/optimize/index.dart' as optimize_route;
 import 'support/optimize_no_provider_fixture.dart';
@@ -55,6 +56,11 @@ void main() {
       ),
     );
     Database.useConnectionForTesting(pool);
+    // O veredito do validador passa por um Monte Carlo. Sem semente, ele
+    // dependia da ordem das linhas do PostgreSQL e oscilava perto do mínimo
+    // 70 (68 numa rodada em 5). Com a semente de teste, antes e depois usam os
+    // mesmos números e a mesma ordem, e o resultado é o mesmo toda vez.
+    OptimizationValidator.monteCarloSeedForTesting = 20260928;
     await seedOptimizeNoProviderCatalog(pool);
     userId = await insertOptimizeNoProviderUser(pool);
     deckWithShortlist = await insertOptimizeNoProviderDeck(
@@ -71,6 +77,7 @@ void main() {
 
   tearDownAll(() async {
     if (!enabled) return;
+    OptimizationValidator.monteCarloSeedForTesting = null;
     Database.resetForTesting();
     await pool.close();
   });
@@ -124,6 +131,11 @@ void main() {
 
         expect(run.status, 200, reason: jsonEncode(body));
         expect(body['outcome_code'], 'optimized', reason: jsonEncode(body));
+        // Com a semente de teste, o veredito do validador é o mesmo toda vez.
+        final validation =
+            (body['post_analysis'] as Map)['validation'] as Map<String, dynamic>;
+        expect(validation['verdict'], 'aprovado', reason: jsonEncode(validation));
+        expect(validation['validation_score'], greaterThanOrEqualTo(70));
         expect(body['strategy_source'], 'deterministic_first');
         expect(body['is_mock'], isNot(true));
         expect(body['can_apply'], isNot(false));

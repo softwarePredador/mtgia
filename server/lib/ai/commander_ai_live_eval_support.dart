@@ -5,8 +5,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import '../../ai_provider_runtime_support.dart';
+import '../../openai_runtime_config.dart';
 import '../../openai_structured_output_support.dart';
 import '../../plan_service.dart';
+import '../../runtime_environment.dart';
 import 'commander_ai_prompt_eval_suite.dart';
 
 String buildCommanderAiLiveEvalPrompt(Map<String, dynamic> testCase) {
@@ -197,13 +199,17 @@ Future<Map<String, dynamic>> runCommanderAiLiveEvalCase({
   required String systemPrompt,
   required Map<String, dynamic> testCase,
   Duration timeout = const Duration(seconds: 60),
+  Uri? endpoint,
 }) async {
+  final providerUri =
+      endpoint ??
+      OpenAiRuntimeConfig(loadRuntimeEnvironment()).chatCompletionsUri;
   final started = Stopwatch()..start();
   late final http.Response response;
   try {
     response = await client
         .post(
-          Uri.parse('https://api.openai.com/v1/chat/completions'),
+          providerUri,
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $apiKey',

@@ -616,7 +616,7 @@ $commanderBracketPrompt
         send:
             (abortTrigger) => sendAiGenerateProviderHttpRequest(
               client: providerClient,
-              uri: Uri.parse('https://api.openai.com/v1/chat/completions'),
+              uri: aiConfig.chatCompletionsUri,
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer $apiKey',

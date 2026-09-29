@@ -166,7 +166,6 @@ void main() {
       }
       for (final (method, path) in [
         ('GET', '/ai/generate/jobs/j1'),
-        ('POST', '/ai/optimize/telemetry'),
         ('POST', '/ai/generate/jobs/j1/cancel'),
         ('POST', '/ai/battle/sessions/s1/actions'),
         ('POST', '/ai/battle/sessions/s1/concede'),

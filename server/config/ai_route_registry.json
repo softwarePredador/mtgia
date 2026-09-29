@@ -39,11 +39,15 @@
       "authOnly"
     ]
   },
-  "rule": "D-31: rota sem consumidor no app, no site e nos scripts, e com substituto, sai junto com os testes que a tratam como recurso. Uma rota nova de IA entra aqui antes de ganhar capability.",
+  "rule": "D-31: rota sem consumidor no app, no site e nos scripts, e com substituto, sai junto com os testes que a tratam como recurso. A D-83 aplicou a mesma regra ao GET /ai/optimize/telemetry. Uma rota nova de IA entra aqui antes de ganhar capability.",
   "providers": {
     "openai_chat_completions": {
       "url": "https://api.openai.com/v1/chat/completions",
-      "url_configurable": false,
+      "url_configurable": true,
+      "url_env": "OPENAI_BASE_URL",
+      "url_source": "server/lib/openai_runtime_config.dart",
+      "url_rule": "fixa na produção (perfil prod); fora dela, OPENAI_BASE_URL só é aceita em loopback (127.0.0.0/8, ::1 ou localhost), por http ou https, sem usuário, consulta ou fragmento; outro valor é ignorado e a chamada vai para a URL fixa",
+      "callsite_marker": "chatCompletionsUri",
       "key_env": "OPENAI_API_KEY",
       "callsites": [
         "server/lib/ai/commander_ai_live_eval_support.dart",
@@ -63,7 +67,7 @@
         "server/routes/ai/generate/index.dart": 1,
         "server/routes/decks/[id]/ai-analysis/index.dart": 1
       },
-      "note": "A URL está fixa no código: 8 pontos em 7 arquivos. Antes da D-31 eram 9 em 8; a sessão do gate achou os 4 de server/lib, e deck_recommendations_route_support.dart saiu com a D-31. A fixture isolada (scripts/manaloom_server_contract_e2e_isolated.sh) exporta OPENAI_BASE_URL vazia, mas nenhum código do servidor (lib e routes) lê essa variável; só o entrypoint do laboratório Hermes (server/bin/hermes_lab_entrypoint.sh) a usa, para o próprio Hermes. Trocar o provedor por base URL exige mexer nos 7 arquivos. commander_ai_live_eval_support.dart é da avaliação ao vivo, fora das rotas.",
+      "note": "A URL mora num lugar só, o OpenAiRuntimeConfig (D-83): os 8 pontos em 7 arquivos que a tinham fixa usam chatCompletionsUri. Na produção ela é sempre https://api.openai.com/v1/chat/completions. Fora dela, OPENAI_BASE_URL aponta para um provedor falso local, só em loopback; a fixture isolada (scripts/manaloom_server_contract_e2e_isolated.sh) exporta a variável vazia, e a URL fica a fixa. O entrypoint do laboratório Hermes (server/bin/hermes_lab_entrypoint.sh) usa a mesma variável para o próprio Hermes. commander_ai_live_eval_support.dart é da avaliação ao vivo, fora das rotas.",
       "without_key": "Perfil de produção: 503 nas rotas que dependem do provedor. Fora da produção: mock ou fallback local marcado is_mock=true, nunca cacheado nem aplicável; o POST /ai/optimize entrega as trocas determinísticas quando há shortlist (D-82)."
     },
     "edhrec": {
@@ -372,23 +376,6 @@
       "writes_note": "cancela o trabalho",
       "external_providers": [],
       "substitute": null
-    },
-    {
-      "method": "GET",
-      "path": "/ai/optimize/telemetry",
-      "handler": "server/routes/ai/optimize/telemetry/index.dart",
-      "status": "legacy_off",
-      "capability": "legacy_ai_routes",
-      "access_policy": "rateLimitedAuxiliary",
-      "legal_reacceptance": false,
-      "owner": "BT-AI-018",
-      "lane": "deck_e_ia",
-      "consumers": [],
-      "consumer_note": "nenhum consumidor no app, no site, nos scripts nem no ops; só o teste ao vivo de contrato",
-      "writes": [],
-      "external_providers": [],
-      "substitute": "consulta de operação ao PostgreSQL (ai_optimize_fallback_telemetry) e o painel de /health/dashboard",
-      "rule_verdict": "pela regra da D-31 (sem consumidor, com substituto) a rota sairia; a D-31 listou só as quatro e disse que esta segue off sob legacy_ai_routes, então a remoção ficou em decisoes-pendentes"
     },
     {
       "method": "POST",
@@ -993,6 +980,16 @@
         "card_combos",
         "combo_cards"
       ],
+      "after_removal": "404 capability_route_unclassified"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/optimize/telemetry",
+      "handler": "server/routes/ai/optimize/telemetry/index.dart",
+      "decision": "D-83",
+      "removed_on": "2026-09-28",
+      "substitute": "consulta de operação ao PostgreSQL (ai_optimize_fallback_telemetry) e o painel de /health/dashboard",
+      "writes_left_behind": [],
       "after_removal": "404 capability_route_unclassified"
     }
   ]

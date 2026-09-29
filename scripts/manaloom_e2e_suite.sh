@@ -315,8 +315,8 @@ run_optional_server_live_e2e() {
   fi
 
   local live_api_base="${TEST_API_BASE_URL:-${API_BASE_URL:-http://127.0.0.1:8082}}"
-  run_step "Server live AI generate optimize telemetry E2E" \
-    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL=\"$live_api_base\" JWT_SECRET=local_manaloom_live_e2e_$STAMP dart test -j 1 test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/ai_optimize_telemetry_contract_test.dart"
+  run_step "Server live AI generate optimize E2E" \
+    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL=\"$live_api_base\" JWT_SECRET=local_manaloom_live_e2e_$STAMP dart test -j 1 test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart"
 }
 
 run_optional_live_product_e2e() {

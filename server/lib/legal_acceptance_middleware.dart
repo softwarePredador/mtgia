@@ -147,11 +147,10 @@ bool isLegalGatedAiRequest(Request request) {
   );
 }
 
-/// Escritas sob `/ai` que não criam nem compartilham dado novo: telemetria,
-/// e ações sobre um trabalho ou uma partida que já existem (uma partida em
-/// curso não é interrompida por uma versão nova dos Termos).
+/// Escritas sob `/ai` que não criam nem compartilham dado novo: o diagnóstico
+/// do ML e ações sobre um trabalho ou uma partida que já existem (uma partida
+/// em curso não é interrompida por uma versão nova dos Termos).
 final legalReacceptanceAiExemptions = <RegExp>[
-  RegExp(r'^/ai/optimize/telemetry$'),
   RegExp(r'^/ai/ml-status$'),
   RegExp(r'^/ai/(generate|optimize)/jobs/.+$'),
   RegExp(r'^/ai/battle/jobs/.+$'),

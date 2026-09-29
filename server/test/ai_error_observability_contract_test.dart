@@ -85,7 +85,6 @@ void main() {
       'routes/ai/generate/jobs/[id].dart',
       'routes/ai/optimize/index.dart',
       'routes/ai/optimize/jobs/[id].dart',
-      'routes/ai/optimize/telemetry/index.dart',
       'routes/ai/rebuild/index.dart',
       'routes/ai/simulate/index.dart',
       'routes/ai/commander-reference/index.dart',

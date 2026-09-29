@@ -446,11 +446,11 @@ String? requiredCapabilityForRequest({
   }
   // As quatro rotas legadas sem consumidor (POST /decks/:id/recommendations,
   // GET /decks/:id/simulate, POST /ai/simulate-matchup e
-  // POST /ai/weakness-analysis) saíram na D-31 (BT-AI-029). Quem ainda chamar
-  // /ai/simulate-matchup ou /ai/weakness-analysis cai em rota não classificada
-  // (404 e contador próprio); as de /decks/:id não têm mais handler.
-  if (normalizedPath == '/ai/ml-status' ||
-      normalizedPath.startsWith('/ai/optimize/telemetry')) {
+  // POST /ai/weakness-analysis) saíram na D-31 (BT-AI-029), e
+  // GET /ai/optimize/telemetry saiu pela mesma regra na D-83. Quem ainda
+  // chamar as de /ai cai em rota não classificada (404 e contador próprio);
+  // as de /decks/:id não têm mais handler.
+  if (normalizedPath == '/ai/ml-status') {
     return 'legacy_ai_routes';
   }
 

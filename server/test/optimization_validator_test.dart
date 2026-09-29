@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:test/test.dart';
+import '../lib/ai/goldfish_simulator.dart';
 import '../lib/ai/optimization_functional_roles.dart';
 import '../lib/ai/optimization_validator.dart';
 import '../lib/ai/theme_contextual_rules_service.dart';
 
 void main() {
+  _seededMonteCarloTests();
+
   group('OptimizationValidator', () {
     late OptimizationValidator validator;
 
@@ -922,6 +927,118 @@ void main() {
       expect(report.healthScore, lessThan(45));
       expect(report.score, lessThan(45));
       expect(report.verdict, equals('reprovado'));
+    });
+  });
+}
+
+void _seededMonteCarloTests() {
+  group('Monte Carlo com semente de teste (D-82 estável)', () {
+    tearDown(() => OptimizationValidator.monteCarloSeedForTesting = null);
+
+    List<Map<String, dynamic>> original() => [
+      ..._makeLands(36),
+      ..._makeSpells(64, avgCmc: 4),
+    ];
+    List<Map<String, dynamic>> optimized() => [
+      ..._makeLands(36),
+      ..._makeSpells(54, avgCmc: 4),
+      ..._makeSpells(10, avgCmc: 2).map(
+        (card) => {...card, 'name': 'Upgrade ${card['name']}'},
+      ),
+    ];
+
+    Future<ValidationReport> run(
+      List<Map<String, dynamic>> before,
+      List<Map<String, dynamic>> after,
+    ) => OptimizationValidator().validate(
+      originalDeck: before,
+      optimizedDeck: after,
+      removals: const ['Spell 55'],
+      additions: const ['Upgrade Spell 1'],
+      commanders: const ['Test Commander'],
+      archetype: 'midrange',
+    );
+
+    test('a ordem das cartas não muda o resultado', () async {
+      OptimizationValidator.monteCarloSeedForTesting = 20260928;
+      final inOrder = await run(original(), optimized());
+      final reversed = await run(
+        original().reversed.toList(),
+        optimized().reversed.toList(),
+      );
+      final interleaved = await run(
+        [...original()]..sort((a, b) => '${b['name']}'.compareTo('${a['name']}')),
+        [...optimized()]..shuffle(Random(7)),
+      );
+      for (final other in [reversed, interleaved]) {
+        expect(other.monteCarlo.toJson(), inOrder.monteCarlo.toJson());
+        expect(other.score, inOrder.score);
+        expect(other.verdict, inOrder.verdict);
+      }
+    });
+
+    test('antes e depois usam os mesmos números: troca que não mexe nos '
+        'terrenos não mexe em screw e flood', () async {
+      OptimizationValidator.monteCarloSeedForTesting = 20260928;
+      final report = await run(original(), optimized());
+      expect(report.monteCarlo.after.screwRate, report.monteCarlo.before.screwRate);
+      expect(report.monteCarlo.after.floodRate, report.monteCarlo.before.floodRate);
+    });
+
+    test('sem semente, o Monte Carlo é o de sempre', () async {
+      final report = await run(original(), optimized());
+      final expected = GoldfishSimulator(original(), simulations: 1000).simulate();
+      expect(report.monteCarlo.before.toJson(), expected.toJson());
+      // O mulligan também segue a semente estável de cada deck: o mesmo
+      // formato com outros nomes sorteia outras mãos.
+      final renamed = [
+        for (final card in original()) {...card, 'name': 'Outro ${card['name']}'},
+      ];
+      final other = await run(renamed, optimized());
+      expect(
+        other.monteCarlo.beforeMulligan.toJson(),
+        isNot(report.monteCarlo.beforeMulligan.toJson()),
+      );
+      final seeded = await () async {
+        OptimizationValidator.monteCarloSeedForTesting = 20260928;
+        return run(original(), optimized());
+      }();
+      expect(seeded.monteCarlo.before.toJson(), isNot(expected.toJson()));
+    });
+
+    test('a semente do E2E isolado só vale no runtime isolado de '
+        'desenvolvimento ou teste', () {
+      const seed = OptimizationValidator.isolatedMonteCarloSeedEnvironment;
+      expect(
+        OptimizationValidator.isolatedMonteCarloSeed({
+          'MANALOOM_E2E_ISOLATED_RUNTIME': '1',
+          'ENVIRONMENT': 'development',
+          seed: '42',
+        }),
+        42,
+      );
+      expect(
+        OptimizationValidator.isolatedMonteCarloSeed({
+          'MANALOOM_E2E_ISOLATED_RUNTIME': '1',
+          'ENVIRONMENT': 'test',
+          seed: '7',
+        }),
+        7,
+      );
+      for (final environment in [
+        {'ENVIRONMENT': 'development', seed: '42'},
+        {'MANALOOM_E2E_ISOLATED_RUNTIME': '1', 'ENVIRONMENT': 'production', seed: '42'},
+        {'MANALOOM_E2E_ISOLATED_RUNTIME': '1', 'ENVIRONMENT': 'staging', seed: '42'},
+        {'MANALOOM_E2E_ISOLATED_RUNTIME': '1', seed: '42'},
+        {'MANALOOM_E2E_ISOLATED_RUNTIME': '1', 'ENVIRONMENT': 'development'},
+        {'MANALOOM_E2E_ISOLATED_RUNTIME': '1', 'ENVIRONMENT': 'development', seed: 'x'},
+      ]) {
+        expect(
+          OptimizationValidator.isolatedMonteCarloSeed(environment),
+          isNull,
+          reason: '$environment',
+        );
+      }
     });
   });
 }

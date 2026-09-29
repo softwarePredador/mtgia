@@ -11,11 +11,12 @@ import 'package:test/test.dart';
 import '../lib/beta_invites/beta_invite_issuance.dart';
 import '../lib/legal_policy.dart';
 
-/// BT-AI-029 e D-31 de ponta a ponta, por HTTP contra a API local com as
-/// capabilities `account_registration`, `decks_private`,
+/// BT-AI-029, D-31 e D-83 de ponta a ponta, por HTTP contra a API local com
+/// as capabilities `account_registration`, `decks_private`,
 /// `ai_analyze_optimize_advisory` e `legacy_ai_routes` ligadas no manifesto
-/// isolado. Mesmo com a capability legada ligada, as quatro rotas removidas
-/// respondem 404; as rotas que ficaram seguem respondendo.
+/// isolado. Mesmo com a capability legada ligada, as rotas removidas (as
+/// quatro da D-31 e o `GET /ai/optimize/telemetry` da D-83) respondem 404; as
+/// rotas que ficaram seguem respondendo.
 ///
 /// Requer `RUN_AI_ROUTE_REGISTRY_E2E_TESTS=1`, `TEST_API_BASE_URL` e as
 /// variáveis `DB_*` do mesmo banco da API.
@@ -100,11 +101,17 @@ void main() {
     await pool.close();
   });
 
-  test('as quatro rotas removidas pela D-31 respondem 404, mesmo com a '
+  test('as rotas removidas pela regra da D-31 respondem 404, mesmo com a '
       'capability legada ligada', () async {
     for (final (method, path, code) in [
       ('POST', '/ai/weakness-analysis', 'capability_route_unclassified'),
       ('POST', '/ai/simulate-matchup', 'capability_route_unclassified'),
+      ('GET', '/ai/optimize/telemetry', 'capability_route_unclassified'),
+      (
+        'GET',
+        '/ai/optimize/telemetry?days=7&include_global=true',
+        'capability_route_unclassified',
+      ),
       ('POST', '/decks/{deck}/recommendations', null),
       ('GET', '/decks/{deck}/simulate', null),
     ]) {
