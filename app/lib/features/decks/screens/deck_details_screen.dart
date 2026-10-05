@@ -1254,12 +1254,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         variant: CardArtworkVariant.gallery,
                         imageUrl: card.printingImageUrl,
                         fallbackImageUrl: card.fallbackImageUrl,
+                        fallbackName: card.name,
                         semanticLabel: card.hasPrintingArtwork
                             ? 'Arte da impressão ${card.name}'
                             : 'Arte de referência de ${card.name}',
                         imageIsReference: !card.hasPrintingArtwork,
                         width: AppTheme.touchTargetMin,
-                        height: 62,
+                        height: 67,
                         constrainAspectRatio: false,
                       ),
                     ),

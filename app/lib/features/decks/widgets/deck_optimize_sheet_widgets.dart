@@ -1263,7 +1263,7 @@ class _PostGameEvidenceCard extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 45,
+            width: 46,
             height: 64,
             child: artwork == null || artwork.isEmpty
                 ? DecoratedBox(
@@ -1281,6 +1281,7 @@ class _PostGameEvidenceCard extends StatelessWidget {
                 : CardArtwork(
                     variant: CardArtworkVariant.gallery,
                     imageUrl: artwork,
+                    fallbackName: name,
                     semanticLabel: 'Impressão de $name',
                     constrainAspectRatio: false,
                     showStatusBadge: false,

@@ -44,6 +44,29 @@ void main() {
     expect(offenders, isEmpty);
   });
 
+  // BT-UX-IMG-001: card images go through CardArtwork, which owns the 63:88
+  // frame, the labelled states and the fallback name. The direct
+  // CachedCardImage calls left are on surfaces that are OFF in the beta
+  // (battle, social, community); they migrate before those flags open.
+  test('direct CachedCardImage calls stay on surfaces outside the beta', () {
+    const allowed = <String, int>{
+      'lib/features/battle/screens/battle_coach_screen.dart': 4,
+      'lib/features/battle/screens/battle_replays_screen.dart': 2,
+      'lib/features/community/screens/community_screen.dart': 3,
+      'lib/features/social/screens/user_profile_screen.dart': 4,
+    };
+
+    final found = <String, int>{};
+    for (final file in _dartFiles(Directory('lib/features'))) {
+      final count = 'CachedCardImage('
+          .allMatches(file.readAsStringSync())
+          .length;
+      if (count > 0) found[file.path.replaceAll('\\', '/')] = count;
+    }
+
+    expect(found, equals(allowed));
+  });
+
   // BT-ART-01 / D-37: card artwork is always shown whole. A card widget
   // that receives cover, fill or fitWidth would crop the card.
   test('card image widgets never crop the card', () {

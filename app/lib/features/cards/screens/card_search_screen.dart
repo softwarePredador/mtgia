@@ -871,6 +871,7 @@ class _CardSearchResultTile extends StatelessWidget {
                         : CardArtworkVariant.gallery,
                     imageUrl: card.printingImageUrl,
                     fallbackImageUrl: card.fallbackImageUrl,
+                    fallbackName: card.name,
                     semanticLabel: card.hasPrintingArtwork
                         ? 'Arte da impressão ${card.name}'
                         : 'Arte de referência de ${card.name}',
@@ -1354,6 +1355,7 @@ class _AddCardDialogState extends State<_AddCardDialog> {
                       variant: CardArtworkVariant.gallery,
                       imageUrl: widget.card.printingImageUrl,
                       fallbackImageUrl: widget.card.fallbackImageUrl,
+                      fallbackName: widget.card.name,
                       semanticLabel: widget.card.hasPrintingArtwork
                           ? 'Arte da impressão ${widget.card.name}'
                           : 'Arte de referência de ${widget.card.name}',

@@ -504,6 +504,7 @@ class _DeckCardDetailsImage extends StatelessWidget {
         variant: CardArtworkVariant.fullCard,
         imageUrl: card.printingImageUrl,
         fallbackImageUrl: card.fallbackImageUrl,
+        fallbackName: card.name,
         semanticLabel: card.hasPrintingArtwork
             ? 'Arte da impressão ${card.name}'
             : 'Arte de referência de ${card.name}',
