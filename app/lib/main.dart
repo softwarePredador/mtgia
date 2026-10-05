@@ -75,6 +75,7 @@ import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/notifications/widgets/notification_permission_boundary.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
+import 'features/home/onboarding_goal_policy.dart';
 import 'features/home/services/onboarding_state_store.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
@@ -450,6 +451,16 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         if (capabilityRedirect != null) {
           debugPrint('[🧭 Router] → fallback de capability da release');
           return capabilityRedirect;
+        }
+
+        final onboardingRedirect = onboardingDeadEndRedirect(
+          uri: state.uri,
+          loadState: _releaseCapabilitiesProvider.loadState,
+          capabilities: _releaseCapabilitiesProvider.snapshot,
+        );
+        if (onboardingRedirect != null) {
+          debugPrint('[🧭 Router] → home (onboarding sem objetivo aberto)');
+          return onboardingRedirect;
         }
 
         debugPrint('[🧭 Router] → null (sem redirect)');
