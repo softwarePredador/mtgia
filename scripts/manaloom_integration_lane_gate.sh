@@ -72,8 +72,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# O perfil temporário do Chrome nasce no TMPDIR do ChromeDriver, e o Chrome
+# põe ali o socket de instância única. Com TMPDIR longo o caminho passa do
+# limite de socket Unix (104/108 bytes) e toda sessão falha com "user data
+# directory is already in use". /tmp existe e é curto no macOS e no Linux.
 set -m
-"$MANALOOM_CHROMEDRIVER_BIN_RESOLVED" --port="$DRIVER_PORT" \
+TMPDIR=/tmp "$MANALOOM_CHROMEDRIVER_BIN_RESOLVED" --port="$DRIVER_PORT" \
   >"$RUN_DIR/chromedriver.log" 2>&1 &
 DRIVER_PID=$!
 set +m

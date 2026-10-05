@@ -95,6 +95,7 @@ void main() {
 
     test('a limpeza mata o grupo do ChromeDriver, com o Chrome junto', () {
       expect(gate, contains('set -m'));
+      expect(gate, contains(r'TMPDIR=/tmp "$MANALOOM_CHROMEDRIVER_BIN_RESOLVED"'));
       expect(gate, contains(r'kill -- "-$DRIVER_PID"'));
       expect(gate, contains('trap cleanup EXIT'));
     });
