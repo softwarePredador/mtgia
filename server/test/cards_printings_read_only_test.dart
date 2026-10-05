@@ -155,15 +155,49 @@ void main() {
     }
   }
 
+  group('GET /cards/printings recusa sync (BT-CAT-02)', () {
+    for (final value in ['true', 'TRUE', '1', 'yes', ' true ']) {
+      test('sync=$value responde 400 antes de qualquer consulta', () async {
+        final pool = poolReturning([aliasRow]);
+
+        final result = await getPrintings(
+          pool,
+          'name=Sol+Ring&dedupe=false&sync=${Uri.encodeQueryComponent(value)}',
+        );
+
+        expect(result.response.statusCode, HttpStatus.badRequest);
+        expect(result.upstream, isEmpty);
+        expect(pool.executedCount, 0, reason: pool.queries.join('\n---\n'));
+        final body = await result.response.json() as Map<String, dynamic>;
+        expect(body['error'], 'catalog_sync_unsupported');
+        expect(body['message'], contains('não é sincronizado a pedido'));
+      });
+    }
+
+    for (final value in ['false', '0', '']) {
+      test('sync=$value segue como leitura', () async {
+        final pool = poolReturning([aliasRow]);
+
+        final result = await getPrintings(
+          pool,
+          'name=Sol+Ring&dedupe=false&sync=$value',
+        );
+
+        expect(result.response.statusCode, HttpStatus.ok);
+        expectOnlyTheThreeReads(pool);
+      });
+    }
+  });
+
   group('GET /cards/printings é somente leitura', () {
     test(
-      'sync=true com uma edição local não chama a Scryfall nem escreve',
+      'uma edição local não chama a Scryfall nem escreve',
       () async {
         final pool = poolReturning([aliasRow]);
 
         final result = await getPrintings(
           pool,
-          'name=Sol+Ring&limit=50&dedupe=false&sync=true',
+          'name=Sol+Ring&limit=50&dedupe=false',
         );
 
         expect(result.response.statusCode, HttpStatus.ok);
@@ -182,7 +216,7 @@ void main() {
 
         final result = await getPrintings(
           pool,
-          'name=Sol+Ring&limit=50&dedupe=false&sync=true',
+          'name=Sol+Ring&limit=50&dedupe=false',
         );
 
         // BT-CAT-02 (D-35): carta ausente é 404 com código estável.
@@ -204,7 +238,7 @@ void main() {
           final pool = poolReturning([aliasRow]);
           final result = await getPrintings(
             pool,
-            'name=Sol+Ring&dedupe=false&sync=true',
+            'name=Sol+Ring&dedupe=false',
           );
           expect(result.response.statusCode, HttpStatus.ok);
           upstream.addAll(result.upstream);
