@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "a5a816f1854067032364bda6fb8bdcb649c4280c88cd073045278a2a45886c95",
+  "source_digest_sha256": "11bfe7f07d540178d9eb37a64fb0d93f15d9a4413d620d43d6fb5768c8ae7e72",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,15 +63,15 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 727,
+    "dart_source_files": 732,
     "non_dart_product_files": 52,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5468,
-    "semantic_resolved_files": 727,
+    "dart_symbols": 5480,
+    "semantic_resolved_files": 732,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43809,
-    "semantic_resolved_call_sites": 69400,
-    "semantic_resolved_type_references": 16828,
+    "semantic_resolved_call_edges": 43863,
+    "semantic_resolved_call_sites": 69476,
+    "semantic_resolved_type_references": 16881,
     "modules": 164,
     "app_routes": 46,
     "web_routes": 11,
@@ -80,8 +80,8 @@
     "database_views": 6,
     "migrations": 74,
     "scripts_and_jobs": 708,
-    "environment_variables": 726,
-    "tests": 1335,
+    "environment_variables": 729,
+    "tests": 1336,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -250,10 +250,14 @@
         "app/lib/core/branding/product_identity.dart",
         "app/lib/core/config/launch_features.dart",
         "app/lib/core/config/release_capabilities.dart",
+        "app/lib/core/config/release_identity_gate.dart",
         "app/lib/core/config/visual_fixture.dart",
         "app/lib/core/models/user_trust_insight.dart",
         "app/lib/core/observability/app_observability.dart",
         "app/lib/core/observability/app_observability_sanitizer.dart",
+        "app/lib/core/platform/page_reload.dart",
+        "app/lib/core/platform/page_reload_stub.dart",
+        "app/lib/core/platform/page_reload_web.dart",
         "app/lib/core/resilience/offline_capability.dart",
         "app/lib/core/security/auth_token_store.dart",
         "app/lib/core/services/activation_funnel_service.dart",
@@ -280,11 +284,12 @@
         "app/lib/core/widgets/manaloom_glyph.dart",
         "app/lib/core/widgets/manaloom_theme_motif.dart",
         "app/lib/core/widgets/player_identity_name.dart",
+        "app/lib/core/widgets/release_update_banner.dart",
         "app/lib/core/widgets/responsive_page_frame.dart",
         "app/lib/core/widgets/shell_app_bar_actions.dart"
       ],
-      "file_count": 36,
-      "symbol_count": 109,
+      "file_count": 41,
+      "symbol_count": 121,
       "providers": [
         "ReleaseCapabilitiesProvider"
       ],
@@ -2721,6 +2726,33 @@
       "line": 608
     },
     {
+      "name": "CompiledReleaseIdentity",
+      "kind": "class",
+      "source": "app/lib/core/config/release_identity_gate.dart",
+      "line": 6,
+      "members": [
+        "parse"
+      ]
+    },
+    {
+      "name": "CompiledReleaseIdentityKind",
+      "kind": "enum",
+      "source": "app/lib/core/config/release_identity_gate.dart",
+      "line": 92
+    },
+    {
+      "name": "ReleaseIdentityGate",
+      "kind": "class",
+      "source": "app/lib/core/config/release_identity_gate.dart",
+      "line": 94,
+      "members": [
+        "_gateEntry",
+        "apply",
+        "dispose",
+        "fetch"
+      ]
+    },
+    {
       "name": "visualFixtureStableText",
       "kind": "function",
       "source": "app/lib/core/config/visual_fixture.dart",
@@ -2829,6 +2861,42 @@
       "kind": "function",
       "source": "app/lib/core/observability/app_observability_sanitizer.dart",
       "line": 131
+    },
+    {
+      "name": "canReloadPage",
+      "kind": "function",
+      "source": "app/lib/core/platform/page_reload.dart",
+      "line": 5
+    },
+    {
+      "name": "reloadPage",
+      "kind": "function",
+      "source": "app/lib/core/platform/page_reload.dart",
+      "line": 8
+    },
+    {
+      "name": "canReloadPage",
+      "kind": "function",
+      "source": "app/lib/core/platform/page_reload_stub.dart",
+      "line": 1
+    },
+    {
+      "name": "reloadPage",
+      "kind": "function",
+      "source": "app/lib/core/platform/page_reload_stub.dart",
+      "line": 3
+    },
+    {
+      "name": "canReloadPage",
+      "kind": "function",
+      "source": "app/lib/core/platform/page_reload_web.dart",
+      "line": 3
+    },
+    {
+      "name": "reloadPage",
+      "kind": "function",
+      "source": "app/lib/core/platform/page_reload_web.dart",
+      "line": 5
     },
     {
       "name": "OfflineCapability",
@@ -3596,6 +3664,33 @@
       "kind": "class",
       "source": "app/lib/core/widgets/player_identity_name.dart",
       "line": 3,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "ReleaseUpdateBannerHost",
+      "kind": "class",
+      "source": "app/lib/core/widgets/release_update_banner.dart",
+      "line": 7,
+      "members": [
+        "createState"
+      ]
+    },
+    {
+      "name": "_ReleaseUpdateBanner",
+      "kind": "class",
+      "source": "app/lib/core/widgets/release_update_banner.dart",
+      "line": 65,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "_ReleaseUpdateBannerHostState",
+      "kind": "class",
+      "source": "app/lib/core/widgets/release_update_banner.dart",
+      "line": 34,
       "members": [
         "build"
       ]
@@ -18195,7 +18290,7 @@
       "name": "ManaLoomApp",
       "kind": "class",
       "source": "app/lib/main.dart",
-      "line": 214,
+      "line": 216,
       "members": [
         "createState"
       ]
@@ -18204,7 +18299,7 @@
       "name": "ManaLoomScrollBehavior",
       "kind": "class",
       "source": "app/lib/main.dart",
-      "line": 204,
+      "line": 206,
       "members": [
         "dragDevices"
       ]
@@ -18213,7 +18308,7 @@
       "name": "_ManaLoomAppState",
       "kind": "class",
       "source": "app/lib/main.dart",
-      "line": 221,
+      "line": 223,
       "members": [
         "_canHandleRealtimeData",
         "_clearAllProvidersState",
@@ -18236,25 +18331,25 @@
       "name": "_initializePostFirstFramePlatformServices",
       "kind": "function",
       "source": "app/lib/main.dart",
-      "line": 129
+      "line": 131
     },
     {
       "name": "_runStartupTask",
       "kind": "function",
       "source": "app/lib/main.dart",
-      "line": 167
+      "line": 169
     },
     {
       "name": "_schedulePostFirstFramePlatformBootstrap",
       "kind": "function",
       "source": "app/lib/main.dart",
-      "line": 123
+      "line": 125
     },
     {
       "name": "main",
       "kind": "function",
       "source": "app/lib/main.dart",
-      "line": 114
+      "line": 116
     },
     {
       "name": "_option",
@@ -27090,13 +27185,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -42363,17 +42458,21 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 727,
+    "resolved_file_count": 732,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
       "app/lib/core/branding/product_identity.dart",
       "app/lib/core/config/launch_features.dart",
       "app/lib/core/config/release_capabilities.dart",
+      "app/lib/core/config/release_identity_gate.dart",
       "app/lib/core/config/visual_fixture.dart",
       "app/lib/core/models/user_trust_insight.dart",
       "app/lib/core/observability/app_observability.dart",
       "app/lib/core/observability/app_observability_sanitizer.dart",
+      "app/lib/core/platform/page_reload.dart",
+      "app/lib/core/platform/page_reload_stub.dart",
+      "app/lib/core/platform/page_reload_web.dart",
       "app/lib/core/resilience/offline_capability.dart",
       "app/lib/core/security/auth_token_store.dart",
       "app/lib/core/services/activation_funnel_service.dart",
@@ -42400,6 +42499,7 @@
       "app/lib/core/widgets/manaloom_glyph.dart",
       "app/lib/core/widgets/manaloom_theme_motif.dart",
       "app/lib/core/widgets/player_identity_name.dart",
+      "app/lib/core/widgets/release_update_banner.dart",
       "app/lib/core/widgets/responsive_page_frame.dart",
       "app/lib/core/widgets/shell_app_bar_actions.dart",
       "app/lib/features/auth/account_security_service.dart",
@@ -43099,9 +43199,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43809,
-    "resolved_call_site_count": 69400,
-    "workspace_call_edge_count": 13961,
+    "resolved_call_edge_count": 43863,
+    "resolved_call_site_count": 69476,
+    "workspace_call_edge_count": 13976,
     "unresolved_call_edge_count": 568,
     "unresolved_call_site_count": 786,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -44042,6 +44142,94 @@
         "occurrences": 1
       },
       {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 106,
+        "caller": "ReleaseIdentityGate.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "CompiledReleaseIdentity.fromEnvironment",
+        "target": "CompiledReleaseIdentity.CompiledReleaseIdentity.fromEnvironment",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 107,
+        "caller": "ReleaseIdentityGate.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "ApiClient",
+        "target": "ApiClient.ApiClient",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 117,
+        "caller": "ReleaseIdentityGate.fetch",
+        "kind": "method",
+        "lexical_target": "apply",
+        "target": "ReleaseIdentityGate.apply",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 117,
+        "caller": "ReleaseIdentityGate.fetch",
+        "kind": "method",
+        "lexical_target": "get",
+        "target": "ApiClient.get",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 126,
+        "caller": "ReleaseIdentityGate.apply",
+        "kind": "constructor",
+        "lexical_target": "ApiResponse",
+        "target": "ApiResponse.ApiResponse",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 153,
+        "caller": "ReleaseIdentityGate.apply",
+        "kind": "method",
+        "lexical_target": "_gateEntry",
+        "target": "ReleaseIdentityGate._gateEntry",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 23,
+        "caller": "CompiledReleaseIdentity.<constructor>",
+        "kind": "method",
+        "lexical_target": "parse",
+        "target": "CompiledReleaseIdentity.parse",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 46,
+        "caller": "CompiledReleaseIdentity.parse",
+        "kind": "constructor",
+        "lexical_target": "CompiledReleaseIdentity._",
+        "target": "CompiledReleaseIdentity.CompiledReleaseIdentity._",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
         "source": "app/lib/core/models/user_trust_insight.dart",
         "line": 25,
         "caller": "UserTrustInsight.<constructor>",
@@ -44500,6 +44688,17 @@
         "lexical_target": "sanitizeAppObservedMap",
         "target": "sanitizeAppObservedMap",
         "target_library": "package:manaloom/core/observability/app_observability_sanitizer.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/platform/page_reload.dart",
+        "line": 9,
+        "caller": "reloadPage",
+        "kind": "method",
+        "lexical_target": "reloadPage",
+        "target": "reloadPage",
+        "target_library": "package:manaloom/core/platform/page_reload_stub.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -46744,6 +46943,28 @@
         "lexical_target": "_paintBattlefield",
         "target": "_ManaLoomThemeMotifPainter._paintBattlefield",
         "target_library": "package:manaloom/core/widgets/manaloom_theme_motif.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/release_update_banner.dart",
+        "line": 31,
+        "caller": "ReleaseUpdateBannerHost.createState",
+        "kind": "constructor",
+        "lexical_target": "_ReleaseUpdateBannerHostState",
+        "target": "_ReleaseUpdateBannerHostState._ReleaseUpdateBannerHostState",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/release_update_banner.dart",
+        "line": 45,
+        "caller": "_ReleaseUpdateBannerHostState.build",
+        "kind": "constructor",
+        "lexical_target": "_ReleaseUpdateBanner",
+        "target": "_ReleaseUpdateBanner._ReleaseUpdateBanner",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -108250,7 +108471,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1003,
+        "line": 1009,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "clearUserContext",
@@ -108261,7 +108482,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1017,
+        "line": 1023,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "refresh",
@@ -108272,7 +108493,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1030,
+        "line": 1036,
         "caller": "_ManaLoomAppState._onLegalAcceptanceChanged",
         "kind": "method",
         "lexical_target": "takePrompt",
@@ -108283,7 +108504,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1033,
+        "line": 1039,
         "caller": "_ManaLoomAppState._onLegalAcceptanceChanged",
         "kind": "method",
         "lexical_target": "showLegalReacceptanceDialog",
@@ -108294,7 +108515,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1049,
+        "line": 1055,
         "caller": "_ManaLoomAppState._onReleaseCapabilitiesChanged",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -108305,7 +108526,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1052,
+        "line": 1058,
         "caller": "_ManaLoomAppState._onReleaseCapabilitiesChanged",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -108316,7 +108537,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1055,
+        "line": 1061,
         "caller": "_ManaLoomAppState._onReleaseCapabilitiesChanged",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -108327,7 +108548,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1058,
+        "line": 1064,
         "caller": "_ManaLoomAppState._onReleaseCapabilitiesChanged",
         "kind": "method",
         "lexical_target": "_disablePushForSession",
@@ -108338,7 +108559,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1063,
+        "line": 1069,
         "caller": "_ManaLoomAppState._onReleaseCapabilitiesChanged",
         "kind": "method",
         "lexical_target": "_scheduleAuthenticatedWarmup",
@@ -108349,7 +108570,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1071,
+        "line": 1077,
         "caller": "_ManaLoomAppState._refreshCapabilitiesAndWarmup",
         "kind": "method",
         "lexical_target": "refresh",
@@ -108360,7 +108581,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1076,
+        "line": 1082,
         "caller": "_ManaLoomAppState._refreshCapabilitiesAndWarmup",
         "kind": "method",
         "lexical_target": "_scheduleAuthenticatedWarmup",
@@ -108371,18 +108592,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 108,
-        "caller": "<top-level>",
-        "kind": "constructor",
-        "lexical_target": "ReleaseRouteBuildSupport",
-        "target": "ReleaseRouteBuildSupport.ReleaseRouteBuildSupport",
-        "target_library": "package:manaloom/core/config/release_capabilities.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/main.dart",
-        "line": 1086,
+        "line": 1092,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -108393,7 +108603,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1089,
+        "line": 1095,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "startPolling",
@@ -108404,7 +108614,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1091,
+        "line": 1097,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -108415,7 +108625,18 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1096,
+        "line": 110,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "ReleaseRouteBuildSupport",
+        "target": "ReleaseRouteBuildSupport.ReleaseRouteBuildSupport",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 1102,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "startPolling",
@@ -108426,7 +108647,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1098,
+        "line": 1104,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -108437,7 +108658,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1111,
+        "line": 1117,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "refreshFromServer",
@@ -108448,7 +108669,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1119,
+        "line": 1125,
         "caller": "_ManaLoomAppState._scheduleAuthenticatedWarmup",
         "kind": "method",
         "lexical_target": "_initializeCapabilityAllowedPush",
@@ -108459,7 +108680,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1126,
+        "line": 1132,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -108470,7 +108691,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1131,
+        "line": 1137,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "constructor",
         "lexical_target": "PushNotificationService",
@@ -108481,7 +108702,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1132,
+        "line": 1138,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "method",
         "lexical_target": "_runStartupTask",
@@ -108492,7 +108713,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1136,
+        "line": 1142,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "method",
         "lexical_target": "init",
@@ -108503,7 +108724,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1141,
+        "line": 1147,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "method",
         "lexical_target": "registerIfAuthorized",
@@ -108514,7 +108735,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1151,
+        "line": 1157,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "method",
         "lexical_target": "probeReleaseFcmTokenAvailability",
@@ -108525,7 +108746,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1158,
+        "line": 1164,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "method",
         "lexical_target": "captureReleaseStartupProof",
@@ -108536,7 +108757,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1168,
+        "line": 1174,
         "caller": "_ManaLoomAppState._disablePushForSession",
         "kind": "constructor",
         "lexical_target": "PushNotificationService",
@@ -108547,7 +108768,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1168,
+        "line": 1174,
         "caller": "_ManaLoomAppState._disablePushForSession",
         "kind": "method",
         "lexical_target": "unregister",
@@ -108558,7 +108779,18 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 117,
+        "line": 1184,
+        "caller": "_ManaLoomAppState.didChangeAppLifecycleState",
+        "kind": "method",
+        "lexical_target": "_refreshCapabilitiesAndWarmup",
+        "target": "_ManaLoomAppState._refreshCapabilitiesAndWarmup",
+        "target_library": "package:manaloom/main.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 119,
         "caller": "main",
         "kind": "method",
         "lexical_target": "bootstrap",
@@ -108569,18 +108801,29 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1178,
+        "line": 1196,
         "caller": "_ManaLoomAppState.didChangeAppLifecycleState",
         "kind": "method",
-        "lexical_target": "_refreshCapabilitiesAndWarmup",
-        "target": "_ManaLoomAppState._refreshCapabilitiesAndWarmup",
-        "target_library": "package:manaloom/main.dart",
+        "lexical_target": "stopPolling",
+        "target": "NotificationProvider.stopPolling",
+        "target_library": "package:manaloom/features/notifications/providers/notification_provider.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "app/lib/main.dart",
-        "line": 118,
+        "line": 1197,
+        "caller": "_ManaLoomAppState.didChangeAppLifecycleState",
+        "kind": "method",
+        "lexical_target": "stopPolling",
+        "target": "MessageProvider.stopPolling",
+        "target_library": "package:manaloom/features/messages/providers/message_provider.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 120,
         "caller": "main",
         "kind": "constructor",
         "lexical_target": "ManaLoomApp",
@@ -108591,40 +108834,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 119,
-        "caller": "main",
-        "kind": "method",
-        "lexical_target": "_schedulePostFirstFramePlatformBootstrap",
-        "target": "_schedulePostFirstFramePlatformBootstrap",
-        "target_library": "package:manaloom/main.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/main.dart",
-        "line": 1190,
-        "caller": "_ManaLoomAppState.didChangeAppLifecycleState",
-        "kind": "method",
-        "lexical_target": "stopPolling",
-        "target": "NotificationProvider.stopPolling",
-        "target_library": "package:manaloom/features/notifications/providers/notification_provider.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/main.dart",
-        "line": 1191,
-        "caller": "_ManaLoomAppState.didChangeAppLifecycleState",
-        "kind": "method",
-        "lexical_target": "stopPolling",
-        "target": "MessageProvider.stopPolling",
-        "target_library": "package:manaloom/features/messages/providers/message_provider.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/main.dart",
-        "line": 1199,
+        "line": 1205,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "reset",
@@ -108635,7 +108845,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1200,
+        "line": 1206,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108646,7 +108856,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1201,
+        "line": 1207,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearSearch",
@@ -108657,7 +108867,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1202,
+        "line": 1208,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108668,7 +108878,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1203,
+        "line": 1209,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108679,7 +108889,18 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1204,
+        "line": 121,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "_schedulePostFirstFramePlatformBootstrap",
+        "target": "_schedulePostFirstFramePlatformBootstrap",
+        "target_library": "package:manaloom/main.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 1210,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108690,7 +108911,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1205,
+        "line": 1211,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108701,7 +108922,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1206,
+        "line": 1212,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108712,7 +108933,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1207,
+        "line": 1213,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108723,7 +108944,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1208,
+        "line": 1214,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearAllState",
@@ -108734,7 +108955,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1209,
+        "line": 1215,
         "caller": "_ManaLoomAppState._clearAllProvidersState",
         "kind": "method",
         "lexical_target": "clearRemoteSnapshot",
@@ -108745,7 +108966,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1218,
+        "line": 1224,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "setSessionExpiredHandler",
@@ -108756,7 +108977,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1219,
+        "line": 1225,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "setLegalAcceptanceRequiredHandler",
@@ -108767,7 +108988,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1221,
+        "line": 1227,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -108778,7 +108999,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1222,
+        "line": 1228,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -108789,7 +109010,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1223,
+        "line": 1229,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "constructor",
         "lexical_target": "PushNotificationService",
@@ -108800,7 +109021,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1227,
+        "line": 1233,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "dispose",
@@ -108811,7 +109032,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1234,
+        "line": 1240,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "dispose",
@@ -108822,7 +109043,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1235,
+        "line": 1241,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "dispose",
@@ -108833,7 +109054,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1237,
+        "line": 1243,
         "caller": "_ManaLoomAppState.dispose",
         "kind": "method",
         "lexical_target": "dispose",
@@ -108844,7 +109065,18 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 125,
+        "line": 1244,
+        "caller": "_ManaLoomAppState.dispose",
+        "kind": "method",
+        "lexical_target": "dispose",
+        "target": "ReleaseIdentityGate.dispose",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 127,
         "caller": "_schedulePostFirstFramePlatformBootstrap",
         "kind": "method",
         "lexical_target": "_initializePostFirstFramePlatformServices",
@@ -108855,7 +109087,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1264,
+        "line": 1271,
         "caller": "_ManaLoomAppState.build",
         "kind": "constructor",
         "lexical_target": "ManaLoomScrollBehavior",
@@ -108866,7 +109098,29 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 134,
+        "line": 1273,
+        "caller": "_ManaLoomAppState.build",
+        "kind": "method",
+        "lexical_target": "buildManaLoomDebugAccessibilityTools",
+        "target": "buildManaLoomDebugAccessibilityTools",
+        "target_library": "package:manaloom/core/widgets/debug_accessibility_tools.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 1275,
+        "caller": "_ManaLoomAppState.build",
+        "kind": "constructor",
+        "lexical_target": "ReleaseUpdateBannerHost",
+        "target": "ReleaseUpdateBannerHost.ReleaseUpdateBannerHost",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 136,
         "caller": "_initializePostFirstFramePlatformServices",
         "kind": "method",
         "lexical_target": "captureReleaseStartupProof",
@@ -108877,7 +109131,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 160,
+        "line": 162,
         "caller": "_initializePostFirstFramePlatformServices",
         "kind": "method",
         "lexical_target": "_runStartupTask",
@@ -108888,7 +109142,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 163,
+        "line": 165,
         "caller": "_initializePostFirstFramePlatformServices",
         "kind": "method",
         "lexical_target": "init",
@@ -108899,7 +109153,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 184,
+        "line": 186,
         "caller": "_runStartupTask",
         "kind": "method",
         "lexical_target": "captureException",
@@ -108910,7 +109164,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 218,
+        "line": 220,
         "caller": "ManaLoomApp.createState",
         "kind": "constructor",
         "lexical_target": "_ManaLoomAppState",
@@ -108921,7 +109175,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 247,
+        "line": 250,
         "caller": "_ManaLoomAppState._completeOnboardingTask",
         "kind": "constructor",
         "lexical_target": "OnboardingStateStore",
@@ -108932,7 +109186,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 247,
+        "line": 250,
         "caller": "_ManaLoomAppState._completeOnboardingTask",
         "kind": "method",
         "lexical_target": "settle",
@@ -108943,7 +109197,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 253,
+        "line": 256,
         "caller": "_ManaLoomAppState._completeOnboardingTask",
         "kind": "method",
         "lexical_target": "markOnboardingSettled",
@@ -108954,7 +109208,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 255,
+        "line": 258,
         "caller": "_ManaLoomAppState._completeOnboardingTask",
         "kind": "method",
         "lexical_target": "trackOnce",
@@ -108965,7 +109219,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 280,
+        "line": 283,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "apply",
@@ -108976,7 +109230,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 281,
+        "line": 284,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "install",
@@ -108987,7 +109241,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 287,
+        "line": 290,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "AuthProvider",
@@ -108998,7 +109252,18 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 288,
+        "line": 291,
+        "caller": "_ManaLoomAppState.initState",
+        "kind": "constructor",
+        "lexical_target": "ReleaseIdentityGate",
+        "target": "ReleaseIdentityGate.ReleaseIdentityGate",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 292,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilitiesProvider",
@@ -109009,7 +109274,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 289,
+        "line": 295,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "setSessionExpiredHandler",
@@ -109020,7 +109285,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 290,
+        "line": 296,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "LegalAcceptanceProvider",
@@ -109031,7 +109296,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 291,
+        "line": 297,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "setLegalAcceptanceRequiredHandler",
@@ -109042,7 +109307,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 295,
+        "line": 301,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "DeckProvider",
@@ -109053,7 +109318,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 296,
+        "line": 302,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CardProvider",
@@ -109064,7 +109329,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 297,
+        "line": 303,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "MarketProvider",
@@ -109075,7 +109340,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 298,
+        "line": 304,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CommunityProvider",
@@ -109086,7 +109351,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 299,
+        "line": 305,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "SocialProvider",
@@ -109097,7 +109362,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 300,
+        "line": 306,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "BinderProvider",
@@ -109108,7 +109373,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 301,
+        "line": 307,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "TradeProvider",
@@ -109119,7 +109384,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 302,
+        "line": 308,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "MessageProvider",
@@ -109130,7 +109395,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 303,
+        "line": 309,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "NotificationProvider",
@@ -109141,7 +109406,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 304,
+        "line": 310,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CommercialProvider",
@@ -109152,7 +109417,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 305,
+        "line": 311,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "load",
@@ -109163,7 +109428,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 310,
+        "line": 316,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "refresh",
@@ -109174,7 +109439,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 311,
+        "line": 317,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "initialize",
@@ -109185,7 +109450,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 314,
+        "line": 320,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "debugLogBaseUrl",
@@ -109196,7 +109461,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 324,
+        "line": 330,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "PerformanceNavigatorObserver",
@@ -109207,7 +109472,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 325,
+        "line": 331,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "AppObservabilityNavigatorObserver",
@@ -109218,7 +109483,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 334,
+        "line": 340,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -109229,7 +109494,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 338,
+        "line": 344,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "buildAuthLocation",
@@ -109240,7 +109505,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 414,
+        "line": 420,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "normalizePostAuthRedirect",
@@ -109251,7 +109516,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 431,
+        "line": 437,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "resolveAuthenticatedLocation",
@@ -109262,7 +109527,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 439,
+        "line": 445,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "redirectFor",
@@ -109273,7 +109538,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 456,
+        "line": 462,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "SplashScreen",
@@ -109284,7 +109549,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 461,
+        "line": 467,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "LoginScreen",
@@ -109295,7 +109560,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 470,
+        "line": 476,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "RegisterScreen",
@@ -109306,7 +109571,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 476,
+        "line": 482,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "ForgotPasswordScreen",
@@ -109317,7 +109582,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 480,
+        "line": 486,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "ResetPasswordScreen",
@@ -109328,7 +109593,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 486,
+        "line": 492,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CommercialLegalScreen",
@@ -109339,7 +109604,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 492,
+        "line": 498,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "VerifyEmailScreen",
@@ -109350,7 +109615,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 506,
+        "line": 512,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "LotusLifeCounterScreen",
@@ -109361,7 +109626,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 518,
+        "line": 524,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "MainScaffold",
@@ -109372,7 +109637,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 525,
+        "line": 531,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "HomeScreen",
@@ -109383,7 +109648,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 535,
+        "line": 541,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "OnboardingCoreFlowScreen",
@@ -109394,7 +109659,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 549,
+        "line": 555,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "DeckListScreen",
@@ -109405,7 +109670,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 555,
+        "line": 561,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "_completeOnboardingTask",
@@ -109416,7 +109681,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 569,
+        "line": 575,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "DeckGenerateScreen",
@@ -109427,7 +109692,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 587,
+        "line": 593,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "DeckImportScreen",
@@ -109438,7 +109703,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 603,
+        "line": 609,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "DeckDetailsScreen",
@@ -109449,7 +109714,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 617,
+        "line": 623,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CardSearchScreen",
@@ -109460,7 +109725,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 625,
+        "line": 631,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CardScannerScreen",
@@ -109471,7 +109736,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 641,
+        "line": 647,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "PostGameNotesScreen",
@@ -109482,7 +109747,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 645,
+        "line": 651,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "fetchDeckDetails",
@@ -109493,7 +109758,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 674,
+        "line": 680,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "BattleReplaysScreen",
@@ -109504,7 +109769,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 694,
+        "line": 700,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "BattleCoachScreen",
@@ -109515,7 +109780,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 721,
+        "line": 727,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "playVsAiSessionRouteLocation",
@@ -109526,7 +109791,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 730,
+        "line": 736,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "playVsAiRouteLocation",
@@ -109537,7 +109802,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 738,
+        "line": 744,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "PlanScreen",
@@ -109548,7 +109813,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 742,
+        "line": 748,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CardDetailRouteScreen",
@@ -109559,7 +109824,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 751,
+        "line": 757,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "UpgradeScreen",
@@ -109570,7 +109835,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 755,
+        "line": 761,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CheckoutScreen",
@@ -109581,7 +109846,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 762,
+        "line": 768,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CollectionScreen",
@@ -109592,7 +109857,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 775,
+        "line": 781,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "BinderImportScreen",
@@ -109603,7 +109868,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 793,
+        "line": 799,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "TradeMatchesScreen",
@@ -109614,7 +109879,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 797,
+        "line": 803,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "LatestSetCollectionScreen",
@@ -109625,7 +109890,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 801,
+        "line": 807,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "SetsCatalogScreen",
@@ -109636,7 +109901,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 807,
+        "line": 813,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "SetCardsScreen",
@@ -109647,7 +109912,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 830,
+        "line": 836,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CommunityScreen",
@@ -109658,7 +109923,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 835,
+        "line": 841,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "UserSearchScreen",
@@ -109669,7 +109934,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 843,
+        "line": 849,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "UserProfileScreen",
@@ -109680,7 +109945,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 850,
+        "line": 856,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CommunityDeckDetailScreen",
@@ -109691,7 +109956,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 857,
+        "line": 863,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "ProfileScreen",
@@ -109702,7 +109967,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 861,
+        "line": 867,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "MessageInboxScreen",
@@ -109713,7 +109978,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 871,
+        "line": 877,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "ChatScreen",
@@ -109724,7 +109989,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 881,
+        "line": 887,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "NotificationPermissionBoundary",
@@ -109735,7 +110000,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 882,
+        "line": 888,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "NotificationScreen",
@@ -109746,7 +110011,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 887,
+        "line": 893,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "TradeInboxScreen",
@@ -109757,7 +110022,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 894,
+        "line": 900,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "TradeProposalDeepLink.fromUri",
@@ -109768,7 +110033,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 895,
+        "line": 901,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "CreateTradeScreen",
@@ -109779,7 +110044,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 914,
+        "line": 920,
         "caller": "_ManaLoomAppState.initState",
         "kind": "constructor",
         "lexical_target": "TradeDetailScreen",
@@ -109790,7 +110055,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 923,
+        "line": 929,
         "caller": "_ManaLoomAppState.initState",
         "kind": "method",
         "lexical_target": "_configureRealtimePushHandlers",
@@ -109801,7 +110066,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 927,
+        "line": 933,
         "caller": "_ManaLoomAppState._configureRealtimePushHandlers",
         "kind": "constructor",
         "lexical_target": "RealtimeNotificationCoordinator",
@@ -109812,7 +110077,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 934,
+        "line": 940,
         "caller": "_ManaLoomAppState._configureRealtimePushHandlers",
         "kind": "constructor",
         "lexical_target": "PushNotificationService",
@@ -109823,7 +110088,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 936,
+        "line": 942,
         "caller": "_ManaLoomAppState._configureRealtimePushHandlers",
         "kind": "method",
         "lexical_target": "_canHandleRealtimeData",
@@ -109834,7 +110099,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 937,
+        "line": 943,
         "caller": "_ManaLoomAppState._configureRealtimePushHandlers",
         "kind": "method",
         "lexical_target": "handleForegroundData",
@@ -109845,7 +110110,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 941,
+        "line": 947,
         "caller": "_ManaLoomAppState._configureRealtimePushHandlers",
         "kind": "method",
         "lexical_target": "handleMessageTapData",
@@ -109856,7 +110121,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 946,
+        "line": 952,
         "caller": "_ManaLoomAppState._canHandleRealtimeData",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -109867,7 +110132,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 950,
+        "line": 956,
         "caller": "_ManaLoomAppState._canHandleRealtimeData",
         "kind": "method",
         "lexical_target": "fromData",
@@ -109878,7 +110143,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 973,
+        "line": 979,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "setUserContext",
@@ -109889,7 +110154,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 980,
+        "line": 986,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -109900,7 +110165,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 981,
+        "line": 987,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "stopPolling",
@@ -109911,7 +110176,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 982,
+        "line": 988,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "_disablePushForSession",
@@ -109922,7 +110187,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 983,
+        "line": 989,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "reset",
@@ -109933,7 +110198,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 984,
+        "line": 990,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "_clearAllProvidersState",
@@ -109944,7 +110209,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 990,
+        "line": 996,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "_refreshCapabilitiesAndWarmup",
@@ -109955,7 +110220,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 991,
+        "line": 997,
         "caller": "_ManaLoomAppState._onAuthChanged",
         "kind": "method",
         "lexical_target": "refresh",
@@ -196706,8 +196971,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14445,
-        "occurrences": 24818
+        "unique_references": 14458,
+        "occurrences": 24845
       },
       {
         "target_scope": "dart_sdk",
@@ -196928,14 +197193,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/change_notifier.dart",
-        "unique_references": 203,
-        "occurrences": 327
+        "unique_references": 205,
+        "occurrences": 329
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/key.dart",
-        "unique_references": 419,
-        "occurrences": 1219
+        "unique_references": 420,
+        "occurrences": 1222
       },
       {
         "target_scope": "dependency",
@@ -197198,8 +197463,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/material.dart",
-        "unique_references": 68,
-        "occurrences": 68
+        "unique_references": 69,
+        "occurrences": 69
       },
       {
         "target_scope": "dependency",
@@ -197384,8 +197649,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/text_button.dart",
-        "unique_references": 112,
-        "occurrences": 132
+        "unique_references": 113,
+        "occurrences": 134
       },
       {
         "target_scope": "dependency",
@@ -197420,8 +197685,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/theme.dart",
-        "unique_references": 270,
-        "occurrences": 320
+        "unique_references": 271,
+        "occurrences": 321
       },
       {
         "target_scope": "dependency",
@@ -197480,8 +197745,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/edge_insets.dart",
-        "unique_references": 647,
-        "occurrences": 837
+        "unique_references": 648,
+        "occurrences": 838
       },
       {
         "target_scope": "dependency",
@@ -197510,14 +197775,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_span.dart",
-        "unique_references": 2,
-        "occurrences": 4
+        "unique_references": 3,
+        "occurrences": 7
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_style.dart",
-        "unique_references": 550,
-        "occurrences": 1223
+        "unique_references": 552,
+        "occurrences": 1225
       },
       {
         "target_scope": "dependency",
@@ -197630,8 +197895,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/basic.dart",
-        "unique_references": 2391,
-        "occurrences": 4198
+        "unique_references": 2399,
+        "occurrences": 4206
       },
       {
         "target_scope": "dependency",
@@ -197684,8 +197949,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/framework.dart",
-        "unique_references": 408,
-        "occurrences": 629
+        "unique_references": 409,
+        "occurrences": 630
       },
       {
         "target_scope": "dependency",
@@ -197696,8 +197961,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/icon.dart",
-        "unique_references": 378,
-        "occurrences": 645
+        "unique_references": 379,
+        "occurrences": 646
       },
       {
         "target_scope": "dependency",
@@ -197738,8 +198003,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/media_query.dart",
-        "unique_references": 65,
-        "occurrences": 67
+        "unique_references": 66,
+        "occurrences": 68
       },
       {
         "target_scope": "dependency",
@@ -197792,8 +198057,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/safe_area.dart",
-        "unique_references": 30,
-        "occurrences": 31
+        "unique_references": 31,
+        "occurrences": 32
       },
       {
         "target_scope": "dependency",
@@ -197864,8 +198129,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/text.dart",
-        "unique_references": 643,
-        "occurrences": 1789
+        "unique_references": 645,
+        "occurrences": 1792
       },
       {
         "target_scope": "dependency",
@@ -197888,8 +198153,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/value_listenable_builder.dart",
-        "unique_references": 3,
-        "occurrences": 3
+        "unique_references": 4,
+        "occurrences": 4
       },
       {
         "target_scope": "dependency",
@@ -198188,8 +198453,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:web/src/dom/html.dart",
-        "unique_references": 10,
-        "occurrences": 11
+        "unique_references": 11,
+        "occurrences": 12
       },
       {
         "target_scope": "dependency",
@@ -198212,14 +198477,20 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/api/api_client.dart",
-        "unique_references": 226,
-        "occurrences": 229
+        "unique_references": 229,
+        "occurrences": 233
       },
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/config/release_capabilities.dart",
         "unique_references": 93,
         "occurrences": 199
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "unique_references": 7,
+        "occurrences": 8
       },
       {
         "target_scope": "workspace",
@@ -198238,6 +198509,12 @@
         "target_library": "package:manaloom/core/observability/app_observability_sanitizer.dart",
         "unique_references": 30,
         "occurrences": 41
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/platform/page_reload_stub.dart",
+        "unique_references": 1,
+        "occurrences": 1
       },
       {
         "target_scope": "workspace",
@@ -198356,8 +198633,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/widgets/debug_accessibility_tools.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "workspace",
@@ -198394,6 +198671,12 @@
         "target_library": "package:manaloom/core/widgets/player_identity_name.dart",
         "unique_references": 2,
         "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "unique_references": 3,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -205425,7 +205708,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1155,
+        "line": 1161,
         "caller": "_ManaLoomAppState._initializeCapabilityAllowedPush",
         "kind": "function_expression",
         "lexical_target": "debugPrint",
@@ -205433,7 +205716,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 131,
+        "line": 133,
         "caller": "_initializePostFirstFramePlatformServices",
         "kind": "function_expression",
         "lexical_target": "debugPrint",
@@ -205441,7 +205724,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 174,
+        "line": 176,
         "caller": "_runStartupTask",
         "kind": "function_expression",
         "lexical_target": "task",
@@ -205449,7 +205732,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 175,
+        "line": 177,
         "caller": "_runStartupTask",
         "kind": "function_expression",
         "lexical_target": "debugPrint",
@@ -205457,7 +205740,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 331,
+        "line": 337,
         "caller": "_ManaLoomAppState.initState",
         "kind": "function_expression",
         "lexical_target": "debugPrint",
@@ -206608,9 +206891,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16828,
-    "workspace_type_reference_count": 3607,
-    "unresolved_type_reference_count": 375,
+    "resolved_type_reference_count": 16881,
+    "workspace_type_reference_count": 3619,
+    "unresolved_type_reference_count": 379,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -206730,6 +207013,76 @@
         "resolved_type": "ReleaseCapabilityEntry?",
         "target": "ReleaseCapabilityEntry",
         "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 105,
+        "lexical_type": "ApiClient?",
+        "resolved_type": "ApiClient?",
+        "target": "ApiClient",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 105,
+        "lexical_type": "CompiledReleaseIdentity?",
+        "resolved_type": "CompiledReleaseIdentity?",
+        "target": "CompiledReleaseIdentity",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 107,
+        "lexical_type": "ApiClient",
+        "resolved_type": "ApiClient",
+        "target": "ApiClient",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 116,
+        "lexical_type": "ApiResponse",
+        "resolved_type": "ApiResponse",
+        "target": "ApiResponse",
+        "target_library": "package:manaloom/core/api/api_client.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 37,
+        "lexical_type": "CompiledReleaseIdentity",
+        "resolved_type": "CompiledReleaseIdentity",
+        "target": "CompiledReleaseIdentity",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 59,
+        "lexical_type": "ReleaseCapability",
+        "resolved_type": "ReleaseCapability",
+        "target": "ReleaseCapability",
+        "target_library": "package:manaloom/core/config/release_capabilities.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 85,
+        "lexical_type": "CompiledReleaseIdentityKind",
+        "resolved_type": "CompiledReleaseIdentityKind",
+        "target": "CompiledReleaseIdentityKind",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -207612,6 +207965,36 @@
         "target_library": "package:manaloom/core/widgets/manaloom_theme_motif.dart",
         "target_scope": "workspace",
         "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/release_update_banner.dart",
+        "line": 30,
+        "lexical_type": "ReleaseUpdateBannerHost",
+        "resolved_type": "ReleaseUpdateBannerHost",
+        "target": "ReleaseUpdateBannerHost",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/release_update_banner.dart",
+        "line": 31,
+        "lexical_type": "_ReleaseUpdateBannerHostState",
+        "resolved_type": "_ReleaseUpdateBannerHostState",
+        "target": "_ReleaseUpdateBannerHostState",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/release_update_banner.dart",
+        "line": 45,
+        "lexical_type": "_ReleaseUpdateBanner",
+        "resolved_type": "_ReleaseUpdateBanner",
+        "target": "_ReleaseUpdateBanner",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
       },
       {
         "source": "app/lib/core/widgets/shell_app_bar_actions.dart",
@@ -227515,7 +227898,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 107,
+        "line": 109,
         "lexical_type": "ReleaseRouteBuildSupport",
         "resolved_type": "ReleaseRouteBuildSupport",
         "target": "ReleaseRouteBuildSupport",
@@ -227525,7 +227908,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 118,
+        "line": 120,
         "lexical_type": "ManaLoomApp",
         "resolved_type": "ManaLoomApp",
         "target": "ManaLoomApp",
@@ -227535,7 +227918,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 1264,
+        "line": 1271,
         "lexical_type": "ManaLoomScrollBehavior",
         "resolved_type": "ManaLoomScrollBehavior",
         "target": "ManaLoomScrollBehavior",
@@ -227545,7 +227928,17 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 218,
+        "line": 1275,
+        "lexical_type": "ReleaseUpdateBannerHost",
+        "resolved_type": "ReleaseUpdateBannerHost",
+        "target": "ReleaseUpdateBannerHost",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 220,
         "lexical_type": "_ManaLoomAppState",
         "resolved_type": "_ManaLoomAppState",
         "target": "_ManaLoomAppState",
@@ -227555,7 +227948,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 222,
+        "line": 224,
         "lexical_type": "AuthProvider",
         "resolved_type": "AuthProvider",
         "target": "AuthProvider",
@@ -227565,7 +227958,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 223,
+        "line": 225,
         "lexical_type": "ReleaseCapabilitiesProvider",
         "resolved_type": "ReleaseCapabilitiesProvider",
         "target": "ReleaseCapabilitiesProvider",
@@ -227575,7 +227968,17 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 224,
+        "line": 226,
+        "lexical_type": "ReleaseIdentityGate",
+        "resolved_type": "ReleaseIdentityGate",
+        "target": "ReleaseIdentityGate",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/main.dart",
+        "line": 227,
         "lexical_type": "LegalAcceptanceProvider",
         "resolved_type": "LegalAcceptanceProvider",
         "target": "LegalAcceptanceProvider",
@@ -227585,7 +227988,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 227,
+        "line": 230,
         "lexical_type": "DeckProvider",
         "resolved_type": "DeckProvider",
         "target": "DeckProvider",
@@ -227595,7 +227998,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 228,
+        "line": 231,
         "lexical_type": "CardProvider",
         "resolved_type": "CardProvider",
         "target": "CardProvider",
@@ -227605,7 +228008,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 229,
+        "line": 232,
         "lexical_type": "MarketProvider",
         "resolved_type": "MarketProvider",
         "target": "MarketProvider",
@@ -227615,7 +228018,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 230,
+        "line": 233,
         "lexical_type": "CommunityProvider",
         "resolved_type": "CommunityProvider",
         "target": "CommunityProvider",
@@ -227625,7 +228028,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 231,
+        "line": 234,
         "lexical_type": "SocialProvider",
         "resolved_type": "SocialProvider",
         "target": "SocialProvider",
@@ -227635,7 +228038,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 232,
+        "line": 235,
         "lexical_type": "BinderProvider",
         "resolved_type": "BinderProvider",
         "target": "BinderProvider",
@@ -227645,7 +228048,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 233,
+        "line": 236,
         "lexical_type": "TradeProvider",
         "resolved_type": "TradeProvider",
         "target": "TradeProvider",
@@ -227655,7 +228058,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 234,
+        "line": 237,
         "lexical_type": "MessageProvider",
         "resolved_type": "MessageProvider",
         "target": "MessageProvider",
@@ -227665,7 +228068,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 235,
+        "line": 238,
         "lexical_type": "NotificationProvider",
         "resolved_type": "NotificationProvider",
         "target": "NotificationProvider",
@@ -227675,7 +228078,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 236,
+        "line": 239,
         "lexical_type": "CommercialProvider",
         "resolved_type": "CommercialProvider",
         "target": "CommercialProvider",
@@ -227685,7 +228088,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 237,
+        "line": 240,
         "lexical_type": "RealtimeNotificationCoordinator",
         "resolved_type": "RealtimeNotificationCoordinator",
         "target": "RealtimeNotificationCoordinator",
@@ -227695,7 +228098,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 241,
+        "line": 244,
         "lexical_type": "OnboardingGoal",
         "resolved_type": "OnboardingGoal",
         "target": "OnboardingGoal",
@@ -227705,7 +228108,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 247,
+        "line": 250,
         "lexical_type": "OnboardingStateStore",
         "resolved_type": "OnboardingStateStore",
         "target": "OnboardingStateStore",
@@ -227715,7 +228118,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 324,
+        "line": 330,
         "lexical_type": "PerformanceNavigatorObserver",
         "resolved_type": "PerformanceNavigatorObserver",
         "target": "PerformanceNavigatorObserver",
@@ -227725,7 +228128,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 325,
+        "line": 331,
         "lexical_type": "AppObservabilityNavigatorObserver",
         "resolved_type": "AppObservabilityNavigatorObserver",
         "target": "AppObservabilityNavigatorObserver",
@@ -227735,7 +228138,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 456,
+        "line": 462,
         "lexical_type": "SplashScreen",
         "resolved_type": "SplashScreen",
         "target": "SplashScreen",
@@ -227745,7 +228148,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 461,
+        "line": 467,
         "lexical_type": "LoginScreen",
         "resolved_type": "LoginScreen",
         "target": "LoginScreen",
@@ -227755,7 +228158,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 470,
+        "line": 476,
         "lexical_type": "RegisterScreen",
         "resolved_type": "RegisterScreen",
         "target": "RegisterScreen",
@@ -227765,7 +228168,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 476,
+        "line": 482,
         "lexical_type": "ForgotPasswordScreen",
         "resolved_type": "ForgotPasswordScreen",
         "target": "ForgotPasswordScreen",
@@ -227775,7 +228178,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 480,
+        "line": 486,
         "lexical_type": "ResetPasswordScreen",
         "resolved_type": "ResetPasswordScreen",
         "target": "ResetPasswordScreen",
@@ -227785,7 +228188,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 486,
+        "line": 492,
         "lexical_type": "CommercialLegalScreen",
         "resolved_type": "CommercialLegalScreen",
         "target": "CommercialLegalScreen",
@@ -227795,7 +228198,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 492,
+        "line": 498,
         "lexical_type": "VerifyEmailScreen",
         "resolved_type": "VerifyEmailScreen",
         "target": "VerifyEmailScreen",
@@ -227805,7 +228208,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 506,
+        "line": 512,
         "lexical_type": "LotusLifeCounterScreen",
         "resolved_type": "LotusLifeCounterScreen",
         "target": "LotusLifeCounterScreen",
@@ -227815,7 +228218,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 518,
+        "line": 524,
         "lexical_type": "MainScaffold",
         "resolved_type": "MainScaffold",
         "target": "MainScaffold",
@@ -227825,7 +228228,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 525,
+        "line": 531,
         "lexical_type": "HomeScreen",
         "resolved_type": "HomeScreen",
         "target": "HomeScreen",
@@ -227835,7 +228238,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 535,
+        "line": 541,
         "lexical_type": "OnboardingCoreFlowScreen",
         "resolved_type": "OnboardingCoreFlowScreen",
         "target": "OnboardingCoreFlowScreen",
@@ -227845,7 +228248,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 549,
+        "line": 555,
         "lexical_type": "DeckListScreen",
         "resolved_type": "DeckListScreen",
         "target": "DeckListScreen",
@@ -227855,7 +228258,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 569,
+        "line": 575,
         "lexical_type": "DeckGenerateScreen",
         "resolved_type": "DeckGenerateScreen",
         "target": "DeckGenerateScreen",
@@ -227865,7 +228268,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 587,
+        "line": 593,
         "lexical_type": "DeckImportScreen",
         "resolved_type": "DeckImportScreen",
         "target": "DeckImportScreen",
@@ -227875,7 +228278,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 603,
+        "line": 609,
         "lexical_type": "DeckDetailsScreen",
         "resolved_type": "DeckDetailsScreen",
         "target": "DeckDetailsScreen",
@@ -227885,7 +228288,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 617,
+        "line": 623,
         "lexical_type": "CardSearchScreen",
         "resolved_type": "CardSearchScreen",
         "target": "CardSearchScreen",
@@ -227895,7 +228298,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 625,
+        "line": 631,
         "lexical_type": "CardScannerScreen",
         "resolved_type": "CardScannerScreen",
         "target": "CardScannerScreen",
@@ -227905,7 +228308,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 641,
+        "line": 647,
         "lexical_type": "PostGameNotesScreen",
         "resolved_type": "PostGameNotesScreen",
         "target": "PostGameNotesScreen",
@@ -227915,7 +228318,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 674,
+        "line": 680,
         "lexical_type": "BattleReplaysScreen",
         "resolved_type": "BattleReplaysScreen",
         "target": "BattleReplaysScreen",
@@ -227925,7 +228328,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 694,
+        "line": 700,
         "lexical_type": "BattleCoachScreen",
         "resolved_type": "BattleCoachScreen",
         "target": "BattleCoachScreen",
@@ -227935,7 +228338,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 738,
+        "line": 744,
         "lexical_type": "PlanScreen",
         "resolved_type": "PlanScreen",
         "target": "PlanScreen",
@@ -227945,7 +228348,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 742,
+        "line": 748,
         "lexical_type": "CardDetailRouteScreen",
         "resolved_type": "CardDetailRouteScreen",
         "target": "CardDetailRouteScreen",
@@ -227955,7 +228358,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 744,
+        "line": 750,
         "lexical_type": "DeckCardItem",
         "resolved_type": "DeckCardItem",
         "target": "DeckCardItem",
@@ -227965,7 +228368,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 751,
+        "line": 757,
         "lexical_type": "UpgradeScreen",
         "resolved_type": "UpgradeScreen",
         "target": "UpgradeScreen",
@@ -227975,7 +228378,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 755,
+        "line": 761,
         "lexical_type": "CheckoutScreen",
         "resolved_type": "CheckoutScreen",
         "target": "CheckoutScreen",
@@ -227985,7 +228388,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 762,
+        "line": 768,
         "lexical_type": "CollectionScreen",
         "resolved_type": "CollectionScreen",
         "target": "CollectionScreen",
@@ -227995,7 +228398,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 775,
+        "line": 781,
         "lexical_type": "BinderImportScreen",
         "resolved_type": "BinderImportScreen",
         "target": "BinderImportScreen",
@@ -228005,7 +228408,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 793,
+        "line": 799,
         "lexical_type": "TradeMatchesScreen",
         "resolved_type": "TradeMatchesScreen",
         "target": "TradeMatchesScreen",
@@ -228015,7 +228418,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 797,
+        "line": 803,
         "lexical_type": "LatestSetCollectionScreen",
         "resolved_type": "LatestSetCollectionScreen",
         "target": "LatestSetCollectionScreen",
@@ -228025,7 +228428,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 801,
+        "line": 807,
         "lexical_type": "SetsCatalogScreen",
         "resolved_type": "SetsCatalogScreen",
         "target": "SetsCatalogScreen",
@@ -228035,7 +228438,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 807,
+        "line": 813,
         "lexical_type": "SetCardsScreen",
         "resolved_type": "SetCardsScreen",
         "target": "SetCardsScreen",
@@ -228045,7 +228448,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 830,
+        "line": 836,
         "lexical_type": "CommunityScreen",
         "resolved_type": "CommunityScreen",
         "target": "CommunityScreen",
@@ -228055,7 +228458,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 835,
+        "line": 841,
         "lexical_type": "UserSearchScreen",
         "resolved_type": "UserSearchScreen",
         "target": "UserSearchScreen",
@@ -228065,7 +228468,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 843,
+        "line": 849,
         "lexical_type": "UserProfileScreen",
         "resolved_type": "UserProfileScreen",
         "target": "UserProfileScreen",
@@ -228075,7 +228478,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 850,
+        "line": 856,
         "lexical_type": "CommunityDeckDetailScreen",
         "resolved_type": "CommunityDeckDetailScreen",
         "target": "CommunityDeckDetailScreen",
@@ -228085,7 +228488,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 857,
+        "line": 863,
         "lexical_type": "ProfileScreen",
         "resolved_type": "ProfileScreen",
         "target": "ProfileScreen",
@@ -228095,7 +228498,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 861,
+        "line": 867,
         "lexical_type": "MessageInboxScreen",
         "resolved_type": "MessageInboxScreen",
         "target": "MessageInboxScreen",
@@ -228105,7 +228508,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 868,
+        "line": 874,
         "lexical_type": "ConversationUser",
         "resolved_type": "ConversationUser",
         "target": "ConversationUser",
@@ -228115,7 +228518,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 871,
+        "line": 877,
         "lexical_type": "ChatScreen",
         "resolved_type": "ChatScreen",
         "target": "ChatScreen",
@@ -228125,7 +228528,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 881,
+        "line": 887,
         "lexical_type": "NotificationPermissionBoundary",
         "resolved_type": "NotificationPermissionBoundary",
         "target": "NotificationPermissionBoundary",
@@ -228135,7 +228538,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 882,
+        "line": 888,
         "lexical_type": "NotificationScreen",
         "resolved_type": "NotificationScreen",
         "target": "NotificationScreen",
@@ -228145,7 +228548,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 887,
+        "line": 893,
         "lexical_type": "TradeInboxScreen",
         "resolved_type": "TradeInboxScreen",
         "target": "TradeInboxScreen",
@@ -228155,7 +228558,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 894,
+        "line": 900,
         "lexical_type": "TradeProposalDeepLink",
         "resolved_type": "TradeProposalDeepLink",
         "target": "TradeProposalDeepLink",
@@ -228165,7 +228568,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 895,
+        "line": 901,
         "lexical_type": "CreateTradeScreen",
         "resolved_type": "CreateTradeScreen",
         "target": "CreateTradeScreen",
@@ -228175,7 +228578,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 897,
+        "line": 903,
         "lexical_type": "CreateTradeRouteArgs",
         "resolved_type": "CreateTradeRouteArgs",
         "target": "CreateTradeRouteArgs",
@@ -228185,7 +228588,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 914,
+        "line": 920,
         "lexical_type": "TradeDetailScreen",
         "resolved_type": "TradeDetailScreen",
         "target": "TradeDetailScreen",
@@ -228195,7 +228598,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 934,
+        "line": 940,
         "lexical_type": "PushNotificationService",
         "resolved_type": "PushNotificationService",
         "target": "PushNotificationService",
@@ -242694,8 +243097,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1119,
-        "occurrences": 2235
+        "unique_references": 1120,
+        "occurrences": 2236
       },
       {
         "target_scope": "dart_sdk",
@@ -242712,8 +243115,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6531,
-        "occurrences": 40765
+        "unique_references": 6543,
+        "occurrences": 40805
       },
       {
         "target_scope": "dart_sdk",
@@ -242736,8 +243139,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:ui",
-        "unique_references": 227,
-        "occurrences": 752
+        "unique_references": 229,
+        "occurrences": 755
       },
       {
         "target_scope": "dependency",
@@ -242934,14 +243337,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/change_notifier.dart",
-        "unique_references": 24,
-        "occurrences": 29
+        "unique_references": 27,
+        "occurrences": 32
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/key.dart",
-        "unique_references": 107,
-        "occurrences": 1249
+        "unique_references": 108,
+        "occurrences": 1252
       },
       {
         "target_scope": "dependency",
@@ -243204,8 +243607,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/material.dart",
-        "unique_references": 37,
-        "occurrences": 68
+        "unique_references": 38,
+        "occurrences": 69
       },
       {
         "target_scope": "dependency",
@@ -243384,8 +243787,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/text_button.dart",
-        "unique_references": 51,
-        "occurrences": 123
+        "unique_references": 52,
+        "occurrences": 125
       },
       {
         "target_scope": "dependency",
@@ -243486,8 +243889,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/edge_insets.dart",
-        "unique_references": 90,
-        "occurrences": 842
+        "unique_references": 91,
+        "occurrences": 843
       },
       {
         "target_scope": "dependency",
@@ -243522,14 +243925,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_span.dart",
-        "unique_references": 2,
-        "occurrences": 4
+        "unique_references": 3,
+        "occurrences": 7
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_style.dart",
-        "unique_references": 76,
-        "occurrences": 670
+        "unique_references": 77,
+        "occurrences": 671
       },
       {
         "target_scope": "dependency",
@@ -243648,8 +244051,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/basic.dart",
-        "unique_references": 771,
-        "occurrences": 4198
+        "unique_references": 778,
+        "occurrences": 4206
       },
       {
         "target_scope": "dependency",
@@ -243702,8 +244105,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/framework.dart",
-        "unique_references": 487,
-        "occurrences": 2191
+        "unique_references": 492,
+        "occurrences": 2200
       },
       {
         "target_scope": "dependency",
@@ -243714,8 +244117,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/icon.dart",
-        "unique_references": 82,
-        "occurrences": 645
+        "unique_references": 83,
+        "occurrences": 646
       },
       {
         "target_scope": "dependency",
@@ -243762,8 +244165,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/media_query.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "dependency",
@@ -243816,8 +244219,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/safe_area.dart",
-        "unique_references": 28,
-        "occurrences": 31
+        "unique_references": 29,
+        "occurrences": 32
       },
       {
         "target_scope": "dependency",
@@ -243894,8 +244297,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/text.dart",
-        "unique_references": 93,
-        "occurrences": 1789
+        "unique_references": 94,
+        "occurrences": 1792
       },
       {
         "target_scope": "dependency",
@@ -243918,8 +244321,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/value_listenable_builder.dart",
-        "unique_references": 3,
-        "occurrences": 3
+        "unique_references": 4,
+        "occurrences": 4
       },
       {
         "target_scope": "dependency",
@@ -244212,14 +244615,20 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/api/api_client.dart",
-        "unique_references": 73,
-        "occurrences": 169
+        "unique_references": 76,
+        "occurrences": 177
       },
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/config/release_capabilities.dart",
-        "unique_references": 29,
-        "occurrences": 108
+        "unique_references": 30,
+        "occurrences": 110
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/config/release_identity_gate.dart",
+        "unique_references": 4,
+        "occurrences": 9
       },
       {
         "target_scope": "workspace",
@@ -244370,6 +244779,12 @@
         "target_library": "package:manaloom/core/widgets/player_identity_name.dart",
         "unique_references": 2,
         "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/release_update_banner.dart",
+        "unique_references": 4,
+        "occurrences": 5
       },
       {
         "target_scope": "workspace",
@@ -246876,10 +247291,34 @@
         "occurrences": 4
       },
       {
+        "source": "app/lib/core/config/release_identity_gate.dart",
+        "line": 186,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
         "source": "app/lib/core/observability/app_observability.dart",
         "line": 67,
         "lexical_type": "void",
         "occurrences": 14
+      },
+      {
+        "source": "app/lib/core/platform/page_reload.dart",
+        "line": 9,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/platform/page_reload_stub.dart",
+        "line": 3,
+        "lexical_type": "void",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/platform/page_reload_web.dart",
+        "line": 5,
+        "lexical_type": "void",
+        "occurrences": 1
       },
       {
         "source": "app/lib/core/security/auth_token_store.dart",
@@ -247849,7 +248288,7 @@
       },
       {
         "source": "app/lib/main.dart",
-        "line": 114,
+        "line": 116,
         "lexical_type": "void",
         "occurrences": 17
       },
@@ -283221,9 +283660,26 @@
       "value_captured": false
     },
     {
+      "name": "RELEASE_CAPABILITIES_ALLOWED",
+      "classification": "configuration",
+      "sources": [
+        "app/lib/core/config/release_identity_gate.dart"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "RELEASE_CAPABILITIES_DIGEST",
+      "classification": "configuration",
+      "sources": [
+        "app/lib/core/config/release_identity_gate.dart"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "RELEASE_GIT_SHA",
       "classification": "configuration",
       "sources": [
+        "app/lib/core/config/release_identity_gate.dart",
         "app/lib/core/observability/app_observability.dart"
       ],
       "value_captured": false
@@ -283241,6 +283697,14 @@
       "classification": "configuration",
       "sources": [
         "app/lib/core/observability/app_observability.dart"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "RELEASE_SURFACE",
+      "classification": "configuration",
+      "sources": [
+        "app/lib/core/config/release_identity_gate.dart"
       ],
       "value_captured": false
     },
@@ -284319,6 +284783,7 @@
     "app/test/core/config/launch_features_test.dart",
     "app/test/core/config/release_capabilities_test.dart",
     "app/test/core/config/release_capability_surface_contract_test.dart",
+    "app/test/core/config/release_identity_gate_test.dart",
     "app/test/core/config/visual_fixture_test.dart",
     "app/test/core/observability/app_observability_sanitizer_test.dart",
     "app/test/core/observability/app_observability_test.dart",
@@ -296855,7 +297320,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "a5a816f1854067032364bda6fb8bdcb649c4280c88cd073045278a2a45886c95"
+    "project_logic_source_digest_sha256": "11bfe7f07d540178d9eb37a64fb0d93f15d9a4413d620d43d6fb5768c8ae7e72"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -297587,10 +298052,14 @@
       "app/lib/core/branding/product_identity.dart",
       "app/lib/core/config/launch_features.dart",
       "app/lib/core/config/release_capabilities.dart",
+      "app/lib/core/config/release_identity_gate.dart",
       "app/lib/core/config/visual_fixture.dart",
       "app/lib/core/models/user_trust_insight.dart",
       "app/lib/core/observability/app_observability.dart",
       "app/lib/core/observability/app_observability_sanitizer.dart",
+      "app/lib/core/platform/page_reload.dart",
+      "app/lib/core/platform/page_reload_stub.dart",
+      "app/lib/core/platform/page_reload_web.dart",
       "app/lib/core/resilience/offline_capability.dart",
       "app/lib/core/security/auth_token_store.dart",
       "app/lib/core/services/activation_funnel_service.dart",
@@ -297617,6 +298086,7 @@
       "app/lib/core/widgets/manaloom_glyph.dart",
       "app/lib/core/widgets/manaloom_theme_motif.dart",
       "app/lib/core/widgets/player_identity_name.dart",
+      "app/lib/core/widgets/release_update_banner.dart",
       "app/lib/core/widgets/responsive_page_frame.dart",
       "app/lib/core/widgets/shell_app_bar_actions.dart",
       "app/lib/features/auth/account_security_service.dart",
@@ -297829,6 +298299,7 @@
       "app/test/core/config/launch_features_test.dart",
       "app/test/core/config/release_capabilities_test.dart",
       "app/test/core/config/release_capability_surface_contract_test.dart",
+      "app/test/core/config/release_identity_gate_test.dart",
       "app/test/core/config/visual_fixture_test.dart",
       "app/test/core/observability/app_observability_sanitizer_test.dart",
       "app/test/core/observability/app_observability_test.dart",
