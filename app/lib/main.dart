@@ -11,6 +11,7 @@ import 'core/config/launch_features.dart';
 import 'core/config/release_capabilities.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/image_cache_policy.dart';
+import 'core/services/scryfall_image_cache_manager.dart';
 import 'core/services/activation_funnel_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
@@ -272,6 +273,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     AppImageCachePolicy.apply();
+    CardImageCacheManager.install();
     WidgetsBinding.instance.addObserver(this);
     // go_router keeps imperative pushes out of the browser URL by default.
     // ManaLoom uses push for drill-down screens, so reflecting those pushes is

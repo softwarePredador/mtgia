@@ -75,7 +75,6 @@ void main() {
         r'''(?:r)?'[^'\n]*ManaLoom[^'\n]*'|(?:r)?"[^"\n]*ManaLoom[^"\n]*"''',
       );
       const allowedMachineFacingLiterals = <String>{
-        "'ManaLoom/1.0'",
         "'ManaLoomAuth'",
         "'ManaLoomAuthPublicKey'",
         "'FlutterManaLoomShellBridge'",

@@ -273,7 +273,6 @@ class DeckDetailsOverviewTab extends StatelessWidget {
                       : 'Impressão do comandante ${_heroCommander?.name}',
                   imageIsReference: exactImageUrl == null,
                   constrainAspectRatio: false,
-                  showStatusBadge: false,
                 ),
               ),
             ],

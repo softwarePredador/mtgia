@@ -16,9 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// capability provider instead of passing the final boolean in.
 
 class _FixedBinderProvider extends BinderProvider {
-  _FixedBinderProvider({required this.items, this.withStats = false});
+  _FixedBinderProvider({required this.fixedItems, this.withStats = false});
 
-  final List<BinderItem> items;
+  final List<BinderItem> fixedItems;
   final bool withStats;
 
   @override
@@ -56,7 +56,7 @@ class _FixedBinderProvider extends BinderProvider {
     bool? foil,
     String sortBy = 'name',
     String sortOrder = 'asc',
-  }) async => listType == 'have' && page == 1 ? items : const [];
+  }) async => listType == 'have' && page == 1 ? fixedItems : const [];
 }
 
 class _EmptyImportApi extends ApiClient {
@@ -130,7 +130,7 @@ void main() {
       await _pumpBinder(
         tester,
         binder: _FixedBinderProvider(
-          items: [BinderItem(id: 'b-1', cardId: 'c-1', cardName: 'Sol Ring')],
+          fixedItems: [BinderItem(id: 'b-1', cardId: 'c-1', cardName: 'Sol Ring')],
           withStats: true,
         ),
         capabilities: capabilities,
@@ -146,7 +146,7 @@ void main() {
       await _pumpBinder(
         tester,
         binder: _FixedBinderProvider(
-          items: [BinderItem(id: 'b-1', cardId: 'c-1', cardName: 'Sol Ring')],
+          fixedItems: [BinderItem(id: 'b-1', cardId: 'c-1', cardName: 'Sol Ring')],
         ),
         capabilities: capabilities,
         build: gate.build,
@@ -164,7 +164,7 @@ void main() {
       addTearDown(capabilities.dispose);
       await _pumpBinder(
         tester,
-        binder: _FixedBinderProvider(items: const []),
+        binder: _FixedBinderProvider(fixedItems: const []),
         capabilities: capabilities,
         build: gate.build,
       );

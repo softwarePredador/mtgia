@@ -43,6 +43,68 @@ void main() {
 
     expect(offenders, isEmpty);
   });
+
+  // BT-ART-01 / D-37: card artwork is always shown whole. A card widget
+  // that receives cover, fill or fitWidth would crop the card.
+  test('card image widgets never crop the card', () {
+    final offenders = <String>[];
+    for (final file in _dartFiles(Directory('lib/features'))) {
+      final source = file.readAsStringSync();
+      for (final call in _calls(source, const [
+        'CachedCardImage(',
+        'CardArtwork(',
+      ])) {
+        if (RegExp(r'BoxFit\.(cover|fill|fitWidth|fitHeight)').hasMatch(call)) {
+          offenders.add(file.path.replaceAll('\\', '/'));
+        }
+      }
+    }
+
+    expect(offenders, isEmpty);
+  });
+
+  // BT-ART-01: a reference image is labelled. Only thumbnails too small for
+  // the badge may hide it; they keep the semantic label. The deck hero is a
+  // beta surface where reference art is common, so it always shows the badge.
+  test('only listed thumbnails hide the artwork status badge', () {
+    const allowed = <String, int>{
+      'lib/features/battle/screens/battle_live_spectator_screen.dart': 2,
+      'lib/features/collection/screens/sets_catalog_screen.dart': 1,
+      'lib/features/decks/widgets/deck_optimize_sheet_widgets.dart': 1,
+      'lib/features/decks/widgets/deck_workshop_tab.dart': 1,
+      'lib/features/home/home_screen.dart': 1,
+      'lib/features/retention/screens/post_game_notes_screen.dart': 3,
+      'lib/features/scanner/widgets/scanned_card_preview.dart': 1,
+    };
+
+    final found = <String, int>{};
+    for (final file in _dartFiles(Directory('lib'))) {
+      final count = 'showStatusBadge: false'
+          .allMatches(file.readAsStringSync())
+          .length;
+      if (count > 0) found[file.path.replaceAll('\\', '/')] = count;
+    }
+
+    expect(found, equals(allowed));
+  });
+}
+
+/// Source of every call to one of [constructors], up to its closing paren.
+Iterable<String> _calls(String source, List<String> constructors) sync* {
+  for (final constructor in constructors) {
+    var start = source.indexOf(constructor);
+    while (start >= 0) {
+      var depth = 0;
+      var end = start + constructor.length - 1;
+      for (; end < source.length; end++) {
+        final char = source[end];
+        if (char == '(') depth++;
+        if (char == ')' && --depth == 0) break;
+      }
+      yield source.substring(start, end.clamp(start, source.length));
+      start = source.indexOf(constructor, end);
+    }
+  }
 }
 
 Iterable<File> _dartFiles(Directory root) sync* {
