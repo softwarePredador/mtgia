@@ -30,6 +30,8 @@ import 'features/auth/screens/reset_password_screen.dart';
 import 'features/auth/screens/verify_email_screen.dart';
 import 'features/auth/models/email_verification_delivery_result.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'features/auth/providers/legal_acceptance_provider.dart';
+import 'features/auth/widgets/legal_reacceptance_dialog.dart';
 import 'features/auth/auth_redirect.dart';
 
 import 'core/widgets/main_scaffold.dart';
@@ -219,6 +221,9 @@ class ManaLoomApp extends StatefulWidget {
 class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   late final AuthProvider _authProvider;
   late final ReleaseCapabilitiesProvider _releaseCapabilitiesProvider;
+  late final LegalAcceptanceProvider _legalAcceptanceProvider;
+  final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  bool _legalPromptOpen = false;
   late final DeckProvider _deckProvider;
   late final CardProvider _cardProvider;
   late final MarketProvider _marketProvider;
@@ -282,6 +287,11 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _authProvider = AuthProvider();
     _releaseCapabilitiesProvider = ReleaseCapabilitiesProvider();
     ApiClient.setSessionExpiredHandler(_authProvider.expireSession);
+    _legalAcceptanceProvider = LegalAcceptanceProvider();
+    ApiClient.setLegalAcceptanceRequiredHandler(
+      _legalAcceptanceProvider.markRequiredFromBody,
+    );
+    _legalAcceptanceProvider.addListener(_onLegalAcceptanceChanged);
     _deckProvider = DeckProvider();
     _cardProvider = CardProvider();
     _marketProvider = MarketProvider();
@@ -304,6 +314,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     ApiClient.debugLogBaseUrl();
 
     _router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
       initialLocation: _debugBootIntoLifeCounter ? lifeCounterRoutePath : '/',
       refreshListenable: Listenable.merge([
         _authProvider,
@@ -977,6 +988,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       _authenticatedAccountId = accountId;
       unawaited(AppObservability.instance.setUserContext(_authProvider.user));
       unawaited(_refreshCapabilitiesAndWarmup(expectedAccountId: accountId));
+      unawaited(_legalAcceptanceProvider.refresh());
       return;
     }
 
@@ -1006,6 +1018,31 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
       _clearAllProvidersState();
     }
+  }
+
+  /// Shows the re-acceptance prompt once per pending event, over whatever
+  /// screen is open (BT-LEGAL-ACCEPT-001).
+  void _onLegalAcceptanceChanged() {
+    if (_legalPromptOpen || !_authProvider.isAuthenticated) return;
+    if (!_legalAcceptanceProvider.promptPending) return;
+    final navigatorContext = _rootNavigatorKey.currentContext;
+    if (navigatorContext == null) return;
+    if (!_legalAcceptanceProvider.takePrompt()) return;
+    _legalPromptOpen = true;
+    unawaited(
+      showLegalReacceptanceDialog(
+        context: navigatorContext,
+        provider: _legalAcceptanceProvider,
+        onReadDocument: (section) => unawaited(
+          _router.push(
+            Uri(
+              path: '/legal',
+              queryParameters: {'section': section},
+            ).toString(),
+          ),
+        ),
+      ).whenComplete(() => _legalPromptOpen = false),
+    );
   }
 
   void _onReleaseCapabilitiesChanged() {
@@ -1159,6 +1196,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   /// Limpa o estado de todos os providers ao deslogar, evitando dados stale
   /// entre sessões de diferentes usuários.
   void _clearAllProvidersState() {
+    _legalAcceptanceProvider.reset();
     _deckProvider.clearAllState();
     _cardProvider.clearSearch();
     _marketProvider.clearAllState();
@@ -1178,6 +1216,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _authProvider.removeListener(_onAuthChanged);
     _releaseCapabilitiesProvider.removeListener(_onReleaseCapabilitiesChanged);
     ApiClient.setSessionExpiredHandler(null);
+    ApiClient.setLegalAcceptanceRequiredHandler(null);
+    _legalAcceptanceProvider.removeListener(_onLegalAcceptanceChanged);
     _notificationProvider.stopPolling();
     _messageProvider.stopPolling();
     final pushService = PushNotificationService();
@@ -1195,6 +1235,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _notificationProvider.dispose();
     _commercialProvider.dispose();
     _releaseCapabilitiesProvider.dispose();
+    _legalAcceptanceProvider.dispose();
     _authProvider.dispose();
     super.dispose();
   }
@@ -1205,6 +1246,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider.value(value: _authProvider),
         ChangeNotifierProvider.value(value: _releaseCapabilitiesProvider),
+        ChangeNotifierProvider.value(value: _legalAcceptanceProvider),
         ChangeNotifierProvider.value(value: _deckProvider),
         ChangeNotifierProvider.value(value: _cardProvider),
         ChangeNotifierProvider.value(value: _marketProvider),
