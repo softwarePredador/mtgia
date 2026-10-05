@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "143a33e39085c3689f9e312caf2fc4844b11882dffb64fd56328bca7fdc3349b",
+  "source_digest_sha256": "045255dbef17797aff248e82dfc6f98057d920df67153afb5b025cd645f83ce5",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,7 +80,7 @@
     "database_views": 6,
     "migrations": 74,
     "scripts_and_jobs": 708,
-    "environment_variables": 726,
+    "environment_variables": 728,
     "tests": 1328,
     "flows": 13,
     "traceability_rules": 12,
@@ -274314,6 +274314,7 @@
         "DB_PORT",
         "DB_USER",
         "HOME",
+        "MANALOOM_PLAY_VS_AI_BROWSER_NAME",
         "MANALOOM_PLAY_VS_AI_BROWSER_QA",
         "MANALOOM_PLAY_VS_AI_E2E_REPORT_ROOT",
         "MANALOOM_PLAY_VS_AI_FLUTTER_ROOT",
@@ -274602,6 +274603,7 @@
         "MANALOOM_P0_ANDROID_DIR",
         "MANALOOM_P0_ANDROID_LOG",
         "MANALOOM_P0_ANDROID_PROFILE",
+        "MANALOOM_P0_INDEX_SCOPE",
         "MANALOOM_P0_WEB_DESKTOP_DIR",
         "MANALOOM_P0_WEB_DESKTOP_LOG",
         "MANALOOM_P0_WEB_MOBILE_DIR",
@@ -280418,6 +280420,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_P0_INDEX_SCOPE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_ui_live_evidence_gate.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_P0_WEB_DESKTOP_DIR",
       "classification": "configuration",
       "sources": [
@@ -280553,6 +280563,14 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_web_image_memory_profile.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_PLAY_VS_AI_BROWSER_NAME",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_play_vs_ai_e2e.sh"
       ],
       "value_captured": false
     },
@@ -295803,7 +295821,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "143a33e39085c3689f9e312caf2fc4844b11882dffb64fd56328bca7fdc3349b"
+    "project_logic_source_digest_sha256": "045255dbef17797aff248e82dfc6f98057d920df67153afb5b025cd645f83ce5"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
