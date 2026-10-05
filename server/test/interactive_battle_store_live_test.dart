@@ -627,7 +627,7 @@ void main() {
           DROP TRIGGER IF EXISTS manaloom_test_delay_interactive_replay
             ON battle_simulations;
           DROP FUNCTION IF EXISTS manaloom_test_delay_interactive_replay();
-        ''');
+        ''', queryMode: QueryMode.simple);
         await pool.execute(
           Sql.named(
             'DELETE FROM users WHERE id IN '
@@ -668,7 +668,7 @@ void main() {
         BEFORE INSERT ON interactive_battle_sessions
         FOR EACH ROW
         EXECUTE FUNCTION manaloom_test_delay_interactive_create();
-      ''');
+      ''', queryMode: QueryMode.simple);
       final createFuture = store.create(
         _command(
           id: _lifecycleSessionId,
@@ -704,7 +704,7 @@ void main() {
         DROP TRIGGER manaloom_test_delay_interactive_create
           ON interactive_battle_sessions;
         DROP FUNCTION manaloom_test_delay_interactive_create();
-      ''');
+      ''', queryMode: QueryMode.simple);
 
       expect(
         await deleteDeckAfterBattleGuard(
@@ -729,7 +729,7 @@ void main() {
         BEFORE INSERT ON battle_simulations
         FOR EACH ROW
         EXECUTE FUNCTION manaloom_test_delay_interactive_replay();
-      ''');
+      ''', queryMode: QueryMode.simple);
       final terminalSnapshot = _terminalSnapshot(
         runtimeSessionId: _lifecycleRuntimeId,
         requestId: 'interactive-lifecycle-request-1',
@@ -764,7 +764,7 @@ void main() {
         DROP TRIGGER manaloom_test_delay_interactive_replay
           ON battle_simulations;
         DROP FUNCTION manaloom_test_delay_interactive_replay();
-      ''');
+      ''', queryMode: QueryMode.simple);
 
       final beforeDelete = await pool.execute(
         Sql.named('''

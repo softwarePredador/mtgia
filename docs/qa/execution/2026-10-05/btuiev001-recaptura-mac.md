@@ -108,3 +108,47 @@ Na próxima rodada: trocar o usuário da linha 764 por um de até 30 caracteres
 (por exemplo `pvai_browser_<12 hex>`), recapturar os 23 manifests no digest
 novo, revisar e então reescrever `latest.json` e rodar
 `./scripts/manaloom_ui_live_evidence_gate.sh --check`.
+
+## Passo 7: gate de schema e vermelhos da nuvem
+
+Rodado depois das capturas, sem frases de confirmação (o gate de schema usa a
+aprovação permanente `manaloom.localGates.disposablePostgres=true` do checkout).
+
+- **Schema (`./scripts/manaloom_local_ci.sh schema`, PostgreSQL 17.9):**
+  `database_setup.sql`, `bin/migrate.dart` (até a 076) e o ensaio de migration
+  passaram num cluster descartável em `$TMPDIR`. O gate parou nos testes DB
+  live, antes da comparação `tbls`/manifesto:
+  - No macOS o `pg_ctl` só sobe com `LC_ALL` definido (`postmaster became
+    multithreaded during startup`); é ambiente, resolvido com
+    `LC_ALL=en_US.UTF-8`.
+  - `server/test/interactive_battle_store_live_test.dart` enviava cinco blocos
+    com vários comandos SQL em prepared statement (`42601`). Corrigido com
+    `queryMode: QueryMode.simple` só nesses blocos.
+  - Com isso, o mesmo teste chega à asserção real e falha na linha 762:
+    `deleteDeckAfterBattleGuard` devolve `deleted` enquanto
+    `finalizeRuntimeSnapshot` ainda está em curso (esperado `activeBattle`).
+    Pode ser corrida real entre exclusão de deck e finalização da partida em
+    `server/lib` ou temporização do teste; não investigado aqui (fora do
+    escopo do passo). **Schema gate segue vermelho por esse teste.**
+- **Goldens:** os 4 `home_hero_*` (1440, 1920, sma135m, web; 0,14–0,42%)
+  falham também no Mac. Não é diferença de Linux. O dono tem versões
+  regeneradas não commitadas no checkout principal.
+- **Validador de dependências:** vermelho no Mac — `file` usado fora de `lib/`
+  sem estar em `dev_dependencies`. O checkout principal tem uma alteração
+  staged em `app/dart_dependency_validator.yaml` que provavelmente cobre isso.
+- **custom-lint:** verde no Mac (exit 0). **patrol-smoke:** verde.
+- **Checks do pre-push que dependem de launchd, psycopg2 e histórico git
+  completo:** verdes no Mac (contratos dos gates, secret scan, auditorias
+  determinísticas e contratos de release passaram antes da etapa de qualidade).
+- **Pre-push `full`:** vermelho só nos 4 goldens acima. O push saiu com
+  `--no-verify` pela D-86 e ficou registrado em
+  `~/.manaloom/coordenacao/receipts/pushes.log`.
+- **Gate em worktree novo:** o pre-commit acusa `.dart_tool residual em
+  tools/project_logic` quando a pasta não existia antes; contornado com
+  `dart pub get` nela. Ajuste futuro em `manaloom_project_logic.sh`.
+- **Efeito colateral:** uma das corridas manuais deste passo (schema,
+  custom-lint, patrol-smoke ou auditoria de dependências) reescreveu
+  `app/pubspec.lock` (`meta` 1.18.0→1.17.0, `test_api` 0.7.11→0.7.10). O lock
+  está no digest de UI; foi restaurado ao commitado e o digest voltou a
+  `4fc91724`. Vale identificar qual gate resolve dependências sem
+  `--enforce-lockfile`.
