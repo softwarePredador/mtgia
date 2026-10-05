@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "11bfe7f07d540178d9eb37a64fb0d93f15d9a4413d620d43d6fb5768c8ae7e72",
+  "source_digest_sha256": "0ffbe4e2c7276f5a8d65ff9ef1a17db6ab7edcb27c498e070aa017ce19139acc",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -63,15 +63,15 @@
     "app/doc/UI_TEST_SURFACE_MAP.md"
   ],
   "statistics": {
-    "dart_source_files": 732,
+    "dart_source_files": 744,
     "non_dart_product_files": 52,
     "battle_sidecar_source_files": 34,
-    "dart_symbols": 5480,
-    "semantic_resolved_files": 732,
+    "dart_symbols": 5556,
+    "semantic_resolved_files": 744,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43863,
-    "semantic_resolved_call_sites": 69476,
-    "semantic_resolved_type_references": 16881,
+    "semantic_resolved_call_edges": 44522,
+    "semantic_resolved_call_sites": 70521,
+    "semantic_resolved_type_references": 17396,
     "modules": 164,
     "app_routes": 46,
     "web_routes": 11,
@@ -81,7 +81,7 @@
     "migrations": 74,
     "scripts_and_jobs": 708,
     "environment_variables": 729,
-    "tests": 1336,
+    "tests": 1340,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -269,12 +269,24 @@
         "app/lib/core/services/scryfall_image_cache_manager.dart",
         "app/lib/core/services/scryfall_image_request_policy.dart",
         "app/lib/core/theme/app_theme.dart",
+        "app/lib/core/theme/bt_tokens.dart",
         "app/lib/core/utils/currency_formatter.dart",
         "app/lib/core/utils/friendly_error_mapper.dart",
         "app/lib/core/utils/logger.dart",
         "app/lib/core/utils/mana_helper.dart",
         "app/lib/core/utils/scryfall_image_helper.dart",
+        "app/lib/core/widgets/app_action_bar.dart",
+        "app/lib/core/widgets/app_choice_piece.dart",
+        "app/lib/core/widgets/app_hero_tile.dart",
+        "app/lib/core/widgets/app_numeral.dart",
+        "app/lib/core/widgets/app_numeral_piece.dart",
+        "app/lib/core/widgets/app_plaque.dart",
+        "app/lib/core/widgets/app_rule_tile.dart",
         "app/lib/core/widgets/app_state_panel.dart",
+        "app/lib/core/widgets/app_tile.dart",
+        "app/lib/core/widgets/app_tile_board.dart",
+        "app/lib/core/widgets/app_tile_overlay.dart",
+        "app/lib/core/widgets/bt_surface.dart",
         "app/lib/core/widgets/cached_card_image.dart",
         "app/lib/core/widgets/card_artwork.dart",
         "app/lib/core/widgets/debug_accessibility_tools.dart",
@@ -288,8 +300,8 @@
         "app/lib/core/widgets/responsive_page_frame.dart",
         "app/lib/core/widgets/shell_app_bar_actions.dart"
       ],
-      "file_count": 41,
-      "symbol_count": 121,
+      "file_count": 53,
+      "symbol_count": 197,
       "providers": [
         "ReleaseCapabilitiesProvider"
       ],
@@ -3176,7 +3188,7 @@
       "name": "AppTheme",
       "kind": "class",
       "source": "app/lib/core/theme/app_theme.dart",
-      "line": 8,
+      "line": 10,
       "members": [
         "_buildTextTheme",
         "conditionColor",
@@ -3193,19 +3205,198 @@
       "name": "AppViewportClass",
       "kind": "enum",
       "source": "app/lib/core/theme/app_theme.dart",
-      "line": 3
+      "line": 5
     },
     {
       "name": "display",
       "kind": "function",
       "source": "app/lib/core/theme/app_theme.dart",
-      "line": 470
+      "line": 468
     },
     {
       "name": "ui",
       "kind": "function",
       "source": "app/lib/core/theme/app_theme.dart",
-      "line": 456
+      "line": 454
+    },
+    {
+      "name": "AppNumeralScale",
+      "kind": "enum",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 116
+    },
+    {
+      "name": "BtAngleGradient",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 1299,
+      "members": [
+        "==",
+        "_lerp",
+        "_resolvedStops",
+        "createShader",
+        "hashCode",
+        "lerpFrom",
+        "lerpTo",
+        "scale",
+        "withOpacity"
+      ]
+    },
+    {
+      "name": "BtEllipseGradient",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 1390,
+      "members": [
+        "==",
+        "createShader",
+        "hashCode",
+        "scale",
+        "withOpacity"
+      ]
+    },
+    {
+      "name": "BtGradients",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 419,
+      "members": [
+        "==",
+        "hashCode",
+        "lerp"
+      ]
+    },
+    {
+      "name": "BtMetrics",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 925,
+      "members": [
+        "==",
+        "_all",
+        "hashCode",
+        "lerp",
+        "padPiece",
+        "padRule",
+        "padTile"
+      ]
+    },
+    {
+      "name": "BtNumeralShadow",
+      "kind": "enum",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 229
+    },
+    {
+      "name": "BtNumeralSpec",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 129,
+      "members": [
+        "of",
+        "shadows"
+      ]
+    },
+    {
+      "name": "BtPalette",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 231,
+      "members": [
+        "==",
+        "_all",
+        "hashCode",
+        "lerp"
+      ]
+    },
+    {
+      "name": "BtShadow",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 581,
+      "members": [
+        "==",
+        "hashCode",
+        "lerpList",
+        "toBoxShadow"
+      ]
+    },
+    {
+      "name": "BtShadows",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 635,
+      "members": [
+        "==",
+        "_all",
+        "hashCode",
+        "lerp"
+      ]
+    },
+    {
+      "name": "BtTokens",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 8,
+      "members": [
+        "copyWith",
+        "lerp",
+        "numeral",
+        "of",
+        "vitral"
+      ]
+    },
+    {
+      "name": "BtType",
+      "kind": "class",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 1110,
+      "members": [
+        "==",
+        "_all",
+        "_weight",
+        "display",
+        "hashCode",
+        "lerp",
+        "resize",
+        "ui"
+      ]
+    },
+    {
+      "name": "_listEquals",
+      "kind": "function",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 1449
+    },
+    {
+      "name": "g",
+      "kind": "function",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 535
+    },
+    {
+      "name": "n",
+      "kind": "function",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 375
+    },
+    {
+      "name": "n",
+      "kind": "function",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 887
+    },
+    {
+      "name": "n",
+      "kind": "function",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 1055
+    },
+    {
+      "name": "n",
+      "kind": "function",
+      "source": "app/lib/core/theme/bt_tokens.dart",
+      "line": 1270
     },
     {
       "name": "CurrencyFormatter",
@@ -3295,6 +3486,185 @@
       ]
     },
     {
+      "name": "AppAction",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_action_bar.dart",
+      "line": 20
+    },
+    {
+      "name": "AppActionBar",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_action_bar.dart",
+      "line": 51,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppActionButton",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_action_bar.dart",
+      "line": 99,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppActionKind",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_action_bar.dart",
+      "line": 8
+    },
+    {
+      "name": "AppChoicePiece",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_choice_piece.dart",
+      "line": 9,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppHeroAction",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_hero_tile.dart",
+      "line": 26
+    },
+    {
+      "name": "AppHeroPip",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_hero_tile.dart",
+      "line": 7
+    },
+    {
+      "name": "AppHeroTile",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_hero_tile.dart",
+      "line": 36,
+      "members": [
+        "_build",
+        "build"
+      ]
+    },
+    {
+      "name": "_CarvedAction",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_hero_tile.dart",
+      "line": 365,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "_GoButton",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_hero_tile.dart",
+      "line": 307,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "_Pip",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_hero_tile.dart",
+      "line": 282,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppNumeral",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_numeral.dart",
+      "line": 9,
+      "members": [
+        "_fit",
+        "_width",
+        "build"
+      ]
+    },
+    {
+      "name": "AppNumeralMesa",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_numeral.dart",
+      "line": 115,
+      "members": [
+        "build",
+        "fontSizeFor"
+      ]
+    },
+    {
+      "name": "AppNumeralPiece",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_numeral_piece.dart",
+      "line": 8,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppPlaque",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_plaque.dart",
+      "line": 24,
+      "members": [
+        "createState"
+      ]
+    },
+    {
+      "name": "AppPlaqueKind",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_plaque.dart",
+      "line": 6
+    },
+    {
+      "name": "_AppPlaqueState",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_plaque.dart",
+      "line": 102,
+      "members": [
+        "_build",
+        "_focus",
+        "_onFocus",
+        "build",
+        "didUpdateWidget",
+        "dispose",
+        "initState"
+      ]
+    },
+    {
+      "name": "AppRuleTile",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_rule_tile.dart",
+      "line": 24,
+      "members": [
+        "build",
+        "link"
+      ]
+    },
+    {
+      "name": "AppRuleTileRole",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_rule_tile.dart",
+      "line": 20
+    },
+    {
+      "name": "AppRuleTileSize",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_rule_tile.dart",
+      "line": 8
+    },
+    {
+      "name": "_RuleLink",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_rule_tile.dart",
+      "line": 272,
+      "members": [
+        "build"
+      ]
+    },
+    {
       "name": "AppStatePanel",
       "kind": "class",
       "source": "app/lib/core/widgets/app_state_panel.dart",
@@ -3326,6 +3696,335 @@
       "members": [
         "build"
       ]
+    },
+    {
+      "name": "AppTile",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 34,
+      "members": [
+        "_cornerStyle",
+        "build"
+      ]
+    },
+    {
+      "name": "AppTileEstado",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 467,
+      "members": [
+        "build",
+        "isOff"
+      ]
+    },
+    {
+      "name": "AppTileEstadoTheme",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 445,
+      "members": [
+        "maybeOf",
+        "updateShouldNotify"
+      ]
+    },
+    {
+      "name": "AppTileStatus",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 31
+    },
+    {
+      "name": "AppTileTone",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 9
+    },
+    {
+      "name": "BtArmedController",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 572,
+      "members": [
+        "arm",
+        "armedKey",
+        "disarm",
+        "isArmed"
+      ]
+    },
+    {
+      "name": "BtArmedScope",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 551,
+      "members": [
+        "createState",
+        "maybeOf"
+      ]
+    },
+    {
+      "name": "BtArming",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 636,
+      "members": [
+        "resolve"
+      ]
+    },
+    {
+      "name": "BtBoardScope",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 536,
+      "members": [
+        "updateShouldNotify",
+        "veiledOf"
+      ]
+    },
+    {
+      "name": "_BtArmedInherited",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 622,
+      "members": [
+        "updateShouldNotify"
+      ]
+    },
+    {
+      "name": "_BtArmedScopeState",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 580,
+      "members": [
+        "arm",
+        "armedKey",
+        "build",
+        "disarm",
+        "dispose",
+        "isArmed"
+      ]
+    },
+    {
+      "name": "_TileWithCorner",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile.dart",
+      "line": 405,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppTileBoard",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile_board.dart",
+      "line": 41,
+      "members": [
+        "_ordered",
+        "_weighted",
+        "build"
+      ]
+    },
+    {
+      "name": "AppTileRowSpec",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile_board.dart",
+      "line": 10,
+      "members": [
+        "weightOf"
+      ]
+    },
+    {
+      "name": "BtBackdrop",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile_board.dart",
+      "line": 248,
+      "members": [
+        "filter"
+      ]
+    },
+    {
+      "name": "rowWidget",
+      "kind": "function",
+      "source": "app/lib/core/widgets/app_tile_board.dart",
+      "line": 82
+    },
+    {
+      "name": "AppBackArrow",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile_overlay.dart",
+      "line": 248,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppCloseX",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile_overlay.dart",
+      "line": 192,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "AppCloseXSize",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_tile_overlay.dart",
+      "line": 181
+    },
+    {
+      "name": "AppOverlayVeil",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/app_tile_overlay.dart",
+      "line": 9
+    },
+    {
+      "name": "AppTileOverlay",
+      "kind": "class",
+      "source": "app/lib/core/widgets/app_tile_overlay.dart",
+      "line": 18,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "showAppTileOverlay",
+      "kind": "function",
+      "source": "app/lib/core/widgets/app_tile_overlay.dart",
+      "line": 292
+    },
+    {
+      "name": "BtFocusRing",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 285
+    },
+    {
+      "name": "BtGlyphShape",
+      "kind": "enum",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 465
+    },
+    {
+      "name": "BtPressable",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 294,
+      "members": [
+        "createState"
+      ]
+    },
+    {
+      "name": "BtStrokeGlyph",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 469,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "BtSurface",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 8,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "BtSweep",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 178,
+      "members": [
+        "createState"
+      ]
+    },
+    {
+      "name": "BtThread",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 260,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "BtTouchTarget",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 448,
+      "members": [
+        "build"
+      ]
+    },
+    {
+      "name": "_BtFocusRingPainter",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 398,
+      "members": [
+        "paint",
+        "shouldRepaint"
+      ]
+    },
+    {
+      "name": "_BtGlyphPainter",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 504,
+      "members": [
+        "paint",
+        "shouldRepaint"
+      ]
+    },
+    {
+      "name": "_BtPressableState",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 326,
+      "members": [
+        "_setPressed",
+        "build"
+      ]
+    },
+    {
+      "name": "_BtSurfacePainter",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 89,
+      "members": [
+        "_same",
+        "paint",
+        "shouldRepaint"
+      ]
+    },
+    {
+      "name": "_BtSweepPainter",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 227,
+      "members": [
+        "paint",
+        "shouldRepaint"
+      ]
+    },
+    {
+      "name": "_BtSweepState",
+      "kind": "class",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 187,
+      "members": [
+        "build",
+        "didChangeDependencies",
+        "dispose"
+      ]
+    },
+    {
+      "name": "stroke",
+      "kind": "function",
+      "source": "app/lib/core/widgets/bt_surface.dart",
+      "line": 418
     },
     {
       "name": "CachedCardImage",
@@ -27185,13 +27884,13 @@
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 1711
+      "line": 987
     },
     {
       "name": "bracketSnapshot",
       "kind": "function",
       "source": "server/lib/ai/optimize_complete_support.dart",
-      "line": 987
+      "line": 1711
     },
     {
       "name": "buildCompleteFinalResolutionCountError",
@@ -42458,7 +43157,7 @@
   "semantic_analysis": {
     "engine": "package:analyzer AnalysisContextCollection/ResolvedUnitResult",
     "coverage_status": "complete",
-    "resolved_file_count": 732,
+    "resolved_file_count": 744,
     "unresolved_file_count": 0,
     "resolved_files": [
       "app/lib/core/api/api_client.dart",
@@ -42484,12 +43183,24 @@
       "app/lib/core/services/scryfall_image_cache_manager.dart",
       "app/lib/core/services/scryfall_image_request_policy.dart",
       "app/lib/core/theme/app_theme.dart",
+      "app/lib/core/theme/bt_tokens.dart",
       "app/lib/core/utils/currency_formatter.dart",
       "app/lib/core/utils/friendly_error_mapper.dart",
       "app/lib/core/utils/logger.dart",
       "app/lib/core/utils/mana_helper.dart",
       "app/lib/core/utils/scryfall_image_helper.dart",
+      "app/lib/core/widgets/app_action_bar.dart",
+      "app/lib/core/widgets/app_choice_piece.dart",
+      "app/lib/core/widgets/app_hero_tile.dart",
+      "app/lib/core/widgets/app_numeral.dart",
+      "app/lib/core/widgets/app_numeral_piece.dart",
+      "app/lib/core/widgets/app_plaque.dart",
+      "app/lib/core/widgets/app_rule_tile.dart",
       "app/lib/core/widgets/app_state_panel.dart",
+      "app/lib/core/widgets/app_tile.dart",
+      "app/lib/core/widgets/app_tile_board.dart",
+      "app/lib/core/widgets/app_tile_overlay.dart",
+      "app/lib/core/widgets/bt_surface.dart",
       "app/lib/core/widgets/cached_card_image.dart",
       "app/lib/core/widgets/card_artwork.dart",
       "app/lib/core/widgets/debug_accessibility_tools.dart",
@@ -43199,11 +43910,11 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43863,
-    "resolved_call_site_count": 69476,
-    "workspace_call_edge_count": 13976,
-    "unresolved_call_edge_count": 568,
-    "unresolved_call_site_count": 786,
+    "resolved_call_edge_count": 44522,
+    "resolved_call_site_count": 70521,
+    "workspace_call_edge_count": 14156,
+    "unresolved_call_edge_count": 573,
+    "unresolved_call_site_count": 791,
     "resolved_call_edges_scope": "workspace_targets_only",
     "resolved_call_edges": [
       {
@@ -45562,7 +46273,7 @@
       },
       {
         "source": "app/lib/core/theme/app_theme.dart",
-        "line": 292,
+        "line": 305,
         "caller": "AppTheme.horizontalGutterForWidth",
         "kind": "method",
         "lexical_target": "viewportClassForWidth",
@@ -45573,7 +46284,7 @@
       },
       {
         "source": "app/lib/core/theme/app_theme.dart",
-        "line": 485,
+        "line": 483,
         "caller": "AppTheme._buildTextTheme",
         "kind": "method",
         "lexical_target": "display",
@@ -45584,7 +46295,7 @@
       },
       {
         "source": "app/lib/core/theme/app_theme.dart",
-        "line": 529,
+        "line": 527,
         "caller": "AppTheme._buildTextTheme",
         "kind": "method",
         "lexical_target": "ui",
@@ -45595,12 +46306,650 @@
       },
       {
         "source": "app/lib/core/theme/app_theme.dart",
-        "line": 604,
+        "line": 602,
         "caller": "<top-level>",
         "kind": "method",
         "lexical_target": "_buildTextTheme",
         "target": "AppTheme._buildTextTheme",
         "target_library": "package:manaloom/core/theme/app_theme.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1057,
+        "caller": "BtMetrics.lerp",
+        "kind": "constructor",
+        "lexical_target": "BtMetrics",
+        "target": "BtMetrics.BtMetrics",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1058,
+        "caller": "BtMetrics.lerp",
+        "kind": "method",
+        "lexical_target": "n",
+        "target": "n",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 26
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 106,
+        "caller": "BtTokens.lerp",
+        "kind": "constructor",
+        "lexical_target": "BtTokens",
+        "target": "BtTokens.BtTokens",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 107,
+        "caller": "BtTokens.lerp",
+        "kind": "method",
+        "lexical_target": "lerp",
+        "target": "BtPalette.lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 108,
+        "caller": "BtTokens.lerp",
+        "kind": "method",
+        "lexical_target": "lerp",
+        "target": "BtGradients.lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 109,
+        "caller": "BtTokens.lerp",
+        "kind": "method",
+        "lexical_target": "lerp",
+        "target": "BtShadows.lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1094,
+        "caller": "BtMetrics.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 110,
+        "caller": "BtTokens.lerp",
+        "kind": "method",
+        "lexical_target": "lerp",
+        "target": "BtMetrics.lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 111,
+        "caller": "BtTokens.lerp",
+        "kind": "method",
+        "lexical_target": "lerp",
+        "target": "BtType.lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1133,
+        "caller": "BtType.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtType",
+        "target": "BtType.BtType",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1134,
+        "caller": "BtType.<constructor>",
+        "kind": "method",
+        "lexical_target": "ui",
+        "target": "BtType.ui",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 12
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1137,
+        "caller": "BtType.<constructor>",
+        "kind": "method",
+        "lexical_target": "display",
+        "target": "BtType.display",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1183,
+        "caller": "BtType.ui",
+        "kind": "method",
+        "lexical_target": "_weight",
+        "target": "BtType._weight",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1206,
+        "caller": "BtType.display",
+        "kind": "method",
+        "lexical_target": "_weight",
+        "target": "BtType._weight",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1271,
+        "caller": "BtType.lerp",
+        "kind": "constructor",
+        "lexical_target": "BtType",
+        "target": "BtType.BtType",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1272,
+        "caller": "BtType.lerp",
+        "kind": "method",
+        "lexical_target": "n",
+        "target": "n",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 16
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1293,
+        "caller": "BtType.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1332,
+        "caller": "BtAngleGradient.createShader",
+        "kind": "method",
+        "lexical_target": "_resolvedStops",
+        "target": "BtAngleGradient._resolvedStops",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1337,
+        "caller": "BtAngleGradient.withOpacity",
+        "kind": "constructor",
+        "lexical_target": "BtAngleGradient",
+        "target": "BtAngleGradient.BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1344,
+        "caller": "BtAngleGradient.scale",
+        "kind": "constructor",
+        "lexical_target": "BtAngleGradient",
+        "target": "BtAngleGradient.BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1352,
+        "caller": "BtAngleGradient.lerpFrom",
+        "kind": "method",
+        "lexical_target": "_lerp",
+        "target": "BtAngleGradient._lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1358,
+        "caller": "BtAngleGradient.lerpTo",
+        "kind": "method",
+        "lexical_target": "_lerp",
+        "target": "BtAngleGradient._lerp",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1364,
+        "caller": "BtAngleGradient._lerp",
+        "kind": "method",
+        "lexical_target": "_resolvedStops",
+        "target": "BtAngleGradient._resolvedStops",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1366,
+        "caller": "BtAngleGradient._lerp",
+        "kind": "constructor",
+        "lexical_target": "BtAngleGradient",
+        "target": "BtAngleGradient.BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1382,
+        "caller": "BtAngleGradient.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1424,
+        "caller": "BtEllipseGradient.withOpacity",
+        "kind": "constructor",
+        "lexical_target": "BtEllipseGradient",
+        "target": "BtEllipseGradient.BtEllipseGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1431,
+        "caller": "BtEllipseGradient.scale",
+        "kind": "constructor",
+        "lexical_target": "BtEllipseGradient",
+        "target": "BtEllipseGradient.BtEllipseGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1441,
+        "caller": "BtEllipseGradient.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 151,
+        "caller": "BtNumeralSpec.of",
+        "kind": "constructor",
+        "lexical_target": "BtNumeralSpec",
+        "target": "BtNumeralSpec.BtNumeralSpec",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 269,
+        "caller": "BtPalette.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtPalette",
+        "target": "BtPalette.BtPalette",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 32,
+        "caller": "BtTokens.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtPalette.fromAppTheme",
+        "target": "BtPalette.BtPalette.fromAppTheme",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 33,
+        "caller": "BtTokens.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtTokens",
+        "target": "BtTokens.BtTokens",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 35,
+        "caller": "BtTokens.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtGradients.fromAppTheme",
+        "target": "BtGradients.BtGradients.fromAppTheme",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 36,
+        "caller": "BtTokens.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtShadows.fromAppTheme",
+        "target": "BtShadows.BtShadows.fromAppTheme",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 37,
+        "caller": "BtTokens.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtMetrics",
+        "target": "BtMetrics.BtMetrics",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 376,
+        "caller": "BtPalette.lerp",
+        "kind": "constructor",
+        "lexical_target": "BtPalette",
+        "target": "BtPalette.BtPalette",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 377,
+        "caller": "BtPalette.lerp",
+        "kind": "method",
+        "lexical_target": "n",
+        "target": "n",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 31
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 38,
+        "caller": "BtTokens.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtType.fromAppTheme",
+        "target": "BtType.BtType.fromAppTheme",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 413,
+        "caller": "BtPalette.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 43,
+        "caller": "<top-level>",
+        "kind": "constructor",
+        "lexical_target": "BtTokens.fromAppTheme",
+        "target": "BtTokens.BtTokens.fromAppTheme",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 438,
+        "caller": "BtGradients.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtGradients",
+        "target": "BtGradients.BtGradients",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 440,
+        "caller": "BtGradients.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtAngleGradient",
+        "target": "BtAngleGradient.BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 507,
+        "caller": "BtGradients.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtEllipseGradient",
+        "target": "BtEllipseGradient.BtEllipseGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 536,
+        "caller": "BtGradients.lerp",
+        "kind": "constructor",
+        "lexical_target": "BtGradients",
+        "target": "BtGradients.BtGradients",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 537,
+        "caller": "BtGradients.lerp",
+        "kind": "method",
+        "lexical_target": "g",
+        "target": "g",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 10
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 562,
+        "caller": "BtGradients.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 60,
+        "caller": "BtTokens.vitral",
+        "kind": "constructor",
+        "lexical_target": "BtAngleGradient",
+        "target": "BtAngleGradient.BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 610,
+        "caller": "BtShadow.lerpList",
+        "kind": "constructor",
+        "lexical_target": "BtShadow",
+        "target": "BtShadow.BtShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 665,
+        "caller": "BtShadows.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtShadow",
+        "target": "BtShadow.BtShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 40
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 675,
+        "caller": "BtShadows.<constructor>",
+        "kind": "constructor",
+        "lexical_target": "BtShadows",
+        "target": "BtShadows.BtShadows",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 77,
+        "caller": "BtTokens.numeral",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtNumeralSpec.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 79,
+        "caller": "BtTokens.numeral",
+        "kind": "method",
+        "lexical_target": "display",
+        "target": "BtType.display",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 85,
+        "caller": "BtTokens.numeral",
+        "kind": "method",
+        "lexical_target": "shadows",
+        "target": "BtNumeralSpec.shadows",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 884,
+        "caller": "BtShadows.lerp",
+        "kind": "method",
+        "lexical_target": "lerpList",
+        "target": "BtShadow.lerpList",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 888,
+        "caller": "BtShadows.lerp",
+        "kind": "constructor",
+        "lexical_target": "BtShadows",
+        "target": "BtShadows.BtShadows",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 889,
+        "caller": "BtShadows.lerp",
+        "kind": "method",
+        "lexical_target": "n",
+        "target": "n",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 18
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 916,
+        "caller": "BtShadows.==",
+        "kind": "method",
+        "lexical_target": "_listEquals",
+        "target": "_listEquals",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 95,
+        "caller": "BtTokens.copyWith",
+        "kind": "constructor",
+        "lexical_target": "BtTokens",
+        "target": "BtTokens.BtTokens",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -45902,6 +47251,655 @@
         "occurrences": 1
       },
       {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 107,
+        "caller": "AppActionButton.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 110,
+        "caller": "AppActionButton.build",
+        "kind": "method",
+        "lexical_target": "maybeOf",
+        "target": "BtArmedScope.maybeOf",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 112,
+        "caller": "AppActionButton.build",
+        "kind": "method",
+        "lexical_target": "isArmed",
+        "target": "BtArmedController.isArmed",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 113,
+        "caller": "AppActionButton.build",
+        "kind": "method",
+        "lexical_target": "resolve",
+        "target": "BtArming.resolve",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 130,
+        "caller": "AppActionButton.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 180,
+        "caller": "AppActionButton.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 74,
+        "caller": "AppActionBar.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 90,
+        "caller": "AppActionBar.build",
+        "kind": "constructor",
+        "lexical_target": "AppActionButton",
+        "target": "AppActionButton.AppActionButton",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 130,
+        "caller": "AppChoicePiece.build",
+        "kind": "constructor",
+        "lexical_target": "BtThread",
+        "target": "BtThread.BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 132,
+        "caller": "AppChoicePiece.build",
+        "kind": "constructor",
+        "lexical_target": "AppNumeral",
+        "target": "AppNumeral.AppNumeral",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 162,
+        "caller": "AppChoicePiece.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 215,
+        "caller": "AppChoicePiece.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 55,
+        "caller": "AppChoicePiece.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 58,
+        "caller": "AppChoicePiece.build",
+        "kind": "method",
+        "lexical_target": "maybeOf",
+        "target": "BtArmedScope.maybeOf",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 64,
+        "caller": "AppChoicePiece.build",
+        "kind": "method",
+        "lexical_target": "isArmed",
+        "target": "BtArmedController.isArmed",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 68,
+        "caller": "AppChoicePiece.build",
+        "kind": "method",
+        "lexical_target": "resolve",
+        "target": "BtArming.resolve",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 103,
+        "caller": "AppHeroTile.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 109,
+        "caller": "AppHeroTile.build",
+        "kind": "method",
+        "lexical_target": "_build",
+        "target": "AppHeroTile._build",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 156,
+        "caller": "AppHeroTile._build",
+        "kind": "constructor",
+        "lexical_target": "BtThread",
+        "target": "BtThread.BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 212,
+        "caller": "AppHeroTile._build",
+        "kind": "constructor",
+        "lexical_target": "_Pip",
+        "target": "_Pip._Pip",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 229,
+        "caller": "AppHeroTile._build",
+        "kind": "constructor",
+        "lexical_target": "_CarvedAction",
+        "target": "_CarvedAction._CarvedAction",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 232,
+        "caller": "AppHeroTile._build",
+        "kind": "constructor",
+        "lexical_target": "_GoButton",
+        "target": "_GoButton._GoButton",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 241,
+        "caller": "AppHeroTile._build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 271,
+        "caller": "AppHeroTile._build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 289,
+        "caller": "_Pip.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 322,
+        "caller": "_GoButton.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 330,
+        "caller": "_GoButton.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 336,
+        "caller": "_GoButton.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 344,
+        "caller": "_GoButton.build",
+        "kind": "constructor",
+        "lexical_target": "BtThread",
+        "target": "BtThread.BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 349,
+        "caller": "_GoButton.build",
+        "kind": "constructor",
+        "lexical_target": "BtStrokeGlyph",
+        "target": "BtStrokeGlyph.BtStrokeGlyph",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 374,
+        "caller": "_CarvedAction.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 383,
+        "caller": "_CarvedAction.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 158,
+        "caller": "AppNumeralMesa.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 169,
+        "caller": "AppNumeralMesa.build",
+        "kind": "method",
+        "lexical_target": "fontSizeFor",
+        "target": "AppNumeralMesa.fontSizeFor",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 170,
+        "caller": "AppNumeralMesa.build",
+        "kind": "method",
+        "lexical_target": "numeral",
+        "target": "BtTokens.numeral",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 57,
+        "caller": "AppNumeral.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 58,
+        "caller": "AppNumeral.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtNumeralSpec.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 68,
+        "caller": "AppNumeral.build",
+        "kind": "method",
+        "lexical_target": "numeral",
+        "target": "BtTokens.numeral",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 79,
+        "caller": "AppNumeral.build",
+        "kind": "method",
+        "lexical_target": "_fit",
+        "target": "AppNumeral._fit",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 96,
+        "caller": "AppNumeral._fit",
+        "kind": "method",
+        "lexical_target": "_width",
+        "target": "AppNumeral._width",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 98,
+        "caller": "AppNumeral._fit",
+        "kind": "method",
+        "lexical_target": "resize",
+        "target": "BtType.resize",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 111,
+        "caller": "AppNumeralPiece.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 142,
+        "caller": "AppNumeralPiece.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 48,
+        "caller": "AppNumeralPiece.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 51,
+        "caller": "AppNumeralPiece.build",
+        "kind": "method",
+        "lexical_target": "maybeOf",
+        "target": "BtArmedScope.maybeOf",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 57,
+        "caller": "AppNumeralPiece.build",
+        "kind": "method",
+        "lexical_target": "isArmed",
+        "target": "BtArmedController.isArmed",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 61,
+        "caller": "AppNumeralPiece.build",
+        "kind": "method",
+        "lexical_target": "resolve",
+        "target": "BtArming.resolve",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 89,
+        "caller": "AppNumeralPiece.build",
+        "kind": "constructor",
+        "lexical_target": "BtThread",
+        "target": "BtThread.BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 93,
+        "caller": "AppNumeralPiece.build",
+        "kind": "constructor",
+        "lexical_target": "AppNumeral",
+        "target": "AppNumeral.AppNumeral",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 142,
+        "caller": "_AppPlaqueState.build",
+        "kind": "method",
+        "lexical_target": "_build",
+        "target": "_AppPlaqueState._build",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 147,
+        "caller": "_AppPlaqueState._build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 99,
+        "caller": "AppPlaque.createState",
+        "kind": "constructor",
+        "lexical_target": "_AppPlaqueState",
+        "target": "_AppPlaqueState._AppPlaqueState",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 153,
+        "caller": "AppRuleTile.build",
+        "kind": "constructor",
+        "lexical_target": "BtThread",
+        "target": "BtThread.BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 237,
+        "caller": "AppRuleTile.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 248,
+        "caller": "AppRuleTile.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 286,
+        "caller": "_RuleLink.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 294,
+        "caller": "_RuleLink.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 80,
+        "caller": "AppRuleTile.link",
+        "kind": "constructor",
+        "lexical_target": "_RuleLink",
+        "target": "_RuleLink._RuleLink",
+        "target_library": "package:manaloom/core/widgets/app_rule_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 85,
+        "caller": "AppRuleTile.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
         "source": "app/lib/core/widgets/app_state_panel.dart",
         "line": 101,
         "caller": "AppStatePanel.build",
@@ -45931,6 +47929,699 @@
         "lexical_target": "ManaLoomThemeMotif",
         "target": "ManaLoomThemeMotif.ManaLoomThemeMotif",
         "target_library": "package:manaloom/core/widgets/manaloom_theme_motif.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 127,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 130,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "maybeOf",
+        "target": "BtArmedScope.maybeOf",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 135,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "isArmed",
+        "target": "BtArmedController.isArmed",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 138,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "resolve",
+        "target": "BtArming.resolve",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 170,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "vitral",
+        "target": "BtTokens.vitral",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 221,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "veiledOf",
+        "target": "BtBoardScope.veiledOf",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 227,
+        "caller": "AppTile.build",
+        "kind": "constructor",
+        "lexical_target": "BtThread",
+        "target": "BtThread.BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 229,
+        "caller": "AppTile.build",
+        "kind": "constructor",
+        "lexical_target": "AppTileEstado.off",
+        "target": "AppTileEstado.AppTileEstado.off",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 288,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "_cornerStyle",
+        "target": "AppTile._cornerStyle",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 307,
+        "caller": "AppTile.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 334,
+        "caller": "AppTile.build",
+        "kind": "constructor",
+        "lexical_target": "_TileWithCorner",
+        "target": "_TileWithCorner._TileWithCorner",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 344,
+        "caller": "AppTile.build",
+        "kind": "method",
+        "lexical_target": "isOff",
+        "target": "AppTileEstado.isOff",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 368,
+        "caller": "AppTile.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 388,
+        "caller": "AppTile._cornerStyle",
+        "kind": "constructor",
+        "lexical_target": "AppTileEstadoTheme",
+        "target": "AppTileEstadoTheme.AppTileEstadoTheme",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 486,
+        "caller": "AppTileEstado.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 487,
+        "caller": "AppTileEstado.build",
+        "kind": "method",
+        "lexical_target": "maybeOf",
+        "target": "AppTileEstadoTheme.maybeOf",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 569,
+        "caller": "BtArmedScope.createState",
+        "kind": "constructor",
+        "lexical_target": "_BtArmedScopeState",
+        "target": "_BtArmedScopeState._BtArmedScopeState",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 596,
+        "caller": "_BtArmedScopeState.arm",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 615,
+        "caller": "_BtArmedScopeState.build",
+        "kind": "constructor",
+        "lexical_target": "_BtArmedInherited",
+        "target": "_BtArmedInherited._BtArmedInherited",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 649,
+        "caller": "BtArming.resolve",
+        "kind": "method",
+        "lexical_target": "disarm",
+        "target": "BtArmedController.disarm",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 656,
+        "caller": "BtArming.resolve",
+        "kind": "method",
+        "lexical_target": "arm",
+        "target": "BtArmedController.arm",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 107,
+        "caller": "rowWidget",
+        "kind": "method",
+        "lexical_target": "_weighted",
+        "target": "AppTileBoard._weighted",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 145,
+        "caller": "AppTileBoard.build",
+        "kind": "method",
+        "lexical_target": "rowWidget",
+        "target": "rowWidget",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 165,
+        "caller": "AppTileBoard.build",
+        "kind": "constructor",
+        "lexical_target": "BtBoardScope",
+        "target": "BtBoardScope.BtBoardScope",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 190,
+        "caller": "AppTileBoard.build",
+        "kind": "method",
+        "lexical_target": "filter",
+        "target": "BtBackdrop.filter",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 234,
+        "caller": "AppTileBoard._weighted",
+        "kind": "method",
+        "lexical_target": "weightOf",
+        "target": "AppTileRowSpec.weightOf",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 235,
+        "caller": "AppTileBoard._weighted",
+        "kind": "method",
+        "lexical_target": "_ordered",
+        "target": "AppTileBoard._ordered",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 76,
+        "caller": "AppTileBoard.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 87,
+        "caller": "rowWidget",
+        "kind": "method",
+        "lexical_target": "_ordered",
+        "target": "AppTileBoard._ordered",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 160,
+        "caller": "AppTileOverlay.build",
+        "kind": "method",
+        "lexical_target": "filter",
+        "target": "BtBackdrop.filter",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 207,
+        "caller": "AppCloseX.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 216,
+        "caller": "AppCloseX.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 220,
+        "caller": "AppCloseX.build",
+        "kind": "constructor",
+        "lexical_target": "BtTouchTarget",
+        "target": "BtTouchTarget.BtTouchTarget",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 223,
+        "caller": "AppCloseX.build",
+        "kind": "constructor",
+        "lexical_target": "BtSurface",
+        "target": "BtSurface.BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 232,
+        "caller": "AppCloseX.build",
+        "kind": "constructor",
+        "lexical_target": "BtStrokeGlyph",
+        "target": "BtStrokeGlyph.BtStrokeGlyph",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 262,
+        "caller": "AppBackArrow.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 269,
+        "caller": "AppBackArrow.build",
+        "kind": "constructor",
+        "lexical_target": "BtPressable",
+        "target": "BtPressable.BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 273,
+        "caller": "AppBackArrow.build",
+        "kind": "constructor",
+        "lexical_target": "BtTouchTarget",
+        "target": "BtTouchTarget.BtTouchTarget",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 277,
+        "caller": "AppBackArrow.build",
+        "kind": "constructor",
+        "lexical_target": "BtStrokeGlyph",
+        "target": "BtStrokeGlyph.BtStrokeGlyph",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 300,
+        "caller": "showAppTileOverlay",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 60,
+        "caller": "AppTileOverlay.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 74,
+        "caller": "AppTileOverlay.build",
+        "kind": "constructor",
+        "lexical_target": "AppBackArrow",
+        "target": "AppBackArrow.AppBackArrow",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 92,
+        "caller": "AppTileOverlay.build",
+        "kind": "constructor",
+        "lexical_target": "AppCloseX",
+        "target": "AppCloseX.AppCloseX",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 166,
+        "caller": "_BtSurfacePainter.shouldRepaint",
+        "kind": "method",
+        "lexical_target": "_same",
+        "target": "_BtSurfacePainter._same",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 184,
+        "caller": "BtSweep.createState",
+        "kind": "constructor",
+        "lexical_target": "_BtSweepState",
+        "target": "_BtSweepState._BtSweepState",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 201,
+        "caller": "_BtSweepState.didChangeDependencies",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 213,
+        "caller": "_BtSweepState.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 216,
+        "caller": "_BtSweepState.build",
+        "kind": "constructor",
+        "lexical_target": "_BtSweepPainter",
+        "target": "_BtSweepPainter._BtSweepPainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 240,
+        "caller": "_BtSweepPainter.paint",
+        "kind": "constructor",
+        "lexical_target": "BtAngleGradient",
+        "target": "BtAngleGradient.BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 253,
+        "caller": "_BtSweepPainter.paint",
+        "kind": "method",
+        "lexical_target": "createShader",
+        "target": "BtAngleGradient.createShader",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 271,
+        "caller": "BtThread.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 323,
+        "caller": "BtPressable.createState",
+        "kind": "constructor",
+        "lexical_target": "_BtPressableState",
+        "target": "_BtPressableState._BtPressableState",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 337,
+        "caller": "_BtPressableState.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 373,
+        "caller": "_BtPressableState.build",
+        "kind": "method",
+        "lexical_target": "_setPressed",
+        "target": "_BtPressableState._setPressed",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 378,
+        "caller": "_BtPressableState.build",
+        "kind": "constructor",
+        "lexical_target": "_BtFocusRingPainter",
+        "target": "_BtFocusRingPainter._BtFocusRingPainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 39,
+        "caller": "BtSurface.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 43,
+        "caller": "BtSurface.build",
+        "kind": "method",
+        "lexical_target": "toBoxShadow",
+        "target": "BtShadow.toBoxShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 436,
+        "caller": "_BtFocusRingPainter.paint",
+        "kind": "method",
+        "lexical_target": "stroke",
+        "target": "stroke",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 457,
+        "caller": "BtTouchTarget.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 491,
+        "caller": "BtStrokeGlyph.build",
+        "kind": "constructor",
+        "lexical_target": "_BtGlyphPainter",
+        "target": "_BtGlyphPainter._BtGlyphPainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 494,
+        "caller": "BtStrokeGlyph.build",
+        "kind": "method",
+        "lexical_target": "of",
+        "target": "BtTokens.of",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 59,
+        "caller": "BtSurface.build",
+        "kind": "constructor",
+        "lexical_target": "BtSweep",
+        "target": "BtSweep.BtSweep",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 73,
+        "caller": "BtSurface.build",
+        "kind": "constructor",
+        "lexical_target": "_BtSurfacePainter",
+        "target": "_BtSurfacePainter._BtSurfacePainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -196953,8 +199644,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 528,
-        "occurrences": 676
+        "unique_references": 532,
+        "occurrences": 680
       },
       {
         "target_scope": "dart_sdk",
@@ -196971,8 +199662,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14458,
-        "occurrences": 24845
+        "unique_references": 14496,
+        "occurrences": 24898
       },
       {
         "target_scope": "dart_sdk",
@@ -196995,8 +199686,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:math",
-        "unique_references": 98,
-        "occurrences": 127
+        "unique_references": 105,
+        "occurrences": 137
       },
       {
         "target_scope": "dart_sdk",
@@ -197007,8 +199698,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:ui",
-        "unique_references": 491,
-        "occurrences": 1059
+        "unique_references": 568,
+        "occurrences": 1242
       },
       {
         "target_scope": "dart_sdk",
@@ -197175,8 +199866,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/animation/animation_controller.dart",
-        "unique_references": 12,
-        "occurrences": 12
+        "unique_references": 16,
+        "occurrences": 16
       },
       {
         "target_scope": "dependency",
@@ -197187,20 +199878,20 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/animation/tween.dart",
-        "unique_references": 5,
-        "occurrences": 7
+        "unique_references": 6,
+        "occurrences": 8
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/change_notifier.dart",
-        "unique_references": 205,
-        "occurrences": 329
+        "unique_references": 209,
+        "occurrences": 333
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/key.dart",
-        "unique_references": 420,
-        "occurrences": 1222
+        "unique_references": 421,
+        "occurrences": 1223
       },
       {
         "target_scope": "dependency",
@@ -197445,8 +200136,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/input_decorator.dart",
-        "unique_references": 64,
-        "occurrences": 105
+        "unique_references": 65,
+        "occurrences": 106
       },
       {
         "target_scope": "dependency",
@@ -197661,8 +200352,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/text_field.dart",
-        "unique_references": 46,
-        "occurrences": 59
+        "unique_references": 47,
+        "occurrences": 60
       },
       {
         "target_scope": "dependency",
@@ -197685,14 +200376,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/theme.dart",
-        "unique_references": 271,
-        "occurrences": 321
+        "unique_references": 272,
+        "occurrences": 322
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/theme_data.dart",
-        "unique_references": 2,
-        "occurrences": 2
+        "unique_references": 3,
+        "occurrences": 3
       },
       {
         "target_scope": "dependency",
@@ -197708,33 +200399,39 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:flutter/src/painting/alignment.dart",
+        "unique_references": 2,
+        "occurrences": 2
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/border_radius.dart",
-        "unique_references": 424,
-        "occurrences": 676
+        "unique_references": 428,
+        "occurrences": 680
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/borders.dart",
-        "unique_references": 98,
-        "occurrences": 144
+        "unique_references": 101,
+        "occurrences": 147
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/box_border.dart",
-        "unique_references": 317,
-        "occurrences": 354
+        "unique_references": 320,
+        "occurrences": 357
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/box_decoration.dart",
-        "unique_references": 373,
-        "occurrences": 481
+        "unique_references": 383,
+        "occurrences": 492
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/box_shadow.dart",
-        "unique_references": 36,
-        "occurrences": 40
+        "unique_references": 39,
+        "occurrences": 43
       },
       {
         "target_scope": "dependency",
@@ -197745,14 +200442,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/edge_insets.dart",
-        "unique_references": 648,
-        "occurrences": 838
+        "unique_references": 661,
+        "occurrences": 854
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/gradient.dart",
-        "unique_references": 18,
-        "occurrences": 23
+        "unique_references": 25,
+        "occurrences": 30
       },
       {
         "target_scope": "dependency",
@@ -197768,21 +200465,27 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:flutter/src/painting/text_painter.dart",
+        "unique_references": 3,
+        "occurrences": 3
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_scaler.dart",
-        "unique_references": 5,
-        "occurrences": 5
+        "unique_references": 8,
+        "occurrences": 8
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_span.dart",
-        "unique_references": 3,
-        "occurrences": 7
+        "unique_references": 5,
+        "occurrences": 9
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_style.dart",
-        "unique_references": 552,
-        "occurrences": 1225
+        "unique_references": 571,
+        "occurrences": 1255
       },
       {
         "target_scope": "dependency",
@@ -197799,8 +200502,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/rendering/box.dart",
-        "unique_references": 86,
-        "occurrences": 103
+        "unique_references": 98,
+        "occurrences": 119
       },
       {
         "target_scope": "dependency",
@@ -197870,6 +200573,12 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:flutter/src/widgets/actions.dart",
+        "unique_references": 3,
+        "occurrences": 4
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/animated_switcher.dart",
         "unique_references": 10,
         "occurrences": 11
@@ -197895,8 +200604,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/basic.dart",
-        "unique_references": 2399,
-        "occurrences": 4206
+        "unique_references": 2543,
+        "occurrences": 4395
       },
       {
         "target_scope": "dependency",
@@ -197907,8 +200616,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/container.dart",
-        "unique_references": 390,
-        "occurrences": 484
+        "unique_references": 399,
+        "occurrences": 494
       },
       {
         "target_scope": "dependency",
@@ -197931,32 +200640,38 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/focus_manager.dart",
-        "unique_references": 33,
-        "occurrences": 48
+        "unique_references": 35,
+        "occurrences": 50
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/focus_scope.dart",
-        "unique_references": 5,
-        "occurrences": 5
+        "unique_references": 7,
+        "occurrences": 7
+      },
+      {
+        "target_scope": "dependency",
+        "target_library": "package:flutter/src/widgets/focus_traversal.dart",
+        "unique_references": 6,
+        "occurrences": 6
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/form.dart",
-        "unique_references": 16,
-        "occurrences": 16
+        "unique_references": 18,
+        "occurrences": 18
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/framework.dart",
-        "unique_references": 409,
-        "occurrences": 630
+        "unique_references": 422,
+        "occurrences": 644
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/gesture_detector.dart",
-        "unique_references": 14,
-        "occurrences": 16
+        "unique_references": 17,
+        "occurrences": 19
       },
       {
         "target_scope": "dependency",
@@ -197967,14 +200682,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/icon_theme.dart",
-        "unique_references": 3,
-        "occurrences": 3
+        "unique_references": 11,
+        "occurrences": 11
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/icon_theme_data.dart",
-        "unique_references": 4,
-        "occurrences": 9
+        "unique_references": 11,
+        "occurrences": 16
       },
       {
         "target_scope": "dependency",
@@ -197985,8 +200700,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/implicit_animations.dart",
-        "unique_references": 15,
-        "occurrences": 15
+        "unique_references": 17,
+        "occurrences": 17
       },
       {
         "target_scope": "dependency",
@@ -197997,20 +200712,20 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/layout_builder.dart",
-        "unique_references": 76,
-        "occurrences": 78
+        "unique_references": 83,
+        "occurrences": 85
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/media_query.dart",
-        "unique_references": 66,
-        "occurrences": 68
+        "unique_references": 75,
+        "occurrences": 77
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/navigator.dart",
-        "unique_references": 174,
-        "occurrences": 290
+        "unique_references": 176,
+        "occurrences": 292
       },
       {
         "target_scope": "dependency",
@@ -198029,6 +200744,12 @@
         "target_library": "package:flutter/src/widgets/page_view.dart",
         "unique_references": 7,
         "occurrences": 7
+      },
+      {
+        "target_scope": "dependency",
+        "target_library": "package:flutter/src/widgets/pages.dart",
+        "unique_references": 1,
+        "occurrences": 1
       },
       {
         "target_scope": "dependency",
@@ -198057,8 +200778,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/safe_area.dart",
-        "unique_references": 31,
-        "occurrences": 32
+        "unique_references": 32,
+        "occurrences": 33
       },
       {
         "target_scope": "dependency",
@@ -198093,14 +200814,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/shortcuts.dart",
-        "unique_references": 10,
-        "occurrences": 15
+        "unique_references": 15,
+        "occurrences": 21
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/single_child_scroll_view.dart",
-        "unique_references": 50,
-        "occurrences": 56
+        "unique_references": 52,
+        "occurrences": 58
       },
       {
         "target_scope": "dependency",
@@ -198129,26 +200850,26 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/text.dart",
-        "unique_references": 645,
-        "occurrences": 1792
+        "unique_references": 664,
+        "occurrences": 1818
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/ticker_provider.dart",
-        "unique_references": 14,
-        "occurrences": 14
+        "unique_references": 15,
+        "occurrences": 15
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/transitions.dart",
-        "unique_references": 9,
-        "occurrences": 9
+        "unique_references": 11,
+        "occurrences": 11
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/tween_animation_builder.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "dependency",
@@ -198165,8 +200886,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/widget_span.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "dependency",
@@ -198440,6 +201161,12 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:vector_math/vector_math_64.dart",
+        "unique_references": 3,
+        "occurrences": 5
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:wakelock_plus/wakelock_plus.dart",
         "unique_references": 1,
         "occurrences": 1
@@ -198584,6 +201311,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "unique_references": 94,
+        "occurrences": 265
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:manaloom/core/utils/currency_formatter.dart",
         "unique_references": 11,
         "occurrences": 16
@@ -198614,9 +201347,63 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "unique_references": 1,
+        "occurrences": 1
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "unique_references": 4,
+        "occurrences": 4
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "unique_references": 5,
+        "occurrences": 7
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "unique_references": 2,
+        "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_rule_tile.dart",
+        "unique_references": 1,
+        "occurrences": 1
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:manaloom/core/widgets/app_state_panel.dart",
         "unique_references": 57,
         "occurrences": 79
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "unique_references": 24,
+        "occurrences": 26
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "unique_references": 7,
+        "occurrences": 8
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "unique_references": 2,
+        "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "unique_references": 40,
+        "occurrences": 49
       },
       {
         "target_scope": "workspace",
@@ -202779,6 +205566,46 @@
         "occurrences": 1
       },
       {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 204,
+        "caller": "_AppPlaqueState._build",
+        "kind": "method",
+        "lexical_target": "call",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 650,
+        "caller": "BtArming.resolve",
+        "kind": "function_expression",
+        "lexical_target": "onArmedConfirm",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 655,
+        "caller": "BtArming.resolve",
+        "kind": "method",
+        "lexical_target": "call",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 310,
+        "caller": "showAppTileOverlay",
+        "kind": "function_expression",
+        "lexical_target": "builder",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 362,
+        "caller": "_BtPressableState.build",
+        "kind": "method",
+        "lexical_target": "call",
+        "occurrences": 1
+      },
+      {
         "source": "app/lib/core/widgets/cached_card_image.dart",
         "line": 224,
         "caller": "_CachedCardImageState._notifyLoadState",
@@ -206891,9 +209718,9 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 16881,
-    "workspace_type_reference_count": 3619,
-    "unresolved_type_reference_count": 379,
+    "resolved_type_reference_count": 17396,
+    "workspace_type_reference_count": 3717,
+    "unresolved_type_reference_count": 382,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
       {
@@ -207508,11 +210335,191 @@
       },
       {
         "source": "app/lib/core/theme/app_theme.dart",
-        "line": 282,
+        "line": 295,
         "lexical_type": "AppViewportClass",
         "resolved_type": "AppViewportClass",
         "target": "AppViewportClass",
         "target_library": "package:manaloom/core/theme/app_theme.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 1449,
+        "lexical_type": "T",
+        "resolved_type": "T",
+        "target": "_listEquals.T",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 148,
+        "lexical_type": "BtNumeralShadow",
+        "resolved_type": "BtNumeralShadow",
+        "target": "BtNumeralShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 150,
+        "lexical_type": "BtNumeralSpec",
+        "resolved_type": "BtNumeralSpec",
+        "target": "BtNumeralSpec",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 10
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 21,
+        "lexical_type": "BtTokens",
+        "resolved_type": "BtTokens",
+        "target": "BtTokens",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 12
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 32,
+        "lexical_type": "BtPalette",
+        "resolved_type": "BtPalette",
+        "target": "BtPalette",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 9
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 35,
+        "lexical_type": "BtGradients",
+        "resolved_type": "BtGradients",
+        "target": "BtGradients",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 36,
+        "lexical_type": "BtShadows",
+        "resolved_type": "BtShadows",
+        "target": "BtShadows",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 37,
+        "lexical_type": "BtMetrics",
+        "resolved_type": "BtMetrics",
+        "target": "BtMetrics",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 7
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 38,
+        "lexical_type": "BtType",
+        "resolved_type": "BtType",
+        "target": "BtType",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 8
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 507,
+        "lexical_type": "BtEllipseGradient",
+        "resolved_type": "BtEllipseGradient",
+        "target": "BtEllipseGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 60,
+        "lexical_type": "BtAngleGradient",
+        "resolved_type": "BtAngleGradient",
+        "target": "BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 18
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 605,
+        "lexical_type": "BtShadow",
+        "resolved_type": "BtShadow",
+        "target": "BtShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 65
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 73,
+        "lexical_type": "AppNumeralScale",
+        "resolved_type": "AppNumeralScale",
+        "target": "AppNumeralScale",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 90,
+        "lexical_type": "BtPalette?",
+        "resolved_type": "BtPalette?",
+        "target": "BtPalette",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 91,
+        "lexical_type": "BtGradients?",
+        "resolved_type": "BtGradients?",
+        "target": "BtGradients",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 92,
+        "lexical_type": "BtShadows?",
+        "resolved_type": "BtShadows?",
+        "target": "BtShadows",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 93,
+        "lexical_type": "BtMetrics?",
+        "resolved_type": "BtMetrics?",
+        "target": "BtMetrics",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/theme/bt_tokens.dart",
+        "line": 94,
+        "lexical_type": "BtType?",
+        "resolved_type": "BtType?",
+        "target": "BtType",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -207553,6 +210560,386 @@
         "resolved_type": "_SanitizedAppLogError",
         "target": "_SanitizedAppLogError",
         "target_library": "package:manaloom/core/utils/logger.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 130,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 180,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 46,
+        "lexical_type": "AppActionKind",
+        "resolved_type": "AppActionKind",
+        "target": "AppActionKind",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 57,
+        "lexical_type": "AppAction",
+        "resolved_type": "AppAction",
+        "target": "AppAction",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 65,
+        "lexical_type": "AppAction?",
+        "resolved_type": "AppAction?",
+        "target": "AppAction",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_action_bar.dart",
+        "line": 90,
+        "lexical_type": "AppActionButton",
+        "resolved_type": "AppActionButton",
+        "target": "AppActionButton",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 130,
+        "lexical_type": "BtThread",
+        "resolved_type": "BtThread",
+        "target": "BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 132,
+        "lexical_type": "AppNumeral",
+        "resolved_type": "AppNumeral",
+        "target": "AppNumeral",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 162,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 215,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_choice_piece.dart",
+        "line": 47,
+        "lexical_type": "AppTileStatus",
+        "resolved_type": "AppTileStatus",
+        "target": "AppTileStatus",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 115,
+        "lexical_type": "BtTokens",
+        "resolved_type": "BtTokens",
+        "target": "BtTokens",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 156,
+        "lexical_type": "BtThread",
+        "resolved_type": "BtThread",
+        "target": "BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 212,
+        "lexical_type": "_Pip",
+        "resolved_type": "_Pip",
+        "target": "_Pip",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 229,
+        "lexical_type": "_CarvedAction",
+        "resolved_type": "_CarvedAction",
+        "target": "_CarvedAction",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 232,
+        "lexical_type": "_GoButton",
+        "resolved_type": "_GoButton",
+        "target": "_GoButton",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 241,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 271,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 349,
+        "lexical_type": "BtStrokeGlyph",
+        "resolved_type": "BtStrokeGlyph",
+        "target": "BtStrokeGlyph",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 53,
+        "lexical_type": "AppHeroPip",
+        "resolved_type": "AppHeroPip",
+        "target": "AppHeroPip",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_hero_tile.dart",
+        "line": 58,
+        "lexical_type": "AppHeroAction",
+        "resolved_type": "AppHeroAction",
+        "target": "AppHeroAction",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral.dart",
+        "line": 33,
+        "lexical_type": "AppNumeralScale",
+        "resolved_type": "AppNumeralScale",
+        "target": "AppNumeralScale",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 111,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 142,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 41,
+        "lexical_type": "AppTileStatus",
+        "resolved_type": "AppTileStatus",
+        "target": "AppTileStatus",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 79,
+        "lexical_type": "BtShadow",
+        "resolved_type": "BtShadow",
+        "target": "BtShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 89,
+        "lexical_type": "BtThread",
+        "resolved_type": "BtThread",
+        "target": "BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_numeral_piece.dart",
+        "line": 93,
+        "lexical_type": "AppNumeral",
+        "resolved_type": "AppNumeral",
+        "target": "AppNumeral",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 58,
+        "lexical_type": "AppPlaqueKind",
+        "resolved_type": "AppPlaqueKind",
+        "target": "AppPlaqueKind",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 99,
+        "lexical_type": "AppPlaque",
+        "resolved_type": "AppPlaque",
+        "target": "AppPlaque",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 99,
+        "lexical_type": "_AppPlaqueState",
+        "resolved_type": "_AppPlaqueState",
+        "target": "_AppPlaqueState",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 153,
+        "lexical_type": "BtThread",
+        "resolved_type": "BtThread",
+        "target": "BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 237,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 248,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 66,
+        "lexical_type": "AppRuleTileSize",
+        "resolved_type": "AppRuleTileSize",
+        "target": "AppRuleTileSize",
+        "target_library": "package:manaloom/core/widgets/app_rule_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 67,
+        "lexical_type": "AppRuleTileRole",
+        "resolved_type": "AppRuleTileRole",
+        "target": "AppRuleTileRole",
+        "target_library": "package:manaloom/core/widgets/app_rule_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 68,
+        "lexical_type": "AppTileStatus",
+        "resolved_type": "AppTileStatus",
+        "target": "AppTileStatus",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_rule_tile.dart",
+        "line": 80,
+        "lexical_type": "_RuleLink",
+        "resolved_type": "_RuleLink",
+        "target": "_RuleLink",
+        "target_library": "package:manaloom/core/widgets/app_rule_tile.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -207605,6 +210992,426 @@
         "target_library": "package:manaloom/core/widgets/manaloom_theme_motif.dart",
         "target_scope": "workspace",
         "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 106,
+        "lexical_type": "AppTileStatus",
+        "resolved_type": "AppTileStatus",
+        "target": "AppTileStatus",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 150,
+        "lexical_type": "BtShadow",
+        "resolved_type": "BtShadow",
+        "target": "BtShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 227,
+        "lexical_type": "BtThread",
+        "resolved_type": "BtThread",
+        "target": "BtThread",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 229,
+        "lexical_type": "AppTileEstado",
+        "resolved_type": "AppTileEstado",
+        "target": "AppTileEstado",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 4
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 307,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 334,
+        "lexical_type": "_TileWithCorner",
+        "resolved_type": "_TileWithCorner",
+        "target": "_TileWithCorner",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 368,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 381,
+        "lexical_type": "BtTokens",
+        "resolved_type": "BtTokens",
+        "target": "BtTokens",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 388,
+        "lexical_type": "AppTileEstadoTheme",
+        "resolved_type": "AppTileEstadoTheme",
+        "target": "AppTileEstadoTheme",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 459,
+        "lexical_type": "AppTileEstadoTheme?",
+        "resolved_type": "AppTileEstadoTheme?",
+        "target": "AppTileEstadoTheme",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 544,
+        "lexical_type": "BtBoardScope",
+        "resolved_type": "BtBoardScope",
+        "target": "BtBoardScope",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 564,
+        "lexical_type": "BtArmedController?",
+        "resolved_type": "BtArmedController?",
+        "target": "BtArmedController",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 565,
+        "lexical_type": "_BtArmedInherited",
+        "resolved_type": "_BtArmedInherited",
+        "target": "_BtArmedInherited",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 569,
+        "lexical_type": "BtArmedScope",
+        "resolved_type": "BtArmedScope",
+        "target": "BtArmedScope",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 569,
+        "lexical_type": "_BtArmedScopeState",
+        "resolved_type": "_BtArmedScopeState",
+        "target": "_BtArmedScopeState",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 581,
+        "lexical_type": "BtArmedController",
+        "resolved_type": "BtArmedController",
+        "target": "BtArmedController",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 99,
+        "lexical_type": "AppTileTone",
+        "resolved_type": "AppTileTone",
+        "target": "AppTileTone",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 165,
+        "lexical_type": "BtBoardScope",
+        "resolved_type": "BtBoardScope",
+        "target": "BtBoardScope",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_board.dart",
+        "line": 63,
+        "lexical_type": "AppTileRowSpec",
+        "resolved_type": "AppTileRowSpec",
+        "target": "AppTileRowSpec",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 202,
+        "lexical_type": "AppCloseXSize",
+        "resolved_type": "AppCloseXSize",
+        "target": "AppCloseXSize",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 216,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 220,
+        "lexical_type": "BtTouchTarget",
+        "resolved_type": "BtTouchTarget",
+        "target": "BtTouchTarget",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 223,
+        "lexical_type": "BtSurface",
+        "resolved_type": "BtSurface",
+        "target": "BtSurface",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 232,
+        "lexical_type": "BtStrokeGlyph",
+        "resolved_type": "BtStrokeGlyph",
+        "target": "BtStrokeGlyph",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 295,
+        "lexical_type": "T?",
+        "resolved_type": "T?",
+        "target": "showAppTileOverlay.T",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 301,
+        "lexical_type": "T",
+        "resolved_type": "T",
+        "target": "showAppTileOverlay.T",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 52,
+        "lexical_type": "AppOverlayVeil",
+        "resolved_type": "AppOverlayVeil",
+        "target": "AppOverlayVeil",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 74,
+        "lexical_type": "AppBackArrow",
+        "resolved_type": "AppBackArrow",
+        "target": "AppBackArrow",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile_overlay.dart",
+        "line": 92,
+        "lexical_type": "AppCloseX",
+        "resolved_type": "AppCloseX",
+        "target": "AppCloseX",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 184,
+        "lexical_type": "_BtSweepState",
+        "resolved_type": "_BtSweepState",
+        "target": "_BtSweepState",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 20,
+        "lexical_type": "BtShadow",
+        "resolved_type": "BtShadow",
+        "target": "BtShadow",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 216,
+        "lexical_type": "_BtSweepPainter",
+        "resolved_type": "_BtSweepPainter",
+        "target": "_BtSweepPainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 230,
+        "lexical_type": "BtPalette",
+        "resolved_type": "BtPalette",
+        "target": "BtPalette",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 240,
+        "lexical_type": "BtAngleGradient",
+        "resolved_type": "BtAngleGradient",
+        "target": "BtAngleGradient",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 316,
+        "lexical_type": "BtFocusRing",
+        "resolved_type": "BtFocusRing",
+        "target": "BtFocusRing",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 323,
+        "lexical_type": "BtPressable",
+        "resolved_type": "BtPressable",
+        "target": "BtPressable",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 323,
+        "lexical_type": "_BtPressableState",
+        "resolved_type": "_BtPressableState",
+        "target": "_BtPressableState",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 378,
+        "lexical_type": "_BtFocusRingPainter",
+        "resolved_type": "_BtFocusRingPainter",
+        "target": "_BtFocusRingPainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 478,
+        "lexical_type": "BtGlyphShape",
+        "resolved_type": "BtGlyphShape",
+        "target": "BtGlyphShape",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 491,
+        "lexical_type": "_BtGlyphPainter",
+        "resolved_type": "_BtGlyphPainter",
+        "target": "_BtGlyphPainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 59,
+        "lexical_type": "BtSweep",
+        "resolved_type": "BtSweep",
+        "target": "BtSweep",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 3
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 73,
+        "lexical_type": "_BtSurfacePainter",
+        "resolved_type": "_BtSurfacePainter",
+        "target": "_BtSurfacePainter",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
       },
       {
         "source": "app/lib/core/widgets/cached_card_image.dart",
@@ -243097,8 +246904,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:async",
-        "unique_references": 1120,
-        "occurrences": 2236
+        "unique_references": 1123,
+        "occurrences": 2239
       },
       {
         "target_scope": "dart_sdk",
@@ -243115,8 +246922,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6543,
-        "occurrences": 40805
+        "unique_references": 6613,
+        "occurrences": 41101
       },
       {
         "target_scope": "dart_sdk",
@@ -243139,8 +246946,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:ui",
-        "unique_references": 229,
-        "occurrences": 755
+        "unique_references": 275,
+        "occurrences": 929
       },
       {
         "target_scope": "dependency",
@@ -243313,8 +247120,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/animation/animation_controller.dart",
-        "unique_references": 4,
-        "occurrences": 8
+        "unique_references": 6,
+        "occurrences": 10
       },
       {
         "target_scope": "dependency",
@@ -243325,14 +247132,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/animation/tween.dart",
-        "unique_references": 3,
-        "occurrences": 4
+        "unique_references": 4,
+        "occurrences": 5
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/basic_types.dart",
-        "unique_references": 54,
-        "occurrences": 105
+        "unique_references": 55,
+        "occurrences": 107
       },
       {
         "target_scope": "dependency",
@@ -243343,8 +247150,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/foundation/key.dart",
-        "unique_references": 108,
-        "occurrences": 1252
+        "unique_references": 110,
+        "occurrences": 1254
       },
       {
         "target_scope": "dependency",
@@ -243589,8 +247396,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/input_decorator.dart",
-        "unique_references": 40,
-        "occurrences": 105
+        "unique_references": 41,
+        "occurrences": 106
       },
       {
         "target_scope": "dependency",
@@ -243799,8 +247606,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/text_field.dart",
-        "unique_references": 31,
-        "occurrences": 59
+        "unique_references": 32,
+        "occurrences": 60
       },
       {
         "target_scope": "dependency",
@@ -243823,8 +247630,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/material/theme_data.dart",
-        "unique_references": 7,
-        "occurrences": 26
+        "unique_references": 10,
+        "occurrences": 29
       },
       {
         "target_scope": "dependency",
@@ -243841,32 +247648,32 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/alignment.dart",
-        "unique_references": 3,
-        "occurrences": 4
+        "unique_references": 4,
+        "occurrences": 6
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/border_radius.dart",
-        "unique_references": 83,
-        "occurrences": 682
+        "unique_references": 86,
+        "occurrences": 686
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/borders.dart",
-        "unique_references": 49,
-        "occurrences": 144
+        "unique_references": 52,
+        "occurrences": 147
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/box_border.dart",
-        "unique_references": 77,
-        "occurrences": 354
+        "unique_references": 81,
+        "occurrences": 359
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/box_decoration.dart",
-        "unique_references": 79,
-        "occurrences": 481
+        "unique_references": 86,
+        "occurrences": 492
       },
       {
         "target_scope": "dependency",
@@ -243877,8 +247684,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/box_shadow.dart",
-        "unique_references": 28,
-        "occurrences": 40
+        "unique_references": 31,
+        "occurrences": 44
       },
       {
         "target_scope": "dependency",
@@ -243889,14 +247696,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/edge_insets.dart",
-        "unique_references": 91,
-        "occurrences": 843
+        "unique_references": 100,
+        "occurrences": 863
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/gradient.dart",
-        "unique_references": 14,
-        "occurrences": 28
+        "unique_references": 25,
+        "occurrences": 63
       },
       {
         "target_scope": "dependency",
@@ -243913,8 +247720,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/inline_span.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 3
       },
       {
         "target_scope": "dependency",
@@ -243924,15 +247731,21 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:flutter/src/painting/text_painter.dart",
+        "unique_references": 1,
+        "occurrences": 1
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_span.dart",
-        "unique_references": 3,
-        "occurrences": 7
+        "unique_references": 5,
+        "occurrences": 9
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/painting/text_style.dart",
-        "unique_references": 77,
-        "occurrences": 671
+        "unique_references": 81,
+        "occurrences": 702
       },
       {
         "target_scope": "dependency",
@@ -243949,14 +247762,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/rendering/box.dart",
-        "unique_references": 42,
-        "occurrences": 101
+        "unique_references": 51,
+        "occurrences": 118
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/rendering/custom_paint.dart",
-        "unique_references": 4,
-        "occurrences": 5
+        "unique_references": 5,
+        "occurrences": 9
       },
       {
         "target_scope": "dependency",
@@ -244021,8 +247834,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/services/text_input.dart",
-        "unique_references": 4,
-        "occurrences": 4
+        "unique_references": 7,
+        "occurrences": 7
+      },
+      {
+        "target_scope": "dependency",
+        "target_library": "package:flutter/src/widgets/actions.dart",
+        "unique_references": 5,
+        "occurrences": 8
       },
       {
         "target_scope": "dependency",
@@ -244051,8 +247870,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/basic.dart",
-        "unique_references": 778,
-        "occurrences": 4206
+        "unique_references": 883,
+        "occurrences": 4393
       },
       {
         "target_scope": "dependency",
@@ -244063,8 +247882,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/container.dart",
-        "unique_references": 101,
-        "occurrences": 484
+        "unique_references": 109,
+        "occurrences": 494
       },
       {
         "target_scope": "dependency",
@@ -244081,38 +247900,44 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/editable_text.dart",
-        "unique_references": 35,
-        "occurrences": 115
+        "unique_references": 36,
+        "occurrences": 116
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/focus_manager.dart",
-        "unique_references": 13,
-        "occurrences": 32
+        "unique_references": 16,
+        "occurrences": 37
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/focus_scope.dart",
-        "unique_references": 5,
-        "occurrences": 5
+        "unique_references": 7,
+        "occurrences": 7
+      },
+      {
+        "target_scope": "dependency",
+        "target_library": "package:flutter/src/widgets/focus_traversal.dart",
+        "unique_references": 4,
+        "occurrences": 6
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/form.dart",
-        "unique_references": 10,
-        "occurrences": 16
+        "unique_references": 13,
+        "occurrences": 19
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/framework.dart",
-        "unique_references": 492,
-        "occurrences": 2200
+        "unique_references": 543,
+        "occurrences": 2343
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/gesture_detector.dart",
-        "unique_references": 11,
-        "occurrences": 16
+        "unique_references": 14,
+        "occurrences": 19
       },
       {
         "target_scope": "dependency",
@@ -244135,8 +247960,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/icon_theme_data.dart",
-        "unique_references": 4,
-        "occurrences": 9
+        "unique_references": 9,
+        "occurrences": 16
       },
       {
         "target_scope": "dependency",
@@ -244147,8 +247972,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/implicit_animations.dart",
-        "unique_references": 13,
-        "occurrences": 15
+        "unique_references": 15,
+        "occurrences": 17
       },
       {
         "target_scope": "dependency",
@@ -244159,8 +247984,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/layout_builder.dart",
-        "unique_references": 41,
-        "occurrences": 78
+        "unique_references": 47,
+        "occurrences": 85
       },
       {
         "target_scope": "dependency",
@@ -244194,6 +248019,12 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:flutter/src/widgets/pages.dart",
+        "unique_references": 1,
+        "occurrences": 1
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/platform_view.dart",
         "unique_references": 1,
         "occurrences": 1
@@ -244219,8 +248050,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/safe_area.dart",
-        "unique_references": 29,
-        "occurrences": 32
+        "unique_references": 30,
+        "occurrences": 33
       },
       {
         "target_scope": "dependency",
@@ -244261,14 +248092,14 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/shortcuts.dart",
-        "unique_references": 8,
-        "occurrences": 15
+        "unique_references": 16,
+        "occurrences": 24
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/single_child_scroll_view.dart",
-        "unique_references": 29,
-        "occurrences": 56
+        "unique_references": 31,
+        "occurrences": 58
       },
       {
         "target_scope": "dependency",
@@ -244297,26 +248128,26 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/text.dart",
-        "unique_references": 94,
-        "occurrences": 1792
+        "unique_references": 102,
+        "occurrences": 1811
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/ticker_provider.dart",
-        "unique_references": 14,
-        "occurrences": 14
+        "unique_references": 15,
+        "occurrences": 15
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/transitions.dart",
-        "unique_references": 9,
-        "occurrences": 9
+        "unique_references": 11,
+        "occurrences": 11
       },
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/tween_animation_builder.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "dependency",
@@ -244327,8 +248158,8 @@
       {
         "target_scope": "dependency",
         "target_library": "package:flutter/src/widgets/widget_span.dart",
-        "unique_references": 1,
-        "occurrences": 1
+        "unique_references": 2,
+        "occurrences": 2
       },
       {
         "target_scope": "dependency",
@@ -244554,6 +248385,12 @@
       },
       {
         "target_scope": "dependency",
+        "target_library": "package:vector_math/vector_math_64.dart",
+        "unique_references": 1,
+        "occurrences": 3
+      },
+      {
+        "target_scope": "dependency",
         "target_library": "package:web/src/dom/html.dart",
         "unique_references": 2,
         "occurrences": 4
@@ -244609,8 +248446,8 @@
       {
         "target_scope": "unknown",
         "target_library": "<unresolved>",
-        "unique_references": 413,
-        "occurrences": 4751
+        "unique_references": 414,
+        "occurrences": 4752
       },
       {
         "target_scope": "workspace",
@@ -244710,6 +248547,12 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:manaloom/core/theme/bt_tokens.dart",
+        "unique_references": 26,
+        "occurrences": 171
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:manaloom/core/utils/friendly_error_mapper.dart",
         "unique_references": 1,
         "occurrences": 6
@@ -244722,9 +248565,63 @@
       },
       {
         "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_action_bar.dart",
+        "unique_references": 4,
+        "occurrences": 6
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_hero_tile.dart",
+        "unique_references": 5,
+        "occurrences": 9
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_numeral.dart",
+        "unique_references": 2,
+        "occurrences": 4
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_plaque.dart",
+        "unique_references": 3,
+        "occurrences": 5
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_rule_tile.dart",
+        "unique_references": 3,
+        "occurrences": 3
+      },
+      {
+        "target_scope": "workspace",
         "target_library": "package:manaloom/core/widgets/app_state_panel.dart",
         "unique_references": 27,
         "occurrences": 81
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_tile.dart",
+        "unique_references": 16,
+        "occurrences": 27
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_tile_board.dart",
+        "unique_references": 1,
+        "occurrences": 2
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/app_tile_overlay.dart",
+        "unique_references": 6,
+        "occurrences": 7
+      },
+      {
+        "target_scope": "workspace",
+        "target_library": "package:manaloom/core/widgets/bt_surface.dart",
+        "unique_references": 32,
+        "occurrences": 53
       },
       {
         "target_scope": "workspace",
@@ -247397,6 +251294,24 @@
         "line": 11,
         "lexical_type": "void",
         "occurrences": 4
+      },
+      {
+        "source": "app/lib/core/widgets/app_plaque.dart",
+        "line": 109,
+        "lexical_type": "void",
+        "occurrences": 4
+      },
+      {
+        "source": "app/lib/core/widgets/app_tile.dart",
+        "line": 576,
+        "lexical_type": "void",
+        "occurrences": 5
+      },
+      {
+        "source": "app/lib/core/widgets/bt_surface.dart",
+        "line": 111,
+        "lexical_type": "void",
+        "occurrences": 8
       },
       {
         "source": "app/lib/core/widgets/cached_card_image.dart",
@@ -284803,11 +288718,14 @@
     "app/test/core/theme/app_theme_test.dart",
     "app/test/core/theme/app_theme_token_usage_test.dart",
     "app/test/core/theme/app_theme_widget_tokens_test.dart",
+    "app/test/core/theme/bt_tokens_test.dart",
     "app/test/core/utils/currency_formatter_test.dart",
     "app/test/core/utils/friendly_error_mapper_test.dart",
     "app/test/core/utils/logger_test.dart",
     "app/test/core/utils/scryfall_image_helper_test.dart",
     "app/test/core/widgets/app_state_panel_test.dart",
+    "app/test/core/widgets/bt_kit_specimen_test.dart",
+    "app/test/core/widgets/bt_kit_widgets_test.dart",
     "app/test/core/widgets/cached_card_image_test.dart",
     "app/test/core/widgets/card_artwork_test.dart",
     "app/test/core/widgets/card_image_source_policy_guard_test.dart",
@@ -285011,6 +288929,7 @@
     "app/test/tool/runtime_screenshot_crop_test.dart",
     "app/test/tool/serve_flutter_web_app_contract_test.dart",
     "app/test/tool/ui_runtime_evidence_test.dart",
+    "app/test/ui/legacy_pattern_guard_test.dart",
     "app/test/ui/manaloom_auth_ui_audit_test.dart",
     "app/test/ui/manaloom_commercial_ui_audit_test.dart",
     "app/test/ui/manaloom_deck_analysis_ui_audit_test.dart",
@@ -297320,7 +301239,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "11bfe7f07d540178d9eb37a64fb0d93f15d9a4413d620d43d6fb5768c8ae7e72"
+    "project_logic_source_digest_sha256": "0ffbe4e2c7276f5a8d65ff9ef1a17db6ab7edcb27c498e070aa017ce19139acc"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -298071,12 +301990,24 @@
       "app/lib/core/services/scryfall_image_cache_manager.dart",
       "app/lib/core/services/scryfall_image_request_policy.dart",
       "app/lib/core/theme/app_theme.dart",
+      "app/lib/core/theme/bt_tokens.dart",
       "app/lib/core/utils/currency_formatter.dart",
       "app/lib/core/utils/friendly_error_mapper.dart",
       "app/lib/core/utils/logger.dart",
       "app/lib/core/utils/mana_helper.dart",
       "app/lib/core/utils/scryfall_image_helper.dart",
+      "app/lib/core/widgets/app_action_bar.dart",
+      "app/lib/core/widgets/app_choice_piece.dart",
+      "app/lib/core/widgets/app_hero_tile.dart",
+      "app/lib/core/widgets/app_numeral.dart",
+      "app/lib/core/widgets/app_numeral_piece.dart",
+      "app/lib/core/widgets/app_plaque.dart",
+      "app/lib/core/widgets/app_rule_tile.dart",
       "app/lib/core/widgets/app_state_panel.dart",
+      "app/lib/core/widgets/app_tile.dart",
+      "app/lib/core/widgets/app_tile_board.dart",
+      "app/lib/core/widgets/app_tile_overlay.dart",
+      "app/lib/core/widgets/bt_surface.dart",
       "app/lib/core/widgets/cached_card_image.dart",
       "app/lib/core/widgets/card_artwork.dart",
       "app/lib/core/widgets/debug_accessibility_tools.dart",
@@ -298319,11 +302250,14 @@
       "app/test/core/theme/app_theme_test.dart",
       "app/test/core/theme/app_theme_token_usage_test.dart",
       "app/test/core/theme/app_theme_widget_tokens_test.dart",
+      "app/test/core/theme/bt_tokens_test.dart",
       "app/test/core/utils/currency_formatter_test.dart",
       "app/test/core/utils/friendly_error_mapper_test.dart",
       "app/test/core/utils/logger_test.dart",
       "app/test/core/utils/scryfall_image_helper_test.dart",
       "app/test/core/widgets/app_state_panel_test.dart",
+      "app/test/core/widgets/bt_kit_specimen_test.dart",
+      "app/test/core/widgets/bt_kit_widgets_test.dart",
       "app/test/core/widgets/cached_card_image_test.dart",
       "app/test/core/widgets/card_artwork_test.dart",
       "app/test/core/widgets/card_image_source_policy_guard_test.dart",
@@ -298528,6 +302462,7 @@
       "app/test/tool/serve_flutter_web_app_contract_test.dart",
       "app/test/tool/ui_runtime_evidence_test.dart",
       "app/test/ui/fixtures/ui_surface_inventory.json",
+      "app/test/ui/legacy_pattern_guard_test.dart",
       "app/test/ui/manaloom_auth_ui_audit_test.dart",
       "app/test/ui/manaloom_commercial_ui_audit_test.dart",
       "app/test/ui/manaloom_deck_analysis_ui_audit_test.dart",
