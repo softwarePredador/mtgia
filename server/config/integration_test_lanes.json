@@ -674,8 +674,8 @@
     },
     {
       "path": "app/integration_test/lorehold_generate_reference_stats_runtime_test.dart",
-      "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Lorehold generate uses public reference st)."
     },
     {
       "path": "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
@@ -699,38 +699,38 @@
     },
     {
       "path": "app/integration_test/profile_community_runtime_test.dart",
-      "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: profile edit reload and community social )."
     },
     {
       "path": "app/integration_test/realtime_notifications_runtime_test.dart",
-      "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: foreground notifications refresh badges, )."
     },
     {
       "path": "app/integration_test/release_observability_smoke_test.dart",
       "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (UnsupportedError): checks Sentry and Firebase Performance release readiness"
     },
     {
       "path": "app/integration_test/scanner_controlled_harness_runtime_test.dart",
-      "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
     },
     {
       "path": "app/integration_test/scanner_physical_runtime_test.dart",
-      "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (physical back camera initializes and its frame is accepted b)."
     },
     {
       "path": "app/integration_test/sets_catalog_runtime_test.dart",
       "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): sets catalog searches and opens set detail against live backend"
     },
     {
       "path": "app/integration_test/sets_search_catalog_runtime_test.dart",
       "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (rc 124): "
     },
     {
       "path": "app/integration_test/social_trade_visual_runtime_proof_test.dart",
@@ -739,8 +739,8 @@
     },
     {
       "path": "app/integration_test/strixhaven_commander_profiles_runtime_test.dart",
-      "lane": "triage",
-      "reason": "Não rodou no inventário de 2026-10-05."
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Strixhaven commander profiles generate/sav)."
     },
     {
       "path": "app/integration_test/visual_system_workspace_runtime_proof_test.dart",
