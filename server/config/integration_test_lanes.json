@@ -1,0 +1,751 @@
+{
+  "schema": "manaloom.integration_test_lanes.v1",
+  "lanes": {
+    "web_hermetic": "roda no quality_gate full: Chrome real, API presa em loopback fechado, falha fechado",
+    "web_backend": "precisa de API e PostgreSQL descartáveis em loopback; ainda fora do gate",
+    "device": "precisa de Android físico, iOS ou WebView nativa; roda na sessão no Mac do Rafael",
+    "ui_proof": "pertence à prova de UI (BT-UIEV-001) e roda nos scripts de captura dela",
+    "triage": "vermelho no Chrome sem causa de ambiente; precisa de dono e correção antes de entrar numa trilha"
+  },
+  "inventory": {
+    "date": "2026-10-05",
+    "runtime": "flutter drive -d web-server, Chrome 141 headless, API_BASE_URL=http://127.0.0.1:9"
+  },
+  "tests": [
+    {
+      "path": "app/integration_test/android_fcm_delivery_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (Android physical runtime proves real FCM foreground and tap)."
+    },
+    {
+      "path": "app/integration_test/app_existing_user_visual_audit_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/app_full_non_life_counter_visual_capture_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (_Exception): captures non-life-counter app tabs + deck generate preview"
+    },
+    {
+      "path": "app/integration_test/battle_coach_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/battle_learning_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/battle_live_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/binder_dashboard_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: binder dashboard value progress filters a)."
+    },
+    {
+      "path": "app/integration_test/binder_import_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/binder_marketplace_trade_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: binder marketplace sale trade lifecycle w)."
+    },
+    {
+      "path": "app/integration_test/card_add_commander_choice_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): add-card modal exposes commander choice for eligible card"
+    },
+    {
+      "path": "app/integration_test/collection_entrypoints_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): collection hub exposes binder and sets entry points"
+    },
+    {
+      "path": "app/integration_test/commander_edition_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: commander edition is visible and stays ou)."
+    },
+    {
+      "path": "app/integration_test/commander_learned_deck_availability_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone runtime: learned deck button appears for five promote)."
+    },
+    {
+      "path": "app/integration_test/commander_learned_deck_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (localized iPhone runtime: Lorehold learned deck button, prev)."
+    },
+    {
+      "path": "app/integration_test/commander_reference_app_value_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Commander Reference app value generate/sav)."
+    },
+    {
+      "path": "app/integration_test/commander_reference_feather_app_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: Commander Reference Feather app proof)."
+    },
+    {
+      "path": "app/integration_test/commander_reference_sprint3_lot_a_app_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Sprint 3 Lote A Commander Reference Krenko)."
+    },
+    {
+      "path": "app/integration_test/commander_reference_sprint3_lot_b_app_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Sprint 3 Lote B Commander Reference Urza a)."
+    },
+    {
+      "path": "app/integration_test/commander_reference_sprint3_lot_c_app_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Sprint 3 Lote C Commander Reference Brago )."
+    },
+    {
+      "path": "app/integration_test/commander_reference_sprint4_lot1_app_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Sprint 4 Lote 1 Commander Reference Miirym)."
+    },
+    {
+      "path": "app/integration_test/core_performance_runtime_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/core_product_acceptance_runtime_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/critical_overlays_states_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/deck_functional_tags_runtime_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/deck_generate_async_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (iPhone 15 runtime: generate async -> save -> details -> opti)."
+    },
+    {
+      "path": "app/integration_test/deck_runtime_m2006_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (device runtime: iPhone 15 register -> create commander -> co)."
+    },
+    {
+      "path": "app/integration_test/deck_workshop_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/fcm_staging_smoke_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/image_memory_runtime_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/life_counter_clock_visual_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_commander_cast_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_commander_cast_roundtrip_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_commander_damage_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_commander_damage_roundtrip_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_day_night_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_dice_coin_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_dice_d20_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_dice_first_player_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_dice_high_roll_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_extra_counters_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_extra_counters_roundtrip_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_five_players_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_four_players_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_game_timer_paused_reopen_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_game_timer_paused_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_game_timer_reopen_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_game_timer_reset_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_game_timer_resume_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_game_timer_start_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_life_totals_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_lotus_card_search_visual_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_lotus_settings_visual_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_lotus_visual_capture_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_lotus_visual_overlays_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_lotus_visual_runtime_proof_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_card_search_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_clock_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_commander_damage_hidden_lifeloss_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_commander_damage_hidden_live_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): applies hidden commander damage through the direct shell without reload"
+    },
+    {
+      "path": "app/integration_test/life_counter_native_commander_damage_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_commander_damage_visible_cards_live_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): applies direct commander damage with visible player cards without reload"
+    },
+    {
+      "path": "app/integration_test/life_counter_native_game_modes_card_pool_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): shows explicit close action when the embedded Planechase card pool editor is alr"
+    },
+    {
+      "path": "app/integration_test/life_counter_native_game_modes_settings_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_game_modes_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_game_timer_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_history_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_background_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_color_card_dismiss_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_color_card_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_dismiss_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_image_present_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_profile_image_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_profiles_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_appearance_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_hidden_autokill_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_hidden_live_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): applies direct player counter while counters stay hidden without reload"
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_hub_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_visible_cards_autokill_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_visible_cards_live_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TimeoutException): applies direct player counter with visible player cards without reload"
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_counter_visible_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_appearance_background_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_appearance_dismiss_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_appearance_hub_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_appearance_image_present_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_commander_damage_hub_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_d20_hub_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_hidden_commander_damage_lifeloss_fallback_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): falls back on hidden commander damage through player state when life loss on com"
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_hidden_commander_damage_visible_cards_lifeloss_fallback_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): falls back on mixed hidden commander damage through player state when life loss "
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_hidden_counter_autokill_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_hidden_counter_visible_cards_autokill_fallback_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_option_card_appearance_background_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_option_card_appearance_dismiss_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_option_card_hidden_commander_damage_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_option_card_hidden_counter_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_option_card_partner_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_set_life_autokill_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_set_life_hub_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_native_player_state_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_appearance_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_hidden_commander_damage_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_hidden_commander_damage_visible_cards_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_hidden_counter_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_hidden_counter_visible_cards_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_partner_commander_fallback_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_partner_commander_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_partner_commander_partner_image_fallback_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_partner_commander_visible_cards_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_player_state_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_regular_counters_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_reopen_snapshot_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_set_life_high_delta_fallback_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_set_life_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_settings_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_settings_ui_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_six_players_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_table_state_clear_ownership_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_table_state_ownership_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_table_state_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_table_state_roundtrip_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_table_state_storm_live_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_tabletop_seat_orientation_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): faces every 2-6 player card toward its physical table seat"
+    },
+    {
+      "path": "app/integration_test/life_counter_three_players_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_turn_tracker_live_next_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_turn_tracker_live_previous_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_turn_tracker_live_previous_two_steps_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/life_counter_turn_tracker_reopen_smoke_test.dart",
+      "lane": "web_hermetic",
+      "reason": "Passa no Chrome com API em loopback fechado (inventário 2026-10-05)."
+    },
+    {
+      "path": "app/integration_test/life_counter_two_players_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): bootstraps canonical session for 2 players"
+    },
+    {
+      "path": "app/integration_test/life_counter_webview_smoke_test.dart",
+      "lane": "device",
+      "reason": "Depende do host Lotus em WebView (webview_flutter); no Chrome o snapshot do Lotus não aparece."
+    },
+    {
+      "path": "app/integration_test/localized_import_runtime_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/lorehold_commander_edition_android_runtime_test.dart",
+      "lane": "device",
+      "reason": "Escrito para aparelho físico (SM A135M runtime: Lorehold edition picker options preserve c)."
+    },
+    {
+      "path": "app/integration_test/lorehold_generate_reference_stats_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/manaloom_authenticated_mobile_qa_test.dart",
+      "lane": "triage",
+      "reason": "Vermelho no Chrome sem causa de ambiente identificada (TestFailure): authenticated mobile QA covers signup, navigation, commercial surfaces and AI pa"
+    },
+    {
+      "path": "app/integration_test/mobile_sentry_smoke_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/onboarding_first_run_runtime_test.dart",
+      "lane": "web_backend",
+      "reason": "Precisa de API/PostgreSQL descartáveis em loopback e de fixtures por --dart-define."
+    },
+    {
+      "path": "app/integration_test/onboarding_intent_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/profile_community_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/realtime_notifications_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/release_observability_smoke_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/scanner_controlled_harness_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/scanner_physical_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/sets_catalog_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/sets_search_catalog_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/social_trade_visual_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    },
+    {
+      "path": "app/integration_test/strixhaven_commander_profiles_runtime_test.dart",
+      "lane": "triage",
+      "reason": "Não rodou no inventário de 2026-10-05."
+    },
+    {
+      "path": "app/integration_test/visual_system_workspace_runtime_proof_test.dart",
+      "lane": "ui_proof",
+      "reason": "Na fonte do digest de UI; roda nos scripts de captura da prova de UI (BT-UIEV-001)."
+    }
+  ]
+}

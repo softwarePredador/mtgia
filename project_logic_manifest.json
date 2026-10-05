@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "d79cdde4499b9b42b107e09abc76488e14e4836ab5b8fc134f3bb14ef6c5c646",
+  "source_digest_sha256": "0748a26efd76e4d745906585a89a787304163ff0578d39df3cc84c7ee0fb4a8b",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,9 +79,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 709,
-    "environment_variables": 727,
-    "tests": 1329,
+    "scripts_and_jobs": 711,
+    "environment_variables": 729,
+    "tests": 1330,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -274224,6 +274224,23 @@
       ]
     },
     {
+      "path": "scripts/manaloom_integration_lane_gate.sh",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "CHROME_EXECUTABLE",
+        "MANALOOM_INTEGRATION_DRIVER_PORT",
+        "MANALOOM_INTEGRATION_TEST_TIMEOUT_SECONDS",
+        "TMPDIR"
+      ]
+    },
+    {
+      "path": "scripts/manaloom_integration_lanes.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_live_credential_audit.py",
       "role": "audit",
       "mutation_class": "read_only_or_unknown",
@@ -276471,6 +276488,11 @@
       "source": "scripts/quality_gate.sh"
     },
     {
+      "mode": "integration",
+      "command": "./scripts/quality_gate.sh integration",
+      "source": "scripts/quality_gate.sh"
+    },
+    {
       "mode": "patrol-smoke",
       "command": "./scripts/quality_gate.sh patrol-smoke",
       "source": "scripts/quality_gate.sh"
@@ -276832,6 +276854,7 @@
         "scripts/manaloom_binder_import_visual_qa.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
         "scripts/manaloom_deck_workshop_visual_qa.sh",
+        "scripts/manaloom_integration_lane_gate.sh",
         "scripts/manaloom_onboarding_intent_visual_qa.sh",
         "scripts/manaloom_p0_runtime_capture.sh",
         "scripts/manaloom_social_trade_visual_qa.sh",
@@ -279768,6 +279791,22 @@
       "sources": [
         "docs/hermes-analysis/manaloom-knowledge/scripts/run_import.py",
         "server/bin/manaloom_knowledge_import.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_INTEGRATION_DRIVER_PORT",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_integration_lane_gate.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_INTEGRATION_TEST_TIMEOUT_SECONDS",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_integration_lane_gate.sh"
       ],
       "value_captured": false
     },
@@ -282792,6 +282831,7 @@
         "scripts/manaloom_dart_doc.sh",
         "scripts/manaloom_deck_workshop_visual_qa.sh",
         "scripts/manaloom_install_external_engine_delta_schedule.sh",
+        "scripts/manaloom_integration_lane_gate.sh",
         "scripts/manaloom_local_ci.sh",
         "scripts/manaloom_migrations_038_040_isolated.sh",
         "scripts/manaloom_onboarding_intent_visual_qa.sh",
@@ -284272,6 +284312,7 @@
     "server/test/import_to_deck_merge_support_test.dart",
     "server/test/import_to_deck_two_phase_db_live_test.dart",
     "server/test/import_verified_email_test.dart",
+    "server/test/integration_test_lanes_contract_test.dart",
     "server/test/interactive_battle_contract_test.dart",
     "server/test/interactive_battle_coverage_probe_test.dart",
     "server/test/interactive_battle_metrics_service_test.dart",
@@ -295923,7 +295964,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "d79cdde4499b9b42b107e09abc76488e14e4836ab5b8fc134f3bb14ef6c5c646"
+    "project_logic_source_digest_sha256": "0748a26efd76e4d745906585a89a787304163ff0578d39df3cc84c7ee0fb4a8b"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -298142,6 +298183,8 @@
       "scripts/manaloom_install_external_engine_delta_schedule.sh",
       "scripts/manaloom_install_local_hooks.sh",
       "scripts/manaloom_install_remote_backup_cron.sh",
+      "scripts/manaloom_integration_lane_gate.sh",
+      "scripts/manaloom_integration_lanes.py",
       "scripts/manaloom_live_credential_audit.py",
       "scripts/manaloom_local_ci.sh",
       "scripts/manaloom_migration_rehearsal.py",
@@ -299041,6 +299084,7 @@
       "server/test/import_to_deck_merge_support_test.dart",
       "server/test/import_to_deck_two_phase_db_live_test.dart",
       "server/test/import_verified_email_test.dart",
+      "server/test/integration_test_lanes_contract_test.dart",
       "server/test/interactive_battle_contract_test.dart",
       "server/test/interactive_battle_coverage_probe_test.dart",
       "server/test/interactive_battle_metrics_service_test.dart",
