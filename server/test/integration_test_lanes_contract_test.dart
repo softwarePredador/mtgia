@@ -92,5 +92,11 @@ void main() {
       expect(gate, contains("grep -q 'All tests passed'"));
       expect(gate, contains(r'if [[ "$failures" -gt 0 ]]; then'));
     });
+
+    test('a limpeza mata o grupo do ChromeDriver, com o Chrome junto', () {
+      expect(gate, contains('set -m'));
+      expect(gate, contains(r'kill -- "-$DRIVER_PID"'));
+      expect(gate, contains('trap cleanup EXIT'));
+    });
   });
 }

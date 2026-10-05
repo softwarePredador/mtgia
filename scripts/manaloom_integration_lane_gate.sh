@@ -59,18 +59,24 @@ RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-integration-lanes.XXXXXX")"
 SUMMARY="$RUN_DIR/summary.tsv"
 printf 'status\tseconds\tpath\tlog\n' >"$SUMMARY"
 
+# O ChromeDriver sobe no próprio grupo de processos (job control), e a limpeza
+# mata o grupo inteiro. Matar só o driver deixava o Chrome headless órfão; na
+# rodada seguinte toda sessão nova falhava com "user data directory is already
+# in use" e a trilha inteira ficava vermelha sem nenhum teste rodar.
 DRIVER_PID=""
 cleanup() {
   if [[ -n "$DRIVER_PID" ]]; then
-    kill "$DRIVER_PID" 2>/dev/null || true
+    kill -- "-$DRIVER_PID" 2>/dev/null || kill "$DRIVER_PID" 2>/dev/null || true
     wait "$DRIVER_PID" 2>/dev/null || true
   fi
 }
 trap cleanup EXIT
 
+set -m
 "$MANALOOM_CHROMEDRIVER_BIN_RESOLVED" --port="$DRIVER_PORT" \
   >"$RUN_DIR/chromedriver.log" 2>&1 &
 DRIVER_PID=$!
+set +m
 for _ in $(seq 1 50); do
   if (exec 3<>"/dev/tcp/127.0.0.1/$DRIVER_PORT") 2>/dev/null; then
     break
