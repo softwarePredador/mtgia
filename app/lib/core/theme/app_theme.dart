@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'bt_tokens.dart';
+
 /// Canonical responsive ranges. Boundary ownership is intentionally explicit:
 /// 600 starts medium, 840 starts expanded, 1200 starts wide and 1600 starts
 /// the bounded ultra-wide canvas.
@@ -15,11 +17,14 @@ enum AppViewportClass { compact, medium, expanded, wide, ultraWide }
 ///   1. Brass is the primary action color.
 ///   2. Frost blue supports (filters, info, technical indicators) but does not lead.
 ///   3. Large background regions stay within the obsidian/slate family.
-///   4. Gradients only for hero sections and primary buttons.
+///   4. Gradientes carregam significado: vidro (160°) em toda peça neutra,
+///      vitral (158°) no que está valendo, latão (158°) no herói e no
+///      selecionado. Gradiente decorativo continua proibido.
 ///
-/// COLOR BUDGET (24 tokens):
-///   10 brand/layout + 5 semantic + 6 WUBRG + 1 hint + 2 format extras = 24
-///   Qualquer cor fora deste arquivo é violação.
+/// COLOR BUDGET: 24 tokens de produto + a paleta do kit BrewTact
+///   (bt_tokens.dart, docs/design/ui-kit-spec.md §3.2). Os literais da paleta
+///   do kit moram neste arquivo (decisão F1, D-44); bt_tokens.dart só compõe.
+///   Cor fora desses dois arquivos é violação.
 ///
 /// RADIUS SCALE: radiusXxs(2) / radiusXs(4) / radiusSm(8) / radiusMd(12) / radiusLg(16) / radiusXl(20) / radiusPill(999)
 /// FONT SCALE:   fontMicro(11) / fontTiny(11) / fontXs(12) / fontSm(12) / fontMd(14) / fontLg(16) / fontXl(18) / fontXxl(20) / fontDisplay(32)
@@ -64,66 +69,15 @@ class AppTheme {
   static const Color overlayBlack65 = Color(0xA6000000);
 
   // ── Life Counter / Tabletop tokens ────────────────────────
-  static const List<Color> lifeCounterPlayerColors = [
-    Color(0xFFFFB51E),
-    Color(0xFFFF0A5B),
-    Color(0xFFCF7AEF),
-    Color(0xFF4B57FF),
-    Color(0xFF44E063),
-    Color(0xFF40B9FF),
-  ];
-
-  static const Color lifeCounterYellow = Color(0xFFFFB51E);
-  static const Color lifeCounterPink = Color(0xFFFF2C77);
+  // Only the tokens still read by the native life-counter sheets remain; the
+  // pink ones leave with the conversion of
+  // life_counter_native_set_life_sheet.dart (docs/design/ui-kit-spec.md §7.2).
   static const Color lifeCounterPinkText = Color(0xFFFF5E9A);
   static const Color lifeCounterPinkSoft = Color(0x66FF2C77);
   static const Color lifeCounterPinkSubtle = Color(0x33FF2C77);
   static const Color lifeCounterSetLifeDanger = Color(0xFFFF7A9C);
-  static const Color lifeCounterBlue = Color(0xFF40B9FF);
-  static const Color lifeCounterGreen = Color(0xFF44E063);
-  static const Color lifeCounterVictoryGreen = Color(0xFF6BFF8D);
-  static const Color lifeCounterIvory = Color(0xFFF7F4EC);
   static const Color lifeCounterWhite = Color(0xFFFFFFFF);
   static const Color lifeCounterBlack = Color(0xFF000000);
-  static const Color lifeCounterHubIconDark = Color(0xFF0D1117);
-  static const Color lifeCounterRestartYellow = Color(0xFFFFE277);
-  static const Color lifeCounterSettingsPurple = Color(0xFFB9B4FF);
-  static const Color lifeCounterSettingsSelected = Color(0xFFFFC81E);
-  static const Color lifeCounterSettingsRadio = Color(0xFF1C78FF);
-  static const Color lifeCounterNeutralChip = Color(0xFF454257);
-  static const Color lifeCounterSheetDark = Color(0xFF171717);
-  static const Color lifeCounterHubGlow = Color(0xFF9CE9FF);
-
-  static const List<Color> lifeCounterHubShellGradient = [
-    Color(0xFF04070E),
-    Color(0xFF121A2B),
-  ];
-  static const List<Color> lifeCounterHubShellStrokeGradient = [
-    Color(0xFFEAFDFF),
-    Color(0xFFB9D7FF),
-  ];
-  static const List<Color> lifeCounterHubCoreGradient = [
-    Color(0xFFFDF4FF),
-    Color(0xFFD7EDFF),
-  ];
-  static const List<Color> lifeCounterWinnerGradient = [
-    Color(0xFFFF9CD1),
-    Color(0xFFFFF5A3),
-    Color(0xFFB7FFBE),
-    Color(0xFFB5C8FF),
-  ];
-  static const List<Color> lifeCounterTieGradient = [
-    Color(0xFFFFC55A),
-    Color(0xFFFFE596),
-    Color(0xFFFFB764),
-  ];
-  static const List<Color> lifeCounterConfettiColors = [
-    Color(0xFFFF4C7D),
-    Color(0xFF4A5BFF),
-    Color(0xFFFFC552),
-    Color(0xFF5BDF79),
-    Color(0xFFFFFFFF),
-  ];
 
   static const Color lifeDeckedOutPanel = Color(0xFF4A3A12);
   static const Color lifeAnswerLeftPanel = Color(0xFF1D1D1D);
@@ -140,6 +94,59 @@ class AppTheme {
   static const Color lifeDefeatedAccent = Color(0xFFFF5AA9);
   static const Color lifeCommanderLethalAccent = Color(0xFFFF5B61);
   static const Color lifeLowTotalWarning = Color(0xFFFFB3A8);
+
+  // ── BrewTact kit palette (docs/design/ui-kit-spec.md §3.2) ──────
+  // Values follow docs/design/life-counter-prototype/mesa-brewtact.html as
+  // ratified by the owner on 2026-09-22 (D-44): the day and crown vitrals
+  // were darkened there and "brasa cheia" became the wine #6E1B2A, so every
+  // pair meets its WCAG minimum with ivory ink. bt_tokens.dart composes
+  // these into gradients and shadows and never declares a color itself.
+  static const Color btBrassLight = Color(0xFFF4CB6C); // latão claro
+  static const Color btBrassLabel = Color(0xFFEBCB8B); // rótulo sem dono
+  static const Color btWine = Color(0xFF6E1B2A); // brasa cheia (vinho)
+  static const Color btWineRing = Color(0xFF9E344A); // aro da regra ruim
+  static const Color btTileRest = Color(0xFF2A3142); // azulejo em repouso
+  static const Color btVitralNight = Color(0xFF2B3274);
+  static const Color btVitralNightDeep = Color(0xFF12163F);
+  static const Color btVitralDay = Color(0xFF27618F);
+  static const Color btVitralDayDeep = Color(0xFFC98A3A);
+  static const Color btVitralPlane = Color(0xFF5B3A8C);
+  static const Color btVitralPlaneDeep = Color(0xFF23163F);
+  static const Color btVitralCrown = Color(0xFF8A5E18);
+  static const Color btVitralCrownDeep = Color(0xFF46270E);
+  static const Color btVitralInitiative = Color(0xFF2F6C8C);
+  static const Color btVitralInitiativeDeep = Color(0xFF12303F);
+  static const Color btFreeTop = Color(0xFF2B2114); // vidro tracejado
+  static const Color btFreeBottom = Color(0xFF1A1610);
+  static const Color btErrorGlassTop = Color(0xFF3D262A); // vidro de erro
+  static const Color btErrorGlassBottom = Color(0xFF1A1418);
+  static const Color btHeart = Color(0xFFD9695A); // coração da vida inicial
+  static const Color btLight = Color(0xFFFFFFFF); // base dos brilhos rgba
+  static const Color btShade = Color(0xFF000000); // base das sombras rgba
+
+  // Seats: a color belongs to a player, never to a button (`var PALETTE`).
+  static const Color btSeatBrasa = Color(0xFFA83A27);
+  static const Color btSeatAmbar = Color(0xFF855614);
+  static const Color btSeatMusgo = Color(0xFF356B45);
+  static const Color btSeatMare = Color(0xFF1D6985);
+  static const Color btSeatIndigo = Color(0xFF3B4699);
+  static const Color btSeatAmeixa = Color(0xFF7A3B86);
+  static const Color btSeatFerro = Color(0xFF4A5260);
+  static const Color btSeatOliva = Color(0xFF5F6B22);
+  static const Color btSeatCobre = Color(0xFF8A4A20);
+  static const Color btSeatPinho = Color(0xFF245C58);
+  static const List<Color> btSeats = [
+    btSeatBrasa,
+    btSeatAmbar,
+    btSeatMusgo,
+    btSeatMare,
+    btSeatIndigo,
+    btSeatAmeixa,
+    btSeatFerro,
+    btSeatOliva,
+    btSeatCobre,
+    btSeatPinho,
+  ];
 
   // ── Deprecated aliases (backward compat) ────────────────────
   @Deprecated('Use primarySoft instead')
@@ -159,8 +166,9 @@ class AppTheme {
   static const Color disabled = textHint;
 
   // ── Gradients ───────────────────────────────────────────────
-  // Gradients reserved for hero sections and primary buttons only.
-  // Cards/lists use flat surfaceSlate or surfaceElevated.
+  // Gradients carry meaning (design rule 4): the kit's glass, vitral and
+  // brass gradients live in bt_tokens.dart. Legacy cards/lists still use the
+  // flat surfaceSlate or surfaceElevated until their wave is converted.
   static const LinearGradient scaffoldGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
@@ -181,6 +189,10 @@ class AppTheme {
   );
 
   /// Intentionally flat — no visible gradient on cards/list items.
+  ///
+  /// Revocation (2) of docs/design/ui-kit-spec.md §7.1 (turn this into the
+  /// tile glass, BtTokens.glassTile) waits for the UI capture batch
+  /// (BT-UIEV-001): it repaints product screens.
   static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -201,6 +213,7 @@ class AppTheme {
   static const double radiusLg = 16; // large containers, scanner
   static const double radiusXl = 20; // pills, bottom sheets
   static const double radiusPill = 999; // fully rounded pills/circular shells
+  static const double radiusPad = 14; // kit pad inside a live block (§3.2)
 
   // ── Stroke / layout metrics ───────────────────────────────
   static const double strokeHairline = 0.5;
@@ -295,11 +308,8 @@ class AppTheme {
   static const double radiusLogoOuter = 30;
   static const double radiusLogoInner = 26;
   static const double radiusLifeCounterSm = 10;
-  static const double radiusLifeCounterMd = 16;
   static const double radiusLifeCounterLg = 18;
-  static const double radiusLifeCounterAction = 28;
   static const double radiusLifeCounterXl = 22;
-  static const double radiusLifeCounterXxl = 24;
 
   // ── Font Size Scale (9 tokens) ────────────────────────────
   // Operational text never drops below 11 px. Dense surfaces should simplify
@@ -313,20 +323,8 @@ class AppTheme {
   static const double fontXl = 18; // section headers
   static const double fontXxl = 20; // screen titles
   static const double fontDisplay = 32; // hero / avatar placeholder
-  static const double fontLifeCounterLabel = 13.4;
   static const double fontLifeCounterStormValue = 42;
-  static const double fontLifeCounterStepLarge = 28;
-  static const double fontLifeCounterHub = 22;
-  static const double fontLifeCounterAction = 24;
   static const double fontLifeCounterInputValue = 62;
-  static const double fontLifeCounterLargeValue = 72;
-  static const double fontLifeCounterXLargeValue = 76;
-  static const double fontLifeCounterCoreDense = 104;
-  static const double fontLifeCounterCoreCompact = 126;
-  static const double fontLifeCounterCoreLarge = 184;
-  static const double fontLifeCounterTableDense = 128;
-  static const double fontLifeCounterTableCompact = 168;
-  static const double fontLifeCounterTableLarge = 246;
 
   // ── MTG WUBRG + Colorless ──────────────────────────────────
   static const Color manaW = Color(0xFFF0F2C0);
@@ -602,6 +600,7 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: backgroundAbyss,
     textTheme: _buildTextTheme(),
+    extensions: <ThemeExtension<dynamic>>[BtTokens.standard],
     appBarTheme: const AppBarTheme(
       backgroundColor: backgroundAbyss,
       foregroundColor: textPrimary,
@@ -714,6 +713,9 @@ class AppTheme {
         borderRadius: BorderRadius.all(Radius.circular(radiusMd)),
       ),
     ),
+    // Revocation (4) of docs/design/ui-kit-spec.md §7.1 (no boxed fields;
+    // AppPlaque is the field) waits for the UI capture batch (BT-UIEV-001):
+    // it changes every text field of the app.
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: surfaceSlate,
@@ -855,6 +857,7 @@ class AppTheme {
         fontFamily: uiFontFamily,
         fontSize: fontMd,
       ),
+      // Revocation (4) of §7.1 waits for the capture batch (BT-UIEV-001).
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceSlate,
