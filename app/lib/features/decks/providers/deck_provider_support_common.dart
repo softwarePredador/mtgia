@@ -319,14 +319,7 @@ Map<String, dynamic> asDynamicMap(dynamic value) {
 }
 
 String extractApiError(dynamic data, {required String fallback}) {
-  if (data is Map) {
-    final error = data['error'] ?? data['message'];
-    if (error != null) {
-      final text = error.toString().trim();
-      if (text.isNotEmpty) return text;
-    }
-  }
-  return fallback;
+  return FriendlyErrorMapper.serverMessageFromBody(data) ?? fallback;
 }
 
 Set<String>? getCommanderIdentitySet(DeckDetails? deck) {

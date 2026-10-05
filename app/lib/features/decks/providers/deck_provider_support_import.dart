@@ -98,7 +98,9 @@ Map<String, dynamic> parseValidateImportListResponse(ApiResponse response) {
   final data = asDynamicMap(response.data);
   return {
     'success': false,
-    'error': data['error']?.toString() ?? 'Erro ao validar lista',
+    'error':
+        FriendlyErrorMapper.serverMessageFromBody(data) ??
+        'Não foi possível validar a lista. Revise e tente novamente.',
   };
 }
 
@@ -146,8 +148,11 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
   final data = asDynamicMap(response.data);
   return {
     'success': false,
-    'error':
-        data['error']?.toString() ?? 'Erro ao importar: ${response.statusCode}',
+    'error': FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckSave,
+      fallback: 'Não foi possível importar a lista. Tente novamente.',
+    ),
     'not_found_lines': (data['not_found_lines'] is List)
         ? List<String>.from(data['not_found_lines'])
         : const <String>[],

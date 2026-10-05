@@ -256,11 +256,13 @@ Map<String, dynamic> parseDeckPricingResponse(ApiResponse response) {
   if (response.statusCode == 200) {
     return (response.data as Map).cast<String, dynamic>();
   }
-  final data = response.data;
-  final msg = (data is Map && data['error'] != null)
-      ? data['error'].toString()
-      : 'Falha ao calcular custo: ${response.statusCode}';
-  throw Exception(msg);
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckPricing,
+      fallback: 'Não foi possível calcular o custo deste deck agora.',
+    ),
+  );
 }
 
 Future<Map<String, dynamic>> fetchDeckPricingRequest(
