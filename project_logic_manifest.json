@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "84c325d2204195214a475343f6030720c84121663e9af95cff1896fc5519d99c",
+  "source_digest_sha256": "d35754a9bf273bbf4cd2425008b5cc7439053826c93f9210ee48775b0b587411",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,15 +79,15 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 708,
-    "environment_variables": 726,
-    "tests": 1328,
+    "scripts_and_jobs": 709,
+    "environment_variables": 727,
+    "tests": 1329,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
     "task_dependency_edges": 437,
     "route_consumer_bindings": 57,
-    "receipt_contracts": 6
+    "receipt_contracts": 7
   },
   "modules": [
     {
@@ -274014,6 +274014,7 @@
         "MANALOOM_FLUTTER_RUNTIME_API_BASE_URL",
         "MANALOOM_FLUTTER_RUNTIME_DEVICE",
         "MANALOOM_FLUTTER_RUNTIME_EMIT_SCREENSHOT_CHUNKS",
+        "MANALOOM_GATE_RECEIPT_ROOT",
         "MANALOOM_NEW_SERVER_ENV",
         "MANALOOM_RUN_FLUTTER_RUNTIME_E2E",
         "MANALOOM_RUN_LIVE_PRODUCT_E2E",
@@ -274090,6 +274091,12 @@
         "MANALOOM_RESTORE_POSTGRES_IMAGE",
         "TABLE_COUNT"
       ]
+    },
+    {
+      "path": "scripts/manaloom_gate_run_receipt.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
     },
     {
       "path": "scripts/manaloom_generate_release_sbom.py",
@@ -279632,6 +279639,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_GATE_RECEIPT_ROOT",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_e2e_suite.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_GITLEAKS_BIN",
       "classification": "configuration",
       "sources": [
@@ -284177,6 +284192,7 @@
     "server/test/forge_battle_client_test.dart",
     "server/test/functional_card_tags_commander_probe_test.dart",
     "server/test/functional_card_tags_test.dart",
+    "server/test/gate_run_receipt_test.py",
     "server/test/generate_job_latest_db_live_test.dart",
     "server/test/generate_job_latest_e2e_live_test.dart",
     "server/test/generate_provider_repair_policy_test.dart",
@@ -285758,7 +285774,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "ab4a0649a528e1d963bf90007f2c2591c091c10e46cd579a6b45dd6ad7402497"
+      "sha256": "8ef0167effa636760e944965079c8f1ad27f87e0daf436f7a4c6e723fe44ae9b"
     },
     "required_task_fields": [
       "id",
@@ -288636,12 +288652,12 @@
       {
         "id": "BT-GATE-002",
         "priority": "P0 CORE",
-        "status": "TODO",
+        "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Receipt forte ligado a SHA, worktree/project-logic digest, schema/target e checks nomeados.",
         "depends_on": [
           "BT-DOC-004"
         ],
-        "acceptance": "Receipt fresco não pode ser forjado com um check; digest no fim igual ao início; logs/artifacts hasheados; `/tmp` não é prova durável. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta implementação — o receipt do E2E não carrega SHA nem digest (`manaloom_e2e_suite.sh:516-532`) e o `local_ci` apaga o próprio `RUN_DIR` (`manaloom_local_ci.sh:68-75`); ver `docs/flows/_p0/gates-qa-web.md`. Decisão do dono em 2026-09-22: D-17, o receipt forte começa por Deck/IA e cresce para todos os fluxos.",
+        "acceptance": "Receipt fresco não pode ser forjado com um check; digest no fim igual ao início; logs/artifacts hasheados; `/tmp` não é prova durável. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta implementação — o receipt do E2E não carrega SHA nem digest (`manaloom_e2e_suite.sh:516-532`) e o `local_ci` apaga o próprio `RUN_DIR` (`manaloom_local_ci.sh:68-75`); ver `docs/flows/_p0/gates-qa-web.md`. Decisão do dono em 2026-09-22: D-17, o receipt forte começa por Deck/IA e cresce para todos os fluxos. Feito em 2026-10-05, na branch `claude/frente-servidor-release-nknr66`: `scripts/manaloom_gate_run_receipt.py` captura SHA, digest do worktree e de project logic no início e no fim, copia os logs com sha256 para `~/.manaloom/receipts` e só marca `gate_eligible` com `PASS`, fonte estável e raiz durável; a suíte E2E grava esse receipt; a ligação do `local_ci` (catálogo fechado por modo, sem receipt no `quick --staged-scope`) está pronta e testada, mas o `local_ci` é plano de controle do escopo staged e o commit dele exige a prova de UI do `BT-UIEV-001`; o validador Deck/IA ganhou os testes de captura real, hash de mesmo tamanho, regras por check e frescor. Receipt `docs/qa/execution/2026-10-05/BT-GATE-002-receipt-forte-local-ci-e2e.md`. Falta o primeiro receipt real (o `full` verde depende do `BT-UIEV-001`) e o `release-read-only` do Deck/IA contra o PostgreSQL de produção, com a palavra do dono.",
         "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
         "source_line": 685
       },
@@ -295661,7 +295677,14 @@
           "gate_eligible",
           "summary.step_count",
           "summary.skipped",
-          "steps"
+          "steps",
+          "git_sha",
+          "source.stable",
+          "source.worktree_digest_sha256",
+          "source.project_logic_source_digest",
+          "receipt.path",
+          "receipt.durable",
+          "receipt.artifact_manifest_sha256"
         ],
         "status_semantics": {
           "PASS": {
@@ -295681,6 +295704,47 @@
             "gate_eligible": false
           }
         }
+      },
+      {
+        "id": "manaloom_gate_run_receipt_v1",
+        "flows": [
+          "release_operations"
+        ],
+        "producers": [
+          "scripts/manaloom_gate_run_receipt.py",
+          "scripts/manaloom_e2e_suite.sh"
+        ],
+        "consumers": [
+          "scripts/manaloom_gate_run_receipt.py",
+          "server/test/gate_run_receipt_test.py"
+        ],
+        "schemas": [
+          "manaloom.gate_run_receipt.v1"
+        ],
+        "durability": "durable_outside_tmp_and_worktree",
+        "allowed_statuses": [
+          "PASS",
+          "FAIL",
+          "BLOCKED",
+          "PARTIAL"
+        ],
+        "required_bindings": [
+          "gate.id",
+          "gate.mode",
+          "git_sha",
+          "worktree_digest_sha256",
+          "project_logic_source_digest",
+          "source.start",
+          "source.end",
+          "source.stable",
+          "checks",
+          "check_catalog_sha256",
+          "artifacts",
+          "artifact_manifest_sha256",
+          "evidence_root",
+          "durable",
+          "gate_eligible"
+        ]
       },
       {
         "id": "ui_live_evidence_v1",
@@ -295803,7 +295867,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "84c325d2204195214a475343f6030720c84121663e9af95cff1896fc5519d99c"
+    "project_logic_source_digest_sha256": "d35754a9bf273bbf4cd2425008b5cc7439053826c93f9210ee48775b0b587411"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -296181,7 +296245,14 @@
         "gate_eligible",
         "summary.step_count",
         "summary.skipped",
-        "steps"
+        "steps",
+        "git_sha",
+        "source.stable",
+        "source.worktree_digest_sha256",
+        "source.project_logic_source_digest",
+        "receipt.path",
+        "receipt.durable",
+        "receipt.artifact_manifest_sha256"
       ],
       "status_semantics": {
         "PASS": {
@@ -296201,6 +296272,47 @@
           "gate_eligible": false
         }
       }
+    },
+    {
+      "id": "manaloom_gate_run_receipt_v1",
+      "flows": [
+        "release_operations"
+      ],
+      "producers": [
+        "scripts/manaloom_gate_run_receipt.py",
+        "scripts/manaloom_e2e_suite.sh"
+      ],
+      "consumers": [
+        "scripts/manaloom_gate_run_receipt.py",
+        "server/test/gate_run_receipt_test.py"
+      ],
+      "schemas": [
+        "manaloom.gate_run_receipt.v1"
+      ],
+      "durability": "durable_outside_tmp_and_worktree",
+      "allowed_statuses": [
+        "PASS",
+        "FAIL",
+        "BLOCKED",
+        "PARTIAL"
+      ],
+      "required_bindings": [
+        "gate.id",
+        "gate.mode",
+        "git_sha",
+        "worktree_digest_sha256",
+        "project_logic_source_digest",
+        "source.start",
+        "source.end",
+        "source.stable",
+        "checks",
+        "check_catalog_sha256",
+        "artifacts",
+        "artifact_manifest_sha256",
+        "evidence_root",
+        "durable",
+        "gate_eligible"
+      ]
     },
     {
       "id": "ui_live_evidence_v1",
@@ -297968,6 +298080,7 @@
       "scripts/manaloom_external_engine_delta_audit.sh",
       "scripts/manaloom_external_engine_delta_weekly.sh",
       "scripts/manaloom_full_restore_drill.sh",
+      "scripts/manaloom_gate_run_receipt.py",
       "scripts/manaloom_generate_release_sbom.py",
       "scripts/manaloom_global_battle_closure.sh",
       "scripts/manaloom_install_external_engine_delta_schedule.sh",
@@ -298848,6 +298961,7 @@
       "server/test/forge_battle_client_test.dart",
       "server/test/functional_card_tags_commander_probe_test.dart",
       "server/test/functional_card_tags_test.dart",
+      "server/test/gate_run_receipt_test.py",
       "server/test/generate_job_latest_db_live_test.dart",
       "server/test/generate_job_latest_e2e_live_test.dart",
       "server/test/generate_provider_repair_policy_test.dart",

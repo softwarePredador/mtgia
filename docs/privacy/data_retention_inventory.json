@@ -150,7 +150,7 @@
       "applies_to": [
         "artifact:backups"
       ],
-      "status": "prazo de rotação ainda não decidido; backup local sem cifra e sem cópia fora da máquina (BT-DR-001)"
+      "status": "prazo de 30 dias decidido (D-84, reconfirmado pelo dono em 2026-10-05) e registrado em server/config/backup_policy.json; a rotação ainda não está aplicada (apagar dump pede o sim do dono na hora), então o consumidor backups do outbox segue blocked_backup_rotation_not_applied; cifra em repouso pelo FileVault e sem cópia fora da máquina (D-81, D-84)"
     },
     {
       "decision": "D-78",

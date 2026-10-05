@@ -44,7 +44,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 | D-29 | prompt bruto do Generate por 30 dias, fora de `decks.description` | `decks.description`, `ai_generate_jobs.result`, `ai_generate_requests.prompt`, descrição no `deck_change_events` | o servidor guarda o prompt em `ai_generate_requests` e a limpeza por prazo o apaga em 30 dias, junto com o texto de descrição do ledger (`DCK-P0-04`); o deck materializado nasce sem o prompt; o app antigo ainda grava o prompt na descrição pelo `POST /decks` |
 | D-30 | purga da lixeira em 30 dias | `decks.deleted_at`, `shared_deck_reports`, `deck_learning_events` | o `DELETE` manda o deck para a lixeira, que some das superfícies, não conta em limite nem em aprendizado e entra na exportação; o restaurar devolve o deck privado, sem republicar relatório; a limpeza por prazo apaga de vez em 30 dias o deck, os relatórios e os eventos de aprendizado dele (`DCK-P0-06`); a tela da lixeira é da raia do app |
 | D-32 | jobs de IA por 24 h | `ai_generate_jobs`, `ai_optimize_jobs` | o código apaga em 30 min; é o `BT-AI-032` |
-| D-23 | backups não são reescritos; rotação entra na política | backups | prazo de rotação ainda não decidido |
+| D-23 | backups não são reescritos; rotação entra na política | backups | 30 dias (D-84, reconfirmado em 2026-10-05, em `server/config/backup_policy.json`); a rotação ainda não está aplicada, e o consumidor `backups` do outbox segue bloqueado até ela |
 | D-78 | logs de pedido de exportação (`MANALOOM_PRIVACY_EXPORT_REQUEST`) por 90 dias | log da API, artefato `privacy_export_request_log` | a linha não existia; existe desde a D-71, e a rotação de 90 dias no host não está aplicada (configuração do dono) |
 
 ## Resumo por classe
@@ -108,7 +108,7 @@ Lifecycle: `SUPPORTING_REFERENCE · NO_PRIORITY_AUTHORITY`. Levantado em 2026-09
 
 ## Pendente de decisão do dono
 
-- Prazo de rotação dos backups (D-23 manda registrá-lo na política).
+- Aplicar a rotação de 30 dias dos backups (D-84): o prazo está na política, mas apagar dump ainda pede o sim do dono na hora.
 - Aplicar no host a rotação de 90 dias dos logs de pedido de exportação (D-78): é configuração
   persistente do host da API.
 - Ligar a limpeza por prazo em produção (D-70): é exclusão em produção. Os prazos de partida da
