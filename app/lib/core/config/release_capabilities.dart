@@ -272,7 +272,10 @@ class ReleaseCapabilitiesProvider extends ChangeNotifier {
 
   Future<bool> refresh() async {
     final generation = ++_generation;
-    _snapshot = ReleaseCapabilitiesSnapshot.denied();
+    // The current snapshot stays while the request is in flight, so the
+    // route guard does not expel the user from an allowed screen on every
+    // resume (BT-NAV-02). Any failure still replaces it with all-off, and
+    // reset() still denies at once when the account changes.
     _loadState = ReleaseCapabilitiesLoadState.loading;
     _notifyIfMounted();
 
