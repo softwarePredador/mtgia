@@ -171,6 +171,16 @@ class _LoreholdSearchApiClient extends ApiClient {
   }
 }
 
+class _FixedResponseApiClient extends ApiClient {
+  _FixedResponseApiClient(this.response);
+
+  final ApiResponse response;
+
+  @override
+  Future<ApiResponse> get(String endpoint, {Duration? timeout}) async =>
+      response;
+}
+
 class _PrintingsApiClient extends ApiClient {
   final List<String> requestedEndpoints = [];
 
@@ -309,17 +319,49 @@ void main() {
     },
   );
 
-  test('explicit printing sync also preserves physical variants', () async {
-    final api = _PrintingsApiClient();
-    final provider = CardProvider(apiClient: api);
+  test(
+    'a printing missing from the catalog is an empty list (BT-CAT-02)',
+    () async {
+      final provider = CardProvider(
+        apiClient: _FixedResponseApiClient(
+          ApiResponse(404, const {
+            'error': 'card_not_in_catalog',
+            'message': 'A carta "Sol Rng" não está no catálogo do BrewTact.',
+          }),
+        ),
+      );
 
-    final printings = await provider.resolveAndFetchPrintings('Sol Ring');
+      expect(await provider.fetchPrintingsByName('Sol Rng'), isEmpty);
+    },
+  );
 
-    expect(printings, hasLength(2));
-    expect(api.requestedEndpoints, [
-      '/cards/printings?name=Sol+Ring&limit=50&dedupe=false&sync=true',
-    ]);
-  });
+  test(
+    'a printing lookup failure shows the server phrase, never the code',
+    () async {
+      final provider = CardProvider(
+        apiClient: _FixedResponseApiClient(
+          ApiResponse(503, const {
+            'error': 'service_unavailable',
+            'message': 'O catálogo está indisponível agora.',
+          }),
+        ),
+      );
+
+      await expectLater(
+        provider.fetchPrintingsByName('Sol Ring'),
+        throwsA(
+          isA<Exception>().having(
+            (error) => error.toString(),
+            'message',
+            allOf(
+              contains('O catálogo está indisponível agora.'),
+              isNot(contains('service_unavailable')),
+            ),
+          ),
+        ),
+      );
+    },
+  );
 
   test('card detail reload resolves the exact backend card id', () async {
     final api = _CardByIdApiClient();

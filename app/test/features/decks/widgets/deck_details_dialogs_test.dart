@@ -394,6 +394,42 @@ void main() {
     },
   );
 
+  testWidgets(
+    'card details hide the edition swap while deck replace-all is closed',
+    (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Center(
+                child: ElevatedButton(
+                  onPressed: () => showDeckCardDetailsDialog(
+                    context: context,
+                    card: _buildCard(),
+                    onOpenFullDetails: () async {},
+                  ),
+                  child: const Text('abrir'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('abrir'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('deck-card-details-dialog-card-1')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('deck-card-change-edition-card-1')),
+        findsNothing,
+      );
+    },
+  );
+
   testWidgets('showDeckRemoveCardConfirmationDialog returns confirmation', (
     tester,
   ) async {

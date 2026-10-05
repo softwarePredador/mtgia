@@ -180,16 +180,10 @@ class DeckProvider extends ChangeNotifier {
     required String cardId,
   }) async {
     final epoch = _sessionEpoch;
-    final deck = await _ensureDeckLoadedForMutation(deckId);
-    if (deck == null) throw Exception('Deck não encontrado');
-
-    final currentCards = buildCurrentCardsMap(deck);
-    currentCards.remove(cardId);
-
     final result = await removeCardFromDeckRequest(
       _apiClient,
       deckId: deckId,
-      cardsPayload: currentCards.values.toList(),
+      cardId: cardId,
     );
 
     if (!result.isSuccess) {
@@ -925,7 +919,7 @@ class DeckProvider extends ChangeNotifier {
     throw Exception(result.errorMessage);
   }
 
-  /// Atualiza apenas a descrição do deck via PUT
+  /// Atualiza apenas a descrição do deck via PATCH
   Future<bool> updateDeckDescription({
     required String deckId,
     required String description,
@@ -1623,17 +1617,20 @@ class DeckProvider extends ChangeNotifier {
 
   // ───── Social / Sharing ─────
 
-  /// Alterna visibilidade pública/privada do deck via PUT /decks/:id
-  Future<bool> togglePublic(String deckId, {required bool isPublic}) async {
+  /// Alterna visibilidade pública/privada do deck via PATCH /decks/:id
+  Future<DeckMutationResult> togglePublic(
+    String deckId, {
+    required bool isPublic,
+  }) async {
     final epoch = _sessionEpoch;
     try {
-      final isSuccess = await togglePublicRequest(
+      final result = await togglePublicRequest(
         _apiClient,
         deckId: deckId,
         isPublic: isPublic,
       );
-      if (_isStale(epoch)) return isSuccess;
-      if (isSuccess) {
+      if (_isStale(epoch)) return result;
+      if (result.isSuccess) {
         _selectedDeck = applyDeckVisibilityToSelectedDeck(
           _selectedDeck,
           deckId,
@@ -1646,9 +1643,8 @@ class DeckProvider extends ChangeNotifier {
         );
         invalidateDeckCache(deckId);
         notifyListeners();
-        return true;
       }
-      return false;
+      return result;
     } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] togglePublic error: $e');
       _captureProviderException(
@@ -1657,7 +1653,10 @@ class DeckProvider extends ChangeNotifier {
         operation: 'togglePublic',
         extras: {'deck_id': deckId, 'is_public': isPublic},
       );
-      return false;
+      return const DeckMutationResult(
+        isSuccess: false,
+        errorMessage: 'Não foi possível alterar a visibilidade agora.',
+      );
     }
   }
 

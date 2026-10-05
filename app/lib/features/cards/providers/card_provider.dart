@@ -506,32 +506,23 @@ class CardProvider extends ChangeNotifier {
     throw error;
   }
 
+  /// Lists every printing the catalog already has for [name].
+  ///
+  /// The catalog is read-only for users (BT-CAT-02, D-35): the app never asks
+  /// the server to fetch editions from Scryfall, so there is no `sync`
+  /// parameter. A 404 means the catalog has no edition for that name, which
+  /// the pickers show as an empty list.
   Future<List<Map<String, dynamic>>> fetchPrintingsByName(String name) async {
     final encoded = Uri.encodeQueryComponent(name.trim());
     final response = await _apiClient.get(
       '/cards/printings?name=$encoded&limit=50&dedupe=false',
     );
+    if (response.statusCode == 404) return const [];
     if (response.statusCode != 200) {
-      throw Exception('Não foi possível carregar as edições agora.');
-    }
-
-    final data = response.data as Map<String, dynamic>;
-    final list = (data['data'] as List?)?.whereType<Map>().toList() ?? const [];
-    return list.map((m) => m.cast<String, dynamic>()).toList();
-  }
-
-  /// Chama /cards/resolve para importar todas as edições do Scryfall
-  /// e depois retorna a lista atualizada de printings do banco.
-  Future<List<Map<String, dynamic>>> resolveAndFetchPrintings(
-    String name,
-  ) async {
-    // Usa o parâmetro sync=true que importa automaticamente do Scryfall
-    final encoded = Uri.encodeQueryComponent(name.trim());
-    final response = await _apiClient.get(
-      '/cards/printings?name=$encoded&limit=50&dedupe=false&sync=true',
-    );
-    if (response.statusCode != 200) {
-      throw Exception('Não foi possível sincronizar as edições agora.');
+      throw Exception(
+        FriendlyErrorMapper.serverMessageFromBody(response.data) ??
+            'Não foi possível carregar as edições agora.',
+      );
     }
 
     final data = response.data as Map<String, dynamic>;

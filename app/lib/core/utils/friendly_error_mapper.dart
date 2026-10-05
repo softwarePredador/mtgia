@@ -334,6 +334,14 @@ class FriendlyErrorMapper {
         'Serviço temporariamente indisponível. Tente de novo em instantes.',
     'service_database_unavailable':
         'Serviço temporariamente indisponível. Tente de novo em instantes.',
+    'card_not_in_catalog':
+        'Esta carta não está no catálogo do BrewTact. Confira o nome.',
+    'deck_publication_unavailable':
+        'Publicar decks não está disponível nesta beta.',
+    'deck_public_requires_cards':
+        'Um deck vazio não pode ser público. Adicione cartas antes de publicar.',
+    'deck_patch_field_unsupported':
+        'Não foi possível salvar essa alteração do deck.',
   };
 
   static String? _messageFromBody(
