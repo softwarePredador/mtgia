@@ -19,8 +19,10 @@ class OptimizationApplyAuthorizationViolation implements Exception {
 }
 
 OptimizeApplyAuthorizationVerification? validateOptimizationApplyAuthorization({
+  required String ownerId,
   required String deckId,
   required String currentDeckSignature,
+  int? currentDeckRevision,
   required List<Map<String, dynamic>> beforeCards,
   required List<Map<String, dynamic>> afterCards,
   required Map<String, dynamic> mutationContext,
@@ -62,8 +64,10 @@ OptimizeApplyAuthorizationVerification? validateOptimizationApplyAuthorization({
   final verification = verifyOptimizeApplyAuthorization(
     signingSecret: signingSecret,
     token: token,
+    ownerId: ownerId,
     deckId: deckId,
     deckSignature: currentDeckSignature,
+    deckRevision: currentDeckRevision,
     actualRemovals: actualRemovals,
     actualAdditions: actualAdditions,
     expectedBracket: expectedBracket,

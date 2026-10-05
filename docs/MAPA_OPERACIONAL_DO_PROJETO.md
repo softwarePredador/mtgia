@@ -250,9 +250,10 @@ crontab em comentário, nunca registrados em `manaloom_ops_daemon.py`.
 | `manaloom-ops` (scheduler) | `server/Dockerfile.manaloom-ops` | `manaloom_deploy_ops_image.sh` | sim — **1 job ativo** |
 | Sidecar XMage | `services/xmage-sidecar/` | `manaloom_deploy_battle_sidecars.sh` | sim |
 | Sidecar Forge | `services/forge-sidecar/` | idem | sim |
-| Flutter Web | `app/` | `manaloom_deploy_flutter_web.sh` | **bloqueado** — exige capability aberta |
+| Flutter Web | `app/` | `manaloom_deploy_flutter_web.sh` | liberado pela D-13 — com a matriz toda off sai como release de plano de controle (`release_mode` no `release.json`); com capability on, exige verificação live datada |
 | APK Android | `app/` | `manaloom_publish_android_release.sh` | sim — fixa o snapshot de capabilities na identidade do release |
 | Web público (Next.js) | `web-public/` | `manaloom_deploy_public_web.sh` | sim — **único sem nenhuma referência a capability** |
+| Promoção conjunta | `server/config/release_promotion.json` | `manaloom_promote_release.sh` (`BT-REL-001`) | backend, ops, site, `/app` e Android na ordem da D-13, numa transação com diário, same-SHA por superfície (`BT-REL-002`: SHA, digest da matriz, modo e flags; mixed falha fechado) e rollback provado |
 | `hermes-lab` | `server/Dockerfile.hermes-lab` | nenhum | **desconhecido** — último commit no Dockerfile 2026-06-18 (`637f22193`); estado do container só com o comando da §9 |
 
 O `manaloom-ops` sobe em `safe_housekeeping_only` com dois jobs habilitados:

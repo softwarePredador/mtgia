@@ -5,6 +5,7 @@ import 'package:postgres/postgres.dart';
 
 import '../color_identity.dart';
 import '../import_card_lookup_service.dart';
+import '../schema_requirements.dart';
 import 'commander_reference_profile_support.dart';
 
 const commanderReferenceCardStatsTable = 'commander_reference_card_stats';
@@ -468,48 +469,22 @@ List<String> findOffColorCommanderReferenceCards({
   return offColor.toList()..sort();
 }
 
-Future<void> ensureCommanderReferenceCardStatsTable(Pool pool) async {
-  await pool.execute('''
-    CREATE TABLE IF NOT EXISTS commander_reference_card_stats (
-      commander_name TEXT NOT NULL,
-      commander_name_normalized TEXT NOT NULL,
-      card_name TEXT NOT NULL,
-      card_name_normalized TEXT NOT NULL,
-      card_id UUID REFERENCES cards(id) ON DELETE SET NULL,
-      package_key TEXT NOT NULL,
-      role TEXT NOT NULL,
-      score NUMERIC NOT NULL,
-      confidence TEXT NOT NULL,
-      confidence_rank SMALLINT NOT NULL,
-      source TEXT NOT NULL,
-      evidence_count INTEGER NOT NULL DEFAULT 1,
-      unresolved BOOLEAN NOT NULL DEFAULT FALSE,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (
-        commander_name_normalized,
-        card_name_normalized,
-        package_key
-      )
-    )
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_commander_reference_card_stats_hot
-    ON commander_reference_card_stats (
-      commander_name_normalized,
-      confidence_rank DESC,
-      score DESC
-    )
-    WHERE unresolved = FALSE
-  ''');
-  await pool.execute('''
-    CREATE INDEX IF NOT EXISTS idx_commander_reference_card_stats_unresolved
-    ON commander_reference_card_stats (
-      commander_name_normalized,
-      unresolved,
-      card_name_normalized
-    )
-  ''');
-}
+/// A tabela e os índices nascem da migration 034 (BT-DB-004): o CLI só
+/// confere que existem e para se faltar algo.
+const commanderReferenceCardStatsSchemaRequirements = SchemaRequirements(
+  tables: {'commander_reference_card_stats'},
+  indexes: {
+    'idx_commander_reference_card_stats_hot',
+    'idx_commander_reference_card_stats_unresolved',
+  },
+);
+
+Future<void> requireCommanderReferenceCardStatsSchema(Pool pool) =>
+    requireSchemaObjects(
+      pool,
+      caller: 'commander_reference_card_stats',
+      requirements: commanderReferenceCardStatsSchemaRequirements,
+    );
 
 Future<void> upsertCommanderReferenceCardStats(
   Pool pool,

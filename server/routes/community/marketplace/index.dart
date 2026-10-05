@@ -39,6 +39,22 @@ Future<Response> onRequest(RequestContext context) async {
       // dados assim. Observador anônimo (viewerUserId nulo) só vê público.
       "(u.binder_visibility = 'public' OR u.id = CAST(@viewerUserId AS uuid))",
       "(u.profile_visibility = 'public' OR u.id = CAST(@viewerUserId AS uuid))",
+      // D-38: "só seguidores" vale também na busca global, como em
+      // /community/trade-matches. Observador anônimo só vê quem abre as
+      // trocas para todos.
+      '''(
+        u.id = CAST(@viewerUserId AS uuid)
+        OR u.trade_visibility = 'everyone'
+        OR (
+          u.trade_visibility = 'followers'
+          AND EXISTS (
+            SELECT 1
+            FROM user_follows f
+            WHERE f.follower_id = CAST(@viewerUserId AS uuid)
+              AND f.following_id = u.id
+          )
+        )
+      )''',
       '''(
         u.id = CAST(@viewerUserId AS uuid)
         OR CAST(@viewerUserId AS uuid) IS NULL

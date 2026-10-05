@@ -1,0 +1,996 @@
+{
+  "schema_version": 1,
+  "registry": "ai_route_registry_v1",
+  "task": "BT-AI-029",
+  "decision": "D-31",
+  "description": "Registry de todas as rotas de IA do servidor: consumidor, escritas, capability, dono, substituto, provedor externo, URL do provedor e o que acontece sem ele. server/test/ai_route_registry_test.dart falha quando surge rota de IA fora dele.",
+  "scope_rule": "Rota de IA é toda rota sob /ai, toda rota que requiredCapabilityForRequest põe numa capability de ai_capabilities e todo handler que fala com o provedor direto (provider_markers).",
+  "ai_capabilities": [
+    "ai_analyze_optimize_advisory",
+    "ai_generate_rebuild",
+    "legacy_ai_routes",
+    "learning_reads",
+    "learning_writes",
+    "battle_batch",
+    "battle_live",
+    "battle_coach"
+  ],
+  "provider_markers": [
+    "api.openai.com",
+    "OpenAiRuntimeConfig"
+  ],
+  "vocabulary": {
+    "status": [
+      "guarded_off",
+      "legacy_off"
+    ],
+    "status_meaning": {
+      "guarded_off": "tem consumidor; a capability fica desligada até as tarefas do dono fecharem",
+      "legacy_off": "sem consumidor de produto; fica desligada sob legacy_ai_routes com veredito e substituto"
+    },
+    "lane": [
+      "deck_e_ia",
+      "battle"
+    ],
+    "access_policy": [
+      "meteredAction",
+      "rateLimitedAuxiliary",
+      "polling",
+      "authOnly"
+    ]
+  },
+  "rule": "D-31: rota sem consumidor no app, no site e nos scripts, e com substituto, sai junto com os testes que a tratam como recurso. A D-83 aplicou a mesma regra ao GET /ai/optimize/telemetry. Uma rota nova de IA entra aqui antes de ganhar capability.",
+  "providers": {
+    "openai_chat_completions": {
+      "url": "https://api.openai.com/v1/chat/completions",
+      "url_configurable": true,
+      "url_env": "OPENAI_BASE_URL",
+      "url_source": "server/lib/openai_runtime_config.dart",
+      "url_rule": "fixa na produção (perfil prod); fora dela, OPENAI_BASE_URL só é aceita em loopback (127.0.0.0/8, ::1 ou localhost), por http ou https, sem usuário, consulta ou fragmento; outro valor é ignorado e a chamada vai para a URL fixa",
+      "callsite_marker": "chatCompletionsUri",
+      "key_env": "OPENAI_API_KEY",
+      "callsites": [
+        "server/lib/ai/commander_ai_live_eval_support.dart",
+        "server/lib/ai/optimization_validator.dart",
+        "server/lib/ai/otimizacao.dart",
+        "server/routes/ai/archetypes/index.dart",
+        "server/routes/ai/explain/index.dart",
+        "server/routes/ai/generate/index.dart",
+        "server/routes/decks/[id]/ai-analysis/index.dart"
+      ],
+      "callsite_occurrences": {
+        "server/lib/ai/commander_ai_live_eval_support.dart": 1,
+        "server/lib/ai/optimization_validator.dart": 1,
+        "server/lib/ai/otimizacao.dart": 2,
+        "server/routes/ai/archetypes/index.dart": 1,
+        "server/routes/ai/explain/index.dart": 1,
+        "server/routes/ai/generate/index.dart": 1,
+        "server/routes/decks/[id]/ai-analysis/index.dart": 1
+      },
+      "note": "A URL mora num lugar só, o OpenAiRuntimeConfig (D-83): os 8 pontos em 7 arquivos que a tinham fixa usam chatCompletionsUri. Na produção ela é sempre https://api.openai.com/v1/chat/completions. Fora dela, OPENAI_BASE_URL aponta para um provedor falso local, só em loopback; a fixture isolada (scripts/manaloom_server_contract_e2e_isolated.sh) exporta a variável vazia, e a URL fica a fixa. O entrypoint do laboratório Hermes (server/bin/hermes_lab_entrypoint.sh) usa a mesma variável para o próprio Hermes. commander_ai_live_eval_support.dart é da avaliação ao vivo, fora das rotas.",
+      "without_key": "Perfil de produção: 503 nas rotas que dependem do provedor. Fora da produção: mock ou fallback local marcado is_mock=true, nunca cacheado nem aplicável; o POST /ai/optimize entrega as trocas determinísticas quando há shortlist (D-82)."
+    },
+    "edhrec": {
+      "url": "https://json.edhrec.com",
+      "url_configurable": false,
+      "key_env": null,
+      "switch_env": "MANALOOM_EDHREC_AUTOMATED_COLLECTION_AUTHORIZED",
+      "note": "fonte de dados, não é provedor de IA; a coleta automática fica desligada por padrão",
+      "without_key": "com a coleta desligada, nenhuma chamada sai e a validação por EDHREC é pulada"
+    },
+    "battle_sidecars": {
+      "url": "XMAGE_SIDECAR_URL, FORGE_SIDECAR_URL, NATIVE_BATTLE_SIDECAR_URL, XMAGE_INTERACTIVE_SIDECAR_URL",
+      "url_configurable": true,
+      "key_env": null,
+      "note": "motores de regra (XMage, Forge, nativo) em processos próprios; não são provedor de IA",
+      "without_key": "sem URL configurada o motor falha fechado com 503 e código estável"
+    },
+    "mtgtop8": {
+      "url": "https://www.mtgtop8.com",
+      "url_configurable": false,
+      "key_env": null,
+      "note": "só na atualização de referência de comandante (refresh=true, administrador), com orçamento de tempo",
+      "without_key": "sem rede, a atualização falha no orçamento e a leitura segue do PostgreSQL"
+    }
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/ai/archetypes",
+      "handler": "server/routes/ai/archetypes/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "access_policy": "meteredAction",
+      "legal_reacceptance": true,
+      "owner": "BT-AI-003",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_mutation.dart",
+          "needle": "apiClient.post('/ai/archetypes'"
+        }
+      ],
+      "writes": [
+        "ai_logs",
+        "user_plans"
+      ],
+      "writes_note": "cota do plano e uso do provedor",
+      "external_providers": [
+        "openai_chat_completions"
+      ],
+      "without_provider": "Perfil de produção sem OPENAI_API_KEY: 503. Fora da produção: resposta mock ou fallback local marcado is_mock=true, que não é cacheado nem aplicável.",
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/explain",
+      "handler": "server/routes/ai/explain/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "access_policy": "meteredAction",
+      "legal_reacceptance": true,
+      "owner": "BT-AI-020",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/cards/providers/card_provider.dart",
+          "needle": "_apiClient.post('/ai/explain'"
+        }
+      ],
+      "writes": [
+        "cards.ai_description",
+        "ai_logs",
+        "user_plans"
+      ],
+      "writes_note": "grava a explicação do provedor em cards.ai_description, um cache compartilhado do catálogo com marcador; autorizar ou mover para tabela própria fica em decisoes-pendentes",
+      "external_providers": [
+        "openai_chat_completions"
+      ],
+      "without_provider": "Perfil de produção sem OPENAI_API_KEY: 503. Fora da produção: resposta mock ou fallback local marcado is_mock=true, que não é cacheado nem aplicável. A explicação local não é gravada em cards.",
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/generate",
+      "handler": "server/routes/ai/generate/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "meteredAction",
+      "legal_reacceptance": true,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_generation.dart",
+          "needle": "apiClient.post('/ai/generate'"
+        }
+      ],
+      "writes": [
+        "ai_generate_jobs",
+        "ai_logs",
+        "user_plans"
+      ],
+      "writes_note": "a prévia não grava deck; eventos de aprendizado só com learning_writes ligada",
+      "external_providers": [
+        "openai_chat_completions"
+      ],
+      "without_provider": "Perfil de produção sem OPENAI_API_KEY: 503. Fora da produção: resposta mock ou fallback local marcado is_mock=true, que não é cacheado nem aplicável. O deck mock não é persistido.",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/generate/jobs/:id",
+      "handler": "server/routes/ai/generate/jobs/[id].dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_generation.dart",
+          "needle": "pollUrl: '/ai/generate/jobs/$normalizedJobId'"
+        },
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_generation.dart",
+          "needle": "'/ai/generate/jobs/latest?active="
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "o id \"latest\" devolve o último trabalho da conta, ou 200 {\"job\": null} quando não há (BT-AI-031)"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/generate/requests/:id",
+      "handler": "server/routes/ai/generate/requests/[id]/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [],
+      "consumer_note": "Ainda sem consumidor: o app guarda um rascunho local do Generate, e a reidratação do pedido em outro aparelho entra na raia do app (DCK-P0-04).",
+      "writes": [],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "Leitura do pedido durável do Generate pela conta dona (id ou latest). Sem consumidor no app ainda: a reidratação em outro aparelho é da raia do app. Não chama provedor."
+    },
+    {
+      "method": "POST",
+      "path": "/ai/generate/requests/:id/materialize",
+      "handler": "server/routes/ai/generate/requests/[id]/materialize.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "polling",
+      "legal_reacceptance": true,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [],
+      "consumer_note": "Ainda sem consumidor: o app atual salva o deck do Generate pelo caminho antigo; a materialização no servidor entra na raia do app (DCK-P0-04).",
+      "writes": [
+        "decks",
+        "deck_cards",
+        "deck_change_events",
+        "ai_generate_requests"
+      ],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "Materializa no servidor o resultado do Generate num deck novo, com o review_artifact generate_materialize. Cria deck, então passa pela trava do reaceite (D-24). Sem consumidor no app ainda. Não chama provedor."
+    },
+    {
+      "method": "DELETE",
+      "path": "/ai/generate/jobs/:id",
+      "handler": "server/routes/ai/generate/jobs/[id].dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "DCK-P0-04",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_generation.dart",
+          "needle": "apiClient.delete('/ai/generate/jobs/$jobId')"
+        }
+      ],
+      "writes": [
+        "ai_generate_jobs"
+      ],
+      "writes_note": "cancela o trabalho",
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/optimize",
+      "handler": "server/routes/ai/optimize/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "access_policy": "meteredAction",
+      "legal_reacceptance": true,
+      "owner": "BT-AI-031",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_ai.dart",
+          "needle": "apiClient.post('/ai/optimize', payload)"
+        }
+      ],
+      "writes": [
+        "ai_optimize_jobs",
+        "ai_optimize_cache",
+        "ai_user_preferences",
+        "ai_optimize_fallback_telemetry",
+        "optimization_analysis_logs",
+        "ml_prompt_feedback",
+        "ai_logs",
+        "user_plans"
+      ],
+      "writes_note": "a prévia não grava o deck; aplicar é PUT /decks/:id com a autorização assinada",
+      "external_providers": [
+        "openai_chat_completions",
+        "edhrec"
+      ],
+      "without_provider": "Perfil de produção sem OPENAI_API_KEY: 503 provider_unavailable. Fora da produção (D-82): com shortlist determinística, 200 com as trocas determinísticas (ai_provider configured=false, attempted=false; sem tentativa de provedor; fora do cache); sem shortlist, o mock mock_non_actionable. O EDHREC segue a própria chave de coleta.",
+      "provider_calls": [
+        {
+          "name": "tentativa primária do otimizador",
+          "callsite": "server/lib/ai/otimizacao.dart",
+          "ai_logs_endpoint": "provider:optimize",
+          "when": "com chave, no modo optimize, quando não há shortlist determinística",
+          "on_failure": "422 com quality_error OPTIMIZE_EXECUTION_FAILED quando o deck está saudável, senão 500 \"Optimization failed\"; o deck fica como estava"
+        },
+        {
+          "name": "fallback por IA",
+          "callsite": "server/lib/ai/otimizacao.dart",
+          "ai_logs_endpoint": "provider:optimize",
+          "when": "com chave, uma vez por pedido, quando a resposta não traz troca segura (OPTIMIZE_NO_SAFE_SWAPS) ou a validação a rejeita (OPTIMIZE_QUALITY_REJECTED) e o plano de nova tentativa pede",
+          "on_failure": "fica o erro de qualidade da primeira resposta (422)"
+        },
+        {
+          "name": "Critic IA",
+          "callsite": "server/lib/ai/optimization_validator.dart",
+          "ai_logs_endpoint": "optimization_critic",
+          "when": "com chave, na validação automática depois das trocas, inclusive das trocas determinísticas: o validador pede uma segunda opinião ao provedor",
+          "on_failure": "a validação segue sem o crítico (log \"Critic AI unavailable\"), a falha fica em ai_logs com endpoint optimization_critic e a resposta sai normalmente"
+        },
+        {
+          "name": "montagem no modo complete",
+          "callsite": "server/lib/ai/otimizacao.dart",
+          "ai_logs_endpoint": "provider:complete",
+          "when": "com chave e sem OPTIMIZE_COMPLETE_DISABLE_OPENAI=1, no modo complete, enquanto faltam cartas e o bootstrap determinístico não bastou",
+          "on_failure": "a iteração para e o preenchimento determinístico completa o deck"
+        }
+      ],
+      "provider_calls_without_key": "Nenhuma (D-82): runAiOptimizeAttempt volta sem chamar, os dois fallbacks exigem o otimizador, o validador pula o Critic IA com a chave vazia e o modo complete roda sem otimizador, só com o preenchimento determinístico.",
+      "evidence_note": "Com chave, \"ai_upstream_called: false\" num manifesto de captura quer dizer que as trocas não vieram da IA, não que nada foi tentado: o Critic IA tenta o provedor depois do caminho determinístico. Sem chave, nada é tentado.",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/optimize/jobs/:id",
+      "handler": "server/routes/ai/optimize/jobs/[id].dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-AI-031",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_ai.dart",
+          "needle": "apiClient.get('/ai/optimize/jobs/$jobId')"
+        },
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_ai.dart",
+          "needle": "apiClient.get('/ai/optimize/jobs/latest?$query')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/ai/optimize/jobs/:id",
+      "handler": "server/routes/ai/optimize/jobs/[id].dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-AI-031",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_ai.dart",
+          "needle": "apiClient.delete('/ai/optimize/jobs/$jobId')"
+        }
+      ],
+      "writes": [
+        "ai_optimize_jobs"
+      ],
+      "writes_note": "cancela o trabalho",
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/rebuild",
+      "handler": "server/routes/ai/rebuild/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "meteredAction",
+      "legal_reacceptance": true,
+      "owner": "DCK-P1-08",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_ai.dart",
+          "needle": "'/ai/rebuild',"
+        }
+      ],
+      "writes": [
+        "decks",
+        "deck_cards",
+        "ai_logs",
+        "user_plans"
+      ],
+      "writes_note": "com save_mode=draft_clone cria um clone em rascunho; o deck original não muda",
+      "external_providers": [],
+      "substitute": null,
+      "notes": "determinística: não chama provedor externo"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/commander-learning",
+      "handler": "server/routes/ai/commander-learning/index.dart",
+      "status": "guarded_off",
+      "capability": "learning_reads",
+      "access_policy": "authOnly",
+      "legal_reacceptance": false,
+      "owner": "DCK-P0-05",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider.dart",
+          "needle": "path: '/ai/commander-learning',"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/commander-reference",
+      "handler": "server/routes/ai/commander-reference/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_generate_rebuild",
+      "access_policy": "rateLimitedAuxiliary",
+      "legal_reacceptance": false,
+      "owner": "BT-AI-017",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "server/bin/lorehold_public_generator_parity_audit.dart",
+          "needle": "/ai/commander-reference?commander="
+        }
+      ],
+      "consumer_note": "o app não chama; o Generate e o Optimize usam as bibliotecas direto, não a rota",
+      "writes": [],
+      "external_providers": [
+        "mtgtop8",
+        "edhrec"
+      ],
+      "without_provider": "sem rede externa a atualização (refresh=true, só administrador) falha no orçamento de tempo; a leitura segue do PostgreSQL",
+      "substitute": null,
+      "notes": "leitura sem escrita no PostgreSQL (commander_reference_read_only_contract_test)"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/ml-status",
+      "handler": "server/routes/ai/ml-status/index.dart",
+      "status": "legacy_off",
+      "capability": "legacy_ai_routes",
+      "access_policy": "rateLimitedAuxiliary",
+      "legal_reacceptance": false,
+      "owner": "BT-AI-027",
+      "lane": "deck_e_ia",
+      "consumers": [],
+      "consumer_note": "administração; nenhum consumidor no app, no site nem nos scripts",
+      "writes": [],
+      "external_providers": [],
+      "substitute": "a decisão da lane ML legada (BT-AI-027): remover ou migrar integralmente",
+      "rule_verdict": "a D-31 mandou esta rota ficar com o BT-AI-027, fora da remoção"
+    },
+    {
+      "method": "POST",
+      "path": "/ai/simulate",
+      "handler": "server/routes/ai/simulate/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "access_policy": "rateLimitedAuxiliary",
+      "legal_reacceptance": true,
+      "owner": "BT-BAT-003",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "_apiClient.post('/ai/simulate'"
+        }
+      ],
+      "writes": [
+        "battle_simulations",
+        "battle_simulation_attempts"
+      ],
+      "external_providers": [
+        "battle_sidecars"
+      ],
+      "without_provider": "sem sidecar configurado ou disponível: 503 com código estável; nada é gravado como resultado",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/battle/jobs",
+      "handler": "server/routes/ai/battle/jobs/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-004",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_job_gateway.dart",
+          "needle": "_apiClient.get('/ai/battle/jobs?$query')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/battle/jobs",
+      "handler": "server/routes/ai/battle/jobs/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "access_policy": "polling",
+      "legal_reacceptance": true,
+      "owner": "BT-BAT-004",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_job_gateway.dart",
+          "needle": "_apiClient.post('/ai/battle/jobs'"
+        }
+      ],
+      "writes": [
+        "battle_jobs"
+      ],
+      "writes_note": "a rota só enfileira; o worker chama o sidecar",
+      "external_providers": [
+        "battle_sidecars"
+      ],
+      "without_provider": "a rota só enfileira, e nada sai da API; quem chama o sidecar é o worker (BATTLE_JOB_WORKER_ENABLED)",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/battle/jobs/:id",
+      "handler": "server/routes/ai/battle/jobs/[id]/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-004",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_job_gateway.dart",
+          "needle": "_apiClient.get('/ai/battle/jobs/$normalizedJobId')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/ai/battle/jobs/:id",
+      "handler": "server/routes/ai/battle/jobs/[id]/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-004",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_job_gateway.dart",
+          "needle": "_apiClient.delete('/ai/battle/jobs/$normalizedJobId')"
+        }
+      ],
+      "writes": [
+        "battle_jobs"
+      ],
+      "writes_note": "cancela o trabalho",
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/battle/jobs/:id/live",
+      "handler": "server/routes/ai/battle/jobs/[id]/live/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_live",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-PLAY-001",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_job_gateway.dart",
+          "needle": "_apiClient.get('/ai/battle/jobs/$normalizedJobId/live?$query')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "superfície de espectador; a ADR 0013 manda tirá-la da superfície pública (BT-PLAY-001)"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/battle/sessions",
+      "handler": "server/routes/ai/battle/sessions/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_coach",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-PLAY-003",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/interactive_battle_service.dart",
+          "needle": "_apiClient.get('/ai/battle/sessions?$query')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/battle/sessions",
+      "handler": "server/routes/ai/battle/sessions/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_coach",
+      "access_policy": "polling",
+      "legal_reacceptance": true,
+      "owner": "BT-PLAY-003",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/interactive_battle_service.dart",
+          "needle": "_apiClient.post('/ai/battle/sessions'"
+        }
+      ],
+      "writes": [
+        "interactive_battle_sessions",
+        "interactive_battle_records",
+        "battle_simulation_attempts",
+        "battle_simulations"
+      ],
+      "external_providers": [
+        "battle_sidecars"
+      ],
+      "without_provider": "com INTERACTIVE_BATTLE_ENABLED desligado ou sem XMAGE_INTERACTIVE_SIDECAR_URL, a sessão não abre; falha do sidecar interativo: 503 com código estável",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/ai/battle/sessions/:id",
+      "handler": "server/routes/ai/battle/sessions/[id]/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_coach",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-PLAY-003",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/interactive_battle_service.dart",
+          "needle": "'/ai/battle/sessions/${Uri.encodeComponent(sessionId)}',"
+        }
+      ],
+      "writes": [],
+      "external_providers": [
+        "battle_sidecars"
+      ],
+      "without_provider": "com INTERACTIVE_BATTLE_ENABLED desligado: 404; falha do sidecar interativo: 503 com código estável (Retry-After quando dá para tentar de novo)",
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/battle/sessions/:id/actions",
+      "handler": "server/routes/ai/battle/sessions/[id]/actions/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_coach",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-PLAY-003",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/interactive_battle_service.dart",
+          "needle": "'/ai/battle/sessions/${Uri.encodeComponent(sessionId)}/actions',"
+        }
+      ],
+      "writes": [
+        "interactive_battle_sessions",
+        "interactive_battle_records"
+      ],
+      "external_providers": [
+        "battle_sidecars"
+      ],
+      "without_provider": "falha do sidecar interativo: 503 com código estável (Retry-After quando dá para tentar de novo); a ação não é aplicada",
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/ai/battle/sessions/:id/concede",
+      "handler": "server/routes/ai/battle/sessions/[id]/concede/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_coach",
+      "access_policy": "polling",
+      "legal_reacceptance": false,
+      "owner": "BT-PLAY-003",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/interactive_battle_service.dart",
+          "needle": "'/ai/battle/sessions/${Uri.encodeComponent(sessionId)}/concede',"
+        }
+      ],
+      "writes": [
+        "interactive_battle_sessions",
+        "interactive_battle_records"
+      ],
+      "external_providers": [
+        "battle_sidecars"
+      ],
+      "without_provider": "falha do sidecar interativo: 503 com código estável (Retry-After quando dá para tentar de novo)",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/analysis",
+      "handler": "server/routes/decks/[id]/analysis/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "legal_reacceptance": false,
+      "owner": "DCK-P1-04",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_fetch.dart",
+          "needle": "apiClient.get('/decks/$deckId/analysis')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "determinística; não é a autoridade legal final (DCK-P1-04)"
+    },
+    {
+      "method": "POST",
+      "path": "/decks/:id/ai-analysis",
+      "handler": "server/routes/decks/[id]/ai-analysis/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "legal_reacceptance": true,
+      "owner": "BT-AI-003",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_fetch.dart",
+          "needle": "apiClient.post('/decks/$deckId/ai-analysis'"
+        }
+      ],
+      "writes": [
+        "decks",
+        "ai_logs",
+        "user_plans"
+      ],
+      "writes_note": "decks.synergy_score, strengths e weaknesses",
+      "external_providers": [
+        "openai_chat_completions"
+      ],
+      "without_provider": "Perfil de produção sem OPENAI_API_KEY: 503. Fora da produção: resposta mock ou fallback local marcado is_mock=true, que não é cacheado nem aplicável. O fallback heurístico não é gravado no deck.",
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/optimizations",
+      "handler": "server/routes/decks/[id]/optimizations/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "legal_reacceptance": false,
+      "owner": "DCK-P1-07",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_mutation.dart",
+          "needle": "apiClient.get('/decks/$deckId/optimizations')"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/decks/:id/optimizations/:eventId/rollback",
+      "handler": "server/routes/decks/[id]/optimizations/[eventId]/rollback/index.dart",
+      "status": "guarded_off",
+      "capability": "ai_analyze_optimize_advisory",
+      "legal_reacceptance": false,
+      "owner": "DCK-P1-07",
+      "lane": "deck_e_ia",
+      "consumers": [
+        {
+          "file": "app/lib/features/decks/providers/deck_provider_support_mutation.dart",
+          "needle": "'/decks/$deckId/optimizations/$eventId/rollback',"
+        }
+      ],
+      "writes": [
+        "decks",
+        "deck_cards",
+        "deck_optimization_events"
+      ],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/battle-preflight",
+      "handler": "server/routes/decks/[id]/battle-preflight/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-004",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "'/decks/${Uri.encodeComponent(deckId)}/battle-preflight'"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null,
+      "notes": "com mode=interactive a capability é battle_coach"
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/battle-replays",
+      "handler": "server/routes/decks/[id]/battle-replays/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-001",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "'/decks/${Uri.encodeComponent(deckId)}/battle-replays?$query',"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/battle-replays/:replayId",
+      "handler": "server/routes/decks/[id]/battle-replays/[replayId]/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-001",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "'/decks/${Uri.encodeComponent(deckId)}/battle-replays/'"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/battle-replays/:replayId/annotations",
+      "handler": "server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-001",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "'${_annotationEndpoint(deckId: deckId, replayId: replayId)}?limit=100',"
+        }
+      ],
+      "writes": [],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "POST",
+      "path": "/decks/:id/battle-replays/:replayId/annotations",
+      "handler": "server/routes/decks/[id]/battle-replays/[replayId]/annotations/index.dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-001",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "_annotationEndpoint(deckId: deckId, replayId: replayId),"
+        }
+      ],
+      "writes": [
+        "battle_replay_annotations"
+      ],
+      "external_providers": [],
+      "substitute": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/decks/:id/battle-replays/:replayId/annotations/:annotationId",
+      "handler": "server/routes/decks/[id]/battle-replays/[replayId]/annotations/[annotationId].dart",
+      "status": "guarded_off",
+      "capability": "battle_batch",
+      "legal_reacceptance": false,
+      "owner": "BT-BAT-001",
+      "lane": "battle",
+      "consumers": [
+        {
+          "file": "app/lib/features/battle/services/battle_replay_service.dart",
+          "needle": "'${Uri.encodeComponent(annotationId)}',"
+        }
+      ],
+      "writes": [
+        "battle_replay_annotations"
+      ],
+      "external_providers": [],
+      "substitute": null
+    }
+  ],
+  "removed_routes": [
+    {
+      "method": "POST",
+      "path": "/decks/:id/recommendations",
+      "handler": "server/routes/decks/[id]/recommendations/index.dart",
+      "decision": "D-31",
+      "removed_on": "2026-09-28",
+      "substitute": "Optimize (POST /ai/optimize)",
+      "writes_left_behind": [],
+      "after_removal": "404: sem handler, sob decks_private"
+    },
+    {
+      "method": "GET",
+      "path": "/decks/:id/simulate",
+      "handler": "server/routes/decks/[id]/simulate/index.dart",
+      "decision": "D-31",
+      "removed_on": "2026-09-28",
+      "substitute": "Battle (POST /ai/simulate)",
+      "writes_left_behind": [],
+      "after_removal": "404: sem handler, sob decks_private"
+    },
+    {
+      "method": "POST",
+      "path": "/ai/simulate-matchup",
+      "handler": "server/routes/ai/simulate-matchup/index.dart",
+      "decision": "D-31",
+      "removed_on": "2026-09-28",
+      "substitute": "Battle (POST /ai/simulate com type=matchup)",
+      "writes_left_behind": [
+        "deck_matchups"
+      ],
+      "after_removal": "404 capability_route_unclassified"
+    },
+    {
+      "method": "POST",
+      "path": "/ai/weakness-analysis",
+      "handler": "server/routes/ai/weakness-analysis/index.dart",
+      "decision": "D-31",
+      "removed_on": "2026-09-28",
+      "substitute": "Analyze (GET /decks/:id/analysis e POST /decks/:id/ai-analysis)",
+      "writes_left_behind": [
+        "deck_weakness_reports",
+        "card_combos",
+        "combo_cards"
+      ],
+      "after_removal": "404 capability_route_unclassified"
+    },
+    {
+      "method": "GET",
+      "path": "/ai/optimize/telemetry",
+      "handler": "server/routes/ai/optimize/telemetry/index.dart",
+      "decision": "D-83",
+      "removed_on": "2026-09-28",
+      "substitute": "consulta de operação ao PostgreSQL (ai_optimize_fallback_telemetry) e o painel de /health/dashboard",
+      "writes_left_behind": [],
+      "after_removal": "404 capability_route_unclassified"
+    }
+  ]
+}

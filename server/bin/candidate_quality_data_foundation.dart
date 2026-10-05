@@ -7,6 +7,7 @@ import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:server/ai/optimize_rejection_history_support.dart';
 import 'package:server/database.dart';
 import 'package:server/meta/meta_deck_card_list_support.dart';
+import 'package:server/schema_requirements.dart';
 
 const _defaultArtifactDir =
     'test/artifacts/aggressive_candidate_quality_v2_2026-05-05';
@@ -254,7 +255,11 @@ Future<void> main(List<String> args) async {
           preview: staleGeneratedRowsBeforeApply,
           transactionRows: transactionStaleRows,
         );
-        await _ensureCandidateQualitySchema(session);
+        await requireSchemaObjects(
+          session,
+          caller: 'candidate_quality_data_foundation',
+          requirements: candidateQualitySchemaRequirements,
+        );
         final counts = <String, int>{};
         counts['upserted_function_tags'] = await _upsertFunctionTags(
           session,
@@ -1166,17 +1171,6 @@ Map<String, dynamic> _buildOneSamplePool({
     ],
     'candidates': candidates.take(12).toList(),
   };
-}
-
-Future<void> _ensureCandidateQualitySchema(Session pool) async {
-  for (final statement in candidateQualitySchemaStatements) {
-    await pool.execute(statement);
-  }
-  for (final statement in candidateQualityIndexStatements) {
-    await pool.execute(statement);
-  }
-  await pool.execute(optimizeCandidateQualitySummaryViewStatement);
-  await pool.execute(cardIntelligenceSnapshotViewStatement);
 }
 
 Future<int> _upsertFunctionTags(

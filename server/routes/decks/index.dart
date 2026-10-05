@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../lib/deck_schema_support.dart';
 import '../../lib/deck_validation_state_support.dart';
+import '../../lib/deck_visibility_policy.dart';
 import '../../lib/e2e_validation_policy.dart';
 import '../../lib/deck_card_name_resolution_support.dart';
 import '../../lib/deck_format_support.dart';
@@ -84,6 +86,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       '''
@@ -119,6 +122,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       ''')
@@ -155,6 +159,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       '''
@@ -190,6 +195,7 @@ Future<Response> _listDecks(RequestContext context) async {
         ) cmd ON true
         LEFT JOIN deck_cards dc ON d.id = dc.deck_id
         WHERE d.user_id = @userId
+          AND d.deleted_at IS NULL
         GROUP BY d.id, cmd.commander_name, cmd.commander_image_url
         ORDER BY d.created_at DESC
       ''');
@@ -256,7 +262,8 @@ Future<Response> _listDecks(RequestContext context) async {
             JOIN cards c ON c.id = dc.card_id
             CROSS JOIN LATERAL unnest(COALESCE(c.color_identity, '{}')) AS unnested
             WHERE dc.deck_id = ANY(
-              SELECT id FROM decks WHERE user_id = @userId
+              SELECT id FROM decks
+              WHERE user_id = @userId AND deleted_at IS NULL
             )
             GROUP BY dc.deck_id
           '''),
@@ -342,6 +349,36 @@ Future<Response> _createDeck(RequestContext context) async {
     return badRequest(e.message);
   } on DeckRulesException catch (e) {
     return badRequest(e.message);
+  }
+
+  // DCK-P0-00: deck novo nasce privado; publicar na criação exige a galeria
+  // aberta e cartas na lista. A recusa vem antes de qualquer acesso ao banco.
+  try {
+    // DCK-P0-04: deck de um Generate nasce no servidor, pela
+    // materialização do resultado; o app não manda essa lista aqui.
+    if (body.containsKey('generate_request_id') ||
+        body.containsKey('source_generate_request_id')) {
+      return Response.json(
+        statusCode: HttpStatus.badRequest,
+        body: const {
+          'error':
+              'Deck do Generate é criado pela materialização do resultado.',
+          'error_code': 'generate_materialize_required',
+        },
+      );
+    }
+    ensureDeckPublicationAllowed(
+      requested: isPublic,
+      cardCountAfter: rawCardObjects.length,
+      galleryOpen: context.read<ReleaseCapabilityPolicy>().isAllowed(
+        'gallery_public',
+      ),
+    );
+  } on DeckVisibilityException catch (e) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: e.responseBody,
+    );
   }
 
   final conn = context.read<Pool>();
@@ -454,6 +491,7 @@ Future<Response> _createDeck(RequestContext context) async {
         session,
       ).validateAndThrow(format: format, cards: normalizedCards, strict: false);
       String? strictValidationError;
+      String? strictValidationReason;
       var strictValidationPassed = false;
       try {
         await DeckRulesService(session).validateAndThrow(
@@ -464,6 +502,7 @@ Future<Response> _createDeck(RequestContext context) async {
         strictValidationPassed = true;
       } on DeckRulesException catch (error) {
         strictValidationError = error.message;
+        strictValidationReason = error.reason;
       }
       final readiness = buildDeckReadinessContract(
         format: format,
@@ -476,6 +515,7 @@ Future<Response> _createDeck(RequestContext context) async {
         ),
         strictValidationPassed: strictValidationPassed,
         strictValidationError: strictValidationError,
+        strictValidationReason: strictValidationReason,
       );
       print(
         '[DECK_CREATE_TIMING] validate_rules_done elapsed_ms=${stopwatch.elapsedMilliseconds}',

@@ -167,6 +167,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                     },
                 ],
                 apply=True,
+                deck_exists=lambda _pg_deck_id: True,
             )
 
             self.assertEqual(stats["cards_seen"], 3)
@@ -279,6 +280,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                     }
                 ],
                 apply=True,
+                deck_exists=lambda _pg_deck_id: True,
             )
 
             conn = sqlite3.connect(db_path)
@@ -337,6 +339,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                         },
                     ],
                     apply=True,
+                    deck_exists=lambda _pg_deck_id: True,
                 )
 
             self.assertIn("duplicate card_id rows", str(err.exception))
@@ -370,6 +373,7 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
                         },
                     ],
                     apply=True,
+                    deck_exists=lambda _pg_deck_id: True,
                 )
 
             self.assertIn("missing card_id", str(err.exception))
@@ -493,6 +497,183 @@ class SyncPgTargetDeckToHermesTests(unittest.TestCase):
             hashes.append(sync.snapshot_hashes(normalized)[2])
 
         self.assertEqual(hashes[0], hashes[1])
+
+
+    # BT-AI-030: a conferência no PostgreSQL acontece com o lock de escrita do
+    # SQLite já tomado, como no alimentador.
+    _LOCK_DECK = {
+        "name": "Runtime Lorehold Learned",
+        "archetype": "midrange",
+        "total_qty": 1,
+        "pg_deck_id": "8938B746-1A9E-46CE-B0D9-C2EC932DDDDD",
+    }
+    _LOCK_CARDS = [
+        {
+            "card_id": "00000000-0000-0000-0000-000000000003",
+            "name": "Sol Ring",
+            "quantity": 1,
+            "is_commander": False,
+            "functional_tag": "ramp",
+            "functional_tags_json": ["ramp"],
+            "semantic_tags_v2_json": [],
+            "battle_rules_json": [],
+            "cmc": 1,
+            "type_line": "Artifact",
+            "oracle_text": "{T}: Add {C}{C}.",
+        }
+    ]
+
+    @staticmethod
+    def _write_lock_is_held(db_path: Path) -> bool:
+        probe = sqlite3.connect(db_path, timeout=0)
+        try:
+            probe.execute("BEGIN IMMEDIATE")
+        except sqlite3.OperationalError as error:
+            return "locked" in str(error)
+        else:
+            probe.rollback()
+            return False
+        finally:
+            probe.close()
+
+    @staticmethod
+    def _target_rows(db_path: Path) -> tuple[int, int]:
+        conn = sqlite3.connect(db_path)
+        try:
+            decks = conn.execute("SELECT count(*) FROM decks WHERE id = 6").fetchone()[0]
+            cards = conn.execute(
+                "SELECT count(*) FROM deck_cards WHERE deck_id = 6"
+            ).fetchone()[0]
+            return decks, cards
+        finally:
+            conn.close()
+
+    def test_apply_confirms_the_pg_deck_under_the_sqlite_write_lock(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            seen: list[tuple[str, bool]] = []
+
+            def deck_exists(pg_deck_id: str) -> bool:
+                seen.append((pg_deck_id, self._write_lock_is_held(db_path)))
+                return True
+
+            stats = sync.write_sqlite(
+                str(db_path),
+                6,
+                self._LOCK_DECK,
+                self._LOCK_CARDS,
+                apply=True,
+                deck_exists=deck_exists,
+            )
+
+            self.assertEqual(
+                seen, [("8938B746-1A9E-46CE-B0D9-C2EC932DDDDD", True)]
+            )
+            self.assertTrue(stats["pg_deck_confirmed_under_sqlite_lock"])
+            self.assertEqual(self._target_rows(db_path), (1, 1))
+            self.assertFalse(self._write_lock_is_held(db_path))
+
+    def test_apply_refuses_a_deck_deleted_after_the_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            # Uma cópia anterior do alvo fica como estava: quem apaga cópia de
+            # deck excluído é o expurgo, não este script.
+            sync.write_sqlite(
+                str(db_path),
+                6,
+                self._LOCK_DECK,
+                self._LOCK_CARDS,
+                apply=True,
+                deck_exists=lambda _pg_deck_id: True,
+            )
+            before = self._target_rows(db_path)
+
+            with self.assertRaises(sync.DeckGoneError) as err:
+                sync.write_sqlite(
+                    str(db_path),
+                    6,
+                    {**self._LOCK_DECK, "name": "Nova cópia"},
+                    self._LOCK_CARDS,
+                    apply=True,
+                    deck_exists=lambda _pg_deck_id: False,
+                )
+
+            self.assertNotIn(
+                self._LOCK_DECK["pg_deck_id"].lower(), str(err.exception).lower()
+            )
+            self.assertEqual(self._target_rows(db_path), before)
+            conn = sqlite3.connect(db_path)
+            try:
+                name = conn.execute("SELECT deck_name FROM decks WHERE id = 6").fetchone()[0]
+            finally:
+                conn.close()
+            self.assertEqual(name, "Runtime Lorehold Learned")
+            self.assertFalse(self._write_lock_is_held(db_path))
+
+    def test_apply_without_a_callback_uses_the_postgres_check(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+            calls: list[str] = []
+
+            def fake_pg_check(pg_deck_id: str) -> bool:
+                calls.append(pg_deck_id)
+                return False
+
+            with patch.object(sync, "pg_deck_still_exists", fake_pg_check):
+                with self.assertRaises(sync.DeckGoneError):
+                    sync.write_sqlite(
+                        str(db_path),
+                        6,
+                        self._LOCK_DECK,
+                        self._LOCK_CARDS,
+                        apply=True,
+                    )
+
+            self.assertEqual(calls, ["8938B746-1A9E-46CE-B0D9-C2EC932DDDDD"])
+            self.assertEqual(self._target_rows(db_path), (0, 0))
+
+    def test_dry_run_takes_no_lock_and_asks_nothing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "knowledge.db"
+
+            def deck_exists(_pg_deck_id: str) -> bool:
+                raise AssertionError("dry run must not ask PostgreSQL")
+
+            stats = sync.write_sqlite(
+                str(db_path),
+                6,
+                self._LOCK_DECK,
+                self._LOCK_CARDS,
+                apply=False,
+                deck_exists=deck_exists,
+            )
+
+            self.assertNotIn("pg_deck_confirmed_under_sqlite_lock", stats)
+            self.assertEqual(self._target_rows(db_path), (0, 0))
+
+    def test_deck_still_in_postgres_ignores_the_trash(self) -> None:
+        class FakeCursor:
+            def __init__(self, row):
+                self.row = row
+                self.executed: list[tuple[str, tuple]] = []
+
+            def execute(self, sql, params):
+                self.executed.append((sql, params))
+
+            def fetchone(self):
+                return self.row
+
+        alive = FakeCursor((1,))
+        self.assertTrue(
+            sync.deck_still_in_postgres(alive, " 8938B746-1A9E-46CE-B0D9-C2EC932DDDDD ")
+        )
+        sql, params = alive.executed[0]
+        self.assertIn("FROM decks", sql)
+        self.assertIn("deleted_at IS NULL", sql)
+        self.assertEqual(params, ("8938b746-1a9e-46ce-b0d9-c2ec932ddddd",))
+
+        gone = FakeCursor(None)
+        self.assertFalse(sync.deck_still_in_postgres(gone, "qualquer"))
 
 
 if __name__ == "__main__":

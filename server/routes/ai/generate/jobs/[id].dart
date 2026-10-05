@@ -36,6 +36,12 @@ Future<Response> onRequest(RequestContext context, String id) async {
             : context.request.method == HttpMethod.delete
             ? await AiGenerateJobStore.cancel(pool, id, userId: userId)
             : await AiGenerateJobStore.get(pool, id);
+    // BT-AI-031: sem job é resposta normal, como no Optimize. O 404 fazia o
+    // navegador registrar erro no console cada vez que a tela de geração
+    // abria. A busca já é só da conta; job de outra conta nunca aparece.
+    if (id == 'latest' && job == null) {
+      return Response.json(body: const {'job': null});
+    }
     if (job == null || job.userId.isEmpty || job.userId != userId) {
       return Response.json(
         statusCode: HttpStatus.notFound,

@@ -37,6 +37,7 @@ void main() {
 
   Map<String, dynamic> buildAuthorization() =>
       buildOptimizeApplyAuthorizationForResponse(
+        ownerId: 'owner-1',
         signingSecret: secret,
         deckId: 'deck-1',
         deckSignature: 'signature-1',
@@ -51,6 +52,7 @@ void main() {
       () {
         final authorization = buildAuthorization();
         final verification = verifyOptimizeApplyAuthorization(
+          ownerId: 'owner-1',
           signingSecret: secret,
           token: authorization['token'] as String,
           deckId: 'deck-1',
@@ -80,6 +82,7 @@ void main() {
     test('rejects legacy or incomplete structural policies before signing', () {
       Map<String, dynamic>? signWithPolicy(Map<String, dynamic> policy) {
         return buildOptimizeApplyAuthorizationForResponse(
+          ownerId: 'owner-1',
           signingSecret: secret,
           deckId: 'deck-1',
           deckSignature: 'signature-1',
@@ -148,6 +151,7 @@ void main() {
 
         Map<String, dynamic>? signComplete(Object? policy) =>
             buildOptimizeApplyAuthorizationForResponse(
+              ownerId: 'owner-1',
               signingSecret: secret,
               deckId: 'deck-1',
               deckSignature: 'signature-1',
@@ -266,6 +270,7 @@ void main() {
     test('accepts an exact paired partial selection', () {
       final authorization = buildAuthorization();
       final verification = verifyOptimizeApplyAuthorization(
+        ownerId: 'owner-1',
         signingSecret: secret,
         token: authorization['token'] as String,
         deckId: 'deck-1',
@@ -286,6 +291,7 @@ void main() {
     test('rejects crossing independently authorized swap pairs', () {
       final authorization = buildAuthorization();
       final verification = verifyOptimizeApplyAuthorization(
+        ownerId: 'owner-1',
         signingSecret: secret,
         token: authorization['token'] as String,
         deckId: 'deck-1',
@@ -308,6 +314,7 @@ void main() {
       final authorization = buildAuthorization();
 
       final extraCard = verifyOptimizeApplyAuthorization(
+        ownerId: 'owner-1',
         signingSecret: secret,
         token: authorization['token'] as String,
         deckId: 'deck-1',
@@ -322,6 +329,7 @@ void main() {
         now: issuedAt.add(const Duration(hours: 1)),
       );
       final excessQuantity = verifyOptimizeApplyAuthorization(
+        ownerId: 'owner-1',
         signingSecret: secret,
         token: authorization['token'] as String,
         deckId: 'deck-1',
@@ -343,13 +351,16 @@ void main() {
     test('rejects tampering, expiry and mismatched binding', () {
       final authorization = buildAuthorization();
       final token = authorization['token'] as String;
+      // DeckReviewArtifact v1: `drv1.<payload>.<assinatura>`.
       final tokenParts = token.split('.');
-      final replacement = tokenParts.first.startsWith('A') ? 'B' : 'A';
+      final replacement = tokenParts[1].startsWith('A') ? 'B' : 'A';
       final tampered =
-          '$replacement${tokenParts.first.substring(1)}.${tokenParts.last}';
+          '${tokenParts[0]}.$replacement${tokenParts[1].substring(1)}'
+          '.${tokenParts[2]}';
 
       expect(
         verifyOptimizeApplyAuthorization(
+          ownerId: 'owner-1',
           signingSecret: secret,
           token: tampered,
           deckId: 'deck-1',
@@ -362,6 +373,7 @@ void main() {
       );
       expect(
         verifyOptimizeApplyAuthorization(
+          ownerId: 'owner-1',
           signingSecret: secret,
           token: token,
           deckId: 'deck-1',
@@ -374,6 +386,7 @@ void main() {
       );
       expect(
         verifyOptimizeApplyAuthorization(
+          ownerId: 'owner-1',
           signingSecret: secret,
           token: token,
           deckId: 'deck-1',
@@ -387,6 +400,7 @@ void main() {
       );
       expect(
         verifyOptimizeApplyAuthorization(
+          ownerId: 'owner-1',
           signingSecret: secret,
           token: token,
           deckId: 'another-deck',
@@ -397,11 +411,109 @@ void main() {
         ).code,
         'deck_binding_mismatch',
       );
+      // DCK-P0-02: o artefato é do dono e do estado do deck no preview.
+      expect(
+        verifyOptimizeApplyAuthorization(
+          signingSecret: secret,
+          token: token,
+          ownerId: 'owner-2',
+          deckId: 'deck-1',
+          deckSignature: 'signature-1',
+          actualRemovals: const [],
+          actualAdditions: const [],
+          now: issuedAt,
+        ).code,
+        'owner_binding_mismatch',
+      );
+      expect(
+        verifyOptimizeApplyAuthorization(
+          signingSecret: secret,
+          token: token,
+          ownerId: 'owner-1',
+          deckId: 'deck-1',
+          deckSignature: 'signature-2',
+          actualRemovals: const [],
+          actualAdditions: const [],
+          now: issuedAt,
+        ).code,
+        'stale_deck_signature',
+      );
+    });
+
+    test(
+      'the authorization is a DeckReviewArtifact v1 of kind optimize_apply',
+      () {
+        final authorization = buildAuthorization();
+        final verification = verifyOptimizeApplyAuthorization(
+          signingSecret: secret,
+          token: authorization['token'] as String,
+          ownerId: 'owner-1',
+          deckId: 'deck-1',
+          deckSignature: 'signature-1',
+          actualRemovals: const [],
+          actualAdditions: const [],
+          now: issuedAt,
+        );
+
+        expect(authorization['version'], 'deck_review_artifact_v1');
+        expect(authorization['algo'], 'hmac-sha256');
+        expect(authorization['token'], startsWith('drv1.'));
+        expect(verification.payload['kind'], 'optimize_apply');
+        expect(verification.payload['owner_id'], 'owner-1');
+        expect(verification.payload['deck_signature'], 'signature-1');
+        expect(verification.payload['input_hash'], hasLength(64));
+        expect(verification.payload['constraints_hash'], hasLength(64));
+      },
+    );
+
+    test('the artifact binds the deck revision when the preview knows it', () {
+      final authorization =
+          buildOptimizeApplyAuthorizationForResponse(
+            signingSecret: secret,
+            ownerId: 'owner-1',
+            deckId: 'deck-1',
+            deckSignature: 'signature-1',
+            deckRevision: 7,
+            responseBody: response,
+            issuedAt: issuedAt,
+          )!;
+      OptimizeApplyAuthorizationVerification verify(int? revision) =>
+          verifyOptimizeApplyAuthorization(
+            signingSecret: secret,
+            token: authorization['token'] as String,
+            ownerId: 'owner-1',
+            deckId: 'deck-1',
+            deckSignature: 'signature-1',
+            deckRevision: revision,
+            actualRemovals: const [],
+            actualAdditions: const [],
+            now: issuedAt,
+          );
+
+      expect(verify(7).valid, isTrue);
+      expect(verify(8).code, 'stale_deck_revision');
+      expect(verify(null).code, 'stale_deck_revision');
+    });
+
+    test('an empty owner never receives an apply authorization', () {
+      final body = Map<String, dynamic>.from(response);
+      attachOptimizeApplyAuthorizationToResponse(
+        ownerId: ' ',
+        deckId: 'deck-1',
+        deckSignature: 'signature-1',
+        responseBody: body,
+        bracket: 2,
+        environment: const {'OPTIMIZATION_APPLY_SIGNING_SECRET': secret},
+      );
+
+      expect(body.containsKey('apply_authorization'), isFalse);
+      expect(body['can_apply'], isFalse);
     });
 
     test('apply support verifies the actual before/after deck delta', () {
       final authorization =
           buildOptimizeApplyAuthorizationForResponse(
+            ownerId: 'owner-1',
             signingSecret: secret,
             deckId: 'deck-1',
             deckSignature: 'signature-1',
@@ -442,6 +554,7 @@ void main() {
 
       expect(
         () => validateOptimizationApplyAuthorization(
+          ownerId: 'owner-1',
           deckId: 'deck-1',
           currentDeckSignature: 'signature-1',
           beforeCards: const [
@@ -466,6 +579,7 @@ void main() {
 
       expect(
         () => validateOptimizationApplyAuthorization(
+          ownerId: 'owner-1',
           deckId: 'deck-1',
           currentDeckSignature: 'signature-1',
           beforeCards: const [
@@ -492,6 +606,7 @@ void main() {
     test('accepts a signed and persisted bracket transition from 2 to 3', () {
       final authorization =
           buildOptimizeApplyAuthorizationForResponse(
+            ownerId: 'owner-1',
             signingSecret: secret,
             deckId: 'deck-1',
             deckSignature: 'signature-1',
@@ -515,6 +630,7 @@ void main() {
 
       expect(
         () => validateOptimizationApplyAuthorization(
+          ownerId: 'owner-1',
           deckId: 'deck-1',
           currentDeckSignature: 'signature-1',
           beforeCards: const [
@@ -540,6 +656,7 @@ void main() {
       ) {
         try {
           validateOptimizationApplyAuthorization(
+            ownerId: 'owner-1',
             deckId: 'deck-1',
             currentDeckSignature: 'signature-1',
             beforeCards: const [
@@ -592,6 +709,7 @@ void main() {
     test('partial selection cannot omit wipes required by signed floor', () {
       final authorization =
           buildOptimizeApplyAuthorizationForResponse(
+            ownerId: 'owner-1',
             signingSecret: secret,
             deckId: 'deck-1',
             deckSignature: 'signature-1',
@@ -634,6 +752,7 @@ void main() {
             issuedAt: issuedAt,
           )!;
       final verification = validateOptimizationApplyAuthorization(
+        ownerId: 'owner-1',
         deckId: 'deck-1',
         currentDeckSignature: 'signature-1',
         beforeCards: const [
@@ -781,6 +900,7 @@ void main() {
     test('authorization and signing secret are fail-closed', () {
       final unsignedPreview = Map<String, dynamic>.from(response);
       attachOptimizeApplyAuthorizationToResponse(
+        ownerId: 'owner-1',
         deckId: 'deck-1',
         deckSignature: 'signature-1',
         responseBody: unsignedPreview,
@@ -798,6 +918,7 @@ void main() {
 
       expect(
         () => validateOptimizationApplyAuthorization(
+          ownerId: 'owner-1',
           deckId: 'deck-1',
           currentDeckSignature: 'signature-1',
           beforeCards: const [
@@ -820,6 +941,7 @@ void main() {
 
       expect(
         () => validateOptimizationApplyAuthorization(
+          ownerId: 'owner-1',
           deckId: 'deck-1',
           currentDeckSignature: 'signature-1',
           beforeCards: const [],

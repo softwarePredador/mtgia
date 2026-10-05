@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../../lib/binder_item_contract.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
+import '../../../lib/release_capability_policy.dart';
 
 /// PUT /binder/:id  → Atualiza item do binder
 /// DELETE /binder/:id → Remove item do binder
@@ -600,6 +601,15 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
       params['listType'] = lt;
     }
 
+    // SCOPE-P0-TRD-00 (D-39): oferta para troca ou venda só com a capability
+    // aberta; a recusa vem antes da transação.
+    ensureBinderCommerceAllowed(
+      forTrade: params['forTrade'] as bool?,
+      forSale: params['forSale'] as bool?,
+      price: params['price'] as double?,
+      isAllowed: context.read<ReleaseCapabilityPolicy>().isAllowed,
+    );
+
     return pool.runTx((transaction) async {
       final locked = await transaction.execute(
         Sql.named('''
@@ -680,6 +690,11 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': error.message, 'code': error.code},
+    );
+  } on BinderCommerceUnavailableException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: binderCommerceUnavailableBody(error),
     );
   } on ServerException catch (error, stackTrace) {
     if (error.code == '23505') {

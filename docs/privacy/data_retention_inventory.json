@@ -17,7 +17,12 @@
     "D-26": "Testar o restore do dump de 2026-08-03, guardá-lo cifrado e apagar os dois de 2026-07-17 só com o sim do dono.",
     "D-29": "Prompt bruto do Generate retido por 30 dias e fora de decks.description.",
     "D-30": "Lixeira de decks com purge em 30 dias; deck na lixeira entra na exportação.",
-    "D-32": "Jobs de IA retidos por 24 h."
+    "D-32": "Jobs de IA retidos por 24 h.",
+    "D-68": "Outbox da exclusão (D-23) aprovado: tabela account_deletion_outbox e job de consumo sem capability; a migration pede a palavra do dono na execução.",
+    "D-70": "Limpeza por prazo separada da capability ai_analyze_optimize_advisory, com recibo por execução; ligar em produção só com a palavra do dono.",
+    "D-71": "Registrar cada pedido de exportação, com quem pediu, quando e o resultado, sem o conteúdo.",
+    "D-77": "O sidecar de Jogar contra IA é dado como limpo no outbox da exclusão depois do tempo máximo da sessão, 7200 s + 10 min contados da exclusão, sem rota de confirmação.",
+    "D-78": "Os logs de pedido de exportação (MANALOOM_PRIVACY_EXPORT_REQUEST) são guardados por 90 dias; aplicar a rotação no host é configuração persistente, com o dono."
   },
   "vocabulary": {
     "category": [
@@ -51,6 +56,7 @@
     "deletion_mode": [
       "delete",
       "anonymize",
+      "partial_delete",
       "cascade",
       "keep_legal",
       "gap",
@@ -113,17 +119,21 @@
       "rule": "prompt bruto do Generate retido por 30 dias, fora de decks.description",
       "applies_to": [
         "decks.description",
-        "ai_generate_jobs.result"
+        "ai_generate_jobs.result",
+        "ai_generate_requests.prompt",
+        "deck_change_events.metadata_before"
       ],
-      "status": "não implementado: o app grava o prompt em decks.description e o job que o ecoa some em 30 min; o armazenamento do prompt com prazo é o DCK-P0-04"
+      "status": "implementado no servidor (DCK-P0-04): o pedido do Generate guarda o prompt em ai_generate_requests.prompt e a limpeza por prazo (retention_cleanup_apply_v1) o apaga em 30 dias, junto com o texto de descrição copiado no ledger; o deck materializado no servidor nasce sem o prompt na descrição. Falta: o app antigo ainda grava o prompt em decks.description ao salvar pelo POST /decks, e o prompt que já está em descrições de decks existentes fica como está (pendente de decisão do dono)"
     },
     {
       "decision": "D-30",
       "rule": "purga da lixeira de decks em 30 dias",
       "applies_to": [
-        "decks.deleted_at"
+        "decks.deleted_at",
+        "shared_deck_reports",
+        "deck_learning_events"
       ],
-      "status": "não implementado: DCK-P0-06"
+      "status": "implementado no servidor (DCK-P0-06): DELETE /decks/:id manda o deck para a lixeira (decks.deleted_at) sem apagar nada, tira o deck da galeria e despublica os relatórios; o deck na lixeira some das superfícies, não conta em limite nem em aprendizado e entra na exportação; POST /decks/:id/restore devolve o deck íntegro e privado, sem republicar relatório; a limpeza por prazo (retention_cleanup_apply_v1) apaga de vez, em 30 dias, o deck, os relatórios e os eventos de aprendizado dele. Falta: a tela da lixeira no app e a ativação da limpeza na produção (decisão do dono)"
     },
     {
       "decision": "D-32",
@@ -132,7 +142,7 @@
         "ai_generate_jobs",
         "ai_optimize_jobs"
       ],
-      "status": "o código ainda apaga em 30 min (ai_generate_job.dart:12, optimize_job.dart:23, AI_JOB_RETENTION_MINUTES=30): BT-AI-032"
+      "status": "o job de limpeza (D-70) aplica 24 h quando ativado; o serviço ainda apaga em 30 min (ai_generate_job.dart:12, optimize_job.dart:23): BT-AI-032"
     },
     {
       "decision": "D-23",
@@ -141,9 +151,129 @@
         "artifact:backups"
       ],
       "status": "prazo de rotação ainda não decidido; backup local sem cifra e sem cópia fora da máquina (BT-DR-001)"
+    },
+    {
+      "decision": "D-78",
+      "rule": "logs de pedido de exportação guardados por 90 dias",
+      "applies_to": [
+        "artifact:privacy_export_request_log"
+      ],
+      "status": "registrado no inventário; a rotação de 90 dias no host da API não está aplicada (configuração persistente, com o dono)"
     }
   ],
+  "retention_cleanup": {
+    "job": "manaloom_ai_runtime_cleanup",
+    "contract": "retention_cleanup_apply_v1",
+    "decision": "D-70",
+    "activation": "desligada por padrão: o agendado só apaga depois de uma execução supervisionada com MANALOOM_CONFIRM_POSTGRES_WRITES (--mode activate), registrada em sync_state; até lá conta e deixa o recibo MANALOOM_RETENTION_CLEANUP. Ligar em produção é decisão do dono",
+    "rules": [
+      {
+        "id": "ai_optimize_fallback_telemetry_180d",
+        "table": "ai_optimize_fallback_telemetry",
+        "max_age_minutes": 259200,
+        "scope": "todas as linhas",
+        "decision": null
+      },
+      {
+        "id": "ai_logs_180d",
+        "table": "ai_logs",
+        "max_age_minutes": 259200,
+        "scope": "fora as reservas de cota (endpoint plan-reservation:*)",
+        "decision": null
+      },
+      {
+        "id": "ai_logs_unconfirmed_plan_reservation_10min",
+        "table": "ai_logs",
+        "max_age_minutes": 10,
+        "scope": "reservas de cota não confirmadas (plan-reservation:*, success falso); igual ao TTL do PlanService",
+        "decision": null
+      },
+      {
+        "id": "rate_limit_events_24h",
+        "table": "rate_limit_events",
+        "max_age_minutes": 1440,
+        "scope": "todas as linhas",
+        "decision": null
+      },
+      {
+        "id": "ai_generate_jobs_24h",
+        "table": "ai_generate_jobs",
+        "max_age_minutes": 1440,
+        "scope": "todas as linhas",
+        "decision": "D-32"
+      },
+      {
+        "id": "ai_optimize_jobs_24h",
+        "table": "ai_optimize_jobs",
+        "max_age_minutes": 1440,
+        "scope": "todas as linhas",
+        "decision": "D-32"
+      },
+      {
+        "id": "ai_generate_requests_prompt_30d",
+        "table": "ai_generate_requests",
+        "max_age_minutes": 43200,
+        "scope": "só o prompt bruto e a impressão derivada dele (a linha fica)",
+        "decision": "D-29",
+        "action": "redact"
+      },
+      {
+        "id": "deck_change_events_description_30d",
+        "table": "deck_change_events",
+        "max_age_minutes": 43200,
+        "scope": "só o texto de descrição copiado no ledger (a linha fica, com description_redacted_at)",
+        "decision": "D-29",
+        "action": "redact"
+      },
+      {
+        "id": "shared_deck_reports_trashed_deck_30d",
+        "table": "shared_deck_reports",
+        "max_age_minutes": 43200,
+        "scope": "relatórios de deck com mais de 30 dias na lixeira (já despublicados desde a ida para a lixeira); sai antes do deck",
+        "decision": "D-30"
+      },
+      {
+        "id": "deck_learning_events_trashed_deck_30d",
+        "table": "deck_learning_events",
+        "max_age_minutes": 43200,
+        "scope": "eventos de aprendizado de deck com mais de 30 dias na lixeira (sem chave estrangeira para o deck); sai antes do deck",
+        "decision": "D-30"
+      },
+      {
+        "id": "decks_trash_30d",
+        "table": "decks",
+        "max_age_minutes": 43200,
+        "scope": "deck com mais de 30 dias na lixeira, contado de deleted_at; a cascata leva o que pende do deck",
+        "decision": "D-30"
+      }
+    ]
+  },
   "tables": {
+    "account_deletion_outbox": {
+      "category": "privacy_control",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Outbox da exclusão (D-68): uma linha por consumidor fora do PostgreSQL (SQLite do Hermes, sidecar de Jogar contra IA, EndpointCache, Sentry, backups), com lease, nova tentativa e recibo por consumidor. Cada execução do job cria a linha que falta para todo recibo de exclusão (BT-PRIV-002).",
+      "owner": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo; os tokens de deck saem da linha quando o consumidor conclui",
+        "decision": "D-68",
+        "enforced_by": "job manaloom_account_deletion_outbox (server/bin/account_deletion_outbox_worker.dart via server/bin/manaloom_ops_daemon.py), sem capability, contrato account_deletion_outbox_v1",
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "não tem vínculo com o titular: aponta para o recibo e leva decks só como HMAC"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "Gravado na exclusão, na transação do recibo, ou pela reconciliação do job, que conta o prazo da hora da exclusão; os decks vão como o mesmo HMAC dos tombstones e só para o Hermes (desde a D-77, o sidecar fecha pelo tempo e não recebe tokens)."
+      },
+      "legal_exception": "Prova, por consumidor, de que a exclusão chegou aos lugares fora do banco; não guarda identificador da pessoa."
+    },
     "account_deletion_receipts": {
       "category": "privacy_control",
       "subject_kind": "none",
@@ -174,14 +304,14 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "user_id",
-      "purpose": "Funil de ativação (eventos do onboarding e do primeiro deck).",
+      "purpose": "Funil de ativação (BT-KPI-001, D-47): eventos do catálogo activation_events_v1, com metadado só de enumerados, inteiros com faixa e booleanos; nenhuma decklist, texto livre nem ID interno. As métricas de ativação contam usuários distintos e não leem o metadado.",
       "owner": "server/routes/users/me/activation-events/index.dart",
       "retention": {
         "class": "account_lifetime",
         "period": "sem prazo: nenhum job apaga eventos antigos",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "prazo de retenção de analytics não decidido; o job de limpeza não toca a tabela (BT-KPI-001)"
+        "gap": "prazo de retenção de analytics não decidido (D-69: entra no job depois do advogado); o job de limpeza não toca a tabela. Linhas gravadas antes do catálogo v1 podem ter no metadado a chave de idempotência (com o ID do usuário), IDs de deck e de nota e o nome livre do arquétipo (BT-KPI-001)"
       },
       "export": {
         "section": "data.activation_events"
@@ -195,6 +325,7 @@
       "columns": {
         "created_at": "include",
         "deck_id": "deck_ref",
+        "dedupe_key": "omit_hash",
         "event_name": "include",
         "format": "include",
         "id": "include",
@@ -214,8 +345,8 @@
         "class": "ttl",
         "period": "decidido: 24 h; hoje: 30 min",
         "decision": "D-32",
-        "enforced_by": "limpeza no próprio serviço a cada job novo (ai_generate_job.dart:12 e :345, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o código ainda apaga em 30 min; subir para 24 h é o BT-AI-032. O prompt bruto retido por 30 dias (D-29) depende do DCK-P0-04"
+        "enforced_by": "limpeza no próprio serviço a cada job novo (ai_generate_job.dart:12 e :345, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "o serviço ainda apaga em 30 min; subir para 24 h é o BT-AI-032. A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70). O prompt bruto retido por 30 dias (D-29) depende do DCK-P0-04"
       },
       "export": {
         "section": "data.ai_activity.generate_jobs"
@@ -245,6 +376,61 @@
         "user_id": "person_ref"
       }
     },
+    "ai_generate_requests": {
+      "category": "ai_runtime",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Pedido durável do Generate (DCK-P0-04): a entrada original (prompt e controles), a impressão do pedido, o resultado quando o job termina e o deck que o servidor materializou a partir dele.",
+      "owner": "server/lib/ai/ai_generate_request_store.dart; server/routes/ai/generate/**",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "o pedido fica enquanto a conta existir; o prompt bruto e a impressão derivada dele, 30 dias",
+        "decision": "D-29",
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "gap": null,
+        "redactions": [
+          {
+            "rule": "ai_generate_requests_prompt_30d",
+            "columns": [
+              "prompt",
+              "request_fingerprint"
+            ],
+            "period": "30 dias",
+            "decision": "D-29",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
+      },
+      "export": {
+        "section": "data.ai_activity.generate_requests"
+      },
+      "deletion": {
+        "mode": "delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": null
+      },
+      "legal_exception": null,
+      "columns": {
+        "can_materialize": "include",
+        "controls": "include",
+        "created_at": "include",
+        "format": "include",
+        "id": "include",
+        "job_id": "omit_internal",
+        "materialized_at": "include",
+        "materialized_deck_id": "deck_ref",
+        "prompt": "include",
+        "prompt_purged_at": "include",
+        "request_fingerprint": "omit_hash",
+        "request_key": "omit_hash",
+        "result_deck": "include",
+        "result_fingerprint": "omit_hash",
+        "status": "include",
+        "updated_at": "include",
+        "user_id": "person_ref"
+      }
+    },
     "ai_logs": {
       "category": "ai_runtime",
       "subject_kind": "account_holder",
@@ -256,8 +442,8 @@
         "class": "ttl",
         "period": "180 dias (AI_LOG_RETENTION_DAYS); reservas de cota não confirmadas em 10 min",
         "decision": null,
-        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": "data.ai_activity.logs"
@@ -329,8 +515,8 @@
         "class": "ttl",
         "period": "180 dias (TELEMETRY_RETENTION_DAYS)",
         "decision": null,
-        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": "data.ai_activity.fallback_telemetry"
@@ -368,8 +554,8 @@
         "class": "ttl",
         "period": "decidido: 24 h; hoje: 30 min",
         "decision": "D-32",
-        "enforced_by": "limpeza no próprio serviço a cada job novo (optimize_job.dart:23 e :450, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory",
-        "gap": "o código ainda apaga em 30 min; subir para 24 h é o BT-AI-032"
+        "enforced_by": "limpeza no próprio serviço a cada job novo (optimize_job.dart:23 e :450, _jobTtl de 30 min) e o job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70)",
+        "gap": "o serviço ainda apaga em 30 min; subir para 24 h é o BT-AI-032. A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": "data.ai_activity.optimize_jobs"
@@ -434,6 +620,31 @@
         "user_id": "person_ref"
       }
     },
+    "analysis_sources": {
+      "category": "operational",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Arquivos de análise importados pelo laboratório Hermes (caminho, tipo, comandante e hash); nasce da migration 075.",
+      "owner": "docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o processo existir",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
     "archetype_counters": {
       "category": "reference",
       "subject_kind": "none",
@@ -441,6 +652,31 @@
       "subject_link": null,
       "purpose": "Contra-estratégias por arquétipo.",
       "owner": "server/lib/ai/** e server/bin/** (pipelines de referência)",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "archetype_patterns": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Padrões de construção por arquétipo e formato; nasce da migration 075.",
+      "owner": "server/lib/ml_knowledge_service.dart; server/bin/extract_meta_insights.dart",
       "retention": {
         "class": "not_personal",
         "period": "acompanha o ciclo do catalogo e das referencias",
@@ -708,6 +944,56 @@
         "turns_played": "include",
         "winner_deck_id": "deck_ref"
       }
+    },
+    "beta_invite_events": {
+      "category": "security",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Trilha de auditoria dos convites da beta (BT-AUTH-006): emissão, entrega, reenvio, revogação, aceite e recusas, com ator, request-id e data.",
+      "owner": "server/lib/beta_invites/beta_invite_store.dart; server/lib/beta_invites/beta_invite_issuance.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "enquanto o convite existir (apagada junto, ON DELETE CASCADE)",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "não guarda dado pessoal; o vínculo com a pessoa passa pelo convite"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": "Não guarda dado pessoal; sai junto quando o convite é apagado (FK invite_id ON DELETE CASCADE)."
+      },
+      "legal_exception": null
+    },
+    "beta_invites": {
+      "category": "security",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "accepted_user_id depois do aceite; antes dele, email_digest (digest do e-mail convidado)",
+      "purpose": "Convite de uso único da beta (BT-AUTH-006, D-16): hash do código, digest e pista mascarada do e-mail convidado, lote, validade, entrega, revogação e aceite.",
+      "owner": "server/lib/beta_invites/beta_invite_store.dart; server/lib/beta_invites/beta_invite_issuance.dart; server/bin/beta_invites.dart",
+      "retention": {
+        "class": "ttl",
+        "period": "o convite aberto vale até expires_at (padrão 14 dias, 1 a 60 no script); a linha fica depois de aceita, vencida ou revogada",
+        "decision": null,
+        "enforced_by": null,
+        "gap": "sem purga das linhas vencidas, revogadas ou aceitas; recomendação registrada no diário da frente de servidor: apagar 90 dias depois de vencer ou ser revogado"
+      },
+      "export": {
+        "section": null,
+        "reason": "controle de admissão: só hash do código e digest do e-mail; a conta criada já sai na exportação"
+      },
+      "deletion": {
+        "mode": "gap",
+        "by": null,
+        "notes": "A exclusão de conta ainda não apaga nem desliga o convite aceito (email_digest e email_hint ficam; accepted_user_id aponta para a conta pseudonimizada). Pendência para a frente de privacidade."
+      },
+      "legal_exception": null
     },
     "card_battle_rules": {
       "category": "catalog",
@@ -1351,6 +1637,59 @@
         "quantity": "include"
       }
     },
+    "deck_change_events": {
+      "category": "user_content",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Ledger imutável das mudanças de cada deck (DCK-P0-01): revisão de antes e de depois, operação, só as cartas e os metadados que mudaram, o desfazer e a chave de idempotência do pedido.",
+      "owner": "server/lib/decks/deck_revision_support.dart",
+      "retention": {
+        "class": "account_lifetime",
+        "period": "enquanto o deck existir; o texto de descrição copiado no ledger, 30 dias (D-29)",
+        "decision": null,
+        "enforced_by": "FK deck_change_events.deck_id ON DELETE CASCADE",
+        "gap": null,
+        "redactions": [
+          {
+            "rule": "deck_change_events_description_30d",
+            "columns": [
+              "metadata_before.description",
+              "metadata_after.description"
+            ],
+            "period": "30 dias",
+            "decision": "D-29",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
+      },
+      "export": {
+        "section": "data.deck_change_events"
+      },
+      "deletion": {
+        "mode": "cascade",
+        "by": "FK deck_change_events.deck_id -> decks ON DELETE CASCADE",
+        "notes": "O ledger só recebe INSERT: o gatilho manaloom_deck_change_events_append_only recusa DELETE direto e deixa passar só a cascata do deck ou da conta; o único UPDATE aceito é a redação governada da descrição (D-29), com a sessão marcada pela limpeza por prazo."
+      },
+      "legal_exception": null,
+      "columns": {
+        "cards_after": "include",
+        "cards_before": "include",
+        "created_at": "include",
+        "deck_id": "deck_ref",
+        "description_redacted_at": "include",
+        "id": "include",
+        "idempotency_key": "omit_hash",
+        "metadata_after": "include",
+        "metadata_before": "include",
+        "operation": "include",
+        "request_fingerprint": "omit_hash",
+        "revision_after": "include",
+        "revision_before": "include",
+        "undo_of_event_id": "include",
+        "user_id": "person_ref"
+      }
+    },
     "deck_comments": {
       "category": "user_content",
       "subject_kind": "account_holder",
@@ -1393,10 +1732,19 @@
       "owner": "server/lib/ai/deck_learning_event_support.dart; server/bin/pull_learning_events.py (cópia para o SQLite Hermes)",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto o deck existir",
+        "period": "enquanto o deck existir; evento de deck na lixeira não vai para o Hermes (D-30) e sai com o deck purgado",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)"
+        "gap": "a cópia no SQLite Hermes (user_learning_events) não é apagada na exclusão (BT-AI-030)",
+        "purges": [
+          {
+            "rule": "deck_learning_events_trashed_deck_30d",
+            "scope": "evento de deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.deck_learning_events"
@@ -1425,8 +1773,8 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "deck_id -> decks.user_id",
-      "purpose": "Resultado legado de simulação de confronto entre dois decks (POST /ai/simulate-matchup, desligada e com remoção decidida na D-31).",
-      "owner": "server/routes/ai/simulate-matchup/index.dart",
+      "purpose": "Resultado legado de simulação de confronto entre dois decks. A rota que o gravava (POST /ai/simulate-matchup) saiu na D-31, em 2026-09-28; as linhas antigas seguem na exportação e na exclusão.",
+      "owner": "nenhum escritor desde a D-31: POST /ai/simulate-matchup saiu em 2026-09-28 (BT-AI-029); descartar a tabela fica com o BT-DB-005",
       "retention": {
         "class": "account_lifetime",
         "period": "enquanto o deck existir",
@@ -1502,8 +1850,8 @@
       "subject_kind": "account_holder",
       "personal_data": true,
       "subject_link": "deck_id -> decks.user_id",
-      "purpose": "Relatório legado de fraquezas do deck (POST /ai/weakness-analysis, desligada e com remoção decidida na D-31).",
-      "owner": "server/routes/ai/weakness-analysis/index.dart",
+      "purpose": "Relatório legado de fraquezas do deck. A rota que o gravava (POST /ai/weakness-analysis) saiu na D-31, em 2026-09-28; as linhas antigas seguem na exportação e na exclusão.",
+      "owner": "nenhum escritor desde a D-31: POST /ai/weakness-analysis saiu em 2026-09-28 (BT-AI-029); descartar a tabela fica com o BT-DB-005",
       "retention": {
         "class": "account_lifetime",
         "period": "enquanto o deck existir",
@@ -1541,10 +1889,19 @@
       "owner": "server/routes/decks/**; server/routes/import/**",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e deveria ser purgado em 30 dias",
+        "period": "enquanto a conta existir; deck apagado vai para a lixeira (deleted_at) e sai de vez em 30 dias (D-30)",
         "decision": "D-30",
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "a purga da lixeira em 30 dias ainda não existe (DCK-P0-06); o prompt bruto em decks.description contraria a D-29 (DCK-P0-04)"
+        "gap": "o prompt bruto em decks.description de decks salvos pelo app antigo contraria a D-29 (DCK-P0-04; decks existentes pendentes de decisão do dono)",
+        "purges": [
+          {
+            "rule": "decks_trash_30d",
+            "scope": "deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.decks"
@@ -1570,6 +1927,7 @@
         "pricing_source": "include",
         "pricing_total": "include",
         "pricing_updated_at": "include",
+        "revision": "include",
         "strengths": "include",
         "synergy_score": "include",
         "user_id": "person_ref",
@@ -1842,6 +2200,31 @@
       },
       "legal_exception": null
     },
+    "ml_learning_state": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Estado do aprendizado por versão do modelo; nasce da migration 075.",
+      "owner": "server/routes/ai/ml-status/index.dart; server/bin/extract_meta_insights.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
     "ml_prompt_feedback": {
       "category": "user_activity",
       "subject_kind": "account_holder",
@@ -1937,6 +2320,31 @@
         "type": "include",
         "user_id": "person_ref"
       }
+    },
+    "optimization_analysis_logs": {
+      "category": "ai_runtime",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Log de análise do Optimize (nome do comandante, listas de cartas e métricas), sem user_id nem deck_id; nasce da migration 075 (BT-DB-005).",
+      "owner": "server/lib/ai/optimize_analysis_support.dart; server/routes/ai/ml-status/index.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "sem prazo: nenhum job apaga; sem vínculo com conta",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
     },
     "optimize_rejection_penalties": {
       "category": "reference",
@@ -2143,8 +2551,8 @@
         "class": "ttl",
         "period": "24 h (RATE_LIMIT_EVENT_RETENTION_HOURS); cada acerto também apaga as linhas do mesmo balde e identidade mais velhas que duas janelas",
         "decision": null,
-        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), que exige a capability ai_analyze_optimize_advisory; e distributed_rate_limiter.dart:32",
-        "gap": "o job de limpeza só roda com ai_analyze_optimize_advisory ligada (manaloom_ops_daemon.py:712); com a capability OFF em produção, o prazo não é aplicado"
+        "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); e distributed_rate_limiter.dart:32",
+        "gap": "A limpeza do job fica desligada até a ativação supervisionada (--mode activate com MANALOOM_CONFIRM_POSTGRES_WRITES); até lá só conta e deixa o recibo. Ligar em produção é decisão do dono (D-70)"
       },
       "export": {
         "section": null,
@@ -2241,10 +2649,19 @@
       "owner": "server/lib/reports/shareable_report_service.dart",
       "retention": {
         "class": "account_lifetime",
-        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck é apagado (D-19)",
+        "period": "enquanto a conta existir; o link deixa de ser servido quando expira ou quando o deck vai para a lixeira, e não volta com o restaurar (D-19, D-30); sai com o deck purgado",
         "decision": null,
         "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas"
+        "gap": "expires_at só filtra a leitura; linhas vencidas não são purgadas",
+        "purges": [
+          {
+            "rule": "shared_deck_reports_trashed_deck_30d",
+            "scope": "relatório de deck com mais de 30 dias na lixeira",
+            "period": "30 dias na lixeira",
+            "decision": "D-30",
+            "enforced_by": "job manaloom_ai_runtime_cleanup (server/bin/cleanup_optimize_telemetry.dart via server/bin/manaloom_ops_daemon.py), sem capability, sob o contrato retention_cleanup_apply_v1 (D-70); desligado até a ativação supervisionada"
+          }
+        ]
       },
       "export": {
         "section": "data.shared_deck_reports"
@@ -2318,6 +2735,56 @@
       },
       "legal_exception": null
     },
+    "synergy_packages": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Pacotes de sinergia aprendidos (nomes de cartas e arquétipo); nasce da migration 075.",
+      "owner": "server/lib/ml_knowledge_service.dart; server/bin/extract_meta_insights.dart",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
+    "theme_contextual_rules": {
+      "category": "reference",
+      "subject_kind": "none",
+      "personal_data": false,
+      "subject_link": null,
+      "purpose": "Regras de contagem por tema e função de carta, importadas do THEMES.md do laboratório Hermes; nasce da migration 075.",
+      "owner": "server/lib/ai/theme_contextual_rules_service.dart; docs/hermes-analysis/manaloom-knowledge/scripts/import_knowledge.py",
+      "retention": {
+        "class": "not_personal",
+        "period": "acompanha o ciclo do catalogo e das referencias",
+        "decision": null,
+        "enforced_by": null,
+        "gap": null
+      },
+      "export": {
+        "section": null,
+        "reason": "sem dado pessoal"
+      },
+      "deletion": {
+        "mode": "not_personal",
+        "by": null,
+        "notes": null
+      },
+      "legal_exception": null
+    },
     "trade_items": {
       "category": "trade",
       "subject_kind": "account_holder",
@@ -2327,9 +2794,9 @@
       "owner": "server/routes/trades/index.dart",
       "retention": {
         "class": "legal_hold",
-        "period": "mantido com a troca",
+        "period": "o item de oferta aberta sai na exclusão da conta; o de troca em andamento ou encerrada fica com a troca",
         "decision": null,
-        "enforced_by": null,
+        "enforced_by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
         "gap": null
       },
       "export": {
@@ -2337,11 +2804,11 @@
         "reason": "só os itens do titular"
       },
       "deletion": {
-        "mode": "keep_legal",
-        "by": null,
-        "notes": "Fica com a troca; o snapshot é só da carta (sem texto do usuário) e é imutável (trigger manaloom_trade_item_snapshot_immutable)."
+        "mode": "partial_delete",
+        "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
+        "notes": "D-66: na oferta aberta (pending) do titular, a oferta é cancelada e os itens dele saem; os da outra pessoa ficam. Nas demais trocas o item do titular fica, sem o vínculo com o fichário (binder_item_id nulo), e owner_id aponta para a conta pseudonimizada. O snapshot é só da carta e é imutável. A chave owner_id é RESTRICT desde a migration 059: apagar a linha de users de quem tem item de troca é recusado."
       },
-      "legal_exception": "Parte do registro da troca.",
+      "legal_exception": "Parte do registro da troca da outra pessoa (trocas e disputas); confirmar o prazo com o advogado (D-69, BT-LEGAL-001).",
       "columns": {
         "agreed_price": "include",
         "binder_item_id": "include",
@@ -2412,7 +2879,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte."
+        "notes": "Mensagem enviada pelo titular e código de rastreio viram nulos; a troca fica para a outra parte. D-66: a oferta aberta (pending) do titular é cancelada, com uma linha no histórico."
       },
       "legal_exception": "Registro de negociação entre duas partes (trocas e disputas); confirmar o prazo com o advogado (BT-LEGAL-001).",
       "columns": {
@@ -2452,7 +2919,7 @@
       "deletion": {
         "mode": "anonymize",
         "by": "UserDataPrivacyService.deleteAndAnonymizeAccount (server/lib/user_data_privacy_service.dart)",
-        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'."
+        "notes": "A nota escrita pelo titular vira '[detalhe removido pelo titular]'. D-66: o cancelamento da oferta aberta entra com a nota 'Oferta cancelada: a conta foi excluída.'."
       },
       "legal_exception": "Parte do registro da troca.",
       "columns": {
@@ -2601,6 +3068,31 @@
         "id": "include"
       }
     },
+    "user_legal_acceptances": {
+      "category": "privacy_control",
+      "subject_kind": "account_holder",
+      "personal_data": true,
+      "subject_link": "user_id",
+      "purpose": "Histórico de aceites de Termos de uso e Política de privacidade (BT-LEGAL-ACCEPT-001, D-24): versões aceitas, origem (cadastro, reaceite ou retrato inicial da migration 062), request-id e data. É a prova de consentimento; users guarda só o aceite vigente.",
+      "owner": "server/lib/legal_acceptance_service.dart; server/routes/users/me/legal-acceptance/index.dart; server/lib/auth_service.dart (cadastro)",
+      "retention": {
+        "class": "legal_hold",
+        "period": "sem prazo; só cresce (nenhuma rota apaga ou altera linha)",
+        "decision": "D-24",
+        "enforced_by": null,
+        "gap": "prazo de guarda da prova de consentimento a confirmar com o advogado (BT-LEGAL-001)"
+      },
+      "export": {
+        "section": null,
+        "reason": "as versões aceitas vigentes já saem em users (terms_version, privacy_version); pôr o histórico na exportação fica com a frente de privacidade"
+      },
+      "deletion": {
+        "mode": "keep_legal",
+        "by": null,
+        "notes": "A exclusão de conta não apaga o histórico: a linha fica ligada à conta pseudonimizada, sem nome, e-mail nem IP. Só a remoção física de users (que a exclusão não faz) levaria as linhas junto, pela FK ON DELETE CASCADE."
+      },
+      "legal_exception": "Prova de consentimento (LGPD, art. 8º, § 2º: o ônus da prova do consentimento é do controlador); confirmar prazo e escopo com o advogado (BT-LEGAL-001)."
+    },
     "user_plans": {
       "category": "account",
       "subject_kind": "account_holder",
@@ -2731,37 +3223,7 @@
     }
   },
   "production_only_tables": {
-    "optimization_analysis_logs": {
-      "group": "used_by_code_without_migration",
-      "personal_data": false,
-      "note": "Log de análise do Optimize com nome do comandante e listas de cartas, sem user_id nem deck_id (server/lib/ai/optimize_analysis_support.dart:206); fora da exportação e da exclusão por não ter vínculo com conta."
-    },
-    "synergy_packages": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "archetype_patterns": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "theme_contextual_rules": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "ml_learning_state": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
     "card_rulings_legacy": {
-      "group": "used_by_code_without_migration",
-      "personal_data": null,
-      "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
-    },
-    "analysis_sources": {
       "group": "used_by_code_without_migration",
       "personal_data": null,
       "note": "Existe só na produção e é usada pelo código sem migration que a crie; colunas não inspecionadas."
@@ -2836,14 +3298,6 @@
     "ml_prompt_feedback.user_rating": {
       "personal_data": true,
       "note": "Nota do usuário sobre a sugestão da IA; existe só na produção (receipt de 2026-09-22) e nenhum código a usa. Fica fora da exportação, e a exclusão apaga a linha inteira do titular."
-    },
-    "cards.edhrec_rank": {
-      "personal_data": false,
-      "note": "Catálogo; existe só na produção e é lida pelo Optimize (server/lib/ai/otimizacao.dart:563)."
-    },
-    "card_meta_insights.id": {
-      "personal_data": false,
-      "note": "Catálogo; na produção a tabela tem id e não tem created_at."
     }
   },
   "artifacts": {
@@ -2853,9 +3307,10 @@
       "personal_data": true,
       "retention": "teto de 24 h em qualquer entrada; a vencida sai da memória na primeira leitura ou gravação depois de 1 min, mesmo que a chave não volte a ser lida",
       "export": "fora da exportação: cópia derivada e passageira",
-      "deletion": "não há invalidação na exclusão; vale o TTL de até 24 h (D-23)",
+      "deletion": "não há invalidação direta; vale o teto de 24 h (D-23). O outbox (D-68) conclui a obrigação 24 h 5 min depois da exclusão (endpoint_cache: expired_by_24h_cache_cap)",
       "decisions": [
-        "D-23"
+        "D-23",
+        "D-68"
       ],
       "gap": "sem nenhum acesso ao cache, a entrada vencida espera o próximo acesso ou o reinício, sem ser servida"
     },
@@ -2867,7 +3322,20 @@
       "export": "fora da exportação: métrica operacional",
       "deletion": "não há limpeza na exclusão",
       "decisions": [],
-      "gap": "o caminho cru com IDs é chave de métrica (BT-OBS-001, BT-SEC-AI-002)"
+      "gap": "o caminho cru com IDs é chave de métrica (BT-SEC-AI-002). O BT-OBS-001 (2d1f2cc52, na integração) troca a chave pelo template da rota, com :id no lugar de UUID, número e token; integrado, a métrica deixa de guardar identificador"
+    },
+    "optimize_job_memory": {
+      "kind": "memory_cache",
+      "what": "OptimizeJobStore (server/lib/ai/optimize_job.dart): cópia em memória, por réplica, dos jobs de Optimize assíncrono (id, deck, usuário e resultado); a verdade é ai_optimize_jobs.",
+      "personal_data": true,
+      "retention": "30 min; a limpeza roda na próxima chamada ao store depois de 5 min",
+      "export": "fora da exportação: cópia passageira de ai_optimize_jobs",
+      "deletion": "a exclusão apaga ai_optimize_jobs, e toda leitura do job vai ao PostgreSQL, então a cópia não é servida depois disso; um job em andamento não recria a linha, porque as escritas são UPDATE por id e status. O teto de 30 min fica abaixo das 24 h da D-23, coberto pela linha endpoint_cache do outbox (24 h 5 min)",
+      "decisions": [
+        "D-23",
+        "D-68"
+      ],
+      "gap": "sem nenhuma chamada ao store, a cópia vencida espera a próxima chamada ou o reinício, sem ser servida"
     },
     "interactive_battle_sidecar_memory": {
       "kind": "sidecar_store",
@@ -2875,23 +3343,29 @@
       "personal_data": true,
       "retention": "até o TTL da sessão",
       "export": "fora da exportação; a sessão persistida entra por interactive_battle_sessions",
-      "deletion": "não recebe aviso da exclusão",
-      "decisions": [],
-      "gap": "sem sinal de cancelamento para o sidecar (BT-PRIV-002, BT-BAT-002)"
+      "deletion": "não recebe aviso da exclusão; a sessão vive até 7200 s e fica mais 10 min na memória depois de terminal. O outbox (D-68) dá a obrigação como cumprida 2 h 10 min depois da exclusão, sem confirmação do sidecar (D-77: interactive_battle_sidecar, expired_by_max_session_lifetime)",
+      "decisions": [
+        "D-68",
+        "D-77"
+      ],
+      "gap": "a sessão terminal só sai da memória na primeira chamada ao sidecar depois dos 10 min (mais 10 s de concessão quando o motor não confirma o fim); sem chamada, espera a próxima ou o reinício. O Battle está desligado em produção (D-57)"
     },
     "hermes_sqlite_learning": {
       "kind": "sidecar_store",
-      "what": "SQLite do laboratório Hermes (knowledge.db, tabela user_learning_events), preenchido por server/bin/pull_learning_events.py com deck_id cru e até 200 cartas por evento.",
+      "what": "SQLite do Hermes (knowledge.db na imagem de ops, HERMES_KNOWLEDGE_DB): user_learning_events, preenchido por server/bin/pull_learning_events.py com deck_id cru e até 200 cartas por evento, e as cópias de deck (decks e deck_cards) que sync_pg_target_deck_to_hermes.py grava com o pg_deck_id no notes.",
       "personal_data": true,
-      "retention": "sem prazo",
+      "retention": "sem prazo; o que é de deck apagado sai pelo outbox",
       "export": "fora da exportação",
-      "deletion": "não é apagado na exclusão; hoje contido porque learning_writes está OFF",
-      "decisions": [],
-      "gap": "purga por sujeito no BT-AI-030"
+      "deletion": "o outbox apaga (D-68, BT-PRIV-002). O job manaloom_account_deletion_outbox varre o knowledge.db (server/bin/hermes_learning_purge.py), acha no PostgreSQL, pelo HMAC dos tombstones, os decks apagados que o arquivo guarda e apaga os eventos e as cópias sob o lock de escrita do SQLite; cada linha confere os próprios decks e conclui (hermes_learning_sqlite: purged_by_tombstone_sweep). O alimentador só grava evento que ainda existe no PostgreSQL, conferido sob o mesmo lock, então nada de deck apagado volta depois da varredura",
+      "decisions": [
+        "D-23",
+        "D-68"
+      ],
+      "gap": "sync_pg_target_deck_to_hermes.py não confere a existência do deck sob o lock: rodado à mão em paralelo com o outbox, pode regravar a cópia de um deck apagado até a próxima varredura (no agendador, o master_optimizer_preflight roda em sequência com o outbox e está desligado por capability)"
     },
     "server_logs": {
       "kind": "logs",
-      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais.",
+      "what": "Stdout do servidor e do worker no host (Easypanel/Docker) e logs do manaloom_ops_daemon.py: linhas com user_id cru em erros e pedidos lentos (server/routes/_middleware.dart:300) e nas notificações sociais. As linhas MANALOOM_PRIVACY_EXPORT_REQUEST têm artefato próprio, privacy_export_request_log (90 dias, D-78).",
       "personal_data": true,
       "retention": "rotação do host, não configurada no repositório",
       "export": "fora da exportação",
@@ -2899,15 +3373,42 @@
       "decisions": [],
       "gap": "prazo de rotação dos logs não documentado; pseudonimização é o BT-SEC-AI-002"
     },
+    "ops_artifacts": {
+      "kind": "ops_artifacts",
+      "what": "Saída e relatórios dos jobs do manaloom_ops_daemon.py em /data/manaloom-ops (cron/output e artifacts): o log do alimentador do Hermes (id do evento e comandante), os relatórios do master_optimizer_preflight (deck-alvo copiado, com o pg_deck_id) e do validador de base de mana (nome e comandante dos decks do Hermes), e os recibos sem identificador do outbox e da limpeza por prazo.",
+      "personal_data": true,
+      "retention": "sem rotação configurada no repositório",
+      "export": "fora da exportação",
+      "deletion": "a exclusão não reescreve relatórios passados; os jobs que leem deck de conta (alimentador e master_optimizer_preflight) estão desligados por capability (learning_writes, ai_analyze_optimize_advisory e battle_batch OFF)",
+      "decisions": [],
+      "gap": "prazo de rotação dos artefatos de ops não definido (decisão do dono)"
+    },
+    "privacy_export_request_log": {
+      "kind": "logs",
+      "what": "Linhas MANALOOM_PRIVACY_EXPORT_REQUEST no stdout da API, uma por pedido que chega a POST /users/me/export (server/routes/users/me/export/index.dart): evento, horário, resultado e referência de quem pediu, HMAC-SHA256 do ID com chave derivada do JWT_SECRET, truncado em 16 hexadecimais. Nunca o ID, a senha ou o conteúdo (D-71).",
+      "personal_data": true,
+      "owner": "server/lib/privacy/privacy_export_request_log.dart",
+      "retention": "90 dias (D-78)",
+      "retention_days": 90,
+      "deleted_by": "rotação dos logs do host da API (serviço Docker Swarm do Easypanel), configurada pelo dono; o código não apaga log",
+      "export": "fora da exportação: a referência só se liga à conta com a chave do servidor",
+      "deletion": "a exclusão da conta não reescreve logs; a linha sai pela rotação de 90 dias",
+      "decisions": [
+        "D-71",
+        "D-78"
+      ],
+      "gap": "a rotação de 90 dias não está aplicada no host; é configuração persistente e fica com o dono (D-78)"
+    },
     "sentry_server": {
       "kind": "error_tracking",
       "what": "Sentry do servidor (server/lib/observability.dart): eventos de erro com request_id, método e caminho. Nenhum evento leva o usuário, e todo UUID de caminho, título, tag, exceção e contexto vira :id no beforeSend (o request_id fica).",
       "personal_data": true,
       "retention": "retenção do plano da conta Sentry; conferir no painel do Sentry e registrar aqui",
       "export": "fora da exportação",
-      "deletion": "não há exclusão por titular no provedor",
+      "deletion": "não há exclusão por titular no provedor; o outbox (D-68) conclui na hora, porque os eventos do servidor não levam o usuário (sentry: server_events_carry_no_user_id). Eventos de antes de 2026-09-23 14:49 UTC seguem a retenção do plano",
       "decisions": [
-        "D-23"
+        "D-23",
+        "D-68"
       ],
       "gap": "a retenção do plano Sentry ainda não foi conferida no painel (dono)"
     },
@@ -2959,10 +3460,11 @@
       "personal_data": true,
       "retention": "backups não são reescritos na exclusão; o prazo de rotação entra na política (D-23)",
       "export": "fora da exportação",
-      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação",
+      "deletion": "a exclusão não reescreve backups; um restore reintroduz contas apagadas até a rotação. O outbox (D-68) guarda a obrigação (blocked_backup_rotation_not_applied) até a rotação de 30 dias da D-69",
       "decisions": [
         "D-23",
-        "D-26"
+        "D-26",
+        "D-68"
       ],
       "gap": "prazo de rotação não decidido; cópia fora da máquina e cifra em aberto (BT-DR-001); limpeza do manaloom_deploy_audit no BT-DB-006"
     },

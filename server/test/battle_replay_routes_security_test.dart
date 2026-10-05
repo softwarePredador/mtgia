@@ -545,7 +545,8 @@ Future<void> _expectSanitized(Response response, String expectedError) async {
   final body = await _jsonBody(response);
 
   expect(response.statusCode, HttpStatus.internalServerError);
-  expect(body, {'error': expectedError});
+  // BT-AUTH-001 (D-21): código estável e a frase da rota, sem detalhe.
+  expect(body, {'error': 'server_internal_error', 'message': expectedError});
   expect(body, isNot(contains('details')));
   expect(body.toString(), isNot(contains('prod-secret')));
   expect(body.toString(), isNot(contains('SELECT * FROM users')));

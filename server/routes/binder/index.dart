@@ -4,6 +4,7 @@ import 'package:postgres/postgres.dart';
 import '../../lib/binder_item_contract.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
+import '../../lib/release_capability_policy.dart';
 import '../../lib/scryfall_image_url.dart';
 
 /// GET /binder  → Lista itens do binder do usuário autenticado
@@ -316,6 +317,17 @@ Future<Response> _addToBinder(RequestContext context) async {
     }
     final body = decoded;
     final cardId = readBinderCardId(body['card_id']);
+    final forTrade = readBinderBoolean(body['for_trade']);
+    final forSale = readBinderBoolean(body['for_sale']);
+    final price = readBinderPrice(body['price']);
+    // SCOPE-P0-TRD-00 (D-39): oferta para troca ou venda só com a capability
+    // aberta; a recusa vem antes de qualquer acesso ao banco.
+    ensureBinderCommerceAllowed(
+      forTrade: forTrade,
+      forSale: forSale,
+      price: price,
+      isAllowed: context.read<ReleaseCapabilityPolicy>().isAllowed,
+    );
 
     // Verifica que a carta existe
     final cardCheck = await pool.execute(
@@ -332,9 +344,6 @@ Future<Response> _addToBinder(RequestContext context) async {
     final quantity = readBinderQuantity(body['quantity']);
     final condition = readBinderCondition(body['condition']);
     final isFoil = readBinderBoolean(body['is_foil']);
-    final forTrade = readBinderBoolean(body['for_trade']);
-    final forSale = readBinderBoolean(body['for_sale']);
-    final price = readBinderPrice(body['price']);
     final notes = readBinderNotes(body['notes']);
     final language = readBinderLanguage(body['language']);
     final listType = readBinderListType(body['list_type']);
@@ -419,6 +428,11 @@ Future<Response> _addToBinder(RequestContext context) async {
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': error.message, 'code': error.code},
+    );
+  } on BinderCommerceUnavailableException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: binderCommerceUnavailableBody(error),
     );
   } catch (e, st) {
     await captureRouteException(

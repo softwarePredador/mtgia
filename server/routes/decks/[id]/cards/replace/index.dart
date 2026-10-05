@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
+import '../../../../../lib/deck_request_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
+import '../../../../../lib/decks/deck_revision_support.dart';
+import '../../../../../lib/http_responses.dart';
 
 /// POST /decks/:id/cards/replace
 /// Body: { "old_card_id": "...", "new_card_id": "..." }
@@ -47,8 +50,22 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     return Response.json(body: {'ok': true, 'changed': false});
   }
 
+  final mutation = DeckMutationRequest.fromContext(
+    context,
+    operation: 'card_replace',
+    deckId: deckId,
+    body: body,
+  );
+
   try {
     final res = await pool.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) throw const DeckNotFoundForMutation();
       final deckResult = await session.execute(
         Sql.named(
           'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1 FOR UPDATE',
@@ -56,7 +73,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
       final format = (deckResult.first[0] as String).toLowerCase();
 
@@ -203,26 +220,32 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         );
       }
 
-      return {
+      final receipt = await recordDeckMutation(session, baseline);
+      return <String, Object?>{
         'changed': true,
         'name': oldName,
         'old_card_id': oldCardId,
         'new_card_id': newCardId,
+        ...receipt.toJson(),
       };
     });
 
-    return Response.json(body: {'ok': true, ...res});
+    return Response.json(
+      body: {'ok': true, ...res},
+      headers: deckRevisionHeadersOf(res),
+    );
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
   } on DeckRulesException catch (e) {
     print('[ERROR] handler: $e');
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': e.message},
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } catch (e) {
     print('[ERROR] handler: $e');
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': e.toString()},
-    );
+    return internalServerError('Falha ao substituir as cartas do deck');
   }
 }

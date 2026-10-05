@@ -4,6 +4,13 @@
 Hermes battle tooling expects a local SQLite target deck, traditionally
 `deck_id=6`. This script makes a dev/runtime knowledge.db usable by importing a
 real ManaLoom deck from Postgres instead of relying on old local artifacts.
+
+BT-AI-030: com --apply, a gravação pega o lock de escrita do SQLite
+(BEGIN IMMEDIATE) e só então confirma no PostgreSQL que o deck ainda existe e
+não está na lixeira, como o alimentador (server/bin/pull_learning_events.py).
+O expurgo do outbox da exclusão (server/bin/hermes_learning_purge.py) pega o
+mesmo lock, então a cópia de um deck apagado não volta ao SQLite depois da
+varredura.
 """
 
 from __future__ import annotations
@@ -15,7 +22,7 @@ import os
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from db_helper import connect, sanitized_database_target
 
@@ -24,6 +31,12 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 DEFAULT_SQLITE_DB = Path(os.environ.get("MANALOOM_KNOWLEDGE_DB", SCRIPT_DIR / "knowledge.db"))
 DEFAULT_CANONICAL_PG_DECK_ID = "8938b746-1a9e-46ce-b0d9-c2ec932ddddd"
 PROTECTED_HERMES_DECK_ID = 6
+# O mesmo tempo de espera do alimentador pelo lock de escrita do SQLite.
+SQLITE_BUSY_TIMEOUT_SECONDS = 30
+
+
+class DeckGoneError(RuntimeError):
+    """O deck lido do PostgreSQL deixou de existir antes da gravação."""
 
 ROLE_TO_TAG = {
     "board_wipe": "board_wipe",
@@ -901,6 +914,25 @@ def fetch_target_deck(args: argparse.Namespace) -> tuple[dict[str, Any], list[di
             return deck, cards
 
 
+def deck_still_in_postgres(cur: Any, pg_deck_id: str) -> bool:
+    """O deck ainda existe no PostgreSQL e não está na lixeira (BT-AI-030)."""
+    cur.execute(
+        "SELECT 1 FROM decks WHERE id::text = %s AND deleted_at IS NULL",
+        (str(pg_deck_id).strip().lower(),),
+    )
+    return cur.fetchone() is not None
+
+
+def pg_deck_still_exists(pg_deck_id: str) -> bool:
+    """Confere o deck numa conexão própria, aberta sob o lock do SQLite."""
+    conn = connect()
+    try:
+        with conn.cursor() as cur:
+            return deck_still_in_postgres(cur, pg_deck_id)
+    finally:
+        conn.close()
+
+
 def snapshot_hashes(cards: list[dict[str, Any]]) -> tuple[str, str, str]:
     deck_payload = []
     semantics_payload = []
@@ -940,8 +972,9 @@ def write_sqlite(
     cards: list[dict[str, Any]],
     *,
     apply: bool,
+    deck_exists: Callable[[str], bool] | None = None,
 ) -> dict[str, Any]:
-    conn = sqlite3.connect(sqlite_db)
+    conn = sqlite3.connect(sqlite_db, timeout=SQLITE_BUSY_TIMEOUT_SECONDS)
     try:
         cur = conn.cursor()
         ensure_sqlite_schema(cur)
@@ -993,6 +1026,20 @@ def write_sqlite(
                 "This usually means a join multiplied deck card rows."
             )
         if apply:
+            # BT-AI-030: o lock de escrita vem antes da conferência no
+            # PostgreSQL. Se o deck for apagado depois da leitura, ou a cópia é
+            # gravada antes de o expurgo pegar o lock (e ele a apaga), ou a
+            # conferência já não acha o deck e nada é gravado.
+            conn.commit()
+            cur.execute("BEGIN IMMEDIATE")
+            confirm = deck_exists or pg_deck_still_exists
+            if not confirm(str(deck["pg_deck_id"])):
+                conn.rollback()
+                raise DeckGoneError(
+                    "Refusing to write the Hermes copy: the PostgreSQL deck no "
+                    "longer exists or is in the trash."
+                )
+            stats["pg_deck_confirmed_under_sqlite_lock"] = True
             cur.execute("DELETE FROM deck_cards WHERE deck_id=?", (target_deck_id,))
             cur.execute("DELETE FROM decks WHERE id=?", (target_deck_id,))
             cur.execute(

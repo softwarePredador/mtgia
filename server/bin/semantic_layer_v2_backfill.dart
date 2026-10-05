@@ -10,6 +10,7 @@ import 'package:server/ai/candidate_quality_data_support.dart';
 import 'package:server/ai/functional_card_tags.dart';
 import 'package:server/ai/optimization_functional_roles.dart';
 import 'package:server/database.dart';
+import 'package:server/schema_requirements.dart';
 
 const _defaultArtifactDir =
     'test/artifacts/semantic_layer_v2_backfill_2026-07-16';
@@ -164,7 +165,11 @@ Future<void> main(List<String> args) async {
         await session.execute(
           "SELECT pg_advisory_xact_lock(hashtext('$_advisoryLockName'))",
         );
-        await _ensureSchema(session);
+        await requireSchemaObjects(
+          session,
+          caller: 'semantic_layer_v2_backfill',
+          requirements: candidateQualitySchemaRequirements,
+        );
         await _lockAuthoritativeTables(session);
 
         final transactionCards = await _loadAnalyzedCards(session);
@@ -628,17 +633,6 @@ class _BackfillCard {
     'mana_cost': manaCost,
     'cmc': cmc?.toString(),
   };
-}
-
-Future<void> _ensureSchema(Session session) async {
-  for (final statement in candidateQualitySchemaStatements) {
-    await session.execute(statement);
-  }
-  for (final statement in candidateQualityIndexStatements) {
-    await session.execute(statement);
-  }
-  await session.execute(optimizeCandidateQualitySummaryViewStatement);
-  await session.execute(cardIntelligenceSnapshotViewStatement);
 }
 
 Future<void> _lockAuthoritativeTables(Session session) async {

@@ -5,9 +5,6 @@ import 'dart:io';
 
 import 'package:postgres/postgres.dart';
 
-import '../lib/ai/candidate_quality_data_support.dart';
-import '../lib/ai/commander_learning_snapshot_support.dart';
-import '../lib/import_card_lookup_service.dart';
 import '../lib/runtime_environment.dart';
 
 final _tableDdlPattern = RegExp(
@@ -280,7 +277,7 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
         view: relations[view] == 'VIEW' || relations[view] == 'BASE TABLE',
     };
 
-    final rollbackValidation = await _validateViewsInRollback(connection);
+    final viewValidation = await _validateViewsReadOnly(connection);
     final fanout = await _fanoutChecks(connection, relations);
     final nullOwnerDecks = await _nullOwnerDeckAudit(connection, relations);
 
@@ -296,7 +293,7 @@ Future<Map<String, dynamic>> _runDatabaseAudit(
       'relations': relations,
       'critical_row_counts': rowCounts,
       'critical_view_presence': viewPresence,
-      'rollback_view_validation': rollbackValidation,
+      'read_only_view_validation': viewValidation,
       'fanout_checks': fanout,
       'null_owner_deck_audit': nullOwnerDecks,
     };
@@ -392,33 +389,29 @@ Future<Map<String, dynamic>> _nullOwnerDeckAudit(
   };
 }
 
-Future<Map<String, dynamic>> _validateViewsInRollback(
+/// Lê as views críticas como estão no banco, numa transação READ ONLY.
+///
+/// Antes, o auditor recriava tabelas, índices e views dentro de
+/// BEGIN/ROLLBACK no banco auditado. BT-DB-004: auditor não executa DDL; a
+/// view que falta ou não compila aparece como erro no relatório.
+Future<Map<String, dynamic>> _validateViewsReadOnly(
   Connection connection,
 ) async {
   final result = <String, dynamic>{};
-  await connection.execute('BEGIN');
+  await connection.execute('BEGIN TRANSACTION READ ONLY');
   try {
-    await connection.execute(Sql.named(createCardLocalizedNamesTableSql));
-    for (final sql in createCardLocalizedNamesIndexesSql) {
-      await connection.execute(Sql.named(sql));
-    }
-    for (final sql in candidateQualitySchemaStatements) {
-      await connection.execute(Sql.named(sql));
-    }
-    for (final sql in candidateQualityIndexStatements) {
-      await connection.execute(Sql.named(sql));
-    }
-    await connection.execute(
-      Sql.named(optimizeCandidateQualitySummaryViewStatement),
-    );
-    await connection.execute(Sql.named(cardIntelligenceSnapshotViewStatement));
-    await connection.execute(Sql.named(createCardIdentityBridgeViewSql));
-    await connection.execute(Sql.named(commanderLearningSnapshotViewStatement));
-
     for (final view in _criticalViews) {
+      final present = await connection.execute(
+        Sql.named("SELECT to_regclass('public.' || @view) IS NOT NULL"),
+        parameters: {'view': view},
+      );
+      if (present.first[0] != true) {
+        result[view] = {'present': false};
+        continue;
+      }
       result[view] = {
-        'compiled_in_rollback': true,
-        'row_count_in_rollback': await _countRelation(connection, view),
+        'present': true,
+        'row_count': await _countRelation(connection, view),
       };
     }
   } catch (e) {
@@ -829,12 +822,12 @@ String _toMarkdown(Map<String, dynamic> report) {
       ..writeln(
         '- Critical view presence: `${jsonEncode(database['critical_view_presence'])}`.',
       )
-      ..writeln('- Rollback view validation:')
+      ..writeln('- Read-only view validation:')
       ..writeln('```json')
       ..writeln(
         const JsonEncoder.withIndent(
           '  ',
-        ).convert(database['rollback_view_validation']),
+        ).convert(database['read_only_view_validation']),
       )
       ..writeln('```')
       ..writeln('- Fanout checks:')

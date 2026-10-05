@@ -6,10 +6,24 @@ import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:meta/meta.dart' show visibleForTesting;
 import 'package:postgres/postgres.dart';
 import 'auth_runtime_policy.dart';
+import 'beta_invites/beta_invite_store.dart';
 import 'database.dart';
+import 'legal_acceptance_service.dart';
 import 'legal_policy.dart';
 import 'password_policy.dart';
 import 'runtime_environment.dart';
+
+/// Cadastro recusado por regra de negócio (BT-AUTH-001): a frase pública e
+/// um código estável, nunca o texto de uma exceção do banco.
+class RegistrationRejectedException implements Exception {
+  const RegistrationRejectedException(this.code, this.message);
+
+  final String code;
+  final String message;
+
+  @override
+  String toString() => message;
+}
 
 /// Serviço centralizado de autenticação
 ///
@@ -157,12 +171,20 @@ class AuthService {
   /// - Email único
   /// - Senha com hash bcrypt
   ///
+  /// Com [invite] (BT-AUTH-006), o convite é travado e conferido dentro da
+  /// transação, antes de qualquer escrita: convite recusado lança
+  /// [BetaInviteDeniedException] sem criar a conta. Aceito, ele fica ligado à
+  /// conta nova e o e-mail já nasce verificado (D-56), sem token de
+  /// verificação.
+  ///
   /// Retorna: Map com 'userId', 'username', 'email' e 'token'
   Future<Map<String, dynamic>> register({
     required String username,
     required String email,
     required String password,
     LegalAcceptance? legalAcceptance,
+    BetaInviteClaim? invite,
+    String? requestId,
   }) async {
     final db = Database();
     final conn = db.connection;
@@ -175,15 +197,80 @@ class AuthService {
       email: normalizedEmail,
     );
     if (!passwordValidation.isValid) {
-      throw Exception(passwordValidation.message);
+      throw RegistrationRejectedException(
+        passwordValidation.code ?? 'weak_password',
+        passwordValidation.message ?? 'Senha fraca.',
+      );
     }
 
     final hashedPassword = hashPassword(password);
-    final emailVerificationToken = _newOpaqueToken();
+    final emailVerificationToken = invite == null ? _newOpaqueToken() : null;
     final emailVerificationExpiresAt = DateTime.now().toUtc().add(
       const Duration(hours: 24),
     );
-    final account = await conn.runTx((session) async {
+    final ({String userId, String username, String email, String? inviteId})
+    account;
+    try {
+      account = await _registerTransaction(
+        conn,
+        normalizedUsername: normalizedUsername,
+        normalizedEmail: normalizedEmail,
+        hashedPassword: hashedPassword,
+        legalAcceptance: legalAcceptance,
+        invite: invite,
+        requestId: requestId,
+        emailVerificationToken: emailVerificationToken,
+        emailVerificationExpiresAt: emailVerificationExpiresAt,
+      );
+    } on ServerException catch (error) {
+      // Dois cadastros ao mesmo tempo com o mesmo nome ou e-mail passam das
+      // checagens e um bate no índice único: a recusa sai com código, nunca
+      // com o texto do PostgreSQL (BT-AUTH-001).
+      if (error.code != '23505') rethrow;
+      throw const RegistrationRejectedException(
+        'auth_account_taken',
+        'Nome de usuário ou email já está em uso',
+      );
+    }
+
+    // Gerar token
+    final token = generateToken(account.userId, account.username);
+
+    return {
+      'userId': account.userId,
+      'username': account.username,
+      'email': account.email,
+      'token': token,
+      'emailVerified': account.inviteId != null,
+      'inviteId': account.inviteId,
+      'emailVerificationToken': emailVerificationToken,
+      'emailVerificationExpiresAt': emailVerificationExpiresAt,
+    };
+  }
+
+  Future<({String userId, String username, String email, String? inviteId})>
+  _registerTransaction(
+    Pool conn, {
+    required String normalizedUsername,
+    required String normalizedEmail,
+    required String hashedPassword,
+    required LegalAcceptance? legalAcceptance,
+    required BetaInviteClaim? invite,
+    required String? requestId,
+    required String? emailVerificationToken,
+    required DateTime emailVerificationExpiresAt,
+  }) {
+    return conn.runTx((session) async {
+      // O convite vem antes de tudo: negado aqui, nada foi escrito.
+      final inviteId =
+          invite == null
+              ? null
+              : await BetaInviteAdmission.lockForAcceptance(
+                session,
+                code: invite.code,
+                email: normalizedEmail,
+              );
+
       final usernameCheck = await session.execute(
         Sql.named(
           'SELECT id FROM users WHERE LOWER(username) = @username '
@@ -192,7 +279,10 @@ class AuthService {
         parameters: {'username': normalizedUsername},
       );
       if (usernameCheck.isNotEmpty) {
-        throw Exception('Username já está em uso');
+        throw const RegistrationRejectedException(
+          'auth_username_taken',
+          'Username já está em uso',
+        );
       }
 
       final emailCheck = await session.execute(
@@ -203,7 +293,10 @@ class AuthService {
         parameters: {'email': normalizedEmail},
       );
       if (emailCheck.isNotEmpty) {
-        throw Exception('Email já está em uso');
+        throw const RegistrationRejectedException(
+          'auth_email_taken',
+          'Email já está em uso',
+        );
       }
 
       final result = await session.execute(
@@ -211,7 +304,8 @@ class AuthService {
           INSERT INTO users (
             username, email, password_hash,
             terms_version, terms_accepted_at,
-            privacy_version, privacy_accepted_at
+            privacy_version, privacy_accepted_at,
+            email_verified_at
           )
           VALUES (
             @username, @email, @passwordHash,
@@ -220,7 +314,9 @@ class AuthService {
               THEN NULL ELSE CURRENT_TIMESTAMP END,
             CAST(@privacyVersion AS text),
             CASE WHEN CAST(@privacyVersion AS text) IS NULL
-              THEN NULL ELSE CURRENT_TIMESTAMP END
+              THEN NULL ELSE CURRENT_TIMESTAMP END,
+            CASE WHEN CAST(@inviteVerified AS boolean)
+              THEN CURRENT_TIMESTAMP ELSE NULL END
           )
           RETURNING id, username, email
         '''),
@@ -230,6 +326,7 @@ class AuthService {
           'passwordHash': hashedPassword,
           'termsVersion': legalAcceptance?.termsVersion,
           'privacyVersion': legalAcceptance?.privacyVersion,
+          'inviteVerified': inviteId != null,
         },
       );
       final row = result.first;
@@ -242,39 +339,46 @@ class AuthService {
         '''),
         parameters: {'userId': userId},
       );
-      await session.execute(
-        Sql.named('''
-          INSERT INTO email_verification_tokens (
-            user_id, token_hash, expires_at
-          ) VALUES (
-            CAST(@userId AS uuid), @tokenHash, @expiresAt
-          )
-        '''),
-        parameters: {
-          'userId': userId,
-          'tokenHash': _hashOpaqueToken(emailVerificationToken),
-          'expiresAt': emailVerificationExpiresAt,
-        },
-      );
+      // BT-LEGAL-ACCEPT-001 (D-24): o aceite do cadastro entra no histórico.
+      if (legalAcceptance != null) {
+        await LegalAcceptanceService.recordHistory(
+          session,
+          userId: userId,
+          acceptance: legalAcceptance,
+          source: LegalAcceptanceSource.register,
+          requestId: requestId,
+        );
+      }
+      if (inviteId != null) {
+        await BetaInviteAdmission.markAccepted(
+          session,
+          inviteId: inviteId,
+          userId: userId,
+          requestId: invite!.requestId,
+        );
+      } else {
+        await session.execute(
+          Sql.named('''
+            INSERT INTO email_verification_tokens (
+              user_id, token_hash, expires_at
+            ) VALUES (
+              CAST(@userId AS uuid), @tokenHash, @expiresAt
+            )
+          '''),
+          parameters: {
+            'userId': userId,
+            'tokenHash': _hashOpaqueToken(emailVerificationToken!),
+            'expiresAt': emailVerificationExpiresAt,
+          },
+        );
+      }
       return (
         userId: userId,
         username: row[1] as String,
         email: row[2] as String,
+        inviteId: inviteId,
       );
     });
-
-    // Gerar token
-    final token = generateToken(account.userId, account.username);
-
-    return {
-      'userId': account.userId,
-      'username': account.username,
-      'email': account.email,
-      'token': token,
-      'emailVerified': false,
-      'emailVerificationToken': emailVerificationToken,
-      'emailVerificationExpiresAt': emailVerificationExpiresAt,
-    };
   }
 
   /// Autentica um usuário com email e senha

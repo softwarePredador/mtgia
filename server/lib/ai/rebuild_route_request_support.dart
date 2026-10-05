@@ -61,7 +61,9 @@ RebuildRouteRequestData parseRebuildRouteRequest(Map<String, dynamic> body) {
         maxLength: 32,
         report: report,
       )?.toLowerCase() ??
-      'draft_clone';
+      // DCK-P0-00 (IA consultiva): sem `save_mode`, o rebuild só mostra a
+      // prévia; gravar o rascunho é pedido explícito (o app sempre manda).
+      'preview_only';
 
   final bracketResult = parseCommanderBracket(body['bracket']);
   final bracket = bracketResult.value;

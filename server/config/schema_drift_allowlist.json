@@ -1,0 +1,486 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-schema-drift-allowlist",
+  "version": "2026-09-28.3",
+  "task": "BT-DB-003",
+  "status": "proposta_pendente_do_dono",
+  "fonte": "docs/qa/execution/2026-09-23/BT-DB-001-auditoria-de-schema.saida.json",
+  "regra": "Lista fechada da deriva aceita da produção depois do upgrade. O ensaio (scripts/manaloom_migration_rehearsal.py) falha em qualquer diferença contra o banco novo que não esteja aqui. Uma entrada de schema ou de tabela sobrando cobre também o que está dentro dela. Tirar a entrada quando a decisão ou a tarefa fechar.",
+  "reconciliado_pelas_migrations": {
+    "058": "as 4 colunas de snapshot de trade_items e o ledger (BT-REL-000)",
+    "059": "public.trade_items: FOREIGN KEY (owner_id) REFERENCES users(id) (D-66)",
+    "063": "public.commander_learning_snapshot (D-65)",
+    "064": [
+      "card_rulings_pkey1",
+      "idx_card_battle_rules_name_rule_key",
+      "unique_card_insight",
+      "uq_conversation",
+      "uq_conversation_pair"
+    ],
+    "065": [
+      "idx_binder_marketplace_available_created",
+      "idx_binder_user_list_name_filters",
+      "idx_cards_colors",
+      "idx_cards_lower_name",
+      "idx_conversations_user_a_last",
+      "idx_conversations_user_b_last",
+      "idx_deck_cards_card_id",
+      "idx_decks_format",
+      "idx_direct_messages_conversation_created",
+      "idx_direct_messages_unread_by_conversation",
+      "idx_notifications_user_created",
+      "idx_notifications_user_unread_created",
+      "idx_trade_history_offer_created",
+      "idx_trade_items_offer_direction",
+      "idx_trade_messages_offer_created",
+      "idx_trade_offers_receiver_status_updated",
+      "idx_trade_offers_receiver_updated",
+      "idx_trade_offers_sender_status_updated",
+      "idx_trade_offers_sender_updated",
+      "idx_users_email",
+      "idx_users_username"
+    ],
+    "066": [
+      "idx_battle_simulations_created_at",
+      "idx_battle_simulations_deck_a_id",
+      "idx_battle_simulations_deck_b_id",
+      "idx_battle_simulations_winner_deck_id",
+      "idx_binder_list_type",
+      "idx_card_legalities_card_id",
+      "idx_card_legalities_format",
+      "idx_card_legalities_status",
+      "idx_cards_collector_set",
+      "idx_cards_set_code",
+      "idx_deck_cards_is_commander",
+      "idx_deck_matchups_deck_id",
+      "idx_deck_matchups_opponent_deck_id",
+      "idx_deck_matchups_win_rate",
+      "idx_decks_created_at",
+      "idx_decks_is_public",
+      "idx_decks_user_public",
+      "idx_meta_decks_commander_name",
+      "idx_meta_decks_partner_commander_name",
+      "idx_users_display_name_lower",
+      "idx_users_username_lower"
+    ],
+    "075": [
+      "public.optimization_analysis_logs",
+      "public.synergy_packages",
+      "public.archetype_patterns",
+      "public.ml_learning_state",
+      "public.theme_contextual_rules",
+      "public.analysis_sources",
+      "public.card_meta_insights.id",
+      "public.cards.edhrec_rank",
+      "public.battle_simulations.simulation_type",
+      "public.commander_learned_decks.created_at",
+      "public.commander_learned_decks.updated_at",
+      "public.user_binder_items.list_type",
+      "public.users.location_city",
+      "public.users.location_state",
+      "public.binder_item_availability",
+      "public.collection_availability_snapshot",
+      "public.user_binder_items.user_binder_items_list_type_check",
+      "public.idx_ml_prompt_feedback_archetype_created",
+      "public.idx_ml_prompt_feedback_deck_created",
+      "public.idx_ml_prompt_feedback_user_created",
+      "public.card_meta_insights_pkey",
+      "public.idx_trade_history_offer",
+      "public.idx_trade_messages_offer",
+      "public.account_deletion_receipts.account_deletion_receipts_deletion_mode_check",
+      "public.account_deletion_receipts.chk_account_deletion_mode",
+      "public.post_game_notes.post_game_notes_revision_check",
+      "public.archetype_patterns.last_analyzed_at",
+      "public.optimization_analysis_logs.test_run_id",
+      "public.user_binder_items.chk_list_type"
+    ],
+    "076": [
+      "public.direct_messages: FOREIGN KEY (sender_id) REFERENCES users(id)",
+      "public.trade_messages: FOREIGN KEY (sender_id) REFERENCES users(id)",
+      "public.trade_status_history: FOREIGN KEY (changed_by) REFERENCES users(id)"
+    ]
+  },
+  "itens": [
+    {
+      "categoria": "schemas",
+      "tipo": "sobrando",
+      "objeto": "manaloom_deploy_audit",
+      "motivo": "schema de auditoria dos pacotes aplicados à mão (1.033 tabelas); exportar para o arquivo cifrado e apagar depois do backup, com aprovação por execução",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_battle_rules_backup_pg780b_hash_new_server",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_battle_rules_backup_pg814_hash_new_server",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_deck_profiles",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_extended",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.card_rulings_legacy",
+      "motivo": "o código usa e nenhuma migration cria; a migration da BT-DB-005 cria nos dois bancos",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg252_manual_runtime_waiver_promotions_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg253_existing_focused_runtime_rule_promotions_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg254_blink_static_legacy_runtime_promotions_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg255_fast_mana_runtime_promotions_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg256_treasonous_ogre_life_payment_mana_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg257_phyrexian_censor_static_runtime_20260629_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.pg596b_oracle_hash_backfill_backup",
+      "motivo": "backup manual de pacote aplicado à mão; exportar e apagar depois do backup",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.posts",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "tabelas",
+      "tipo": "sobrando",
+      "objeto": "public.search_subjects",
+      "motivo": "tabela órfã; apagar só depois de confirmar que ninguém lê",
+      "decisao": "D-49"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "faltando",
+      "objeto": "public.card_meta_insights.created_at",
+      "motivo": "coluna da migration que a produção não tem e que o código não usa; criar na produção (só metadado, com a hora da migration nas linhas antigas) ou tirar do banco novo (o project_logic ainda não enxerga DROP COLUMN)",
+      "decisao": "pendente: dono (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "sobrando",
+      "objeto": "public.ml_prompt_feedback.user_rating",
+      "motivo": "coluna só da produção, com dado pessoal e sem código que a use; entrar no banco novo pede classificar a exportação (frente de privacidade)",
+      "decisao": "pendente: BT-PRIV-001 (BT-DB-005)"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.common_archetypes",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.common_formats",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.last_updated_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.meta_deck_count",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.top_pairs",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.usage_count",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.card_meta_insights.versatility_score",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (o tipo e o default ficaram iguais pela 075)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.conversations.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.direct_messages.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.archetype",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.cards_accepted",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.cards_rejected",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.ml_prompt_feedback.prompt_version",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (o tipo e o default ficaram iguais pela 075)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.notifications.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_messages.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_offers.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_offers.payment_currency",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_offers.updated_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.trade_status_history.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.created_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.currency",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.for_sale",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.for_trade",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.is_foil",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.language",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "colunas",
+      "tipo": "divergente",
+      "objeto": "public.user_binder_items.updated_at",
+      "motivo": "NOT NULL na migration e anulável na produção; apertar na produção depois de contar os nulos (server/sql/readonly/d67_not_null_null_counts.sql)",
+      "decisao": "D-67"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "faltando",
+      "objeto": "public.ml_prompt_feedback: FOREIGN KEY (deck_id) REFERENCES decks(id)",
+      "motivo": "chave que falta na produção; contar os órfãos, criar como NOT VALID e validar, com aprovação por execução",
+      "decisao": "D-50"
+    },
+    {
+      "categoria": "chaves_estrangeiras",
+      "tipo": "faltando",
+      "objeto": "public.ml_prompt_feedback: FOREIGN KEY (user_id) REFERENCES users(id)",
+      "motivo": "chave que falta na produção; contar os órfãos, criar como NOT VALID e validar, com aprovação por execução",
+      "decisao": "D-50"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "divergente",
+      "objeto": "public.card_rulings_pkey",
+      "motivo": "definição diferente na produção (chave primária trocada ou tabela renomeada); reconciliar na migration da BT-DB-005",
+      "decisao": "D-48 (BT-DB-005)"
+    },
+    {
+      "categoria": "indices",
+      "tipo": "sobrando",
+      "objeto": "public.uq_binder_user_card_cond_foil_list",
+      "motivo": "não adotado (D-83): UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); na produção a rota POST /binder devolve 500 para a mesma carta em outro idioma, e tirá-lo de lá pede um passo governado",
+      "decisao": "D-83"
+    },
+    {
+      "categoria": "restricoes",
+      "tipo": "faltando",
+      "objeto": "public.ml_prompt_feedback.chk_ml_prompt_feedback_effectiveness_score",
+      "motivo": "CHECK do banco novo que a produção não tem; contar as violações e criar NOT VALID e validar, com aprovação por execução (como a D-50)",
+      "decisao": "pendente: dono (BT-DB-005)",
+      "origem": "docs/qa/execution/2026-09-28/BT-DB-003-ensaio-na-estrutura-da-producao.md",
+      "no_receipt": "ml_prompt_feedback.chk_ml_prompt_feedback_effectiveness_score"
+    },
+    {
+      "categoria": "restricoes",
+      "tipo": "faltando",
+      "objeto": "public.notifications.notifications_type_check",
+      "motivo": "CHECK do banco novo que a produção não tem; contar as violações e criar NOT VALID e validar, com aprovação por execução (como a D-50)",
+      "decisao": "pendente: dono (BT-DB-005)",
+      "origem": "docs/qa/execution/2026-09-28/BT-DB-003-ensaio-na-estrutura-da-producao.md",
+      "no_receipt": "notifications.notifications_type_check"
+    },
+    {
+      "categoria": "restricoes",
+      "tipo": "faltando",
+      "objeto": "public.user_binder_items.user_binder_items_currency_check",
+      "motivo": "CHECK do banco novo que a produção não tem; contar as violações e criar NOT VALID e validar, com aprovação por execução (como a D-50)",
+      "decisao": "pendente: dono (BT-DB-005)",
+      "origem": "docs/qa/execution/2026-09-28/BT-DB-003-ensaio-na-estrutura-da-producao.md",
+      "no_receipt": "user_binder_items.user_binder_items_currency_check"
+    },
+    {
+      "categoria": "gatilhos",
+      "tipo": "faltando",
+      "objeto": "public.ml_prompt_feedback: CREATE TRIGGER <gatilho> BEFORE INSERT OR UPDATE OF user_id ON ml_prompt_feedback FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user('user_id')",
+      "motivo": "a produção não tem a chave ml_prompt_feedback.user_id; a trava de conta ativa vem com ela, pelo laço canônico no fim da migration que criar a chave",
+      "decisao": "D-50",
+      "origem": "docs/qa/execution/2026-09-28/BT-DB-003-ensaio-na-estrutura-da-producao.md",
+      "no_receipt": "ml_prompt_feedback"
+    },
+    {
+      "categoria": "tipos_enum",
+      "tipo": "sobrando",
+      "objeto": "public.poststatus",
+      "motivo": "tipo enum que acompanha a tabela posts, só da produção e sem uso no código; sai com ela, depois do backup",
+      "decisao": "D-49",
+      "origem": "docs/qa/execution/2026-09-28/BT-DB-003-ensaio-na-estrutura-da-producao.md",
+      "no_receipt": "poststatus"
+    }
+  ],
+  "payload": [
+    {
+      "tabela": "public.card_meta_insights",
+      "migration": "075",
+      "motivo": "versatility_score passa de numeric(6,3) para double precision, como na produção: o valor é o mesmo e o texto da linha muda (0.000 vira 0); na produção a coluna já é double precision e nada muda"
+    }
+  ]
+}

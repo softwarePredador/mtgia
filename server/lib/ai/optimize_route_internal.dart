@@ -240,6 +240,7 @@ Future<void> recordOptimizeAnalysisOutcome({
   required List<Map<String, dynamic>> deterministicSwapCandidates,
   required String cacheKey,
   required int executionTimeMs,
+  Map<String, Object?>? provenance,
 }) async {
   await optimize_analysis.recordOptimizeAnalysisOutcome(
     pool: pool,
@@ -264,6 +265,7 @@ Future<void> recordOptimizeAnalysisOutcome({
     deterministicSwapCandidates: deterministicSwapCandidates,
     cacheKey: cacheKey,
     executionTimeMs: executionTimeMs,
+    provenance: provenance,
   );
 }
 
@@ -289,6 +291,7 @@ Future<void> processCompleteModeAsync({
   required Map<String, dynamic> deckAnalysis,
   required String? userId,
   required String deckSignature,
+  int? deckRevision,
   required String? cacheKey,
   required OptimizeIntensityConfig intensity,
   required Map<String, dynamic> userPreferences,
@@ -605,8 +608,10 @@ Future<void> processCompleteModeAsync({
         );
       }
       attachOptimizeApplyAuthorizationToResponse(
+        ownerId: userId ?? '',
         deckId: deckId,
         deckSignature: deckSignature,
+        deckRevision: deckRevision,
         responseBody: responseBody,
         bracket: bracket,
       );

@@ -1,5 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_middleware.dart';
+import '../../lib/legal_acceptance_middleware.dart';
 import '../../lib/plan_middleware.dart';
 import '../../lib/rate_limit_middleware.dart';
 
@@ -20,15 +21,14 @@ const meteredAiActionPaths = <String>{
 
 const rateLimitedAuxiliaryAiPaths = <String>{
   '/ai/simulate',
-  '/ai/simulate-matchup',
-  '/ai/weakness-analysis',
   '/ai/commander-reference',
   '/ai/ml-status',
-  '/ai/optimize/telemetry',
 };
 
 AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
+  // DCK-P0-04: ler o pedido e materializar o resultado não chamam IA.
   if (path.startsWith('/ai/generate/jobs/') ||
+      path.startsWith('/ai/generate/requests/') ||
       path.startsWith('/ai/optimize/jobs/') ||
       path == '/ai/battle/jobs' ||
       path.startsWith('/ai/battle/jobs/') ||
@@ -61,16 +61,23 @@ AiEndpointAccessPolicy aiEndpointAccessPolicyForPath(String path) {
 /// - Tempo de resposta é longo (5-10s)
 /// - Previne uso abusivo do sistema
 Handler middleware(Handler handler) {
-  final authOnlyHandler = handler.use(authMiddleware());
+  // Versão nova dos Termos ou da Política (BT-LEGAL-ACCEPT-001, D-24)
+  // bloqueia a IA logo depois da autenticação, antes de gastar limite ou
+  // cota do plano.
+  final legal = legalAcceptanceForWrites(appliesTo: isLegalGatedAiRequest);
+  final authOnlyHandler = handler.use(legal).use(authMiddleware());
   final pollingHandler = handler
       .use(aiPollingRateLimit())
+      .use(legal)
       .use(authMiddleware());
   final rateLimitedAuxiliaryHandler = handler
       .use(aiRateLimit())
+      .use(legal)
       .use(authMiddleware());
   final costlyAiHandler = handler
       .use(aiRateLimit())
       .use(aiPlanLimitMiddleware())
+      .use(legal)
       .use(authMiddleware());
 
   return (context) {

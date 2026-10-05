@@ -31,7 +31,10 @@ IDENTITY_JSON="$(
 EXPECTED_DIGEST="$(shasum -a 256 "$REPO/server/config/release_capabilities.json" | awk '{print $1}')"
 EXPECTED_COUNT="$(jq -r '.capabilities | length' "$REPO/server/config/release_capabilities.json")"
 [[ "$EXPECTED_DIGEST" == \
-  "ace782b3969a9ba5a2691f5ca3d97360927919739cd16c796d7b36e8124d754d" ]]
+  "ace782b3969a9ba5a2691f5ca3d97360927919739cd16c796d7b36e8124d754d" ]] || {
+  echo "digest de server/config/release_capabilities.json mudou: $EXPECTED_DIGEST" >&2
+  exit 1
+}
 jq -e \
   --arg sha "$SHA" \
   --arg digest "$EXPECTED_DIGEST" \
@@ -81,6 +84,29 @@ if manaloom_require_public_app_release_open \
   echo "contrato abriu /app sem verificacao live datada" >&2
   exit 1
 fi
+
+# D-13: a matriz all-OFF sai como release de plano de controle; com capability
+# on, o gate de abertura decide; matriz incoerente nunca vira plano de controle.
+resolved_mode() {
+  (
+    manaloom_resolve_public_app_release_mode "$1" >/dev/null 2>&1 || exit 2
+    printf '%s' "$MANALOOM_PUBLIC_APP_RELEASE_MODE"
+  )
+}
+[[ "$(resolved_mode "$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")" == "control_plane" ]] || {
+  echo "D-13: a matriz all-OFF nao saiu como plano de controle" >&2; exit 1; }
+[[ "$(resolved_mode "$PUBLIC_APP_OPEN_FIXTURE")" == "product_open" ]] || {
+  echo "D-13: a abertura verificada nao saiu como product_open" >&2; exit 1; }
+for incoherent in "$PUBLIC_APP_UNVERIFIED_FIXTURE" \
+  "$(jq -c '.capabilities.ads.allowed = true' <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")" \
+  "$(jq -c '.capabilities.ads.release_capability = "on"' <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")" \
+  "$(jq -c '.capabilities = {}' <<<"$MANALOOM_RELEASE_CAPABILITIES_POLICY_JSON")" \
+  'nao e json'; do
+  if resolved_mode "$incoherent" >/dev/null; then
+    echo "D-13: matriz incoerente virou release do /app: $incoherent" >&2
+    exit 1
+  fi
+done
 
 expect_invalid_policy() {
   local label="$1"
@@ -163,8 +189,13 @@ grep -Fq '.release_capabilities == $release_capabilities' \
   "$ROOT_DIR/scripts/manaloom_publish_android_release.sh"
 grep -Fq 'manaloom_require_exact_release_capabilities' \
   "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq 'manaloom_require_public_app_release_open' \
+grep -Fq 'manaloom_resolve_public_app_release_mode' \
   "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"
+if grep -Eq '^[[:space:]]*manaloom_require_public_app_release_open' \
+  "$ROOT_DIR/scripts/manaloom_deploy_flutter_web.sh"; then
+  echo "D-13: o deploy do /app voltou a exigir capability on com a matriz all-OFF" >&2
+  exit 1
+fi
 
 BATTLE_SIDECAR_DEPLOY="$ROOT_DIR/scripts/manaloom_deploy_battle_sidecars.sh"
 grep -Fq 'manaloom_load_release_capabilities_from_git' \

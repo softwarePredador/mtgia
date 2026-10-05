@@ -132,6 +132,22 @@ const requiredReleaseSchemaMigrations = <String, String>{
   '056': 'create_interactive_battle_sessions',
   '057': 'expand_battle_job_async_timeout',
   '058': 'snapshot_trade_item_identity',
+  '059': 'align_trade_items_owner_fk',
+  '060': 'create_account_deletion_outbox',
+  '061': 'create_beta_invites',
+  '062': 'record_legal_acceptance_history',
+  '063': 'recreate_commander_learning_snapshot_view',
+  '064': 'adopt_production_unique_indexes',
+  '065': 'adopt_production_indexes_from_database_indexes_sql',
+  '066': 'adopt_remaining_production_only_indexes',
+  '067': 'create_deck_revision_ledger',
+  '068': 'demote_decks_on_legality_change',
+  '069': 'create_ai_generate_requests',
+  '072': 'deck_trash_lifecycle',
+  '073': 'activation_events_dedupe',
+  '074': 'reinstall_active_user_triggers',
+  '075': 'adopt_production_ml_tables_and_shapes',
+  '076': 'align_message_and_trade_history_user_fks',
 };
 
 const releaseSchemaReadinessSql = '''
@@ -157,11 +173,27 @@ const releaseSchemaReadinessSql = '''
       ('055', 'create_battle_job_live_records'),
       ('056', 'create_interactive_battle_sessions'),
       ('057', 'expand_battle_job_async_timeout'),
-      ('058', 'snapshot_trade_item_identity')
+      ('058', 'snapshot_trade_item_identity'),
+      ('059', 'align_trade_items_owner_fk'),
+      ('060', 'create_account_deletion_outbox'),
+      ('061', 'create_beta_invites'),
+      ('062', 'record_legal_acceptance_history'),
+      ('063', 'recreate_commander_learning_snapshot_view'),
+      ('064', 'adopt_production_unique_indexes'),
+      ('065', 'adopt_production_indexes_from_database_indexes_sql'),
+      ('066', 'adopt_remaining_production_only_indexes'),
+      ('067', 'create_deck_revision_ledger'),
+      ('068', 'demote_decks_on_legality_change'),
+      ('069', 'create_ai_generate_requests'),
+      ('072', 'deck_trash_lifecycle'),
+      ('073', 'activation_events_dedupe'),
+      ('074', 'reinstall_active_user_triggers'),
+      ('075', 'adopt_production_ml_tables_and_shapes'),
+      ('076', 'align_message_and_trade_history_user_fks')
   )
   SELECT
     (
-      SELECT COUNT(*) = 21
+      SELECT COUNT(*) = 37
       FROM required_migrations required
       JOIN public.schema_migrations actual
         ON actual.version = required.version
@@ -170,7 +202,7 @@ const releaseSchemaReadinessSql = '''
     COALESCE(
       (SELECT MAX(version) FROM public.schema_migrations),
       ''
-    ) = '058' AS latest_migration_ready,
+    ) = '076' AS latest_migration_ready,
     (
       SELECT COUNT(*)
       FROM pg_class
@@ -644,8 +676,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: healthy,
       check: {
         'status': healthy ? 'healthy' : 'unhealthy',
-        'required_range': '038-058',
-        'latest_migration': '058',
+        'required_range': '038-076',
+        'latest_migration': '076',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),
@@ -657,8 +689,8 @@ Future<ReleaseSchemaReadiness> evaluateReleaseSchemaReadiness(Pool pool) async {
       healthy: false,
       check: {
         'status': 'unhealthy',
-        'required_range': '038-058',
-        'latest_migration': '058',
+        'required_range': '038-076',
+        'latest_migration': '076',
         'migrations': requiredReleaseSchemaMigrations.keys.toList(
           growable: false,
         ),

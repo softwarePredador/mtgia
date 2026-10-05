@@ -1,309 +1,104 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
-import 'package:postgres/postgres.dart';
+import '../lib/database.dart';
+import '../lib/privacy/retention_cleanup.dart';
 
-import '../lib/runtime_environment.dart';
-
-void main(List<String> args) async {
-  final env = loadRuntimeEnvironment();
-
-  final retentionArg = args.firstWhere(
-    (a) => a.startsWith('--retention-days='),
-    orElse: () => '',
-  );
-  final dryRun = args.contains('--dry-run');
-  final reservationTtlArg = args.firstWhere(
-    (a) => a.startsWith('--reservation-ttl-minutes='),
-    orElse: () => '',
-  );
-  final rateLimitRetentionArg = args.firstWhere(
-    (a) => a.startsWith('--rate-limit-retention-hours='),
-    orElse: () => '',
-  );
-  final aiLogRetentionArg = args.firstWhere(
-    (a) => a.startsWith('--ai-log-retention-days='),
-    orElse: () => '',
-  );
-  final jobRetentionArg = args.firstWhere(
-    (a) => a.startsWith('--job-retention-minutes='),
-    orElse: () => '',
-  );
-
-  final retentionFromArg =
-      retentionArg.isNotEmpty
-          ? int.tryParse(retentionArg.split('=').last.trim())
-          : null;
-  final retentionFromEnv = int.tryParse(env['TELEMETRY_RETENTION_DAYS'] ?? '');
-  final retentionDays = retentionFromArg ?? retentionFromEnv ?? 180;
-  final reservationTtlFromArg =
-      reservationTtlArg.isNotEmpty
-          ? int.tryParse(reservationTtlArg.split('=').last.trim())
-          : null;
-  final reservationTtlFromEnv = int.tryParse(
-    env['AI_PLAN_RESERVATION_TTL_MINUTES'] ?? '',
-  );
-  final reservationTtlMinutes =
-      reservationTtlFromArg ?? reservationTtlFromEnv ?? 10;
-  final rateLimitRetentionFromArg =
-      rateLimitRetentionArg.isNotEmpty
-          ? int.tryParse(rateLimitRetentionArg.split('=').last.trim())
-          : null;
-  final rateLimitRetentionFromEnv = int.tryParse(
-    env['RATE_LIMIT_EVENT_RETENTION_HOURS'] ?? '',
-  );
-  final rateLimitRetentionHours =
-      rateLimitRetentionFromArg ?? rateLimitRetentionFromEnv ?? 24;
-  final aiLogRetentionFromArg =
-      aiLogRetentionArg.isNotEmpty
-          ? int.tryParse(aiLogRetentionArg.split('=').last.trim())
-          : null;
-  final aiLogRetentionFromEnv = int.tryParse(
-    env['AI_LOG_RETENTION_DAYS'] ?? '',
-  );
-  final aiLogRetentionDays =
-      aiLogRetentionFromArg ?? aiLogRetentionFromEnv ?? 180;
-  final jobRetentionFromArg =
-      jobRetentionArg.isNotEmpty
-          ? int.tryParse(jobRetentionArg.split('=').last.trim())
-          : null;
-  final jobRetentionFromEnv = int.tryParse(
-    env['AI_JOB_RETENTION_MINUTES'] ?? '',
-  );
-  final jobRetentionMinutes = jobRetentionFromArg ?? jobRetentionFromEnv ?? 30;
-
-  if (retentionDays < 1) {
-    print('❌ retention-days inválido. Use um inteiro >= 1.');
-    exit(1);
-  }
-  if (reservationTtlMinutes < 1) {
-    print('❌ reservation-ttl-minutes inválido. Use um inteiro >= 1.');
-    exit(1);
-  }
-  if (rateLimitRetentionHours < 1) {
-    print('❌ rate-limit-retention-hours inválido. Use um inteiro >= 1.');
-    exit(1);
-  }
-  if (aiLogRetentionDays < 1) {
-    print('❌ ai-log-retention-days inválido. Use um inteiro >= 1.');
-    exit(1);
-  }
-  if (jobRetentionMinutes < 1) {
-    print('❌ job-retention-minutes inválido. Use um inteiro >= 1.');
-    exit(1);
-  }
-
-  final host = env['DB_HOST'];
-  final port = int.tryParse(env['DB_PORT'] ?? '');
-  final database = env['DB_NAME'];
-  final username = env['DB_USER'];
-  final password = env['DB_PASS'];
-
-  if (host == null ||
-      port == null ||
-      database == null ||
-      username == null ||
-      password == null) {
-    print(
-      '❌ Variáveis de DB ausentes (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS).',
+/// Limpeza por prazo (D-70), agendada pelo `manaloom_ops_daemon.py` como
+/// `manaloom_ai_runtime_cleanup`, sem capability.
+///
+/// Os prazos vêm do inventário de retenção (`retentionCleanupRules`); não há
+/// flag nem variável de ambiente que os encurte.
+///
+/// Uso:
+///   dart run bin/cleanup_optimize_telemetry.dart                 # agendado
+///   dart run bin/cleanup_optimize_telemetry.dart --mode dry-run  # só conta
+///   MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+///     dart run bin/cleanup_optimize_telemetry.dart --mode activate
+///   MANALOOM_CONFIRM_POSTGRES_WRITES=I_HAVE_EXPLICIT_APPROVAL \
+///     dart run bin/cleanup_optimize_telemetry.dart --mode deactivate
+///
+/// Toda execução deixa o recibo `MANALOOM_RETENTION_CLEANUP {json}` no
+/// stdout e, com `--output-dir` ou `MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR`, o
+/// mesmo JSON num arquivo. Saída 0: concluída; 2: argumento inválido; 3: modo
+/// supervisionado sem a aprovação; 4: outra execução em andamento; 1: erro.
+Future<void> main(List<String> args) async {
+  final parsed = parseRetentionCleanupArguments(args);
+  if (parsed == null) {
+    stderr.writeln(
+      'uso: cleanup_optimize_telemetry.dart '
+      '[--mode scheduled|activate|deactivate|dry-run] [--output-dir <dir>]. '
+      'Os prazos vêm do inventário de retenção (D-70); não há flag de prazo.',
     );
-    exit(1);
+    exitCode = 2;
+    return;
   }
-
-  final connection = await Connection.open(
-    Endpoint(
-      host: host,
-      port: port,
-      database: database,
-      username: username,
-      password: password,
-    ),
-    settings: const ConnectionSettings(sslMode: SslMode.disable),
-  );
-
+  final (mode, outputDirOption) = parsed;
+  final outputDir =
+      outputDirOption ??
+      Platform.environment['MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR'];
+  final runId = _runId();
+  final database = Database();
+  Map<String, dynamic> receipt;
   try {
-    print(
-      '🧹 Cleanup AI runtime '
-      '(retention_days=$retentionDays, '
-      'ai_log_retention_days=$aiLogRetentionDays, '
-      'job_retention_minutes=$jobRetentionMinutes, '
-      'reservation_ttl_minutes=$reservationTtlMinutes, '
-      'rate_limit_retention_hours=$rateLimitRetentionHours, '
-      'dry_run=$dryRun)',
-    );
-
-    final countResult = await connection.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM ai_optimize_fallback_telemetry
-        WHERE created_at < NOW() - (CAST(@days AS int) * INTERVAL '1 day')
-      '''),
-      parameters: {'days': retentionDays},
-    );
-
-    final toDelete = _toInt(countResult.first.toColumnMap()['c']);
-    final staleReservationResult = await connection.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM ai_logs
-        WHERE endpoint LIKE 'plan-reservation:%'
-          AND success = FALSE
-          AND created_at <
-            NOW() - (CAST(@minutes AS int) * INTERVAL '1 minute')
-      '''),
-      parameters: {'minutes': reservationTtlMinutes},
-    );
-    final staleReservations = _toInt(
-      staleReservationResult.first.toColumnMap()['c'],
-    );
-    final staleRateLimitResult = await connection.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM rate_limit_events
-        WHERE created_at <
-          NOW() - (CAST(@hours AS int) * INTERVAL '1 hour')
-      '''),
-      parameters: {'hours': rateLimitRetentionHours},
-    );
-    final staleRateLimitEvents = _toInt(
-      staleRateLimitResult.first.toColumnMap()['c'],
-    );
-    final staleAiLogResult = await connection.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM ai_logs
-        WHERE endpoint NOT LIKE 'plan-reservation:%'
-          AND created_at <
-            NOW() - (CAST(@days AS int) * INTERVAL '1 day')
-      '''),
-      parameters: {'days': aiLogRetentionDays},
-    );
-    final staleAiLogs = _toInt(staleAiLogResult.first.toColumnMap()['c']);
-    final staleGenerateJobResult = await connection.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM ai_generate_jobs
-        WHERE created_at <
-          NOW() - (CAST(@minutes AS int) * INTERVAL '1 minute')
-      '''),
-      parameters: {'minutes': jobRetentionMinutes},
-    );
-    final staleGenerateJobs = _toInt(
-      staleGenerateJobResult.first.toColumnMap()['c'],
-    );
-    final staleOptimizeJobResult = await connection.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM ai_optimize_jobs
-        WHERE created_at <
-          NOW() - (CAST(@minutes AS int) * INTERVAL '1 minute')
-      '''),
-      parameters: {'minutes': jobRetentionMinutes},
-    );
-    final staleOptimizeJobs = _toInt(
-      staleOptimizeJobResult.first.toColumnMap()['c'],
-    );
-    print(
-      '📊 Elegíveis: optimize_telemetry=$toDelete '
-      'ai_logs=$staleAiLogs '
-      'generate_jobs=$staleGenerateJobs '
-      'optimize_jobs=$staleOptimizeJobs '
-      'stale_plan_reservations=$staleReservations '
-      'stale_rate_limit_events=$staleRateLimitEvents',
-    );
-
-    if (dryRun ||
-        (toDelete == 0 &&
-            staleAiLogs == 0 &&
-            staleGenerateJobs == 0 &&
-            staleOptimizeJobs == 0 &&
-            staleReservations == 0 &&
-            staleRateLimitEvents == 0)) {
-      print('✅ Nenhuma remoção executada.');
-      return;
+    if (mode.requiresWriteApproval &&
+        Platform.environment[retentionCleanupWriteApprovalEnvironment] !=
+            retentionCleanupWriteApprovalValue) {
+      throw RetentionCleanupRefused(mode);
     }
-
-    final deleted = await connection.runTx((session) async {
-      final telemetryDeleteResult = await session.execute(
-        Sql.named('''
-          DELETE FROM ai_optimize_fallback_telemetry
-          WHERE created_at < NOW() - (CAST(@days AS int) * INTERVAL '1 day')
-        '''),
-        parameters: {'days': retentionDays},
-      );
-      final aiLogDeleteResult = await session.execute(
-        Sql.named('''
-          DELETE FROM ai_logs
-          WHERE endpoint NOT LIKE 'plan-reservation:%'
-            AND created_at <
-              NOW() - (CAST(@days AS int) * INTERVAL '1 day')
-        '''),
-        parameters: {'days': aiLogRetentionDays},
-      );
-      final reservationDeleteResult = await session.execute(
-        Sql.named('''
-          DELETE FROM ai_logs
-          WHERE endpoint LIKE 'plan-reservation:%'
-            AND success = FALSE
-            AND created_at <
-              NOW() - (CAST(@minutes AS int) * INTERVAL '1 minute')
-        '''),
-        parameters: {'minutes': reservationTtlMinutes},
-      );
-      final rateLimitDeleteResult = await session.execute(
-        Sql.named('''
-          DELETE FROM rate_limit_events
-          WHERE created_at <
-            NOW() - (CAST(@hours AS int) * INTERVAL '1 hour')
-        '''),
-        parameters: {'hours': rateLimitRetentionHours},
-      );
-      final generateJobDeleteResult = await session.execute(
-        Sql.named('''
-          DELETE FROM ai_generate_jobs
-          WHERE created_at <
-            NOW() - (CAST(@minutes AS int) * INTERVAL '1 minute')
-        '''),
-        parameters: {'minutes': jobRetentionMinutes},
-      );
-      final optimizeJobDeleteResult = await session.execute(
-        Sql.named('''
-          DELETE FROM ai_optimize_jobs
-          WHERE created_at <
-            NOW() - (CAST(@minutes AS int) * INTERVAL '1 minute')
-        '''),
-        parameters: {'minutes': jobRetentionMinutes},
-      );
-      return (
-        telemetry: telemetryDeleteResult.affectedRows,
-        aiLogs: aiLogDeleteResult.affectedRows,
-        generateJobs: generateJobDeleteResult.affectedRows,
-        optimizeJobs: optimizeJobDeleteResult.affectedRows,
-        reservations: reservationDeleteResult.affectedRows,
-        rateLimitEvents: rateLimitDeleteResult.affectedRows,
-      );
-    });
-
-    print(
-      '✅ Remoção concluída: optimize_telemetry=${deleted.telemetry} '
-      'ai_logs=${deleted.aiLogs} '
-      'generate_jobs=${deleted.generateJobs} '
-      'optimize_jobs=${deleted.optimizeJobs} '
-      'stale_plan_reservations=${deleted.reservations} '
-      'stale_rate_limit_events=${deleted.rateLimitEvents}',
-    );
-  } catch (e) {
-    print('❌ Falha no cleanup: $e');
-    exit(1);
+    await database.connect();
+    receipt = await RetentionCleanupRunner(
+      database.connection,
+    ).run(mode: mode, runId: runId, environment: Platform.environment);
+    if (receipt['status'] == 'busy') exitCode = 4;
+  } on RetentionCleanupRefused catch (error) {
+    stderr.writeln(error);
+    receipt = _stopped(runId, mode, 'refused');
+    exitCode = 3;
+  } catch (error) {
+    stderr.writeln('retention cleanup: ${error.runtimeType}');
+    receipt = _stopped(runId, mode, 'error');
+    exitCode = 1;
   } finally {
-    await connection.close();
+    if (database.isConnected) await database.close();
+  }
+  print(retentionCleanupReceiptLine(receipt));
+  if (outputDir != null && outputDir.isNotEmpty) {
+    final directory = Directory(outputDir)..createSync(recursive: true);
+    File('${directory.path}/retention_cleanup_$runId.json').writeAsStringSync(
+      '${const JsonEncoder.withIndent('  ').convert(receipt)}\n',
+    );
   }
 }
 
-int _toInt(dynamic value) {
-  if (value == null) return 0;
-  if (value is int) return value;
-  if (value is num) return value.toInt();
-  return int.tryParse(value.toString()) ?? 0;
+Map<String, dynamic> _stopped(
+  String runId,
+  RetentionCleanupMode mode,
+  String status,
+) => {
+  'schema': retentionCleanupReceiptSchema,
+  'contract': retentionCleanupContract,
+  'job': retentionCleanupJobName,
+  'run_id': runId,
+  'mode': mode.wireName,
+  'finished_at': DateTime.now().toUtc().toIso8601String(),
+  'status': status,
+  'applied': false,
+};
+
+String _runId() {
+  final random = Random.secure();
+  final stamp = DateTime.now().toUtc().toIso8601String().replaceAll(
+    RegExp(r'[^0-9]'),
+    '',
+  );
+  final suffix =
+      List.generate(
+        6,
+        (_) => random.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ).join();
+  return '${stamp.substring(0, 14)}_$suffix';
 }

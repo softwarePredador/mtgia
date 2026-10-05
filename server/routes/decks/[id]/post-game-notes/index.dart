@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../lib/http_responses.dart';
+import '../../../../lib/retention/post_game_error_contract.dart';
 import '../../../../lib/retention/post_game_note_service.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
@@ -22,7 +23,7 @@ Future<Response> _list(RequestContext context, String deckId) async {
 
   try {
     if (!await service.ownsDeck(userId: userId, deckId: deckId)) {
-      return notFound('Deck nao encontrado.');
+      return postGameDeckNotFound();
     }
     final params = context.request.uri.queryParameters;
     final includeDeleted = params['include_deleted'] == 'true';
@@ -67,7 +68,7 @@ Future<Response> _upsert(RequestContext context, String deckId) async {
 
   try {
     if (!await service.ownsDeck(userId: userId, deckId: deckId)) {
-      return notFound('Deck nao encontrado.');
+      return postGameDeckNotFound();
     }
     final note = await service.upsertNote(
       userId: userId,
@@ -78,22 +79,10 @@ Future<Response> _upsert(RequestContext context, String deckId) async {
   } on PostGameValidationException catch (error) {
     return badRequest(error.message);
   } on PostGameConflictException catch (error) {
-    return _conflict(error);
-  } on PostGameNoteNotFoundException {
-    return notFound('Nota pos-jogo nao encontrada.');
+    return postGameConflict(code: error.code, currentNote: error.currentNote);
+  } on PostGameNoteNotFoundException catch (error) {
+    return postGameNotFoundFor(error.code);
   } catch (error) {
     return internalServerError('Falha ao salvar nota pos-jogo', details: error);
   }
-}
-
-Response _conflict(PostGameConflictException error) {
-  return Response.json(
-    statusCode: HttpStatus.conflict,
-    body: {
-      'error': 'post_game_conflict',
-      'message':
-          'A nota mudou em outro dispositivo ou já foi excluída. Atualize antes de tentar novamente.',
-      if (error.currentNote != null) 'current_note': error.currentNote,
-    },
-  );
 }

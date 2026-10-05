@@ -28,6 +28,8 @@ import '../../../lib/ai/generate_bracket_support.dart';
 import '../../../lib/ai/generate_provider_repair_policy.dart';
 import '../../../lib/ai/generate_reference_structural_repair_support.dart';
 import '../../../lib/ai/generate_structural_quality_support.dart';
+import '../../../lib/ai/ai_generate_request_store.dart';
+import '../../../lib/commander_bracket.dart';
 import '../../../lib/color_identity.dart';
 import '../../../lib/generated_deck_validation_service.dart';
 import '../../../lib/http_responses.dart';
@@ -614,7 +616,7 @@ $commanderBracketPrompt
         send:
             (abortTrigger) => sendAiGenerateProviderHttpRequest(
               client: providerClient,
-              uri: Uri.parse('https://api.openai.com/v1/chat/completions'),
+              uri: aiConfig.chatCompletionsUri,
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer $apiKey',
@@ -1412,6 +1414,34 @@ Future<Response> _startAiGenerateAsyncJob({
     );
   }
   final jobId = creation.jobId;
+  // DCK-P0-04: o pedido fica durável (a fila de jobs vive 24 h): entrada
+  // original, impressão e, quando o job terminar, o resultado.
+  late final String generateRequestId;
+  try {
+    generateRequestId = await AiGenerateRequestStore.record(
+      pool,
+      userId: authenticatedUserId,
+      requestKey: creation.requestKey,
+      requestFingerprint: cacheKey,
+      jobId: jobId,
+      format: format,
+      controls: {
+        'bracket': parseCommanderBracket(body['bracket']).value,
+        'commander_name': body['commander_name']?.toString(),
+        if (constraints.isRequested)
+          'generation_constraints': constraints.toJson(),
+      },
+      prompt: prompt,
+    );
+  } on AiGenerateRequestConflict {
+    return Response.json(
+      statusCode: HttpStatus.conflict,
+      body: {
+        'error': 'request_key ja foi usada com outro pedido.',
+        'error_code': 'ai_job_idempotency_conflict',
+      },
+    );
+  }
   final planReservation =
       creation.isNew ? deferAiPlanReservationIfAvailable(context) : null;
   if (!creation.isNew) {
@@ -1480,6 +1510,8 @@ Future<Response> _startAiGenerateAsyncJob({
       'poll_url': '/ai/generate/jobs/$jobId',
       'cancel_url': '/ai/generate/jobs/$jobId',
       'resume_url': '/ai/generate/jobs/$jobId',
+      'generate_request_id': generateRequestId,
+      'request_url': '/ai/generate/requests/$generateRequestId',
       'poll_interval_ms': 1000,
       'job_timeout_ms': AiGenerateJobStore.executionTimeout.inMilliseconds,
       'total_stages': 4,
@@ -1663,6 +1695,18 @@ Future<bool> _processAiGenerateAsyncJob({
       statusCode: response.statusCode,
       result: resultBody,
     );
+    if (completed) {
+      // O resultado entra no pedido durável; só vira deck pela
+      // materialização no servidor.
+      await AiGenerateRequestStore.recordResult(
+        pool,
+        jobId: jobId,
+        result: resultBody,
+        canMaterialize:
+            response.statusCode == HttpStatus.ok &&
+            _aiGenerateBodyIsValidWithoutInvalidCards(resultBody),
+      );
+    }
     return completed && response.statusCode == HttpStatus.ok;
   }
 

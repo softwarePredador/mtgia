@@ -15,9 +15,7 @@ final RegExp _uuidPattern = RegExp(
   r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
   caseSensitive: false,
 );
-final RegExp _languagePattern = RegExp(
-  r'^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$',
-);
+final RegExp _languagePattern = RegExp(r'^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$');
 
 String readBinderCardId(Object? value) {
   if (value is! String || !_uuidPattern.hasMatch(value.trim())) {
@@ -122,6 +120,70 @@ double? readBinderPrice(Object? value) {
   }
   return price;
 }
+
+/// Troca e venda do fichário (SCOPE-P0-TRD-00, decisão D-39 do dono): na
+/// beta, oferecer uma cópia para troca exige a capability `trades`, e para
+/// venda, ou com preço de venda, exige `marketplace`. Com a capability
+/// fechada, a escrita responde 422, erro explícito, em vez de zerar em
+/// silêncio. Gravar `false` ou `null` continua valendo: é o que o app manda
+/// quando a pessoa não oferece a cópia, e é também como se tira uma oferta.
+const binderCommerceUnavailableCode = 'binder_commerce_unavailable';
+const binderCommerceUnavailableMessage =
+    'Troca e venda de cartas não estão disponíveis nesta beta.';
+
+class BinderCommerceUnavailableException implements Exception {
+  const BinderCommerceUnavailableException({
+    required this.field,
+    required this.capability,
+  });
+
+  /// O campo do corpo que pediu a oferta: `for_trade`, `for_sale` ou `price`.
+  final String field;
+
+  /// A capability que a oferta exige: `trades` ou `marketplace`.
+  final String capability;
+
+  @override
+  String toString() => binderCommerceUnavailableMessage;
+}
+
+/// Recusa a escrita que ofereceria a cópia com a capability fechada. Campo
+/// ausente do corpo vale `null` e nunca é recusado.
+void ensureBinderCommerceAllowed({
+  required bool? forTrade,
+  required bool? forSale,
+  required double? price,
+  required bool Function(String capability) isAllowed,
+}) {
+  if (forTrade == true && !isAllowed('trades')) {
+    throw const BinderCommerceUnavailableException(
+      field: 'for_trade',
+      capability: 'trades',
+    );
+  }
+  if (forSale == true && !isAllowed('marketplace')) {
+    throw const BinderCommerceUnavailableException(
+      field: 'for_sale',
+      capability: 'marketplace',
+    );
+  }
+  if (price != null && !isAllowed('marketplace')) {
+    throw const BinderCommerceUnavailableException(
+      field: 'price',
+      capability: 'marketplace',
+    );
+  }
+}
+
+/// Corpo da resposta 422, no formato de erro do fichário.
+Map<String, Object> binderCommerceUnavailableBody(
+  BinderCommerceUnavailableException error,
+) => {
+  'error': binderCommerceUnavailableMessage,
+  'code': binderCommerceUnavailableCode,
+  'field': error.field,
+  'capability': error.capability,
+};
 
 String? readBinderNotes(Object? value) {
   if (value == null) return null;

@@ -172,7 +172,16 @@ class DeckRulesService {
       }
 
       final status = legalities[cardId];
-      if (status == null) continue;
+      if (status == null) {
+        // D-28: na validação estrita, legalidade ausente não vira legal.
+        // Montar o deck (não estrito) segue aceitando a carta.
+        if (!strict) continue;
+        throw DeckRulesException(
+          'Regra violada: "${info.name}" não tem legalidade conhecida no formato $normalizedFormat.',
+          cardName: info.name,
+          reason: deckRulesReasonLegalityUnknown,
+        );
+      }
       if (status == 'banned') {
         throw DeckRulesException(
           'Regra violada: "${info.name}" é BANIDA no formato $normalizedFormat.',
@@ -583,10 +592,17 @@ String unsupportedDeckSectionsMessage(Iterable<String> labels) {
       'Importe apenas o deck principal e marque comandante pelo campo/tag de comandante.';
 }
 
+/// Motivo de revisão quando a validação estrita recusa carta sem linha de
+/// legalidade no formato (D-28).
+const deckRulesReasonLegalityUnknown = 'legality_unknown';
+
 class DeckRulesException implements Exception {
-  DeckRulesException(this.message, {this.cardName});
+  DeckRulesException(this.message, {this.cardName, this.reason});
   final String message;
   final String? cardName;
+
+  /// Motivo de revisão específico, quando há um (ex.: `legality_unknown`).
+  final String? reason;
   @override
   String toString() => message;
 }

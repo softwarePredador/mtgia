@@ -51,11 +51,8 @@ void main() {
 
     for (final path in [
       '/ai/simulate',
-      '/ai/simulate-matchup',
-      '/ai/weakness-analysis',
       '/ai/commander-reference',
       '/ai/ml-status',
-      '/ai/optimize/telemetry',
     ]) {
       expect(
         ai_middleware.aiEndpointAccessPolicyForPath(path),
@@ -64,7 +61,13 @@ void main() {
       );
     }
 
-    for (final path in ['/ai/generate/jobs/job-1', '/ai/optimize/jobs/job-1']) {
+    for (final path in [
+      '/ai/generate/jobs/job-1',
+      '/ai/optimize/jobs/job-1',
+      // DCK-P0-04: ler o pedido e materializar não chamam IA.
+      '/ai/generate/requests/latest',
+      '/ai/generate/requests/req-1/materialize',
+    ]) {
       expect(
         ai_middleware.aiEndpointAccessPolicyForPath(path),
         ai_middleware.AiEndpointAccessPolicy.polling,
@@ -136,16 +139,9 @@ void main() {
         File(
           'routes/decks/[id]/ai-analysis/_middleware.dart',
         ).readAsStringSync();
-    final recommendationsSource =
-        File(
-          'routes/decks/[id]/recommendations/_middleware.dart',
-        ).readAsStringSync();
 
     expect(analysisSource, contains('.use(aiRateLimit())'));
     expect(analysisSource, contains('.use(aiPlanLimitMiddleware())'));
     expect(analysisSource, contains('.use(authMiddleware())'));
-    expect(recommendationsSource, contains('.use(aiRateLimit())'));
-    expect(recommendationsSource, contains('.use(aiPlanLimitMiddleware())'));
-    expect(recommendationsSource, contains('.use(authMiddleware())'));
   });
 }

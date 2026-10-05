@@ -8,9 +8,10 @@ Este arquivo testa toda a pipeline de IA/ML:
 - POST /ai/archetypes - Detecção de arquétipo
 - POST /ai/generate - Geração de deck por prompt
 - POST /ai/simulate - Simulação goldfish
-- POST /ai/simulate-matchup - Simulação de matchup
-- POST /ai/weakness-analysis - Análise de fraquezas
 - POST /ai/explain - Explicação de carta
+
+POST /ai/simulate-matchup e POST /ai/weakness-analysis saíram na D-31
+(BT-AI-029); os substitutos são Battle e Analyze.
 
 Uso:
     MANALOOM_CONFIRM_LIVE_MUTATIONS=I_HAVE_EXPLICIT_APPROVAL \
@@ -569,44 +570,6 @@ class MLTestSuite:
                        has_explanation, f"Keys: {list(body.keys())}")
     
     # ═══════════════════════════════════════════════════════════════════════════
-    # TESTES WEAKNESS ANALYSIS
-    # ═══════════════════════════════════════════════════════════════════════════
-    
-    def test_weakness_analysis(self):
-        """Testa POST /ai/weakness-analysis"""
-        print("\n🛡️ TESTES: POST /ai/weakness-analysis")
-        cat = "Weakness"
-        import time
-        time.sleep(1)  # Evitar rate limiting
-        
-        if not self.deck_id:
-            print("  ⚠️ Sem deck de teste, pulando testes de weakness analysis")
-            return
-        
-        # Test 1: Sem token → 401 (ou 429)
-        code, body = self._req("POST", "/ai/weakness-analysis", json_data={"deck_id": self.deck_id})
-        self._test(cat, "Sem token → 401 ou 429", code in (401, 429), f"Got {code}")
-        
-        time.sleep(1)
-        # Test 2: Sem deck_id → 400 (ou 429)
-        code, body = self._req("POST", "/ai/weakness-analysis", token=self.token, json_data={})
-        self._test(cat, "Sem deck_id → 400 ou 429", code in (400, 429), f"Got {code}")
-        
-        time.sleep(1)
-        # Test 3: Requisição válida
-        code, body = self._req("POST", "/ai/weakness-analysis", token=self.token, json_data={
-            "deck_id": self.deck_id
-        })
-        self._test(cat, "Requisição válida → 200 ou 404 ou 429",
-                   code in (200, 404, 429), f"Got {code}")
-        
-        if code == 200:
-            # Test 4: Resposta tem análise
-            has_analysis = any(k in body for k in ["weaknesses", "analysis", "vulnerabilities", "suggestions"])
-            self._test(cat, "Resposta tem análise de fraquezas",
-                       has_analysis, f"Keys: {list(body.keys())}")
-    
-    # ═══════════════════════════════════════════════════════════════════════════
     # CLEANUP
     # ═══════════════════════════════════════════════════════════════════════════
     
@@ -646,7 +609,6 @@ class MLTestSuite:
             self.test_generate()
             self.test_simulate()
             self.test_explain()
-            self.test_weakness_analysis()
         except Exception as e:
             print(f"\n❌ Erro durante testes: {e}")
             import traceback

@@ -31,7 +31,8 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     // 1. Buscar informações do deck (formato)
     final deckResult = await pool.execute(
       Sql.named(
-        'SELECT format FROM decks WHERE id = @deckId AND user_id = @userId',
+        'SELECT format, validation_state FROM decks '
+        'WHERE id = @deckId AND user_id = @userId',
       ),
       parameters: {'deckId': deckId, 'userId': userId},
     );
@@ -44,6 +45,9 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
     }
 
     final format = deckResult.first[0] as String;
+    // DCK-P1-04: a prontidão da análise não diz "válido" sem a validação
+    // estrita persistida no deck.
+    final strictValidated = deckResult.first[1] == 'validated';
     final hasCardIntelligenceSnapshot = await _hasTable(
       pool,
       'card_intelligence_snapshot',
@@ -284,14 +288,24 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
         final id = card['id'] as String;
         final name = card['name'] as String;
 
-        // Se não tiver registro na tabela de legalidade, assumimos que é legal (ou que falta dado)
-        // Mas se tiver e for 'banned', reportamos.
-        if (legalityMap.containsKey(id)) {
-          final status = legalityMap[id]!;
+        // D-28: sem linha de legalidade no formato a carta não é legal.
+        final status = legalityMap[id];
+        if (status == null) {
+          issues.add({
+            'type': 'error',
+            'code': 'legality_unknown',
+            'message': '"$name" has no known legality in $format.',
+          });
+        } else {
           if (status == 'banned') {
             issues.add({
               'type': 'error',
               'message': '"$name" is BANNED in $format.',
+            });
+          } else if (status == 'not_legal') {
+            issues.add({
+              'type': 'error',
+              'message': '"$name" is NOT LEGAL in $format.',
             });
           } else if (status == 'restricted' && (card['quantity'] as int) > 1) {
             issues.add({
@@ -506,6 +520,7 @@ Future<Response> _analyzeDeck(RequestContext context, String deckId) async {
           totalCards: totalCards,
           cards: cards,
           issues: issues,
+          strictValidated: strictValidated,
         ),
         'battle_readiness': _buildBattleReadinessSummary(cards),
         'battle_learning_evidence': battleLearningEvidence,
@@ -759,6 +774,7 @@ Map<String, dynamic> _buildDeckReadinessSummary({
   required int totalCards,
   required List<Map<String, dynamic>> cards,
   required List<Map<String, dynamic>> issues,
+  required bool strictValidated,
 }) {
   final normalizedFormat = format.toLowerCase().trim();
   final isCommander =
@@ -797,10 +813,17 @@ Map<String, dynamic> _buildDeckReadinessSummary({
     blockers.add('legality_or_structure_errors');
     nextActions.add('Corrigir erros de legalidade e estrutura.');
   }
+  if (blockers.isEmpty && !strictValidated) {
+    nextActions.add('Validar o deck para confirmar legalidade e estrutura.');
+  }
 
   final status =
       blockers.isNotEmpty
           ? blockers.first
+          // Estrutura ok, mas sem a validação estrita do servidor: nunca
+          // "válido" nem "pronto" (DCK-P1-04).
+          : !strictValidated
+          ? 'awaiting_strict_validation'
           : warningCount > 0
           ? 'ready_with_warnings'
           : isCommander
@@ -815,6 +838,7 @@ Map<String, dynamic> _buildDeckReadinessSummary({
     'total_cards': totalCards,
     'error_count': errorCount,
     'warning_count': warningCount,
+    'strict_validated': strictValidated,
     'blockers': blockers.toSet().toList(growable: false),
     'next_actions': nextActions.toSet().toList(growable: false),
     'advanced_intelligence_enabled': blockers.isEmpty,

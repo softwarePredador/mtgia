@@ -882,65 +882,6 @@ void main() {
     );
 
     test(
-      'POST /ai/simulate-matchup without ids returns 400 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/ai/simulate-matchup'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
-
-        expectJsonErrorContract(response, 400);
-      },
-      skip: skipIntegration,
-    );
-
-    test(
-      'POST /ai/simulate-matchup with missing my_deck returns 404 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/ai/simulate-matchup'),
-          headers: authHeaders(true),
-          body: jsonEncode({
-            'my_deck_id': missingDeckId,
-            'opponent_deck_id': missingDeckId,
-          }),
-        );
-
-        expectJsonErrorContract(response, 404);
-      },
-      skip: skipIntegration,
-    );
-
-    test(
-      'POST /ai/weakness-analysis without deck_id returns 400 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/ai/weakness-analysis'),
-          headers: authHeaders(true),
-          body: jsonEncode({}),
-        );
-
-        expectJsonErrorContract(response, 400);
-      },
-      skip: skipIntegration,
-    );
-
-    test(
-      'POST /ai/weakness-analysis with missing deck returns 404 with error',
-      () async {
-        final response = await http.post(
-          Uri.parse('$baseUrl/ai/weakness-analysis'),
-          headers: authHeaders(true),
-          body: jsonEncode({'deck_id': missingDeckId}),
-        );
-
-        expectJsonErrorContract(response, 404);
-      },
-      skip: skipIntegration,
-    );
-
-    test(
       'POST /community/decks/:id without token returns 401 (or 404 compat)',
       () async {
         final response = await http.post(

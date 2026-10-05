@@ -4,6 +4,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 
 import '../../../../../lib/deck_cards_bulk_support.dart';
+import '../../../../../lib/deck_request_support.dart';
 import '../../../../../lib/deck_rules_service.dart';
 import '../../../../../lib/deck_validation_state_support.dart';
 import '../../../../../lib/decks/deck_applied_analysis_support.dart';
@@ -12,6 +13,8 @@ import '../../../../../lib/decks/optimization_bracket_support.dart';
 import '../../../../../lib/decks/optimization_functional_role_floor_support.dart';
 import '../../../../../lib/decks/optimization_mana_floor_support.dart';
 import '../../../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../../../lib/decks/deck_revision_support.dart';
+import '../../../../../lib/http_responses.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method != HttpMethod.post) {
@@ -89,8 +92,27 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     );
   }
 
+  final mutation = DeckMutationRequest.fromContext(
+    context,
+    operation:
+        DeckOptimizationHistoryService.normalizeMutationContext(
+              mutationContext,
+            ).isNotEmpty
+            ? 'optimization_apply'
+            : 'card_bulk',
+    deckId: deckId,
+    body: body,
+  );
+
   try {
     final result = await pool.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) throw const DeckNotFoundForMutation();
       final isOptimizationMutation =
           DeckOptimizationHistoryService.normalizeMutationContext(
             mutationContext,
@@ -107,7 +129,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
 
       final format = (deckResult.first[0] as String).toLowerCase();
@@ -169,7 +191,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       final applyAuthorizationVerification =
           isOptimizationMutation
               ? validateOptimizationApplyAuthorization(
+                ownerId: userId,
                 deckId: deckId,
+                currentDeckRevision: baseline.revision,
                 currentDeckSignature:
                     DeckOptimizationHistoryService.buildDeckSignature(current),
                 beforeCards: current,
@@ -257,7 +281,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         0,
         (sum, c) => sum + (c['quantity'] as int),
       );
-      if (!isOptimizationMutation) return {'total_cards': total};
+      if (!isOptimizationMutation) {
+        final receipt = await recordDeckMutation(session, baseline);
+        return <String, Object?>{'total_cards': total, ...receipt.toJson()};
+      }
 
       final stateResult = await session.execute(
         Sql.named('''
@@ -345,7 +372,8 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         },
         authoritativeAfterAnalysis: appliedPostAnalysis,
       );
-      return {
+      final receipt = await recordDeckMutation(session, baseline);
+      return <String, Object?>{
         'total_cards': total,
         if (event != null) 'optimization_event': event,
         'post_analysis': appliedPostAnalysis,
@@ -358,6 +386,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           'review_reasons': const <String>[],
           'validation_updated_at': afterValidation['validation_updated_at'],
         },
+        ...receipt.toJson(),
       };
     });
 
@@ -365,7 +394,12 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       return Response.json(statusCode: HttpStatus.conflict, body: result);
     }
 
-    return Response.json(body: {'ok': true, ...result});
+    return Response.json(
+      body: {'ok': true, ...result},
+      headers: deckRevisionHeadersOf(result),
+    );
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
   } on OptimizationLandFloorViolation catch (e) {
     print('[WARN] Optimization mana floor blocked bulk deck update: $e');
     return Response.json(statusCode: HttpStatus.conflict, body: e.responseBody);
@@ -386,11 +420,10 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
       statusCode: HttpStatus.badRequest,
       body: {'error': e.message},
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } catch (e) {
     print('[ERROR] handler: $e');
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': e.toString()},
-    );
+    return internalServerError('Falha ao alterar as cartas do deck');
   }
 }

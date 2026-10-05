@@ -1,3 +1,5 @@
+import 'dart:io' show InternetAddress;
+
 import 'package:dotenv/dotenv.dart';
 
 class OpenAiRuntimeConfig {
@@ -30,6 +32,63 @@ class OpenAiRuntimeConfig {
 
   bool get allowsMockFallbacks => !isProductionLike;
 
+  /// Base fixa do provedor de chat. É a única cópia da URL no servidor
+  /// (`lib` e `routes`); toda chamada usa [chatCompletionsUri].
+  static const defaultBaseUrl = 'https://api.openai.com/v1';
+
+  /// Variável que troca a base fora da produção (D-83, `BT-AI-029`).
+  static const baseUrlEnvironment = 'OPENAI_BASE_URL';
+
+  /// Endpoint de chat completions de toda chamada ao provedor.
+  ///
+  /// Na produção (perfil `prod`) é sempre [defaultBaseUrl]: nenhuma variável
+  /// de ambiente desvia o tráfego nem a chave. Fora dela, `OPENAI_BASE_URL`
+  /// pode apontar para um provedor falso local, mas só em loopback
+  /// (127.0.0.0/8, `::1` ou `localhost`), por http ou https, sem usuário,
+  /// consulta ou fragmento. Qualquer outro valor é ignorado, e a chamada vai
+  /// para a URL fixa, como antes.
+  Uri get chatCompletionsUri =>
+      Uri.parse('${providerBaseUrl}/chat/completions');
+
+  /// A base efetivamente usada: a de `OPENAI_BASE_URL` quando ela é aceita,
+  /// senão [defaultBaseUrl].
+  String get providerBaseUrl => acceptedBaseUrlOverride ?? defaultBaseUrl;
+
+  /// `OPENAI_BASE_URL` aceita, sem a barra final, ou `null` quando ela está
+  /// vazia, na produção ou fora do loopback.
+  String? get acceptedBaseUrlOverride {
+    if (isProductionLike) return null;
+    final raw = env[baseUrlEnvironment]?.trim();
+    if (raw == null || raw.isEmpty) return null;
+    final uri = Uri.tryParse(raw);
+    if (uri == null || !uri.hasAuthority) return null;
+    if (uri.scheme != 'http' && uri.scheme != 'https') return null;
+    if (uri.userInfo.isNotEmpty || uri.hasQuery || uri.hasFragment) {
+      return null;
+    }
+    if (!isLoopbackHost(uri.host)) return null;
+    var base = uri.toString();
+    while (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    return base;
+  }
+
+  /// `OPENAI_BASE_URL` veio preenchida e foi recusada (produção ou host fora
+  /// do loopback). Serve para diagnóstico; a chamada segue na URL fixa.
+  bool get ignoresBaseUrlOverride {
+    final raw = env[baseUrlEnvironment]?.trim();
+    return raw != null && raw.isNotEmpty && acceptedBaseUrlOverride == null;
+  }
+
+  /// Loopback de verdade: um literal IP de loopback ou o nome `localhost`.
+  static bool isLoopbackHost(String host) {
+    final normalized = host.trim().toLowerCase();
+    if (normalized == 'localhost') return true;
+    final address = InternetAddress.tryParse(normalized);
+    return address != null && address.isLoopback;
+  }
+
   String get generateModel => modelFor(
     key: 'OPENAI_MODEL_GENERATE',
     fallback: 'gpt-4o-mini',
@@ -48,14 +107,6 @@ class OpenAiRuntimeConfig {
 
   String get explainModel => modelFor(
     key: 'OPENAI_MODEL_EXPLAIN',
-    fallback: 'gpt-4o-mini',
-    devFallback: 'gpt-4o-mini',
-    stagingFallback: 'gpt-4o-mini',
-    prodFallback: 'gpt-4o-mini',
-  );
-
-  String get recommendationsModel => modelFor(
-    key: 'OPENAI_MODEL_RECOMMENDATIONS',
     fallback: 'gpt-4o-mini',
     devFallback: 'gpt-4o-mini',
     stagingFallback: 'gpt-4o-mini',
@@ -98,7 +149,6 @@ class OpenAiRuntimeConfig {
     'generate': generateModel,
     'archetypes': archetypesModel,
     'explain': explainModel,
-    'recommendations': recommendationsModel,
     'analysis': analysisModel,
     'optimize': optimizeModel,
     'complete': completeModel,

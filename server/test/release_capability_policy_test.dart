@@ -190,17 +190,32 @@ void main() {
         'GET /sets': 'catalog_private',
         'GET /binder': 'collection_private',
         'GET /decks': 'decks_private',
+        // DCK-P0-00: criar, adicionar e a edição incremental (D-27) ficam em
+        // decks_private; só o replace-all tem capability própria.
+        'POST /decks': 'decks_private',
+        'POST /decks/deck/cards': 'decks_private',
+        'POST /decks/deck/cards/remove': 'decks_private',
+        'PATCH /decks/deck': 'decks_private',
         'POST /decks/deck/cards/bulk': 'decks_private',
         'POST /decks/deck/cards/set': 'decks_private',
+        // DCK-P0-06 (D-30): apagar, ver a lixeira e restaurar ficam em
+        // decks_private.
+        'DELETE /decks/deck': 'decks_private',
+        'GET /decks/trash': 'decks_private',
+        'POST /decks/deck/restore': 'decks_private',
         'PUT /decks/deck': 'deck_replace_all',
         'POST /decks/deck/cards/replace': 'deck_replace_all',
         'POST /import/to-deck': 'deck_replace_all',
+        // D-29: a prévia do import em deck existente não grava nada.
+        'POST /import/to-deck/preview': 'decks_private',
         'GET /decks/deck/analysis': 'ai_analyze_optimize_advisory',
         'POST /decks/deck/ai-analysis': 'ai_analyze_optimize_advisory',
         'POST /decks/deck/optimizations': 'ai_analyze_optimize_advisory',
         'GET /ai/optimize/jobs/job': 'ai_analyze_optimize_advisory',
         'POST /ai/generate': 'ai_generate_rebuild',
         'GET /ai/generate/jobs/job': 'ai_generate_rebuild',
+        'GET /ai/generate/requests/latest': 'ai_generate_rebuild',
+        'POST /ai/generate/requests/req/materialize': 'ai_generate_rebuild',
         'GET /ai/battle/jobs': 'battle_batch',
         'POST /ai/battle/jobs': 'battle_batch',
         'DELETE /ai/battle/jobs/job': 'battle_batch',
@@ -217,6 +232,10 @@ void main() {
         'POST /users/me/fcm-token': 'social_push',
         'GET /community/binders/user': 'binder_public',
         'POST /trades': 'trades',
+        // SCOPE-P0-TRD-00: match e listagem também têm dono fixado.
+        'GET /community/trade-matches': 'trades',
+        'POST /binder': 'collection_private',
+        'PUT /binder/item': 'collection_private',
         'GET /community/marketplace': 'marketplace',
         'POST /users/me/plan/checkout': 'billing_checkout',
         'GET /ai/commander-learning': 'learning_reads',

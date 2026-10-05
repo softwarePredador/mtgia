@@ -68,8 +68,8 @@ sequenceDiagram
     Cards_API->>Flutter: cards, disponibilidade e fallback
 ```
 
-Implementação: `app/lib/features/cards/providers/card_provider.dart`, `app/lib/features/collection/screens/sets_catalog_screen.dart`, `server/routes/cards/index.dart`, `server/routes/sets/index.dart`.
-Testes: `app/test/features/cards/providers/card_provider_search_test.dart`, `app/test/features/collection/sets_catalog_screen_test.dart`.
+Implementação: `app/lib/features/cards/providers/card_provider.dart`, `app/lib/features/collection/screens/sets_catalog_screen.dart`, `server/routes/cards/index.dart`, `server/routes/sets/index.dart`, `server/lib/catalog_read_guard.dart`.
+Testes: `app/test/features/cards/providers/card_provider_search_test.dart`, `app/test/features/collection/sets_catalog_screen_test.dart`, `server/test/catalog_read_guard_test.dart`.
 Gates: `scripts/quality_gate.sh`.
 
 ## Fichário, importação de coleção e scanner
@@ -239,8 +239,8 @@ sequenceDiagram
     Runtime->>Operator: health, smoke, observabilidade ou rollback
 ```
 
-Implementação: `scripts/manaloom_build_beta_release.sh`, `scripts/manaloom_deploy_backend_image.sh`, `scripts/manaloom_deploy_battle_sidecars.sh`, `scripts/manaloom_deploy_flutter_web.sh`, `scripts/manaloom_generate_release_sbom.py`, `server/bin/migrate.dart`, `server/lib/health_readiness_support.dart`, `server/routes/_middleware.dart`, `server/lib/release_capability_policy.dart`, `server/routes/capabilities/index.dart`, `app/lib/core/config/release_capabilities.dart`, `server/bin/manaloom_ops_daemon.py`.
-Testes: `server/test/deploy_rollback_convergence_contract_test.dart`, `server/test/ops_sidecar_digest_release_contract_test.dart`, `server/test/release_sbom_scope_test.py`, `server/test/flutter_web_deploy_contract_test.dart`, `server/test/data_model_migration_test.dart`, `server/test/release_capability_policy_test.dart`, `app/test/core/config/release_capabilities_test.dart`, `app/test/core/config/release_capability_surface_contract_test.dart`, `server/test/manaloom_ops_daemon_test.py`.
+Implementação: `scripts/manaloom_build_beta_release.sh`, `scripts/manaloom_deploy_backend_image.sh`, `scripts/manaloom_deploy_battle_sidecars.sh`, `scripts/manaloom_deploy_flutter_web.sh`, `scripts/manaloom_generate_release_sbom.py`, `scripts/manaloom_backup_cycle.sh`, `scripts/manaloom_backup_cadence.py`, `scripts/manaloom_migration_rehearsal.py`, `scripts/manaloom_capacity_snapshot.sh`, `scripts/manaloom_capacity_policy.py`, `scripts/manaloom_capacity_resources.sh`, `scripts/manaloom_capacity_resources.py`, `scripts/manaloom_promote_release.sh`, `scripts/manaloom_promote_release.py`, `scripts/manaloom_release_identity_gate.py`, `scripts/manaloom_errexit_lint.py`, `scripts/manaloom_errexit_lint_pending.json`, `server/bin/migrate.dart`, `server/lib/migration_preflight.dart`, `server/lib/health_readiness_support.dart`, `server/routes/_middleware.dart`, `server/lib/release_capability_policy.dart`, `server/routes/capabilities/index.dart`, `app/lib/core/config/release_capabilities.dart`, `server/bin/manaloom_ops_daemon.py`.
+Testes: `server/test/deploy_rollback_convergence_contract_test.dart`, `server/test/ops_sidecar_digest_release_contract_test.dart`, `server/test/release_sbom_scope_test.py`, `server/test/backup_cadence_test.py`, `server/test/capacity_policy_test.py`, `server/test/capacity_resources_test.py`, `server/test/release_promotion_test.py`, `server/test/release_identity_gate_test.py`, `server/test/errexit_postdeploy_test.py`, `server/test/migration_preflight_test.dart`, `server/test/migration_rehearsal_test.py`, `server/test/flutter_web_deploy_contract_test.dart`, `server/test/data_model_migration_test.dart`, `server/test/active_user_trigger_rule_test.dart`, `server/test/production_shape_adoption_test.dart`, `server/test/release_capability_policy_test.dart`, `app/test/core/config/release_capabilities_test.dart`, `app/test/core/config/release_capability_surface_contract_test.dart`, `server/test/manaloom_ops_daemon_test.py`.
 Gates: `scripts/quality_gate.sh`, `scripts/manaloom_release_ops_contract_test.sh`, `scripts/manaloom_e2e_suite.sh`.
 
 ## Plano, cota de IA e comércio (beta gratuita, sem cobrança)
@@ -295,7 +295,7 @@ Gates: `scripts/quality_gate.sh`, `scripts/manaloom_public_web_smoke.sh`.
 ## Scheduler operacional (manaloom-ops) e sincronizações
 
 Estado: `guarded_no_implicit_live_write`
-Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (17 jobs) and REFERENCE_DATA_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only) and manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) run; an invalid policy keeps only the governor
+Fonte de verdade: server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (19 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox), manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) and manaloom_slo_alerts (BT-OBS-001 read-only SLO and alert evaluator that notifies the owner by e-mail or Telegram, D-47) run; an invalid policy keeps only the governor and the SLO evaluator
 
 ```mermaid
 sequenceDiagram
@@ -307,14 +307,17 @@ sequenceDiagram
     participant Catalog_Refresh as Catalog Refresh
     participant Scryfall as Scryfall
     participant PostgreSQL as PostgreSQL
+    participant SLO_Evaluator as SLO Evaluator
+    participant Owner as Owner
     Operator->>Ops_Image: deploy da imagem do daemon (mesmo SHA)
     Ops_Daemon->>Capability_Policy: lê release_capabilities.json no boot
     Ops_Daemon->>Job: agenda job cuja capability está on; com tudo off, só o governor e o refresh de dado de referência
     Catalog_Refresh->>Scryfall: bulk default_cards, uma vez por dia, só com o contrato ativado
     Job->>PostgreSQL: sync_log, sync_state e data_source_snapshots
     Ops_Daemon->>Operator: GET /health próprio e relatório do governor
+    SLO_Evaluator->>Owner: alerta de API, banco, jobs, cache e catálogo por e-mail ou Telegram (D-47)
 ```
 
-Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`.
-Testes: `server/test/manaloom_ops_daemon_test.py`, `server/test/sync_catalog_reference_from_scryfall_test.py`.
+Implementação: `server/bin/manaloom_ops_daemon.py`, `scripts/manaloom_deploy_ops_image.sh`, `server/bin/hermes_cron_governor_report.sh`, `server/bin/cron_cleanup_optimize_telemetry.sh`, `server/bin/cron_account_deletion_outbox.sh`, `server/bin/account_deletion_outbox_worker.dart`, `server/lib/privacy/account_deletion_outbox.dart`, `server/bin/cleanup_optimize_telemetry.dart`, `server/lib/privacy/retention_cleanup.dart`, `server/bin/sync_card_legalities_from_scryfall.sh`, `server/bin/cron_sync_cards.sh`, `server/bin/sync_catalog_reference_from_scryfall.py`, `server/bin/sync_cards.dart`, `server/bin/sync_staples.dart`, `server/bin/sync_status.dart`, `server/bin/manaloom_slo_alerts.py`, `server/config/slo_alert_policy.json`.
+Testes: `server/test/manaloom_ops_daemon_test.py`, `server/test/sync_catalog_reference_from_scryfall_test.py`, `server/test/slo_alerts_test.py`.
 Gates: `scripts/manaloom_battle_product_gate.sh`.

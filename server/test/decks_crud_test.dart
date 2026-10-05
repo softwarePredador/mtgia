@@ -181,7 +181,10 @@ void main() {
   });
 
   group('POST /decks - Create Deck', () {
-    test('should respect is_public when creating deck', () async {
+    // DCK-P0-00: deck vazio nunca nasce público. Com a galeria fechada a
+    // recusa é deck_publication_unavailable; aberta, deck_public_requires_cards.
+    test('refuses an empty public deck and creates nothing', () async {
+      final name = 'Public Deck ${DateTime.now().millisecondsSinceEpoch}';
       final response = await http.post(
         Uri.parse('$baseUrl/decks'),
         headers: {
@@ -189,7 +192,7 @@ void main() {
           'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode({
-          'name': 'Public Deck ${DateTime.now().millisecondsSinceEpoch}',
+          'name': name,
           'format': 'commander',
           'description': 'Deck público de teste',
           'is_public': true,
@@ -197,18 +200,38 @@ void main() {
         }),
       );
 
+      expect(response.statusCode, equals(422), reason: response.body);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(
+        data['error_code'],
+        anyOf('deck_publication_unavailable', 'deck_public_requires_cards'),
+      );
+
+      final listResponse = await http.get(
+        Uri.parse('$baseUrl/decks'),
+        headers: {'Authorization': 'Bearer $authToken'},
+      );
+      expect(listResponse.body, isNot(contains(name)));
+    }, skip: skipIntegration);
+
+    test('creates a private deck when is_public is omitted', () async {
+      final response = await http.post(
+        Uri.parse('$baseUrl/decks'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken',
+        },
+        body: jsonEncode({
+          'name': 'Private Deck ${DateTime.now().millisecondsSinceEpoch}',
+          'format': 'commander',
+          'cards': [],
+        }),
+      );
+
       expect(response.statusCode, anyOf(200, 201), reason: response.body);
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       testDeckId = data['id'] as String;
-
-      final deckResponse = await http.get(
-        Uri.parse('$baseUrl/decks/$testDeckId'),
-        headers: {'Authorization': 'Bearer $authToken'},
-      );
-
-      expect(deckResponse.statusCode, equals(200), reason: deckResponse.body);
-      final deckData = jsonDecode(deckResponse.body) as Map<String, dynamic>;
-      expect(deckData['is_public'], isTrue, reason: deckResponse.body);
+      expect(data['is_public'], isFalse, reason: response.body);
     }, skip: skipIntegration);
   }, skip: skipIntegration);
 
@@ -434,7 +457,7 @@ void main() {
       expect(response.statusCode, equals(401));
     });
 
-    test('should cascade delete deck cards', () async {
+    test('moves a deck with cards to the trash (DCK-P0-06)', () async {
       // Arrange: Cria deck com cartas
       testDeckId = await createTestDeck(authToken!);
       final validCard = await getValidCard(authToken!);
@@ -467,9 +490,9 @@ void main() {
       // Assert
       expect(response.statusCode, equals(204));
 
-      // NOTA: As cartas do deck devem ser deletadas via CASCADE no banco
-      // Se não houver CASCADE, o código em routes/decks/[id]/index.dart
-      // deveria ter um DELETE manual de deck_cards (comentado na linha 42-46)
+      // DCK-P0-06 (D-30): o DELETE manda o deck para a lixeira; as cartas
+      // ficam até a purga por prazo de 30 dias. A prova no banco está em
+      // deck_trash_db_live_test.dart.
 
       testDeckId = null;
     });

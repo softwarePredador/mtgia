@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `6cfde257326c33979e7e0cfd2388ca651e837d29e4c3d47985ba9944a880b5a1`
+**Digest das fontes:** `143a33e39085c3689f9e312caf2fc4844b11882dffb64fd56328bca7fdc3349b`
 
 ## Fontes de verdade
 
@@ -15,29 +15,29 @@
 
 | Superfície | Quantidade |
 |---|---:|
-| `dart_source_files` | 696 |
-| `non_dart_product_files` | 50 |
+| `dart_source_files` | 724 |
+| `non_dart_product_files` | 52 |
 | `battle_sidecar_source_files` | 34 |
-| `dart_symbols` | 5260 |
-| `semantic_resolved_files` | 696 |
+| `dart_symbols` | 5460 |
+| `semantic_resolved_files` | 724 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 42955 |
-| `semantic_resolved_call_sites` | 68434 |
-| `semantic_resolved_type_references` | 16211 |
-| `modules` | 159 |
+| `semantic_resolved_call_edges` | 43711 |
+| `semantic_resolved_call_sites` | 69253 |
+| `semantic_resolved_type_references` | 16756 |
+| `modules` | 164 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
-| `api_routes` | 121 |
-| `database_tables` | 79 |
+| `api_routes` | 125 |
+| `database_tables` | 91 |
 | `database_views` | 6 |
-| `migrations` | 58 |
-| `scripts_and_jobs` | 691 |
-| `environment_variables` | 718 |
-| `tests` | 1250 |
+| `migrations` | 74 |
+| `scripts_and_jobs` | 708 |
+| `environment_variables` | 726 |
+| `tests` | 1328 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
-| `tasks` | 244 |
-| `task_dependency_edges` | 435 |
+| `tasks` | 246 |
+| `task_dependency_edges` | 437 |
 | `route_consumer_bindings` | 57 |
 | `receipt_contracts` | 6 |
 
@@ -57,7 +57,7 @@
 | Build, migração, deploy, observabilidade e rollback | `guarded_no_implicit_live_write` | same-SHA release contract, artifact digests, migration ledger and health/readiness |
 | Plano, cota de IA e comércio (beta gratuita, sem cobrança) | `free_beta_no_commerce` | user_plans and ai_logs in PostgreSQL under PlanService; offer_mode free_beta_no_commerce in server/config/release_capabilities.json; no payment provider exists |
 | Site público (brewtact.com) e relatório compartilhável | `active_release_scope` | web-public/src/lib/product-data.ts and routes.ts under the free-beta offer contract; shared_deck_reports in PostgreSQL for GET /reports/{id}; no product capability is served |
-| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (17 jobs) and REFERENCE_DATA_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only) and manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation) run; an invalid policy keeps only the governor |
+| Scheduler operacional (manaloom-ops) e sincronizações | `guarded_no_implicit_live_write` | server/bin/manaloom_ops_daemon.py with JOB_REQUIRED_CAPABILITIES (19 jobs), REFERENCE_DATA_JOBS and PRIVACY_CONTROL_JOBS reading server/config/release_capabilities.json; with every capability off only hermes_cron_governor_report (safe_housekeeping_only), manaloom_catalog_reference_refresh (reference data under the catalog_reference_apply_v1 contract, applied only after a supervised activation), manaloom_account_deletion_outbox (D-68 outbox consumer under account_deletion_outbox_v1, writing only account_deletion_outbox), manaloom_ai_runtime_cleanup (D-70 retention cleanup under retention_cleanup_apply_v1, deleting only the inventory periods and only after a supervised activation) and manaloom_slo_alerts (BT-OBS-001 read-only SLO and alert evaluator that notifies the owner by e-mail or Telegram, D-47) run; an invalid policy keeps only the governor and the SLO evaluator |
 
 ## Como validar
 

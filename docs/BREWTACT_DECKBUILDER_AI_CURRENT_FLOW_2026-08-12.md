@@ -366,14 +366,17 @@ observabilidade e custo em `BT-BAT-000..010`. Battle nunca é atalho para
 | `POST /ai/explain` | detalhe de carta | pode persistir `cards.ai_description` | `ai_analyze_optimize_advisory` | inventariar/autorizar explicitamente em `BT-AI-029` |
 | `GET /ai/commander-reference` | backend Generate/Optimize | zero DML; preview externo transitório | `ai_generate_rebuild` | manter read-only; ingestão é `BT-AI-017` |
 | `GET /ai/commander-learning` | Flutter Generate | zero PG quando capability OFF; read quando ON | `learning_reads` | default-off até `DCK-P0-05` |
-| `POST /decks/:id/recommendations` | nenhum Flutter encontrado | provider/plan; sem persistir sugestão | `legacy_ai_routes` | default-off, telemetria→adapter/410 em `BT-AI-029` |
-| `POST /ai/weakness-analysis` | nenhum Flutter encontrado | grava `deck_weakness_reports` | `legacy_ai_routes` | default-off antes de PG; decidir em `BT-AI-029` |
-| `POST /ai/simulate-matchup` | nenhum Flutter encontrado | grava `deck_matchups` | `legacy_ai_routes` | default-off; `/ai/simulate` é caminho atual |
-| `GET /decks/:id/simulate` | nenhum Flutter encontrado | cálculo legacy | `legacy_ai_routes` | default-off; decidir adapter/410 |
+| `POST /decks/:id/recommendations` | nenhum | — | — | removida em 2026-09-28 (D-31, `BT-AI-029`); substituto: Optimize |
+| `POST /ai/weakness-analysis` | nenhum | — (a tabela `deck_weakness_reports` fica) | — | removida em 2026-09-28 (D-31, `BT-AI-029`); substituto: Analyze |
+| `POST /ai/simulate-matchup` | nenhum | — (a tabela `deck_matchups` fica) | — | removida em 2026-09-28 (D-31, `BT-AI-029`); substituto: Battle (`/ai/simulate`) |
+| `GET /decks/:id/simulate` | nenhum | — | — | removida em 2026-09-28 (D-31, `BT-AI-029`); substituto: Battle (`/ai/simulate`) |
 | `GET /ai/ml-status` | admin | leitura de lane ML parcialmente ausente do baseline | `legacy_ai_routes` | não pode declarar active; `BT-AI-027`/`BT-DB-005` |
 
-Esse inventário deve virar registry machine-readable em `BT-AI-029`; a tabela
-manual não substitui enforcement server-side nem telemetria de clientes externos.
+O registry machine-readable de todas as rotas de IA (`BT-AI-029`) está em
+`server/config/ai_route_registry.json`, com consumidor, escritas, capability,
+dono, substituto, provedor externo, URL do provedor e o que acontece sem chave.
+`server/test/ai_route_registry_test.dart` falha quando surge rota de IA fora
+dele. Esta tabela é o resumo humano; o registry manda.
 
 ## Matriz de prontidão por jornada
 
@@ -413,9 +416,9 @@ manual não substitui enforcement server-side nem telemetria de clientes externo
   sobrepostos; convergir após testes de paridade, sem remoção cega;
 - Complete é modo de Optimize; não criar uma terceira pipeline independente;
 - `/ai/weakness-analysis`, `/ai/simulate-matchup`, `/decks/:id/simulate` e
-  `/decks/:id/recommendations` não têm consumer Flutter encontrado; ficam
-  default-off por `BT-AI-029` antes de decidir adapter/410/remove. `/ai/simulate`
-  é a superfície atual e também depende dos P0 Battle;
+  `/decks/:id/recommendations` foram removidas em 2026-09-28 (D-31,
+  `BT-AI-029`), sem consumidor e com substitutos (Optimize, Battle e Analyze).
+  `/ai/simulate` é a superfície atual e também depende dos P0 Battle;
 - `server/lib/ai/battle_simulator.dart` não é a autoridade de execução externa;
   o contrato canônico aponta `BattleExecutionRuntime`; confirmar zero consumer
   antes de arquivar o arquivo legado;

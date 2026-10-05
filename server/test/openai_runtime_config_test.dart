@@ -135,4 +135,90 @@ void main() {
       );
     });
   });
+
+  group('OpenAiRuntimeConfig base URL (D-83, BT-AI-029)', () {
+    const fixed = 'https://api.openai.com/v1/chat/completions';
+
+    OpenAiRuntimeConfig config(Map<String, String> values) =>
+        OpenAiRuntimeConfig(DotEnv()..addAll(values));
+
+    test('sem OPENAI_BASE_URL a chamada vai para a URL fixa', () {
+      for (final environment in const ['development', 'staging', 'production']) {
+        final value = config({'ENVIRONMENT': environment});
+        expect(value.chatCompletionsUri.toString(), fixed, reason: environment);
+        expect(value.ignoresBaseUrlOverride, isFalse, reason: environment);
+      }
+      expect(
+        config({'ENVIRONMENT': 'development', 'OPENAI_BASE_URL': '  '})
+            .chatCompletionsUri
+            .toString(),
+        fixed,
+      );
+    });
+
+    test('na produção a URL é fixa, mesmo com loopback', () {
+      for (final values in const [
+        {'ENVIRONMENT': 'production', 'OPENAI_BASE_URL': 'http://127.0.0.1:9/v1'},
+        {'ENVIRONMENT': 'prod', 'OPENAI_BASE_URL': 'http://localhost:9/v1'},
+        {'OPENAI_PROFILE': 'prod', 'OPENAI_BASE_URL': 'http://[::1]:9/v1'},
+        {
+          'ENVIRONMENT': 'production',
+          'OPENAI_PROFILE': 'dev',
+          'OPENAI_BASE_URL': 'http://127.0.0.1:9/v1',
+        },
+      ]) {
+        final value = config(values);
+        expect(value.chatCompletionsUri.toString(), fixed, reason: '$values');
+        expect(value.acceptedBaseUrlOverride, isNull, reason: '$values');
+        expect(value.ignoresBaseUrlOverride, isTrue, reason: '$values');
+      }
+    });
+
+    test('fora da produção aceita só loopback', () {
+      for (final (raw, expected) in const [
+        ('http://127.0.0.1:58193/v1', 'http://127.0.0.1:58193/v1/chat/completions'),
+        ('http://127.0.0.1:58193/v1/', 'http://127.0.0.1:58193/v1/chat/completions'),
+        ('https://127.1.2.3:8443/v1', 'https://127.1.2.3:8443/v1/chat/completions'),
+        ('http://localhost:8080/v1', 'http://localhost:8080/v1/chat/completions'),
+        ('http://LOCALHOST:8080', 'http://localhost:8080/chat/completions'),
+        ('http://[::1]:9000/v1', 'http://[::1]:9000/v1/chat/completions'),
+      ]) {
+        for (final environment in const ['development', 'staging']) {
+          final value = config({
+            'ENVIRONMENT': environment,
+            'OPENAI_BASE_URL': raw,
+          });
+          expect(
+            value.chatCompletionsUri.toString(),
+            expected,
+            reason: '$environment $raw',
+          );
+          expect(value.ignoresBaseUrlOverride, isFalse, reason: raw);
+        }
+      }
+    });
+
+    test('fora do loopback, ou com forma estranha, é ignorada', () {
+      for (final raw in const [
+        'http://10.0.0.1:9/v1',
+        'https://api.example.com/v1',
+        'http://localhost.example.com/v1',
+        'http://127.0.0.1.example.com/v1',
+        'http://0.0.0.0:9/v1',
+        'http://192.168.0.10:9/v1',
+        'ftp://127.0.0.1/v1',
+        'file:///tmp/v1',
+        '127.0.0.1:9/v1',
+        'http://usuario:senha@127.0.0.1:9/v1',
+        'http://127.0.0.1:9/v1?chave=1',
+        'http://127.0.0.1:9/v1#frag',
+        'nao e url',
+      ]) {
+        final value = config({'ENVIRONMENT': 'development', 'OPENAI_BASE_URL': raw});
+        expect(value.chatCompletionsUri.toString(), fixed, reason: raw);
+        expect(value.acceptedBaseUrlOverride, isNull, reason: raw);
+        expect(value.ignoresBaseUrlOverride, isTrue, reason: raw);
+      }
+    });
+  });
 }

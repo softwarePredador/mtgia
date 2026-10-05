@@ -37,6 +37,9 @@ def _load_script(file_name: str):
 
 
 class ManaLoomOpsDaemonTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._saved_environ = dict(os.environ)
+
     def test_base_env_loads_database_values_from_env_file(self) -> None:
         module = _load_module()
         with tempfile.TemporaryDirectory() as tmp:
@@ -187,10 +190,10 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertFalse(runtime.allowed("battle_batch"))
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(runtime)],
-            ["hermes_cron_governor_report"],
+            ["hermes_cron_governor_report", "manaloom_slo_alerts"],
         )
 
-    def test_all_off_policy_schedules_only_governor_and_catalog_reference(
+    def test_all_off_policy_schedules_only_governor_catalog_and_privacy_jobs(
         self,
     ) -> None:
         module = _load_module()
@@ -202,7 +205,13 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
 
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(all_off)],
-            ["manaloom_catalog_reference_refresh", "hermes_cron_governor_report"],
+            [
+                "manaloom_ai_runtime_cleanup",
+                "manaloom_account_deletion_outbox",
+                "manaloom_catalog_reference_refresh",
+                "hermes_cron_governor_report",
+                "manaloom_slo_alerts",
+            ],
         )
         self.assertEqual(
             {job.name for job in module.JOBS},
@@ -213,12 +222,39 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         module = _load_module()
         invalid = module.ReleasePolicy(False, "invalid", {})
 
+        # O governor e o avaliador de SLO só leem: rodam até com política
+        # inválida, quando o alerta mais importa (BT-OBS-001).
         self.assertEqual(
             [job.name for job in module._jobs_for_release_policy(invalid)],
-            ["hermes_cron_governor_report"],
+            ["hermes_cron_governor_report", "manaloom_slo_alerts"],
         )
 
-    def test_catalog_reference_is_the_only_new_capability_free_job(self) -> None:
+    def test_slo_alerts_job_runs_the_evaluator_every_five_minutes(self) -> None:
+        module = _load_module()
+        jobs = {job.name: job for job in module.JOBS}
+        job = jobs["manaloom_slo_alerts"]
+        policy = json.loads(
+            (module.REPO_ROOT / "server/config/slo_alert_policy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+
+        self.assertEqual(job.schedule, policy["evaluation"]["schedule"])
+        self.assertEqual(policy["evaluation"]["job"], job.name)
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME" && python3 ./server/bin/manaloom_slo_alerts.py run',
+        )
+        self.assertEqual(module.JOB_REQUIRED_CAPABILITIES[job.name], ())
+        self.assertNotIn(job.name, module.REFERENCE_DATA_JOBS)
+        self.assertNotIn(job.name, module.PRIVACY_CONTROL_JOBS)
+        self.assertTrue(
+            (module.REPO_ROOT / "server/bin/manaloom_slo_alerts.py").is_file()
+        )
+
+    def test_only_catalog_and_privacy_contract_jobs_are_capability_free(
+        self,
+    ) -> None:
         module = _load_module()
         capability_free = {
             name
@@ -227,11 +263,24 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         }
         self.assertEqual(
             capability_free,
-            {"hermes_cron_governor_report", "manaloom_catalog_reference_refresh"},
+            {
+                "hermes_cron_governor_report",
+                "manaloom_catalog_reference_refresh",
+                "manaloom_account_deletion_outbox",
+                "manaloom_ai_runtime_cleanup",
+                "manaloom_slo_alerts",
+            },
         )
         self.assertEqual(
             module.REFERENCE_DATA_JOBS,
             {"manaloom_catalog_reference_refresh": "catalog_reference_apply_v1"},
+        )
+        self.assertEqual(
+            module.PRIVACY_CONTROL_JOBS,
+            {
+                "manaloom_ai_runtime_cleanup": "retention_cleanup_apply_v1",
+                "manaloom_account_deletion_outbox": "account_deletion_outbox_v1",
+            },
         )
         # No other job was opened: each keeps the capabilities it required
         # before BT-CAT-01.
@@ -242,7 +291,6 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
                 if name not in capability_free
             },
             {
-                "manaloom_ai_runtime_cleanup": ("ai_analyze_optimize_advisory",),
                 "pull_learning_events": ("learning_writes",),
                 "auto_sync_learned_decks": ("learning_writes",),
                 "manaloom_sync_card_legalities_from_scryfall": ("catalog_private",),
@@ -284,6 +332,39 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             module._matches_schedule(job.schedule, module.datetime(2026, 9, 24, 6, 20))
         )
 
+    def test_account_deletion_outbox_job_runs_its_contract_every_15_minutes(
+        self,
+    ) -> None:
+        module = _load_module()
+        jobs = {job.name: job for job in module.JOBS}
+        job = jobs["manaloom_account_deletion_outbox"]
+
+        self.assertEqual(job.schedule, "*/15 * * * *")
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME" && ./server/bin/cron_account_deletion_outbox.sh',
+        )
+        self.assertEqual(job.script_name, "cron_account_deletion_outbox.sh")
+        self.assertFalse(job.background)
+        contract_source = (
+            module.REPO_ROOT / "server/lib/privacy/account_deletion_outbox.dart"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "const accountDeletionOutboxContract = "
+            f"'{module.PRIVACY_CONTROL_JOBS[job.name]}';",
+            contract_source,
+        )
+        script = module.REPO_ROOT / "server/bin" / job.script_name
+        self.assertTrue(os.access(script, os.X_OK), script)
+        self.assertTrue(
+            module._matches_schedule(job.schedule, module.datetime(2026, 9, 24, 6, 45))
+        )
+        env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        self.assertEqual(
+            env["MANALOOM_ACCOUNT_DELETION_OUTBOX_OUTPUT_DIR"],
+            str(module.ARTIFACT_DIR / "account_deletion_outbox"),
+        )
+
     def test_base_env_sends_catalog_receipts_to_the_artifact_dir(self) -> None:
         module = _load_module()
         env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
@@ -312,6 +393,77 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
             module.JOBS = original_jobs
 
         self.assertNotIn(unexpected.name, names)
+
+    def test_base_env_confirms_postgres_reads_but_never_writes(self) -> None:
+        # O db_helper do Hermes recusa host fora do loopback sem confirmação.
+        # A produção passa o banco pelo ambiente do serviço (DB_* do Swarm,
+        # host evolution_manaloom-postgres); o daemon confirma só a leitura.
+        module = _load_module()
+        previous = os.environ.pop("MANALOOM_CONFIRM_POSTGRES_WRITES", None)
+        try:
+            env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        finally:
+            if previous is not None:
+                os.environ["MANALOOM_CONFIRM_POSTGRES_WRITES"] = previous
+        self.assertEqual(
+            env["MANALOOM_CONFIRM_POSTGRES_READS"], "I_HAVE_EXPLICIT_APPROVAL"
+        )
+        self.assertNotIn("MANALOOM_CONFIRM_POSTGRES_WRITES", env)
+
+    def test_hermes_db_helper_reads_the_production_database_under_the_daemon(
+        self,
+    ) -> None:
+        # A produção continua recebendo a URL como hoje: DB_* no ambiente do
+        # serviço, exportados pelo job. Com o ambiente do daemon, o db_helper
+        # lê o banco interno; sem ele, recusa; escrever exige outra aprovação.
+        root = Path(__file__).resolve().parents[2]
+        helper_path = (
+            root / "docs/hermes-analysis/manaloom-knowledge/scripts/db_helper.py"
+        )
+        spec = importlib.util.spec_from_file_location("db_helper_ops", helper_path)
+        helper = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(helper)
+        module = _load_module()
+        service_env = {
+            "DB_HOST": "evolution_manaloom-postgres",
+            "DB_PORT": "5432",
+            "DB_NAME": "halder",
+            "DB_USER": "postgres",
+            "DB_PASS": "senha-do-servico",
+        }
+        keys = [
+            *service_env,
+            "DATABASE_URL",
+            "PGHOST",
+            "PGHOSTADDR",
+            "PGSERVICE",
+            "MANALOOM_POSTGRES_ENV",
+            "MANALOOM_CONFIRM_POSTGRES_READS",
+            "MANALOOM_CONFIRM_POSTGRES_WRITES",
+        ]
+        original_env_file = module.ENV_FILE
+        try:
+            for key in keys:
+                os.environ.pop(key, None)
+            os.environ.update(service_env)
+            with self.assertRaises(helper.DatabaseConfigError):
+                helper.get_database_url()
+
+            module.ENV_FILE = Path("/caminho/sem/env")
+            job_env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+            os.environ.clear()
+            os.environ.update(job_env)
+            self.assertEqual(
+                helper.sanitized_database_target(),
+                "evolution_manaloom-postgres:5432/halder",
+            )
+            with self.assertRaises(helper.DatabaseConfigError):
+                helper.get_database_url(access="write")
+        finally:
+            module.ENV_FILE = original_env_file
+            os.environ.clear()
+            os.environ.update(self._saved_environ)
 
     def test_base_env_neutralizes_legacy_true_flags(self) -> None:
         module = _load_module()
@@ -616,22 +768,46 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertEqual(job.schedule, "30 */6 * * *")
         self.assertIn("sync_card_legalities_from_scryfall.sh", job.command)
 
-    def test_ai_runtime_cleanup_is_scheduled_with_reservation_ttl(self) -> None:
+    def test_retention_cleanup_runs_its_contract_without_period_overrides(
+        self,
+    ) -> None:
         module = _load_module()
         jobs = {job.name: job for job in module.JOBS}
 
         job = jobs["manaloom_ai_runtime_cleanup"]
         self.assertEqual(job.schedule, "10 4 * * *")
-        self.assertIn("cron_cleanup_optimize_telemetry.sh", job.command)
-        self.assertIn("--ai-log-retention-days=", job.command)
-        self.assertIn("AI_LOG_RETENTION_DAYS", job.command)
-        self.assertIn("--job-retention-minutes=", job.command)
-        self.assertIn("AI_JOB_RETENTION_MINUTES", job.command)
-        self.assertIn("--reservation-ttl-minutes=", job.command)
-        self.assertIn("AI_PLAN_RESERVATION_TTL_MINUTES", job.command)
-        self.assertIn("--rate-limit-retention-hours=", job.command)
-        self.assertIn("RATE_LIMIT_EVENT_RETENTION_HOURS", job.command)
+        self.assertEqual(
+            job.command,
+            'cd "$MTGIA_HOME/server" && '
+            "./bin/cron_cleanup_optimize_telemetry.sh --mode scheduled",
+        )
+        # D-70: the periods come only from the retention inventory.
+        for knob in (
+            "RETENTION_DAYS",
+            "RETENTION_MINUTES",
+            "RETENTION_HOURS",
+            "TTL_MINUTES",
+            "--retention",
+        ):
+            self.assertNotIn(knob, job.command)
         self.assertFalse(job.background)
+        contract_source = (
+            module.REPO_ROOT / "server/lib/privacy/retention_cleanup.dart"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "const retentionCleanupContract = "
+            f"'{module.PRIVACY_CONTROL_JOBS[job.name]}';",
+            contract_source,
+        )
+        self.assertIn(
+            f"const retentionCleanupJobName = '{job.name}';",
+            contract_source,
+        )
+        env = module._base_env(module.ReleasePolicy(False, "invalid", {}))
+        self.assertEqual(
+            env["MANALOOM_RETENTION_CLEANUP_OUTPUT_DIR"],
+            str(module.ARTIFACT_DIR / "retention_cleanup"),
+        )
 
     def test_battle_strategy_jobs_produce_gate_evidence_in_background(self) -> None:
         module = _load_module()

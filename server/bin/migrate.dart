@@ -1,11 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:postgres/postgres.dart';
-import 'package:server/ai/candidate_quality_data_support.dart';
-import 'package:server/ai/commander_learning_snapshot_support.dart';
-import 'package:server/collection_availability_contract.dart';
-import 'package:server/import_card_lookup_service.dart';
+import 'package:server/migration_preflight.dart';
 import 'package:server/runtime_environment.dart';
 import 'package:server/sql_statement_splitter.dart';
 
@@ -14,11 +12,19 @@ import 'package:server/sql_statement_splitter.dart';
 /// Gerencia migrações de banco de dados de forma ordenada e idempotente.
 /// Cada migração é executada apenas uma vez e registrada na tabela `schema_migrations`.
 ///
-/// Uso: dart run bin/migrate.dart [--status] [--rollback N]
+/// Uso: dart run bin/migrate.dart [--status | --preflight | --rollback N |
+///        --target VERSÃO]
 ///
 /// Opções:
 ///   --status    Mostra o status das migrações
+///   --preflight Só lê: classifica o banco (sem_ledger, canonico ou misto) e
+///               imprime o resultado em JSON; sai 3 quando o perfil é misto
 ///   --rollback N  Reverte, em transação, as últimas N migrações conhecidas
+///   --target VERSÃO  Aplica as pendentes só até essa versão (ensaios)
+///
+/// Antes de qualquer DDL, a aplicação e o rollback rodam o preflight
+/// (lib/migration_preflight.dart): um banco de perfil misto para ali, com
+/// código 3, sem escrever nada.
 
 const migrationWriteApprovalEnvironment = 'MANALOOM_CONFIRM_POSTGRES_WRITES';
 const migrationLiveApprovalEnvironment = 'MANALOOM_CONFIRM_LIVE_MUTATIONS';
@@ -606,8 +612,7 @@ final migrations = <Migration>[
   Migration(
     version: '022',
     name: 'create_card_identity_and_intelligence_views',
-    up: '''
-      CREATE TABLE IF NOT EXISTS card_meta_insights (
+    up: r'''      CREATE TABLE IF NOT EXISTS card_meta_insights (
         card_name TEXT PRIMARY KEY,
         usage_count INTEGER NOT NULL DEFAULT 0,
         meta_deck_count INTEGER NOT NULL DEFAULT 0,
@@ -626,19 +631,539 @@ final migrations = <Migration>[
       CREATE INDEX IF NOT EXISTS idx_card_meta_insights_archetypes
       ON card_meta_insights USING gin (common_archetypes);
 
-      $createCardLocalizedNamesTableSql;
+      CREATE TABLE IF NOT EXISTS card_localized_names (
+  scryfall_id UUID NOT NULL,
+  oracle_id UUID,
+  card_id UUID REFERENCES cards(id) ON DELETE CASCADE,
+  lang TEXT NOT NULL,
+  printed_name TEXT NOT NULL,
+  normalized_printed_name TEXT NOT NULL,
+  canonical_name TEXT NOT NULL,
+  set_code TEXT,
+  collector_number TEXT,
+  source TEXT NOT NULL DEFAULT 'scryfall',
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (scryfall_id, lang, normalized_printed_name)
+)
+;
 
-      ${createCardLocalizedNamesIndexesSql.join(';\n')};
+        CREATE INDEX IF NOT EXISTS idx_card_localized_names_lookup
+  ON card_localized_names (normalized_printed_name, lang)
+  ;
+  CREATE INDEX IF NOT EXISTS idx_card_localized_names_card_id
+  ON card_localized_names (card_id)
+  ;
+  CREATE INDEX IF NOT EXISTS idx_card_localized_names_oracle_id
+  ON card_localized_names (oracle_id)
+  ;
 
-      ${candidateQualitySchemaStatements.join(';\n')};
+      CREATE TABLE IF NOT EXISTS card_function_tags (
+  card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+  card_name TEXT NOT NULL,
+  tag TEXT NOT NULL,
+  confidence NUMERIC(4,3) NOT NULL CHECK (confidence >= 0 AND confidence <= 1),
+  source TEXT NOT NULL,
+  evidence TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (card_id, tag, source)
+)
+;
+CREATE TABLE IF NOT EXISTS card_role_scores (
+  card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+  card_name TEXT NOT NULL,
+  role TEXT NOT NULL,
+  score INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+  format TEXT NOT NULL DEFAULT 'commander',
+  subformat TEXT NOT NULL DEFAULT 'any',
+  bracket_scope TEXT NOT NULL DEFAULT 'any',
+  budget_tier TEXT NOT NULL DEFAULT 'unknown',
+  source TEXT NOT NULL,
+  evidence TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (card_id, role, format, subformat, bracket_scope, source)
+)
+;
+CREATE TABLE IF NOT EXISTS commander_card_synergy (
+  commander_name_normalized TEXT NOT NULL,
+  commander_name TEXT NOT NULL,
+  card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+  card_name TEXT NOT NULL,
+  role TEXT NOT NULL,
+  score INTEGER NOT NULL CHECK (score BETWEEN 0 AND 100),
+  source TEXT NOT NULL,
+  evidence_count INTEGER NOT NULL DEFAULT 0 CHECK (evidence_count >= 0),
+  evidence TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (commander_name_normalized, card_id, role, source)
+)
+;
+CREATE TABLE IF NOT EXISTS optimize_rejection_penalties (
+  card_name_normalized TEXT NOT NULL,
+  card_name TEXT NOT NULL,
+  commander_name_normalized TEXT NOT NULL DEFAULT '',
+  commander_name TEXT NOT NULL DEFAULT '',
+  archetype TEXT NOT NULL DEFAULT '',
+  function TEXT NOT NULL DEFAULT '',
+  penalty INTEGER NOT NULL CHECK (penalty BETWEEN 0 AND 1000),
+  reject_count INTEGER NOT NULL DEFAULT 0 CHECK (reject_count >= 0),
+  source TEXT NOT NULL,
+  evidence TEXT,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (
+    card_name_normalized,
+    commander_name_normalized,
+    archetype,
+    function,
+    source
+  )
+)
+;
+CREATE TABLE IF NOT EXISTS card_semantic_tags_v2 (
+  card_id UUID NOT NULL REFERENCES cards(id) ON DELETE CASCADE,
+  card_name TEXT NOT NULL,
+  schema_version TEXT NOT NULL,
+  speed TEXT NOT NULL DEFAULT 'unknown',
+  mana_efficiency TEXT NOT NULL DEFAULT 'unknown',
+  card_advantage_type TEXT NOT NULL DEFAULT 'none',
+  interaction_scope TEXT NOT NULL DEFAULT 'none',
+  combo_piece BOOLEAN NOT NULL DEFAULT false,
+  wincon BOOLEAN NOT NULL DEFAULT false,
+  engine BOOLEAN NOT NULL DEFAULT false,
+  payoff BOOLEAN NOT NULL DEFAULT false,
+  enabler BOOLEAN NOT NULL DEFAULT false,
+  protection_type TEXT NOT NULL DEFAULT 'none',
+  recursion_type TEXT NOT NULL DEFAULT 'none',
+  role_confidence NUMERIC(4,3) NOT NULL CHECK (
+    role_confidence >= 0 AND role_confidence <= 1
+  ),
+  explanation_reason TEXT NOT NULL,
+  tags JSONB NOT NULL DEFAULT '[]'::jsonb,
+  source TEXT NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (card_id, source)
+)
+;
 
-      ${candidateQualityIndexStatements.join(';\n')};
+      CREATE INDEX IF NOT EXISTS idx_card_function_tags_tag
+ON card_function_tags (tag, confidence DESC)
+;
+CREATE INDEX IF NOT EXISTS idx_card_function_tags_card_name
+ON card_function_tags (LOWER(card_name))
+;
+CREATE INDEX IF NOT EXISTS idx_card_role_scores_lookup
+ON card_role_scores (role, format, subformat, bracket_scope, score DESC)
+;
+CREATE INDEX IF NOT EXISTS idx_card_role_scores_budget
+ON card_role_scores (budget_tier, score DESC)
+;
+CREATE INDEX IF NOT EXISTS idx_commander_card_synergy_lookup
+ON commander_card_synergy (
+  commander_name_normalized,
+  role,
+  score DESC,
+  evidence_count DESC
+)
+;
+CREATE INDEX IF NOT EXISTS idx_optimize_rejection_penalties_lookup
+ON optimize_rejection_penalties (
+  commander_name_normalized,
+  archetype,
+  function,
+  penalty DESC
+)
+;
+CREATE INDEX IF NOT EXISTS idx_card_semantic_tags_v2_flags
+ON card_semantic_tags_v2 (
+  wincon,
+  combo_piece,
+  engine,
+  payoff,
+  enabler,
+  role_confidence DESC
+)
+;
+CREATE INDEX IF NOT EXISTS idx_card_semantic_tags_v2_card_name
+ON card_semantic_tags_v2 (LOWER(card_name))
+;
 
-      $optimizeCandidateQualitySummaryViewStatement;
+      CREATE OR REPLACE VIEW optimize_candidate_quality_summary AS
+WITH meta_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(usage_count)::int AS usage_count,
+    MAX(meta_deck_count)::int AS meta_deck_count
+  FROM card_meta_insights
+  GROUP BY LOWER(card_name)
+),
+function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL)
+      AS function_tags
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL)
+      AS scored_roles
+  FROM card_role_scores
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+)
+SELECT
+  c.id AS card_id,
+  c.name AS card_name,
+  c.type_line,
+  c.mana_cost,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  COALESCE(cmi.usage_count, 0) AS meta_usage_count,
+  COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(rs.best_role_score, 0)::int AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2
+FROM cards c
+LEFT JOIN meta_insights cmi ON cmi.normalized_card_name = LOWER(c.name)
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+;
 
-      $cardIntelligenceSnapshotViewStatement;
+      CREATE OR REPLACE VIEW card_intelligence_snapshot AS
+WITH function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL) AS function_tags,
+    jsonb_agg(jsonb_build_object(
+      'tag', tag,
+      'confidence', confidence,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, tag, source) AS function_tag_details,
+    MAX(confidence) AS max_function_tag_confidence
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL) AS scored_roles,
+    jsonb_agg(jsonb_build_object(
+      'role', role,
+      'score', score,
+      'format', format,
+      'subformat', subformat,
+      'bracket_scope', bracket_scope,
+      'budget_tier', budget_tier,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, role, source) AS role_score_details
+  FROM card_role_scores
+  GROUP BY card_id
+),
+commander_synergy AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS commander_synergy_rows,
+    MAX(score)::int AS best_commander_synergy_score,
+    jsonb_agg(jsonb_build_object(
+      'commander_name', commander_name,
+      'commander_name_normalized', commander_name_normalized,
+      'role', role,
+      'score', score,
+      'source', source,
+      'evidence_count', evidence_count,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, evidence_count DESC, commander_name_normalized, role)
+      AS commander_synergy_details
+  FROM commander_card_synergy
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags,
+      'updated_at', updated_at
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2,
+    MAX(role_confidence) AS max_semantic_confidence
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+),
+battle_rule_matches AS (
+  SELECT DISTINCT ON (matched_card_id, logical_rule_key)
+    matched_card_id AS card_id,
+    logical_rule_key,
+    source,
+    confidence,
+    review_status,
+    execution_status,
+    rule_version,
+    effect_json,
+    deck_role_json,
+    notes,
+    updated_at
+  FROM (
+    SELECT
+      br.card_id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    WHERE br.card_id IS NOT NULL
 
-      $createCardIdentityBridgeViewSql;
+    UNION ALL
+
+    SELECT
+      c.id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    JOIN cards c
+      ON br.normalized_name IN (
+        LOWER(TRIM(c.name)),
+        LOWER(TRIM(SPLIT_PART(c.name, ' // ', 1)))
+      )
+  ) matched
+  WHERE matched_card_id IS NOT NULL
+  ORDER BY
+    matched_card_id,
+    logical_rule_key,
+    (review_status = 'verified') DESC,
+    confidence DESC,
+    source
+),
+battle_rules AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS battle_rule_count,
+    (COUNT(*) FILTER (WHERE review_status = 'verified'))::int
+      AS verified_battle_rule_count,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY (review_status = 'verified') DESC, confidence DESC, source)
+      AS battle_rules,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, source)
+      FILTER (WHERE review_status = 'verified') AS verified_battle_rules
+  FROM battle_rule_matches
+  GROUP BY card_id
+),
+legalities AS (
+  SELECT
+    card_id,
+    jsonb_object_agg(format, status ORDER BY format) AS legalities
+  FROM card_legalities
+  GROUP BY card_id
+),
+rulings AS (
+  SELECT
+    oracle_id,
+    COUNT(*)::int AS ruling_count,
+    MAX(published_at) AS latest_ruling_at
+  FROM card_rulings
+  GROUP BY oracle_id
+)
+SELECT
+  c.id AS id,
+  c.id AS card_id,
+  c.oracle_id,
+  c.scryfall_id,
+  c.name AS name,
+  c.name AS card_name,
+  LOWER(TRIM(c.name)) AS normalized_card_name,
+  c.mana_cost,
+  c.type_line,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.image_url,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  c.collector_number,
+  c.rarity,
+  c.keywords,
+  COALESCE(l.legalities, '{}'::jsonb) AS legalities,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(ft.function_tag_details, '[]'::jsonb) AS function_tag_details,
+  ft.max_function_tag_confidence,
+  COALESCE(rs.best_role_score, 0) AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(rs.role_score_details, '[]'::jsonb) AS role_score_details,
+  COALESCE(cs.commander_synergy_rows, 0) AS commander_synergy_rows,
+  COALESCE(cs.best_commander_synergy_score, 0)
+    AS best_commander_synergy_score,
+  COALESCE(cs.commander_synergy_details, '[]'::jsonb)
+    AS commander_synergy_details,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+  sv2.max_semantic_confidence,
+  COALESCE(br.battle_rules, '[]'::jsonb) AS battle_rules,
+  COALESCE(br.verified_battle_rules, '[]'::jsonb) AS verified_battle_rules,
+  COALESCE(br.battle_rule_count, 0) AS battle_rule_count,
+  COALESCE(br.verified_battle_rule_count, 0) AS verified_battle_rule_count,
+  COALESCE(ru.ruling_count, 0) AS ruling_count,
+  ru.latest_ruling_at,
+  jsonb_build_object(
+    'has_legalities', l.card_id IS NOT NULL,
+    'has_function_tags', ft.card_id IS NOT NULL,
+    'has_role_scores', rs.card_id IS NOT NULL,
+    'has_commander_synergy', cs.card_id IS NOT NULL,
+    'has_semantic_v2', sv2.card_id IS NOT NULL,
+    'has_verified_battle_rules',
+      COALESCE(br.verified_battle_rule_count, 0) > 0,
+    'has_any_battle_rules', COALESCE(br.battle_rule_count, 0) > 0,
+    'has_rulings', COALESCE(ru.ruling_count, 0) > 0
+  ) AS source_coverage
+FROM cards c
+LEFT JOIN legalities l ON l.card_id = c.id
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN commander_synergy cs ON cs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+LEFT JOIN battle_rules br ON br.card_id = c.id
+LEFT JOIN rulings ru ON ru.oracle_id = c.oracle_id::text
+;
+
+      CREATE OR REPLACE VIEW card_identity_bridge AS
+SELECT
+  c.id AS card_id,
+  c.oracle_id,
+  c.scryfall_id,
+  c.name AS canonical_name,
+  LOWER(TRIM(c.name)) AS normalized_canonical_name,
+  c.name AS lookup_name,
+  LOWER(TRIM(c.name)) AS normalized_lookup_name,
+  c.name AS printed_name,
+  'en'::text AS lang,
+  c.type_line,
+  c.image_url,
+  c.color_identity,
+  c.colors,
+  c.oracle_text,
+  c.mana_cost,
+  c.cmc,
+  'cards'::text AS source,
+  0 AS match_priority
+FROM cards c
+UNION ALL
+SELECT
+  c.id AS card_id,
+  COALESCE(l.oracle_id, c.oracle_id) AS oracle_id,
+  COALESCE(l.scryfall_id, c.scryfall_id) AS scryfall_id,
+  c.name AS canonical_name,
+  LOWER(TRIM(c.name)) AS normalized_canonical_name,
+  l.printed_name AS lookup_name,
+  l.normalized_printed_name AS normalized_lookup_name,
+  l.printed_name,
+  l.lang,
+  c.type_line,
+  c.image_url,
+  c.color_identity,
+  c.colors,
+  c.oracle_text,
+  c.mana_cost,
+  c.cmc,
+  l.source,
+  CASE
+    WHEN c.id = l.card_id THEN 1
+    WHEN c.scryfall_id = l.scryfall_id THEN 2
+    WHEN c.scryfall_id = l.oracle_id THEN 3
+    ELSE 4
+  END AS match_priority
+FROM card_localized_names l
+JOIN cards c
+  ON c.id = l.card_id
+  OR c.scryfall_id = l.scryfall_id
+  OR c.scryfall_id = l.oracle_id
+  OR LOWER(c.name) = LOWER(l.canonical_name)
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS card_identity_bridge;
@@ -651,8 +1176,7 @@ final migrations = <Migration>[
   Migration(
     version: '023',
     name: 'create_commander_learning_snapshot',
-    up: '''
-      CREATE TABLE IF NOT EXISTS commander_learned_decks (
+    up: r'''      CREATE TABLE IF NOT EXISTS commander_learned_decks (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         commander_name TEXT NOT NULL,
         commander_name_normalized TEXT NOT NULL,
@@ -711,7 +1235,153 @@ final migrations = <Migration>[
       CREATE INDEX IF NOT EXISTS idx_commander_card_usage_commander
       ON commander_card_usage (commander_name_normalized, usage_count DESC);
 
-      $commanderLearningSnapshotViewStatement;
+      CREATE OR REPLACE VIEW commander_learning_snapshot AS
+WITH active_learned_decks AS (
+  SELECT
+    commander_name_normalized,
+    MAX(commander_name) AS commander_name,
+    COUNT(*)::int AS active_learned_deck_count,
+    MAX(score) AS best_learned_score,
+    MAX(promoted_at) AS latest_promoted_at,
+    MAX(updated_at) AS latest_learned_updated_at,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT legal_status ORDER BY legal_status), NULL)
+      AS learned_legal_statuses,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT archetype ORDER BY archetype), NULL)
+      AS learned_archetypes,
+    jsonb_agg(jsonb_build_object(
+      'deck_name', deck_name,
+      'archetype', archetype,
+      'card_count', card_count,
+      'score', score,
+      'legal_status', legal_status,
+      'wincon_primary', wincon_primary,
+      'wincon_backup', wincon_backup,
+      'promoted_at', promoted_at,
+      'updated_at', updated_at
+    ) ORDER BY score DESC NULLS LAST, promoted_at DESC NULLS LAST, updated_at DESC)
+      AS active_learned_decks
+  FROM commander_learned_decks
+  WHERE is_active = TRUE
+    AND card_count = 100
+    AND card_list ILIKE '%' || commander_name || '%'
+  GROUP BY commander_name_normalized
+),
+bridge_names AS (
+  SELECT DISTINCT ON (normalized_lookup_name)
+    normalized_lookup_name,
+    canonical_name
+  FROM card_identity_bridge
+  WHERE normalized_lookup_name IS NOT NULL
+    AND normalized_lookup_name <> ''
+  ORDER BY normalized_lookup_name, (source = 'cards') DESC, match_priority ASC,
+    canonical_name ASC
+),
+usage_ranked AS (
+  SELECT
+    ccu.commander_name_normalized,
+    ccu.card_name_normalized,
+    COALESCE(bn.canonical_name, ccu.card_name_normalized)
+      AS canonical_card_name,
+    ccu.usage_count,
+    ccu.last_used_at,
+    ROW_NUMBER() OVER (
+      PARTITION BY ccu.commander_name_normalized
+      ORDER BY ccu.usage_count DESC, ccu.last_used_at DESC, ccu.card_name_normalized
+    ) AS rn
+  FROM commander_card_usage ccu
+  LEFT JOIN bridge_names bn
+    ON bn.normalized_lookup_name = ccu.card_name_normalized
+),
+usage_summary AS (
+  SELECT
+    commander_name_normalized,
+    COUNT(*)::int AS usage_card_rows,
+    COALESCE(SUM(usage_count), 0)::int AS total_usage_count,
+    jsonb_agg(jsonb_build_object(
+      'card_name_normalized', card_name_normalized,
+      'canonical_card_name', canonical_card_name,
+      'usage_count', usage_count,
+      'last_used_at', last_used_at
+    ) ORDER BY usage_count DESC, last_used_at DESC, card_name_normalized)
+      FILTER (WHERE rn <= 50) AS top_usage_cards
+  FROM usage_ranked
+  GROUP BY commander_name_normalized
+),
+synergy_ranked AS (
+  SELECT
+    ccs.commander_name_normalized,
+    ccs.commander_name,
+    ccs.card_id,
+    ccs.card_name,
+    ccs.role,
+    ccs.score,
+    ccs.source,
+    ccs.evidence_count,
+    ccs.updated_at,
+    ROW_NUMBER() OVER (
+      PARTITION BY ccs.commander_name_normalized
+      ORDER BY ccs.score DESC, ccs.evidence_count DESC, ccs.card_name, ccs.role
+    ) AS rn
+  FROM commander_card_synergy ccs
+),
+synergy_summary AS (
+  SELECT
+    commander_name_normalized,
+    MAX(commander_name) AS commander_name,
+    COUNT(*)::int AS synergy_rows,
+    MAX(score)::int AS best_synergy_score,
+    jsonb_agg(jsonb_build_object(
+      'card_id', card_id,
+      'card_name', card_name,
+      'role', role,
+      'score', score,
+      'source', source,
+      'evidence_count', evidence_count,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, evidence_count DESC, card_name, role)
+      FILTER (WHERE rn <= 50) AS top_synergy_cards
+  FROM synergy_ranked
+  GROUP BY commander_name_normalized
+),
+all_commanders AS (
+  SELECT commander_name_normalized FROM active_learned_decks
+  UNION
+  SELECT commander_name_normalized FROM usage_summary
+  UNION
+  SELECT commander_name_normalized FROM synergy_summary
+)
+SELECT
+  ac.commander_name_normalized,
+  COALESCE(ld.commander_name, ss.commander_name, ac.commander_name_normalized)
+    AS commander_name,
+  COALESCE(ld.active_learned_deck_count, 0) AS active_learned_deck_count,
+  ld.best_learned_score,
+  ld.latest_promoted_at,
+  ld.latest_learned_updated_at,
+  COALESCE(ld.learned_legal_statuses, ARRAY[]::TEXT[])
+    AS learned_legal_statuses,
+  COALESCE(ld.learned_archetypes, ARRAY[]::TEXT[]) AS learned_archetypes,
+  COALESCE(ld.active_learned_decks, '[]'::jsonb) AS active_learned_decks,
+  COALESCE(us.usage_card_rows, 0) AS usage_card_rows,
+  COALESCE(us.total_usage_count, 0) AS total_usage_count,
+  COALESCE(us.top_usage_cards, '[]'::jsonb) AS top_usage_cards,
+  COALESCE(ss.synergy_rows, 0) AS synergy_rows,
+  COALESCE(ss.best_synergy_score, 0) AS best_synergy_score,
+  COALESCE(ss.top_synergy_cards, '[]'::jsonb) AS top_synergy_cards,
+  jsonb_build_object(
+    'has_active_learned_deck', COALESCE(ld.active_learned_deck_count, 0) > 0,
+    'has_usage', COALESCE(us.usage_card_rows, 0) > 0,
+    'has_synergy', COALESCE(ss.synergy_rows, 0) > 0,
+    'metadata_hidden', TRUE
+  ) AS source_coverage
+FROM all_commanders ac
+LEFT JOIN active_learned_decks ld
+  ON ld.commander_name_normalized = ac.commander_name_normalized
+LEFT JOIN usage_summary us
+  ON us.commander_name_normalized = ac.commander_name_normalized
+LEFT JOIN synergy_summary ss
+  ON ss.commander_name_normalized = ac.commander_name_normalized
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS commander_learning_snapshot;
@@ -723,8 +1393,153 @@ final migrations = <Migration>[
   Migration(
     version: '024',
     name: 'refresh_commander_learning_snapshot_bridge_resolution',
-    up: '''
-      $commanderLearningSnapshotViewStatement;
+    up: r'''      CREATE OR REPLACE VIEW commander_learning_snapshot AS
+WITH active_learned_decks AS (
+  SELECT
+    commander_name_normalized,
+    MAX(commander_name) AS commander_name,
+    COUNT(*)::int AS active_learned_deck_count,
+    MAX(score) AS best_learned_score,
+    MAX(promoted_at) AS latest_promoted_at,
+    MAX(updated_at) AS latest_learned_updated_at,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT legal_status ORDER BY legal_status), NULL)
+      AS learned_legal_statuses,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT archetype ORDER BY archetype), NULL)
+      AS learned_archetypes,
+    jsonb_agg(jsonb_build_object(
+      'deck_name', deck_name,
+      'archetype', archetype,
+      'card_count', card_count,
+      'score', score,
+      'legal_status', legal_status,
+      'wincon_primary', wincon_primary,
+      'wincon_backup', wincon_backup,
+      'promoted_at', promoted_at,
+      'updated_at', updated_at
+    ) ORDER BY score DESC NULLS LAST, promoted_at DESC NULLS LAST, updated_at DESC)
+      AS active_learned_decks
+  FROM commander_learned_decks
+  WHERE is_active = TRUE
+    AND card_count = 100
+    AND card_list ILIKE '%' || commander_name || '%'
+  GROUP BY commander_name_normalized
+),
+bridge_names AS (
+  SELECT DISTINCT ON (normalized_lookup_name)
+    normalized_lookup_name,
+    canonical_name
+  FROM card_identity_bridge
+  WHERE normalized_lookup_name IS NOT NULL
+    AND normalized_lookup_name <> ''
+  ORDER BY normalized_lookup_name, (source = 'cards') DESC, match_priority ASC,
+    canonical_name ASC
+),
+usage_ranked AS (
+  SELECT
+    ccu.commander_name_normalized,
+    ccu.card_name_normalized,
+    COALESCE(bn.canonical_name, ccu.card_name_normalized)
+      AS canonical_card_name,
+    ccu.usage_count,
+    ccu.last_used_at,
+    ROW_NUMBER() OVER (
+      PARTITION BY ccu.commander_name_normalized
+      ORDER BY ccu.usage_count DESC, ccu.last_used_at DESC, ccu.card_name_normalized
+    ) AS rn
+  FROM commander_card_usage ccu
+  LEFT JOIN bridge_names bn
+    ON bn.normalized_lookup_name = ccu.card_name_normalized
+),
+usage_summary AS (
+  SELECT
+    commander_name_normalized,
+    COUNT(*)::int AS usage_card_rows,
+    COALESCE(SUM(usage_count), 0)::int AS total_usage_count,
+    jsonb_agg(jsonb_build_object(
+      'card_name_normalized', card_name_normalized,
+      'canonical_card_name', canonical_card_name,
+      'usage_count', usage_count,
+      'last_used_at', last_used_at
+    ) ORDER BY usage_count DESC, last_used_at DESC, card_name_normalized)
+      FILTER (WHERE rn <= 50) AS top_usage_cards
+  FROM usage_ranked
+  GROUP BY commander_name_normalized
+),
+synergy_ranked AS (
+  SELECT
+    ccs.commander_name_normalized,
+    ccs.commander_name,
+    ccs.card_id,
+    ccs.card_name,
+    ccs.role,
+    ccs.score,
+    ccs.source,
+    ccs.evidence_count,
+    ccs.updated_at,
+    ROW_NUMBER() OVER (
+      PARTITION BY ccs.commander_name_normalized
+      ORDER BY ccs.score DESC, ccs.evidence_count DESC, ccs.card_name, ccs.role
+    ) AS rn
+  FROM commander_card_synergy ccs
+),
+synergy_summary AS (
+  SELECT
+    commander_name_normalized,
+    MAX(commander_name) AS commander_name,
+    COUNT(*)::int AS synergy_rows,
+    MAX(score)::int AS best_synergy_score,
+    jsonb_agg(jsonb_build_object(
+      'card_id', card_id,
+      'card_name', card_name,
+      'role', role,
+      'score', score,
+      'source', source,
+      'evidence_count', evidence_count,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, evidence_count DESC, card_name, role)
+      FILTER (WHERE rn <= 50) AS top_synergy_cards
+  FROM synergy_ranked
+  GROUP BY commander_name_normalized
+),
+all_commanders AS (
+  SELECT commander_name_normalized FROM active_learned_decks
+  UNION
+  SELECT commander_name_normalized FROM usage_summary
+  UNION
+  SELECT commander_name_normalized FROM synergy_summary
+)
+SELECT
+  ac.commander_name_normalized,
+  COALESCE(ld.commander_name, ss.commander_name, ac.commander_name_normalized)
+    AS commander_name,
+  COALESCE(ld.active_learned_deck_count, 0) AS active_learned_deck_count,
+  ld.best_learned_score,
+  ld.latest_promoted_at,
+  ld.latest_learned_updated_at,
+  COALESCE(ld.learned_legal_statuses, ARRAY[]::TEXT[])
+    AS learned_legal_statuses,
+  COALESCE(ld.learned_archetypes, ARRAY[]::TEXT[]) AS learned_archetypes,
+  COALESCE(ld.active_learned_decks, '[]'::jsonb) AS active_learned_decks,
+  COALESCE(us.usage_card_rows, 0) AS usage_card_rows,
+  COALESCE(us.total_usage_count, 0) AS total_usage_count,
+  COALESCE(us.top_usage_cards, '[]'::jsonb) AS top_usage_cards,
+  COALESCE(ss.synergy_rows, 0) AS synergy_rows,
+  COALESCE(ss.best_synergy_score, 0) AS best_synergy_score,
+  COALESCE(ss.top_synergy_cards, '[]'::jsonb) AS top_synergy_cards,
+  jsonb_build_object(
+    'has_active_learned_deck', COALESCE(ld.active_learned_deck_count, 0) > 0,
+    'has_usage', COALESCE(us.usage_card_rows, 0) > 0,
+    'has_synergy', COALESCE(ss.synergy_rows, 0) > 0,
+    'metadata_hidden', TRUE
+  ) AS source_coverage
+FROM all_commanders ac
+LEFT JOIN active_learned_decks ld
+  ON ld.commander_name_normalized = ac.commander_name_normalized
+LEFT JOIN usage_summary us
+  ON us.commander_name_normalized = ac.commander_name_normalized
+LEFT JOIN synergy_summary ss
+  ON ss.commander_name_normalized = ac.commander_name_normalized
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS commander_learning_snapshot;
@@ -733,8 +1548,80 @@ final migrations = <Migration>[
   Migration(
     version: '025',
     name: 'refresh_optimize_candidate_quality_summary_anti_fanout',
-    up: '''
-      $optimizeCandidateQualitySummaryViewStatement;
+    up: r'''      CREATE OR REPLACE VIEW optimize_candidate_quality_summary AS
+WITH meta_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(usage_count)::int AS usage_count,
+    MAX(meta_deck_count)::int AS meta_deck_count
+  FROM card_meta_insights
+  GROUP BY LOWER(card_name)
+),
+function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL)
+      AS function_tags
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL)
+      AS scored_roles
+  FROM card_role_scores
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+)
+SELECT
+  c.id AS card_id,
+  c.name AS card_name,
+  c.type_line,
+  c.mana_cost,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  COALESCE(cmi.usage_count, 0) AS meta_usage_count,
+  COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(rs.best_role_score, 0)::int AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2
+FROM cards c
+LEFT JOIN meta_insights cmi ON cmi.normalized_card_name = LOWER(c.name)
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS optimize_candidate_quality_summary;
@@ -793,8 +1680,7 @@ final migrations = <Migration>[
   Migration(
     version: '028',
     name: 'persist_card_battle_rules_logical_rule_key',
-    up: '''
-      ALTER TABLE card_battle_rules
+    up: r'''      ALTER TABLE card_battle_rules
       ADD COLUMN IF NOT EXISTS logical_rule_key TEXT;
 
       UPDATE card_battle_rules
@@ -825,8 +1711,329 @@ final migrations = <Migration>[
       CREATE INDEX IF NOT EXISTS idx_card_battle_rules_normalized_name
       ON card_battle_rules (normalized_name);
 
-      $cardIntelligenceSnapshotViewStatement;
-      $optimizeCandidateQualitySummaryViewStatement;
+      CREATE OR REPLACE VIEW card_intelligence_snapshot AS
+WITH function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL) AS function_tags,
+    jsonb_agg(jsonb_build_object(
+      'tag', tag,
+      'confidence', confidence,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, tag, source) AS function_tag_details,
+    MAX(confidence) AS max_function_tag_confidence
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL) AS scored_roles,
+    jsonb_agg(jsonb_build_object(
+      'role', role,
+      'score', score,
+      'format', format,
+      'subformat', subformat,
+      'bracket_scope', bracket_scope,
+      'budget_tier', budget_tier,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, role, source) AS role_score_details
+  FROM card_role_scores
+  GROUP BY card_id
+),
+commander_synergy AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS commander_synergy_rows,
+    MAX(score)::int AS best_commander_synergy_score,
+    jsonb_agg(jsonb_build_object(
+      'commander_name', commander_name,
+      'commander_name_normalized', commander_name_normalized,
+      'role', role,
+      'score', score,
+      'source', source,
+      'evidence_count', evidence_count,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, evidence_count DESC, commander_name_normalized, role)
+      AS commander_synergy_details
+  FROM commander_card_synergy
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags,
+      'updated_at', updated_at
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2,
+    MAX(role_confidence) AS max_semantic_confidence
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+),
+battle_rule_matches AS (
+  SELECT DISTINCT ON (matched_card_id, logical_rule_key)
+    matched_card_id AS card_id,
+    logical_rule_key,
+    source,
+    confidence,
+    review_status,
+    execution_status,
+    rule_version,
+    effect_json,
+    deck_role_json,
+    notes,
+    updated_at
+  FROM (
+    SELECT
+      br.card_id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    WHERE br.card_id IS NOT NULL
+
+    UNION ALL
+
+    SELECT
+      c.id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    JOIN cards c
+      ON br.normalized_name IN (
+        LOWER(TRIM(c.name)),
+        LOWER(TRIM(SPLIT_PART(c.name, ' // ', 1)))
+      )
+  ) matched
+  WHERE matched_card_id IS NOT NULL
+  ORDER BY
+    matched_card_id,
+    logical_rule_key,
+    (review_status = 'verified') DESC,
+    confidence DESC,
+    source
+),
+battle_rules AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS battle_rule_count,
+    (COUNT(*) FILTER (WHERE review_status = 'verified'))::int
+      AS verified_battle_rule_count,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY (review_status = 'verified') DESC, confidence DESC, source)
+      AS battle_rules,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, source)
+      FILTER (WHERE review_status = 'verified') AS verified_battle_rules
+  FROM battle_rule_matches
+  GROUP BY card_id
+),
+legalities AS (
+  SELECT
+    card_id,
+    jsonb_object_agg(format, status ORDER BY format) AS legalities
+  FROM card_legalities
+  GROUP BY card_id
+),
+rulings AS (
+  SELECT
+    oracle_id,
+    COUNT(*)::int AS ruling_count,
+    MAX(published_at) AS latest_ruling_at
+  FROM card_rulings
+  GROUP BY oracle_id
+)
+SELECT
+  c.id AS id,
+  c.id AS card_id,
+  c.oracle_id,
+  c.scryfall_id,
+  c.name AS name,
+  c.name AS card_name,
+  LOWER(TRIM(c.name)) AS normalized_card_name,
+  c.mana_cost,
+  c.type_line,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.image_url,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  c.collector_number,
+  c.rarity,
+  c.keywords,
+  COALESCE(l.legalities, '{}'::jsonb) AS legalities,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(ft.function_tag_details, '[]'::jsonb) AS function_tag_details,
+  ft.max_function_tag_confidence,
+  COALESCE(rs.best_role_score, 0) AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(rs.role_score_details, '[]'::jsonb) AS role_score_details,
+  COALESCE(cs.commander_synergy_rows, 0) AS commander_synergy_rows,
+  COALESCE(cs.best_commander_synergy_score, 0)
+    AS best_commander_synergy_score,
+  COALESCE(cs.commander_synergy_details, '[]'::jsonb)
+    AS commander_synergy_details,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+  sv2.max_semantic_confidence,
+  COALESCE(br.battle_rules, '[]'::jsonb) AS battle_rules,
+  COALESCE(br.verified_battle_rules, '[]'::jsonb) AS verified_battle_rules,
+  COALESCE(br.battle_rule_count, 0) AS battle_rule_count,
+  COALESCE(br.verified_battle_rule_count, 0) AS verified_battle_rule_count,
+  COALESCE(ru.ruling_count, 0) AS ruling_count,
+  ru.latest_ruling_at,
+  jsonb_build_object(
+    'has_legalities', l.card_id IS NOT NULL,
+    'has_function_tags', ft.card_id IS NOT NULL,
+    'has_role_scores', rs.card_id IS NOT NULL,
+    'has_commander_synergy', cs.card_id IS NOT NULL,
+    'has_semantic_v2', sv2.card_id IS NOT NULL,
+    'has_verified_battle_rules',
+      COALESCE(br.verified_battle_rule_count, 0) > 0,
+    'has_any_battle_rules', COALESCE(br.battle_rule_count, 0) > 0,
+    'has_rulings', COALESCE(ru.ruling_count, 0) > 0
+  ) AS source_coverage
+FROM cards c
+LEFT JOIN legalities l ON l.card_id = c.id
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN commander_synergy cs ON cs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+LEFT JOIN battle_rules br ON br.card_id = c.id
+LEFT JOIN rulings ru ON ru.oracle_id = c.oracle_id::text
+;
+      CREATE OR REPLACE VIEW optimize_candidate_quality_summary AS
+WITH meta_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(usage_count)::int AS usage_count,
+    MAX(meta_deck_count)::int AS meta_deck_count
+  FROM card_meta_insights
+  GROUP BY LOWER(card_name)
+),
+function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL)
+      AS function_tags
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL)
+      AS scored_roles
+  FROM card_role_scores
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+)
+SELECT
+  c.id AS card_id,
+  c.name AS card_name,
+  c.type_line,
+  c.mana_cost,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  COALESCE(cmi.usage_count, 0) AS meta_usage_count,
+  COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(rs.best_role_score, 0)::int AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2
+FROM cards c
+LEFT JOIN meta_insights cmi ON cmi.normalized_card_name = LOWER(c.name)
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS optimize_candidate_quality_summary;
@@ -853,8 +2060,7 @@ final migrations = <Migration>[
   Migration(
     version: '029',
     name: 'add_card_battle_rules_execution_status',
-    up: '''
-      ALTER TABLE card_battle_rules
+    up: r'''      ALTER TABLE card_battle_rules
       ADD COLUMN IF NOT EXISTS execution_status TEXT;
 
       UPDATE card_battle_rules
@@ -885,8 +2091,329 @@ final migrations = <Migration>[
         )
       );
 
-      $cardIntelligenceSnapshotViewStatement;
-      $optimizeCandidateQualitySummaryViewStatement;
+      CREATE OR REPLACE VIEW card_intelligence_snapshot AS
+WITH function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL) AS function_tags,
+    jsonb_agg(jsonb_build_object(
+      'tag', tag,
+      'confidence', confidence,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, tag, source) AS function_tag_details,
+    MAX(confidence) AS max_function_tag_confidence
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL) AS scored_roles,
+    jsonb_agg(jsonb_build_object(
+      'role', role,
+      'score', score,
+      'format', format,
+      'subformat', subformat,
+      'bracket_scope', bracket_scope,
+      'budget_tier', budget_tier,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, role, source) AS role_score_details
+  FROM card_role_scores
+  GROUP BY card_id
+),
+commander_synergy AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS commander_synergy_rows,
+    MAX(score)::int AS best_commander_synergy_score,
+    jsonb_agg(jsonb_build_object(
+      'commander_name', commander_name,
+      'commander_name_normalized', commander_name_normalized,
+      'role', role,
+      'score', score,
+      'source', source,
+      'evidence_count', evidence_count,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, evidence_count DESC, commander_name_normalized, role)
+      AS commander_synergy_details
+  FROM commander_card_synergy
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags,
+      'updated_at', updated_at
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2,
+    MAX(role_confidence) AS max_semantic_confidence
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+),
+battle_rule_matches AS (
+  SELECT DISTINCT ON (matched_card_id, logical_rule_key)
+    matched_card_id AS card_id,
+    logical_rule_key,
+    source,
+    confidence,
+    review_status,
+    execution_status,
+    rule_version,
+    effect_json,
+    deck_role_json,
+    notes,
+    updated_at
+  FROM (
+    SELECT
+      br.card_id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    WHERE br.card_id IS NOT NULL
+
+    UNION ALL
+
+    SELECT
+      c.id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    JOIN cards c
+      ON br.normalized_name IN (
+        LOWER(TRIM(c.name)),
+        LOWER(TRIM(SPLIT_PART(c.name, ' // ', 1)))
+      )
+  ) matched
+  WHERE matched_card_id IS NOT NULL
+  ORDER BY
+    matched_card_id,
+    logical_rule_key,
+    (review_status = 'verified') DESC,
+    confidence DESC,
+    source
+),
+battle_rules AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS battle_rule_count,
+    (COUNT(*) FILTER (WHERE review_status = 'verified'))::int
+      AS verified_battle_rule_count,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY (review_status = 'verified') DESC, confidence DESC, source)
+      AS battle_rules,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, source)
+      FILTER (WHERE review_status = 'verified') AS verified_battle_rules
+  FROM battle_rule_matches
+  GROUP BY card_id
+),
+legalities AS (
+  SELECT
+    card_id,
+    jsonb_object_agg(format, status ORDER BY format) AS legalities
+  FROM card_legalities
+  GROUP BY card_id
+),
+rulings AS (
+  SELECT
+    oracle_id,
+    COUNT(*)::int AS ruling_count,
+    MAX(published_at) AS latest_ruling_at
+  FROM card_rulings
+  GROUP BY oracle_id
+)
+SELECT
+  c.id AS id,
+  c.id AS card_id,
+  c.oracle_id,
+  c.scryfall_id,
+  c.name AS name,
+  c.name AS card_name,
+  LOWER(TRIM(c.name)) AS normalized_card_name,
+  c.mana_cost,
+  c.type_line,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.image_url,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  c.collector_number,
+  c.rarity,
+  c.keywords,
+  COALESCE(l.legalities, '{}'::jsonb) AS legalities,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(ft.function_tag_details, '[]'::jsonb) AS function_tag_details,
+  ft.max_function_tag_confidence,
+  COALESCE(rs.best_role_score, 0) AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(rs.role_score_details, '[]'::jsonb) AS role_score_details,
+  COALESCE(cs.commander_synergy_rows, 0) AS commander_synergy_rows,
+  COALESCE(cs.best_commander_synergy_score, 0)
+    AS best_commander_synergy_score,
+  COALESCE(cs.commander_synergy_details, '[]'::jsonb)
+    AS commander_synergy_details,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+  sv2.max_semantic_confidence,
+  COALESCE(br.battle_rules, '[]'::jsonb) AS battle_rules,
+  COALESCE(br.verified_battle_rules, '[]'::jsonb) AS verified_battle_rules,
+  COALESCE(br.battle_rule_count, 0) AS battle_rule_count,
+  COALESCE(br.verified_battle_rule_count, 0) AS verified_battle_rule_count,
+  COALESCE(ru.ruling_count, 0) AS ruling_count,
+  ru.latest_ruling_at,
+  jsonb_build_object(
+    'has_legalities', l.card_id IS NOT NULL,
+    'has_function_tags', ft.card_id IS NOT NULL,
+    'has_role_scores', rs.card_id IS NOT NULL,
+    'has_commander_synergy', cs.card_id IS NOT NULL,
+    'has_semantic_v2', sv2.card_id IS NOT NULL,
+    'has_verified_battle_rules',
+      COALESCE(br.verified_battle_rule_count, 0) > 0,
+    'has_any_battle_rules', COALESCE(br.battle_rule_count, 0) > 0,
+    'has_rulings', COALESCE(ru.ruling_count, 0) > 0
+  ) AS source_coverage
+FROM cards c
+LEFT JOIN legalities l ON l.card_id = c.id
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN commander_synergy cs ON cs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+LEFT JOIN battle_rules br ON br.card_id = c.id
+LEFT JOIN rulings ru ON ru.oracle_id = c.oracle_id::text
+;
+      CREATE OR REPLACE VIEW optimize_candidate_quality_summary AS
+WITH meta_insights AS (
+  SELECT
+    LOWER(card_name) AS normalized_card_name,
+    MAX(usage_count)::int AS usage_count,
+    MAX(meta_deck_count)::int AS meta_deck_count
+  FROM card_meta_insights
+  GROUP BY LOWER(card_name)
+),
+function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL)
+      AS function_tags
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL)
+      AS scored_roles
+  FROM card_role_scores
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+)
+SELECT
+  c.id AS card_id,
+  c.name AS card_name,
+  c.type_line,
+  c.mana_cost,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  COALESCE(cmi.usage_count, 0) AS meta_usage_count,
+  COALESCE(cmi.meta_deck_count, 0) AS meta_deck_count,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(rs.best_role_score, 0)::int AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2
+FROM cards c
+LEFT JOIN meta_insights cmi ON cmi.normalized_card_name = LOWER(c.name)
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS optimize_candidate_quality_summary;
@@ -1012,8 +2539,255 @@ final migrations = <Migration>[
   Migration(
     version: '032',
     name: 'refresh_card_intelligence_snapshot_rule_identity_fallback',
-    up: '''
-      $cardIntelligenceSnapshotViewStatement;
+    up: r'''      CREATE OR REPLACE VIEW card_intelligence_snapshot AS
+WITH function_tags AS (
+  SELECT
+    card_id,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT tag ORDER BY tag), NULL) AS function_tags,
+    jsonb_agg(jsonb_build_object(
+      'tag', tag,
+      'confidence', confidence,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, tag, source) AS function_tag_details,
+    MAX(confidence) AS max_function_tag_confidence
+  FROM card_function_tags
+  GROUP BY card_id
+),
+role_scores AS (
+  SELECT
+    card_id,
+    MAX(score)::int AS best_role_score,
+    ARRAY_REMOVE(ARRAY_AGG(DISTINCT role ORDER BY role), NULL) AS scored_roles,
+    jsonb_agg(jsonb_build_object(
+      'role', role,
+      'score', score,
+      'format', format,
+      'subformat', subformat,
+      'bracket_scope', bracket_scope,
+      'budget_tier', budget_tier,
+      'source', source,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, role, source) AS role_score_details
+  FROM card_role_scores
+  GROUP BY card_id
+),
+commander_synergy AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS commander_synergy_rows,
+    MAX(score)::int AS best_commander_synergy_score,
+    jsonb_agg(jsonb_build_object(
+      'commander_name', commander_name,
+      'commander_name_normalized', commander_name_normalized,
+      'role', role,
+      'score', score,
+      'source', source,
+      'evidence_count', evidence_count,
+      'evidence', evidence,
+      'updated_at', updated_at
+    ) ORDER BY score DESC, evidence_count DESC, commander_name_normalized, role)
+      AS commander_synergy_details
+  FROM commander_card_synergy
+  GROUP BY card_id
+),
+semantic_v2 AS (
+  SELECT
+    card_id,
+    jsonb_agg(jsonb_build_object(
+      'schema_version', schema_version,
+      'source', source,
+      'speed', speed,
+      'mana_efficiency', mana_efficiency,
+      'card_advantage_type', card_advantage_type,
+      'interaction_scope', interaction_scope,
+      'combo_piece', combo_piece,
+      'wincon', wincon,
+      'engine', engine,
+      'payoff', payoff,
+      'enabler', enabler,
+      'protection_type', protection_type,
+      'recursion_type', recursion_type,
+      'role_confidence', role_confidence,
+      'explanation_reason', explanation_reason,
+      'tags', tags,
+      'updated_at', updated_at
+    ) ORDER BY role_confidence DESC, source) AS semantic_tags_v2,
+    MAX(role_confidence) AS max_semantic_confidence
+  FROM card_semantic_tags_v2
+  GROUP BY card_id
+),
+battle_rule_matches AS (
+  SELECT DISTINCT ON (matched_card_id, logical_rule_key)
+    matched_card_id AS card_id,
+    logical_rule_key,
+    source,
+    confidence,
+    review_status,
+    execution_status,
+    rule_version,
+    effect_json,
+    deck_role_json,
+    notes,
+    updated_at
+  FROM (
+    SELECT
+      br.card_id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    WHERE br.card_id IS NOT NULL
+
+    UNION ALL
+
+    SELECT
+      c.id AS matched_card_id,
+      br.logical_rule_key,
+      br.source,
+      br.confidence,
+      br.review_status,
+      br.execution_status,
+      br.rule_version,
+      br.effect_json,
+      br.deck_role_json,
+      br.notes,
+      br.updated_at
+    FROM card_battle_rules br
+    JOIN cards c
+      ON br.normalized_name IN (
+        LOWER(TRIM(c.name)),
+        LOWER(TRIM(SPLIT_PART(c.name, ' // ', 1)))
+      )
+  ) matched
+  WHERE matched_card_id IS NOT NULL
+  ORDER BY
+    matched_card_id,
+    logical_rule_key,
+    (review_status = 'verified') DESC,
+    confidence DESC,
+    source
+),
+battle_rules AS (
+  SELECT
+    card_id,
+    COUNT(*)::int AS battle_rule_count,
+    (COUNT(*) FILTER (WHERE review_status = 'verified'))::int
+      AS verified_battle_rule_count,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY (review_status = 'verified') DESC, confidence DESC, source)
+      AS battle_rules,
+    jsonb_agg(jsonb_build_object(
+      'logical_rule_key', logical_rule_key,
+      'source', source,
+      'confidence', confidence,
+      'review_status', review_status,
+      'execution_status', execution_status,
+      'rule_version', rule_version,
+      'effect', effect_json,
+      'deck_role', deck_role_json,
+      'notes', notes,
+      'updated_at', updated_at
+    ) ORDER BY confidence DESC, source)
+      FILTER (WHERE review_status = 'verified') AS verified_battle_rules
+  FROM battle_rule_matches
+  GROUP BY card_id
+),
+legalities AS (
+  SELECT
+    card_id,
+    jsonb_object_agg(format, status ORDER BY format) AS legalities
+  FROM card_legalities
+  GROUP BY card_id
+),
+rulings AS (
+  SELECT
+    oracle_id,
+    COUNT(*)::int AS ruling_count,
+    MAX(published_at) AS latest_ruling_at
+  FROM card_rulings
+  GROUP BY oracle_id
+)
+SELECT
+  c.id AS id,
+  c.id AS card_id,
+  c.oracle_id,
+  c.scryfall_id,
+  c.name AS name,
+  c.name AS card_name,
+  LOWER(TRIM(c.name)) AS normalized_card_name,
+  c.mana_cost,
+  c.type_line,
+  c.oracle_text,
+  c.colors,
+  c.color_identity,
+  c.cmc,
+  c.image_url,
+  c.price_usd,
+  c.price_usd_foil,
+  c.set_code,
+  c.collector_number,
+  c.rarity,
+  c.keywords,
+  COALESCE(l.legalities, '{}'::jsonb) AS legalities,
+  COALESCE(ft.function_tags, ARRAY[]::TEXT[]) AS function_tags,
+  COALESCE(ft.function_tag_details, '[]'::jsonb) AS function_tag_details,
+  ft.max_function_tag_confidence,
+  COALESCE(rs.best_role_score, 0) AS best_role_score,
+  COALESCE(rs.scored_roles, ARRAY[]::TEXT[]) AS scored_roles,
+  COALESCE(rs.role_score_details, '[]'::jsonb) AS role_score_details,
+  COALESCE(cs.commander_synergy_rows, 0) AS commander_synergy_rows,
+  COALESCE(cs.best_commander_synergy_score, 0)
+    AS best_commander_synergy_score,
+  COALESCE(cs.commander_synergy_details, '[]'::jsonb)
+    AS commander_synergy_details,
+  COALESCE(sv2.semantic_tags_v2, '[]'::jsonb) AS semantic_tags_v2,
+  sv2.max_semantic_confidence,
+  COALESCE(br.battle_rules, '[]'::jsonb) AS battle_rules,
+  COALESCE(br.verified_battle_rules, '[]'::jsonb) AS verified_battle_rules,
+  COALESCE(br.battle_rule_count, 0) AS battle_rule_count,
+  COALESCE(br.verified_battle_rule_count, 0) AS verified_battle_rule_count,
+  COALESCE(ru.ruling_count, 0) AS ruling_count,
+  ru.latest_ruling_at,
+  jsonb_build_object(
+    'has_legalities', l.card_id IS NOT NULL,
+    'has_function_tags', ft.card_id IS NOT NULL,
+    'has_role_scores', rs.card_id IS NOT NULL,
+    'has_commander_synergy', cs.card_id IS NOT NULL,
+    'has_semantic_v2', sv2.card_id IS NOT NULL,
+    'has_verified_battle_rules',
+      COALESCE(br.verified_battle_rule_count, 0) > 0,
+    'has_any_battle_rules', COALESCE(br.battle_rule_count, 0) > 0,
+    'has_rulings', COALESCE(ru.ruling_count, 0) > 0
+  ) AS source_coverage
+FROM cards c
+LEFT JOIN legalities l ON l.card_id = c.id
+LEFT JOIN function_tags ft ON ft.card_id = c.id
+LEFT JOIN role_scores rs ON rs.card_id = c.id
+LEFT JOIN commander_synergy cs ON cs.card_id = c.id
+LEFT JOIN semantic_v2 sv2 ON sv2.card_id = c.id
+LEFT JOIN battle_rules br ON br.card_id = c.id
+LEFT JOIN rulings ru ON ru.oracle_id = c.oracle_id::text
+;
     ''',
     down: '''
       DROP VIEW IF EXISTS card_intelligence_snapshot;
@@ -2195,8 +3969,151 @@ final migrations = <Migration>[
   Migration(
     version: '045',
     name: 'create_collection_availability_contract',
-    up: collectionAvailabilityViewsSql,
-    down: dropCollectionAvailabilityViewsSql,
+    up: r'''CREATE OR REPLACE VIEW collection_availability_snapshot AS
+WITH owned AS (
+  SELECT
+    bi.user_id,
+    COALESCE(c.oracle_id, c.id) AS playable_card_id,
+    MIN(c.name) AS canonical_name,
+    COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'have'
+  GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+),
+allocated AS (
+  SELECT
+    d.user_id,
+    COALESCE(c.oracle_id, c.id) AS playable_card_id,
+    MIN(c.name) AS canonical_name,
+    COALESCE(SUM(dc.quantity), 0)::int AS allocated_quantity
+  FROM decks d
+  JOIN deck_cards dc ON dc.deck_id = d.id
+  JOIN cards c ON c.id = dc.card_id
+  WHERE d.deleted_at IS NULL
+  GROUP BY d.user_id, COALESCE(c.oracle_id, c.id)
+),
+committed AS (
+  SELECT
+    ti.owner_id AS user_id,
+    COALESCE(c.oracle_id, c.id) AS playable_card_id,
+    MIN(c.name) AS canonical_name,
+    COALESCE(SUM(ti.quantity), 0)::int AS committed_trade_quantity
+  FROM trade_items ti
+  JOIN trade_offers trade ON trade.id = ti.trade_offer_id
+  JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+  JOIN cards c ON c.id = bi.card_id
+  WHERE trade.status IN (
+    'pending', 'accepted', 'shipped', 'delivered', 'disputed'
+  )
+    AND bi.list_type = 'have'
+  GROUP BY ti.owner_id, COALESCE(c.oracle_id, c.id)
+),
+wanted AS (
+  SELECT
+    bi.user_id,
+    COALESCE(c.oracle_id, c.id) AS playable_card_id,
+    MIN(c.name) AS canonical_name,
+    COALESCE(SUM(bi.quantity), 0)::int AS wanted_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'want'
+  GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+),
+identities AS (
+  SELECT user_id, playable_card_id FROM owned
+  UNION
+  SELECT user_id, playable_card_id FROM allocated
+  UNION
+  SELECT user_id, playable_card_id FROM committed
+  UNION
+  SELECT user_id, playable_card_id FROM wanted
+)
+SELECT
+  identity.user_id,
+  identity.playable_card_id,
+  COALESCE(
+    owned.canonical_name,
+    allocated.canonical_name,
+    committed.canonical_name,
+    wanted.canonical_name
+  ) AS canonical_name,
+  COALESCE(owned.owned_quantity, 0)::int AS owned_quantity,
+  COALESCE(allocated.allocated_quantity, 0)::int AS allocated_quantity,
+  COALESCE(committed.committed_trade_quantity, 0)::int
+    AS committed_trade_quantity,
+  GREATEST(
+    COALESCE(owned.owned_quantity, 0)
+      - COALESCE(allocated.allocated_quantity, 0)
+      - COALESCE(committed.committed_trade_quantity, 0),
+    0
+  )::int AS free_quantity,
+  GREATEST(
+    COALESCE(allocated.allocated_quantity, 0)
+      - COALESCE(owned.owned_quantity, 0),
+    0
+  )::int AS missing_quantity,
+  COALESCE(wanted.wanted_quantity, 0)::int AS wanted_quantity,
+  GREATEST(
+    COALESCE(wanted.wanted_quantity, 0)
+      - COALESCE(owned.owned_quantity, 0),
+    0
+  )::int AS wanted_missing_quantity
+FROM identities identity
+LEFT JOIN owned USING (user_id, playable_card_id)
+LEFT JOIN allocated USING (user_id, playable_card_id)
+LEFT JOIN committed USING (user_id, playable_card_id)
+LEFT JOIN wanted USING (user_id, playable_card_id);
+
+CREATE OR REPLACE VIEW binder_item_availability AS
+WITH item_priority AS (
+  SELECT
+    bi.id AS binder_item_id,
+    bi.user_id,
+    bi.card_id,
+    COALESCE(c.oracle_id, c.id) AS playable_card_id,
+    bi.quantity AS item_quantity,
+    COALESCE(
+      SUM(bi.quantity) OVER (
+        PARTITION BY bi.user_id, COALESCE(c.oracle_id, c.id)
+        ORDER BY
+          CASE WHEN bi.for_trade OR bi.for_sale THEN 0 ELSE 1 END,
+          bi.updated_at,
+          bi.id
+        ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+      ),
+      0
+    )::int AS prior_item_quantity
+  FROM user_binder_items bi
+  JOIN cards c ON c.id = bi.card_id
+  WHERE bi.list_type = 'have'
+)
+SELECT
+  item.binder_item_id,
+  item.user_id,
+  item.card_id,
+  item.playable_card_id,
+  item.item_quantity,
+  availability.owned_quantity,
+  availability.allocated_quantity,
+  availability.committed_trade_quantity,
+  availability.free_quantity,
+  availability.missing_quantity,
+  GREATEST(
+    LEAST(
+      item.item_quantity,
+      availability.free_quantity - item.prior_item_quantity
+    ),
+    0
+  )::int AS available_quantity
+FROM item_priority item
+JOIN collection_availability_snapshot availability
+  ON availability.user_id = item.user_id
+ AND availability.playable_card_id = item.playable_card_id;
+''',
+    down: r'''DROP VIEW IF EXISTS binder_item_availability;
+DROP VIEW IF EXISTS collection_availability_snapshot;
+''',
   ),
   Migration(
     version: '046',
@@ -4002,6 +5919,1716 @@ final migrations = <Migration>[
       ALTER TABLE trade_items DROP COLUMN IF EXISTS snapshot_schema_version;
     ''',
   ),
+  Migration(
+    version: '059',
+    name: 'align_trade_items_owner_fk',
+    // D-66 (BT-PRIV-002): a chave de trade_items.owner_id vinha com
+    // ON DELETE CASCADE da 041 e está sem ação na produção (BT-DB-001).
+    // Nos dois bancos ela passa a RESTRICT, como as outras chaves de troca e
+    // mensagem para users: apagar a linha de users de quem tem item de troca
+    // é recusado, em vez de levar em silêncio o histórico da outra parte. A
+    // exclusão de conta do produto não apaga users (ela pseudonimiza) e trata
+    // os itens antes (UserDataPrivacyService.deleteAndAnonymizeAccount).
+    up: '''
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_owner_id_fkey;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT trade_items_owner_id_fkey
+      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE RESTRICT;
+
+      DO \$trade_items_owner_trigger\$
+      DECLARE
+        stale RECORD;
+        owner_constraint_oid OID;
+      BEGIN
+        -- O trigger de conta ativa leva o OID da chave no nome
+        -- (manaloom_active_user_<oid>, migration 038). A chave nova tem
+        -- outro OID: sai o trigger antigo e entra um com o nome novo.
+        FOR stale IN
+          SELECT tgname
+          FROM pg_trigger
+          WHERE tgrelid = 'public.trade_items'::regclass
+            AND NOT tgisinternal
+            AND left(tgname, 21) = 'manaloom_active_user_'
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.trade_items',
+            stale.tgname
+          );
+        END LOOP;
+        SELECT oid INTO owner_constraint_oid
+        FROM pg_constraint
+        WHERE conrelid = 'public.trade_items'::regclass
+          AND conname = 'trade_items_owner_id_fkey';
+        EXECUTE format(
+          'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF owner_id '
+          'ON public.trade_items FOR EACH ROW '
+          'EXECUTE FUNCTION manaloom_require_active_user(%L)',
+          'manaloom_active_user_' || owner_constraint_oid,
+          'owner_id'
+        );
+      END;
+      \$trade_items_owner_trigger\$;
+    ''',
+    down: '''
+      ALTER TABLE trade_items
+      DROP CONSTRAINT IF EXISTS trade_items_owner_id_fkey;
+      ALTER TABLE trade_items
+      ADD CONSTRAINT trade_items_owner_id_fkey
+      FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE;
+
+      DO \$trade_items_owner_trigger\$
+      DECLARE
+        stale RECORD;
+        owner_constraint_oid OID;
+      BEGIN
+        FOR stale IN
+          SELECT tgname
+          FROM pg_trigger
+          WHERE tgrelid = 'public.trade_items'::regclass
+            AND NOT tgisinternal
+            AND left(tgname, 21) = 'manaloom_active_user_'
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.trade_items',
+            stale.tgname
+          );
+        END LOOP;
+        SELECT oid INTO owner_constraint_oid
+        FROM pg_constraint
+        WHERE conrelid = 'public.trade_items'::regclass
+          AND conname = 'trade_items_owner_id_fkey';
+        EXECUTE format(
+          'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF owner_id '
+          'ON public.trade_items FOR EACH ROW '
+          'EXECUTE FUNCTION manaloom_require_active_user(%L)',
+          'manaloom_active_user_' || owner_constraint_oid,
+          'owner_id'
+        );
+      END;
+      \$trade_items_owner_trigger\$;
+    ''',
+  ),
+  Migration(
+    version: '060',
+    name: 'create_account_deletion_outbox',
+    // D-68 (BT-PRIV-002): o outbox da exclusão avisa, com recibo por
+    // consumidor, lease e nova tentativa, os lugares fora do PostgreSQL. A
+    // exclusão grava uma linha por consumidor na mesma transação do recibo
+    // (lib/privacy/account_deletion_outbox.dart). Sem identificador do
+    // titular: a linha aponta para o recibo e leva os decks como o HMAC dos
+    // tombstones, nunca o UUID cru. DDL aprovado na D-68.
+    up: '''
+      CREATE TABLE IF NOT EXISTS account_deletion_outbox (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        receipt_id UUID NOT NULL
+          REFERENCES account_deletion_receipts(id) ON DELETE RESTRICT,
+        consumer TEXT NOT NULL CHECK (consumer IN (
+          'hermes_learning_sqlite',
+          'interactive_battle_sidecar',
+          'endpoint_cache',
+          'sentry',
+          'backups'
+        )),
+        key_version SMALLINT NOT NULL
+          REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+        deck_tokens TEXT[] NOT NULL DEFAULT '{}',
+        status TEXT NOT NULL DEFAULT 'pending'
+          CHECK (status IN ('pending', 'processing', 'done', 'failed')),
+        attempts INTEGER NOT NULL DEFAULT 0 CHECK (attempts BETWEEN 0 AND 100),
+        next_attempt_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP,
+        lease_owner TEXT,
+        lease_expires_at TIMESTAMP WITH TIME ZONE,
+        last_error_code TEXT,
+        completed_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT uq_account_deletion_outbox_consumer
+          UNIQUE (receipt_id, consumer),
+        CONSTRAINT chk_account_deletion_outbox_done
+          CHECK ((status = 'done') = (completed_at IS NOT NULL)),
+        CONSTRAINT chk_account_deletion_outbox_lease
+          CHECK (
+            (status = 'processing') =
+            (lease_owner IS NOT NULL AND lease_expires_at IS NOT NULL)
+          )
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_account_deletion_outbox_due
+        ON account_deletion_outbox (next_attempt_at)
+        WHERE status IN ('pending', 'failed');
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS account_deletion_outbox;
+    ''',
+  ),
+  Migration(
+    version: '061',
+    name: 'create_beta_invites',
+    // BT-AUTH-006 (D-16, D-56): convite de uso único, emitido pelo dono em
+    // lotes e entregue por e-mail, com expiração e revogação. O banco guarda
+    // só o hash do código e o digest do e-mail convidado, mais uma pista
+    // mascarada para o dono listar; nunca o código nem o e-mail em claro.
+    // Um convite aberto por e-mail (índice parcial). A auditoria fica em
+    // beta_invite_events, sem dado pessoal.
+    up: '''
+      CREATE TABLE IF NOT EXISTS beta_invites (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        batch_label TEXT NOT NULL
+          CHECK (batch_label ~ '^[a-z0-9][a-z0-9._-]{0,63}\$'),
+        email_digest TEXT NOT NULL CHECK (email_digest ~ '^[0-9a-f]{64}\$'),
+        email_hint TEXT NOT NULL
+          CHECK (char_length(email_hint) BETWEEN 3 AND 120),
+        token_hash TEXT NOT NULL CHECK (token_hash ~ '^[0-9a-f]{64}\$'),
+        issued_by TEXT NOT NULL CHECK (char_length(issued_by) BETWEEN 1 AND 80),
+        issued_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        delivered_at TIMESTAMP WITH TIME ZONE,
+        revoked_at TIMESTAMP WITH TIME ZONE,
+        revoked_reason TEXT
+          CHECK (
+            revoked_reason IS NULL
+            OR char_length(revoked_reason) BETWEEN 1 AND 200
+          ),
+        accepted_at TIMESTAMP WITH TIME ZONE,
+        accepted_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+        CONSTRAINT uq_beta_invites_token_hash UNIQUE (token_hash),
+        CONSTRAINT chk_beta_invites_expiry CHECK (expires_at > issued_at),
+        CONSTRAINT chk_beta_invites_single_outcome
+          CHECK (accepted_at IS NULL OR revoked_at IS NULL),
+        CONSTRAINT chk_beta_invites_revoked_reason
+          CHECK ((revoked_at IS NULL) = (revoked_reason IS NULL)),
+        CONSTRAINT chk_beta_invites_accepted_user
+          CHECK (accepted_at IS NOT NULL OR accepted_user_id IS NULL)
+      );
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_beta_invites_open_email
+        ON beta_invites (email_digest)
+        WHERE accepted_at IS NULL AND revoked_at IS NULL;
+      CREATE INDEX IF NOT EXISTS idx_beta_invites_batch
+        ON beta_invites (batch_label, issued_at);
+
+      CREATE TABLE IF NOT EXISTS beta_invite_events (
+        id BIGSERIAL PRIMARY KEY,
+        invite_id UUID NOT NULL
+          REFERENCES beta_invites(id) ON DELETE CASCADE,
+        event TEXT NOT NULL CHECK (event IN (
+          'issued',
+          'delivered',
+          'delivery_failed',
+          'resent',
+          'revoked',
+          'accepted',
+          'denied_expired',
+          'denied_revoked',
+          'denied_used',
+          'denied_email_mismatch'
+        )),
+        actor TEXT NOT NULL CHECK (char_length(actor) BETWEEN 1 AND 80),
+        request_id TEXT
+          CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_beta_invite_events_invite
+        ON beta_invite_events (invite_id, created_at);
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS beta_invite_events;
+      DROP TABLE IF EXISTS beta_invites;
+    ''',
+  ),
+  Migration(
+    version: '062',
+    name: 'record_legal_acceptance_history',
+    // BT-LEGAL-ACCEPT-001 (D-24): histórico de aceites de Termos e
+    // Privacidade, a prova de consentimento. `users` guarda o aceite vigente;
+    // aqui fica cada aceite (cadastro, reaceite e, uma vez, o retrato do que
+    // já estava aceito antes desta migration). Só cresce: nenhuma rota apaga
+    // ou altera linha.
+    up: '''
+      CREATE TABLE IF NOT EXISTS user_legal_acceptances (
+        id BIGSERIAL PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        terms_version TEXT NOT NULL
+          CHECK (char_length(terms_version) BETWEEN 1 AND 40),
+        privacy_version TEXT NOT NULL
+          CHECK (char_length(privacy_version) BETWEEN 1 AND 40),
+        source TEXT NOT NULL
+          CHECK (source IN ('register', 'reaccept', 'backfill')),
+        request_id TEXT
+          CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+        accepted_at TIMESTAMP WITH TIME ZONE NOT NULL
+          DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_user_legal_acceptances_user
+        ON user_legal_acceptances (user_id, accepted_at DESC);
+
+      INSERT INTO user_legal_acceptances (
+        user_id, terms_version, privacy_version, source, accepted_at
+      )
+      SELECT u.id, u.terms_version, u.privacy_version, 'backfill',
+             GREATEST(u.terms_accepted_at, u.privacy_accepted_at)
+      FROM users u
+      WHERE u.deleted_at IS NULL
+        AND u.terms_version IS NOT NULL
+        AND u.privacy_version IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM user_legal_acceptances a WHERE a.user_id = u.id
+        );
+
+      -- A chave nova para users ganha a trava de conta ativa (migration 038),
+      -- como as tabelas das migrations seguintes. O laço refaz todas as
+      -- chaves para users, então também cobre a de beta_invites (061).
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS user_legal_acceptances;
+    ''',
+  ),
+  Migration(
+    version: '063',
+    name: 'recreate_commander_learning_snapshot_view',
+    // D-65 (BT-DB-004): a view vinha das migrations 023 e 024, que
+    // interpolavam uma constante de server/lib. A constante mudou depois
+    // (b70c3edd8) e a produção ficou sem os filtros card_count = 100 e
+    // "comandante na lista" (BT-DB-001). O texto de hoje vale, escrito por
+    // extenso: nenhuma migration monta SQL com código que pode mudar.
+    up: r'''
+      CREATE OR REPLACE VIEW commander_learning_snapshot AS
+      WITH active_learned_decks AS (
+        SELECT
+          commander_name_normalized,
+          MAX(commander_name) AS commander_name,
+          COUNT(*)::int AS active_learned_deck_count,
+          MAX(score) AS best_learned_score,
+          MAX(promoted_at) AS latest_promoted_at,
+          MAX(updated_at) AS latest_learned_updated_at,
+          ARRAY_REMOVE(ARRAY_AGG(DISTINCT legal_status ORDER BY legal_status), NULL)
+            AS learned_legal_statuses,
+          ARRAY_REMOVE(ARRAY_AGG(DISTINCT archetype ORDER BY archetype), NULL)
+            AS learned_archetypes,
+          jsonb_agg(jsonb_build_object(
+            'deck_name', deck_name,
+            'archetype', archetype,
+            'card_count', card_count,
+            'score', score,
+            'legal_status', legal_status,
+            'wincon_primary', wincon_primary,
+            'wincon_backup', wincon_backup,
+            'promoted_at', promoted_at,
+            'updated_at', updated_at
+          ) ORDER BY score DESC NULLS LAST, promoted_at DESC NULLS LAST, updated_at DESC)
+            AS active_learned_decks
+        FROM commander_learned_decks
+        WHERE is_active = TRUE
+          AND card_count = 100
+          AND card_list ILIKE '%' || commander_name || '%'
+        GROUP BY commander_name_normalized
+      ),
+      bridge_names AS (
+        SELECT DISTINCT ON (normalized_lookup_name)
+          normalized_lookup_name,
+          canonical_name
+        FROM card_identity_bridge
+        WHERE normalized_lookup_name IS NOT NULL
+          AND normalized_lookup_name <> ''
+        ORDER BY normalized_lookup_name, (source = 'cards') DESC, match_priority ASC,
+          canonical_name ASC
+      ),
+      usage_ranked AS (
+        SELECT
+          ccu.commander_name_normalized,
+          ccu.card_name_normalized,
+          COALESCE(bn.canonical_name, ccu.card_name_normalized)
+            AS canonical_card_name,
+          ccu.usage_count,
+          ccu.last_used_at,
+          ROW_NUMBER() OVER (
+            PARTITION BY ccu.commander_name_normalized
+            ORDER BY ccu.usage_count DESC, ccu.last_used_at DESC, ccu.card_name_normalized
+          ) AS rn
+        FROM commander_card_usage ccu
+        LEFT JOIN bridge_names bn
+          ON bn.normalized_lookup_name = ccu.card_name_normalized
+      ),
+      usage_summary AS (
+        SELECT
+          commander_name_normalized,
+          COUNT(*)::int AS usage_card_rows,
+          COALESCE(SUM(usage_count), 0)::int AS total_usage_count,
+          jsonb_agg(jsonb_build_object(
+            'card_name_normalized', card_name_normalized,
+            'canonical_card_name', canonical_card_name,
+            'usage_count', usage_count,
+            'last_used_at', last_used_at
+          ) ORDER BY usage_count DESC, last_used_at DESC, card_name_normalized)
+            FILTER (WHERE rn <= 50) AS top_usage_cards
+        FROM usage_ranked
+        GROUP BY commander_name_normalized
+      ),
+      synergy_ranked AS (
+        SELECT
+          ccs.commander_name_normalized,
+          ccs.commander_name,
+          ccs.card_id,
+          ccs.card_name,
+          ccs.role,
+          ccs.score,
+          ccs.source,
+          ccs.evidence_count,
+          ccs.updated_at,
+          ROW_NUMBER() OVER (
+            PARTITION BY ccs.commander_name_normalized
+            ORDER BY ccs.score DESC, ccs.evidence_count DESC, ccs.card_name, ccs.role
+          ) AS rn
+        FROM commander_card_synergy ccs
+      ),
+      synergy_summary AS (
+        SELECT
+          commander_name_normalized,
+          MAX(commander_name) AS commander_name,
+          COUNT(*)::int AS synergy_rows,
+          MAX(score)::int AS best_synergy_score,
+          jsonb_agg(jsonb_build_object(
+            'card_id', card_id,
+            'card_name', card_name,
+            'role', role,
+            'score', score,
+            'source', source,
+            'evidence_count', evidence_count,
+            'updated_at', updated_at
+          ) ORDER BY score DESC, evidence_count DESC, card_name, role)
+            FILTER (WHERE rn <= 50) AS top_synergy_cards
+        FROM synergy_ranked
+        GROUP BY commander_name_normalized
+      ),
+      all_commanders AS (
+        SELECT commander_name_normalized FROM active_learned_decks
+        UNION
+        SELECT commander_name_normalized FROM usage_summary
+        UNION
+        SELECT commander_name_normalized FROM synergy_summary
+      )
+      SELECT
+        ac.commander_name_normalized,
+        COALESCE(ld.commander_name, ss.commander_name, ac.commander_name_normalized)
+          AS commander_name,
+        COALESCE(ld.active_learned_deck_count, 0) AS active_learned_deck_count,
+        ld.best_learned_score,
+        ld.latest_promoted_at,
+        ld.latest_learned_updated_at,
+        COALESCE(ld.learned_legal_statuses, ARRAY[]::TEXT[])
+          AS learned_legal_statuses,
+        COALESCE(ld.learned_archetypes, ARRAY[]::TEXT[]) AS learned_archetypes,
+        COALESCE(ld.active_learned_decks, '[]'::jsonb) AS active_learned_decks,
+        COALESCE(us.usage_card_rows, 0) AS usage_card_rows,
+        COALESCE(us.total_usage_count, 0) AS total_usage_count,
+        COALESCE(us.top_usage_cards, '[]'::jsonb) AS top_usage_cards,
+        COALESCE(ss.synergy_rows, 0) AS synergy_rows,
+        COALESCE(ss.best_synergy_score, 0) AS best_synergy_score,
+        COALESCE(ss.top_synergy_cards, '[]'::jsonb) AS top_synergy_cards,
+        jsonb_build_object(
+          'has_active_learned_deck', COALESCE(ld.active_learned_deck_count, 0) > 0,
+          'has_usage', COALESCE(us.usage_card_rows, 0) > 0,
+          'has_synergy', COALESCE(ss.synergy_rows, 0) > 0,
+          'metadata_hidden', TRUE
+        ) AS source_coverage
+      FROM all_commanders ac
+      LEFT JOIN active_learned_decks ld
+        ON ld.commander_name_normalized = ac.commander_name_normalized
+      LEFT JOIN usage_summary us
+        ON us.commander_name_normalized = ac.commander_name_normalized
+      LEFT JOIN synergy_summary ss
+        ON ss.commander_name_normalized = ac.commander_name_normalized;
+    ''',
+  ),
+  Migration(
+    version: '064',
+    name: 'adopt_production_unique_indexes',
+    // D-67 (BT-DB-004): os índices UNIQUE que só existiam na produção
+    // (auditoria BT-DB-001). Lá já existem com estes nomes, então o
+    // IF NOT EXISTS não muda nada; o banco novo passa a recusar o mesmo.
+    // Fica de fora uq_binder_user_card_cond_foil_list, pendente de decisão:
+    // ele não tem o idioma e contradiz a identidade física da 049 (ADR 0008).
+    up: r'''
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_card_battle_rules_name_rule_key ON card_battle_rules USING btree (normalized_name, logical_rule_key);
+      CREATE UNIQUE INDEX IF NOT EXISTS unique_card_insight ON card_meta_insights USING btree (card_name);
+      CREATE UNIQUE INDEX IF NOT EXISTS card_rulings_pkey1 ON card_rulings USING btree (id);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation ON conversations USING btree (user_a_id, user_b_id);
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_pair ON conversations USING btree (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id));
+    ''',
+    down: r'''
+      DROP INDEX IF EXISTS uq_conversation_pair;
+      DROP INDEX IF EXISTS uq_conversation;
+      DROP INDEX IF EXISTS card_rulings_pkey1;
+      DROP INDEX IF EXISTS unique_card_insight;
+      DROP INDEX IF EXISTS idx_card_battle_rules_name_rule_key;
+    ''',
+  ),
+  Migration(
+    version: '065',
+    name: 'adopt_production_indexes_from_database_indexes_sql',
+    // D-48 (BT-DB-004): server/database_indexes.sql foi aposentado. Os
+    // índices dele que a produção tem viram migration, com a definição da
+    // produção; os que ela não tem saem com o arquivo.
+    up: r'''
+      CREATE INDEX IF NOT EXISTS idx_cards_colors ON cards USING gin (colors);
+      CREATE INDEX IF NOT EXISTS idx_cards_lower_name ON cards USING btree (lower(name));
+      CREATE INDEX IF NOT EXISTS idx_conversations_user_a_last ON conversations USING btree (user_a_id, last_message_at DESC, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_conversations_user_b_last ON conversations USING btree (user_b_id, last_message_at DESC, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_deck_cards_card_id ON deck_cards USING btree (card_id);
+      CREATE INDEX IF NOT EXISTS idx_decks_format ON decks USING btree (format);
+      CREATE INDEX IF NOT EXISTS idx_direct_messages_conversation_created ON direct_messages USING btree (conversation_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_direct_messages_unread_by_conversation ON direct_messages USING btree (conversation_id, sender_id) WHERE (read_at IS NULL);
+      CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications USING btree (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_notifications_user_unread_created ON notifications USING btree (user_id, created_at DESC) WHERE (read_at IS NULL);
+      CREATE INDEX IF NOT EXISTS idx_trade_items_offer_direction ON trade_items USING btree (trade_offer_id, direction);
+      CREATE INDEX IF NOT EXISTS idx_trade_messages_offer_created ON trade_messages USING btree (trade_offer_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_status_updated ON trade_offers USING btree (receiver_id, status, updated_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_updated ON trade_offers USING btree (receiver_id, updated_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_status_updated ON trade_offers USING btree (sender_id, status, updated_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_updated ON trade_offers USING btree (sender_id, updated_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_trade_history_offer_created ON trade_status_history USING btree (trade_offer_id, created_at);
+      CREATE INDEX IF NOT EXISTS idx_binder_marketplace_available_created ON user_binder_items USING btree (created_at DESC) WHERE ((for_trade = true) OR (for_sale = true));
+      CREATE INDEX IF NOT EXISTS idx_binder_user_list_name_filters ON user_binder_items USING btree (user_id, list_type, condition, for_trade, for_sale);
+      CREATE INDEX IF NOT EXISTS idx_users_email ON users USING btree (email);
+      CREATE INDEX IF NOT EXISTS idx_users_username ON users USING btree (username);
+    ''',
+    down: r'''
+      DROP INDEX IF EXISTS idx_users_username;
+      DROP INDEX IF EXISTS idx_users_email;
+      DROP INDEX IF EXISTS idx_binder_user_list_name_filters;
+      DROP INDEX IF EXISTS idx_binder_marketplace_available_created;
+      DROP INDEX IF EXISTS idx_trade_history_offer_created;
+      DROP INDEX IF EXISTS idx_trade_offers_sender_updated;
+      DROP INDEX IF EXISTS idx_trade_offers_sender_status_updated;
+      DROP INDEX IF EXISTS idx_trade_offers_receiver_updated;
+      DROP INDEX IF EXISTS idx_trade_offers_receiver_status_updated;
+      DROP INDEX IF EXISTS idx_trade_messages_offer_created;
+      DROP INDEX IF EXISTS idx_trade_items_offer_direction;
+      DROP INDEX IF EXISTS idx_notifications_user_unread_created;
+      DROP INDEX IF EXISTS idx_notifications_user_created;
+      DROP INDEX IF EXISTS idx_direct_messages_unread_by_conversation;
+      DROP INDEX IF EXISTS idx_direct_messages_conversation_created;
+      DROP INDEX IF EXISTS idx_decks_format;
+      DROP INDEX IF EXISTS idx_deck_cards_card_id;
+      DROP INDEX IF EXISTS idx_conversations_user_b_last;
+      DROP INDEX IF EXISTS idx_conversations_user_a_last;
+      DROP INDEX IF EXISTS idx_cards_lower_name;
+      DROP INDEX IF EXISTS idx_cards_colors;
+    ''',
+  ),
+  Migration(
+    version: '066',
+    name: 'adopt_remaining_production_only_indexes',
+    // D-83 (BT-DB-004, 2026-09-28): os 21 índices que só a produção tinha e que
+    // não vinham do database_indexes.sql aposentado (auditoria BT-DB-001). Lá já
+    // existem com estes nomes e definições, então o IF NOT EXISTS não muda nada; o
+    // banco novo passa a tê-los. uq_binder_user_card_cond_foil_list continua de
+    // fora: não tem o idioma e contradiz a identidade física da 049.
+    up: r'''
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_created_at ON battle_simulations USING btree (created_at);
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_a_id ON battle_simulations USING btree (deck_a_id);
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_b_id ON battle_simulations USING btree (deck_b_id);
+      CREATE INDEX IF NOT EXISTS idx_battle_simulations_winner_deck_id ON battle_simulations USING btree (winner_deck_id);
+      CREATE INDEX IF NOT EXISTS idx_card_legalities_card_id ON card_legalities USING btree (card_id);
+      CREATE INDEX IF NOT EXISTS idx_card_legalities_format ON card_legalities USING btree (format);
+      CREATE INDEX IF NOT EXISTS idx_card_legalities_status ON card_legalities USING btree (status);
+      CREATE INDEX IF NOT EXISTS idx_cards_collector_set ON cards USING btree (collector_number, set_code) WHERE (collector_number IS NOT NULL);
+      CREATE INDEX IF NOT EXISTS idx_cards_set_code ON cards USING btree (set_code);
+      CREATE INDEX IF NOT EXISTS idx_deck_cards_is_commander ON deck_cards USING btree (is_commander);
+      CREATE INDEX IF NOT EXISTS idx_deck_matchups_deck_id ON deck_matchups USING btree (deck_id);
+      CREATE INDEX IF NOT EXISTS idx_deck_matchups_opponent_deck_id ON deck_matchups USING btree (opponent_deck_id);
+      CREATE INDEX IF NOT EXISTS idx_deck_matchups_win_rate ON deck_matchups USING btree (win_rate);
+      CREATE INDEX IF NOT EXISTS idx_decks_created_at ON decks USING btree (created_at);
+      CREATE INDEX IF NOT EXISTS idx_decks_is_public ON decks USING btree (is_public);
+      CREATE INDEX IF NOT EXISTS idx_decks_user_public ON decks USING btree (user_id, is_public);
+      CREATE INDEX IF NOT EXISTS idx_meta_decks_commander_name ON meta_decks USING btree (commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (commander_name IS NOT NULL));
+      CREATE INDEX IF NOT EXISTS idx_meta_decks_partner_commander_name ON meta_decks USING btree (partner_commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (partner_commander_name IS NOT NULL));
+      CREATE INDEX IF NOT EXISTS idx_binder_list_type ON user_binder_items USING btree (user_id, list_type);
+      CREATE INDEX IF NOT EXISTS idx_users_display_name_lower ON users USING btree (lower(COALESCE(display_name, ''::text)));
+      CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users USING btree (lower(username));
+    ''',
+    down: r'''
+      DROP INDEX IF EXISTS idx_users_username_lower;
+      DROP INDEX IF EXISTS idx_users_display_name_lower;
+      DROP INDEX IF EXISTS idx_binder_list_type;
+      DROP INDEX IF EXISTS idx_meta_decks_partner_commander_name;
+      DROP INDEX IF EXISTS idx_meta_decks_commander_name;
+      DROP INDEX IF EXISTS idx_decks_user_public;
+      DROP INDEX IF EXISTS idx_decks_is_public;
+      DROP INDEX IF EXISTS idx_decks_created_at;
+      DROP INDEX IF EXISTS idx_deck_matchups_win_rate;
+      DROP INDEX IF EXISTS idx_deck_matchups_opponent_deck_id;
+      DROP INDEX IF EXISTS idx_deck_matchups_deck_id;
+      DROP INDEX IF EXISTS idx_deck_cards_is_commander;
+      DROP INDEX IF EXISTS idx_cards_set_code;
+      DROP INDEX IF EXISTS idx_cards_collector_set;
+      DROP INDEX IF EXISTS idx_card_legalities_status;
+      DROP INDEX IF EXISTS idx_card_legalities_format;
+      DROP INDEX IF EXISTS idx_card_legalities_card_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_winner_deck_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_deck_b_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_deck_a_id;
+      DROP INDEX IF EXISTS idx_battle_simulations_created_at;
+    ''',
+  ),
+  Migration(
+    version: '067',
+    name: 'create_deck_revision_ledger',
+    // DCK-P0-01 (decisão D-29 do dono): revisão otimista do deck e ledger
+    // imutável de mudanças. Toda mudança de deck existente sobe
+    // `decks.revision` e grava uma linha em `deck_change_events` com o que
+    // mudou, antes e depois, na mesma transação
+    // (lib/decks/deck_revision_support.dart); a `Idempotency-Key` do pedido
+    // fica no evento para o repetido devolver o mesmo recibo. O ledger só
+    // recebe INSERT; DELETE só em cascata do deck ou da conta. 067 a 069 são
+    // da frente de deck; 061-062 e 063-066, das frentes A e C.
+    up: '''
+      ALTER TABLE decks ADD COLUMN IF NOT EXISTS revision BIGINT NOT NULL DEFAULT 1;
+      ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_revision_positive;
+      ALTER TABLE decks ADD CONSTRAINT chk_decks_revision_positive
+        CHECK (revision >= 1);
+
+      CREATE TABLE IF NOT EXISTS deck_change_events (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        revision_before BIGINT NOT NULL CHECK (revision_before >= 1),
+        revision_after BIGINT NOT NULL,
+        operation TEXT NOT NULL,
+        cards_before JSONB,
+        cards_after JSONB,
+        metadata_before JSONB NOT NULL DEFAULT '{}'::jsonb,
+        metadata_after JSONB NOT NULL DEFAULT '{}'::jsonb,
+        undo_of_event_id UUID REFERENCES deck_change_events(id) ON DELETE CASCADE,
+        idempotency_key TEXT,
+        request_fingerprint TEXT,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT chk_deck_change_events_revision_step
+          CHECK (revision_after = revision_before + 1),
+        CONSTRAINT chk_deck_change_events_cards_pair
+          CHECK ((cards_before IS NULL) = (cards_after IS NULL)),
+        CONSTRAINT chk_deck_change_events_idempotency_pair
+          CHECK ((idempotency_key IS NULL) = (request_fingerprint IS NULL)),
+        CONSTRAINT chk_deck_change_events_idempotency_key
+          CHECK (
+            idempotency_key IS NULL
+            OR char_length(idempotency_key) BETWEEN 1 AND 200
+          ),
+        CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+          'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+          'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+          'optimization_rollback', 'undo'
+        )),
+        CONSTRAINT uq_deck_change_events_revision UNIQUE (deck_id, revision_after)
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_deck_change_events_idempotency
+        ON deck_change_events (deck_id, idempotency_key)
+        WHERE idempotency_key IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_deck_change_events_user
+        ON deck_change_events (user_id);
+      CREATE INDEX IF NOT EXISTS idx_deck_change_events_undo_of
+        ON deck_change_events (undo_of_event_id)
+        WHERE undo_of_event_id IS NOT NULL;
+
+      CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_change_events_append_only\$
+      BEGIN
+        -- UPDATE nunca. DELETE só em cascata (deck ou conta apagados), que chega
+        -- por um gatilho de integridade: profundidade 2 ou mais.
+        IF TG_OP = 'UPDATE' OR pg_trigger_depth() <= 1 THEN
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        RETURN OLD;
+      END;
+      \$deck_change_events_append_only\$;
+
+      DROP TRIGGER IF EXISTS manaloom_deck_change_events_append_only
+        ON deck_change_events;
+      CREATE TRIGGER manaloom_deck_change_events_append_only
+      BEFORE UPDATE OR DELETE ON deck_change_events
+      FOR EACH ROW EXECUTE FUNCTION manaloom_deck_change_events_append_only();
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS deck_change_events;
+      DROP FUNCTION IF EXISTS manaloom_deck_change_events_append_only();
+      ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_revision_positive;
+      ALTER TABLE decks DROP COLUMN IF EXISTS revision;
+    ''',
+  ),
+  Migration(
+    version: '068',
+    name: 'demote_decks_on_legality_change',
+    // DCK-P1-04 (decisão D-28 do dono): a validação estrita vale para a
+    // legalidade de hoje. Quando a legalidade de uma carta muda num formato
+    // (qualquer escritor de card_legalities: a sincronização do catálogo, os
+    // seeds e os scripts antigos), o deck `validated` desse formato que tem a
+    // carta volta a `draft` com `card_legality_changed`, na mesma transação.
+    // Gatilhos por comando, com tabelas de transição: a sincronização em lote
+    // roda uma atualização só, e regravar o mesmo status não rebaixa nada.
+    // 067 a 069 são da frente de deck.
+    up: '''
+      CREATE OR REPLACE FUNCTION manaloom_demote_decks_for_legalities(changed jsonb)
+      RETURNS void
+      LANGUAGE sql
+      AS \$demote_for_legalities\$
+        UPDATE decks d
+        SET validation_state = 'draft',
+            validation_reasons = CASE
+              WHEN COALESCE(d.validation_reasons, '[]'::jsonb) ? 'card_legality_changed'
+                THEN COALESCE(d.validation_reasons, '[]'::jsonb)
+              ELSE COALESCE(d.validation_reasons, '[]'::jsonb)
+                || '["card_legality_changed"]'::jsonb
+            END,
+            validation_updated_at = CURRENT_TIMESTAMP
+        WHERE d.validation_state = 'validated'
+          AND EXISTS (
+            SELECT 1
+            FROM jsonb_to_recordset(changed) AS c(card_id uuid, format text)
+            JOIN deck_cards dc ON dc.card_id = c.card_id
+            WHERE dc.deck_id = d.id
+              AND LOWER(c.format) = LOWER(d.format)
+          );
+      \$demote_for_legalities\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_inserted()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$legality_inserted\$
+      BEGIN
+        PERFORM manaloom_demote_decks_for_legalities((
+          SELECT COALESCE(
+            jsonb_agg(jsonb_build_object('card_id', card_id, 'format', format)),
+            '[]'::jsonb
+          )
+          FROM legality_new_rows
+        ));
+        RETURN NULL;
+      END;
+      \$legality_inserted\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_deleted()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$legality_deleted\$
+      BEGIN
+        PERFORM manaloom_demote_decks_for_legalities((
+          SELECT COALESCE(
+            jsonb_agg(jsonb_build_object('card_id', card_id, 'format', format)),
+            '[]'::jsonb
+          )
+          FROM legality_old_rows
+        ));
+        RETURN NULL;
+      END;
+      \$legality_deleted\$;
+
+      CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_updated()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$legality_updated\$
+      BEGIN
+        -- Só o que mudou de fato: a sincronização regrava a mesma linha sem
+        -- mudar o status, e isso não rebaixa nada.
+        PERFORM manaloom_demote_decks_for_legalities((
+          SELECT COALESCE(
+            jsonb_agg(jsonb_build_object('card_id', changed.card_id,
+                                         'format', changed.format)),
+            '[]'::jsonb
+          )
+          FROM (
+            SELECT n.card_id, n.format
+            FROM legality_new_rows n
+            WHERE NOT EXISTS (
+              SELECT 1 FROM legality_old_rows o
+              WHERE o.card_id = n.card_id AND o.format = n.format
+                AND o.status IS NOT DISTINCT FROM n.status
+            )
+            UNION
+            SELECT o.card_id, o.format
+            FROM legality_old_rows o
+            WHERE NOT EXISTS (
+              SELECT 1 FROM legality_new_rows n
+              WHERE n.card_id = o.card_id AND n.format = o.format
+                AND n.status IS NOT DISTINCT FROM o.status
+            )
+          ) changed
+        ));
+        RETURN NULL;
+      END;
+      \$legality_updated\$;
+
+      DROP TRIGGER IF EXISTS manaloom_card_legality_inserted ON card_legalities;
+      CREATE TRIGGER manaloom_card_legality_inserted
+      AFTER INSERT ON card_legalities
+      REFERENCING NEW TABLE AS legality_new_rows
+      FOR EACH STATEMENT
+      EXECUTE FUNCTION manaloom_mark_decks_legality_inserted();
+
+      DROP TRIGGER IF EXISTS manaloom_card_legality_updated ON card_legalities;
+      CREATE TRIGGER manaloom_card_legality_updated
+      AFTER UPDATE ON card_legalities
+      REFERENCING OLD TABLE AS legality_old_rows NEW TABLE AS legality_new_rows
+      FOR EACH STATEMENT
+      EXECUTE FUNCTION manaloom_mark_decks_legality_updated();
+
+      DROP TRIGGER IF EXISTS manaloom_card_legality_deleted ON card_legalities;
+      CREATE TRIGGER manaloom_card_legality_deleted
+      AFTER DELETE ON card_legalities
+      REFERENCING OLD TABLE AS legality_old_rows
+      FOR EACH STATEMENT
+      EXECUTE FUNCTION manaloom_mark_decks_legality_deleted();
+    ''',
+    down: '''
+      DROP TRIGGER IF EXISTS manaloom_card_legality_inserted ON card_legalities;
+      DROP TRIGGER IF EXISTS manaloom_card_legality_updated ON card_legalities;
+      DROP TRIGGER IF EXISTS manaloom_card_legality_deleted ON card_legalities;
+      DROP FUNCTION IF EXISTS manaloom_mark_decks_legality_inserted();
+      DROP FUNCTION IF EXISTS manaloom_mark_decks_legality_updated();
+      DROP FUNCTION IF EXISTS manaloom_mark_decks_legality_deleted();
+      DROP FUNCTION IF EXISTS manaloom_demote_decks_for_legalities(jsonb);
+    ''',
+  ),
+  Migration(
+    version: '069',
+    name: 'create_ai_generate_requests',
+    // DCK-P0-04 (decisão D-29 do dono): o pedido do Generate fica durável,
+    // fora da fila de jobs (que dura 24 h pela D-32): entrada original,
+    // impressão, resultado e o deck materializado no servidor. O prompt
+    // bruto fica 30 dias e a limpeza por prazo (retention_cleanup_apply_v1)
+    // o apaga, junto com a impressão derivada dele. A mesma limpeza tira do
+    // ledger o texto de descrição com mais de 30 dias: o gatilho do ledger
+    // passa a aceitar só essa redação, com a sessão marcada. 067 a 069 são
+    // da frente de deck.
+    up: '''
+      CREATE TABLE IF NOT EXISTS ai_generate_requests (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        request_key TEXT NOT NULL,
+        request_fingerprint TEXT,
+        job_id TEXT,
+        format TEXT NOT NULL,
+        controls JSONB NOT NULL DEFAULT '{}'::jsonb,
+        prompt TEXT,
+        prompt_purged_at TIMESTAMP WITH TIME ZONE,
+        status TEXT NOT NULL DEFAULT 'pending',
+        result_deck JSONB,
+        result_fingerprint TEXT,
+        can_materialize BOOLEAN NOT NULL DEFAULT FALSE,
+        materialized_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+        materialized_at TIMESTAMP WITH TIME ZONE,
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT uq_ai_generate_requests_user_key UNIQUE (user_id, request_key),
+        CONSTRAINT chk_ai_generate_requests_status
+          CHECK (status IN ('pending', 'completed', 'failed', 'cancelled')),
+        CONSTRAINT chk_ai_generate_requests_prompt_purge
+          CHECK (
+            prompt_purged_at IS NULL
+            OR (prompt IS NULL AND request_fingerprint IS NULL)
+          ),
+        CONSTRAINT chk_ai_generate_requests_result
+          CHECK ((result_deck IS NULL) = (result_fingerprint IS NULL)),
+        CONSTRAINT chk_ai_generate_requests_materialize
+          CHECK (NOT can_materialize OR result_deck IS NOT NULL)
+      );
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_user_created
+        ON ai_generate_requests (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_job
+        ON ai_generate_requests (job_id)
+        WHERE job_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_materialized_deck
+        ON ai_generate_requests (materialized_deck_id)
+        WHERE materialized_deck_id IS NOT NULL;
+      CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_prompt_retention
+        ON ai_generate_requests (created_at)
+        WHERE prompt IS NOT NULL;
+
+      ALTER TABLE deck_change_events
+        ADD COLUMN IF NOT EXISTS description_redacted_at TIMESTAMP WITH TIME ZONE;
+
+      CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_change_events_append_only\$
+      BEGIN
+        IF TG_OP = 'UPDATE' THEN
+          -- A única mudança aceita é a redação governada da D-29: a limpeza por
+          -- prazo tira o texto da descrição de antes e de depois e marca
+          -- description_redacted_at, com todo o resto igual.
+          IF current_setting('manaloom.deck_ledger_redaction', true)
+               = 'd29_prompt_retention'
+             AND OLD.description_redacted_at IS NULL
+             AND NEW.description_redacted_at IS NOT NULL
+             AND NEW.id = OLD.id
+             AND NEW.deck_id = OLD.deck_id
+             AND NEW.user_id = OLD.user_id
+             AND NEW.revision_before = OLD.revision_before
+             AND NEW.revision_after = OLD.revision_after
+             AND NEW.operation = OLD.operation
+             AND NEW.cards_before IS NOT DISTINCT FROM OLD.cards_before
+             AND NEW.cards_after IS NOT DISTINCT FROM OLD.cards_after
+             AND NEW.undo_of_event_id IS NOT DISTINCT FROM OLD.undo_of_event_id
+             AND NEW.idempotency_key IS NOT DISTINCT FROM OLD.idempotency_key
+             AND NEW.request_fingerprint IS NOT DISTINCT FROM OLD.request_fingerprint
+             AND NEW.created_at = OLD.created_at
+             AND (NEW.metadata_before - 'description')
+               = (OLD.metadata_before - 'description')
+             AND (NEW.metadata_after - 'description')
+               = (OLD.metadata_after - 'description')
+             AND COALESCE(NEW.metadata_before -> 'description', 'null'::jsonb)
+               = 'null'::jsonb
+             AND COALESCE(NEW.metadata_after -> 'description', 'null'::jsonb)
+               = 'null'::jsonb
+          THEN
+            RETURN NEW;
+          END IF;
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        -- DELETE só em cascata (deck ou conta apagados), que chega por um gatilho
+        -- de integridade: profundidade 2 ou mais.
+        IF pg_trigger_depth() <= 1 THEN
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        RETURN OLD;
+      END;
+      \$deck_change_events_append_only\$;
+    ''',
+    down: '''
+      DROP TABLE IF EXISTS ai_generate_requests;
+      CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+      RETURNS trigger
+      LANGUAGE plpgsql
+      AS \$deck_change_events_append_only\$
+      BEGIN
+        IF TG_OP = 'UPDATE' OR pg_trigger_depth() <= 1 THEN
+          RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+            USING ERRCODE = 'restrict_violation';
+        END IF;
+        RETURN OLD;
+      END;
+      \$deck_change_events_append_only\$;
+      ALTER TABLE deck_change_events DROP COLUMN IF EXISTS description_redacted_at;
+    ''',
+  ),
+  Migration(
+    version: '072',
+    name: 'deck_trash_lifecycle',
+    // DCK-P0-06 (decisões D-30 e D-19 do dono): apagar deck vira ir para a
+    // lixeira (decks.deleted_at, que existe desde a 003); restaurar volta o
+    // deck privado. As duas mudanças entram no ledger (deck_delete e
+    // deck_restore). A purga em 30 dias é a limpeza por prazo
+    // (retention_cleanup_apply_v1), desligada até a ativação supervisionada.
+    // 067 a 069 e 072 a 073 são da frente de deck.
+    up: '''
+      -- O ledger passa a registrar ir para a lixeira e voltar dela: cada uma sobe a
+      -- revisão do deck como as outras mudanças do dono.
+      ALTER TABLE deck_change_events
+        DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+      ALTER TABLE deck_change_events
+        ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+        'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+        'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+        'optimization_rollback', 'undo',
+        'deck_delete', 'deck_restore'
+      ));
+      -- A lixeira de cada dono, da mais nova para a mais velha; a limpeza por prazo
+      -- lê o mesmo índice parcial (só decks na lixeira).
+      CREATE INDEX IF NOT EXISTS idx_decks_user_trash
+        ON decks (user_id, deleted_at DESC)
+        WHERE deleted_at IS NOT NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS idx_decks_user_trash;
+      ALTER TABLE deck_change_events
+        DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+      ALTER TABLE deck_change_events
+        ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+        'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+        'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+        'optimization_rollback', 'undo'
+      ));
+    ''',
+  ),
+  Migration(
+    version: '073',
+    name: 'activation_events_dedupe',
+    // BT-KPI-001 (decisão D-47 do dono): o coletor de eventos de ativação
+    // guarda só o hash SHA-256 da chave de idempotência do app, que carrega o
+    // ID do usuário, e a mesma chave do mesmo usuário grava uma vez só. Não
+    // cria tabela: o laço dos gatilhos de conta ativa não muda. 067 a 069 e
+    // 072 a 073 são da frente de deck.
+    up: '''
+      ALTER TABLE activation_funnel_events
+        ADD COLUMN IF NOT EXISTS dedupe_key TEXT;
+      ALTER TABLE activation_funnel_events
+        DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+      ALTER TABLE activation_funnel_events
+        ADD CONSTRAINT chk_activation_funnel_events_dedupe_key
+        CHECK (dedupe_key IS NULL OR dedupe_key ~ '^[0-9a-f]{64}\$');
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_activation_funnel_events_dedupe
+        ON activation_funnel_events (user_id, dedupe_key)
+        WHERE dedupe_key IS NOT NULL;
+    ''',
+    down: '''
+      DROP INDEX IF EXISTS uq_activation_funnel_events_dedupe;
+      ALTER TABLE activation_funnel_events
+        DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+      ALTER TABLE activation_funnel_events DROP COLUMN IF EXISTS dedupe_key;
+    ''',
+  ),
+  Migration(
+    version: '074',
+    name: 'reinstall_active_user_triggers',
+    // BT-DB-007 (Frente C): refaz a trava de conta ativa
+    // (manaloom_active_user_<oid>, migration 038) em toda chave de uma coluna
+    // para users, com o mesmo laço da 056. A 067 (deck_change_events) e a 069
+    // (ai_generate_requests), da frente de deck, criam chave para users sem
+    // rodar o laço. No banco novo o gatilho existe, porque o bootstrap já tem
+    // as tabelas quando o laço roda; no banco migrado, que é o caminho da
+    // produção, ele faltava, e o ensaio de upgrade (BT-DB-003) no código
+    // integrado acusou a diferença. O laço refaz todas as chaves, então cobre
+    // qualquer tabela nova que venha antes desta. Daqui em diante, toda
+    // migration com chave para users roda o laço no fim
+    // (test/active_user_trigger_rule_test.dart). O down é neutro: os gatilhos
+    // são a trava da 038, que o banco já devia ter, e tirá-los reabriria o
+    // buraco.
+    up: '''
+      DO \$active_user_triggers\$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      \$active_user_triggers\$;
+    ''',
+    down: 'SELECT 1;',
+  ),
+  Migration(
+    version: '075',
+    name: 'adopt_production_ml_tables_and_shapes',
+    // BT-DB-005 (D-48): o que o código usa e só a produção tinha passa a nascer
+    // de migration, com a forma dela (auditoria BT-DB-001 e o ensaio na estrutura
+    // do dump de 2026-09-23, só nomes e resultados). Na produção, tudo aqui é
+    // nulo ou só confere, menos três coisas que ela não tinha e o código usa:
+    // os índices de ml_prompt_feedback e os defaults de prompt_version e de
+    // battle_simulations.simulation_type (só metadado). Onde a produção é mais
+    // estrita (tipos, NOT NULL, chave primária), o banco novo adota. O que pede
+    // olhar dado (NOT NULL da D-67, chaves da D-50, CHECK que a produção não tem)
+    // fica na lista fechada da deriva, pendente do dono. 075 e 076 são da frente
+    // de banco.
+    up: r'''
+      CREATE TABLE IF NOT EXISTS optimization_analysis_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        test_run_id TEXT NOT NULL,
+        test_number INTEGER NOT NULL,
+        test_timestamp TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        commander_name TEXT NOT NULL,
+        commander_colors TEXT[] NOT NULL,
+        deck_format TEXT DEFAULT 'commander',
+        initial_card_count INTEGER NOT NULL,
+        final_card_count INTEGER NOT NULL,
+        operation_mode TEXT NOT NULL,
+        target_archetype TEXT,
+        detected_theme TEXT,
+        edhrec_themes TEXT[],
+        theme_match BOOLEAN DEFAULT false,
+        hybrid_mode_used BOOLEAN DEFAULT false,
+        before_avg_cmc DOUBLE PRECISION,
+        before_land_count INTEGER,
+        before_creature_count INTEGER,
+        after_avg_cmc DOUBLE PRECISION,
+        after_land_count INTEGER,
+        after_creature_count INTEGER,
+        removals_count INTEGER DEFAULT 0,
+        additions_count INTEGER DEFAULT 0,
+        removals_list JSONB,
+        additions_list JSONB,
+        validation_score INTEGER,
+        validation_verdict TEXT,
+        color_identity_violations INTEGER DEFAULT 0,
+        edhrec_validated_count INTEGER DEFAULT 0,
+        edhrec_not_validated_count INTEGER DEFAULT 0,
+        validation_warnings JSONB,
+        decisions_reasoning JSONB,
+        swap_analysis JSONB,
+        role_delta JSONB,
+        execution_time_ms INTEGER,
+        effectiveness_score DOUBLE PRECISION,
+        improvements_achieved JSONB,
+        potential_issues JSONB,
+        alternative_approaches JSONB,
+        lessons_learned TEXT,
+        algorithm_version TEXT DEFAULT 'v1.1-hybrid',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_oal_test_run ON optimization_analysis_logs USING btree (test_run_id);
+      CREATE INDEX IF NOT EXISTS idx_oal_commander ON optimization_analysis_logs USING btree (commander_name);
+      CREATE INDEX IF NOT EXISTS idx_oal_mode ON optimization_analysis_logs USING btree (operation_mode);
+      CREATE INDEX IF NOT EXISTS idx_oal_effectiveness ON optimization_analysis_logs USING btree (effectiveness_score);
+      CREATE INDEX IF NOT EXISTS idx_oal_timestamp ON optimization_analysis_logs USING btree (test_timestamp);
+      CREATE INDEX IF NOT EXISTS idx_opt_analysis_test_run ON optimization_analysis_logs USING btree (test_run_id);
+
+      CREATE TABLE IF NOT EXISTS synergy_packages (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        package_name TEXT NOT NULL,
+        package_type TEXT NOT NULL,
+        card_names TEXT[] NOT NULL,
+        primary_archetype TEXT,
+        supported_formats TEXT[] DEFAULT '{}',
+        occurrence_count INTEGER DEFAULT 0,
+        confidence_score DOUBLE PRECISION DEFAULT 0.5,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT unique_package UNIQUE (package_name)
+      );
+
+      CREATE TABLE IF NOT EXISTS archetype_patterns (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        archetype TEXT NOT NULL,
+        format TEXT NOT NULL,
+        ideal_land_count INTEGER,
+        ideal_avg_cmc DOUBLE PRECISION,
+        typical_ramp TEXT[] DEFAULT '{}',
+        typical_draw TEXT[] DEFAULT '{}',
+        typical_removal TEXT[] DEFAULT '{}',
+        typical_finishers TEXT[] DEFAULT '{}',
+        core_cards TEXT[] DEFAULT '{}',
+        flex_options JSONB DEFAULT '{}',
+        win_conditions TEXT[] DEFAULT '{}',
+        sample_size INTEGER DEFAULT 0,
+        last_analyzed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        data_sources TEXT[] DEFAULT '{}',
+        CONSTRAINT unique_archetype_format UNIQUE (archetype, format)
+      );
+
+      CREATE TABLE IF NOT EXISTS ml_learning_state (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        model_version TEXT NOT NULL,
+        prompt_template_hash TEXT,
+        total_optimizations INTEGER DEFAULT 0,
+        avg_effectiveness_score DOUBLE PRECISION DEFAULT 0.0,
+        active_rules JSONB DEFAULT '{}',
+        is_active BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT unique_model_version UNIQUE (model_version)
+      );
+
+      CREATE TABLE IF NOT EXISTS theme_contextual_rules (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        theme TEXT NOT NULL,
+        function TEXT NOT NULL,
+        min_count INTEGER,
+        max_count INTEGER,
+        ideal_count INTEGER,
+        priority TEXT CHECK (priority IN ('essential', 'high', 'medium', 'low')),
+        conditions JSONB DEFAULT '{}'::jsonb,
+        description TEXT,
+        source TEXT DEFAULT 'themes_md',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        CONSTRAINT theme_contextual_rules_theme_function_key UNIQUE (theme, function)
+      );
+      CREATE INDEX IF NOT EXISTS idx_theme_rules_theme ON theme_contextual_rules USING btree (theme);
+
+      CREATE TABLE IF NOT EXISTS analysis_sources (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        source_file TEXT NOT NULL,
+        source_type TEXT NOT NULL,
+        commander_name TEXT,
+        hash TEXT,
+        imported_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+        CONSTRAINT analysis_sources_source_file_key UNIQUE (source_file)
+      );
+      CREATE INDEX IF NOT EXISTS idx_analysis_sources_commander ON analysis_sources USING btree (commander_name);
+      CREATE INDEX IF NOT EXISTS idx_analysis_sources_type ON analysis_sources USING btree (source_type);
+
+      -- Colunas: a forma da produção (auditoria BT-DB-001). Na produção, tudo
+      -- abaixo é nulo ou só confere; o banco novo passa a ser igual.
+      ALTER TABLE cards ADD COLUMN IF NOT EXISTS edhrec_rank INTEGER;
+
+      ALTER TABLE ml_prompt_feedback
+        ALTER COLUMN prompt_version SET DEFAULT 'v1.1-hybrid';
+      CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_user_created
+        ON ml_prompt_feedback (user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_deck_created
+        ON ml_prompt_feedback (deck_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_ml_prompt_feedback_archetype_created
+        ON ml_prompt_feedback (LOWER(archetype), created_at DESC);
+
+      ALTER TABLE battle_simulations ALTER COLUMN simulation_type SET DEFAULT 'legacy';
+
+      ALTER TABLE commander_learned_decks ALTER COLUMN created_at SET DEFAULT now();
+      ALTER TABLE commander_learned_decks ALTER COLUMN created_at SET NOT NULL;
+      ALTER TABLE commander_learned_decks ALTER COLUMN updated_at SET DEFAULT now();
+      ALTER TABLE commander_learned_decks ALTER COLUMN updated_at SET NOT NULL;
+
+      ALTER TABLE card_meta_insights
+        ADD COLUMN IF NOT EXISTS id UUID NOT NULL DEFAULT gen_random_uuid();
+
+      -- Trocas que a produção já tem: só rodam onde a forma ainda é a antiga.
+      DO $adopt_production_shapes$
+      BEGIN
+        IF EXISTS (
+          SELECT 1
+          FROM pg_constraint constraint_row
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = constraint_row.conrelid
+           AND attribute_row.attnum = ANY (constraint_row.conkey)
+          WHERE constraint_row.conrelid = 'public.card_meta_insights'::regclass
+            AND constraint_row.contype = 'p'
+            AND attribute_row.attname = 'card_name'
+        ) THEN
+          ALTER TABLE card_meta_insights DROP CONSTRAINT card_meta_insights_pkey;
+          ALTER TABLE card_meta_insights
+            ADD CONSTRAINT card_meta_insights_pkey PRIMARY KEY (id);
+        END IF;
+
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.card_meta_insights'::regclass
+            AND attname = 'versatility_score'
+        ) <> 'double precision' THEN
+          ALTER TABLE card_meta_insights
+            ALTER COLUMN versatility_score TYPE DOUBLE PRECISION;
+          ALTER TABLE card_meta_insights ALTER COLUMN versatility_score SET DEFAULT 0.0;
+        END IF;
+
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.users'::regclass AND attname = 'location_city'
+        ) <> 'character varying(100)' THEN
+          ALTER TABLE users ALTER COLUMN location_city TYPE VARCHAR(100);
+        END IF;
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.users'::regclass AND attname = 'location_state'
+        ) <> 'character varying(2)' THEN
+          ALTER TABLE users ALTER COLUMN location_state TYPE VARCHAR(2);
+        END IF;
+
+        IF (
+          SELECT format_type(atttypid, atttypmod)
+          FROM pg_attribute
+          WHERE attrelid = 'public.user_binder_items'::regclass
+            AND attname = 'list_type'
+        ) <> 'character varying(4)' THEN
+          DROP VIEW IF EXISTS binder_item_availability;
+          DROP VIEW IF EXISTS collection_availability_snapshot;
+          ALTER TABLE user_binder_items ALTER COLUMN list_type TYPE VARCHAR(4);
+          ALTER TABLE user_binder_items ALTER COLUMN list_type SET DEFAULT 'have';
+    CREATE VIEW collection_availability_snapshot AS
+    WITH owned AS (
+      SELECT
+        bi.user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(bi.quantity), 0)::int AS owned_quantity
+      FROM user_binder_items bi
+      JOIN cards c ON c.id = bi.card_id
+      WHERE bi.list_type = 'have'
+      GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+    ),
+    allocated AS (
+      SELECT
+        d.user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(dc.quantity), 0)::int AS allocated_quantity
+      FROM decks d
+      JOIN deck_cards dc ON dc.deck_id = d.id
+      JOIN cards c ON c.id = dc.card_id
+      WHERE d.deleted_at IS NULL
+      GROUP BY d.user_id, COALESCE(c.oracle_id, c.id)
+    ),
+    committed AS (
+      SELECT
+        ti.owner_id AS user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(ti.quantity), 0)::int AS committed_trade_quantity
+      FROM trade_items ti
+      JOIN trade_offers trade ON trade.id = ti.trade_offer_id
+      JOIN user_binder_items bi ON bi.id = ti.binder_item_id
+      JOIN cards c ON c.id = bi.card_id
+      WHERE trade.status IN (
+        'pending', 'accepted', 'shipped', 'delivered', 'disputed'
+      )
+        AND bi.list_type = 'have'
+      GROUP BY ti.owner_id, COALESCE(c.oracle_id, c.id)
+    ),
+    wanted AS (
+      SELECT
+        bi.user_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        MIN(c.name) AS canonical_name,
+        COALESCE(SUM(bi.quantity), 0)::int AS wanted_quantity
+      FROM user_binder_items bi
+      JOIN cards c ON c.id = bi.card_id
+      WHERE bi.list_type = 'want'
+      GROUP BY bi.user_id, COALESCE(c.oracle_id, c.id)
+    ),
+    identities AS (
+      SELECT user_id, playable_card_id FROM owned
+      UNION
+      SELECT user_id, playable_card_id FROM allocated
+      UNION
+      SELECT user_id, playable_card_id FROM committed
+      UNION
+      SELECT user_id, playable_card_id FROM wanted
+    )
+    SELECT
+      identity.user_id,
+      identity.playable_card_id,
+      COALESCE(
+        owned.canonical_name,
+        allocated.canonical_name,
+        committed.canonical_name,
+        wanted.canonical_name
+      ) AS canonical_name,
+      COALESCE(owned.owned_quantity, 0)::int AS owned_quantity,
+      COALESCE(allocated.allocated_quantity, 0)::int AS allocated_quantity,
+      COALESCE(committed.committed_trade_quantity, 0)::int
+        AS committed_trade_quantity,
+      GREATEST(
+        COALESCE(owned.owned_quantity, 0)
+          - COALESCE(allocated.allocated_quantity, 0)
+          - COALESCE(committed.committed_trade_quantity, 0),
+        0
+      )::int AS free_quantity,
+      GREATEST(
+        COALESCE(allocated.allocated_quantity, 0)
+          - COALESCE(owned.owned_quantity, 0),
+        0
+      )::int AS missing_quantity,
+      COALESCE(wanted.wanted_quantity, 0)::int AS wanted_quantity,
+      GREATEST(
+        COALESCE(wanted.wanted_quantity, 0)
+          - COALESCE(owned.owned_quantity, 0),
+        0
+      )::int AS wanted_missing_quantity
+    FROM identities identity
+    LEFT JOIN owned USING (user_id, playable_card_id)
+    LEFT JOIN allocated USING (user_id, playable_card_id)
+    LEFT JOIN committed USING (user_id, playable_card_id)
+    LEFT JOIN wanted USING (user_id, playable_card_id);
+
+    CREATE VIEW binder_item_availability AS
+    WITH item_priority AS (
+      SELECT
+        bi.id AS binder_item_id,
+        bi.user_id,
+        bi.card_id,
+        COALESCE(c.oracle_id, c.id) AS playable_card_id,
+        bi.quantity AS item_quantity,
+        COALESCE(
+          SUM(bi.quantity) OVER (
+            PARTITION BY bi.user_id, COALESCE(c.oracle_id, c.id)
+            ORDER BY
+              CASE WHEN bi.for_trade OR bi.for_sale THEN 0 ELSE 1 END,
+              bi.updated_at,
+              bi.id
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+          ),
+          0
+        )::int AS prior_item_quantity
+      FROM user_binder_items bi
+      JOIN cards c ON c.id = bi.card_id
+      WHERE bi.list_type = 'have'
+    )
+    SELECT
+      item.binder_item_id,
+      item.user_id,
+      item.card_id,
+      item.playable_card_id,
+      item.item_quantity,
+      availability.owned_quantity,
+      availability.allocated_quantity,
+      availability.committed_trade_quantity,
+      availability.free_quantity,
+      availability.missing_quantity,
+      GREATEST(
+        LEAST(
+          item.item_quantity,
+          availability.free_quantity - item.prior_item_quantity
+        ),
+        0
+      )::int AS available_quantity
+    FROM item_priority item
+    JOIN collection_availability_snapshot availability
+      ON availability.user_id = item.user_id
+     AND availability.playable_card_id = item.playable_card_id;
+        END IF;
+
+        IF to_regclass('public.idx_trade_history_offer') IS NULL
+           OR pg_get_indexdef(to_regclass('public.idx_trade_history_offer'))
+              <> 'CREATE INDEX idx_trade_history_offer ON public.trade_status_history USING btree (trade_offer_id)' THEN
+          DROP INDEX IF EXISTS idx_trade_history_offer;
+          CREATE INDEX idx_trade_history_offer ON trade_status_history (trade_offer_id);
+        END IF;
+        IF to_regclass('public.idx_trade_messages_offer') IS NULL
+           OR pg_get_indexdef(to_regclass('public.idx_trade_messages_offer'))
+              <> 'CREATE INDEX idx_trade_messages_offer ON public.trade_messages USING btree (trade_offer_id)' THEN
+          DROP INDEX IF EXISTS idx_trade_messages_offer;
+          CREATE INDEX idx_trade_messages_offer ON trade_messages (trade_offer_id);
+        END IF;
+
+        -- CHECK com o nome da produção (o ensaio na estrutura dela, 2026-09-28).
+        IF EXISTS (
+          SELECT 1 FROM pg_constraint
+          WHERE conrelid = 'public.account_deletion_receipts'::regclass
+            AND conname = 'account_deletion_receipts_deletion_mode_check'
+        ) AND NOT EXISTS (
+          SELECT 1 FROM pg_constraint
+          WHERE conrelid = 'public.account_deletion_receipts'::regclass
+            AND conname = 'chk_account_deletion_mode'
+        ) THEN
+          ALTER TABLE account_deletion_receipts
+            RENAME CONSTRAINT account_deletion_receipts_deletion_mode_check
+            TO chk_account_deletion_mode;
+        END IF;
+        -- O CHECK de list_type com o nome e o texto da produção: refeito sobre
+        -- o varchar(4) onde ainda não é o dela.
+        IF COALESCE((
+          SELECT pg_get_constraintdef(oid, true)
+          FROM pg_constraint
+          WHERE conrelid = 'public.user_binder_items'::regclass
+            AND conname = 'chk_list_type'
+        ), '') <> 'CHECK (list_type::text = ANY (ARRAY[''have''::character varying::text, ''want''::character varying::text]))' THEN
+          ALTER TABLE user_binder_items
+            DROP CONSTRAINT IF EXISTS user_binder_items_list_type_check;
+          ALTER TABLE user_binder_items DROP CONSTRAINT IF EXISTS chk_list_type;
+          ALTER TABLE user_binder_items
+            ADD CONSTRAINT chk_list_type CHECK (list_type::text = ANY (ARRAY['have'::character varying::text, 'want'::character varying::text]));
+        END IF;
+      END;
+      $adopt_production_shapes$;
+
+      -- A mesma regra de chk_post_game_notes_revision (038), repetida no bootstrap.
+      ALTER TABLE post_game_notes DROP CONSTRAINT IF EXISTS post_game_notes_revision_check;
+    ''',
+    // Rollback só por plano manual: a 075 adota o que a produção já tem, e um
+    // down automático tiraria dela tabelas e formas anteriores à migration.
+    down: 'SELECT 1;',
+  ),
+  Migration(
+    version: '076',
+    name: 'align_message_and_trade_history_user_fks',
+    // BT-DB-005: direct_messages.sender_id, trade_messages.sender_id e
+    // trade_status_history.changed_by estão sem ação na produção e com RESTRICT
+    // nas migrations (auditoria BT-DB-001). Como a 059 fez com trade_items
+    // (D-66), os dois bancos ficam com RESTRICT: apagar a linha de users de quem
+    // mandou mensagem ou mudou uma troca é recusado. A exclusão de conta do
+    // produto não apaga users (pseudonimiza). Refazer a chave troca o OID dela:
+    // sai o gatilho de conta ativa antigo, e o laço canônico refaz o de cada
+    // chave (regra da 074).
+    up: r'''
+      DO $align_user_fks$
+      DECLARE
+        wanted RECORD;
+      BEGIN
+        FOR wanted IN
+          SELECT *
+          FROM (VALUES
+            ('direct_messages', 'sender_id', 'direct_messages_sender_id_fkey'),
+            ('trade_messages', 'sender_id', 'trade_messages_sender_id_fkey'),
+            ('trade_status_history', 'changed_by', 'trade_status_history_changed_by_fkey')
+          ) AS key_row (table_name, column_name, constraint_name)
+        LOOP
+          IF EXISTS (
+            SELECT 1
+            FROM pg_constraint
+            WHERE conrelid = format('public.%I', wanted.table_name)::regclass
+              AND conname = wanted.constraint_name
+              AND contype = 'f'
+              AND confdeltype <> 'r'
+          ) THEN
+            EXECUTE format(
+              'ALTER TABLE public.%I DROP CONSTRAINT %I',
+              wanted.table_name,
+              wanted.constraint_name
+            );
+            EXECUTE format(
+              'ALTER TABLE public.%I ADD CONSTRAINT %I '
+              'FOREIGN KEY (%I) REFERENCES users(id) ON DELETE RESTRICT',
+              wanted.table_name,
+              wanted.constraint_name,
+              wanted.column_name
+            );
+          END IF;
+        END LOOP;
+      END;
+      $align_user_fks$;
+
+      -- Refazer a chave troca o OID dela, e o gatilho de conta ativa com o OID
+      -- antigo ficaria para trás (a 059 fez o mesmo em trade_items).
+      DO $drop_stale_active_user_triggers$
+      DECLARE
+        stale RECORD;
+      BEGIN
+        FOR stale IN
+          SELECT trigger_row.tgname, relation_row.relname
+          FROM pg_trigger trigger_row
+          JOIN pg_class relation_row ON relation_row.oid = trigger_row.tgrelid
+          WHERE NOT trigger_row.tgisinternal
+            AND left(trigger_row.tgname, 21) = 'manaloom_active_user_'
+            AND relation_row.relnamespace = 'public'::regnamespace
+            AND NOT EXISTS (
+              SELECT 1
+              FROM pg_constraint constraint_row
+              WHERE constraint_row.conrelid = trigger_row.tgrelid
+                AND constraint_row.contype = 'f'
+                AND 'manaloom_active_user_' || constraint_row.oid = trigger_row.tgname
+            )
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.%I',
+            stale.tgname,
+            stale.relname
+          );
+        END LOOP;
+      END;
+      $drop_stale_active_user_triggers$;
+
+      DO $active_user_triggers$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      $active_user_triggers$;
+    ''',
+    down: r'''
+      DO $restore_user_fks$
+      DECLARE
+        wanted RECORD;
+      BEGIN
+        FOR wanted IN
+          SELECT *
+          FROM (VALUES
+            ('direct_messages', 'sender_id', 'direct_messages_sender_id_fkey'),
+            ('trade_messages', 'sender_id', 'trade_messages_sender_id_fkey'),
+            ('trade_status_history', 'changed_by', 'trade_status_history_changed_by_fkey')
+          ) AS key_row (table_name, column_name, constraint_name)
+        LOOP
+          IF EXISTS (
+            SELECT 1
+            FROM pg_constraint
+            WHERE conrelid = format('public.%I', wanted.table_name)::regclass
+              AND conname = wanted.constraint_name
+              AND contype = 'f'
+              AND confdeltype <> 'a'
+          ) THEN
+            EXECUTE format(
+              'ALTER TABLE public.%I DROP CONSTRAINT %I',
+              wanted.table_name,
+              wanted.constraint_name
+            );
+            EXECUTE format(
+              'ALTER TABLE public.%I ADD CONSTRAINT %I '
+              'FOREIGN KEY (%I) REFERENCES users(id)',
+              wanted.table_name,
+              wanted.constraint_name,
+              wanted.column_name
+            );
+          END IF;
+        END LOOP;
+      END;
+      $restore_user_fks$;
+
+      -- Refazer a chave troca o OID dela, e o gatilho de conta ativa com o OID
+      -- antigo ficaria para trás (a 059 fez o mesmo em trade_items).
+      DO $drop_stale_active_user_triggers$
+      DECLARE
+        stale RECORD;
+      BEGIN
+        FOR stale IN
+          SELECT trigger_row.tgname, relation_row.relname
+          FROM pg_trigger trigger_row
+          JOIN pg_class relation_row ON relation_row.oid = trigger_row.tgrelid
+          WHERE NOT trigger_row.tgisinternal
+            AND left(trigger_row.tgname, 21) = 'manaloom_active_user_'
+            AND relation_row.relnamespace = 'public'::regnamespace
+            AND NOT EXISTS (
+              SELECT 1
+              FROM pg_constraint constraint_row
+              WHERE constraint_row.conrelid = trigger_row.tgrelid
+                AND constraint_row.contype = 'f'
+                AND 'manaloom_active_user_' || constraint_row.oid = trigger_row.tgname
+            )
+        LOOP
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON public.%I',
+            stale.tgname,
+            stale.relname
+          );
+        END LOOP;
+      END;
+      $drop_stale_active_user_triggers$;
+
+      DO $active_user_triggers$
+      DECLARE
+        reference RECORD;
+        trigger_name TEXT;
+      BEGIN
+        FOR reference IN
+          SELECT constraint_row.oid AS constraint_oid,
+                 namespace_row.nspname AS schema_name,
+                 relation_row.relname AS table_name,
+                 attribute_row.attname AS column_name
+          FROM pg_constraint constraint_row
+          JOIN pg_class relation_row
+            ON relation_row.oid = constraint_row.conrelid
+          JOIN pg_namespace namespace_row
+            ON namespace_row.oid = relation_row.relnamespace
+          JOIN pg_attribute attribute_row
+            ON attribute_row.attrelid = relation_row.oid
+           AND attribute_row.attnum = constraint_row.conkey[1]
+          WHERE constraint_row.contype = 'f'
+            AND constraint_row.confrelid = 'users'::regclass
+            AND array_length(constraint_row.conkey, 1) = 1
+        LOOP
+          trigger_name := 'manaloom_active_user_' || reference.constraint_oid;
+          EXECUTE format(
+            'DROP TRIGGER IF EXISTS %I ON %I.%I',
+            trigger_name,
+            reference.schema_name,
+            reference.table_name
+          );
+          EXECUTE format(
+            'CREATE TRIGGER %I BEFORE INSERT OR UPDATE OF %I ON %I.%I '
+            'FOR EACH ROW EXECUTE FUNCTION manaloom_require_active_user(%L)',
+            trigger_name,
+            reference.column_name,
+            reference.schema_name,
+            reference.table_name,
+            reference.column_name
+          );
+        END LOOP;
+      END;
+      $active_user_triggers$;
+    ''',
+  ),
 ];
 
 class Migration {
@@ -4072,7 +7699,24 @@ enum MigrationRollbackPolicy { standard, emptyOnly, manualOnly }
 
 MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
     switch (version) {
-      '033' || '035' => MigrationRollbackPolicy.emptyOnly,
+      // A 060 cria o outbox da exclusão (D-68): o down só roda com a tabela
+      // vazia, porque cada linha é a obrigação de um consumidor.
+      // A 061 cria os convites da beta (BT-AUTH-006): convite emitido é
+      // compromisso com quem o recebeu, e a trilha de auditoria vai junto.
+      // A 067 cria o ledger de mudanças do deck: o down só roda sem nenhum
+      // evento e com todo deck ainda na revisão 1.
+      // A 069 cria os pedidos duráveis do Generate: o down só roda sem pedido
+      // gravado e sem descrição redigida no ledger.
+      // A 072 abre a lixeira de decks: o down só roda sem deck na lixeira e
+      // sem evento de lixeira no ledger (o código de antes mostraria o deck
+      // apagado como vivo, e o CHECK antigo recusaria os eventos).
+      '033' ||
+      '035' ||
+      '060' ||
+      '061' ||
+      '067' ||
+      '069' ||
+      '072' => MigrationRollbackPolicy.emptyOnly,
       // Estas migrations alteram ou adotam dados preexistentes. O down
       // automático não consegue reconstruir o estado anterior com segurança.
       '034' ||
@@ -4097,7 +7741,26 @@ MigrationRollbackPolicy migrationRollbackPolicy(String version) =>
       '055' ||
       '056' ||
       '057' ||
-      '058' => MigrationRollbackPolicy.manualOnly,
+      '058' ||
+      // A 059 alinha a chave de trade_items.owner_id: o down volta ao
+      // CASCADE da 041, mas a produção estava sem ação antes dela. Voltar no
+      // automático mudaria o comportamento da produção.
+      '059' ||
+      // A 062 guarda o histórico de aceites (prova de consentimento, D-24) e
+      // copia o aceite que já estava em users: o down apagaria a prova.
+      '062' ||
+      // 063 a 065 adotam na migration o que a produção já tinha (view com o
+      // texto de hoje e índices que só existiam lá; D-48, D-65 e D-67). Um
+      // down automático tiraria da produção objetos anteriores à migration.
+      '063' ||
+      '064' ||
+      '065' ||
+      // A 066 adota os índices que só a produção tinha (D-83).
+      '066' ||
+      // A 075 adota tabelas e formas da produção, e a 076 alinha três chaves
+      // que na produção estavam sem ação: o down automático mudaria a produção.
+      '075' ||
+      '076' => MigrationRollbackPolicy.manualOnly,
       _ => MigrationRollbackPolicy.standard,
     };
 
@@ -4129,6 +7792,43 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
           )
       ''')).first[0] ==
           true,
+    '060' =>
+      (await tx.execute(
+            'SELECT EXISTS (SELECT 1 FROM account_deletion_outbox)',
+          )).first[0] ==
+          true,
+    '061' =>
+      (await tx.execute(
+            'SELECT EXISTS (SELECT 1 FROM beta_invites)',
+          )).first[0] ==
+          true,
+    '067' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM deck_change_events)
+          OR EXISTS (SELECT 1 FROM decks WHERE revision <> 1)
+      ''')).first[0] ==
+          true,
+    '069' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM ai_generate_requests)
+          OR EXISTS (
+            SELECT 1 FROM deck_change_events
+            WHERE description_redacted_at IS NOT NULL
+          )
+      ''')).first[0] ==
+          true,
+    '072' =>
+      (await tx.execute('''
+        SELECT
+          EXISTS (SELECT 1 FROM decks WHERE deleted_at IS NOT NULL)
+          OR EXISTS (
+            SELECT 1 FROM deck_change_events
+            WHERE operation IN ('deck_delete', 'deck_restore')
+          )
+      ''')).first[0] ==
+          true,
     _ => false,
   };
   if (unsafe) {
@@ -4140,9 +7840,43 @@ Future<void> _assertRollbackSafe(Session tx, Migration migration) async {
   }
 }
 
+List<MigrationIdentity> migrationIdentities() => [
+  for (final migration in migrations)
+    (version: migration.version, name: migration.name),
+];
+
+void _printPreflightRefusal(MigrationPreflightResult preflight) {
+  stderr.writeln(
+    'BLOCKED: perfil de origem misto; nada foi escrito. '
+    'Recrie o banco ou reconcilie o ledger antes de migrar:',
+  );
+  for (final reason in preflight.reasons) {
+    stderr.writeln('  - $reason');
+  }
+}
+
 void main(List<String> args) async {
   final showStatus = args.contains('--status');
+  final showPreflight = args.contains('--preflight');
   final rollbackRequested = args.contains('--rollback');
+  String? targetVersion;
+  if (args.contains('--target')) {
+    final targetIndex = args.indexOf('--target');
+    targetVersion =
+        targetIndex + 1 < args.length ? args[targetIndex + 1] : null;
+    if (targetVersion == null ||
+        showStatus ||
+        showPreflight ||
+        rollbackRequested ||
+        !migrations.any((item) => item.version == targetVersion)) {
+      stderr.writeln(
+        'Uso inválido: --target exige uma versão desta lista e não combina '
+        'com --status, --preflight ou --rollback. Nenhuma conexão foi aberta.',
+      );
+      exitCode = 2;
+      return;
+    }
+  }
   int? rollbackCount;
   if (rollbackRequested) {
     final rollbackIndex = args.indexOf('--rollback');
@@ -4158,7 +7892,8 @@ void main(List<String> args) async {
     }
   }
 
-  if (!showStatus &&
+  final readOnlyRequested = showStatus || showPreflight;
+  if (!readOnlyRequested &&
       (!hasMigrationWriteApproval(Platform.environment) ||
           !hasMigrationLiveApproval(Platform.environment))) {
     stderr.writeln(
@@ -4180,7 +7915,7 @@ void main(List<String> args) async {
         if (env[key] case final value?) key: value,
     },
     callerEnvironment: Platform.environment,
-    writeRequested: !showStatus,
+    writeRequested: !readOnlyRequested,
   );
   if (destinationViolation != null) {
     stderr.writeln(
@@ -4202,6 +7937,16 @@ void main(List<String> args) async {
   );
 
   try {
+    if (showPreflight) {
+      final preflight = await runMigrationPreflight(
+        connection,
+        migrationIdentities(),
+      );
+      print(jsonEncode(preflight.toJson()));
+      if (!preflight.accepted) exitCode = 3;
+      return;
+    }
+
     if (showStatus) {
       Set<String> executedVersions;
       try {
@@ -4235,6 +7980,15 @@ void main(List<String> args) async {
     }
 
     if (rollbackRequested) {
+      final preflight = await runMigrationPreflight(
+        connection,
+        migrationIdentities(),
+      );
+      if (!preflight.accepted) {
+        _printPreflightRefusal(preflight);
+        exitCode = 3;
+        return;
+      }
       final executedResult = await connection.execute(
         Sql.named('''
           SELECT version, name
@@ -4290,7 +8044,19 @@ void main(List<String> args) async {
     }
 
     // Apply mode only. Reaching this branch requires the explicit textual
-    // PostgreSQL approval check above, before Connection.open.
+    // PostgreSQL approval check above, before Connection.open. O preflight
+    // vem antes de qualquer DDL, inclusive a criação de schema_migrations.
+    final preflight = await runMigrationPreflight(
+      connection,
+      migrationIdentities(),
+    );
+    if (!preflight.accepted) {
+      _printPreflightRefusal(preflight);
+      exitCode = 3;
+      return;
+    }
+    print('🔎 Preflight: perfil ${preflight.profile.code}');
+
     await connection.execute('''
       CREATE TABLE IF NOT EXISTS schema_migrations (
         version TEXT PRIMARY KEY,
@@ -4309,6 +8075,11 @@ void main(List<String> args) async {
     var migratedCount = 0;
 
     for (final migration in migrations) {
+      if (targetVersion != null &&
+          migration.version.compareTo(targetVersion) > 0) {
+        print('⏹️  Parando na $targetVersion (--target).');
+        break;
+      }
       if (executedVersions.contains(migration.version)) {
         print('⏭️  ${migration.fullName} (já executada)');
         continue;

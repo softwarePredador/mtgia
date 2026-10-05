@@ -4,7 +4,9 @@ import 'package:postgres/postgres.dart';
 
 import '../../../../lib/auth_service.dart';
 import '../../../../lib/basic_land_utils.dart' as land_utils;
+import '../../../../lib/deck_request_support.dart';
 import '../../../../lib/deck_rules_service.dart';
+import '../../../../lib/legal_acceptance_middleware.dart';
 import '../../../../lib/logger.dart';
 import '../../../../lib/observability.dart';
 import '../../../../lib/scryfall_image_url.dart';
@@ -339,6 +341,13 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
   final userId = user['id'] as String;
   final conn = context.read<Pool>();
 
+  // BT-LEGAL-ACCEPT-001: copiar cria um deck novo.
+  final legalBlocked = await legalAcceptanceRequiredResponse(
+    userId: userId,
+    pool: conn,
+  );
+  if (legalBlocked != null) return legalBlocked;
+
   try {
     final newDeck = await conn.runTx((session) async {
       // 1. Verificar que o deck original existe e é público
@@ -368,7 +377,9 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
       );
 
       if (original.isEmpty) {
-        throw Exception('Deck not found or is not public.');
+        throw const DeckNotFoundException(
+          'Deck não encontrado ou não é público.',
+        );
       }
 
       final origMap = original.first.toColumnMap();
@@ -445,14 +456,12 @@ Future<Response> _copyPublicDeck(RequestContext context, String deckId) async {
         if (error.cardName != null) 'card_name': error.cardName,
       },
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } on Exception catch (e, st) {
     Log.e(
       '[community_route] server_error endpoint=POST /community/decks/:id error=$e',
     );
-    final msg = e.toString();
-    if (msg.contains('not found') || msg.contains('not public')) {
-      return Response.json(statusCode: 404, body: {'error': msg});
-    }
     await captureRouteException(
       context,
       e,

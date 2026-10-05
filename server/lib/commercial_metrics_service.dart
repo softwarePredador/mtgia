@@ -1,6 +1,8 @@
 import 'package:postgres/postgres.dart';
 
 import 'ai_telemetry_contract.dart';
+import 'analytics/activation_kpi.dart';
+import 'plan_service.dart';
 
 class CommercialMetricsService {
   const CommercialMetricsService(this.pool);
@@ -17,16 +19,13 @@ class CommercialMetricsService {
 
   Future<Map<String, dynamic>> snapshot({int days = 30}) async {
     final safeDays = normalizeWindowDays(days);
-    final hasActivation = await _tableExists('activation_funnel_events');
     final hasAiLogs = await _tableExists('ai_logs');
     final hasUserPlans = await _tableExists('user_plans');
     final hasReports = await _tableExists('shared_deck_reports');
     final hasPostGame = await _tableExists('post_game_notes');
 
-    final activation =
-        hasActivation
-            ? await _activationFunnel(safeDays)
-            : _missing('activation_funnel_events');
+    final activation = await activationKpi(days: safeDays);
+    final guardrails = await activationGuardrails(days: safeDays);
     final ai = hasAiLogs ? await _aiPerformance(safeDays) : _missing('ai_logs');
     final plans = hasUserPlans ? await _planMix() : _missing('user_plans');
     final reports =
@@ -40,7 +39,8 @@ class CommercialMetricsService {
       'status': 'ok',
       'window_days': safeDays,
       'generated_at': DateTime.now().toUtc().toIso8601String(),
-      'activation_funnel': activation,
+      'activation': activation,
+      'guardrails': guardrails,
       'ai_performance': ai,
       'ai_performance_history':
           hasAiLogs
@@ -55,10 +55,6 @@ class CommercialMetricsService {
   }
 
   static int normalizeWindowDays(int days) => days.clamp(1, 90);
-  static int countAiActivationEvents(Map<String, int> events) =>
-      (events['deck_generated'] ?? 0) +
-      (events['deck_optimized'] ?? 0) +
-      (events['deck_rebuild_created'] ?? 0);
 
   static String normalizeHistoryBucket(String? bucket) {
     final normalized = bucket?.trim().toLowerCase();
@@ -190,37 +186,158 @@ class CommercialMetricsService {
     'table': table,
   };
 
-  Future<Map<String, dynamic>> _activationFunnel(int days) async {
-    final result = await pool.execute(
-      Sql.named('''
-        SELECT event_name, COUNT(*)::int AS total
-        FROM activation_funnel_events
-        WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
-        GROUP BY event_name
-        ORDER BY event_name ASC
-      '''),
-      parameters: {'days': days},
-    );
+  /// BT-KPI-001 (D-47): coortes por semana de cadastro, ativação em 24 h,
+  /// volta na segunda semana, loops de valor e funil, sempre em usuários
+  /// distintos (`lib/analytics/activation_kpi.dart`).
+  Future<Map<String, dynamic>> activationKpi({int days = 30}) async {
+    final safeDays = normalizeWindowDays(days);
+    if (!await _tableExists('users') || !await _tableExists('decks')) {
+      return _missing('users');
+    }
+    final existing = <String>{
+      for (final table in activationKpiOptionalTables())
+        if (await _tableExists(table)) table,
+    };
 
-    final events = <String, int>{};
-    for (final row in result) {
-      events[row[0].toString()] = (row[1] as int?) ?? 0;
+    final cohortRows = await pool.execute(
+      Sql.named(activationKpiCohortSql(existing)),
+      parameters: {'days': safeDays},
+    );
+    final funnelUsers = <String, Map<String, int>>{};
+    if (existing.contains('activation_funnel_events')) {
+      final funnelRows = await pool.execute(
+        Sql.named(activationKpiFunnelSql()),
+        parameters: {'days': safeDays},
+      );
+      for (final row in funnelRows) {
+        final columns = row.toColumnMap();
+        funnelUsers.putIfAbsent(
+              columns['cohort_week'] as String,
+              () => <String, int>{},
+            )[columns['event_name'] as String] =
+            columns['users'] as int;
+      }
     }
 
-    final signups = await _countUsers(days);
-    final deckCreated = events['deck_created'] ?? 0;
-    final aiUsed = countAiActivationEvents(events);
+    final totals = <String, int>{};
+    final totalFunnel = <String, int>{};
+    final cohorts = <Map<String, Object?>>[];
+    for (final row in cohortRows) {
+      final columns = row.toColumnMap();
+      final week = columns['cohort_week'] as String;
+      final counts = <String, int>{
+        for (final counter in activationKpiCohortCounters)
+          counter: columns[counter] as int,
+      };
+      counts.forEach(
+        (counter, value) => totals[counter] = (totals[counter] ?? 0) + value,
+      );
+      final weekFunnel = funnelUsers[week] ?? const <String, int>{};
+      weekFunnel.forEach(
+        (event, users) =>
+            totalFunnel[event] = (totalFunnel[event] ?? 0) + users,
+      );
+      cohorts.add(
+        activationKpiCohortJson(
+          cohortWeek: week,
+          counts: counts,
+          funnelUsers: weekFunnel,
+        ),
+      );
+    }
 
     return {
       'status': 'ok',
-      'signups': signups,
-      'events': events,
-      'deck_created_count': deckCreated,
-      'deck_generated_count': events['deck_generated'] ?? 0,
-      'ai_used_count': aiUsed,
-      'deck_created_per_signup':
-          signups > 0 ? _ratio(deckCreated, signups) : 0.0,
-      'ai_used_per_signup': signups > 0 ? _ratio(aiUsed, signups) : 0.0,
+      'window_days': safeDays,
+      'definition': activationKpiDefinition(existing),
+      'totals': activationKpiCohortJson(
+        cohortWeek: null,
+        counts: totals,
+        funnelUsers: totalFunnel,
+      ),
+      'cohorts': cohorts,
+    };
+  }
+
+  /// BT-KPI-001 (D-47): guardrails de custo de IA e de taxa de erro na
+  /// janela, com os limites versionados em `lib/analytics/activation_kpi.dart`.
+  Future<Map<String, dynamic>> activationGuardrails({int days = 30}) async {
+    final safeDays = normalizeWindowDays(days);
+    final items = <Map<String, Object?>>[];
+
+    if (await _tableExists('ai_logs')) {
+      final errors =
+          (await pool.execute(
+            Sql.named(activationKpiAiErrorSql),
+            parameters: {'days': safeDays},
+          )).first.toColumnMap();
+      final calls = errors['calls'] as int;
+      final failedCalls = errors['errors'] as int;
+      items.add(
+        evaluateActivationKpiGuardrail(
+          id: 'ai_provider_error_rate',
+          observed: activationKpiRate(failedCalls, calls),
+          sample: calls,
+          minimumSample: activationKpiErrorRateMinimumSample,
+          warningAt: activationKpiErrorRateWarning,
+          criticalAt: activationKpiErrorRateCritical,
+          extra: {'errors': failedCalls},
+        ),
+      );
+
+      final actions =
+          (await pool.execute(
+            Sql.named(activationKpiAiActionsSql),
+            parameters: {'days': safeDays},
+          )).first.toColumnMap();
+      final aiUsers = actions['users'] as int;
+      final completedActions = actions['actions'] as int;
+      items.add(
+        evaluateActivationKpiGuardrail(
+          id: 'ai_actions_per_ai_user_30d',
+          observed: activationKpiAiActionsPer30Days(
+            actions: completedActions,
+            users: aiUsers,
+            windowDays: safeDays,
+          ),
+          sample: aiUsers,
+          minimumSample: 1,
+          warningAt: activationKpiAiActionsWarningAt(),
+          criticalAt: activationKpiAiActionsCriticalAt(),
+          extra: {
+            'actions': completedActions,
+            'monthly_cap': PlanService.freeBetaAiMonthlyOperationalLimit,
+          },
+        ),
+      );
+    }
+
+    if (await _tableExists('ai_generate_requests')) {
+      final generate =
+          (await pool.execute(
+            Sql.named(activationKpiGenerateFailureSql),
+            parameters: {'days': safeDays},
+          )).first.toColumnMap();
+      final finished = generate['finished'] as int;
+      final failed = generate['failed'] as int;
+      items.add(
+        evaluateActivationKpiGuardrail(
+          id: 'generate_failure_rate',
+          observed: activationKpiRate(failed, finished),
+          sample: finished,
+          minimumSample: activationKpiErrorRateMinimumSample,
+          warningAt: activationKpiErrorRateWarning,
+          criticalAt: activationKpiErrorRateCritical,
+          extra: {'failed': failed},
+        ),
+      );
+    }
+
+    return {
+      'status': activationKpiGuardrailsStatus(items),
+      'version': activationKpiGuardrailsVersion,
+      'window_days': safeDays,
+      'items': items,
     };
   }
 
@@ -398,25 +515,6 @@ class CommercialMetricsService {
     };
   }
 
-  Future<int> _countUsers(int days) async {
-    final hasUsers = await _tableExists('users');
-    if (!hasUsers) return 0;
-
-    final hasCreatedAt = await _columnExists('users', 'created_at');
-    if (!hasCreatedAt) return 0;
-
-    final result = await pool.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int
-        FROM users
-        WHERE created_at >= NOW() - (@days * INTERVAL '1 day')
-          AND deleted_at IS NULL
-      '''),
-      parameters: {'days': days},
-    );
-    return result.isEmpty ? 0 : ((result.first[0] as int?) ?? 0);
-  }
-
   Future<bool> _tableExists(String table) async {
     final result = await pool.execute(
       Sql.named('''
@@ -426,20 +524,6 @@ class CommercialMetricsService {
           AND table_name = @table
       '''),
       parameters: {'table': table},
-    );
-    return result.isNotEmpty && (((result.first[0] as int?) ?? 0) > 0);
-  }
-
-  Future<bool> _columnExists(String table, String column) async {
-    final result = await pool.execute(
-      Sql.named('''
-        SELECT COUNT(*)::int AS c
-        FROM information_schema.columns
-        WHERE table_schema = 'public'
-          AND table_name = @table
-          AND column_name = @column
-      '''),
-      parameters: {'table': table, 'column': column},
     );
     return result.isNotEmpty && (((result.first[0] as int?) ?? 0) > 0);
   }

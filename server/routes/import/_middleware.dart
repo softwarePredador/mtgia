@@ -1,5 +1,6 @@
 import 'package:dart_frog/dart_frog.dart';
 import '../../lib/auth_middleware.dart';
+import '../../lib/legal_acceptance_middleware.dart';
 import '../../lib/verified_email_middleware.dart';
 
 /// Middleware de autenticação para rotas de importação
@@ -8,5 +9,8 @@ import '../../lib/verified_email_middleware.dart';
 /// exige e-mail verificado nas escritas (`/import` e `/import/*` são todas
 /// POST), porque importar cria ou substitui deck (BT-AUTH-010).
 Handler middleware(Handler handler) {
-  return handler.use(verifiedEmailForMutations()).use(authMiddleware());
+  return handler
+      .use(legalAcceptanceForWrites(appliesTo: isLegalGatedImportRequest))
+      .use(verifiedEmailForMutations())
+      .use(authMiddleware());
 }

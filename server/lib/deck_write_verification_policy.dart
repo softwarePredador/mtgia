@@ -62,11 +62,6 @@ final deckWriteVerificationExemptions = <DeckWriteVerificationExemption>[
   ),
   DeckWriteVerificationExemption(
     'POST',
-    r'^/decks/[^/]+/recommendations$',
-    'cálculo do servidor; só devolve sugestões',
-  ),
-  DeckWriteVerificationExemption(
-    'POST',
     r'^/decks/[^/]+/post-game-notes$',
     'registro privado das partidas, usado pelo pós-jogo do contador de '
         'vida; não muda o deck nem é publicado',

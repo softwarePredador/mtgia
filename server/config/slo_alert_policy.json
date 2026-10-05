@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "policy": "brewtact-slo-alerts",
+  "version": "2026-09-28.2",
+  "task": "BT-OBS-001",
+  "decisions": [
+    "D-47",
+    "D-51",
+    "D-13"
+  ],
+  "scope": "API, PostgreSQL, jobs do daemon de ops, cache e catálogo (BT-OBS-001) e, separado, o alerta de release (BT-OBS-003, D-51): as regras release_*. A queda vista de fora fica no BT-OBS-002.",
+  "evaluation": {
+    "job": "manaloom_slo_alerts",
+    "schedule": "*/5 * * * *",
+    "slot_minutes": 5,
+    "observation_retention_days": 35
+  },
+  "slos": {
+    "api_availability": {
+      "objective": 0.995,
+      "window_days": 30,
+      "evidence": "SLO de 99,5% de disponibilidade",
+      "bad_slot_error_rate": 0.05,
+      "min_requests": 20,
+      "sli": "fração das janelas de 5 minutos, com avaliação, em que /health/live e /health/ready responderam 200 e a taxa de 5xx do tráfego de produto ficou abaixo de 5% (janelas com menos de 20 requisições contam pela sondagem)"
+    },
+    "api_read_latency": {
+      "objective_p95_ms": 800,
+      "window_days": 30,
+      "evidence": "p95 abaixo de 800 ms em leitura",
+      "min_reads": 20,
+      "sli": "p95 das requisições GET e HEAD de produto em cada janela de 5 minutos com pelo menos 20 leituras"
+    }
+  },
+  "alerts": {
+    "api_down": {
+      "severity": "critical",
+      "source": "GET /health/live",
+      "consecutive": 2,
+      "summary": "A API não responde ao liveness.",
+      "runbook": "api_down"
+    },
+    "api_not_ready": {
+      "severity": "critical",
+      "source": "GET /health/ready",
+      "consecutive": 2,
+      "summary": "A API responde, mas não está pronta (banco, schema ou capabilities).",
+      "runbook": "api_not_ready"
+    },
+    "postgres_unavailable": {
+      "severity": "critical",
+      "source": "checks.database de /health/ready e conexão só de leitura do avaliador",
+      "consecutive": 2,
+      "summary": "O PostgreSQL não responde.",
+      "runbook": "postgres_unavailable"
+    },
+    "api_5xx_fast_burn": {
+      "severity": "critical",
+      "source": "janela de 5 min de /health/metrics",
+      "error_rate_min": 0.072,
+      "min_requests": 20,
+      "summary": "A taxa de 5xx queima o orçamento do SLO 14,4 vezes mais rápido que o permitido.",
+      "runbook": "api_5xx"
+    },
+    "api_5xx_slow_burn": {
+      "severity": "warning",
+      "source": "janela de 60 min de /health/metrics",
+      "error_rate_min": 0.03,
+      "min_requests": 100,
+      "summary": "A taxa de 5xx queima o orçamento do SLO 6 vezes mais rápido que o permitido.",
+      "runbook": "api_5xx"
+    },
+    "api_read_latency_p95": {
+      "severity": "warning",
+      "source": "janela de 5 min de /health/metrics",
+      "p95_ms_max": 800,
+      "min_reads": 20,
+      "consecutive": 2,
+      "summary": "O p95 das leituras passou de 800 ms.",
+      "runbook": "api_read_latency_p95"
+    },
+    "metrics_unavailable": {
+      "severity": "warning",
+      "source": "GET /health/metrics com a chave de ops",
+      "consecutive": 2,
+      "summary": "O avaliador não consegue ler as métricas da API: o SLO fica sem medição.",
+      "runbook": "metrics_unavailable"
+    },
+    "postgres_connections_high": {
+      "severity": "warning",
+      "source": "pg_stat_activity e max_connections, em transação READ ONLY",
+      "used_ratio_max": 0.8,
+      "summary": "As conexões ao PostgreSQL passaram de 80% do máximo.",
+      "runbook": "postgres_connections_high"
+    },
+    "job_failed": {
+      "severity": "warning",
+      "source": "manifesto de jobs do daemon de ops",
+      "summary": "Um job do daemon terminou com erro na última execução.",
+      "runbook": "job_failed"
+    },
+    "job_overdue": {
+      "severity": "warning",
+      "source": "manifesto de jobs do daemon de ops e o agendamento de cada job",
+      "grace_minutes": 30,
+      "summary": "Um job agendado não rodou no último horário previsto.",
+      "runbook": "job_overdue"
+    },
+    "catalog_stale": {
+      "severity": "warning",
+      "source": "sync_state do job de catálogo (catalog_reference_source_updated_at e, sem ela, cards_last_sync_at, a mesma regra do job), em transação READ ONLY",
+      "max_age_days": 7,
+      "summary": "O catálogo de cartas está com mais de 7 dias.",
+      "runbook": "catalog_stale"
+    },
+    "endpoint_cache_large": {
+      "severity": "warning",
+      "source": "cache.endpoint_cache_entries de /health/metrics",
+      "max_entries": 5000,
+      "summary": "O cache de rotas em memória passou de 5.000 entradas.",
+      "runbook": "endpoint_cache_large"
+    },
+    "catalog_written_outside_job": {
+      "severity": "critical",
+      "source": "pg_stat_user_tables (linhas inseridas, atualizadas e apagadas em cards, sets e card_legalities) contra a avaliação anterior, e a última execução do job de catálogo em sync_log, em transação READ ONLY",
+      "summary": "As tabelas do catálogo mudaram sem execução do job de catálogo no intervalo: uma leitura que grava, um CLI antigo ou SQL à mão.",
+      "runbook": "catalog_written_outside_job"
+    },
+    "catalog_read_upstream": {
+      "severity": "critical",
+      "source": "catalog_read_guard.upstream_blocked de /health/metrics",
+      "summary": "Uma leitura do catálogo tentou chamar um serviço de fora; a API bloqueou e contou.",
+      "runbook": "catalog_read_upstream"
+    },
+    "release_identity_unreadable": {
+      "task": "BT-OBS-003",
+      "severity": "warning",
+      "source": "as fontes de identidade de cada superfície (server/config/release_promotion.json) e o GIT_SHA e a matriz do próprio ops",
+      "consecutive": 2,
+      "summary": "A identidade de release de uma superfície não se lê: a divergência entre o release e a produção fica sem medição.",
+      "runbook": "release_identity_unreadable"
+    },
+    "release_identity_mixed": {
+      "task": "BT-OBS-003",
+      "severity": "warning",
+      "source": "SHA do backend, do site e do /app contra o do ops (o núcleo same-SHA do BT-REL-002)",
+      "consecutive": 12,
+      "summary": "O núcleo do release (backend, ops, site e /app) está em SHAs diferentes há mais de uma hora: promoção pela metade ou deploy fora da transação.",
+      "runbook": "release_identity_mixed"
+    },
+    "release_capabilities_divergent": {
+      "task": "BT-OBS-003",
+      "severity": "critical",
+      "source": "digest da matriz, modo da D-13, produto, superfície e flags de cada superfície no SHA do ops",
+      "consecutive": 2,
+      "summary": "No mesmo SHA do release, uma superfície serve capabilities, modo, identidade ou flags diferentes dos commitados.",
+      "runbook": "release_capabilities_divergent"
+    },
+    "release_android_behind": {
+      "task": "BT-OBS-003",
+      "severity": "warning",
+      "source": "downloads/release.json do release host contra o SHA do ops",
+      "grace_hours": 24,
+      "summary": "O APK publicado segue num release anterior ao do núcleo há mais de 24 horas.",
+      "runbook": "release_android_behind"
+    }
+  },
+  "thresholds_status": "proposta_pendente_do_dono",
+  "thresholds_rationale": {
+    "api_5xx_fast_burn": "Orçamento de 0,5% (D-47). 14,4 × 0,5% = 7,2% em 5 min gasta 2% do orçamento de 30 dias em 1 hora (regra de queima rápida do SRE).",
+    "api_5xx_slow_burn": "6 × 0,5% = 3% por 60 min gasta 5% do orçamento em 6 horas.",
+    "api_read_latency_p95": "O alvo da D-47; duas janelas seguidas evitam avisar por um pico isolado.",
+    "postgres_connections_high": "O mesmo limite da política de capacidade (BT-CAP-001).",
+    "job_overdue": "30 minutos de tolerância cobrem um job longo que ainda está rodando.",
+    "catalog_stale": "A D-18 exige cartas com menos de 7 dias para o GO.",
+    "endpoint_cache_large": "O cache é por réplica e tem teto de 10.000 entradas (as mais antigas saem primeiro, BT-CAT-03); acima de 5.000 respostas guardadas ele já pesa na memória da API.",
+    "catalog_written_outside_job": "O contrato catalog_reference_apply_v1 (BT-CAT-01) deixa só o job escrever cards, sets e card_legalities, e as leituras não gravam (BT-CAT-02); qualquer linha escrita fora de uma execução do job é o que o aceite do BT-CAT-03 manda alertar.",
+    "catalog_read_upstream": "Leitura do catálogo não chama a Scryfall (D-35); a API bloqueia a tentativa, e uma só já é o alerta do aceite do BT-CAT-03.",
+    "consecutive": "Duas avaliações seguidas (10 minutos) antes de acordar alguém por queda ou lentidão.",
+    "release_identity_unreadable": "Duas avaliações seguidas (10 minutos), como a queda: uma leitura perdida não acorda ninguém.",
+    "release_identity_mixed": "Uma promoção do BT-REL-001 leva até uma hora, com o build de cada superfície no host; doze avaliações (60 minutos) deixam a transação terminar ou desfazer antes de avisar.",
+    "release_capabilities_divergent": "No mesmo SHA não há motivo legítimo para matriz, modo ou flag diferentes (BT-REL-002); duas avaliações seguidas bastam.",
+    "release_android_behind": "O APK da primeira coorte sai em transação própria depois do núcleo (D-13); 24 horas cobrem construir, assinar e publicar, e o app instalado já nega o que não conhece."
+  },
+  "receiver": {
+    "human": "o dono do projeto (D-47)",
+    "channels": {
+      "email": [
+        "MANALOOM_ALERT_EMAIL_TO",
+        "RESEND_API_KEY",
+        "RESEND_FROM_EMAIL"
+      ],
+      "telegram": [
+        "MANALOOM_ALERT_TELEGRAM_BOT_TOKEN",
+        "MANALOOM_ALERT_TELEGRAM_CHAT_ID"
+      ]
+    },
+    "channel_env": "MANALOOM_ALERT_CHANNEL",
+    "repeat_after_minutes": 60,
+    "notify_resolved": true,
+    "note": "O destino e as credenciais ficam só no ambiente do serviço de ops, nunca no repositório."
+  },
+  "release": {
+    "task": "BT-OBS-003",
+    "decisions": [
+      "D-51",
+      "D-13"
+    ],
+    "identity_config": "server/config/release_promotion.json",
+    "anchor": "O próprio ops: sai na mesma promoção (BT-REL-001) e traz o GIT_SHA e a matriz de capabilities do SHA no image. O backend é lido pela URL interna (MANALOOM_SLO_API_BASE_URL); o site, o /app e o APK pela origem pública da política, ou por MANALOOM_RELEASE_PUBLIC_BASE_URL.",
+    "classification": "Fonte que não responde: ilegível. Fonte que responde sem a identidade ou fontes que discordam: divergência. SHA diferente no núcleo: mixed; no Android: atraso. No mesmo SHA, digest, modo, produto, superfície ou flag diferente: divergência."
+  },
+  "pii": "As mensagens levam só o código do alerta, a severidade, números e o template da rota. Nenhum e-mail, UUID, token ou caminho cru sai do avaliador."
+}

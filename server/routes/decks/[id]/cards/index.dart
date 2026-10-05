@@ -6,7 +6,10 @@ import 'package:postgres/postgres.dart';
 import '../../../../lib/basic_land_utils.dart' as basic_lands;
 import '../../../../lib/commander_eligibility.dart';
 import '../../../../lib/deck_card_eligibility.dart';
+import '../../../../lib/deck_request_support.dart';
 import '../../../../lib/deck_rules_service.dart';
+import '../../../../lib/decks/deck_revision_support.dart';
+import '../../../../lib/http_responses.dart';
 
 Future<Response> onRequest(RequestContext context, String deckId) async {
   if (context.request.method != HttpMethod.post) {
@@ -48,8 +51,22 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
     );
   }
 
+  final mutation = DeckMutationRequest.fromContext(
+    context,
+    operation: 'card_add',
+    deckId: deckId,
+    body: body,
+  );
+
   try {
     final result = await pool.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) throw const DeckNotFoundForMutation();
       final deckResult = await session.execute(
         Sql.named(
           'SELECT id::text, format FROM decks WHERE id = @deckId AND user_id = @userId LIMIT 1 FOR UPDATE',
@@ -57,7 +74,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId, 'userId': userId},
       );
       if (deckResult.isEmpty) {
-        throw Exception('Deck not found or permission denied.');
+        throw const DeckNotFoundException();
       }
 
       final format = (deckResult.first[1] as String).toLowerCase();
@@ -233,8 +250,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           parameters: {'deckId': deckId},
         );
         final updatedTotal = (updatedTotalResult.first[0] as int?) ?? 0;
+        final receipt = await recordDeckMutation(session, baseline);
 
-        return {
+        return <String, Object?>{
           'ok': true,
           'deck_id': deckId,
           'card_id': cardId,
@@ -243,6 +261,7 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
           'is_commander': true,
           'condition': condition,
           'total_cards': updatedTotal,
+          ...receipt.toJson(),
         };
       }
 
@@ -409,8 +428,9 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         parameters: {'deckId': deckId},
       );
       final updatedTotal = (updatedTotalResult.first[0] as int?) ?? 0;
+      final receipt = await recordDeckMutation(session, baseline);
 
-      return {
+      return <String, Object?>{
         'ok': true,
         'deck_id': deckId,
         'card_id': cardId,
@@ -419,22 +439,24 @@ Future<Response> onRequest(RequestContext context, String deckId) async {
         'is_commander': isCommander || existingIsCommander,
         'condition': condition,
         'total_cards': updatedTotal,
+        ...receipt.toJson(),
       };
     });
 
-    return Response.json(body: result);
+    return Response.json(body: result, headers: deckRevisionHeadersOf(result));
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
   } on DeckRulesException catch (e) {
     print('[ERROR] handler: $e');
     return Response.json(
       statusCode: HttpStatus.badRequest,
       body: {'error': e.message},
     );
+  } on DeckNotFoundException catch (error) {
+    return Response.json(statusCode: HttpStatus.notFound, body: error.toJson());
   } catch (e) {
     print('[ERROR] handler: $e');
-    return Response.json(
-      statusCode: HttpStatus.internalServerError,
-      body: {'error': e.toString()},
-    );
+    return internalServerError('Falha ao adicionar a carta ao deck');
   }
 }
 

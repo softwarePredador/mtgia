@@ -209,7 +209,7 @@ Future<List<Map<String, dynamic>>> findSynergyReplacements({
          AND availability.user_id =
              CAST(NULLIF(CAST(@user_id AS text), '') AS uuid)
          AND CAST(@check_collection AS boolean) = TRUE
-        WHERE (cl.status = 'legal' OR cl.status = 'restricted' OR cl.status IS NULL)
+        WHERE (cl.status = 'legal' OR cl.status = 'restricted')
           AND LOWER(c.name) NOT IN (SELECT LOWER(unnest(@exclude::text[])))
           AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|\$)')
           AND c.name NOT LIKE 'A-%'

@@ -4,9 +4,13 @@
 
 ```mermaid
 erDiagram
+    privacy_keyring ||--o{ account_deletion_outbox : "key_version -> key_version"
+    account_deletion_receipts ||--o{ account_deletion_outbox : "receipt_id -> id"
     decks ||--o{ activation_funnel_events : "deck_id -> id"
     users ||--o{ activation_funnel_events : "user_id -> id"
     users ||--o{ ai_generate_jobs : "user_id -> id"
+    decks ||--o{ ai_generate_requests : "materialized_deck_id -> id"
+    users ||--o{ ai_generate_requests : "user_id -> id"
     decks ||--o{ ai_logs : "deck_id -> id"
     users ||--o{ ai_logs : "user_id -> id"
     decks ||--o{ ai_optimize_cache : "deck_id -> id"
@@ -34,6 +38,8 @@ erDiagram
     decks ||--o{ battle_simulations : "deck_a_id -> id"
     decks ||--o{ battle_simulations : "deck_b_id -> id"
     decks ||--o{ battle_simulations : "winner_deck_id -> id"
+    beta_invites ||--o{ beta_invite_events : "invite_id -> id"
+    users ||--o{ beta_invites : "accepted_user_id -> id"
     cards ||--o{ card_battle_rules : "card_id -> id"
     cards ||--o{ card_function_tags : "card_id -> id"
     cards ||--o{ card_legalities : "card_id -> id"
@@ -54,6 +60,9 @@ erDiagram
     users ||--o{ conversations : "user_b_id -> id"
     cards ||--o{ deck_cards : "card_id -> id"
     decks ||--o{ deck_cards : "deck_id -> id"
+    decks ||--o{ deck_change_events : "deck_id -> id"
+    deck_change_events ||--o{ deck_change_events : "undo_of_event_id -> id"
+    users ||--o{ deck_change_events : "user_id -> id"
     decks ||--o{ deck_comments : "deck_id -> id"
     users ||--o{ deck_comments : "user_id -> id"
     decks ||--o{ deck_matchups : "deck_id -> id"
@@ -101,7 +110,24 @@ erDiagram
     users ||--o{ user_blocks : "blocker_id -> id"
     users ||--o{ user_follows : "follower_id -> id"
     users ||--o{ user_follows : "following_id -> id"
+    users ||--o{ user_legal_acceptances : "user_id -> id"
     users ||--o{ user_plans : "user_id -> id"
+    account_deletion_outbox {
+        number attempts
+        datetime completed_at
+        string consumer
+        datetime created_at
+        string deck_tokens
+        uuid id PK
+        number key_version
+        string last_error_code
+        datetime lease_expires_at
+        string lease_owner
+        datetime next_attempt_at
+        uuid receipt_id
+        string status
+        datetime updated_at
+    }
     account_deletion_receipts {
         datetime completed_at
         string deletion_mode
@@ -112,6 +138,7 @@ erDiagram
     activation_funnel_events {
         datetime created_at
         uuid deck_id
+        string dedupe_key
         string event_name
         string format
         uuid id PK
@@ -134,6 +161,25 @@ erDiagram
         number stage_number
         string status
         number total_stages
+        datetime updated_at
+        uuid user_id
+    }
+    ai_generate_requests {
+        boolean can_materialize
+        json controls
+        datetime created_at
+        string format
+        uuid id PK
+        string job_id
+        datetime materialized_at
+        uuid materialized_deck_id
+        string prompt
+        datetime prompt_purged_at
+        string request_fingerprint
+        string request_key
+        json result_deck
+        string result_fingerprint
+        string status
         datetime updated_at
         uuid user_id
     }
@@ -206,6 +252,14 @@ erDiagram
         datetime updated_at
         uuid user_id PK
     }
+    analysis_sources {
+        string commander_name
+        string hash
+        uuid id PK
+        datetime imported_at
+        string source_file
+        string source_type
+    }
     archetype_counters {
         string archetype
         string color_identity
@@ -218,6 +272,23 @@ erDiagram
         datetime last_synced_at
         string notes
         number priority
+    }
+    archetype_patterns {
+        string archetype
+        string core_cards
+        string data_sources
+        json flex_options
+        string format
+        uuid id PK
+        string ideal_avg_cmc
+        number ideal_land_count
+        datetime last_analyzed_at
+        number sample_size
+        string typical_draw
+        string typical_finishers
+        string typical_ramp
+        string typical_removal
+        string win_conditions
     }
     battle_job_live_records {
         boolean content_truncated
@@ -319,6 +390,29 @@ erDiagram
         number turns_played
         uuid winner_deck_id
     }
+    beta_invite_events {
+        string actor
+        datetime created_at
+        string event
+        string id PK
+        uuid invite_id
+        string request_id
+    }
+    beta_invites {
+        datetime accepted_at
+        uuid accepted_user_id
+        string batch_label
+        datetime delivered_at
+        string email_digest
+        string email_hint
+        datetime expires_at
+        uuid id PK
+        datetime issued_at
+        string issued_by
+        datetime revoked_at
+        string revoked_reason
+        string token_hash
+    }
     card_battle_rules {
         uuid card_id
         string card_name
@@ -386,6 +480,7 @@ erDiagram
         string common_archetypes
         string common_formats
         datetime created_at
+        uuid id
         datetime last_updated_at
         string learned_role
         number meta_deck_count
@@ -445,6 +540,7 @@ erDiagram
         string color_identity
         string colors
         datetime created_at
+        number edhrec_rank
         boolean foil
         uuid id PK
         string image_url
@@ -461,7 +557,6 @@ erDiagram
         datetime price_updated_at
         number price_usd
         number price_usd_foil
-        string rarity
     }
     combo_cards {
         string card_name
@@ -637,6 +732,23 @@ erDiagram
         boolean is_commander
         number quantity
     }
+    deck_change_events {
+        json cards_after
+        json cards_before
+        datetime created_at
+        uuid deck_id
+        datetime description_redacted_at
+        uuid id PK
+        string idempotency_key
+        json metadata_after
+        json metadata_before
+        string operation
+        string request_fingerprint
+        number revision_after
+        number revision_before
+        uuid undo_of_event_id
+        uuid user_id
+    }
     deck_comments {
         string body
         datetime created_at
@@ -713,6 +825,7 @@ erDiagram
         string pricing_source
         number pricing_total
         datetime pricing_updated_at
+        number revision
         string strengths
         number synergy_score
         uuid user_id
@@ -842,6 +955,17 @@ erDiagram
         string source_url
         string strategy_archetype
     }
+    ml_learning_state {
+        json active_rules
+        string avg_effectiveness_score
+        datetime created_at
+        uuid id PK
+        boolean is_active
+        datetime last_updated_at
+        string model_version
+        string prompt_template_hash
+        number total_optimizations
+    }
     ml_prompt_feedback {
         string archetype
         string cards_accepted
@@ -874,6 +998,32 @@ erDiagram
         string title
         string type
         uuid user_id
+    }
+    optimization_analysis_logs {
+        number additions_count
+        json additions_list
+        string after_avg_cmc
+        number after_creature_count
+        number after_land_count
+        string algorithm_version
+        json alternative_approaches
+        string before_avg_cmc
+        number before_creature_count
+        number before_land_count
+        number color_identity_violations
+        string commander_colors
+        string commander_name
+        datetime created_at
+        json decisions_reasoning
+        string deck_format
+        string detected_theme
+        number edhrec_not_validated_count
+        string edhrec_themes
+        number edhrec_validated_count
+        string effectiveness_score
+        number execution_time_ms
+        number final_card_count
+        boolean hybrid_mode_used
     }
     optimize_rejection_penalties {
         string archetype
@@ -997,6 +1147,31 @@ erDiagram
         datetime updated_at
         string value
     }
+    synergy_packages {
+        string card_names
+        string confidence_score
+        datetime created_at
+        uuid id PK
+        number occurrence_count
+        string package_name
+        string package_type
+        string primary_archetype
+        string supported_formats
+    }
+    theme_contextual_rules {
+        json conditions
+        datetime created_at
+        string description
+        string function
+        uuid id PK
+        number ideal_count
+        number max_count
+        number min_count
+        string priority
+        string source
+        string theme
+        datetime updated_at
+    }
     trade_items {
         number agreed_price
         uuid binder_item_id
@@ -1083,6 +1258,15 @@ erDiagram
         uuid following_id
         uuid id PK
     }
+    user_legal_acceptances {
+        datetime accepted_at
+        string id PK
+        string privacy_version
+        string request_id
+        string source
+        string terms_version
+        uuid user_id
+    }
     user_plans {
         string plan_name
         datetime renews_at
@@ -1119,4 +1303,4 @@ erDiagram
     }
 ```
 
-Tabelas: 79; views: 6; migrations: 58 (latest `058`).
+Tabelas: 91; views: 6; migrations: 74 (latest `076`).

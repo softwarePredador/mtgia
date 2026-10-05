@@ -78,40 +78,42 @@ void main() {
       expect(ops, contains('rollback manaloom-ops comprovado'));
     });
 
-    test(
-      'binds the committed all-off policy and neutralizes legacy toggles',
-      () {
-        expect(ops, contains('manaloom_load_release_capabilities_from_git'));
-        expect(
-          ops,
-          contains(
-            'RELEASE_CAPABILITIES_DIGEST_SHA256='
-            r'"$MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256"',
-          ),
-        );
-        for (final marker in const [
-          'MANALOOM_BOOT_PULL_PENDING_EVENTS=0',
-          'MANALOOM_RUN_PREFLIGHT_ON_BOOT=0',
-          'MTGIA_SYNC_GIT_PULL=0',
-          'HERMES_AUTO_SYNC_APPLY=0',
-          'HERMES_AUTO_PROMOTE_APPLY=0',
-          'MANALOOM_IMPORT_APPLY=0',
-          'MANALOOM_ENABLE_LEARNING_WRITES=0',
-          'MANALOOM_ENABLE_LEARNED_DECK_WRITES=0',
-          'MANALOOM_LEARNING_WRITES=0',
-          'MANALOOM_BATTLE_RULES_APPLY_PG=0',
-          'MANALOOM_SYNC_CARD_LEGALITIES_APPLY=0',
-          'MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=0',
-          'MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0',
-        ]) {
-          expect(ops, contains(marker), reason: marker);
-        }
-        expect(ops, contains("['manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']"));
-        expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));
-        expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1')));
-        expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1')));
-      },
-    );
+    test('binds the committed all-off policy and neutralizes legacy toggles', () {
+      expect(ops, contains('manaloom_load_release_capabilities_from_git'));
+      expect(
+        ops,
+        contains(
+          'RELEASE_CAPABILITIES_DIGEST_SHA256='
+          r'"$MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256"',
+        ),
+      );
+      for (final marker in const [
+        'MANALOOM_BOOT_PULL_PENDING_EVENTS=0',
+        'MANALOOM_RUN_PREFLIGHT_ON_BOOT=0',
+        'MTGIA_SYNC_GIT_PULL=0',
+        'HERMES_AUTO_SYNC_APPLY=0',
+        'HERMES_AUTO_PROMOTE_APPLY=0',
+        'MANALOOM_IMPORT_APPLY=0',
+        'MANALOOM_ENABLE_LEARNING_WRITES=0',
+        'MANALOOM_ENABLE_LEARNED_DECK_WRITES=0',
+        'MANALOOM_LEARNING_WRITES=0',
+        'MANALOOM_BATTLE_RULES_APPLY_PG=0',
+        'MANALOOM_SYNC_CARD_LEGALITIES_APPLY=0',
+        'MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=0',
+        'MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0',
+      ]) {
+        expect(ops, contains(marker), reason: marker);
+      }
+      expect(
+        ops,
+        contains(
+          "['manaloom_ai_runtime_cleanup', 'manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
+        ),
+      );
+      expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));
+      expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1')));
+      expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1')));
+    });
   });
 
   group('immutable battle sidecar releases', () {

@@ -9,6 +9,7 @@ Map<String, dynamic> buildDeckReadinessContract({
   required bool strictValidationPassed,
   Iterable<String> prerequisiteReviewReasons = const <String>[],
   String? strictValidationError,
+  String? strictValidationReason,
 }) {
   final normalizedFormat = format.trim().toLowerCase();
   final requiresCommander =
@@ -22,6 +23,9 @@ Map<String, dynamic> buildDeckReadinessContract({
     reviewReasons.add('missing_commander');
   }
   if (!strictValidationPassed) {
+    // O motivo específico da recusa estrita (ex.: `legality_unknown`).
+    final reason = strictValidationReason?.trim() ?? '';
+    if (reason.isNotEmpty) reviewReasons.add(reason);
     final expectedCount = switch (normalizedFormat) {
       'commander' => 100,
       'brawl' => 60,

@@ -1969,7 +1969,8 @@ CREATE TABLE IF NOT EXISTS trade_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trade_offer_id UUID NOT NULL REFERENCES trade_offers(id) ON DELETE CASCADE,
     binder_item_id UUID REFERENCES user_binder_items(id) ON DELETE SET NULL,
-    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    -- D-66 (migration 059): RESTRICT, alinhado com a produção.
+    owner_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     direction TEXT NOT NULL CHECK (direction IN ('offering', 'requesting')),
     quantity INTEGER NOT NULL DEFAULT 1 CHECK (quantity > 0),
     agreed_price DECIMAL(10,2),
@@ -2400,6 +2401,431 @@ CREATE TABLE IF NOT EXISTS privacy_deleted_deck_tombstones (
 CREATE INDEX IF NOT EXISTS idx_privacy_deleted_deck_token
     ON privacy_deleted_deck_tombstones (deck_token);
 
+-- D-68 (migration 060): outbox da exclusão. Uma linha por consumidor fora do
+-- PostgreSQL, gravada na transação do recibo; sem identificador do titular.
+CREATE TABLE IF NOT EXISTS account_deletion_outbox (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    receipt_id UUID NOT NULL
+        REFERENCES account_deletion_receipts(id) ON DELETE RESTRICT,
+    consumer TEXT NOT NULL CHECK (consumer IN (
+        'hermes_learning_sqlite',
+        'interactive_battle_sidecar',
+        'endpoint_cache',
+        'sentry',
+        'backups'
+    )),
+    key_version SMALLINT NOT NULL
+        REFERENCES privacy_keyring(key_version) ON DELETE RESTRICT,
+    deck_tokens TEXT[] NOT NULL DEFAULT '{}',
+    status TEXT NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'processing', 'done', 'failed')),
+    attempts INTEGER NOT NULL DEFAULT 0 CHECK (attempts BETWEEN 0 AND 100),
+    next_attempt_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    lease_owner TEXT,
+    lease_expires_at TIMESTAMP WITH TIME ZONE,
+    last_error_code TEXT,
+    completed_at TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_account_deletion_outbox_consumer UNIQUE (receipt_id, consumer),
+    CONSTRAINT chk_account_deletion_outbox_done
+        CHECK ((status = 'done') = (completed_at IS NOT NULL)),
+    CONSTRAINT chk_account_deletion_outbox_lease
+        CHECK ((status = 'processing') = (lease_owner IS NOT NULL AND lease_expires_at IS NOT NULL))
+);
+
+CREATE INDEX IF NOT EXISTS idx_account_deletion_outbox_due
+    ON account_deletion_outbox (next_attempt_at)
+    WHERE status IN ('pending', 'failed');
+
+-- BT-AUTH-006 (migration 061, D-16 e D-56): convites da beta. Só o hash do
+-- código e o digest do e-mail convidado, mais uma pista mascarada; um convite
+-- aberto por e-mail. A auditoria não guarda dado pessoal.
+CREATE TABLE IF NOT EXISTS beta_invites (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    batch_label TEXT NOT NULL CHECK (batch_label ~ '^[a-z0-9][a-z0-9._-]{0,63}$'),
+    email_digest TEXT NOT NULL CHECK (email_digest ~ '^[0-9a-f]{64}$'),
+    email_hint TEXT NOT NULL CHECK (char_length(email_hint) BETWEEN 3 AND 120),
+    token_hash TEXT NOT NULL CHECK (token_hash ~ '^[0-9a-f]{64}$'),
+    issued_by TEXT NOT NULL CHECK (char_length(issued_by) BETWEEN 1 AND 80),
+    issued_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    delivered_at TIMESTAMP WITH TIME ZONE,
+    revoked_at TIMESTAMP WITH TIME ZONE,
+    revoked_reason TEXT
+        CHECK (revoked_reason IS NULL OR char_length(revoked_reason) BETWEEN 1 AND 200),
+    accepted_at TIMESTAMP WITH TIME ZONE,
+    accepted_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT uq_beta_invites_token_hash UNIQUE (token_hash),
+    CONSTRAINT chk_beta_invites_expiry CHECK (expires_at > issued_at),
+    CONSTRAINT chk_beta_invites_single_outcome
+        CHECK (accepted_at IS NULL OR revoked_at IS NULL),
+    CONSTRAINT chk_beta_invites_revoked_reason
+        CHECK ((revoked_at IS NULL) = (revoked_reason IS NULL)),
+    CONSTRAINT chk_beta_invites_accepted_user
+        CHECK (accepted_at IS NOT NULL OR accepted_user_id IS NULL)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_beta_invites_open_email
+    ON beta_invites (email_digest)
+    WHERE accepted_at IS NULL AND revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_beta_invites_batch
+    ON beta_invites (batch_label, issued_at);
+
+CREATE TABLE IF NOT EXISTS beta_invite_events (
+    id BIGSERIAL PRIMARY KEY,
+    invite_id UUID NOT NULL REFERENCES beta_invites(id) ON DELETE CASCADE,
+    event TEXT NOT NULL CHECK (event IN (
+        'issued',
+        'delivered',
+        'delivery_failed',
+        'resent',
+        'revoked',
+        'accepted',
+        'denied_expired',
+        'denied_revoked',
+        'denied_used',
+        'denied_email_mismatch'
+    )),
+    actor TEXT NOT NULL CHECK (char_length(actor) BETWEEN 1 AND 80),
+    request_id TEXT CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_beta_invite_events_invite
+    ON beta_invite_events (invite_id, created_at);
+
+-- BT-LEGAL-ACCEPT-001 (migration 062, D-24): histórico de aceites de Termos e
+-- Privacidade, a prova de consentimento. Só cresce.
+CREATE TABLE IF NOT EXISTS user_legal_acceptances (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    terms_version TEXT NOT NULL
+        CHECK (char_length(terms_version) BETWEEN 1 AND 40),
+    privacy_version TEXT NOT NULL
+        CHECK (char_length(privacy_version) BETWEEN 1 AND 40),
+    source TEXT NOT NULL CHECK (source IN ('register', 'reaccept', 'backfill')),
+    request_id TEXT CHECK (request_id IS NULL OR char_length(request_id) <= 128),
+    accepted_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_legal_acceptances_user
+    ON user_legal_acceptances (user_id, accepted_at DESC);
+
+-- DCK-P0-01 (migration 067): revisão otimista do deck e ledger imutável de
+-- mudanças, com desfazer universal e Idempotency-Key
+-- (lib/decks/deck_revision_support.dart).
+ALTER TABLE decks ADD COLUMN IF NOT EXISTS revision BIGINT NOT NULL DEFAULT 1;
+ALTER TABLE decks DROP CONSTRAINT IF EXISTS chk_decks_revision_positive;
+ALTER TABLE decks ADD CONSTRAINT chk_decks_revision_positive
+  CHECK (revision >= 1);
+
+CREATE TABLE IF NOT EXISTS deck_change_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  deck_id UUID NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  revision_before BIGINT NOT NULL CHECK (revision_before >= 1),
+  revision_after BIGINT NOT NULL,
+  operation TEXT NOT NULL,
+  cards_before JSONB,
+  cards_after JSONB,
+  metadata_before JSONB NOT NULL DEFAULT '{}'::jsonb,
+  metadata_after JSONB NOT NULL DEFAULT '{}'::jsonb,
+  undo_of_event_id UUID REFERENCES deck_change_events(id) ON DELETE CASCADE,
+  idempotency_key TEXT,
+  request_fingerprint TEXT,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chk_deck_change_events_revision_step
+    CHECK (revision_after = revision_before + 1),
+  CONSTRAINT chk_deck_change_events_cards_pair
+    CHECK ((cards_before IS NULL) = (cards_after IS NULL)),
+  CONSTRAINT chk_deck_change_events_idempotency_pair
+    CHECK ((idempotency_key IS NULL) = (request_fingerprint IS NULL)),
+  CONSTRAINT chk_deck_change_events_idempotency_key
+    CHECK (
+      idempotency_key IS NULL
+      OR char_length(idempotency_key) BETWEEN 1 AND 200
+    ),
+  CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+    'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+    'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+    'optimization_rollback', 'undo'
+  )),
+  CONSTRAINT uq_deck_change_events_revision UNIQUE (deck_id, revision_after)
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_deck_change_events_idempotency
+  ON deck_change_events (deck_id, idempotency_key)
+  WHERE idempotency_key IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_deck_change_events_user
+  ON deck_change_events (user_id);
+CREATE INDEX IF NOT EXISTS idx_deck_change_events_undo_of
+  ON deck_change_events (undo_of_event_id)
+  WHERE undo_of_event_id IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_change_events_append_only$
+BEGIN
+  -- UPDATE nunca. DELETE só em cascata (deck ou conta apagados), que chega
+  -- por um gatilho de integridade: profundidade 2 ou mais.
+  IF TG_OP = 'UPDATE' OR pg_trigger_depth() <= 1 THEN
+    RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+      USING ERRCODE = 'restrict_violation';
+  END IF;
+  RETURN OLD;
+END;
+$deck_change_events_append_only$;
+
+DROP TRIGGER IF EXISTS manaloom_deck_change_events_append_only
+  ON deck_change_events;
+CREATE TRIGGER manaloom_deck_change_events_append_only
+BEFORE UPDATE OR DELETE ON deck_change_events
+FOR EACH ROW EXECUTE FUNCTION manaloom_deck_change_events_append_only();
+
+-- DCK-P1-04 (migration 068): legalidade que muda rebaixa o deck validado
+-- do formato que tem a carta (card_legality_changed).
+CREATE OR REPLACE FUNCTION manaloom_demote_decks_for_legalities(changed jsonb)
+RETURNS void
+LANGUAGE sql
+AS $demote_for_legalities$
+  UPDATE decks d
+  SET validation_state = 'draft',
+      validation_reasons = CASE
+        WHEN COALESCE(d.validation_reasons, '[]'::jsonb) ? 'card_legality_changed'
+          THEN COALESCE(d.validation_reasons, '[]'::jsonb)
+        ELSE COALESCE(d.validation_reasons, '[]'::jsonb)
+          || '["card_legality_changed"]'::jsonb
+      END,
+      validation_updated_at = CURRENT_TIMESTAMP
+  WHERE d.validation_state = 'validated'
+    AND EXISTS (
+      SELECT 1
+      FROM jsonb_to_recordset(changed) AS c(card_id uuid, format text)
+      JOIN deck_cards dc ON dc.card_id = c.card_id
+      WHERE dc.deck_id = d.id
+        AND LOWER(c.format) = LOWER(d.format)
+    );
+$demote_for_legalities$;
+
+CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_inserted()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $legality_inserted$
+BEGIN
+  PERFORM manaloom_demote_decks_for_legalities((
+    SELECT COALESCE(
+      jsonb_agg(jsonb_build_object('card_id', card_id, 'format', format)),
+      '[]'::jsonb
+    )
+    FROM legality_new_rows
+  ));
+  RETURN NULL;
+END;
+$legality_inserted$;
+
+CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_deleted()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $legality_deleted$
+BEGIN
+  PERFORM manaloom_demote_decks_for_legalities((
+    SELECT COALESCE(
+      jsonb_agg(jsonb_build_object('card_id', card_id, 'format', format)),
+      '[]'::jsonb
+    )
+    FROM legality_old_rows
+  ));
+  RETURN NULL;
+END;
+$legality_deleted$;
+
+CREATE OR REPLACE FUNCTION manaloom_mark_decks_legality_updated()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $legality_updated$
+BEGIN
+  -- Só o que mudou de fato: a sincronização regrava a mesma linha sem
+  -- mudar o status, e isso não rebaixa nada.
+  PERFORM manaloom_demote_decks_for_legalities((
+    SELECT COALESCE(
+      jsonb_agg(jsonb_build_object('card_id', changed.card_id,
+                                   'format', changed.format)),
+      '[]'::jsonb
+    )
+    FROM (
+      SELECT n.card_id, n.format
+      FROM legality_new_rows n
+      WHERE NOT EXISTS (
+        SELECT 1 FROM legality_old_rows o
+        WHERE o.card_id = n.card_id AND o.format = n.format
+          AND o.status IS NOT DISTINCT FROM n.status
+      )
+      UNION
+      SELECT o.card_id, o.format
+      FROM legality_old_rows o
+      WHERE NOT EXISTS (
+        SELECT 1 FROM legality_new_rows n
+        WHERE n.card_id = o.card_id AND n.format = o.format
+          AND n.status IS NOT DISTINCT FROM o.status
+      )
+    ) changed
+  ));
+  RETURN NULL;
+END;
+$legality_updated$;
+
+DROP TRIGGER IF EXISTS manaloom_card_legality_inserted ON card_legalities;
+CREATE TRIGGER manaloom_card_legality_inserted
+AFTER INSERT ON card_legalities
+REFERENCING NEW TABLE AS legality_new_rows
+FOR EACH STATEMENT
+EXECUTE FUNCTION manaloom_mark_decks_legality_inserted();
+
+DROP TRIGGER IF EXISTS manaloom_card_legality_updated ON card_legalities;
+CREATE TRIGGER manaloom_card_legality_updated
+AFTER UPDATE ON card_legalities
+REFERENCING OLD TABLE AS legality_old_rows NEW TABLE AS legality_new_rows
+FOR EACH STATEMENT
+EXECUTE FUNCTION manaloom_mark_decks_legality_updated();
+
+DROP TRIGGER IF EXISTS manaloom_card_legality_deleted ON card_legalities;
+CREATE TRIGGER manaloom_card_legality_deleted
+AFTER DELETE ON card_legalities
+REFERENCING OLD TABLE AS legality_old_rows
+FOR EACH STATEMENT
+EXECUTE FUNCTION manaloom_mark_decks_legality_deleted();
+
+-- DCK-P0-04 (migration 069): pedido do Generate durável, prompt bruto por 30
+-- dias (D-29) e redação governada da descrição no ledger.
+CREATE TABLE IF NOT EXISTS ai_generate_requests (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  request_key TEXT NOT NULL,
+  request_fingerprint TEXT,
+  job_id TEXT,
+  format TEXT NOT NULL,
+  controls JSONB NOT NULL DEFAULT '{}'::jsonb,
+  prompt TEXT,
+  prompt_purged_at TIMESTAMP WITH TIME ZONE,
+  status TEXT NOT NULL DEFAULT 'pending',
+  result_deck JSONB,
+  result_fingerprint TEXT,
+  can_materialize BOOLEAN NOT NULL DEFAULT FALSE,
+  materialized_deck_id UUID REFERENCES decks(id) ON DELETE SET NULL,
+  materialized_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT uq_ai_generate_requests_user_key UNIQUE (user_id, request_key),
+  CONSTRAINT chk_ai_generate_requests_status
+    CHECK (status IN ('pending', 'completed', 'failed', 'cancelled')),
+  CONSTRAINT chk_ai_generate_requests_prompt_purge
+    CHECK (
+      prompt_purged_at IS NULL
+      OR (prompt IS NULL AND request_fingerprint IS NULL)
+    ),
+  CONSTRAINT chk_ai_generate_requests_result
+    CHECK ((result_deck IS NULL) = (result_fingerprint IS NULL)),
+  CONSTRAINT chk_ai_generate_requests_materialize
+    CHECK (NOT can_materialize OR result_deck IS NOT NULL)
+);
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_user_created
+  ON ai_generate_requests (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_job
+  ON ai_generate_requests (job_id)
+  WHERE job_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_materialized_deck
+  ON ai_generate_requests (materialized_deck_id)
+  WHERE materialized_deck_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ai_generate_requests_prompt_retention
+  ON ai_generate_requests (created_at)
+  WHERE prompt IS NOT NULL;
+
+ALTER TABLE deck_change_events
+  ADD COLUMN IF NOT EXISTS description_redacted_at TIMESTAMP WITH TIME ZONE;
+
+CREATE OR REPLACE FUNCTION manaloom_deck_change_events_append_only()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $deck_change_events_append_only$
+BEGIN
+  IF TG_OP = 'UPDATE' THEN
+    -- A única mudança aceita é a redação governada da D-29: a limpeza por
+    -- prazo tira o texto da descrição de antes e de depois e marca
+    -- description_redacted_at, com todo o resto igual.
+    IF current_setting('manaloom.deck_ledger_redaction', true)
+         = 'd29_prompt_retention'
+       AND OLD.description_redacted_at IS NULL
+       AND NEW.description_redacted_at IS NOT NULL
+       AND NEW.id = OLD.id
+       AND NEW.deck_id = OLD.deck_id
+       AND NEW.user_id = OLD.user_id
+       AND NEW.revision_before = OLD.revision_before
+       AND NEW.revision_after = OLD.revision_after
+       AND NEW.operation = OLD.operation
+       AND NEW.cards_before IS NOT DISTINCT FROM OLD.cards_before
+       AND NEW.cards_after IS NOT DISTINCT FROM OLD.cards_after
+       AND NEW.undo_of_event_id IS NOT DISTINCT FROM OLD.undo_of_event_id
+       AND NEW.idempotency_key IS NOT DISTINCT FROM OLD.idempotency_key
+       AND NEW.request_fingerprint IS NOT DISTINCT FROM OLD.request_fingerprint
+       AND NEW.created_at = OLD.created_at
+       AND (NEW.metadata_before - 'description')
+         = (OLD.metadata_before - 'description')
+       AND (NEW.metadata_after - 'description')
+         = (OLD.metadata_after - 'description')
+       AND COALESCE(NEW.metadata_before -> 'description', 'null'::jsonb)
+         = 'null'::jsonb
+       AND COALESCE(NEW.metadata_after -> 'description', 'null'::jsonb)
+         = 'null'::jsonb
+    THEN
+      RETURN NEW;
+    END IF;
+    RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+      USING ERRCODE = 'restrict_violation';
+  END IF;
+  -- DELETE só em cascata (deck ou conta apagados), que chega por um gatilho
+  -- de integridade: profundidade 2 ou mais.
+  IF pg_trigger_depth() <= 1 THEN
+    RAISE EXCEPTION 'deck_change_events e append-only (%)', TG_OP
+      USING ERRCODE = 'restrict_violation';
+  END IF;
+  RETURN OLD;
+END;
+$deck_change_events_append_only$;
+
+-- DCK-P0-06 (migration 072): lixeira de decks (D-30), com os eventos de
+-- lixeira no ledger e o índice parcial da lixeira.
+-- O ledger passa a registrar ir para a lixeira e voltar dela: cada uma sobe a
+-- revisão do deck como as outras mudanças do dono.
+ALTER TABLE deck_change_events
+  DROP CONSTRAINT IF EXISTS chk_deck_change_events_operation;
+ALTER TABLE deck_change_events
+  ADD CONSTRAINT chk_deck_change_events_operation CHECK (operation IN (
+  'card_add', 'card_bulk', 'card_set', 'card_remove', 'card_replace',
+  'deck_patch', 'deck_replace', 'import_to_deck', 'optimization_apply',
+  'optimization_rollback', 'undo',
+  'deck_delete', 'deck_restore'
+));
+-- A lixeira de cada dono, da mais nova para a mais velha; a limpeza por prazo
+-- lê o mesmo índice parcial (só decks na lixeira).
+CREATE INDEX IF NOT EXISTS idx_decks_user_trash
+  ON decks (user_id, deleted_at DESC)
+  WHERE deleted_at IS NOT NULL;
+
+-- BT-KPI-001 (migration 073): o coletor de eventos de ativação guarda só o
+-- hash SHA-256 da chave de idempotência do app (a chave carrega o ID do
+-- usuário), e a mesma chave do mesmo usuário grava uma vez só.
+ALTER TABLE activation_funnel_events
+  ADD COLUMN IF NOT EXISTS dedupe_key TEXT;
+ALTER TABLE activation_funnel_events
+  DROP CONSTRAINT IF EXISTS chk_activation_funnel_events_dedupe_key;
+ALTER TABLE activation_funnel_events
+  ADD CONSTRAINT chk_activation_funnel_events_dedupe_key
+  CHECK (dedupe_key IS NULL OR dedupe_key ~ '^[0-9a-f]{64}$');
+CREATE UNIQUE INDEX IF NOT EXISTS uq_activation_funnel_events_dedupe
+  ON activation_funnel_events (user_id, dedupe_key)
+  WHERE dedupe_key IS NOT NULL;
+
 -- ============================================================
 -- GROWTH: Relatorios compartilhaveis
 -- ============================================================
@@ -2747,3 +3173,54 @@ BEGIN
     END IF;
 END;
 $battle_simulation_trigger$;
+
+-- D-48, D-67 e D-83 (migrations 064 a 066): índices que só existiam na produção (auditoria
+-- BT-DB-001). O banco novo sai com os mesmos nomes e definições. Os de
+-- card_meta_insights e card_rulings ficam na 064, porque essas tabelas nascem
+-- de migration. uq_binder_user_card_cond_foil_list fica de fora, pendente de
+-- decisão: não tem o idioma e contradiz a identidade física da 049.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_card_battle_rules_name_rule_key ON card_battle_rules USING btree (normalized_name, logical_rule_key);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation ON conversations USING btree (user_a_id, user_b_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_conversation_pair ON conversations USING btree (LEAST(user_a_id, user_b_id), GREATEST(user_a_id, user_b_id));
+CREATE INDEX IF NOT EXISTS idx_cards_colors ON cards USING gin (colors);
+CREATE INDEX IF NOT EXISTS idx_cards_lower_name ON cards USING btree (lower(name));
+CREATE INDEX IF NOT EXISTS idx_conversations_user_a_last ON conversations USING btree (user_a_id, last_message_at DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_conversations_user_b_last ON conversations USING btree (user_b_id, last_message_at DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_deck_cards_card_id ON deck_cards USING btree (card_id);
+CREATE INDEX IF NOT EXISTS idx_decks_format ON decks USING btree (format);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_conversation_created ON direct_messages USING btree (conversation_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_unread_by_conversation ON direct_messages USING btree (conversation_id, sender_id) WHERE (read_at IS NULL);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_created ON notifications USING btree (user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_unread_created ON notifications USING btree (user_id, created_at DESC) WHERE (read_at IS NULL);
+CREATE INDEX IF NOT EXISTS idx_trade_items_offer_direction ON trade_items USING btree (trade_offer_id, direction);
+CREATE INDEX IF NOT EXISTS idx_trade_messages_offer_created ON trade_messages USING btree (trade_offer_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_status_updated ON trade_offers USING btree (receiver_id, status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_receiver_updated ON trade_offers USING btree (receiver_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_status_updated ON trade_offers USING btree (sender_id, status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_offers_sender_updated ON trade_offers USING btree (sender_id, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_trade_history_offer_created ON trade_status_history USING btree (trade_offer_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_binder_marketplace_available_created ON user_binder_items USING btree (created_at DESC) WHERE ((for_trade = true) OR (for_sale = true));
+CREATE INDEX IF NOT EXISTS idx_binder_user_list_name_filters ON user_binder_items USING btree (user_id, list_type, condition, for_trade, for_sale);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users USING btree (email);
+CREATE INDEX IF NOT EXISTS idx_users_username ON users USING btree (username);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_created_at ON battle_simulations USING btree (created_at);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_a_id ON battle_simulations USING btree (deck_a_id);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_deck_b_id ON battle_simulations USING btree (deck_b_id);
+CREATE INDEX IF NOT EXISTS idx_battle_simulations_winner_deck_id ON battle_simulations USING btree (winner_deck_id);
+CREATE INDEX IF NOT EXISTS idx_card_legalities_card_id ON card_legalities USING btree (card_id);
+CREATE INDEX IF NOT EXISTS idx_card_legalities_format ON card_legalities USING btree (format);
+CREATE INDEX IF NOT EXISTS idx_card_legalities_status ON card_legalities USING btree (status);
+CREATE INDEX IF NOT EXISTS idx_cards_collector_set ON cards USING btree (collector_number, set_code) WHERE (collector_number IS NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_cards_set_code ON cards USING btree (set_code);
+CREATE INDEX IF NOT EXISTS idx_deck_cards_is_commander ON deck_cards USING btree (is_commander);
+CREATE INDEX IF NOT EXISTS idx_deck_matchups_deck_id ON deck_matchups USING btree (deck_id);
+CREATE INDEX IF NOT EXISTS idx_deck_matchups_opponent_deck_id ON deck_matchups USING btree (opponent_deck_id);
+CREATE INDEX IF NOT EXISTS idx_deck_matchups_win_rate ON deck_matchups USING btree (win_rate);
+CREATE INDEX IF NOT EXISTS idx_decks_created_at ON decks USING btree (created_at);
+CREATE INDEX IF NOT EXISTS idx_decks_is_public ON decks USING btree (is_public);
+CREATE INDEX IF NOT EXISTS idx_decks_user_public ON decks USING btree (user_id, is_public);
+CREATE INDEX IF NOT EXISTS idx_meta_decks_commander_name ON meta_decks USING btree (commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (commander_name IS NOT NULL));
+CREATE INDEX IF NOT EXISTS idx_meta_decks_partner_commander_name ON meta_decks USING btree (partner_commander_name) WHERE ((format = ANY (ARRAY['EDH'::text, 'cEDH'::text])) AND (partner_commander_name IS NOT NULL));
+CREATE INDEX IF NOT EXISTS idx_binder_list_type ON user_binder_items USING btree (user_id, list_type);
+CREATE INDEX IF NOT EXISTS idx_users_display_name_lower ON users USING btree (lower(COALESCE(display_name, ''::text)));
+CREATE INDEX IF NOT EXISTS idx_users_username_lower ON users USING btree (lower(username));

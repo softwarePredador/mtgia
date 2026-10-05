@@ -228,22 +228,56 @@ def parse_atomic_cards(path: Path) -> tuple[list[tuple[Any, ...]], list[tuple[An
     return list(cards_by_oracle.values()), list(legalities_by_key.values())
 
 
-def ensure_schema(conn) -> None:
+# BT-DB-004: o schema só muda por migration. As colunas e os índices abaixo
+# nascem do database_setup.sql; este CLI só confere e para se faltar algo.
+REQUIRED_CARD_COLUMNS = ("color_identity", "power", "toughness", "keywords", "is_reserved", "oracle_id", "cmc",)
+REQUIRED_CARD_INDEXES = ("idx_cards_color_identity", "idx_cards_keywords",)
+
+
+def missing_schema_objects(conn) -> list[str]:
     with conn.cursor() as cur:
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS color_identity TEXT[]")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS power TEXT")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS toughness TEXT")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS keywords TEXT[]")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS is_reserved BOOLEAN")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS oracle_id UUID")
-        cur.execute("ALTER TABLE cards ADD COLUMN IF NOT EXISTS cmc DECIMAL(4, 1) DEFAULT 0")
         cur.execute(
-            "CREATE INDEX IF NOT EXISTS idx_cards_color_identity ON cards USING GIN (color_identity)"
+            """
+            SELECT column_name
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+              AND table_name = 'cards'
+              AND column_name = ANY(%s)
+            """,
+            (list(REQUIRED_CARD_COLUMNS),),
         )
+        present_columns = {row[0] for row in cur.fetchall()}
         cur.execute(
-            "CREATE INDEX IF NOT EXISTS idx_cards_keywords ON cards USING GIN (keywords)"
+            """
+            SELECT indexname
+            FROM pg_indexes
+            WHERE schemaname = 'public'
+              AND indexname = ANY(%s)
+            """,
+            (list(REQUIRED_CARD_INDEXES),),
         )
-    conn.commit()
+        present_indexes = {row[0] for row in cur.fetchall()}
+    conn.rollback()
+    return [
+        f"coluna cards.{column}"
+        for column in REQUIRED_CARD_COLUMNS
+        if column not in present_columns
+    ] + [
+        f"índice {index}"
+        for index in REQUIRED_CARD_INDEXES
+        if index not in present_indexes
+    ]
+
+
+def require_schema(conn) -> None:
+    missing = missing_schema_objects(conn)
+    if missing:
+        raise SystemExit(
+            "Schema incompleto para sync_cards_full_fast: falta "
+            + ", ".join(missing)
+            + ". O schema só muda por migration: aplique bin/migrate.dart "
+            "pelo fluxo aprovado."
+        )
 
 
 def upsert_cards(conn, rows: list[tuple[Any, ...]], batch_size: int) -> int:
@@ -343,7 +377,7 @@ def main() -> None:
     card_rows, legality_rows = parse_atomic_cards(atomic_cards)
     conn = connect()
     try:
-        ensure_schema(conn)
+        require_schema(conn)
         processed_cards = upsert_cards(conn, card_rows, args.batch_size)
         card_ids = load_card_ids(conn)
         processed_legalities = upsert_legalities(

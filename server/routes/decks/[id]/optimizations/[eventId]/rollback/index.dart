@@ -7,6 +7,7 @@ import 'package:postgres/postgres.dart';
 import '../../../../../../lib/deck_rules_service.dart';
 import '../../../../../../lib/deck_validation_state_support.dart';
 import '../../../../../../lib/decks/deck_optimization_history_service.dart';
+import '../../../../../../lib/decks/deck_revision_support.dart';
 import '../../../../../../lib/http_responses.dart';
 
 Future<Response> onRequest(
@@ -21,8 +22,28 @@ Future<Response> onRequest(
   final userId = context.read<String>();
   final pool = context.read<Pool>();
 
+  final mutation = DeckMutationRequest.fromContext(
+    context,
+    operation: 'optimization_rollback',
+    deckId: deckId,
+    target: eventId,
+  );
+
   try {
     final result = await pool.runTx((session) async {
+      final baseline = await lockDeckForMutation(
+        session,
+        deckId: deckId,
+        userId: userId,
+        request: mutation,
+      );
+      if (baseline == null) {
+        throw const _RollbackRequestException(
+          'deck_not_found',
+          'Deck not found or permission denied.',
+          HttpStatus.notFound,
+        );
+      }
       final deckResult = await session.execute(
         Sql.named('''
           SELECT format
@@ -225,7 +246,8 @@ Future<Response> onRequest(
         afterDeckMetadata: restoreMetadata,
       );
 
-      return {
+      final receipt = await recordDeckMutation(session, baseline);
+      return <String, Object?>{
         'ok': true,
         'deck_id': deckId,
         'rolled_back_event_id': eventId,
@@ -238,10 +260,13 @@ Future<Response> onRequest(
           if (strictValidationError != null)
             'strict_validation_error': strictValidationError,
         },
+        ...receipt.toJson(),
       };
     });
 
-    return Response.json(body: result);
+    return Response.json(body: result, headers: deckRevisionHeadersOf(result));
+  } on DeckMutationInterrupt catch (interrupt) {
+    return interrupt.toResponse();
   } on _RollbackRequestException catch (error) {
     return Response.json(
       statusCode: error.statusCode,

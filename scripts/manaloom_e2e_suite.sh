@@ -315,8 +315,8 @@ run_optional_server_live_e2e() {
   fi
 
   local live_api_base="${TEST_API_BASE_URL:-${API_BASE_URL:-http://127.0.0.1:8082}}"
-  run_step "Server live AI generate optimize telemetry E2E" \
-    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL=\"$live_api_base\" JWT_SECRET=local_manaloom_live_e2e_$STAMP dart test -j 1 test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart test/ai_optimize_telemetry_contract_test.dart"
+  run_step "Server live AI generate optimize E2E" \
+    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=1 TEST_API_BASE_URL=\"$live_api_base\" JWT_SECRET=local_manaloom_live_e2e_$STAMP dart test -j 1 test/ai_generate_create_optimize_flow_test.dart test/ai_optimize_flow_test.dart"
 }
 
 run_optional_live_product_e2e() {
@@ -592,7 +592,7 @@ main() {
     "cd \"$ROOT_DIR/app\" && flutter test test/core/utils/logger_test.dart test/core/observability/app_observability_test.dart test/features/auth/providers/auth_provider_log_sanitization_test.dart --no-version-check --reporter compact"
 
   run_step "Server AI deckbuilder battle route contracts" \
-    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_e2e_$STAMP dart test test/ai_generate_learning_boundary_test.dart test/deck_simulate_route_adapter_test.dart test/deck_recommendations_route_adapter_test.dart test/deck_recommendations_route_support_test.dart test/deck_recommendations_power_level_support_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_ai_prompt_eval_suite_test.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/production_ai_mock_fallback_policy_test.dart"
+    "cd \"$ROOT_DIR/server\" && RUN_INTEGRATION_TESTS=0 JWT_SECRET=local_manaloom_e2e_$STAMP dart test test/ai_generate_learning_boundary_test.dart test/ai_route_registry_test.dart test/commander_deckbuilding_contract_support_test.dart test/commander_ai_prompt_eval_suite_test.dart test/commander_learned_deck_support_test.dart test/deck_learning_event_support_test.dart test/ai_generate_performance_support_test.dart test/generated_deck_validation_service_test.dart test/production_ai_mock_fallback_policy_test.dart"
 
   run_ramp_and_data_foundation_contracts
 

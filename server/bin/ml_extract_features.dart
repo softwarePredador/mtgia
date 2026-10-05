@@ -26,6 +26,20 @@ import '../lib/runtime_environment.dart';
 ///     turn1_play, turn2_play, turn3_play, turn4_play
 ///   - Funcional: removal_count, card_draw_count, ramp_count, board_wipe_count
 ///   - Meta: format, num_simulations
+///
+/// DCK-P0-06 (decisão D-30 do dono): deck na lixeira não conta em
+/// aprendizado; a fonte de decks do pipeline é [mlFeatureDeckSourceSql].
+const mlFeatureDeckSourceSql = '''
+      SELECT d.id, d.name, d.format, d.synergy_score,
+             COUNT(dc.id) as card_count
+      FROM decks d
+      LEFT JOIN deck_cards dc ON dc.deck_id = d.id
+      WHERE d.deleted_at IS NULL
+      GROUP BY d.id
+      HAVING COUNT(dc.id) > 0
+      ORDER BY card_count DESC
+    ''';
+
 void main(List<String> args) async {
   final env = loadRuntimeEnvironment();
 
@@ -52,15 +66,7 @@ void main(List<String> args) async {
 
     // ── 1. Buscar todos os decks com cartas ──
     print('📊 Buscando decks...');
-    final decksResult = await pool.execute('''
-      SELECT d.id, d.name, d.format, d.synergy_score,
-             COUNT(dc.id) as card_count
-      FROM decks d
-      LEFT JOIN deck_cards dc ON dc.deck_id = d.id
-      GROUP BY d.id
-      HAVING COUNT(dc.id) > 0
-      ORDER BY card_count DESC
-    ''');
+    final decksResult = await pool.execute(mlFeatureDeckSourceSql);
 
     print('   → ${decksResult.length} decks com cartas encontrados');
 

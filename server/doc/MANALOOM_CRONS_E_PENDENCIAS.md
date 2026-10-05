@@ -30,7 +30,7 @@ Data: 2026-06-02
 | `bin/cron_sync_cards.sh` | `sync_cards.dart` | diária | Sync incremental de cartas (Scryfall) |
 | `bin/cron_sync_prices.sh` | `sync_prices.dart` | diária | Preços via Scryfall (limit/stale-hours) |
 | `bin/cron_sync_prices_mtgjson.sh` | `sync_prices_mtgjson_fast.dart` | diária (04:00) | Preços via MTGJSON (bulk + UPDATE join) |
-| `bin/cron_cleanup_optimize_telemetry.sh` | `cleanup_optimize_telemetry.dart` | diária/semanal | Limpeza de telemetria do optimize |
+| `bin/cron_cleanup_optimize_telemetry.sh` | `cleanup_optimize_telemetry.dart` | diária (04:10, daemon de ops) | Limpeza por prazo do inventário de retenção (D-70), sem capability; só apaga depois da ativação supervisionada |
 
 ### 1.2 Crons CRIADAS nesta auditoria (lacuna de coerência do aprendizado)
 
@@ -41,7 +41,7 @@ inerte. Wrappers criados seguindo o padrão dos cron `*.sh` existentes:
 | Script novo | Alvo | Cadência | Por quê |
 |-------------|------|----------|---------|
 | `bin/cron_snapshot_edhrec.sh` | `snapshot_edhrec.dart` | **diária (05:00)** | **CRÍTICO.** A tendência rising/falling/stable (`edhrec_trend_service.getCardTrends`) é série temporal: sem snapshot diário NUNCA há histórico e o sinal fica permanentemente "stable" (morto p/ recommendations). Incremental/idempotente. |
-| `bin/cron_sync_combos.sh` | `sync_combos.dart` | semanal (seg 03:30) | `card_combos`/`combo_cards` consumidos em weakness-analysis (combos completos + near-miss). Base muda devagar; download pesado com cache 24h. |
+| `bin/cron_sync_combos.sh` | `sync_combos.dart` | **pausado (D-83)** | `card_combos`/`combo_cards` eram consumidos em weakness-analysis, que saiu na D-31. Desde 2026-09-28 o script só roda com `MANALOOM_COMBO_SYNC_AUTHORIZED=1`; sem ela, sai 0 com um recibo de pausa. |
 | `bin/cron_sync_rulings.sh` | `sync_rulings.dart` | semanal (ter 03:30) | `card_rulings` (GET /cards/{id}/rulings). Cadência baixa (lançamentos/erratas). |
 | `bin/cron_snapshot_price_history.sh` | `snapshot_price_history.dart` | diária (04:30) | Snapshot de preço do dia para `price_history`. Deve rodar **após** o sync de preços (04:00). |
 | `bin/cron_sync_staples.sh` | `sync_staples.dart ALL` | semanal (seg 03:00) | `format_staples` alimenta pool de candidatos do optimize/completion. |
@@ -57,7 +57,7 @@ inerte. Wrappers criados seguindo o padrão dos cron `*.sh` existentes:
 
 # -- Semanal -------------------------------------------------
 0  3 * * 1  /app/bin/cron_sync_staples.sh              >> /var/log/mtg_staples.log       2>&1
-30 3 * * 1  /app/bin/cron_sync_combos.sh               >> /var/log/mtg_combos.log        2>&1
+# 30 3 * * 1  /app/bin/cron_sync_combos.sh             >> /var/log/mtg_combos.log        2>&1  # pausado (D-83)
 30 3 * * 2  /app/bin/cron_sync_rulings.sh              >> /var/log/mtg_rulings.log       2>&1
 0  6 * * 0  /app/bin/cron_cleanup_optimize_telemetry.sh                                  >> /var/log/mtg_cleanup.log 2>&1
 ```
