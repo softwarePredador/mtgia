@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "61c52a60a5373f9a19b5b834c155987fd31879982c4fd8b95af9d4b77ed09921",
+  "source_digest_sha256": "d79cdde4499b9b42b107e09abc76488e14e4836ab5b8fc134f3bb14ef6c5c646",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -69,8 +69,8 @@
     "dart_symbols": 5462,
     "semantic_resolved_files": 724,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 43716,
-    "semantic_resolved_call_sites": 69258,
+    "semantic_resolved_call_edges": 43718,
+    "semantic_resolved_call_sites": 69260,
     "semantic_resolved_type_references": 16757,
     "modules": 164,
     "app_routes": 46,
@@ -41299,67 +41299,67 @@
       "name": "_OptimizationPreviewConflict",
       "kind": "class",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1153
+      "line": 1174
     },
     {
       "name": "_deckCardCount",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 868
+      "line": 889
     },
     {
       "name": "_deleteDeck",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 49
+      "line": 50
     },
     {
       "name": "_getDeckById",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 879
+      "line": 900
     },
     {
       "name": "_hasTable",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1162
+      "line": 1183
     },
     {
       "name": "_patchDeck",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 702
+      "line": 713
     },
     {
       "name": "_updateDeck",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 108
+      "line": 109
     },
     {
       "name": "_validateCardCondition",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1145
+      "line": 1166
     },
     {
       "name": "calculateCmc",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1034
+      "line": 1055
     },
     {
       "name": "getMainType",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 1020
+      "line": 1041
     },
     {
       "name": "onRequest",
       "kind": "function",
       "source": "server/routes/decks/[id]/index.dart",
-      "line": 28
+      "line": 29
     },
     {
       "name": "_RollbackRequestException",
@@ -43016,9 +43016,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 43716,
-    "resolved_call_site_count": 69258,
-    "workspace_call_edge_count": 13905,
+    "resolved_call_edge_count": 43718,
+    "resolved_call_site_count": 69260,
+    "workspace_call_edge_count": 13907,
     "unresolved_call_edge_count": 566,
     "unresolved_call_site_count": 784,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -189248,7 +189248,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1022,
+        "line": 1013,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "normalizeScryfallImageUrl",
+        "target": "normalizeScryfallImageUrl",
+        "target_library": "package:server/scryfall_image_url.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 1043,
         "caller": "getMainType",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -189259,7 +189270,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 104,
+        "line": 105,
         "caller": "_deleteDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -189270,7 +189281,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1067,
+        "line": 1088,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "getMainType",
@@ -189281,7 +189292,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1078,
+        "line": 1099,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "isLandTypeLine",
@@ -189292,7 +189303,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1079,
+        "line": 1100,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "calculateCmc",
@@ -189303,7 +189314,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1113,
+        "line": 113,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "ReleaseCapabilityPolicy.isAllowed",
+        "target_library": "package:server/release_capability_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 1134,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "buildDeckSnapshotHash",
@@ -189314,18 +189336,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 112,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "isAllowed",
-        "target": "ReleaseCapabilityPolicy.isAllowed",
-        "target_library": "package:server/release_capability_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 1137,
+        "line": 1158,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "deckRevisionHeadersOf",
@@ -189336,18 +189347,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 1141,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "internalServerError",
-        "target": "internalServerError",
-        "target_library": "package:server/http_responses.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 115,
+        "line": 116,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -189358,7 +189358,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 116,
+        "line": 1162,
+        "caller": "_getDeckById",
+        "kind": "method",
+        "lexical_target": "internalServerError",
+        "target": "internalServerError",
+        "target_library": "package:server/http_responses.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 117,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "hasDeckValidationStateColumns",
@@ -189369,7 +189380,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 130,
+        "line": 131,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "requireJsonObject",
@@ -189380,7 +189391,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 131,
+        "line": 132,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "readOptionalString",
@@ -189391,7 +189402,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 133,
+        "line": 134,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -189402,7 +189413,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 137,
+        "line": 138,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "normalizeSupportedDeckFormat",
@@ -189413,7 +189424,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 139,
+        "line": 140,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "unsupportedDeckFormatMessage",
@@ -189424,7 +189435,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 147,
+        "line": 148,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "parseCommanderBracket",
@@ -189435,7 +189446,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 152,
+        "line": 153,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "readOptionalBool",
@@ -189446,7 +189457,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 153,
+        "line": 154,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "readOptionalList",
@@ -189457,7 +189468,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 154,
+        "line": 155,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "requireObjectList",
@@ -189468,7 +189479,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 156,
+        "line": 157,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "readOptionalObject",
@@ -189479,7 +189490,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 158,
+        "line": 159,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckMutationRequest.fromContext",
@@ -189490,7 +189501,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 161,
+        "line": 162,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "normalizeMutationContext",
@@ -189501,7 +189512,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 170,
+        "line": 171,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -189512,7 +189523,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 177,
+        "line": 179,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "legalAcceptanceRequiredResponse",
+        "target": "legalAcceptanceRequiredResponse",
+        "target_library": "package:server/legal_acceptance_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 188,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "lockDeckForMutation",
@@ -189523,7 +189545,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 201,
+        "line": 212,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckNotFoundException",
@@ -189534,7 +189556,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 215,
+        "line": 226,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "deckValidationTimestampToJson",
@@ -189545,7 +189567,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 224,
+        "line": 235,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckRulesException",
@@ -189556,7 +189578,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 232,
+        "line": 243,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "ensureDeckPublicationAllowed",
@@ -189567,7 +189589,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 237,
+        "line": 248,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "_deckCardCount",
@@ -189578,7 +189600,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 284,
+        "line": 295,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "validateNoUnsupportedDeckSections",
@@ -189589,7 +189611,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 30,
+        "line": 31,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_getDeckById",
@@ -189600,7 +189622,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 315,
+        "line": 326,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "buildDeckSignature",
@@ -189611,7 +189633,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 317,
+        "line": 328,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "_OptimizationPreviewConflict",
@@ -189622,7 +189644,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 334,
+        "line": 345,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "requirePositiveInteger",
@@ -189633,7 +189655,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 34,
+        "line": 35,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_updateDeck",
@@ -189644,7 +189666,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 345,
+        "line": 356,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "resolveDeckCardIdByName",
@@ -189655,7 +189677,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 359,
+        "line": 370,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "_validateCardCondition",
@@ -189666,7 +189688,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 38,
+        "line": 39,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_patchDeck",
@@ -189677,7 +189699,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 400,
+        "line": 411,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "validateOptimizationApplyAuthorization",
@@ -189688,7 +189710,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 414,
+        "line": 425,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "optimizationApplyAuthorizedBracket",
@@ -189699,29 +189721,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 419,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "DeckRulesService",
-        "target": "DeckRulesService.DeckRulesService",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 419,
-        "caller": "_updateDeck",
-        "kind": "method",
-        "lexical_target": "validateAndThrow",
-        "target": "DeckRulesService.validateAndThrow",
-        "target_library": "package:server/deck_rules_service.dart",
-        "target_scope": "workspace",
-        "occurrences": 2
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 42,
+        "line": 43,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "_deleteDeck",
@@ -189732,7 +189732,29 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 426,
+        "line": 430,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "DeckRulesService",
+        "target": "DeckRulesService.DeckRulesService",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 430,
+        "caller": "_updateDeck",
+        "kind": "method",
+        "lexical_target": "validateAndThrow",
+        "target": "DeckRulesService.validateAndThrow",
+        "target_library": "package:server/deck_rules_service.dart",
+        "target_scope": "workspace",
+        "occurrences": 2
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 437,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "assessOptimizationApplyCommanderFunctionalRoleFloor",
@@ -189743,7 +189765,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 436,
+        "line": 447,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "OptimizationFunctionalRoleFloorViolation",
@@ -189754,7 +189776,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 442,
+        "line": 453,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderManaFloor",
@@ -189765,7 +189787,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 449,
+        "line": 460,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "OptimizationLandFloorViolation",
@@ -189776,7 +189798,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 451,
+        "line": 462,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "assessOptimizationCommanderBracket",
@@ -189787,18 +189809,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 459,
-        "caller": "_updateDeck",
-        "kind": "constructor",
-        "lexical_target": "OptimizationBracketViolation",
-        "target": "OptimizationBracketViolation.OptimizationBracketViolation",
-        "target_library": "package:server/decks/optimization_bracket_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 46,
+        "line": 47,
         "caller": "onRequest",
         "kind": "method",
         "lexical_target": "methodNotAllowed",
@@ -189809,7 +189820,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 55,
+        "line": 470,
+        "caller": "_updateDeck",
+        "kind": "constructor",
+        "lexical_target": "OptimizationBracketViolation",
+        "target": "OptimizationBracketViolation.OptimizationBracketViolation",
+        "target_library": "package:server/decks/optimization_bracket_support.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 56,
         "caller": "_deleteDeck",
         "kind": "method",
         "lexical_target": "readDeckIfMatch",
@@ -189820,7 +189842,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 555,
+        "line": 566,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "loadAppliedDeckPostAnalysis",
@@ -189831,7 +189853,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 560,
+        "line": 571,
         "caller": "_updateDeck",
         "kind": "constructor",
         "lexical_target": "DeckOptimizationHistoryService",
@@ -189842,7 +189864,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 560,
+        "line": 571,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "recordAppliedOptimization",
@@ -189853,7 +189875,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 57,
+        "line": 58,
         "caller": "_deleteDeck",
         "kind": "constructor",
         "lexical_target": "DeckRevisionException",
@@ -189864,7 +189886,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 57,
+        "line": 58,
         "caller": "_deleteDeck",
         "kind": "method",
         "lexical_target": "toResponse",
@@ -189875,7 +189897,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 614,
+        "line": 625,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "recordDeckMutation",
@@ -189886,7 +189908,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 63,
+        "line": 64,
         "caller": "_deleteDeck",
         "kind": "method",
         "lexical_target": "deckRevisionPolicyOf",
@@ -189897,7 +189919,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 634,
+        "line": 645,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
@@ -189908,7 +189930,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 647,
+        "line": 658,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "toJson",
@@ -189919,7 +189941,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 653,
+        "line": 664,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "deckRevisionHeadersOf",
@@ -189930,7 +189952,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 656,
+        "line": 667,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "toResponse",
@@ -189941,7 +189963,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 686,
+        "line": 697,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "toJson",
@@ -189952,7 +189974,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 689,
+        "line": 700,
         "caller": "_updateDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -189963,7 +189985,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 713,
+        "line": 724,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -189974,7 +189996,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 72,
+        "line": 73,
         "caller": "_deleteDeck",
         "kind": "method",
         "lexical_target": "deleteDeckAfterBattleGuard",
@@ -189985,7 +190007,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 724,
+        "line": 735,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "requireJsonObject",
@@ -189996,7 +190018,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 749,
+        "line": 760,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "readOptionalString",
@@ -190007,7 +190029,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 751,
+        "line": 762,
         "caller": "_patchDeck",
         "kind": "constructor",
         "lexical_target": "DeckRequestException",
@@ -190018,7 +190040,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 755,
+        "line": 766,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "parseCommanderBracket",
@@ -190029,7 +190051,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 760,
+        "line": 771,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "readOptionalBool",
@@ -190040,7 +190062,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 761,
+        "line": 772,
         "caller": "_patchDeck",
         "kind": "constructor",
         "lexical_target": "DeckMutationRequest.fromContext",
@@ -190051,7 +190073,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 769,
+        "line": 780,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "ensureDeckPublicationAllowed",
@@ -190062,7 +190084,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 776,
+        "line": 787,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "badRequest",
@@ -190073,7 +190095,18 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 787,
+        "line": 800,
+        "caller": "_patchDeck",
+        "kind": "method",
+        "lexical_target": "legalAcceptanceRequiredResponse",
+        "target": "legalAcceptanceRequiredResponse",
+        "target_library": "package:server/legal_acceptance_middleware.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/decks/[id]/index.dart",
+        "line": 808,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -190084,7 +190117,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 789,
+        "line": 810,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "lockDeckForMutation",
@@ -190095,7 +190128,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 800,
+        "line": 821,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "_deckCardCount",
@@ -190106,7 +190139,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 82,
+        "line": 83,
         "caller": "_deleteDeck",
         "kind": "method",
         "lexical_target": "notFound",
@@ -190117,7 +190150,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 841,
+        "line": 862,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "recordDeckMutation",
@@ -190128,7 +190161,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 845,
+        "line": 866,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "toJson",
@@ -190139,7 +190172,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 849,
+        "line": 870,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "notFound",
@@ -190150,7 +190183,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 853,
+        "line": 874,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "deckRevisionHeadersOf",
@@ -190161,7 +190194,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 856,
+        "line": 877,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "toResponse",
@@ -190172,7 +190205,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 864,
+        "line": 885,
         "caller": "_patchDeck",
         "kind": "method",
         "lexical_target": "internalServerError",
@@ -190183,7 +190216,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 883,
+        "line": 904,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckMetaColumns",
@@ -190194,7 +190227,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 884,
+        "line": 905,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckPricingColumns",
@@ -190205,7 +190238,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 885,
+        "line": 906,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckPricingSourceColumn",
@@ -190216,7 +190249,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 886,
+        "line": 907,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasDeckValidationStateColumns",
@@ -190227,7 +190260,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 887,
+        "line": 908,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "_hasTable",
@@ -190238,7 +190271,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 888,
+        "line": 909,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -190249,7 +190282,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 908,
+        "line": 929,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "deckVersionAtSql",
@@ -190260,7 +190293,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 916,
+        "line": 937,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "notFound",
@@ -190271,23 +190304,12 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 939,
+        "line": 960,
         "caller": "_getDeckById",
         "kind": "method",
         "lexical_target": "exposeDeckValidationState",
         "target": "exposeDeckValidationState",
         "target_library": "package:server/deck_validation_state_support.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/routes/decks/[id]/index.dart",
-        "line": 992,
-        "caller": "_getDeckById",
-        "kind": "method",
-        "lexical_target": "normalizeScryfallImageUrl",
-        "target": "normalizeScryfallImageUrl",
-        "target_library": "package:server/scryfall_image_url.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -200159,8 +200181,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/legal_acceptance_middleware.dart",
-        "unique_references": 17,
-        "occurrences": 17
+        "unique_references": 19,
+        "occurrences": 19
       },
       {
         "target_scope": "workspace",
@@ -240820,7 +240842,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 112,
+        "line": 113,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -240830,7 +240852,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 127,
+        "line": 128,
         "lexical_type": "DeckMutationRequest",
         "resolved_type": "DeckMutationRequest",
         "target": "DeckMutationRequest",
@@ -240840,7 +240862,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 133,
+        "line": 134,
         "lexical_type": "DeckRequestException",
         "resolved_type": "DeckRequestException",
         "target": "DeckRequestException",
@@ -240850,7 +240872,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 201,
+        "line": 212,
         "lexical_type": "DeckNotFoundException",
         "resolved_type": "DeckNotFoundException",
         "target": "DeckNotFoundException",
@@ -240860,7 +240882,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 224,
+        "line": 235,
         "lexical_type": "DeckRulesException",
         "resolved_type": "DeckRulesException",
         "target": "DeckRulesException",
@@ -240870,7 +240892,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 317,
+        "line": 328,
         "lexical_type": "_OptimizationPreviewConflict",
         "resolved_type": "_OptimizationPreviewConflict",
         "target": "_OptimizationPreviewConflict",
@@ -240880,7 +240902,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 419,
+        "line": 430,
         "lexical_type": "DeckRulesService",
         "resolved_type": "DeckRulesService",
         "target": "DeckRulesService",
@@ -240890,7 +240912,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 436,
+        "line": 447,
         "lexical_type": "OptimizationFunctionalRoleFloorViolation",
         "resolved_type": "OptimizationFunctionalRoleFloorViolation",
         "target": "OptimizationFunctionalRoleFloorViolation",
@@ -240900,7 +240922,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 449,
+        "line": 460,
         "lexical_type": "OptimizationLandFloorViolation",
         "resolved_type": "OptimizationLandFloorViolation",
         "target": "OptimizationLandFloorViolation",
@@ -240910,7 +240932,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 459,
+        "line": 470,
         "lexical_type": "OptimizationBracketViolation",
         "resolved_type": "OptimizationBracketViolation",
         "target": "OptimizationBracketViolation",
@@ -240920,7 +240942,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 560,
+        "line": 571,
         "lexical_type": "DeckOptimizationHistoryService",
         "resolved_type": "DeckOptimizationHistoryService",
         "target": "DeckOptimizationHistoryService",
@@ -240930,7 +240952,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 57,
+        "line": 58,
         "lexical_type": "DeckRevisionException",
         "resolved_type": "DeckRevisionException",
         "target": "DeckRevisionException",
@@ -240940,7 +240962,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 655,
+        "line": 666,
         "lexical_type": "DeckMutationInterrupt",
         "resolved_type": "DeckMutationInterrupt",
         "target": "DeckMutationInterrupt",
@@ -240950,7 +240972,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 662,
+        "line": 673,
         "lexical_type": "DeckVisibilityException",
         "resolved_type": "DeckVisibilityException",
         "target": "DeckVisibilityException",
@@ -240960,7 +240982,7 @@
       },
       {
         "source": "server/routes/decks/[id]/index.dart",
-        "line": 676,
+        "line": 687,
         "lexical_type": "OptimizationApplyAuthorizationViolation",
         "resolved_type": "OptimizationApplyAuthorizationViolation",
         "target": "OptimizationApplyAuthorizationViolation",
@@ -285808,7 +285830,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "1f03b4489f47e246cb49175f3ad0b7b9ae552ade8b2475da9dfeddd054642dfa"
+      "sha256": "b05b98531e6e2fa175aa5c5d68bd1be58a867500c0312a64e2d8809a159f3978"
     },
     "required_task_fields": [
       "id",
@@ -286086,7 +286108,7 @@
         "depends_on": [
           "BT-GOV-001"
         ],
-        "acceptance": "Aceite registra versões exatas; versão nova bloqueia só o necessário; mensagens traduzidas e acionáveis. Decisão do dono em 2026-09-22: D-24, o reaceite bloqueia só o que cria ou compartilha dado (deck novo, import, IA); login, exportação e exclusão seguem livres; beta só em pt-BR; texto legal versionado no repositório; histórico de aceites guardado (confirmar com advogado). Parte do servidor feita entre 2026-09-24 e 2026-09-28, na branch `servidor/rodada2-2026-09-24`: a migration 062 cria `user_legal_acceptances` (só cresce: cadastro, reaceite e o retrato do aceite que já estava em `users`, sem conta excluída; rollback manual) e refaz a trava de conta ativa nas chaves para `users` (inclusive a de `beta_invites`, que a 061 deixou sem a trava nos bancos migrados). `GET` e `POST /users/me/legal-acceptance`, no plano de controle, mostram o que falta e gravam o reaceite: versão exata, idempotente, sob `FOR UPDATE`, com request-id. Com `MANALOOM_LEGAL_REACCEPTANCE=enforce`, a conta que não aceitou a versão atual (ou nunca aceitou) recebe 403 `legal_acceptance_required`, com as versões aceitas, as atuais e a rota do reaceite, só em deck novo (criar e copiar), relatório público, import que cria ou troca lista, import aplicado do fichário e IA; ler, editar o que existe, login, exportação e exclusão seguem livres. A trava fica desligada por padrão até a raia do app ter a tela de reaceite. Evidência: `server/test/legal_acceptance_test.dart` (inclui as cadeias reais de `/ai`, `/import` e `/binder`: a trava roda antes da cota e do limite), `server/test/legal_acceptance_db_live_test.dart` (retrato, trigger de conta ativa, cadastro, reaceite, 10 aceites simultâneos e o middleware real de `/decks`) e `server/test/legal_acceptance_e2e_live_test.dart` (2 casos por HTTP com a trava ligada: deck, import, fichário e IA); 17 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-LEGAL-ACCEPT-001-servidor.md`. A tela de reaceite e o tratamento do código no app ficam com a raia do app; publicar deck (`is_public` para `true`) ficou fora da trava, e a recomendação é travá-lo depois da integração com a frente de deck, que reescreve essa rota.",
+        "acceptance": "Aceite registra versões exatas; versão nova bloqueia só o necessário; mensagens traduzidas e acionáveis. Decisão do dono em 2026-09-22: D-24, o reaceite bloqueia só o que cria ou compartilha dado (deck novo, import, IA); login, exportação e exclusão seguem livres; beta só em pt-BR; texto legal versionado no repositório; histórico de aceites guardado (confirmar com advogado). Parte do servidor feita entre 2026-09-24 e 2026-09-28, na branch `servidor/rodada2-2026-09-24`: a migration 062 cria `user_legal_acceptances` (só cresce: cadastro, reaceite e o retrato do aceite que já estava em `users`, sem conta excluída; rollback manual) e refaz a trava de conta ativa nas chaves para `users` (inclusive a de `beta_invites`, que a 061 deixou sem a trava nos bancos migrados). `GET` e `POST /users/me/legal-acceptance`, no plano de controle, mostram o que falta e gravam o reaceite: versão exata, idempotente, sob `FOR UPDATE`, com request-id. Com `MANALOOM_LEGAL_REACCEPTANCE=enforce`, a conta que não aceitou a versão atual (ou nunca aceitou) recebe 403 `legal_acceptance_required`, com as versões aceitas, as atuais e a rota do reaceite, só em deck novo (criar e copiar), relatório público, import que cria ou troca lista, import aplicado do fichário e IA; ler, editar o que existe, login, exportação e exclusão seguem livres. A trava fica desligada por padrão até a raia do app ter a tela de reaceite. Evidência: `server/test/legal_acceptance_test.dart` (inclui as cadeias reais de `/ai`, `/import` e `/binder`: a trava roda antes da cota e do limite), `server/test/legal_acceptance_db_live_test.dart` (retrato, trigger de conta ativa, cadastro, reaceite, 10 aceites simultâneos e o middleware real de `/decks`) e `server/test/legal_acceptance_e2e_live_test.dart` (2 casos por HTTP com a trava ligada: deck, import, fichário e IA); 17 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-LEGAL-ACCEPT-001-servidor.md`. A tela de reaceite e o tratamento do código no app ficam com a raia do app; publicar deck (`is_public` para `true`) ficou fora da trava, e a recomendação é travá-lo depois da integração com a frente de deck, que reescreve essa rota. Em 2026-10-05, na branch `claude/frente-servidor-release-nknr66`: `PATCH` e `PUT /decks/:id` com `is_public: true` passam pela trava antes de tocar o deck; despublicar e editar metadados seguem livres (`server/test/deck_containment_test.dart`, 4 testes; a mutação que tira a trava do `PATCH` falha em 2). A tela de reaceite do app está no PR #20 (`24f4e4c`); ligar a trava no deploy segue decisão do dono.",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 321
       },
@@ -295901,7 +295923,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "61c52a60a5373f9a19b5b834c155987fd31879982c4fd8b95af9d4b77ed09921"
+    "project_logic_source_digest_sha256": "d79cdde4499b9b42b107e09abc76488e14e4836ab5b8fc134f3bb14ef6c5c646"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

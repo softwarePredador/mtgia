@@ -6,6 +6,8 @@ import 'package:postgres/postgres.dart';
 import 'package:server/ai/rebuild_route_request_support.dart';
 import 'package:test/test.dart';
 
+import '../lib/legal_acceptance_middleware.dart';
+import '../lib/legal_policy.dart';
 import '../lib/release_capability_policy.dart';
 import '../routes/_middleware.dart' as root_middleware;
 import '../routes/decks/[id]/cards/remove/index.dart' as remove_route;
@@ -172,6 +174,118 @@ void main() {
       expect(response.statusCode, HttpStatus.unprocessableEntity);
       expect(body['error_code'], 'deck_publication_unavailable');
       expect(pool.executedCount, 0);
+    });
+
+    group('publicar pede o aceite vigente (BT-LEGAL-ACCEPT-001)', () {
+      tearDown(() => overrideLegalReacceptanceForTesting(null));
+
+      Object versions(String? terms) => scriptedResult(
+        columns: ['terms_version', 'privacy_version'],
+        rows: [
+          [terms, currentPrivacyVersion],
+        ],
+      );
+
+      Future<(Response, ScriptedPool)> patchWithGallery(
+        Map<String, Object?> body,
+        List<Object> steps,
+      ) async {
+        final pool = ScriptedPool(steps);
+        final response = await deck_route.onRequest(
+          _context(
+            'PATCH',
+            '/decks/$deckId',
+            body,
+            pool: pool,
+            policy: releaseCapabilityPolicyWith({
+              ...betaCoreCapabilities,
+              'gallery_public',
+            }),
+          ),
+          deckId,
+        );
+        return (response, pool);
+      }
+
+      test('versão antiga: 403 antes de tocar o deck', () async {
+        overrideLegalReacceptanceForTesting(true);
+        final (response, pool) = await patchWithGallery(
+          {'is_public': true},
+          [versions('2026-01-01')],
+        );
+        final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+
+        expect(response.statusCode, HttpStatus.forbidden);
+        expect(body['error'], 'legal_acceptance_required');
+        expect(pool.executedCount, 1);
+        expect(pool.queries.single, contains('FROM users'));
+      });
+
+      test('PUT público também pede o aceite', () async {
+        overrideLegalReacceptanceForTesting(true);
+        final pool = ScriptedPool([
+          for (var i = 0; i < 2; i++)
+            scriptedResult(
+              columns: ['exists'],
+              rows: [
+                [true],
+              ],
+            ),
+          versions(null),
+        ]);
+        final response = await deck_route.onRequest(
+          _context(
+            'PUT',
+            '/decks/$deckId',
+            {'is_public': true},
+            pool: pool,
+            policy: releaseCapabilityPolicyWith({
+              ...betaCoreCapabilities,
+              'gallery_public',
+              'deck_replace_all',
+            }),
+          ),
+          deckId,
+        );
+        final body = jsonDecode(await response.body()) as Map<String, dynamic>;
+
+        expect(response.statusCode, HttpStatus.forbidden);
+        expect(body['error'], 'legal_acceptance_required');
+        expect(pool.queries.last, contains('FROM users'));
+      });
+
+      // Sem passos no pool, a primeira consulta depois da trava falha: o que
+      // importa é que a rota passou da trava sem ler o aceite.
+      Future<void> expectPastLegalGate(bool isPublic) async {
+        final pool = ScriptedPool(const []);
+        await expectLater(
+          deck_route.onRequest(
+            _context(
+              'PATCH',
+              '/decks/$deckId',
+              {'is_public': isPublic},
+              pool: pool,
+              policy: releaseCapabilityPolicyWith({
+                ...betaCoreCapabilities,
+                'gallery_public',
+              }),
+            ),
+            deckId,
+          ),
+          throwsStateError,
+        );
+        expect(pool.queries.single, isNot(contains('terms_version')));
+      }
+
+      test('trava desligada: publicar não consulta o aceite', () async {
+        overrideLegalReacceptanceForTesting(false);
+        await expectPastLegalGate(true);
+      });
+
+      test('despublicar segue livre com a versão antiga', () async {
+        overrideLegalReacceptanceForTesting(true);
+        await expectPastLegalGate(false);
+      });
     });
 
     test('cartas e formato ficam fora do PATCH', () async {
