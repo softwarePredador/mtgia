@@ -9,6 +9,8 @@ import 'core/api/api_client.dart';
 import 'core/branding/product_identity.dart';
 import 'core/config/launch_features.dart';
 import 'core/config/release_capabilities.dart';
+import 'core/config/release_identity_gate.dart';
+import 'core/widgets/release_update_banner.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/image_cache_policy.dart';
 import 'core/services/scryfall_image_cache_manager.dart';
@@ -221,6 +223,7 @@ class ManaLoomApp extends StatefulWidget {
 class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   late final AuthProvider _authProvider;
   late final ReleaseCapabilitiesProvider _releaseCapabilitiesProvider;
+  late final ReleaseIdentityGate _releaseIdentityGate;
   late final LegalAcceptanceProvider _legalAcceptanceProvider;
   final _rootNavigatorKey = GlobalKey<NavigatorState>();
   bool _legalPromptOpen = false;
@@ -285,7 +288,10 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     // required for reload, browser back/forward, bookmarks, and shared links.
     GoRouter.optionURLReflectsImperativeAPIs = true;
     _authProvider = AuthProvider();
-    _releaseCapabilitiesProvider = ReleaseCapabilitiesProvider();
+    _releaseIdentityGate = ReleaseIdentityGate();
+    _releaseCapabilitiesProvider = ReleaseCapabilitiesProvider(
+      fetcher: _releaseIdentityGate.fetch,
+    );
     ApiClient.setSessionExpiredHandler(_authProvider.expireSession);
     _legalAcceptanceProvider = LegalAcceptanceProvider();
     ApiClient.setLegalAcceptanceRequiredHandler(
@@ -1235,6 +1241,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _notificationProvider.dispose();
     _commercialProvider.dispose();
     _releaseCapabilitiesProvider.dispose();
+    _releaseIdentityGate.dispose();
     _legalAcceptanceProvider.dispose();
     _authProvider.dispose();
     super.dispose();
@@ -1263,7 +1270,13 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         theme: AppTheme.darkTheme,
         scrollBehavior: const ManaLoomScrollBehavior(),
         routerConfig: _router,
-        builder: buildManaLoomDebugAccessibilityTools,
+        builder: (context, child) => buildManaLoomDebugAccessibilityTools(
+          context,
+          ReleaseUpdateBannerHost(
+            updateAvailable: _releaseIdentityGate.updateAvailable,
+            child: child ?? const SizedBox.shrink(),
+          ),
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );
