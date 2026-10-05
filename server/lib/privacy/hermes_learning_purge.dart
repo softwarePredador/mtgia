@@ -21,7 +21,8 @@ import 'account_deletion_outbox.dart';
 ///    sai do banco;
 /// 3. `hermes_learning_purge.py purge` apaga esses ids sob o lock de escrita
 ///    do SQLite. Depois, ainda sob o lock, lista de novo o que ficou;
-/// 4. se o que ficou ainda tem deck apagado, repete, até [maxRounds] vezes.
+/// 4. se o que ficou ainda tem deck apagado, repete, até
+///    [HermesLearningPurge.maxRounds] vezes.
 ///
 /// A varredura vale para todo deck apagado, não só para os da linha. Assim ela
 /// também pega o que tenha sobrado de exclusões antigas. Depois, cada linha

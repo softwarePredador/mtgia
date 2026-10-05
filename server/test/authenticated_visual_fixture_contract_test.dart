@@ -169,7 +169,7 @@ restore_build_outputs() { [[ "$SCENARIO" != restore_fail ]]; }
 backend_listener_count() { [[ "$SCENARIO" == listener_residual ]] && echo 1 || echo 0; }
 run_pg() {
   if [[ "$1" == dropdb ]]; then
-    [[ "$SCENARIO" != dropdb_fail ]]; return
+    [[ "$SCENARIO" != dropdb_fail ]] && return 0 || return 1
   fi
   [[ "$SCENARIO" != query_fail ]] || return 2
   [[ "$SCENARIO" == db_residual ]] && echo 1 || echo 0
