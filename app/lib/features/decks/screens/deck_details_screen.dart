@@ -314,7 +314,9 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     );
     if (!mounted || result == null) return;
 
-    if (!result.hadGameActivity) {
+    // LC-P0-03: an unsaved exit can't prove there was no play, so it still
+    // offers the post-game, and never says the match was saved.
+    if (!result.hadGameActivity && result.storageFlushed) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
@@ -344,7 +346,12 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          content: Text('Atividade da partida com ${deck.name} salva.'),
+          content: Text(
+            result.storageFlushed
+                ? 'Atividade da partida com ${deck.name} salva.'
+                : 'Mesa de ${deck.name} fechada sem salvar as últimas '
+                      'jogadas neste aparelho.',
+          ),
           action: SnackBarAction(
             label: 'Registrar pós-jogo',
             onPressed: () => context.push(postGameLocation),

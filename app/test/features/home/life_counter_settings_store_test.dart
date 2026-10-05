@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_settings_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,7 +54,7 @@ void main() {
 
     test('normalizes an unsafe persisted custom long-tap value', () async {
       SharedPreferences.setMockInitialValues({
-        lifeCounterSettingsPrefsKey:
+        '$lifeCounterSignedOutKeyPrefix$lifeCounterSettingsPrefsKey':
             LifeCounterSettings.defaults
                 .copyWith(customLongTapValue: -25)
                 .toJsonString(),
@@ -65,7 +66,7 @@ void main() {
 
       expect(restored?.customLongTapValue, lifeCounterMinCustomLongTapValue);
       expect(
-        preferences.getString(lifeCounterSettingsPrefsKey),
+        preferences.getString('$lifeCounterSignedOutKeyPrefix$lifeCounterSettingsPrefsKey'),
         contains('"custom_long_tap_value":$lifeCounterMinCustomLongTapValue'),
       );
     });

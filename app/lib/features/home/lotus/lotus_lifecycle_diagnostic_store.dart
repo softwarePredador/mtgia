@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import '../life_counter/life_counter_account_scope.dart';
 
 typedef LotusLifecycleDiagnosticPreferencesLoader =
     Future<SharedPreferences> Function();
@@ -11,16 +12,23 @@ const String lotusLifecycleDiagnosticPrefsKey =
 class LotusLifecycleDiagnosticStore {
   LotusLifecycleDiagnosticStore({
     LotusLifecycleDiagnosticPreferencesLoader? preferencesLoader,
-    this.prefsKey = lotusLifecycleDiagnosticPrefsKey,
+    String? prefsKey,
+    LifeCounterStorageNamespace? namespace,
     this.maxEntries = 40,
-  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
+  }) : _binding = LifeCounterStorageBinding.resolve(
+         baseKey: lotusLifecycleDiagnosticPrefsKey,
+         namespace: namespace,
+         prefsKey: prefsKey,
+         preferencesLoader: preferencesLoader,
+       );
 
-  final LotusLifecycleDiagnosticPreferencesLoader _preferencesLoader;
-  final String prefsKey;
+  final LifeCounterStorageBinding _binding;
+  String get prefsKey => _binding.prefsKey;
+  LifeCounterStorageNamespace get namespace => _binding.namespace;
   final int maxEntries;
 
   Future<List<Map<String, dynamic>>> load() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     final rawEntries = prefs.getStringList(prefsKey) ?? const <String>[];
     final parsedEntries = <Map<String, dynamic>>[];
 
@@ -41,7 +49,7 @@ class LotusLifecycleDiagnosticStore {
   }
 
   Future<void> append(Map<String, Object?> entry) async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     final existing = prefs.getStringList(prefsKey) ?? <String>[];
     existing.add(jsonEncode(entry));
     final trimmed = existing.length > maxEntries
@@ -51,7 +59,7 @@ class LotusLifecycleDiagnosticStore {
   }
 
   Future<void> clear() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     await prefs.remove(prefsKey);
   }
 }

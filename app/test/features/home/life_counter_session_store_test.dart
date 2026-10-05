@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_session_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -151,7 +152,7 @@ void main() {
         final restored = await store.load();
         final prefs = await SharedPreferences.getInstance();
         final persistedJson =
-            jsonDecode(prefs.getString(legacyLifeCounterSessionPrefsKey)!)
+            jsonDecode(prefs.getString('$lifeCounterSignedOutKeyPrefix$legacyLifeCounterSessionPrefsKey')!)
                 as Map<String, dynamic>;
 
         expect(persistedJson['player_counter_presence'], const [
@@ -174,7 +175,7 @@ void main() {
       'sanitizes legacy set-life events on load and writes back normalized json',
       () async {
         SharedPreferences.setMockInitialValues({
-          legacyLifeCounterSessionPrefsKey: jsonEncode({
+          '$lifeCounterSignedOutKeyPrefix$legacyLifeCounterSessionPrefsKey': jsonEncode({
             'player_count': 4,
             'starting_life': 40,
             'starting_life_two_player': 20,
@@ -198,7 +199,7 @@ void main() {
 
         final restored = await store.load();
         final prefs = await SharedPreferences.getInstance();
-        final normalizedRaw = prefs.getString(legacyLifeCounterSessionPrefsKey);
+        final normalizedRaw = prefs.getString('$lifeCounterSignedOutKeyPrefix$legacyLifeCounterSessionPrefsKey');
 
         expect(restored, isNotNull);
         expect(restored!.lastTableEvent, isNull);
@@ -211,7 +212,7 @@ void main() {
       'restores missing optional collections with compatibility defaults',
       () async {
         SharedPreferences.setMockInitialValues({
-          legacyLifeCounterSessionPrefsKey: jsonEncode({
+          '$lifeCounterSignedOutKeyPrefix$legacyLifeCounterSessionPrefsKey': jsonEncode({
             'player_count': 2,
             'starting_life': 20,
             'lives': [17, 5],
@@ -257,7 +258,7 @@ void main() {
 
     test('returns null for invalid payloads', () async {
       SharedPreferences.setMockInitialValues({
-        legacyLifeCounterSessionPrefsKey: jsonEncode({
+        '$lifeCounterSignedOutKeyPrefix$legacyLifeCounterSessionPrefsKey': jsonEncode({
           'player_count': 9,
           'lives': [40, 40],
         }),
