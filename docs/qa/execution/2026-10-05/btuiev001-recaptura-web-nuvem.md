@@ -2,6 +2,8 @@
 
 Status: `PARCIAL · GATE_NAO_FECHADO · 15/23_MANIFESTS_NO_DIGEST_CORRENTE`
 
+Continuação no Mac: `btuiev001-recaptura-mac.md` (22/23 em `4fc91724`).
+
 Não autoriza merge, deploy, migration, DML live, capability `ON` nem promoção
 de deck/regra. `docs/qa/ui-live/latest.json` ficou intocado de propósito: ele só
 pode ser reescrito quando os 23 manifests estiverem no mesmo digest.
