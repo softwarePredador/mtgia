@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "84c325d2204195214a475343f6030720c84121663e9af95cff1896fc5519d99c",
+  "source_digest_sha256": "143a33e39085c3689f9e312caf2fc4844b11882dffb64fd56328bca7fdc3349b",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -37766,13 +37766,13 @@
       "name": "HermesKnowledgeDbConfig",
       "kind": "class",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 42
+      "line": 43
     },
     {
       "name": "HermesLearningPurge",
       "kind": "class",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 269,
+      "line": 270,
       "members": [
         "_runSweep",
         "handle"
@@ -37782,13 +37782,13 @@
       "name": "HermesPurgeCall",
       "kind": "class",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 80
+      "line": 81
     },
     {
       "name": "HermesPurgeHelper",
       "kind": "class",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 98,
+      "line": 99,
       "members": [
         "list",
         "purge"
@@ -37798,13 +37798,13 @@
       "name": "HermesPurgeStatus",
       "kind": "enum",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 78
+      "line": 79
     },
     {
       "name": "ProcessHermesPurgeHelper",
       "kind": "class",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 105,
+      "line": 106,
       "members": [
         "_parse",
         "_run",
@@ -37816,25 +37816,25 @@
       "name": "_HermesSweep",
       "kind": "class",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 249
+      "line": 250
     },
     {
       "name": "deletedDeckIdsAmong",
       "kind": "function",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 179
+      "line": 180
     },
     {
       "name": "outboxRowDecksAbsent",
       "kind": "function",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 208
+      "line": 209
     },
     {
       "name": "value",
       "kind": "function",
       "source": "server/lib/privacy/hermes_learning_purge.dart",
-      "line": 57
+      "line": 58
     },
     {
       "name": "PrivacyExportField",
@@ -169711,7 +169711,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 111,
+        "line": 112,
         "caller": "ProcessHermesPurgeHelper.list",
         "kind": "method",
         "lexical_target": "_run",
@@ -169722,7 +169722,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 115,
+        "line": 116,
         "caller": "ProcessHermesPurgeHelper.purge",
         "kind": "method",
         "lexical_target": "_run",
@@ -169733,7 +169733,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 131,
+        "line": 132,
         "caller": "ProcessHermesPurgeHelper._run",
         "kind": "constructor",
         "lexical_target": "HermesPurgeCall",
@@ -169744,7 +169744,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 148,
+        "line": 149,
         "caller": "ProcessHermesPurgeHelper._run",
         "kind": "method",
         "lexical_target": "_parse",
@@ -169755,7 +169755,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 168,
+        "line": 169,
         "caller": "ProcessHermesPurgeHelper._parse",
         "kind": "constructor",
         "lexical_target": "HermesPurgeCall",
@@ -169766,7 +169766,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 279,
+        "line": 280,
         "caller": "HermesLearningPurge.<constructor>",
         "kind": "constructor",
         "lexical_target": "ProcessHermesPurgeHelper",
@@ -169777,7 +169777,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 302,
+        "line": 303,
         "caller": "HermesLearningPurge.handle",
         "kind": "method",
         "lexical_target": "_runSweep",
@@ -169788,7 +169788,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 304,
+        "line": 305,
         "caller": "HermesLearningPurge.handle",
         "kind": "constructor",
         "lexical_target": "OutboxFailed",
@@ -169799,7 +169799,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 305,
+        "line": 306,
         "caller": "HermesLearningPurge.handle",
         "kind": "constructor",
         "lexical_target": "OutboxDone",
@@ -169810,7 +169810,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 317,
+        "line": 318,
         "caller": "HermesLearningPurge._runSweep",
         "kind": "constructor",
         "lexical_target": "_HermesSweep.failed",
@@ -169821,7 +169821,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 322,
+        "line": 323,
         "caller": "HermesLearningPurge._runSweep",
         "kind": "constructor",
         "lexical_target": "_HermesSweep.absent",
@@ -169832,7 +169832,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 325,
+        "line": 326,
         "caller": "HermesLearningPurge._runSweep",
         "kind": "method",
         "lexical_target": "list",
@@ -169843,7 +169843,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 341,
+        "line": 342,
         "caller": "HermesLearningPurge._runSweep",
         "kind": "method",
         "lexical_target": "purge",
@@ -169854,7 +169854,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 356,
+        "line": 357,
         "caller": "HermesLearningPurge._runSweep",
         "kind": "constructor",
         "lexical_target": "_HermesSweep.clean",
@@ -169865,7 +169865,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 62,
+        "line": 63,
         "caller": "HermesKnowledgeDbConfig.<constructor>",
         "kind": "constructor",
         "lexical_target": "HermesKnowledgeDbConfig",
@@ -169876,7 +169876,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 63,
+        "line": 64,
         "caller": "HermesKnowledgeDbConfig.<constructor>",
         "kind": "method",
         "lexical_target": "value",
@@ -205558,7 +205558,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 306,
+        "line": 307,
         "caller": "HermesLearningPurge.handle",
         "kind": "function_expression",
         "lexical_target": "rowCheck",
@@ -205566,7 +205566,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 336,
+        "line": 337,
         "caller": "HermesLearningPurge._runSweep",
         "kind": "function_expression",
         "lexical_target": "matcher",
@@ -237646,7 +237646,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 101,
+        "line": 102,
         "lexical_type": "HermesPurgeCall",
         "resolved_type": "HermesPurgeCall",
         "target": "HermesPurgeCall",
@@ -237656,7 +237656,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 105,
+        "line": 106,
         "lexical_type": "HermesPurgeHelper",
         "resolved_type": "HermesPurgeHelper",
         "target": "HermesPurgeHelper",
@@ -237666,7 +237666,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 275,
+        "line": 276,
         "lexical_type": "HermesPurgeHelper?",
         "resolved_type": "HermesPurgeHelper?",
         "target": "HermesPurgeHelper",
@@ -237676,7 +237676,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 277,
+        "line": 278,
         "lexical_type": "DeletedDeckMatcher?",
         "resolved_type": "Future<List<String>> Function(Session, List<String>)?",
         "target": "DeletedDeckMatcher",
@@ -237686,7 +237686,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 278,
+        "line": 279,
         "lexical_type": "OutboxRowDeckCheck?",
         "resolved_type": "Future<bool> Function(Session, String, List<String>)?",
         "target": "OutboxRowDeckCheck",
@@ -237696,7 +237696,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 279,
+        "line": 280,
         "lexical_type": "ProcessHermesPurgeHelper",
         "resolved_type": "ProcessHermesPurgeHelper",
         "target": "ProcessHermesPurgeHelper",
@@ -237706,7 +237706,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 286,
+        "line": 287,
         "lexical_type": "DeletedDeckMatcher",
         "resolved_type": "Future<List<String>> Function(Session, List<String>)",
         "target": "DeletedDeckMatcher",
@@ -237716,7 +237716,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 287,
+        "line": 288,
         "lexical_type": "OutboxRowDeckCheck",
         "resolved_type": "Future<bool> Function(Session, String, List<String>)",
         "target": "OutboxRowDeckCheck",
@@ -237726,7 +237726,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 290,
+        "line": 291,
         "lexical_type": "_HermesSweep",
         "resolved_type": "_HermesSweep",
         "target": "_HermesSweep",
@@ -237736,7 +237736,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 293,
+        "line": 294,
         "lexical_type": "AccountDeletionOutboxOutcome",
         "resolved_type": "AccountDeletionOutboxOutcome",
         "target": "AccountDeletionOutboxOutcome",
@@ -237746,7 +237746,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 295,
+        "line": 296,
         "lexical_type": "AccountDeletionOutboxRow",
         "resolved_type": "AccountDeletionOutboxRow",
         "target": "AccountDeletionOutboxRow",
@@ -237756,7 +237756,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 304,
+        "line": 305,
         "lexical_type": "OutboxFailed",
         "resolved_type": "OutboxFailed",
         "target": "OutboxFailed",
@@ -237766,7 +237766,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 305,
+        "line": 306,
         "lexical_type": "OutboxDone",
         "resolved_type": "OutboxDone",
         "target": "OutboxDone",
@@ -237776,7 +237776,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 62,
+        "line": 63,
         "lexical_type": "HermesKnowledgeDbConfig",
         "resolved_type": "HermesKnowledgeDbConfig",
         "target": "HermesKnowledgeDbConfig",
@@ -237786,7 +237786,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 88,
+        "line": 89,
         "lexical_type": "HermesPurgeStatus",
         "resolved_type": "HermesPurgeStatus",
         "target": "HermesPurgeStatus",
@@ -247926,7 +247926,7 @@
       },
       {
         "source": "server/lib/privacy/hermes_learning_purge.dart",
-        "line": 135,
+        "line": 136,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -295803,7 +295803,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "84c325d2204195214a475343f6030720c84121663e9af95cff1896fc5519d99c"
+    "project_logic_source_digest_sha256": "143a33e39085c3689f9e312caf2fc4844b11882dffb64fd56328bca7fdc3349b"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
