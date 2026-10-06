@@ -179,7 +179,7 @@ Gates: `scripts/quality_gate.sh`, `scripts/manaloom_battle_product_gate.sh`, `sc
 ## Life Counter, sessão e pós-jogo
 
 Estado: `active_release_scope`
-Fonte de verdade: local game session stores plus PostgreSQL post_game_notes after sync
+Fonte de verdade: device-local game session stores namespaced per signed-in account (not durable, never server-side) plus PostgreSQL post_game_notes after sync
 
 ```mermaid
 sequenceDiagram
@@ -189,13 +189,13 @@ sequenceDiagram
     participant Post_game as Post-game
     participant PostgreSQL as PostgreSQL
     Pessoa->>Life_Counter: iniciar e jogar sessão
-    Life_Counter->>Local_Store: checkpoint idempotente
+    Life_Counter->>Local_Store: checkpoint idempotente no namespace da conta; saída sem flush pede confirmação
     Life_Counter->>Post_game: contexto quando houve atividade
     Post_game->>PostgreSQL: sync com tombstone e watermark
 ```
 
-Implementação: `app/lib/features/home/lotus_life_counter_screen.dart`, `app/lib/features/home/life_counter/life_counter_session_store.dart`, `app/lib/features/retention/services/post_game_note_store.dart`, `server/lib/retention/post_game_note_service.dart`, `server/routes/decks/[id]/post-game-notes/index.dart`.
-Testes: `app/test/features/home/lotus_life_counter_screen_test.dart`, `app/test/features/retention/post_game_note_store_test.dart`, `server/test/post_game_note_sync_contract_test.dart`.
+Implementação: `app/lib/features/home/lotus_life_counter_screen.dart`, `app/lib/features/home/life_counter/life_counter_session_store.dart`, `app/lib/features/home/life_counter/life_counter_account_scope.dart`, `app/lib/features/retention/services/post_game_note_store.dart`, `server/lib/retention/post_game_note_service.dart`, `server/routes/decks/[id]/post-game-notes/index.dart`.
+Testes: `app/test/features/home/lotus_life_counter_screen_test.dart`, `app/test/features/home/life_counter_account_scope_test.dart`, `app/test/features/retention/post_game_note_store_test.dart`, `server/test/post_game_note_sync_contract_test.dart`.
 Gates: `scripts/quality_gate.sh`, `scripts/manaloom_e2e_suite.sh`.
 
 ## Comunidade, mensagens, binder e trades

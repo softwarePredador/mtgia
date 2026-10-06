@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'life_counter_history.dart';
 import 'life_counter_session.dart';
+import 'life_counter_account_scope.dart';
 
 const String legacyLifeCounterHistoryPrefsKey = 'life_counter_history_v1';
 
@@ -13,17 +14,24 @@ typedef LifeCounterHistoryPreferencesLoader =
 class LifeCounterHistoryStore {
   LifeCounterHistoryStore({
     LifeCounterHistoryPreferencesLoader? preferencesLoader,
-    this.prefsKey = legacyLifeCounterHistoryPrefsKey,
+    String? prefsKey,
+    LifeCounterStorageNamespace? namespace,
     DateTime Function()? nowProvider,
-  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance,
+  }) : _binding = LifeCounterStorageBinding.resolve(
+         baseKey: legacyLifeCounterHistoryPrefsKey,
+         namespace: namespace,
+         prefsKey: prefsKey,
+         preferencesLoader: preferencesLoader,
+       ),
        _nowProvider = nowProvider ?? DateTime.now;
 
-  final LifeCounterHistoryPreferencesLoader _preferencesLoader;
+  final LifeCounterStorageBinding _binding;
   final DateTime Function() _nowProvider;
-  final String prefsKey;
+  String get prefsKey => _binding.prefsKey;
+  LifeCounterStorageNamespace get namespace => _binding.namespace;
 
   Future<LifeCounterHistoryState?> load() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     final raw = prefs.getString(prefsKey);
     if (raw == null || raw.isEmpty) {
       return null;
@@ -54,7 +62,7 @@ class LifeCounterHistoryStore {
   }
 
   Future<void> save(LifeCounterHistoryState history) async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     await prefs.setString(
       prefsKey,
       _stabilizeCurrentGameMeta(history).toJsonString(),
@@ -69,14 +77,14 @@ class LifeCounterHistoryStore {
         history ?? await load() ?? const LifeCounterHistoryState.empty();
     final stabilized = _stabilizeCurrentGameMeta(base, session: session);
     if (stabilized.toJsonString() != base.toJsonString() || history == null) {
-      final prefs = await _preferencesLoader();
+      final prefs = await _binding.preferences();
       await prefs.setString(prefsKey, stabilized.toJsonString());
     }
     return stabilized;
   }
 
   Future<void> clear() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     await prefs.remove(prefsKey);
   }
 
@@ -87,10 +95,10 @@ class LifeCounterHistoryStore {
     final persistedStartDate = history.currentGameMeta?['startDate'];
     final startDateEpochMs =
         persistedStartDate is num &&
-                persistedStartDate.isFinite &&
-                persistedStartDate.toInt() >= 0
-            ? persistedStartDate.toInt()
-            : _nowProvider().millisecondsSinceEpoch;
+            persistedStartDate.isFinite &&
+            persistedStartDate.toInt() >= 0
+        ? persistedStartDate.toInt()
+        : _nowProvider().millisecondsSinceEpoch;
     return history.withStableCurrentGameMeta(
       startDateEpochMs: startDateEpochMs,
       session: session,

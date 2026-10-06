@@ -136,6 +136,12 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
       } catch (_) {
         // The notes remain usable even if sync metadata cannot be read.
       }
+      var syncRejections = const <PostGameSyncRejection>[];
+      try {
+        syncRejections = await _store.takeSyncRejections(widget.deckId);
+      } catch (_) {
+        // Same as above: the history still opens.
+      }
       if (!mounted) return;
       setState(() {
         _notes = notes;
@@ -144,7 +150,7 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
         _pendingSyncCount = pendingSyncCount;
         _isLoading = false;
         _loadError = null;
-        _operationError = null;
+        _operationError = _syncRejectionMessage(syncRejections);
         _retryOperation = null;
       });
     } catch (_) {
@@ -206,6 +212,11 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
         _selectedIssues.clear();
       });
       await _load(showLoading: false);
+    } on PostGameNoteRejectedException catch (error) {
+      // LC-P0-06: the account refused this note for good (for example, this
+      // match already has one). Retrying would fail the same way.
+      if (!mounted) return;
+      _showOperationError(error.userMessage, null);
     } catch (_) {
       if (!mounted) return;
       _showOperationError(
@@ -244,9 +255,20 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     }
   }
 
+  /// A note queued offline that the account refused while syncing.
+  static String? _syncRejectionMessage(List<PostGameSyncRejection> rejections) {
+    if (rejections.isEmpty) return null;
+    if (rejections.length == 1) {
+      return 'Um registro salvo neste aparelho foi recusado pela sua conta '
+          'e removido. ${rejections.single.message}';
+    }
+    return '${rejections.length} registros salvos neste aparelho foram '
+        'recusados pela sua conta e removidos. ${rejections.first.message}';
+  }
+
   void _showOperationError(
     String message,
-    Future<void> Function() retryOperation,
+    Future<void> Function()? retryOperation,
   ) {
     setState(() {
       _operationError = message;
@@ -568,7 +590,9 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
                     constraints: const BoxConstraints(maxWidth: 720),
                     child: _OperationErrorPanel(
                       message: _operationError!,
-                      onRetry: _retryFailedOperation,
+                      onRetry: _retryOperation == null
+                          ? null
+                          : _retryFailedOperation,
                     ),
                   ),
                 ),
@@ -1903,7 +1927,9 @@ class _OperationErrorPanel extends StatelessWidget {
   const _OperationErrorPanel({required this.message, required this.onRetry});
 
   final String message;
-  final VoidCallback onRetry;
+
+  /// `null` when retrying can't help (the account refused the note).
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -1939,13 +1965,15 @@ class _OperationErrorPanel extends StatelessWidget {
                     height: AppTheme.lineHeightCompact,
                   ),
                 ),
-                const SizedBox(height: AppTheme.space8),
-                TextButton.icon(
-                  key: const Key('post-game-operation-retry'),
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('Tentar novamente'),
-                ),
+                if (onRetry != null) ...[
+                  const SizedBox(height: AppTheme.space8),
+                  TextButton.icon(
+                    key: const Key('post-game-operation-retry'),
+                    onPressed: onRetry,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Tentar novamente'),
+                  ),
+                ],
               ],
             ),
           ),

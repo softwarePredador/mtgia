@@ -6,6 +6,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/observability/app_observability.dart';
 import '../../../core/security/auth_token_store.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../../home/life_counter/life_counter_account_scope.dart';
 import '../../home/services/onboarding_state_store.dart';
 import '../models/email_verification_delivery_result.dart';
 import '../models/user.dart';
@@ -414,12 +415,18 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Logout
-  Future<void> logout() async {
+  /// Logout. [purgeLocalAccountData] also removes the life counter and
+  /// post-game data this account kept on the device (account deletion);
+  /// a plain logout keeps them for the account's next sign-in.
+  Future<void> logout({bool purgeLocalAccountData = false}) async {
+    final signedOutUserId = _user?.id;
     _authGeneration++;
     final prefs = await SharedPreferences.getInstance();
     try {
       await _clearStoredCredentials(prefs);
+      if (purgeLocalAccountData && signedOutUserId != null) {
+        await LifeCounterAccountScope.instance.purgeAccount(signedOutUserId);
+      }
     } finally {
       _token = null;
       _user = null;
@@ -548,6 +555,27 @@ class AuthProvider extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Keeps the device-local life counter and post-game data on the account
+  /// that is signed in now (LC-P0-01/LC-P0-02). Runs before listeners, so the
+  /// router never builds a life counter screen for the previous account.
+  @override
+  void notifyListeners() {
+    _syncLocalAccountScope();
+    super.notifyListeners();
+  }
+
+  void _syncLocalAccountScope() {
+    final scope = LifeCounterAccountScope.instance;
+    final userId = _user?.id.trim();
+    if (_status == AuthStatus.authenticated &&
+        userId != null &&
+        userId.isNotEmpty) {
+      scope.bind(userId);
+    } else if (_status == AuthStatus.unauthenticated) {
+      scope.unbind();
+    }
   }
 
   void markOnboardingSettled() {

@@ -408,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         password: credentials.password,
       );
       if (!mounted) return;
-      await context.read<AuthProvider>().logout();
+      await context.read<AuthProvider>().logout(purgeLocalAccountData: true);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

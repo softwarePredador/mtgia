@@ -181,9 +181,65 @@ void main() {
       expect(find.byKey(Key('post-game-card-$commanderId')), findsNothing);
     },
   );
+
+  testWidgets(
+    'LC-P0-05: a life counter match longer than the deck cache keeps the '
+    'card picker when the revision instant is the same',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1280, 900);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.view.resetPhysicalSize);
+
+      // The deck was opened before the match. After more than 5 minutes the
+      // screen refetches it: a new object, the server's stable revision
+      // instant written with another offset, never the request time.
+      final openedBeforeMatch = _evidenceDeck();
+      final commanderId = openedBeforeMatch.commander.single.id;
+      var loads = 0;
+
+      await tester.pumpWidget(
+        ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
+          create: (_) => ReleaseCapabilitiesProvider.seeded(const [
+            ReleaseCapability.decksPrivate,
+          ]),
+          child: MaterialApp(
+            theme: AppTheme.darkTheme,
+            home: PostGameNotesScreen(
+              deckId: openedBeforeMatch.id,
+              store: PostGameNoteStore(),
+              playSessionId: 'play-1784714400000',
+              sessionStartedAt: DateTime.parse('2026-08-05T12:00:00Z'),
+              sessionEndedAt: DateTime.parse('2026-08-05T12:47:00Z'),
+              deckSnapshotHash: openedBeforeMatch.deckSnapshotHash,
+              deckVersionAt: openedBeforeMatch.deckVersionAt,
+              deckLoader: (_) async {
+                loads += 1;
+                return _evidenceDeck(
+                  deckVersionAt: DateTime.parse('2026-08-05T08:30:00-03:00'),
+                );
+              },
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(loads, 1);
+      expect(
+        find.textContaining('Esta partida usa outra revisão do deck'),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('post-game-card-evidence-picker')),
+        findsOneWidget,
+      );
+      expect(find.byKey(Key('post-game-card-$commanderId')), findsOneWidget);
+    },
+  );
 }
 
-DeckDetails _evidenceDeck() {
+DeckDetails _evidenceDeck({DateTime? deckVersionAt}) {
   return DeckDetails(
     id: 'deck-evidence',
     name: 'Mesa de Evidência',
@@ -194,7 +250,7 @@ DeckDetails _evidenceDeck() {
     stats: const {'total_cards': 100},
     deckSnapshotHash:
         'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
-    deckVersionAt: DateTime.parse('2026-08-05T11:30:00Z'),
+    deckVersionAt: deckVersionAt ?? DateTime.parse('2026-08-05T11:30:00Z'),
     commander: [
       DeckCardItem(
         id: '11111111-1111-4111-8111-111111111111',

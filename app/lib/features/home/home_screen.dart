@@ -253,10 +253,14 @@ class _HomeScreenState extends State<HomeScreen>
       deckVersionAtEpochMs: deckVersionAtEpochMs,
     );
     if (!mounted || result == null) return;
+    // LC-P0-03: "pausada" only when the table really reached the device.
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text(
-          'Sessão pausada. Abra “Jogar agora” para retomar ou encerrar e registrar.',
+          result.storageFlushed
+              ? 'Sessão pausada. Abra “Jogar agora” para retomar ou encerrar e registrar.'
+              : 'Você saiu sem salvar as últimas jogadas. Ao retomar, a mesa '
+                    'volta ao último ponto salvo neste aparelho.',
         ),
       ),
     );

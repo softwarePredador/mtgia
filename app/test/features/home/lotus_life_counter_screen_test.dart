@@ -631,8 +631,102 @@ void main() {
       await tester.pump(const Duration(milliseconds: 2));
       await tester.pumpAndSettle();
 
+      // LC-P0-03: a flush that never confirms does not exit silently.
+      expect(
+        find.byKey(const Key('life-counter-unsaved-exit-dialog')),
+        findsOneWidget,
+      );
+      expect(find.byType(LotusLifeCounterScreen), findsOneWidget);
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-unsaved-exit-discard')),
+      );
+      await tester.pumpAndSettle();
+
       expect(find.text('open-life-counter'), findsOneWidget);
       expect(host.isDisposed, isTrue);
+    });
+
+    testWidgets('unsaved exit lets the person keep playing or retry the save', (
+      tester,
+    ) async {
+      late _FakeLotusHost host;
+      LifeCounterExitResult? routeResult;
+      final flushResults = <bool>[false, false, true];
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => Scaffold(
+              body: TextButton(
+                onPressed: () async {
+                  routeResult =
+                      await openLifeCounterRoute<LifeCounterExitResult>(
+                        context,
+                      );
+                },
+                child: const Text('open-life-counter'),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: lifeCounterRoutePath,
+            builder: (context, state) => LotusLifeCounterScreen(
+              hostFactory:
+                  ({
+                    required onAppReviewRequested,
+                    required onShellMessageRequested,
+                  }) {
+                    host = _FakeLotusHost(
+                      onShellMessageRequested: onShellMessageRequested,
+                      onFlushStorageSnapshot: () async =>
+                          flushResults.removeAt(0),
+                      onLoadBundle: (host) async =>
+                          host.completeSuccessfulLoad(),
+                    );
+                    return host;
+                  },
+            ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('open-life-counter'));
+      await tester.pumpAndSettle();
+
+      host.emitShellMessage(
+        '{"type":"close-life-counter","source":"unsaved_test"}',
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('life-counter-unsaved-exit-dialog')),
+        findsOneWidget,
+      );
+
+      await tester.tap(
+        find.byKey(const Key('life-counter-unsaved-exit-keep-playing')),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(LotusLifeCounterScreen), findsOneWidget);
+      expect(host.isDisposed, isFalse);
+      expect(routeResult, isNull);
+
+      host.emitShellMessage(
+        '{"type":"close-life-counter","source":"unsaved_test"}',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('life-counter-unsaved-exit-retry')),
+      );
+      await tester.pumpAndSettle();
+
+      expect(host.flushStorageSnapshotCallCount, 3);
+      expect(find.text('open-life-counter'), findsOneWidget);
+      expect(routeResult, isNotNull);
+      expect(routeResult!.storageFlushed, isTrue);
     });
 
     testWidgets('close shell message falls back to home when route is direct', (
