@@ -761,7 +761,7 @@ run_browser_qa() {
     printf '%s' "$RUN_ID" | shasum -a 256 | awk '{print substr($1, 1, 12)}'
   )"
   browser_email="play-vs-ai-browser-$browser_seed_suffix@example.invalid"
-  browser_username="play_vs_ai_browser_$browser_seed_suffix"
+  browser_username="pvai_browser_$browser_seed_suffix"
   browser_password="BrowserQA!$browser_seed_suffix"
 
   curl -fsS --max-time 30 \
