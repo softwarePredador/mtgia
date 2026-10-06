@@ -3,6 +3,7 @@ import '../../../core/utils/friendly_error_mapper.dart';
 import '../models/deck.dart';
 import '../models/deck_details.dart';
 import 'deck_provider_support_common.dart';
+import 'deck_provider_support_mutation.dart' show parseDeckMutationResponse;
 
 Map<String, dynamic> buildImportDeckRequestBody({
   required String name,
@@ -98,7 +99,9 @@ Map<String, dynamic> parseValidateImportListResponse(ApiResponse response) {
   final data = asDynamicMap(response.data);
   return {
     'success': false,
-    'error': data['error']?.toString() ?? 'Erro ao validar lista',
+    'error':
+        FriendlyErrorMapper.serverMessageFromBody(data) ??
+        'Não foi possível validar a lista. Revise e tente novamente.',
   };
 }
 
@@ -146,8 +149,11 @@ Map<String, dynamic> parseImportToDeckResponse(ApiResponse response) {
   final data = asDynamicMap(response.data);
   return {
     'success': false,
-    'error':
-        data['error']?.toString() ?? 'Erro ao importar: ${response.statusCode}',
+    'error': FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckSave,
+      fallback: 'Não foi possível importar a lista. Tente novamente.',
+    ),
     'not_found_lines': (data['not_found_lines'] is List)
         ? List<String>.from(data['not_found_lines'])
         : const <String>[],
@@ -209,15 +215,20 @@ Map<String, dynamic> parseDeckExportResponse(ApiResponse response) {
   };
 }
 
-Future<bool> togglePublicRequest(
+/// Changes only the visibility, through `PATCH /decks/:id` (DCK-P0-00).
+/// A refusal (gallery closed, empty deck) carries the server phrase.
+Future<DeckMutationResult> togglePublicRequest(
   ApiClient apiClient, {
   required String deckId,
   required bool isPublic,
 }) async {
-  final response = await apiClient.put('/decks/$deckId', {
+  final response = await apiClient.patch('/decks/$deckId', {
     'is_public': isPublic,
   });
-  return response.statusCode == 200;
+  return parseDeckMutationResponse(
+    response,
+    fallbackMessage: 'Não foi possível alterar a visibilidade agora.',
+  );
 }
 
 Future<Map<String, dynamic>> exportDeckAsTextRequest(

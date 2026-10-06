@@ -1153,7 +1153,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                   final card = cards[index];
                   final name = card['name']?.toString() ?? 'Carta';
                   return SizedBox(
-                    width: 82,
+                    width: 80,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -1165,6 +1165,7 @@ class _DeckImportScreenState extends State<DeckImportScreen> {
                             fallbackImageUrl: ScryfallImageHelper.namedImageUrl(
                               name,
                             ),
+                            fallbackName: name,
                             semanticLabel: 'Carta reconhecida $name',
                             constrainAspectRatio: false,
                           ),

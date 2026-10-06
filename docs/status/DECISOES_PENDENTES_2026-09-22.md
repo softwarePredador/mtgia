@@ -386,6 +386,17 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 - **Escopo:** a coordenação pode fazer push da integração e das branches das frentes depois de cada integração. Master e deploy continuam pedindo a palavra do dono.
 - **Registro:** cada push vai para o log da coordenação.
 
+**D-87 · Quatro frentes paralelas, PR direto na master e escopo fechado no MVP (2026-10-05).**
+- **Decisão do dono:** "Adotar plano", no card da thread "O que falta para o MVP" do projeto.
+- **Escopo fechado:** até o GO da primeira coorte (`BT-DEC-001`), só as tarefas P0 CORE e P0 LIFE do backlog mestre andam. Battle, social, trocas, scanner além do `BT-SCN-00`, Analyze/Optimize e o restante ficam parados.
+- **Gate primeiro:** a frente de gate e evidência fecha o `BT-UIEV-001` e deixa o `full` verde antes de qualquer merge que toque o digest de UI.
+- **Quatro frentes em paralelo, cada uma numa thread da nuvem:** gate e evidência (`BT-UIEV-001`, `BT-WEB-003`, `BT-GOV-002`); servidor e release (`BT-SCP-001`, `BT-LEGAL-ACCEPT-001`, `BT-PRIV-002`, `BT-CAT-02`, `DCK-P0-00`, `BT-GATE-002`, `BT-GATE-003`, `BT-GATE-007`, `BT-REL-002`); app (`BT-UX-KIT-001`, `BT-UX-ERR-001`, `BT-NAV-02`, `BT-NAV-03`, `DCK-P0-07`, `BT-UX-IMG-001`, `BT-ART-01`, `BT-SCN-00`); contador de vida (`LC-P0-01` a `LC-P0-06`).
+- **WIP:** substitui o WIP-1 por raia da D-02 na prática. Cada frente tem várias tarefas abertas ao mesmo tempo. A fila (`docs/execution/CURRENT_QUEUE.md`) mantém o formato que o gerador valida, e o slot `NOW` passa a ser só o marcador da frente de servidor.
+- **Entrega:** cada frente trabalha em branch própria e abre PR em rascunho com base `master`. O fluxo de branches de frente que se juntam em `integracao/<data>` termina com o PR #18. Enquanto o #18 não entrar, as branches partem de `integracao/2026-09-23`.
+- **Digest de UI:** as frentes de app e de contador de vida desenvolvem já, mas só fazem merge depois que o `BT-UIEV-001` fechar; a recaptura sai num lote só.
+- **Ritmo:** um resumo semanal no chat do projeto, às segundas, com o número de P0 em `PASS`. Uma sessão por semana na máquina do dono para Android físico, emulador e deploy, com as decisões pendentes juntas.
+- **Continua valendo:** escrita live, migration, deploy e merge na `master` pedem a palavra do dono (regra 6 da decisão corrente e D-86).
+
 **Ficam para depois:**
 - retenção de analytics (proposta de 180 dias) e o texto da política de privacidade, depois do advogado (D-69);
 - rotação do journal do host (D-78), porque o host é compartilhado com outros projetos;

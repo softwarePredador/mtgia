@@ -19,6 +19,94 @@ void main() {
     expect(message, isNot(contains('/trades')));
   });
 
+  group('server error bodies (BT-UX-ERR-001)', () {
+    test('capability denial without message becomes Portuguese copy', () {
+      final message = FriendlyErrorMapper.fromApiResponse(
+        ApiResponse(404, {
+          'error': 'capability_unavailable',
+          'capability': 'trades',
+          'release_capability': 'off',
+          'request_id': 'req-1',
+        }),
+        context: FriendlyErrorContext.tradeCreate,
+      );
+
+      expect(message, 'Este recurso não está disponível nesta versão da beta.');
+    });
+
+    test('prefers the server phrase in message over the code in error', () {
+      final message = FriendlyErrorMapper.fromApiResponse(
+        ApiResponse(409, {
+          'error': 'deck_revision_conflict',
+          'message': 'Este deck mudou em outra aba. Recarregue para continuar.',
+        }),
+        context: FriendlyErrorContext.deckSave,
+      );
+
+      expect(
+        message,
+        'Este deck mudou em outra aba. Recarregue para continuar.',
+      );
+    });
+
+    test('keeps a Portuguese phrase that the route put in error', () {
+      final message = FriendlyErrorMapper.fromApiResponse(
+        ApiResponse(400, {
+          'error': 'Nome do deck é obrigatório.',
+          'code': 'request_invalid',
+        }),
+        context: FriendlyErrorContext.deckSave,
+      );
+
+      expect(message, 'Nome do deck é obrigatório.');
+    });
+
+    for (final code in const [
+      'capability_unavailable',
+      'interaction_blocked',
+      'trades_not_allowed',
+      'idempotency_conflict',
+      'deck_revision_conflict',
+      'resource_not_found',
+      'legal_acceptance_required',
+    ]) {
+      test('never shows the raw code $code', () {
+        for (final status in const [400, 403, 404, 409, 422]) {
+          final fromResponse = FriendlyErrorMapper.fromApiResponse(
+            ApiResponse(status, {'error': code}),
+          );
+          expect(fromResponse, isNot(contains(code)));
+          expect(fromResponse, isNot(contains('_')));
+        }
+        final fromException = FriendlyErrorMapper.fromException(
+          Exception(code),
+        );
+        expect(fromException, isNot(contains(code)));
+        expect(
+          FriendlyErrorMapper.serverMessageFromBody({'error': code}),
+          anyOf(isNull, isNot(contains('_'))),
+        );
+      });
+    }
+
+    test('exposes the stable code for callers that branch on it', () {
+      expect(
+        FriendlyErrorMapper.errorCodeFromBody({
+          'error': 'capability_unavailable',
+        }),
+        'capability_unavailable',
+      );
+      expect(
+        FriendlyErrorMapper.errorCodeFromBody({
+          'error': 'Frase em português.',
+          'code': 'request_invalid',
+        }),
+        'request_invalid',
+      );
+      expect(FriendlyErrorMapper.errorCodeFromBody('nope'), isNull);
+    });
+  });
+
   test('maps timeout exception without leaking exception type', () {
     final message = FriendlyErrorMapper.fromException(
       TimeoutException('RequestOptions timeout stackTrace'),

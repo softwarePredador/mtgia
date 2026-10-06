@@ -186,6 +186,12 @@ class FriendlyErrorMapper {
       return 'Recebemos uma resposta inesperada. Atualize a tela e tente novamente.';
     }
 
+    if (isMachineErrorCode(normalized)) {
+      return _knownErrorCodeMessages[normalized] ??
+          fallback ??
+          _fallbackForContext(context);
+    }
+
     if (!_looksTechnical(normalized) && normalized.isNotEmpty) {
       return normalized;
     }
@@ -258,16 +264,92 @@ class FriendlyErrorMapper {
     return offlineContractFor(flow);
   }
 
+  /// Frase pública que o servidor mandou no corpo, já em português, ou
+  /// `null` quando não há frase segura para mostrar (BT-UX-ERR-001).
+  ///
+  /// O servidor põe a frase em `message` ou em `error` e o código estável
+  /// (`dominio_motivo`) em `error`, `code` ou `error_code`. A frase vence o
+  /// código; um código nunca aparece cru: os conhecidos viram frase e os
+  /// outros caem no texto pelo status.
+  static String? serverMessageFromBody(Object? body) {
+    if (body is! Map) return null;
+    for (final key in const ['message', 'error']) {
+      final text = body[key]?.toString().trim() ?? '';
+      if (text.isEmpty || isMachineErrorCode(text)) continue;
+      if (_looksTechnical(text)) continue;
+      return text;
+    }
+    for (final key in const ['error', 'code', 'error_code']) {
+      final code = body[key]?.toString().trim() ?? '';
+      final known = _knownErrorCodeMessages[code];
+      if (known != null) return known;
+    }
+    return null;
+  }
+
+  /// Código estável do corpo (`capability_unavailable`, ...), se houver.
+  static String? errorCodeFromBody(Object? body) {
+    if (body is! Map) return null;
+    for (final key in const ['error', 'code', 'error_code']) {
+      final code = body[key]?.toString().trim() ?? '';
+      if (isMachineErrorCode(code)) return code;
+    }
+    return null;
+  }
+
+  static bool isMachineErrorCode(String text) =>
+      _machineErrorCodePattern.hasMatch(text);
+
+  static final _machineErrorCodePattern = RegExp(
+    r'^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$',
+  );
+
+  static const _capabilityUnavailableMessage =
+      'Este recurso não está disponível nesta versão da beta.';
+
+  static const _knownErrorCodeMessages = <String, String>{
+    'capability_unavailable': _capabilityUnavailableMessage,
+    'capability_policy_invalid':
+        'Este recurso está temporariamente indisponível. Tente novamente mais tarde.',
+    'capability_route_unclassified': _capabilityUnavailableMessage,
+    'authentication_required':
+        'Sua sessão expirou. Faça login novamente para continuar.',
+    'invalid_session':
+        'Sua sessão expirou. Faça login novamente para continuar.',
+    'email_verification_required': 'Confirme seu email para usar este recurso.',
+    'legal_acceptance_required':
+        'Aceite os Termos e a Política de Privacidade atualizados para continuar.',
+    'interaction_blocked': 'Esta interação não está disponível.',
+    'trades_not_allowed': 'Este usuário não está recebendo propostas de troca.',
+    'messages_not_allowed': 'Este usuário não está recebendo mensagens.',
+    'recipient_unavailable': 'Este usuário não está disponível no momento.',
+    'participant_unavailable': 'Este usuário não está disponível no momento.',
+    'idempotency_conflict':
+        'Esta ação já foi enviada com outros dados. Atualize a tela e tente novamente.',
+    'invalid_password': 'Senha incorreta.',
+    'password_required': 'Informe sua senha para continuar.',
+    'rate_limited':
+        'Muitas tentativas em sequência. Aguarde um instante e tente novamente.',
+    'service_unavailable':
+        'Serviço temporariamente indisponível. Tente de novo em instantes.',
+    'service_database_unavailable':
+        'Serviço temporariamente indisponível. Tente de novo em instantes.',
+    'card_not_in_catalog':
+        'Esta carta não está no catálogo do BrewTact. Confira o nome.',
+    'deck_publication_unavailable':
+        'Publicar decks não está disponível nesta beta.',
+    'deck_public_requires_cards':
+        'Um deck vazio não pode ser público. Adicione cartas antes de publicar.',
+    'deck_patch_field_unsupported':
+        'Não foi possível salvar essa alteração do deck.',
+  };
+
   static String? _messageFromBody(
     Object? body, {
     required FriendlyErrorContext context,
   }) {
-    if (body is! Map) return null;
-    final value = body['error'] ?? body['message'];
-    if (value == null) return null;
-
-    final text = value.toString().trim();
-    if (text.isEmpty) return null;
+    final text = serverMessageFromBody(body);
+    if (text == null) return null;
     final lower = text.toLowerCase();
 
     if (lower.contains('invalid credential') ||
@@ -314,11 +396,7 @@ class FriendlyErrorMapper {
       return 'Muitas tentativas em sequência. Aguarde um instante e tente novamente.';
     }
 
-    if (!_looksTechnical(text)) {
-      return text;
-    }
-
-    return null;
+    return text;
   }
 
   static bool _looksLikeNetworkError(String lower, String runtimeType) {

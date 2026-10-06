@@ -163,18 +163,7 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       final provider = context.read<CardProvider?>();
       if (provider == null) return;
       final name = widget.item?.cardName ?? widget.cardName!;
-      var results = await provider.fetchPrintingsByName(name);
-
-      // Se só encontrou 0-1 edição, importa do Scryfall e busca de novo
-      if (results.length <= 1 && widget.item == null) {
-        debugPrint(
-          '[BinderItemEditor] Poucas edições (${results.length}), resolvendo via Scryfall...',
-        );
-        results = await provider.resolveAndFetchPrintings(name);
-        debugPrint(
-          '[BinderItemEditor] Após resolve: ${results.length} edições',
-        );
-      }
+      final results = await provider.fetchPrintingsByName(name);
 
       if (!mounted) return;
       setState(() {

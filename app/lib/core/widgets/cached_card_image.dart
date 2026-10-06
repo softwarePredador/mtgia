@@ -39,8 +39,9 @@ class CachedCardImage extends StatefulWidget {
     'MANALOOM_ALLOW_LOOPBACK_HTTP_IMAGES',
     defaultValue: false,
   );
+  // D-37: Scryfall asks for an identifying User-Agent with a contact.
   static const _scryfallHeaders = <String, String>{
-    'User-Agent': 'ManaLoom/1.0',
+    'User-Agent': 'BrewTact/1.0 (+https://brewtact.com)',
     'Accept': 'image/*',
   };
 

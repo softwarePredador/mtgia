@@ -5127,7 +5127,7 @@
     "schema_version": 1,
     "generated_from": {
       "path": "docs/execution/CURRENT_QUEUE.md",
-      "sha256": "895a7e0f5cb8caa9651eab8ed6edf176e427e1cc3e4b1288665c0809cf50cf85"
+      "sha256": "5dae5becc8d47b190841dccb6067b8484e93dd24d30a3751623dd678b5040b0a"
     },
     "wip_limit": 1,
     "wip_scope": "per_lane",
@@ -10049,5 +10049,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "17a4a838cedcc88dfb4510fd8154e3029865c6a4fbbb9b08998734814a08ff11"
+  "project_logic_source_digest_sha256": "c02b1acce1fba78a466bc503a5e656ad0fcae08e0fd1de3ee5a88f3e8454604d"
 }

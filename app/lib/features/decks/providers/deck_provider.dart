@@ -64,6 +64,14 @@ class DeckProvider extends ChangeNotifier {
   String? _activeOptimizeRequestKey;
   bool _isDisposed = false;
 
+  // DCK-P0-07: logout/account switch bumps the epoch, so a response that
+  // started under the previous account never writes into the new one. The
+  // per-surface sequences keep a late deck A response from replacing the
+  // deck B the user opened after it.
+  int _sessionEpoch = 0;
+  int _detailsRequestSeq = 0;
+  int _listRequestSeq = 0;
+
   // Cache de detalhes do deck (evita recarregar se já temos os dados)
   final Map<String, DeckDetails> _deckDetailsCache = {};
   final Map<String, DateTime> _deckDetailsCacheTime = {};
@@ -104,6 +112,11 @@ class DeckProvider extends ChangeNotifier {
 
   @visibleForTesting
   bool get isDisposedForTesting => _isDisposed;
+
+  @visibleForTesting
+  int get sessionEpochForTesting => _sessionEpoch;
+
+  bool _isStale(int epoch) => _isDisposed || epoch != _sessionEpoch;
 
   DeckProvider({
     ApiClient? apiClient,
@@ -166,23 +179,18 @@ class DeckProvider extends ChangeNotifier {
     required String deckId,
     required String cardId,
   }) async {
-    final deck = await _ensureDeckLoadedForMutation(deckId);
-    if (deck == null) throw Exception('Deck não encontrado');
-
-    final currentCards = buildCurrentCardsMap(deck);
-    currentCards.remove(cardId);
-
+    final epoch = _sessionEpoch;
     final result = await removeCardFromDeckRequest(
       _apiClient,
       deckId: deckId,
-      cardsPayload: currentCards.values.toList(),
+      cardId: cardId,
     );
 
     if (!result.isSuccess) {
       throw Exception(result.errorMessage);
     }
 
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
   }
 
   Future<void> updateDeckCardEntry({
@@ -195,6 +203,7 @@ class DeckProvider extends ChangeNotifier {
     String condition = 'NM',
     bool isCommander = false,
   }) async {
+    final epoch = _sessionEpoch;
     if (quantity <= 0) {
       throw Exception('Quantidade deve ser > 0');
     }
@@ -220,7 +229,7 @@ class DeckProvider extends ChangeNotifier {
       throw Exception(result.errorMessage);
     }
 
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
   }
 
   /// Busca detalhes de um deck específico (com cache)
@@ -228,6 +237,8 @@ class DeckProvider extends ChangeNotifier {
     String deckId, {
     bool forceRefresh = false,
   }) async {
+    final epoch = _sessionEpoch;
+    final requestSeq = ++_detailsRequestSeq;
     if (!forceRefresh) {
       final cachedDeck = readFreshDeckDetailsFromCache(
         cache: _deckDetailsCache,
@@ -257,10 +268,13 @@ class DeckProvider extends ChangeNotifier {
 
     try {
       final state = await fetchDeckDetailsRequest(_apiClient, deckId);
-      if (_isDisposed) return;
-      _selectedDeck = state.selectedDeck;
-      _detailsErrorMessage = state.errorMessage;
-      _detailsStatusCode = state.statusCode;
+      if (_isStale(epoch)) return;
+      final isLatest = requestSeq == _detailsRequestSeq;
+      if (isLatest) {
+        _selectedDeck = state.selectedDeck;
+        _detailsErrorMessage = state.errorMessage;
+        _detailsStatusCode = state.statusCode;
+      }
 
       if (state.selectedDeck != null) {
         storeDeckDetailsInCache(
@@ -276,11 +290,13 @@ class DeckProvider extends ChangeNotifier {
         );
       }
     } catch (e, stackTrace) {
-      if (_isDisposed) return;
-      _detailsErrorMessage = FriendlyErrorMapper.fromException(
-        e,
-        context: FriendlyErrorContext.deckDetails,
-      );
+      if (_isStale(epoch)) return;
+      if (requestSeq == _detailsRequestSeq) {
+        _detailsErrorMessage = FriendlyErrorMapper.fromException(
+          e,
+          context: FriendlyErrorContext.deckDetails,
+        );
+      }
       _captureProviderException(
         e,
         stackTrace: stackTrace,
@@ -288,7 +304,7 @@ class DeckProvider extends ChangeNotifier {
         extras: {'deck_id': deckId},
       );
     } finally {
-      if (!_isDisposed) {
+      if (!_isStale(epoch)) {
         _isLoading = false;
         notifyListeners();
       }
@@ -314,17 +330,18 @@ class DeckProvider extends ChangeNotifier {
   }
 
   Future<DeckAnalysisData?> _fetchDeckAnalysisInternal(String deckId) async {
+    final epoch = _sessionEpoch;
     _deckAnalysisLoading[deckId] = true;
     _deckAnalysisErrors.remove(deckId);
     notifyListeners();
 
     try {
       final analysis = await fetchDeckAnalysisRequest(_apiClient, deckId);
-      if (_isDisposed) return null;
+      if (_isStale(epoch)) return null;
       _deckAnalysisCache[deckId] = analysis;
       return analysis;
     } catch (e, stackTrace) {
-      if (_isDisposed) return null;
+      if (_isStale(epoch)) return null;
       _deckAnalysisErrors[deckId] = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.deckDetails,
@@ -338,7 +355,7 @@ class DeckProvider extends ChangeNotifier {
       );
       return null;
     } finally {
-      if (!_isDisposed) {
+      if (!_isStale(epoch)) {
         _deckAnalysisLoading[deckId] = false;
         _deckAnalysisInFlight.remove(deckId);
         notifyListeners();
@@ -355,8 +372,9 @@ class DeckProvider extends ChangeNotifier {
     debugPrint(
       '[DeckProvider] Fetching color identity for ${missing.length} deck(s)...',
     );
+    final epoch = _sessionEpoch;
     final result = await fetchMissingDeckColorIdentities(_apiClient, missing);
-    if (_isDisposed) return;
+    if (_isStale(epoch)) return;
     for (final deck in missing.where(
       (deck) => result.failedDeckIds.contains(deck.id),
     )) {
@@ -389,6 +407,8 @@ class DeckProvider extends ChangeNotifier {
 
   /// Busca todos os decks do usuário
   Future<void> fetchDecks({bool silent = false}) async {
+    final epoch = _sessionEpoch;
+    final requestSeq = ++_listRequestSeq;
     if (!silent) {
       _isLoading = true;
       _errorMessage = null;
@@ -398,7 +418,7 @@ class DeckProvider extends ChangeNotifier {
 
     try {
       final state = await fetchDeckListRequest(_apiClient);
-      if (_isDisposed) return;
+      if (_isStale(epoch) || requestSeq != _listRequestSeq) return;
       if (state.decks != null) {
         final hydration = buildDeckListHydrationResult(
           state.decks!,
@@ -418,7 +438,7 @@ class DeckProvider extends ChangeNotifier {
         }
       }
     } catch (e, stackTrace) {
-      if (_isDisposed) return;
+      if (_isStale(epoch) || requestSeq != _listRequestSeq) return;
       if (!silent) {
         _errorMessage = FriendlyErrorMapper.fromException(
           e,
@@ -434,7 +454,7 @@ class DeckProvider extends ChangeNotifier {
       );
       // Não limpa _decks para permitir cache visual em caso de erro
     } finally {
-      if (!_isDisposed) {
+      if (!_isStale(epoch)) {
         if (!silent) {
           _isLoading = false;
         }
@@ -453,6 +473,7 @@ class DeckProvider extends ChangeNotifier {
     List<Map<String, dynamic>>? cards,
     bool isPublic = false,
   }) async {
+    final epoch = _sessionEpoch;
     try {
       final normalizedArchetype = archetype?.trim();
       final effectiveArchetype =
@@ -473,6 +494,7 @@ class DeckProvider extends ChangeNotifier {
         isPublic: isPublic,
         cards: normalizedCards,
       );
+      if (_isStale(epoch)) return false;
 
       if (result.isSuccess) {
         // A retry bem-sucedida deve remover o erro anterior imediatamente.
@@ -512,6 +534,7 @@ class DeckProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e, stackTrace) {
+      if (_isStale(epoch)) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.deckSave,
@@ -529,8 +552,10 @@ class DeckProvider extends ChangeNotifier {
 
   /// Deleta um deck
   Future<bool> deleteDeck(String deckId) async {
+    final epoch = _sessionEpoch;
     try {
       final result = await deleteDeckRequest(_apiClient, deckId);
+      if (_isStale(epoch)) return result.isSuccess;
       if (result.isSuccess) {
         final nextState = applyDeckDeletionToState(
           _decks,
@@ -547,6 +572,7 @@ class DeckProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e, stackTrace) {
+      if (_isStale(epoch)) return false;
       _errorMessage = FriendlyErrorMapper.fromException(e);
       _captureProviderException(
         e,
@@ -567,7 +593,9 @@ class DeckProvider extends ChangeNotifier {
     bool isCommander = false,
     String condition = 'NM',
   }) async {
+    final epoch = _sessionEpoch;
     final deck = await _ensureDeckLoadedForMutation(deckId);
+    if (_isStale(epoch)) return false;
     if (deck == null) {
       _errorMessage =
           'Deck não carregado. Abra os detalhes do deck e tente novamente.';
@@ -584,6 +612,7 @@ class DeckProvider extends ChangeNotifier {
         isCommander: isCommander,
         condition: condition,
       );
+      if (_isStale(epoch)) return result.isSuccess;
       if (result.isSuccess) {
         _decks = incrementDeckCardCount(
           _decks,
@@ -591,7 +620,7 @@ class DeckProvider extends ChangeNotifier {
           delta: isCommander ? 1 : quantity,
         );
 
-        await _refreshDeckDetailsAfterMutation(deckId);
+        await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
 
         return true;
       }
@@ -600,6 +629,7 @@ class DeckProvider extends ChangeNotifier {
       notifyListeners();
       return false;
     } catch (e, stackTrace) {
+      if (_isStale(epoch)) return false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
         context: FriendlyErrorContext.deckSave,
@@ -638,6 +668,7 @@ class DeckProvider extends ChangeNotifier {
     bool collectionOnly = false,
     int? budgetLimitBrl,
   }) async {
+    final epoch = _sessionEpoch;
     onProgress?.call('Preparando análise do deck...', 0, 5);
 
     final effectiveRequestKey =
@@ -657,6 +688,7 @@ class DeckProvider extends ChangeNotifier {
       recommendationContext: recommendationContext,
       requestKey: effectiveRequestKey,
     );
+    if (_isStale(epoch)) throw const OptimizeJobCancelledException();
 
     late final Map<String, dynamic> result;
     if (requestResult.isAsync) {
@@ -681,6 +713,7 @@ class DeckProvider extends ChangeNotifier {
       try {
         result = await _pollOptimizeJob(
           jobId,
+          epoch: epoch,
           pollInterval: requestResult.pollIntervalMs ?? 2000,
           maxPollingDuration: Duration(
             milliseconds:
@@ -724,6 +757,7 @@ class DeckProvider extends ChangeNotifier {
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
     OptimizeJobCancellation? cancellation,
   }) async {
+    final epoch = _sessionEpoch;
     cancellation?.attachJob(jobId);
     _activeOptimizeJobId = jobId;
     _activeOptimizeDeckId = deckId;
@@ -731,6 +765,7 @@ class DeckProvider extends ChangeNotifier {
     try {
       final result = await _pollOptimizeJob(
         jobId,
+        epoch: epoch,
         pollInterval: pollInterval,
         maxPollingDuration: maxPollingDuration,
         onProgress: onProgress,
@@ -817,6 +852,7 @@ class DeckProvider extends ChangeNotifier {
   /// O intervalo negociado com o backend respeita o mínimo de um segundo.
   Future<Map<String, dynamic>> _pollOptimizeJob(
     String jobId, {
+    required int epoch,
     int pollInterval = 5000,
     Duration maxPollingDuration = const Duration(minutes: 5),
     void Function(String stage, int stageNumber, int totalStages)? onProgress,
@@ -831,11 +867,15 @@ class DeckProvider extends ChangeNotifier {
         throw const OptimizeJobCancelledException();
       }
       await _pollDelay(Duration(milliseconds: safePollInterval));
+      // The job belongs to the account that started it; after logout the
+      // poll stops without touching the new session (DCK-P0-07).
+      if (_isStale(epoch)) throw const OptimizeJobCancelledException();
       if (cancellation?.isCancelled == true) {
         await _cancelOptimizeJobBestEffort(jobId);
         throw const OptimizeJobCancelledException();
       }
       final result = await pollOptimizeJobRequest(_apiClient, jobId);
+      if (_isStale(epoch)) throw const OptimizeJobCancelledException();
       pollCount += 1;
       if (result.isCompleted) {
         AppLogger.debug(
@@ -857,6 +897,7 @@ class DeckProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> cards,
     Map<String, dynamic>? mutationContext,
   }) async {
+    final epoch = _sessionEpoch;
     if (mutationContext?['type'] == 'optimization_apply') {
       _lastAppliedOptimizationEventId = null;
     }
@@ -866,28 +907,30 @@ class DeckProvider extends ChangeNotifier {
       cards: cards,
       mutationContext: mutationContext,
     );
+    if (_isStale(epoch)) return result.isSuccess;
     if (result.isSuccess) {
       final event = result.payload['optimization_event'];
       if (event is Map) {
         _lastAppliedOptimizationEventId = event['id']?.toString();
       }
-      await _refreshDeckDetailsAfterMutation(deckId);
+      await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
       return true;
     }
     throw Exception(result.errorMessage);
   }
 
-  /// Atualiza apenas a descrição do deck via PUT
+  /// Atualiza apenas a descrição do deck via PATCH
   Future<bool> updateDeckDescription({
     required String deckId,
     required String description,
   }) async {
+    final epoch = _sessionEpoch;
     await updateDeckDescriptionRequest(
       _apiClient,
       deckId: deckId,
       description: description,
     );
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
     return true;
   }
 
@@ -896,13 +939,14 @@ class DeckProvider extends ChangeNotifier {
     required String archetype,
     required int bracket,
   }) async {
+    final epoch = _sessionEpoch;
     await updateDeckStrategyRequest(
       _apiClient,
       deckId: deckId,
       archetype: archetype,
       bracket: bracket,
     );
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
   }
 
   /// Valida o deck no servidor (modo estrito: Commander=100 e com comandante).
@@ -914,13 +958,14 @@ class DeckProvider extends ChangeNotifier {
     required String oldCardId,
     required String newCardId,
   }) async {
+    final epoch = _sessionEpoch;
     await replaceCardEditionRequest(
       _apiClient,
       deckId: deckId,
       oldCardId: oldCardId,
       newCardId: newCardId,
     );
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
     return true;
   }
 
@@ -935,11 +980,13 @@ class DeckProvider extends ChangeNotifier {
     String deckId, {
     bool force = false,
   }) async {
+    final epoch = _sessionEpoch;
     final payload = await refreshAiAnalysisRequest(
       _apiClient,
       deckId,
       force: force,
     );
+    if (_isStale(epoch)) return payload.raw;
     final nextSelectedDeck = applyAiAnalysisToSelectedDeck(
       _selectedDeck,
       deckId,
@@ -1110,6 +1157,7 @@ class DeckProvider extends ChangeNotifier {
     required List<Map<String, dynamic>> cardsPayload,
     Map<String, dynamic>? mutationContext,
   }) async {
+    final epoch = _sessionEpoch;
     if (mutationContext?['type'] == 'optimization_apply') {
       _lastAppliedOptimizationEventId = null;
     }
@@ -1124,6 +1172,7 @@ class DeckProvider extends ChangeNotifier {
       '⏱️ [DeckProvider] Tempo de resposta do servidor: ${result.elapsedMilliseconds}ms',
     );
 
+    if (_isStale(epoch)) return false;
     AppLogger.debug('✅ [DeckProvider] Deck atualizado com sucesso!');
     _lastAppliedOptimizationEventId = result.optimizationEvent?['id']
         ?.toString();
@@ -1135,7 +1184,7 @@ class DeckProvider extends ChangeNotifier {
         AppLogger.warning(
           '[DeckProvider] Deck salvo mas falhou na validação estrita: $errors',
         );
-        await _refreshDeckDetailsAfterMutation(deckId);
+        await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
         return false;
       }
     } catch (validationError) {
@@ -1144,7 +1193,7 @@ class DeckProvider extends ChangeNotifier {
       );
     }
 
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
     return true;
   }
 
@@ -1152,13 +1201,15 @@ class DeckProvider extends ChangeNotifier {
     required String deckId,
     required String eventId,
   }) async {
+    final epoch = _sessionEpoch;
     await rollbackDeckOptimizationRequest(
       _apiClient,
       deckId: deckId,
       eventId: eventId,
     );
+    if (_isStale(epoch)) return true;
     _lastAppliedOptimizationEventId = null;
-    await _refreshDeckDetailsAfterMutation(deckId);
+    await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
     return true;
   }
 
@@ -1172,6 +1223,7 @@ class DeckProvider extends ChangeNotifier {
       return cached ?? const <DeckOptimizationEvent>[];
     }
 
+    final epoch = _sessionEpoch;
     _optimizationHistoryLoading[deckId] = true;
     _optimizationHistoryErrors.remove(deckId);
     notifyListeners();
@@ -1180,9 +1232,11 @@ class DeckProvider extends ChangeNotifier {
         _apiClient,
         deckId: deckId,
       );
+      if (_isStale(epoch)) return const <DeckOptimizationEvent>[];
       _optimizationHistory[deckId] = events;
       return events;
     } catch (error, stackTrace) {
+      if (_isStale(epoch)) return const <DeckOptimizationEvent>[];
       _optimizationHistoryErrors[deckId] = FriendlyErrorMapper.fromException(
         error,
         context: FriendlyErrorContext.deckDetails,
@@ -1195,8 +1249,10 @@ class DeckProvider extends ChangeNotifier {
       );
       return cached ?? const <DeckOptimizationEvent>[];
     } finally {
-      _optimizationHistoryLoading[deckId] = false;
-      notifyListeners();
+      if (!_isStale(epoch)) {
+        _optimizationHistoryLoading[deckId] = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -1450,6 +1506,7 @@ class DeckProvider extends ChangeNotifier {
     String? description,
     String? commander,
   }) async {
+    final epoch = _sessionEpoch;
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -1463,16 +1520,19 @@ class DeckProvider extends ChangeNotifier {
         description: description,
         commander: commander,
       );
+      if (_isStale(epoch)) return result;
 
       if (result['success'] == true) {
         await fetchDecks(silent: true);
       }
+      if (_isStale(epoch)) return result;
 
       _errorMessage = result['error']?.toString();
       _isLoading = false;
       notifyListeners();
       return result;
     } catch (e, stackTrace) {
+      if (_isStale(epoch)) return buildConnectionFailureResult(e);
       _isLoading = false;
       _errorMessage = FriendlyErrorMapper.fromException(
         e,
@@ -1511,6 +1571,7 @@ class DeckProvider extends ChangeNotifier {
     required String list,
     bool replaceAll = false,
   }) async {
+    final epoch = _sessionEpoch;
     final result = await runConnectionSafeMapRequest(
       () => importListToDeckRequest(
         _apiClient,
@@ -1521,7 +1582,7 @@ class DeckProvider extends ChangeNotifier {
     );
 
     if (result['success'] == true) {
-      await _refreshDeckDetailsAfterMutation(deckId);
+      await _refreshDeckDetailsAfterMutation(deckId, epoch: epoch);
     }
     return result;
   }
@@ -1531,10 +1592,15 @@ class DeckProvider extends ChangeNotifier {
       AppLogger.debug('📥 [DeckProvider] Buscando detalhes do deck...');
       await fetchDeckDetails(deckId);
     }
-    return _selectedDeck;
+    final selected = _selectedDeck;
+    return selected?.id == deckId ? selected : _deckDetailsCache[deckId];
   }
 
-  Future<void> _refreshDeckDetailsAfterMutation(String deckId) async {
+  Future<void> _refreshDeckDetailsAfterMutation(
+    String deckId, {
+    required int epoch,
+  }) async {
+    if (_isStale(epoch)) return;
     invalidateDeckCache(deckId);
     await fetchDeckDetails(deckId, forceRefresh: true);
     unawaited(_refreshDeckListSilently());
@@ -1551,15 +1617,20 @@ class DeckProvider extends ChangeNotifier {
 
   // ───── Social / Sharing ─────
 
-  /// Alterna visibilidade pública/privada do deck via PUT /decks/:id
-  Future<bool> togglePublic(String deckId, {required bool isPublic}) async {
+  /// Alterna visibilidade pública/privada do deck via PATCH /decks/:id
+  Future<DeckMutationResult> togglePublic(
+    String deckId, {
+    required bool isPublic,
+  }) async {
+    final epoch = _sessionEpoch;
     try {
-      final isSuccess = await togglePublicRequest(
+      final result = await togglePublicRequest(
         _apiClient,
         deckId: deckId,
         isPublic: isPublic,
       );
-      if (isSuccess) {
+      if (_isStale(epoch)) return result;
+      if (result.isSuccess) {
         _selectedDeck = applyDeckVisibilityToSelectedDeck(
           _selectedDeck,
           deckId,
@@ -1572,9 +1643,8 @@ class DeckProvider extends ChangeNotifier {
         );
         invalidateDeckCache(deckId);
         notifyListeners();
-        return true;
       }
-      return false;
+      return result;
     } catch (e, stackTrace) {
       AppLogger.error('[DeckProvider] togglePublic error: $e');
       _captureProviderException(
@@ -1583,7 +1653,10 @@ class DeckProvider extends ChangeNotifier {
         operation: 'togglePublic',
         extras: {'deck_id': deckId, 'is_public': isPublic},
       );
-      return false;
+      return const DeckMutationResult(
+        isSuccess: false,
+        errorMessage: 'Não foi possível alterar a visibilidade agora.',
+      );
     }
   }
 
@@ -1609,18 +1682,19 @@ class DeckProvider extends ChangeNotifier {
 
   /// Limpa todo o estado do provider (chamado no logout)
   void clearAllState() {
+    _sessionEpoch++;
     _decks = [];
     _selectedDeck = null;
     _isLoading = false;
     _errorMessage = null;
+    _listStatusCode = null;
     _detailsErrorMessage = null;
     _detailsStatusCode = null;
-    _deckDetailsCache.clear();
-    _deckDetailsCacheTime.clear();
-    _deckAnalysisCache.clear();
-    _deckAnalysisErrors.clear();
-    _deckAnalysisLoading.clear();
-    _deckAnalysisInFlight.clear();
+    _lastAppliedOptimizationEventId = null;
+    _activeOptimizeJobId = null;
+    _activeOptimizeDeckId = null;
+    _activeOptimizeRequestKey = null;
+    clearAllCache();
     notifyListeners();
   }
 

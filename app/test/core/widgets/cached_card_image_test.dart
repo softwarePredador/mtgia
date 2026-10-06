@@ -152,7 +152,10 @@ void main() {
       expect(uri.queryParameters['exact'], 'Jin-Gitaxias');
       expect(uri.queryParameters.containsKey('set'), isFalse);
       expect(uri.queryParameters['version'], 'normal');
-      expect(image.httpHeaders?['User-Agent'], 'ManaLoom/1.0');
+      expect(
+        image.httpHeaders?['User-Agent'],
+        'BrewTact/1.0 (+https://brewtact.com)',
+      );
       expect(image.httpHeaders?['Accept'], 'image/*');
     }
   });

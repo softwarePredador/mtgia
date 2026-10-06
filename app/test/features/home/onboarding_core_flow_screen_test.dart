@@ -1,11 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/services/activation_funnel_service.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/home/onboarding_core_flow_screen.dart';
+import 'package:manaloom/features/home/onboarding_goal_policy.dart';
 import 'package:manaloom/features/home/services/onboarding_state_store.dart';
 import 'package:manaloom/features/messages/providers/message_provider.dart';
 import 'package:manaloom/features/notifications/providers/notification_provider.dart';
@@ -102,6 +106,14 @@ class _FakeEventTracker implements ActivationEventTracker {
   }
 }
 
+/// The first cohort of the beta: core plus the life counter, no AI (D-07).
+const _firstCohortCapabilities = <ReleaseCapability>{
+  ReleaseCapability.catalogPrivate,
+  ReleaseCapability.decksPrivate,
+  ReleaseCapability.collectionPrivate,
+  ReleaseCapability.lifeCounterLocal,
+};
+
 const _onboardingFixtureCapabilities = <ReleaseCapability>{
   ReleaseCapability.catalogPrivate,
   ReleaseCapability.decksPrivate,
@@ -118,9 +130,21 @@ Widget _subject({
   VoidCallback? onSettled,
   double textScale = 1,
   Set<ReleaseCapability> allowedCapabilities = _onboardingFixtureCapabilities,
+  ReleaseCapabilitiesProvider? capabilities,
+  bool appRouteGuard = false,
 }) {
+  final capabilitiesProvider =
+      capabilities ?? ReleaseCapabilitiesProvider.seeded(allowedCapabilities);
   final router = GoRouter(
     initialLocation: '/onboarding/core-flow',
+    refreshListenable: appRouteGuard ? capabilitiesProvider : null,
+    redirect: appRouteGuard
+        ? (_, state) => onboardingDeadEndRedirect(
+            uri: state.uri,
+            loadState: capabilitiesProvider.loadState,
+            capabilities: capabilitiesProvider.snapshot,
+          )
+        : null,
     routes: [
       GoRoute(
         path: '/onboarding/core-flow',
@@ -171,8 +195,8 @@ Widget _subject({
   onRouter(router);
   return MultiProvider(
     providers: [
-      ChangeNotifierProvider(
-        create: (_) => ReleaseCapabilitiesProvider.seeded(allowedCapabilities),
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+        value: capabilitiesProvider,
       ),
       ChangeNotifierProvider(create: (_) => MessageProvider()),
       ChangeNotifierProvider(create: (_) => NotificationProvider()),
@@ -396,6 +420,148 @@ void main() {
     );
     expect(repository.state.buildMode, OnboardingBuildMode.manual);
     expect(repository.settlements, isEmpty);
+  });
+
+  group('BT-NAV-03: no dead end on the first authenticated screen', () {
+    testWidgets('an all-off policy offers Home instead of an empty list', (
+      tester,
+    ) async {
+      final repository = _FakeOnboardingRepository();
+      late GoRouter router;
+      await tester.pumpWidget(
+        _subject(
+          repository: repository,
+          tracker: _FakeEventTracker(),
+          onRouter: (value) => router = value,
+          allowedCapabilities: const {},
+        ),
+      );
+      addTearDown(router.dispose);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('onboarding-no-goal-notice')),
+        findsOneWidget,
+      );
+      expect(find.text('Nenhum caminho aberto nesta fase da beta'), findsOne);
+      expect(find.byKey(const Key('onboarding-goal-rail')), findsNothing);
+      expect(find.byKey(const Key('onboarding-primary-action')), findsNothing);
+      expect(find.byKey(const Key('onboarding-skip-action')), findsNothing);
+
+      await _tapWhenVisible(
+        tester,
+        const Key('onboarding-no-goal-home-action'),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('home-destination')), findsOneWidget);
+      // Leaving is not a decision: onboarding comes back once goals open.
+      expect(repository.settlements, isEmpty);
+      expect(repository.state.isSettled, isFalse);
+    });
+
+    testWidgets('the app route sends an all-off session straight to Home', (
+      tester,
+    ) async {
+      late GoRouter router;
+      await tester.pumpWidget(
+        _subject(
+          repository: _FakeOnboardingRepository(),
+          tracker: _FakeEventTracker(),
+          onRouter: (value) => router = value,
+          allowedCapabilities: const {},
+          appRouteGuard: true,
+        ),
+      );
+      addTearDown(router.dispose);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('home-destination')), findsOneWidget);
+      expect(find.byKey(const Key('onboarding-intent-screen')), findsNothing);
+    });
+
+    testWidgets('the route waits for /capabilities before leaving', (
+      tester,
+    ) async {
+      final response = Completer<ApiResponse>();
+      final capabilities = ReleaseCapabilitiesProvider(
+        fetcher: (_) => response.future,
+      );
+      addTearDown(capabilities.dispose);
+      final refresh = capabilities.refresh();
+      late GoRouter router;
+      await tester.pumpWidget(
+        _subject(
+          repository: _FakeOnboardingRepository(),
+          tracker: _FakeEventTracker(),
+          onRouter: (value) => router = value,
+          capabilities: capabilities,
+          appRouteGuard: true,
+        ),
+      );
+      addTearDown(router.dispose);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.byKey(const Key('onboarding-intent-screen')), findsOneWidget);
+      expect(
+        find.byKey(const Key('onboarding-no-goal-progress')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('onboarding-no-goal-home-action')),
+        findsNothing,
+      );
+
+      response.complete(ApiResponse(503, const {'error': 'unavailable'}));
+      await refresh;
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('home-destination')), findsOneWidget);
+    });
+
+    testWidgets('the first cohort (D-07) picks a goal or skips to Home', (
+      tester,
+    ) async {
+      final repository = _FakeOnboardingRepository();
+      late GoRouter router;
+      await tester.pumpWidget(
+        _subject(
+          repository: repository,
+          tracker: _FakeEventTracker(),
+          onRouter: (value) => router = value,
+          allowedCapabilities: _firstCohortCapabilities,
+          appRouteGuard: true,
+        ),
+      );
+      addTearDown(router.dispose);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('onboarding-intent-screen')), findsOneWidget);
+      expect(find.byKey(const Key('onboarding-no-goal-notice')), findsNothing);
+      for (final goal in const [
+        OnboardingGoal.buildDeck,
+        OnboardingGoal.importDeck,
+        OnboardingGoal.catalogCollection,
+        OnboardingGoal.play,
+      ]) {
+        expect(
+          find.byKey(Key('onboarding-goal-${goal.name}')),
+          findsOneWidget,
+          reason: goal.name,
+        );
+      }
+      expect(
+        find.byKey(const Key('onboarding-goal-improveDeck')),
+        findsNothing,
+      );
+
+      await _tapWhenVisible(tester, const Key('onboarding-skip-action'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('home-destination')), findsOneWidget);
+      expect(repository.settlements, [OnboardingDisposition.skipped]);
+    });
   });
 
   testWidgets('play intent hands off to Home without false completion', (

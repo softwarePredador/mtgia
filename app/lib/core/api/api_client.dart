@@ -49,6 +49,7 @@ class ApiClient {
   static String? _cachedToken;
   static VoidCallback? _sessionExpiredHandler;
   static bool _sessionExpiryDispatched = false;
+  static void Function(Object? body)? _legalAcceptanceRequiredHandler;
 
   /// Atualiza o token em memória (chamar no login/register/logout).
   static void setToken(String? token) {
@@ -64,6 +65,24 @@ class ApiClient {
   /// local to the form that initiated the request.
   static void setSessionExpiredHandler(VoidCallback? handler) {
     _sessionExpiredHandler = handler;
+  }
+
+  /// Registers the app-level action for a write blocked by updated Terms
+  /// (403 `legal_acceptance_required`, BT-LEGAL-ACCEPT-001). It receives the
+  /// response body, which carries the accepted and current versions. The
+  /// request still fails for its caller, which shows its own message.
+  static void setLegalAcceptanceRequiredHandler(
+    void Function(Object? body)? handler,
+  ) {
+    _legalAcceptanceRequiredHandler = handler;
+  }
+
+  @visibleForTesting
+  static bool isLegalAcceptanceRequired(ApiResponse response) {
+    if (response.statusCode != 403) return false;
+    final data = response.data;
+    return data is Map &&
+        data['error']?.toString().trim() == 'legal_acceptance_required';
   }
 
   static bool get hasAuthenticationToken =>
@@ -88,6 +107,7 @@ class ApiClient {
   }) {
     _cachedToken = token;
     _sessionExpiredHandler = null;
+    _legalAcceptanceRequiredHandler = null;
     _sessionExpiryDispatched = token?.trim().isEmpty != false;
     _httpClient = httpClient ?? http.Client();
     _performanceUnavailable = performanceUnavailable;
@@ -624,6 +644,9 @@ class ApiClient {
         isSessionInvalidatingUnauthorized(parsed)) {
       _sessionExpiryDispatched = true;
       _sessionExpiredHandler?.call();
+    }
+    if (isLegalAcceptanceRequired(parsed)) {
+      _legalAcceptanceRequiredHandler?.call(parsed.data);
     }
 
     _recordHttpResult(

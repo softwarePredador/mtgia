@@ -56,7 +56,8 @@ void main() {
       final token = await _register(
         baseUrl,
         email: 'play-vs-ai-$suffix@example.invalid',
-        username: 'play_vs_ai_$suffix',
+        // auth/register caps usernames at accountUsernameMaxChars (30).
+        username: 'pvai_$suffix',
         password: password,
       );
       final headers = <String, String>{

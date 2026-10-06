@@ -9,8 +9,11 @@ import 'core/api/api_client.dart';
 import 'core/branding/product_identity.dart';
 import 'core/config/launch_features.dart';
 import 'core/config/release_capabilities.dart';
+import 'core/config/release_identity_gate.dart';
+import 'core/widgets/release_update_banner.dart';
 import 'core/observability/app_observability.dart';
 import 'core/services/image_cache_policy.dart';
+import 'core/services/scryfall_image_cache_manager.dart';
 import 'core/services/activation_funnel_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
@@ -29,6 +32,8 @@ import 'features/auth/screens/reset_password_screen.dart';
 import 'features/auth/screens/verify_email_screen.dart';
 import 'features/auth/models/email_verification_delivery_result.dart';
 import 'features/auth/providers/auth_provider.dart';
+import 'features/auth/providers/legal_acceptance_provider.dart';
+import 'features/auth/widgets/legal_reacceptance_dialog.dart';
 import 'features/auth/auth_redirect.dart';
 
 import 'core/widgets/main_scaffold.dart';
@@ -70,6 +75,7 @@ import 'features/notifications/providers/notification_provider.dart';
 import 'features/notifications/screens/notification_screen.dart';
 import 'features/notifications/widgets/notification_permission_boundary.dart';
 import 'features/home/onboarding_core_flow_screen.dart';
+import 'features/home/onboarding_goal_policy.dart';
 import 'features/home/services/onboarding_state_store.dart';
 import 'features/home/life_counter_route.dart';
 import 'features/home/lotus_life_counter_screen.dart';
@@ -218,6 +224,10 @@ class ManaLoomApp extends StatefulWidget {
 class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   late final AuthProvider _authProvider;
   late final ReleaseCapabilitiesProvider _releaseCapabilitiesProvider;
+  late final ReleaseIdentityGate _releaseIdentityGate;
+  late final LegalAcceptanceProvider _legalAcceptanceProvider;
+  final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  bool _legalPromptOpen = false;
   late final DeckProvider _deckProvider;
   late final CardProvider _cardProvider;
   late final MarketProvider _marketProvider;
@@ -272,14 +282,23 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     AppImageCachePolicy.apply();
+    CardImageCacheManager.install();
     WidgetsBinding.instance.addObserver(this);
     // go_router keeps imperative pushes out of the browser URL by default.
     // ManaLoom uses push for drill-down screens, so reflecting those pushes is
     // required for reload, browser back/forward, bookmarks, and shared links.
     GoRouter.optionURLReflectsImperativeAPIs = true;
     _authProvider = AuthProvider();
-    _releaseCapabilitiesProvider = ReleaseCapabilitiesProvider();
+    _releaseIdentityGate = ReleaseIdentityGate();
+    _releaseCapabilitiesProvider = ReleaseCapabilitiesProvider(
+      fetcher: _releaseIdentityGate.fetch,
+    );
     ApiClient.setSessionExpiredHandler(_authProvider.expireSession);
+    _legalAcceptanceProvider = LegalAcceptanceProvider();
+    ApiClient.setLegalAcceptanceRequiredHandler(
+      _legalAcceptanceProvider.markRequiredFromBody,
+    );
+    _legalAcceptanceProvider.addListener(_onLegalAcceptanceChanged);
     _deckProvider = DeckProvider();
     _cardProvider = CardProvider();
     _marketProvider = MarketProvider();
@@ -302,6 +321,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     ApiClient.debugLogBaseUrl();
 
     _router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
       initialLocation: _debugBootIntoLifeCounter ? lifeCounterRoutePath : '/',
       refreshListenable: Listenable.merge([
         _authProvider,
@@ -431,6 +451,16 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         if (capabilityRedirect != null) {
           debugPrint('[🧭 Router] → fallback de capability da release');
           return capabilityRedirect;
+        }
+
+        final onboardingRedirect = onboardingDeadEndRedirect(
+          uri: state.uri,
+          loadState: _releaseCapabilitiesProvider.loadState,
+          capabilities: _releaseCapabilitiesProvider.snapshot,
+        );
+        if (onboardingRedirect != null) {
+          debugPrint('[🧭 Router] → home (onboarding sem objetivo aberto)');
+          return onboardingRedirect;
         }
 
         debugPrint('[🧭 Router] → null (sem redirect)');
@@ -975,6 +1005,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       _authenticatedAccountId = accountId;
       unawaited(AppObservability.instance.setUserContext(_authProvider.user));
       unawaited(_refreshCapabilitiesAndWarmup(expectedAccountId: accountId));
+      unawaited(_legalAcceptanceProvider.refresh());
       return;
     }
 
@@ -1004,6 +1035,31 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
 
       _clearAllProvidersState();
     }
+  }
+
+  /// Shows the re-acceptance prompt once per pending event, over whatever
+  /// screen is open (BT-LEGAL-ACCEPT-001).
+  void _onLegalAcceptanceChanged() {
+    if (_legalPromptOpen || !_authProvider.isAuthenticated) return;
+    if (!_legalAcceptanceProvider.promptPending) return;
+    final navigatorContext = _rootNavigatorKey.currentContext;
+    if (navigatorContext == null) return;
+    if (!_legalAcceptanceProvider.takePrompt()) return;
+    _legalPromptOpen = true;
+    unawaited(
+      showLegalReacceptanceDialog(
+        context: navigatorContext,
+        provider: _legalAcceptanceProvider,
+        onReadDocument: (section) => unawaited(
+          _router.push(
+            Uri(
+              path: '/legal',
+              queryParameters: {'section': section},
+            ).toString(),
+          ),
+        ),
+      ).whenComplete(() => _legalPromptOpen = false),
+    );
   }
 
   void _onReleaseCapabilitiesChanged() {
@@ -1157,6 +1213,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   /// Limpa o estado de todos os providers ao deslogar, evitando dados stale
   /// entre sessões de diferentes usuários.
   void _clearAllProvidersState() {
+    _legalAcceptanceProvider.reset();
     _deckProvider.clearAllState();
     _cardProvider.clearSearch();
     _marketProvider.clearAllState();
@@ -1176,6 +1233,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _authProvider.removeListener(_onAuthChanged);
     _releaseCapabilitiesProvider.removeListener(_onReleaseCapabilitiesChanged);
     ApiClient.setSessionExpiredHandler(null);
+    ApiClient.setLegalAcceptanceRequiredHandler(null);
+    _legalAcceptanceProvider.removeListener(_onLegalAcceptanceChanged);
     _notificationProvider.stopPolling();
     _messageProvider.stopPolling();
     final pushService = PushNotificationService();
@@ -1193,6 +1252,8 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
     _notificationProvider.dispose();
     _commercialProvider.dispose();
     _releaseCapabilitiesProvider.dispose();
+    _releaseIdentityGate.dispose();
+    _legalAcceptanceProvider.dispose();
     _authProvider.dispose();
     super.dispose();
   }
@@ -1203,6 +1264,7 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
       providers: [
         ChangeNotifierProvider.value(value: _authProvider),
         ChangeNotifierProvider.value(value: _releaseCapabilitiesProvider),
+        ChangeNotifierProvider.value(value: _legalAcceptanceProvider),
         ChangeNotifierProvider.value(value: _deckProvider),
         ChangeNotifierProvider.value(value: _cardProvider),
         ChangeNotifierProvider.value(value: _marketProvider),
@@ -1219,7 +1281,13 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
         theme: AppTheme.darkTheme,
         scrollBehavior: const ManaLoomScrollBehavior(),
         routerConfig: _router,
-        builder: buildManaLoomDebugAccessibilityTools,
+        builder: (context, child) => buildManaLoomDebugAccessibilityTools(
+          context,
+          ReleaseUpdateBannerHost(
+            updateAvailable: _releaseIdentityGate.updateAvailable,
+            child: child ?? const SizedBox.shrink(),
+          ),
+        ),
         debugShowCheckedModeBanner: false,
       ),
     );

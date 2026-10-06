@@ -357,9 +357,18 @@ for output in build .dart_frog; do
   git -C "$ROOT_DIR" check-ignore -q "server/$output/" || exit 2
   if [[ -e "$SERVER_DIR/$output" ]]; then
     [[ -d "$SERVER_DIR/$output" ]] || exit 2
-    build_consumers="$(lsof -t +D "$SERVER_DIR/$output" 2>"$RUN_DIR/build-consumers.log")" || {
-      [[ $? == 1 && ! -s "$RUN_DIR/build-consumers.log" ]] || exit 2
-    }
+    # O E2E do Jogar contra IA invoca este script duas vezes seguidas, e o
+    # servidor da primeira invocação ainda segura o diretório por um instante
+    # depois de sair (corrida de handoff medida em 2026-09-21). A guarda
+    # continua fechada: só espera a liberação por até 30 s antes de bloquear.
+    build_consumers=""
+    for _ in $(seq 1 120); do
+      build_consumers="$(lsof -t +D "$SERVER_DIR/$output" 2>"$RUN_DIR/build-consumers.log")" || {
+        [[ $? == 1 && ! -s "$RUN_DIR/build-consumers.log" ]] || exit 2
+      }
+      [[ -n "$build_consumers" ]] || break
+      sleep 0.25
+    done
     [[ -z "$build_consumers" ]] || {
       echo "BLOCKED: build output has a consumer" >&2; exit 2;
     }
