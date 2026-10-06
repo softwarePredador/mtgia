@@ -770,25 +770,27 @@
       "id": "life_counter_post_game",
       "name": "Life Counter, sessão e pós-jogo",
       "status": "active_release_scope",
-      "source_of_truth": "local game session stores plus PostgreSQL post_game_notes after sync",
+      "source_of_truth": "device-local game session stores namespaced per signed-in account (not durable, never server-side) plus PostgreSQL post_game_notes after sync",
       "entrypoints": ["/life-counter", "/decks/{id}/post-game"],
       "implementation": [
         "app/lib/features/home/lotus_life_counter_screen.dart",
         "app/lib/features/home/life_counter/life_counter_session_store.dart",
+        "app/lib/features/home/life_counter/life_counter_account_scope.dart",
         "app/lib/features/retention/services/post_game_note_store.dart",
         "server/lib/retention/post_game_note_service.dart",
         "server/routes/decks/[id]/post-game-notes/index.dart"
       ],
-      "storage": ["local:life_counter_session", "local:post_game_outbox", "post_game_notes", "post_game_sync_state"],
+      "storage": ["local:account_namespace:life_counter_session", "local:account_namespace:post_game_outbox", "post_game_notes", "post_game_sync_state"],
       "tests": [
         "app/test/features/home/lotus_life_counter_screen_test.dart",
+        "app/test/features/home/life_counter_account_scope_test.dart",
         "app/test/features/retention/post_game_note_store_test.dart",
         "server/test/post_game_note_sync_contract_test.dart"
       ],
       "gates": ["scripts/quality_gate.sh", "scripts/manaloom_e2e_suite.sh"],
       "sequence": [
         {"from": "Pessoa", "to": "Life Counter", "message": "iniciar e jogar sessão"},
-        {"from": "Life Counter", "to": "Local Store", "message": "checkpoint idempotente"},
+        {"from": "Life Counter", "to": "Local Store", "message": "checkpoint idempotente no namespace da conta; saída sem flush pede confirmação"},
         {"from": "Life Counter", "to": "Post-game", "message": "contexto quando houve atividade"},
         {"from": "Post-game", "to": "PostgreSQL", "message": "sync com tombstone e watermark"}
       ]

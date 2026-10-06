@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'life_counter_settings.dart';
+import 'life_counter_account_scope.dart';
 
 typedef LifeCounterSettingsPreferencesLoader =
     Future<SharedPreferences> Function();
@@ -8,14 +9,21 @@ typedef LifeCounterSettingsPreferencesLoader =
 class LifeCounterSettingsStore {
   LifeCounterSettingsStore({
     LifeCounterSettingsPreferencesLoader? preferencesLoader,
-    this.prefsKey = lifeCounterSettingsPrefsKey,
-  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
+    String? prefsKey,
+    LifeCounterStorageNamespace? namespace,
+  }) : _binding = LifeCounterStorageBinding.resolve(
+         baseKey: lifeCounterSettingsPrefsKey,
+         namespace: namespace,
+         prefsKey: prefsKey,
+         preferencesLoader: preferencesLoader,
+       );
 
-  final LifeCounterSettingsPreferencesLoader _preferencesLoader;
-  final String prefsKey;
+  final LifeCounterStorageBinding _binding;
+  String get prefsKey => _binding.prefsKey;
+  LifeCounterStorageNamespace get namespace => _binding.namespace;
 
   Future<LifeCounterSettings?> load() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     final raw = prefs.getString(prefsKey);
     final settings = LifeCounterSettings.tryParse(raw);
     if (settings == null) {
@@ -31,12 +39,12 @@ class LifeCounterSettingsStore {
   }
 
   Future<void> save(LifeCounterSettings settings) async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     await prefs.setString(prefsKey, settings.toJsonString());
   }
 
   Future<void> clear() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     await prefs.remove(prefsKey);
   }
 }

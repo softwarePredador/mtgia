@@ -12,7 +12,10 @@ class _ScriptedPostGameStore extends PostGameNoteStore {
     this.addFailures = 0,
     this.deleteFailures = 0,
     this.pendingCount = 0,
-  }) : notes = List<PostGameNote>.of(initialNotes),
+    this.addRejection,
+    List<PostGameSyncRejection> syncRejections = const [],
+  }) : syncRejections = List<PostGameSyncRejection>.of(syncRejections),
+       notes = List<PostGameNote>.of(initialNotes),
        super();
 
   final List<PostGameNote> notes;
@@ -20,12 +23,21 @@ class _ScriptedPostGameStore extends PostGameNoteStore {
   final int addFailures;
   final int deleteFailures;
   final int pendingCount;
+  final PostGameRemoteRejection? addRejection;
+  final List<PostGameSyncRejection> syncRejections;
   int loadCalls = 0;
   int addCalls = 0;
   int deleteCalls = 0;
 
   @override
   Future<int> pendingOperationCount(String deckId) async => pendingCount;
+
+  @override
+  Future<List<PostGameSyncRejection>> takeSyncRejections(String deckId) async {
+    final taken = List<PostGameSyncRejection>.of(syncRejections);
+    syncRejections.clear();
+    return taken;
+  }
 
   @override
   Future<List<PostGameNote>> loadNotes(String deckId) async {
@@ -42,6 +54,8 @@ class _ScriptedPostGameStore extends PostGameNoteStore {
     if (addCalls <= addFailures) {
       throw StateError('write failed with private details');
     }
+    final rejection = addRejection;
+    if (rejection != null) throw PostGameNoteRejectedException(rejection);
     notes
       ..removeWhere((item) => item.id == note.id)
       ..insert(0, note);
@@ -129,6 +143,61 @@ void main() {
           ?.text,
       isEmpty,
     );
+  });
+
+  testWidgets('LC-P0-06: a refused second note of the match shows the '
+      'conflict and keeps the form', (tester) async {
+    final store = _ScriptedPostGameStore(
+      addRejection: const PostGameRemoteRejection(
+        statusCode: 409,
+        error: 'post_game_conflict',
+        errorCode: 'post_game_play_session_conflict',
+        message: 'Esta partida já tem um pós-jogo registrado.',
+      ),
+    );
+
+    await _pumpScreen(tester, store);
+    await tester.enterText(
+      find.byKey(const Key('post-game-result-field')),
+      'Segunda nota',
+    );
+    await tester.ensureVisible(find.byKey(const Key('post-game-save-button')));
+    await tester.tap(find.byKey(const Key('post-game-save-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('post-game-operation-error')), findsOneWidget);
+    expect(
+      find.text('Esta partida já tem um pós-jogo registrado.'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('post-game-operation-retry')), findsNothing);
+    expect(
+      tester
+          .widget<TextField>(find.byKey(const Key('post-game-result-field')))
+          .controller
+          ?.text,
+      'Segunda nota',
+    );
+  });
+
+  testWidgets('LC-P0-06: a queued note refused in the background is said '
+      'once', (tester) async {
+    final store = _ScriptedPostGameStore(
+      syncRejections: const [
+        PostGameSyncRejection(
+          noteId: 'note-old',
+          statusCode: 400,
+          message: 'O pós-jogo contém carta fora da revisão atual do deck.',
+        ),
+      ],
+    );
+
+    await _pumpScreen(tester, store);
+
+    expect(find.byKey(const Key('post-game-operation-error')), findsOneWidget);
+    expect(find.textContaining('recusado pela sua conta'), findsOneWidget);
+    expect(find.textContaining('carta fora da revisão'), findsOneWidget);
+    expect(find.byKey(const Key('post-game-operation-retry')), findsNothing);
   });
 
   testWidgets('delete failure preserves the note and retry removes it', (

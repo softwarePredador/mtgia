@@ -344,3 +344,15 @@ Dois endpoints e uma tela rastreados de ponta a ponta por conta própria:
 ### 11.4 Confiança
 
 **Média.** A espinha dorsal do documento (arquitetura, portões, contrato app↔servidor, achados A1–A9) resistiu ao ataque: os 40+ pares arquivo:linha conferidos bateram, com cinco erros de 1–2 linhas e uma afirmação factual falsa (A10). O que baixa a confiança de alta para média não é o que está escrito, e sim o que faltava: o fluxo foi descrito como se a "revisão exata do deck" funcionasse, quando ela não funciona (A16) e nem é verificável (A17), e um terço das entradas da tela estava fora do mapa (A18). Tudo aqui continua sendo verificação **estática**: nada neste documento foi provado por execução — nem os testes citados, nem o roteiro de prova viva da seção 10.
+
+---
+
+## 12. Estado depois das tarefas P0 LIFE (2026-10-05)
+
+Raia do app na branch `claude/frente-contador-de-vida-ibnawb`, sobre `integracao/2026-09-23`. Implementado e coberto por testes de unidade e de widget; falta a prova de UI no lote único do `BT-UIEV-001` e o Android físico. Os receipts estão em `docs/qa/execution/2026-10-05/`.
+
+- **Persistência é local e por conta, nunca durável no servidor.** As 9 stores do contador, as chaves cruas do host Web e o outbox do pós-jogo moram sob `manaloom.local.v1.account.<id>.` (`LifeCounterAccountScope`, `LC-P0-01`). Uma store aberta para a conta A falha fechada depois da troca de conta. O legado sem prefixo é apagado no primeiro login, com receipt local que guarda só contagens. O que cruza a rede continua sendo só o pós-jogo.
+- **Ciclo de conta** (`LC-P0-02`): login e restart abrem o namespace da conta; logout e expiração do token fecham sem apagar; excluir a conta apaga só os dados dela neste aparelho.
+- **Saída** (`LC-P0-03`, mecanismo do A8): sem flush confirmado, a mesa não fecha sozinha; pergunta tentar de novo, continuar jogando ou sair sem salvar. Home e deck não dizem "pausada"/"salva" quando `storageFlushed=false`.
+- **A1 e A3** (`LC-P0-06`): o 409 da segunda nota da mesma partida chega à tela com a frase do servidor; o DELETE só apaga o tombstone quando o servidor confirma que a nota não existe (`post_game_note_not_found`) ou já foi apagada (`post_game_note_deleted`). Os 404 de capability ou de deck mantêm a nota apagada. **A4** fica parcial: rejeições definitivas (400, 404 de nota, 409, 413, 422) saem do outbox e são avisadas; rede, 401, 5xx e a capability desligada continuam pendentes.
+- Seguem abertos neste fluxo: A5 (`base_revision`/`If-Match`), A6 (`since`), A9, A11, A12, A13, A16 (parte do app), A17 e A18.

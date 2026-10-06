@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/features/retention/models/post_game_note.dart';
 import 'package:manaloom/features/retention/services/post_game_note_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -7,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
+    LifeCounterAccountScope.resetForTesting();
   });
 
   test('stores notes and builds deck evolution summary', () async {
@@ -41,7 +43,7 @@ void main() {
 
   test('corrupted local payload does not crash note loading', () async {
     SharedPreferences.setMockInitialValues({
-      'manaloom.post_game_notes.deck-1': '{bad json',
+      '${lifeCounterSignedOutKeyPrefix}post_game_notes.deck-1': '{bad json',
     });
     final store = PostGameNoteStore();
 
@@ -347,6 +349,162 @@ void main() {
       expect(await firstStore.pendingOperationCount('deck-delete-race'), 2);
     },
   );
+
+  group('LC-P0-06: the account answers are not swallowed', () {
+    PostGameNote noteFor(String deckId, {String playSessionId = 'play-1'}) {
+      return PostGameNote.create(
+        deckId: deckId,
+        result: 'vitória',
+        tableLevel: 'casual',
+        notes: 'Segunda nota da mesma partida.',
+        playSessionId: playSessionId,
+        createdAt: DateTime.parse('2026-09-28T12:00:00Z'),
+      );
+    }
+
+    test('the second note of the same match surfaces the conflict', () async {
+      final api = _ScriptedPostGameApiClient()
+        ..postResponse = ApiResponse(409, {
+          'error': 'post_game_conflict',
+          'error_code': 'post_game_play_session_conflict',
+          'message': 'Esta partida já tem um pós-jogo registrado.',
+        });
+      final store = PostGameNoteStore(
+        remoteClient: ApiPostGameNoteRemoteClient(apiClient: api),
+      );
+      final note = noteFor('deck-409');
+
+      await expectLater(
+        store.addNote(note),
+        throwsA(
+          isA<PostGameNoteRejectedException>()
+              .having(
+                (error) => error.rejection.isPlaySessionConflict,
+                'isPlaySessionConflict',
+                isTrue,
+              )
+              .having(
+                (error) => error.userMessage,
+                'userMessage',
+                'Esta partida já tem um pós-jogo registrado.',
+              ),
+        ),
+      );
+
+      final localOnly = PostGameNoteStore();
+      expect(await localOnly.loadNotes('deck-409'), isEmpty);
+      expect(await store.pendingOperationCount('deck-409'), 0);
+    });
+
+    test('a 409 from an older server without error_code is the same '
+        'conflict', () {
+      final rejection = PostGameRemoteRejection.fromResponse(
+        ApiResponse(409, {'error': 'post_game_conflict'}),
+      );
+      expect(rejection.isPlaySessionConflict, isTrue);
+      expect(rejection.isDefinitive, isTrue);
+      expect(rejection.userMessage, contains('Esta partida já tem'));
+    });
+
+    test('a 5xx or the capability gate keeps the note queued', () async {
+      for (final response in [
+        ApiResponse(503, {'error': 'indisponível'}),
+        ApiResponse(404, {'error': 'capability_unavailable'}),
+      ]) {
+        SharedPreferences.setMockInitialValues({});
+        final api = _ScriptedPostGameApiClient()..postResponse = response;
+        final store = PostGameNoteStore(
+          remoteClient: ApiPostGameNoteRemoteClient(apiClient: api),
+        );
+        final note = noteFor('deck-retry');
+
+        await store.addNote(note);
+
+        expect(await store.pendingOperationCount('deck-retry'), 1);
+        expect(
+          (await PostGameNoteStore().loadNotes('deck-retry')).single.id,
+          note.id,
+        );
+      }
+    });
+
+    for (final notFound in [
+      {'error': 'capability_unavailable', 'capability': 'decks_private'},
+      {'error': 'Deck nao encontrado.', 'error_code': 'deck_not_found'},
+      {'error': 'Não encontrado.'},
+    ]) {
+      test('a deleted note does not come back after a 404 '
+          '${notFound['error_code'] ?? notFound['error']}', () async {
+        final seed = noteFor('deck-404');
+        await PostGameNoteStore().addNote(seed);
+        final api = _ScriptedPostGameApiClient()
+          ..deleteResponse = ApiResponse(404, notFound)
+          ..getNotes = [seed];
+        final store = PostGameNoteStore(
+          remoteClient: ApiPostGameNoteRemoteClient(apiClient: api),
+        );
+
+        await store.deleteNote('deck-404', seed.id);
+        final reloaded = await store.loadNotes('deck-404');
+
+        expect(reloaded.map((note) => note.id), isNot(contains(seed.id)));
+        expect(await store.pendingOperationCount('deck-404'), 1);
+        expect(api.deleteCalls, 2);
+      });
+    }
+
+    for (final gone in [
+      ApiResponse(404, {
+        'error': 'Nota pos-jogo nao encontrada.',
+        'error_code': 'post_game_note_not_found',
+      }),
+      ApiResponse(404, {'error': 'Nota pos-jogo nao encontrada.'}),
+      ApiResponse(409, {
+        'error': 'post_game_conflict',
+        'error_code': 'post_game_note_deleted',
+      }),
+    ]) {
+      test('the tombstone ends when the server confirms the note is gone '
+          '(${gone.statusCode} ${(gone.data as Map)['error_code']})', () async {
+        final seed = noteFor('deck-gone');
+        await PostGameNoteStore().addNote(seed);
+        final api = _ScriptedPostGameApiClient()..deleteResponse = gone;
+        final store = PostGameNoteStore(
+          remoteClient: ApiPostGameNoteRemoteClient(apiClient: api),
+        );
+
+        await store.deleteNote('deck-gone', seed.id);
+
+        expect(await store.pendingOperationCount('deck-gone'), 0);
+      });
+    }
+
+    test('a queued note refused in the background is dropped and reported '
+        'once', () async {
+      final api = _ScriptedPostGameApiClient()..postThrows = true;
+      final store = PostGameNoteStore(
+        remoteClient: ApiPostGameNoteRemoteClient(apiClient: api),
+      );
+      final note = noteFor('deck-400');
+      await store.addNote(note);
+      expect(await store.pendingOperationCount('deck-400'), 1);
+
+      api
+        ..postThrows = false
+        ..postResponse = ApiResponse(400, {
+          'error': 'O pós-jogo contém carta fora da revisão atual do deck.',
+        });
+      final notes = await store.loadNotes('deck-400');
+
+      expect(notes, isEmpty);
+      expect(await store.pendingOperationCount('deck-400'), 0);
+      final rejections = await store.takeSyncRejections('deck-400');
+      expect(rejections.single.noteId, note.id);
+      expect(rejections.single.statusCode, 400);
+      expect(rejections.single.message, contains('carta fora da revisão'));
+      expect(await store.takeSyncRejections('deck-400'), isEmpty);
+    });
+  });
 }
 
 PostGamePreferencesLoader _yieldingLoader(SharedPreferences preferences) {
@@ -432,5 +590,39 @@ class _PostGameApiClient extends ApiClient {
       ],
       'sync_cursor': '2026-07-16T12:30:00Z',
     });
+  }
+}
+
+class _ScriptedPostGameApiClient extends ApiClient {
+  ApiResponse postResponse = ApiResponse(201, {'note': <String, dynamic>{}});
+  ApiResponse deleteResponse = ApiResponse(204, null);
+  bool postThrows = false;
+  List<PostGameNote> getNotes = const <PostGameNote>[];
+  int deleteCalls = 0;
+
+  @override
+  Future<ApiResponse> get(String endpoint) async {
+    return ApiResponse(200, {
+      'data': [for (final note in getNotes) note.toJson()],
+    });
+  }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    if (postThrows) throw StateError('offline');
+    return postResponse;
+  }
+
+  @override
+  Future<ApiResponse> delete(
+    String endpoint, {
+    Map<String, dynamic>? body,
+  }) async {
+    deleteCalls += 1;
+    return deleteResponse;
   }
 }

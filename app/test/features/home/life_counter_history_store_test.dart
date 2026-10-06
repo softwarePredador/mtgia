@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_history_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -55,7 +56,7 @@ void main() {
 
     test('returns null for invalid persisted payloads', () async {
       SharedPreferences.setMockInitialValues({
-        legacyLifeCounterHistoryPrefsKey:
+        '$lifeCounterSignedOutKeyPrefix$legacyLifeCounterHistoryPrefsKey':
             '{"bad":true,"current_game_entries":"oops"}',
       });
 
