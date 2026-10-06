@@ -348,7 +348,7 @@ Future<void> showDeckCardDetailsDialog({
   required BuildContext context,
   required DeckCardItem card,
   Future<void> Function()? onShowAiExplanation,
-  required Future<void> Function() onShowEditionPicker,
+  Future<void> Function()? onShowEditionPicker,
   required Future<void> Function() onOpenFullDetails,
 }) async {
   final shouldOpenFullDetails = await showDialog<bool>(
@@ -380,10 +380,15 @@ Future<void> showDeckCardDetailsDialog({
                   child: _DeckCardDetailsDialogBody(
                     card: card,
                     onShowAiExplanation: onShowAiExplanation,
-                    onShowEditionPicker: () async {
-                      Navigator.of(dialogContext, rootNavigator: true).pop();
-                      await onShowEditionPicker();
-                    },
+                    onShowEditionPicker: onShowEditionPicker == null
+                        ? null
+                        : () async {
+                            Navigator.of(
+                              dialogContext,
+                              rootNavigator: true,
+                            ).pop();
+                            await onShowEditionPicker();
+                          },
                   ),
                 ),
               ),
@@ -428,12 +433,15 @@ class _DeckCardDetailsDialogBody extends StatelessWidget {
   const _DeckCardDetailsDialogBody({
     required this.card,
     this.onShowAiExplanation,
-    required this.onShowEditionPicker,
+    this.onShowEditionPicker,
   });
 
   final DeckCardItem card;
   final Future<void> Function()? onShowAiExplanation;
-  final Future<void> Function() onShowEditionPicker;
+
+  /// Null while `deck_replace_all` is closed: changing only the edition goes
+  /// through `cards/replace`, which belongs to it (DCK-P0-00).
+  final Future<void> Function()? onShowEditionPicker;
 
   @override
   Widget build(BuildContext context) {
@@ -504,6 +512,7 @@ class _DeckCardDetailsImage extends StatelessWidget {
         variant: CardArtworkVariant.fullCard,
         imageUrl: card.printingImageUrl,
         fallbackImageUrl: card.fallbackImageUrl,
+        fallbackName: card.name,
         semanticLabel: card.hasPrintingArtwork
             ? 'Arte da impressão ${card.name}'
             : 'Arte de referência de ${card.name}',
@@ -520,12 +529,15 @@ class _DeckCardDetailsInfo extends StatelessWidget {
   const _DeckCardDetailsInfo({
     required this.card,
     this.onShowAiExplanation,
-    required this.onShowEditionPicker,
+    this.onShowEditionPicker,
   });
 
   final DeckCardItem card;
   final Future<void> Function()? onShowAiExplanation;
-  final Future<void> Function() onShowEditionPicker;
+
+  /// Null while `deck_replace_all` is closed: changing only the edition goes
+  /// through `cards/replace`, which belongs to it (DCK-P0-00).
+  final Future<void> Function()? onShowEditionPicker;
 
   @override
   Widget build(BuildContext context) {
@@ -570,7 +582,7 @@ class _DeckCardDetailsInfo extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            if (_hasEditionInfo(card))
+            if (onShowEditionPicker != null && _hasEditionInfo(card))
               ActionChip(
                 key: Key('deck-card-change-edition-${card.id}'),
                 avatar: const Icon(

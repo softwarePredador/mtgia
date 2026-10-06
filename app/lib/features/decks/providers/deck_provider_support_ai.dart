@@ -138,8 +138,7 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
       pollIntervalMs: pollInterval,
       pollTimeoutMs: pollTimeout,
       totalStages: totalStages,
-      requestKey:
-          idempotency['request_key']?.toString() ?? requestKey?.trim(),
+      requestKey: idempotency['request_key']?.toString() ?? requestKey?.trim(),
     );
   }
 
@@ -147,7 +146,7 @@ Future<OptimizeDeckRequestResult> requestOptimizeDeck(
     final data = asDynamicMap(response.data);
     final qualityError = asDynamicMap(data['quality_error']);
     final errorMsg =
-        data['error'] as String? ??
+        FriendlyErrorMapper.serverMessageFromBody(data) ??
         qualityError['message'] as String? ??
         'A otimização não atingiu a qualidade mínima.';
     final code = qualityError['code'] as String? ?? 'QUALITY_ERROR';
@@ -273,10 +272,9 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
       final hasQualityMessage =
           qualityError['message'] != null &&
           qualityError['message'].toString().trim().isNotEmpty;
-      final rawErrorMsg =
-          hasQualityMessage
-              ? qualityError['message'].toString()
-              : data['error']?.toString() ?? 'Otimização falhou no servidor.';
+      final rawErrorMsg = hasQualityMessage
+          ? qualityError['message'].toString()
+          : data['error']?.toString() ?? 'Otimização falhou no servidor.';
       final errorMsg = _friendlyOptimizeJobFailureMessage(
         rawErrorMsg,
         code: errorCode,
@@ -299,7 +297,9 @@ Future<OptimizeJobPollResult> pollOptimizeJobRequest(
     );
   }
 
-  if (response.statusCode == 404) {
+  if (response.statusCode == 404 &&
+      FriendlyErrorMapper.errorCodeFromBody(response.data) !=
+          'capability_unavailable') {
     throw Exception(
       'A otimização demorou mais que o esperado. Inicie uma nova tentativa.',
     );
@@ -332,10 +332,12 @@ Future<Map<String, dynamic>?> fetchLatestOptimizeJobRequest(
   required String deckId,
   bool activeOnly = true,
 }) async {
-  final query = Uri(queryParameters: {
-    'deck_id': deckId,
-    'active': activeOnly ? 'true' : 'false',
-  }).query;
+  final query = Uri(
+    queryParameters: {
+      'deck_id': deckId,
+      'active': activeOnly ? 'true' : 'false',
+    },
+  ).query;
   final response = await apiClient.get('/ai/optimize/jobs/latest?$query');
   if (response.statusCode == 404) return null;
   if (response.statusCode == 200) return asDynamicMap(response.data);

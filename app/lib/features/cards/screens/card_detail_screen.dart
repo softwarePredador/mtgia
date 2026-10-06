@@ -316,6 +316,7 @@ class CardDetailScreen extends StatelessWidget {
             ? CardArtwork(
                 variant: CardArtworkVariant.fullCard,
                 imageUrl: imageUrl,
+                fallbackName: card.name,
                 semanticLabel: 'Imagem completa da carta ${card.name}',
                 borderRadius: borderRadius,
               )
@@ -381,6 +382,7 @@ class CardDetailScreen extends StatelessWidget {
               child: CardArtwork(
                 variant: CardArtworkVariant.fullCard,
                 imageUrl: imageUrl,
+                fallbackName: card.name,
                 semanticLabel: 'Imagem ampliada da carta ${card.name}',
               ),
             ),

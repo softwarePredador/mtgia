@@ -305,6 +305,57 @@ void main() {
     }
 
     test(
+      'a refresh in flight keeps the loaded matrix for the route guard',
+      () async {
+        const allowed = {
+          ReleaseCapability.socialPush,
+          ReleaseCapability.decksPrivate,
+          ReleaseCapability.collectionPrivate,
+        };
+        final pending = Completer<ApiResponse>();
+        var requestCount = 0;
+        final provider = ReleaseCapabilitiesProvider(
+          fetcher: (_) {
+            requestCount++;
+            if (requestCount == 1) {
+              return Future.value(
+                ApiResponse(200, _validPayload(allowed: allowed)),
+              );
+            }
+            return pending.future;
+          },
+        );
+        addTearDown(provider.dispose);
+        expect(await provider.refresh(), isTrue);
+
+        final resumeRefresh = provider.refresh();
+        expect(provider.loadState, ReleaseCapabilitiesLoadState.loading);
+        for (final path in ['/notifications', '/decks', '/collection']) {
+          expect(
+            ReleaseCapabilityRouteGuard.redirectFor(
+              uri: Uri.parse(path),
+              capabilities: provider.snapshot,
+              buildSupport: const ReleaseRouteBuildSupport(),
+            ),
+            isNull,
+            reason: '$path must survive a refresh in flight',
+          );
+        }
+
+        pending.complete(ApiResponse(503, const {'error': 'unavailable'}));
+        expect(await resumeRefresh, isFalse);
+        expect(
+          ReleaseCapabilityRouteGuard.redirectFor(
+            uri: Uri.parse('/notifications'),
+            capabilities: provider.snapshot,
+            buildSupport: const ReleaseRouteBuildSupport(),
+          ),
+          '/home',
+        );
+      },
+    );
+
+    test(
       'an older concurrent response cannot replace the latest matrix',
       () async {
         final firstResponse = Completer<ApiResponse>();

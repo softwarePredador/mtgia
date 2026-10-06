@@ -385,7 +385,7 @@ void main() {
     expect(heroArt.variant, CardArtworkVariant.fullCard);
     expect(heroArt.imageUrl, contains('/normal/'));
     expect(heroArt.imageUrl, isNot(contains('art_crop')));
-    expect(heroArt.showStatusBadge, isFalse);
+    expect(heroArt.showStatusBadge, isTrue);
 
     final primaryLeft = tester
         .getTopLeft(find.byKey(const Key('deck-overview-primary-pane')))

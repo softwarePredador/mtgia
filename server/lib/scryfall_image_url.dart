@@ -84,6 +84,10 @@ String scryfallNamedImageFallback(String name, {String? setCode}) {
 
 /// Normalizes persisted image URLs while keeping old records readable.
 ///
+/// Only `https://cards.scryfall.io` and `https://api.scryfall.com` survive;
+/// a URL on any other host falls back to the proven printing CDN URL, or to
+/// `null`, so the client shows its labelled placeholder.
+///
 /// When both ids prove that [printingId] is not an oracle identity, legacy
 /// Scryfall image endpoints can be upgraded at read time to the direct CDN.
 /// Without that evidence the original lookup URL is retained.
@@ -123,8 +127,11 @@ String? normalizeScryfallImageUrl(
 
   final parsed = Uri.tryParse(normalized);
   final host = parsed?.host.toLowerCase();
+  // BT-ART-01: card art only ever comes from Scryfall over https. Any other
+  // host or scheme is refused here, where the art contract puts provenance.
+  if (parsed == null || parsed.scheme != 'https') return provenPrintingUrl;
   if (host == 'cards.scryfall.io') return normalized;
-  if (host != 'api.scryfall.com') return normalized;
+  if (host != 'api.scryfall.com') return provenPrintingUrl;
 
   try {
     final uri = Uri.parse(normalized);

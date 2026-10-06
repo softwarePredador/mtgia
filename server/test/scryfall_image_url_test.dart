@@ -112,5 +112,25 @@ void main() {
         'https://cards.scryfall.io/normal/front/0/0/$printingId.jpg',
       );
     });
+
+    test('refuses card art from any host other than Scryfall (BT-ART-01)', () {
+      for (final foreign in const [
+        'https://evil.example/card.jpg',
+        'https://cards.scryfall.io.example.test/normal/front/0/0/x.jpg',
+        'http://images.example.test/card.jpg',
+        'ftp://cards.scryfall.io/normal/front/0/0/x.jpg',
+      ]) {
+        expect(normalizeScryfallImageUrl(foreign), isNull, reason: foreign);
+        expect(
+          normalizeScryfallImageUrl(
+            foreign,
+            printingId: printingId,
+            oracleId: oracleId,
+          ),
+          'https://cards.scryfall.io/normal/front/0/0/$printingId.jpg',
+          reason: foreign,
+        );
+      }
+    });
   });
 }

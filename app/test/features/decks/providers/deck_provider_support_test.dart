@@ -11,15 +11,18 @@ class _FakeApiClient extends ApiClient {
     Map<String, ApiResponse Function(Map<String, dynamic>)>? postHandlers,
     Map<String, ApiResponse Function()>? getHandlers,
     Map<String, ApiResponse Function(Map<String, dynamic>)>? putHandlers,
+    Map<String, ApiResponse Function(Map<String, dynamic>)>? patchHandlers,
     Map<String, ApiResponse Function()>? deleteHandlers,
   }) : _postHandlers = postHandlers ?? const {},
        _getHandlers = getHandlers ?? const {},
        _putHandlers = putHandlers ?? const {},
+       _patchHandlers = patchHandlers ?? const {},
        _deleteHandlers = deleteHandlers ?? const {};
 
   final Map<String, ApiResponse Function(Map<String, dynamic>)> _postHandlers;
   final Map<String, ApiResponse Function()> _getHandlers;
   final Map<String, ApiResponse Function(Map<String, dynamic>)> _putHandlers;
+  final Map<String, ApiResponse Function(Map<String, dynamic>)> _patchHandlers;
   final Map<String, ApiResponse Function()> _deleteHandlers;
 
   @override
@@ -49,6 +52,15 @@ class _FakeApiClient extends ApiClient {
     final handler = _putHandlers[endpoint];
     if (handler == null) {
       throw UnimplementedError('No PUT handler for $endpoint');
+    }
+    return handler(body);
+  }
+
+  @override
+  Future<ApiResponse> patch(String endpoint, Map<String, dynamic> body) async {
+    final handler = _patchHandlers[endpoint];
+    if (handler == null) {
+      throw UnimplementedError('No PATCH handler for $endpoint');
     }
     return handler(body);
   }
@@ -2004,6 +2016,10 @@ void main() {
             expect(body['force'], isFalse);
             return ApiResponse(200, {'synergy_score': 77});
           },
+          '/decks/deck-1/cards/remove': (body) {
+            expect(body, {'card_id': 'card-2'});
+            return ApiResponse(200, const {});
+          },
           '/decks/deck-1/cards/replace': (body) {
             expect(body['old_card_id'], 'old');
             expect(body['new_card_id'], 'new');
@@ -2055,19 +2071,28 @@ void main() {
         },
         putHandlers: {
           '/decks/deck-1': (body) {
-            if (body.containsKey('is_public')) {
-              return ApiResponse(200, const {});
-            }
-            if (body.containsKey('cards')) {
-              return ApiResponse(200, const {});
-            }
-            if (body.containsKey('description')) {
-              return ApiResponse(200, const {});
-            }
-            if (body.containsKey('archetype')) {
+            if (body.keys.toSet().difference({
+              'cards',
+              'mutation_context',
+            }).isEmpty) {
               return ApiResponse(200, const {});
             }
             throw StateError('unexpected PUT body: $body');
+          },
+        },
+        patchHandlers: {
+          '/decks/deck-1': (body) {
+            const patchable = {
+              'name',
+              'description',
+              'archetype',
+              'bracket',
+              'is_public',
+            };
+            if (body.keys.every(patchable.contains)) {
+              return ApiResponse(200, const {});
+            }
+            throw StateError('unexpected PATCH body: $body');
           },
         },
         deleteHandlers: {'/decks/deck-1': () => ApiResponse(204, const {})},
@@ -2113,9 +2138,7 @@ void main() {
       final removeResult = await removeCardFromDeckRequest(
         apiClient,
         deckId: 'deck-1',
-        cardsPayload: const [
-          {'card_id': 'card-2', 'quantity': 1, 'is_commander': false},
-        ],
+        cardId: 'card-2',
       );
       final analysis = await refreshAiAnalysisRequest(
         apiClient,
@@ -2197,7 +2220,7 @@ void main() {
       expect(importResult['missing_commander'], isFalse);
       expect(validateImportResult['success'], isTrue);
       expect(importToDeckResult['success'], isTrue);
-      expect(toggled, isTrue);
+      expect(toggled.isSuccess, isTrue);
       expect(export['text'], '1 Sol Ring');
       expect(copied['success'], isTrue);
     },

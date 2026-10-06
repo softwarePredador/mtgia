@@ -5,17 +5,11 @@ import 'cached_card_image.dart';
 
 /// Named image treatments used by product surfaces.
 ///
-/// Call sites choose the visual job instead of hand-picking geometry. This
-/// keeps printed cards uncropped while allowing intentional art crops for
-/// atmospheric backgrounds and set thumbnails.
-enum CardArtworkVariant {
-  gallery,
-  spotlight,
-  recentDeck,
-  fullCard,
-  artCrop,
-  setArt,
-}
+/// Call sites choose the visual job instead of hand-picking geometry. Every
+/// variant shows the whole printed card at 63:88 with `contain`: the art
+/// contract forbids crop, cover and blur (BT-UX-IMG-001, D-37), so the old
+/// `artCrop` and `setArt` treatments no longer exist.
+enum CardArtworkVariant { gallery, spotlight, recentDeck, fullCard }
 
 /// Estado que a superfície pode afirmar sobre a arte exibida.
 ///
@@ -91,16 +85,6 @@ class CardArtworkSpec {
         fit: BoxFit.contain,
         borderRadius: AppTheme.radiusLg,
       ),
-      CardArtworkVariant.artCrop => const CardArtworkSpec(
-        aspectRatio: 16 / 9,
-        fit: BoxFit.cover,
-        borderRadius: AppTheme.radiusLg,
-      ),
-      CardArtworkVariant.setArt => const CardArtworkSpec(
-        aspectRatio: 3 / 2,
-        fit: BoxFit.cover,
-        borderRadius: AppTheme.radiusMd,
-      ),
     };
   }
 }
@@ -124,6 +108,7 @@ class CardArtwork extends StatefulWidget {
     this.imageIsReference = false,
     this.offline = false,
     this.showStatusBadge = true,
+    this.fallbackName,
   });
 
   final CardArtworkVariant variant;
@@ -142,6 +127,10 @@ class CardArtwork extends StatefulWidget {
   final bool imageIsReference;
   final bool offline;
   final bool showStatusBadge;
+
+  /// Card name drawn over the placeholder when there is no image to show
+  /// (missing, offline or failed), so the card is never anonymous.
+  final String? fallbackName;
 
   @override
   State<CardArtwork> createState() => _CardArtworkState();
@@ -274,6 +263,30 @@ class _CardArtworkState extends State<CardArtwork> {
                       errorPlaceholder: widget.errorPlaceholder,
                       onLoadStateChanged: _handleLoadState,
                     ),
+                    if (_fallbackNameVisible)
+                      Center(
+                        key: const Key('card-artwork-fallback-name'),
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppTheme.space6),
+                          child: Text(
+                            _nonEmpty(widget.fallbackName)!,
+                            textAlign: TextAlign.center,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: AppTheme.textPrimary,
+                              fontSize: AppTheme.fontXs,
+                              fontWeight: FontWeight.w600,
+                              shadows: [
+                                Shadow(
+                                  color: AppTheme.overlayBlack40,
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     if (badge != null)
                       Positioned(
                         left: AppTheme.space5,
@@ -295,6 +308,12 @@ class _CardArtworkState extends State<CardArtwork> {
     if (!widget.constrainAspectRatio) return artwork;
     return AspectRatio(aspectRatio: spec.aspectRatio, child: artwork);
   }
+
+  bool get _fallbackNameVisible =>
+      _nonEmpty(widget.fallbackName) != null &&
+      (_displayState == CardArtworkDisplayState.missing ||
+          _displayState == CardArtworkDisplayState.offline ||
+          _displayState == CardArtworkDisplayState.error);
 
   String get _semanticLabel {
     final base = widget.semanticLabel.trim();

@@ -3,6 +3,7 @@ import 'package:share_plus/share_plus.dart' show Share;
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
+import '../providers/deck_provider_support.dart' show DeckMutationResult;
 
 typedef DeckSnackBarPresenter =
     void Function({required String message, required Color backgroundColor});
@@ -17,7 +18,10 @@ typedef DeckExportTextLoader =
     Future<Map<String, dynamic>> Function(String deckId);
 
 typedef DeckVisibilityToggler =
-    Future<bool> Function(String deckId, {required bool isPublic});
+    Future<DeckMutationResult> Function(
+      String deckId, {
+      required bool isPublic,
+    });
 
 typedef DeckValidator = Future<Map<String, dynamic>> Function(String deckId);
 
@@ -51,16 +55,13 @@ Future<void> executeToggleDeckVisibility({
   required DeckSnackBarPresenter showSnackBar,
 }) async {
   final newState = !currentIsPublic;
-  final success = await togglePublic(deckId, isPublic: newState);
+  final result = await togglePublic(deckId, isPublic: newState);
 
   showSnackBar(
-    message:
-        success
-            ? (newState
-                ? 'Deck agora é público! 🌍'
-                : 'Deck agora é privado 🔒')
-            : 'Erro ao alterar visibilidade',
-    backgroundColor: success ? AppTheme.success : AppTheme.error,
+    message: result.isSuccess
+        ? (newState ? 'Deck agora é público! 🌍' : 'Deck agora é privado 🔒')
+        : (result.errorMessage ?? 'Erro ao alterar visibilidade'),
+    backgroundColor: result.isSuccess ? AppTheme.success : AppTheme.error,
   );
 }
 
@@ -207,8 +208,9 @@ Future<void> executeDeckDescriptionUpdate({
   if (!response) return;
 
   showSnackBar(
-    message:
-        description.isEmpty ? 'Descrição removida' : 'Descrição atualizada',
+    message: description.isEmpty
+        ? 'Descrição removida'
+        : 'Descrição atualizada',
     backgroundColor: AppTheme.success,
   );
 }

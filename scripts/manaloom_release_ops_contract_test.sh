@@ -360,7 +360,12 @@ grep -Fq '~*^/app/assets/assets/lotus/ "no-cache, must-revalidate"' "$NGINX"
 grep -Fq 'Content-Security-Policy' "$NGINX"
 grep -Fq "object-src 'none'" "$NGINX"
 grep -Fq "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://browser.sentry-cdn.com;" "$NGINX"
-grep -Fq 'Permissions-Policy "camera=(self), microphone=(), geolocation=()"' "$NGINX"
+# BT-SCN-00 (D-41): o artefato Web da beta não concede câmera.
+grep -Fq 'Permissions-Policy "camera=(), microphone=(), geolocation=()"' "$NGINX"
+if grep -Fq 'camera=(self)' "$NGINX"; then
+  echo "nginx do Flutter Web nao pode conceder camera na beta (BT-SCN-00)" >&2
+  exit 1
+fi
 grep -Fq -- '--no-web-resources-cdn' "$FLUTTER_WEB_DEPLOY"
 if [[ "$(grep -c 'add_header Cache-Control' "$NGINX")" != "1" ]]; then
   echo "nginx deve declarar Cache-Control uma unica vez no server" >&2

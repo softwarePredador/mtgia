@@ -9,6 +9,7 @@ import '../../core/branding/product_identity.dart';
 import '../../core/config/release_capabilities.dart';
 import '../../core/services/activation_funnel_service.dart';
 import '../../core/theme/app_theme.dart';
+import 'onboarding_goal_policy.dart';
 import 'services/onboarding_state_store.dart';
 
 class OnboardingCoreFlowScreen extends StatefulWidget {
@@ -242,7 +243,7 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
     final experience = _experience;
     if (goal == null || experience == null || _working) return;
     final capabilities = context.read<ReleaseCapabilitiesProvider>();
-    if (!_goalIsAllowed(goal, capabilities)) {
+    if (!onboardingGoalIsAllowed(goal, capabilities.snapshot)) {
       setState(() {
         _persistenceError =
             'Este caminho ainda não está disponível nesta versão da beta.';
@@ -375,34 +376,17 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
   String _eventKey(String suffix) =>
       'onboarding:v${OnboardingStateStore.currentVersion}:${widget.userId}:$suffix';
 
-  bool _goalIsAllowed(
-    OnboardingGoal goal,
-    ReleaseCapabilitiesProvider capabilities,
-  ) {
-    return switch (goal) {
-      OnboardingGoal.buildDeck || OnboardingGoal.importDeck =>
-        capabilities.isAllowed(ReleaseCapability.decksPrivate),
-      OnboardingGoal.catalogCollection =>
-        capabilities.isAllowed(ReleaseCapability.catalogPrivate) &&
-            capabilities.isAllowed(ReleaseCapability.collectionPrivate),
-      OnboardingGoal.play => capabilities.isAllowed(
-        ReleaseCapability.lifeCounterLocal,
-      ),
-      OnboardingGoal.improveDeck =>
-        capabilities.isAllowed(ReleaseCapability.decksPrivate) &&
-            capabilities.isAllowed(
-              ReleaseCapability.aiAnalyzeOptimizeAdvisory,
-            ) &&
-            capabilities.isAllowed(ReleaseCapability.aiGenerateRebuild),
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     final capabilities = context.watch<ReleaseCapabilitiesProvider>();
-    final availableGoals = _goalOrder
-        .where((goal) => _goalIsAllowed(goal, capabilities))
-        .toList(growable: false);
+    final availableGoals = availableOnboardingGoals(capabilities.snapshot);
+    final capabilitiesSettled = switch (capabilities.loadState) {
+      ReleaseCapabilitiesLoadState.ready ||
+      ReleaseCapabilitiesLoadState.unavailable => true,
+      ReleaseCapabilitiesLoadState.initial ||
+      ReleaseCapabilitiesLoadState.loading => false,
+    };
+    final noGoalOpen = availableGoals.isEmpty;
     final effectiveGoal = availableGoals.contains(_selectedGoal)
         ? _selectedGoal
         : null;
@@ -473,72 +457,78 @@ class _OnboardingCoreFlowScreenState extends State<OnboardingCoreFlowScreen> {
                             retry: _loading ? null : _loadState,
                           ),
                         ],
-                        const SizedBox(height: AppTheme.space16),
-                        _JourneyProgress(
-                          hasGoal: effectiveGoal != null,
-                          hasContext: _experience != null,
-                        ),
-                        const SizedBox(height: AppTheme.space14),
-                        if (wide)
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                width: 390,
-                                child: _GoalRail(
-                                  selectedGoal: effectiveGoal,
-                                  goals: availableGoals,
-                                  generateAllowed: generateAllowed,
-                                  enabled: !_loading && !_working,
-                                  onSelected: _selectGoal,
-                                ),
-                              ),
-                              const SizedBox(width: AppTheme.space18),
-                              Expanded(
-                                child: _JourneyComposer(
-                                  selectedGoal: effectiveGoal,
-                                  experience: _experience,
-                                  selectedFormat: _selectedFormat,
-                                  buildMode: effectiveBuildMode,
-                                  generateAllowed: generateAllowed,
-                                  enabled: !_loading && !_working,
-                                  canStart: canStart,
-                                  working: _working,
-                                  disableAnimations: disableAnimations,
-                                  onExperienceSelected: _selectExperience,
-                                  onFormatSelected: _selectFormat,
-                                  onBuildModeSelected: _selectBuildMode,
-                                  onStart: _startTask,
-                                ),
-                              ),
-                            ],
-                          )
-                        else ...[
-                          _GoalRail(
-                            selectedGoal: effectiveGoal,
-                            goals: availableGoals,
-                            generateAllowed: generateAllowed,
-                            enabled: !_loading && !_working,
-                            onSelected: _selectGoal,
+                        if (noGoalOpen) ...[
+                          const SizedBox(height: AppTheme.space16),
+                          _NoGoalNotice(waiting: !capabilitiesSettled),
+                        ] else ...[
+                          const SizedBox(height: AppTheme.space16),
+                          _JourneyProgress(
+                            hasGoal: effectiveGoal != null,
+                            hasContext: _experience != null,
                           ),
                           const SizedBox(height: AppTheme.space14),
-                          _JourneyComposer(
-                            selectedGoal: effectiveGoal,
-                            experience: _experience,
-                            selectedFormat: _selectedFormat,
-                            buildMode: effectiveBuildMode,
-                            generateAllowed: generateAllowed,
-                            enabled: !_loading && !_working,
-                            canStart: canStart,
-                            working: _working,
-                            disableAnimations: disableAnimations,
-                            onExperienceSelected: _selectExperience,
-                            onFormatSelected: _selectFormat,
-                            onBuildModeSelected: _selectBuildMode,
-                            onStart: _startTask,
-                          ),
+                          if (wide)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 390,
+                                  child: _GoalRail(
+                                    selectedGoal: effectiveGoal,
+                                    goals: availableGoals,
+                                    generateAllowed: generateAllowed,
+                                    enabled: !_loading && !_working,
+                                    onSelected: _selectGoal,
+                                  ),
+                                ),
+                                const SizedBox(width: AppTheme.space18),
+                                Expanded(
+                                  child: _JourneyComposer(
+                                    selectedGoal: effectiveGoal,
+                                    experience: _experience,
+                                    selectedFormat: _selectedFormat,
+                                    buildMode: effectiveBuildMode,
+                                    generateAllowed: generateAllowed,
+                                    enabled: !_loading && !_working,
+                                    canStart: canStart,
+                                    working: _working,
+                                    disableAnimations: disableAnimations,
+                                    onExperienceSelected: _selectExperience,
+                                    onFormatSelected: _selectFormat,
+                                    onBuildModeSelected: _selectBuildMode,
+                                    onStart: _startTask,
+                                  ),
+                                ),
+                              ],
+                            )
+                          else ...[
+                            _GoalRail(
+                              selectedGoal: effectiveGoal,
+                              goals: availableGoals,
+                              generateAllowed: generateAllowed,
+                              enabled: !_loading && !_working,
+                              onSelected: _selectGoal,
+                            ),
+                            const SizedBox(height: AppTheme.space14),
+                            _JourneyComposer(
+                              selectedGoal: effectiveGoal,
+                              experience: _experience,
+                              selectedFormat: _selectedFormat,
+                              buildMode: effectiveBuildMode,
+                              generateAllowed: generateAllowed,
+                              enabled: !_loading && !_working,
+                              canStart: canStart,
+                              working: _working,
+                              disableAnimations: disableAnimations,
+                              onExperienceSelected: _selectExperience,
+                              onFormatSelected: _selectFormat,
+                              onBuildModeSelected: _selectBuildMode,
+                              onStart: _startTask,
+                            ),
+                          ],
                         ],
-                        if (_disposition == OnboardingDisposition.pending) ...[
+                        if (_disposition == OnboardingDisposition.pending &&
+                            !(noGoalOpen && capabilitiesSettled)) ...[
                           const SizedBox(height: AppTheme.space10),
                           TextButton(
                             key: const Key('onboarding-skip-action'),
@@ -1412,13 +1402,76 @@ class _PersistenceNotice extends StatelessWidget {
   }
 }
 
-const _goalOrder = <OnboardingGoal>[
-  OnboardingGoal.buildDeck,
-  OnboardingGoal.importDeck,
-  OnboardingGoal.catalogCollection,
-  OnboardingGoal.play,
-  OnboardingGoal.improveDeck,
-];
+/// Shown instead of the goal list when the release policy opens no goal
+/// (BT-NAV-03), so the first authenticated screen always has a way out.
+class _NoGoalNotice extends StatelessWidget {
+  const _NoGoalNotice({required this.waiting});
+
+  /// True while `/capabilities` has not answered yet.
+  final bool waiting;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final title = waiting
+        ? 'Carregando os caminhos desta versão'
+        : 'Nenhum caminho aberto nesta fase da beta';
+    final message = waiting
+        ? 'Em instantes você vê o que já pode fazer por aqui.'
+        : 'Decks, coleção e mesa ainda estão fechados para a sua conta. '
+              'O início mostra o que já está disponível.';
+    return Semantics(
+      liveRegion: true,
+      container: true,
+      child: Container(
+        key: const Key('onboarding-no-goal-notice'),
+        padding: const EdgeInsets.all(AppTheme.space16),
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceSlate.withValues(alpha: 0.72),
+          borderRadius: BorderRadius.circular(AppTheme.radiusLg),
+          border: Border.all(color: AppTheme.outlineMuted),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              title,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: AppTheme.textPrimary,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: AppTheme.space6),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppTheme.textSecondary,
+                height: AppTheme.lineHeightCompact,
+              ),
+            ),
+            if (waiting) ...[
+              const SizedBox(height: AppTheme.space12),
+              const LinearProgressIndicator(
+                key: Key('onboarding-no-goal-progress'),
+              ),
+            ] else ...[
+              const SizedBox(height: AppTheme.space14),
+              FilledButton.icon(
+                key: const Key('onboarding-no-goal-home-action'),
+                onPressed: () => context.go('/home'),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(AppTheme.touchTargetMin),
+                ),
+                icon: const Icon(Icons.home_outlined),
+                label: const Text('Ir para o início'),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 ({
   String title,

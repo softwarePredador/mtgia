@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
+import 'package:manaloom/features/decks/providers/deck_provider_support.dart';
 import 'package:manaloom/features/decks/widgets/deck_details_actions.dart';
 
 void main() {
@@ -11,18 +12,42 @@ void main() {
     await executeToggleDeckVisibility(
       deckId: 'deck-1',
       currentIsPublic: false,
-      togglePublic: (_, {required isPublic}) async => isPublic,
-      showSnackBar: ({
-        required String message,
-        required Color backgroundColor,
-      }) {
-        snackMessage = message;
-        snackBackgroundColor = backgroundColor;
-      },
+      togglePublic: (_, {required isPublic}) async =>
+          DeckMutationResult(isSuccess: isPublic),
+      showSnackBar:
+          ({required String message, required Color backgroundColor}) {
+            snackMessage = message;
+            snackBackgroundColor = backgroundColor;
+          },
     );
     expect(snackMessage, 'Deck agora é público! 🌍');
     expect(snackBackgroundColor, AppTheme.success);
   });
+
+  test(
+    'executeToggleDeckVisibility shows the server refusal (DCK-P0-00)',
+    () async {
+      String? snackMessage;
+      Color? snackBackgroundColor;
+
+      await executeToggleDeckVisibility(
+        deckId: 'deck-1',
+        currentIsPublic: false,
+        togglePublic: (_, {required isPublic}) async => const DeckMutationResult(
+          isSuccess: false,
+          errorMessage:
+              'Um deck vazio não pode ser público. Adicione cartas antes de publicar.',
+        ),
+        showSnackBar:
+            ({required String message, required Color backgroundColor}) {
+              snackMessage = message;
+              snackBackgroundColor = backgroundColor;
+            },
+      );
+      expect(snackMessage, startsWith('Um deck vazio não pode ser público.'));
+      expect(snackBackgroundColor, AppTheme.error);
+    },
+  );
 
   test('executeCopyDeckText reports export failure', () async {
     String? snackMessage;
@@ -31,13 +56,11 @@ void main() {
     await executeCopyDeckText(
       deckId: 'deck-1',
       exportDeckAsText: (_) async => {'error': 'falhou'},
-      showSnackBar: ({
-        required String message,
-        required Color backgroundColor,
-      }) {
-        snackMessage = message;
-        snackBackgroundColor = backgroundColor;
-      },
+      showSnackBar:
+          ({required String message, required Color backgroundColor}) {
+            snackMessage = message;
+            snackBackgroundColor = backgroundColor;
+          },
       copyText: (_) async {},
     );
 
@@ -62,10 +85,7 @@ void main() {
         capturedResult = result;
         capturedInvalidNames = invalidNames;
       },
-      showSnackBar: ({
-        required message,
-        required backgroundColor,
-      }) {
+      showSnackBar: ({required message, required backgroundColor}) {
         snackMessage = message;
       },
       showErrorDialog: ({required title, required message}) async {},
@@ -78,27 +98,31 @@ void main() {
     expect(snackMessage, '✅ Deck válido!');
   });
 
-  test('executeSilentDeckValidation converts exception into error result', () async {
-    Map<String, dynamic>? capturedResult;
-    Set<String>? capturedInvalidNames;
-    final loadingStates = <bool>[];
+  test(
+    'executeSilentDeckValidation converts exception into error result',
+    () async {
+      Map<String, dynamic>? capturedResult;
+      Set<String>? capturedInvalidNames;
+      final loadingStates = <bool>[];
 
-    await executeSilentDeckValidation(
-      deckId: 'deck-1',
-      validateDeck: (_) async => throw Exception('erro local'),
-      extractInvalidCardNames: (result) =>
-          {(result['error'] ?? '').toString()},
-      onLoadingChanged: loadingStates.add,
-      onValidationResult: (result, invalidNames) {
-        capturedResult = result;
-        capturedInvalidNames = invalidNames;
-      },
-    );
+      await executeSilentDeckValidation(
+        deckId: 'deck-1',
+        validateDeck: (_) async => throw Exception('erro local'),
+        extractInvalidCardNames: (result) => {
+          (result['error'] ?? '').toString(),
+        },
+        onLoadingChanged: loadingStates.add,
+        onValidationResult: (result, invalidNames) {
+          capturedResult = result;
+          capturedInvalidNames = invalidNames;
+        },
+      );
 
-    expect(loadingStates, [true, false]);
-    expect(capturedResult?['ok'], false);
-    expect(capturedInvalidNames, {'erro local'});
-  });
+      expect(loadingStates, [true, false]);
+      expect(capturedResult?['ok'], false);
+      expect(capturedInvalidNames, {'erro local'});
+    },
+  );
 
   test('executeDeckPricingLoad reports loaded pricing', () async {
     Map<String, dynamic>? pricing;
@@ -125,8 +149,8 @@ void main() {
     await executeDeckDescriptionUpdate(
       deckId: 'deck-1',
       description: 'Nova descrição',
-      updateDeckDescription:
-          ({required deckId, required description}) async => true,
+      updateDeckDescription: ({required deckId, required description}) async =>
+          true,
       showSnackBar: ({required message, required backgroundColor}) {
         snackMessage = message;
       },

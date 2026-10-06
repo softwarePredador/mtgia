@@ -1254,12 +1254,13 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
                         variant: CardArtworkVariant.gallery,
                         imageUrl: card.printingImageUrl,
                         fallbackImageUrl: card.fallbackImageUrl,
+                        fallbackName: card.name,
                         semanticLabel: card.hasPrintingArtwork
                             ? 'Arte da impressão ${card.name}'
                             : 'Arte de referência de ${card.name}',
                         imageIsReference: !card.hasPrintingArtwork,
                         width: AppTheme.touchTargetMin,
-                        height: 62,
+                        height: 67,
                         constrainAspectRatio: false,
                       ),
                     ),
@@ -1690,7 +1691,10 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       onShowAiExplanation: _canUseAnalyzeOptimize
           ? () => _showAiExplanation(context, card)
           : null,
-      onShowEditionPicker: () => _showEditionPicker(context, card),
+      onShowEditionPicker:
+          _isReleaseCapabilityAllowed(ReleaseCapability.deckReplaceAll)
+          ? () => _showEditionPicker(context, card)
+          : null,
       onOpenFullDetails: () => openCardDetailRoute(context, card),
     );
   }
@@ -1791,7 +1795,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
     await showDeckEditionPicker(
       context: context,
       card: card,
-      loadPrintings: context.read<CardProvider>().resolveAndFetchPrintings,
+      loadPrintings: context.read<CardProvider>().fetchPrintingsByName,
       onReplaceEdition: (newCardId) =>
           _replaceEdition(oldCardId: card.id, newCardId: newCardId),
     );
@@ -1847,7 +1851,7 @@ class _DeckDetailsScreenState extends State<DeckDetailsScreen>
       context: context,
       card: card,
       deckFormat: deckFormat,
-      loadPrintings: context.read<CardProvider>().resolveAndFetchPrintings,
+      loadPrintings: context.read<CardProvider>().fetchPrintingsByName,
       onSave:
           ({
             required selectedCardId,
