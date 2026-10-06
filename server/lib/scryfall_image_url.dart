@@ -1,3 +1,5 @@
+import 'e2e_validation_policy.dart';
+
 final RegExp _scryfallPrintingIdPattern = RegExp(
   r'^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$',
   caseSensitive: false,
@@ -88,6 +90,10 @@ String scryfallNamedImageFallback(String name, {String? setCode}) {
 /// a URL on any other host falls back to the proven printing CDN URL, or to
 /// `null`, so the client shows its labelled placeholder.
 ///
+/// The one exception is the isolated E2E runtime
+/// ([isManaloomE2eIsolatedRuntime]): there a loopback URL served by the
+/// disposable fixture is kept, so visual QA never reaches the public CDN.
+///
 /// When both ids prove that [printingId] is not an oracle identity, legacy
 /// Scryfall image endpoints can be upgraded at read time to the direct CDN.
 /// Without that evidence the original lookup URL is retained.
@@ -95,6 +101,7 @@ String? normalizeScryfallImageUrl(
   String? url, {
   String? printingId,
   String? oracleId,
+  Map<String, String>? environment,
 }) {
   final provenPrintingUrl = _provenPrintingCdnUrl(
     printingId: printingId,
@@ -127,6 +134,12 @@ String? normalizeScryfallImageUrl(
 
   final parsed = Uri.tryParse(normalized);
   final host = parsed?.host.toLowerCase();
+  if (parsed != null &&
+      (parsed.scheme == 'http' || parsed.scheme == 'https') &&
+      _loopbackHosts.contains(host) &&
+      isManaloomE2eIsolatedRuntime(environment: environment)) {
+    return normalized;
+  }
   // BT-ART-01: card art only ever comes from Scryfall over https. Any other
   // host or scheme is refused here, where the art contract puts provenance.
   if (parsed == null || parsed.scheme != 'https') return provenPrintingUrl;
@@ -163,6 +176,8 @@ String? normalizeScryfallImageUrl(
     );
   }
 }
+
+const _loopbackHosts = {'127.0.0.1', 'localhost', '::1', '[::1]'};
 
 bool _isDirectNormalImageForPrinting(String? value, String printingId) {
   if (value == null || value.isEmpty) return false;

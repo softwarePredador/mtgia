@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "8b11c563fc6e23ff9dde199331185c212d5d31ab718e3ecd7d43d39ca2478ebb",
+  "source_digest_sha256": "edcb6fe9cdf83da4e0ca1fc1422af36117c439bcd54a35a85f7459295524c03e",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -69,9 +69,9 @@
     "dart_symbols": 5571,
     "semantic_resolved_files": 748,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 44720,
-    "semantic_resolved_call_sites": 70757,
-    "semantic_resolved_type_references": 17484,
+    "semantic_resolved_call_edges": 44722,
+    "semantic_resolved_call_sites": 70759,
+    "semantic_resolved_type_references": 17485,
     "modules": 164,
     "app_routes": 46,
     "web_routes": 11,
@@ -39950,43 +39950,43 @@
       "name": "_isDirectNormalImageForPrinting",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 167
+      "line": 182
     },
     {
       "name": "_provenPrintingCdnUrl",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 180
+      "line": 195
     },
     {
       "name": "normalizeScryfallImageUrl",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 85
+      "line": 87
     },
     {
       "name": "scryfallNamedImageFallback",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 64
+      "line": 66
     },
     {
       "name": "scryfallNormalCdnUrlForPrinting",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 22
+      "line": 24
     },
     {
       "name": "scryfallNormalImageUrlFromPayload",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 36
+      "line": 38
     },
     {
       "name": "scryfallPrintingIdFromPayload",
       "kind": "function",
       "source": "server/lib/scryfall_image_url.dart",
-      "line": 6
+      "line": 8
     },
     {
       "name": "_dateOnly",
@@ -44084,9 +44084,9 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 44720,
-    "resolved_call_site_count": 70757,
-    "workspace_call_edge_count": 14277,
+    "resolved_call_edge_count": 44722,
+    "resolved_call_site_count": 70759,
+    "workspace_call_edge_count": 14278,
     "unresolved_call_edge_count": 543,
     "unresolved_call_site_count": 762,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -178150,7 +178150,29 @@
       },
       {
         "source": "server/lib/scryfall_image_url.dart",
-        "line": 193,
+        "line": 106,
+        "caller": "normalizeScryfallImageUrl",
+        "kind": "method",
+        "lexical_target": "_provenPrintingCdnUrl",
+        "target": "_provenPrintingCdnUrl",
+        "target_library": "package:server/scryfall_image_url.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/scryfall_image_url.dart",
+        "line": 140,
+        "caller": "normalizeScryfallImageUrl",
+        "kind": "method",
+        "lexical_target": "isManaloomE2eIsolatedRuntime",
+        "target": "isManaloomE2eIsolatedRuntime",
+        "target_library": "package:server/e2e_validation_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/scryfall_image_url.dart",
+        "line": 208,
         "caller": "_provenPrintingCdnUrl",
         "kind": "method",
         "lexical_target": "scryfallNormalCdnUrlForPrinting",
@@ -178161,7 +178183,7 @@
       },
       {
         "source": "server/lib/scryfall_image_url.dart",
-        "line": 43,
+        "line": 45,
         "caller": "scryfallNormalImageUrlFromPayload",
         "kind": "method",
         "lexical_target": "scryfallPrintingIdFromPayload",
@@ -178172,7 +178194,7 @@
       },
       {
         "source": "server/lib/scryfall_image_url.dart",
-        "line": 56,
+        "line": 58,
         "caller": "scryfallNormalImageUrlFromPayload",
         "kind": "method",
         "lexical_target": "_isDirectNormalImageForPrinting",
@@ -178183,22 +178205,11 @@
       },
       {
         "source": "server/lib/scryfall_image_url.dart",
-        "line": 61,
+        "line": 63,
         "caller": "scryfallNormalImageUrlFromPayload",
         "kind": "method",
         "lexical_target": "scryfallNormalCdnUrlForPrinting",
         "target": "scryfallNormalCdnUrlForPrinting",
-        "target_library": "package:server/scryfall_image_url.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/scryfall_image_url.dart",
-        "line": 99,
-        "caller": "normalizeScryfallImageUrl",
-        "kind": "method",
-        "lexical_target": "_provenPrintingCdnUrl",
-        "target": "_provenPrintingCdnUrl",
         "target_library": "package:server/scryfall_image_url.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -201167,8 +201178,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14529,
-        "occurrences": 24939
+        "unique_references": 14530,
+        "occurrences": 24940
       },
       {
         "target_scope": "dart_sdk",
@@ -205403,8 +205414,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/e2e_validation_policy.dart",
-        "unique_references": 11,
-        "occurrences": 11
+        "unique_references": 12,
+        "occurrences": 12
       },
       {
         "target_scope": "workspace",
@@ -211001,7 +211012,7 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 17484,
+    "resolved_type_reference_count": 17485,
     "workspace_type_reference_count": 3758,
     "unresolved_type_reference_count": 383,
     "resolved_type_references_scope": "workspace_targets_only",
@@ -248615,8 +248626,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6649,
-        "occurrences": 41217
+        "unique_references": 6650,
+        "occurrences": 41220
       },
       {
         "target_scope": "dart_sdk",
@@ -302971,7 +302982,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "8b11c563fc6e23ff9dde199331185c212d5d31ab718e3ecd7d43d39ca2478ebb"
+    "project_logic_source_digest_sha256": "edcb6fe9cdf83da4e0ca1fc1422af36117c439bcd54a35a85f7459295524c03e"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

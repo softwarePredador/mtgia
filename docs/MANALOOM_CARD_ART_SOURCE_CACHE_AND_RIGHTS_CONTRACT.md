@@ -44,6 +44,13 @@ diferente até nova revisão.
   qualquer outro host ou esquema: devolve a URL CDN provada da impressão ou
   `null`, e o app mostra o placeholder rotulado
   (`server/test/scryfall_image_url_test.dart`).
+- Exceção só de teste (2026-10-06): no runtime E2E isolado
+  (`MANALOOM_E2E_ISOLATED_RUNTIME=1` com `MANALOOM_E2E_VALIDATION_RUN_TOKEN`
+  válido, ver `server/lib/e2e_validation_policy.dart`), uma URL `http(s)` em
+  `127.0.0.1`, `localhost` ou `::1` é mantida. A fixture descartável serve a
+  arte sintética em loopback, e sem isso o servidor derivava do `scryfall_id`
+  sintético uma URL do CDN público (404 e egress fora de loopback na captura
+  P0 Android). Fora desse runtime, nenhum host permitido mudou.
 - Normalização de transporte no widget não concede proveniência nem licença.
 - O app não consulta Scryfall para substituir silenciosamente uma impressão.
   `/cards/named` é somente fallback de referência e recebe estado visual
