@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T22:40:37.133574Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-05T17:36:44.847195Z",
+  "source_digest": "4fc91724eb8a8f8a64e53725dd245086c3689c06ec2e0ecd63c0fe6ece6637af",
   "surface": "social_trade",
   "profile": "web_social_trade_wide_1920x1080",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "0e323920843a75ad09a78e09cfdb808442490a427ca7d2f0d5629a488a0b5f0a",
+  "log_sha256": "b6159b97400c7d2a39443b35073166882a0316c3316c5b2c3a7887f2f13b495e",
   "checkpoint_count": 16,
   "required_checkpoints": [
     "social_trade_00_matches_populated",
@@ -36,128 +36,128 @@
     {
       "checkpoint": "social_trade_00_matches_populated",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_00_matches_populated.png",
-      "sha256": "cd7cf8c470dc7a99fbe3ef346422a9bd58faa66a41b9980b579c2199a0d1144c",
-      "bytes": 72594,
+      "sha256": "17787b70015f2e3d4dd95ed5b93404ff80e39c27eff983c0f66ff49863454bf8",
+      "bytes": 73255,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_01_marketplace_populated",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_01_marketplace_populated.png",
-      "sha256": "2cc4615468701948aea8e4aa78238bb66be92a1f57a6c7f32094d6280f7373b8",
-      "bytes": 65879,
+      "sha256": "518ccb2a931841ff50bb8f6ada035d6400e06da3ae26820eb07f9238df556d2c",
+      "bytes": 65960,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_02_marketplace_empty",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_02_marketplace_empty.png",
-      "sha256": "d34fda75bbb99b1a20619cfa9d3f1f3df49694101a82164a048f2e96a9dc5b6e",
-      "bytes": 65577,
+      "sha256": "65d1215955c8dab3ea01f9d530469ee559e9180d6fa04dedd840fe94886095cb",
+      "bytes": 65381,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_03_trade_create_rehydrated",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_03_trade_create_rehydrated.png",
-      "sha256": "9f50c3424f4489f5365c9ebaf9e8ce5ff4a721a6fbe6285403a0a75b81605140",
-      "bytes": 91276,
+      "sha256": "ba84d22dfe765501eba3498bac0f57e6cec97b04ae94f54ee7f8161428bceb92",
+      "bytes": 91274,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_04_trade_create_review",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_04_trade_create_review.png",
-      "sha256": "11717af544eda5d12a467498e0c9203c60222ce4521b39767174ed450fd59469",
-      "bytes": 125262,
+      "sha256": "4ab5a801eef69c6e8d990349fdbf6e0700a84f3e3f738b2215f2463b27c539ad",
+      "bytes": 125595,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_05_trade_create_unavailable",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_05_trade_create_unavailable.png",
-      "sha256": "34d40bbd57b7ce4b4c5717a34c692c02765537b59d75b465ec9740e86935ce92",
-      "bytes": 81961,
+      "sha256": "547d40f327cc2c247a7d063f1e53a91a5e6ff1722a50373a081059b5c670cb94",
+      "bytes": 82207,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_06_trade_pending_actions",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_06_trade_pending_actions.png",
-      "sha256": "0430f0b6dc6b136307b876c4f13a4990642002011a995f093f5a95e9254ab52f",
-      "bytes": 123131,
+      "sha256": "fe6b3720b3736cfffbed8e0dfeb572b21517ef0c546211908f46c04b54f8bacc",
+      "bytes": 122399,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_07_trade_counter_draft",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_07_trade_counter_draft.png",
-      "sha256": "3731a7d127cba2e14118dae42b7885c51d09b9d5ccf980796dcab7eade4eb393",
-      "bytes": 104395,
+      "sha256": "6953f6fcc11dd68ff31bc00a6aff88610e39a2ae5d81610887c86df4d90f032c",
+      "bytes": 105051,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_08_trade_declined",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_08_trade_declined.png",
-      "sha256": "a69573840b55ad25fd38b0b21744fab9fdcaa2d3511b7585ebf7bd19609413ed",
-      "bytes": 125298,
+      "sha256": "f1fb31a22f564028e4350b9b58cf67d281d19a8054f3cfe57aa556f79a7096a4",
+      "bytes": 125580,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_09_trade_error",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_09_trade_error.png",
-      "sha256": "191ea4eaeffe3610d70913b43f2cdc52e0235d46c93fbbab81ac77247e95af62",
-      "bytes": 60172,
+      "sha256": "c3a782e46eb933763b44cd274b52b41404a66945f62b9772f294da3b92b2e0e6",
+      "bytes": 60515,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_10_trade_completed",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_10_trade_completed.png",
-      "sha256": "a2bfdc9c83bb13b97067580d115b7602486bf90bc7a24da7e65e3962ad43bfd2",
-      "bytes": 120865,
+      "sha256": "bd10d4d6c16ce28284a03f2818493b05694df38798c0be21398a2f6e3e87174e",
+      "bytes": 121123,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_11_trade_inbox_empty",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_11_trade_inbox_empty.png",
-      "sha256": "105e137b49daba54a30ad305ac582014ab8ee71b15b6b0ff7a5bdb8ae7082f97",
-      "bytes": 63762,
+      "sha256": "69c2da053549404b4c785c73cf674130f7feae14f0d8f963c1116e9c9055b31b",
+      "bytes": 64098,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_12_messages_empty",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_12_messages_empty.png",
-      "sha256": "fa07228bb6b4a8c61baab5fa1f946dfd8c1bfead847d6d98b8e2d451f07c2b7b",
-      "bytes": 60675,
+      "sha256": "26027a54be8a947b3846875b08d6fd520e861d9e1699499d28d4e0c745c81dd8",
+      "bytes": 60972,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_13_users_empty_results",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_13_users_empty_results.png",
-      "sha256": "f6b713804660cda8ef6d2175301079a2f1fb129e01bec61ab248908c6b28029f",
-      "bytes": 56916,
+      "sha256": "cdde21bfffa5e81deccef819097818a480682d0ed217de0b1129808fa7c7e23d",
+      "bytes": 57318,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_14_community_context_comment",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_14_community_context_comment.png",
-      "sha256": "26ecb661aefed8aa8214dd14acb3f6e2f1744fc1516b8ac11b876cb556886fa3",
-      "bytes": 101045,
+      "sha256": "4e56adca2f28792fed6ab11726f9a6efb2cc8d6fe945684223d963a50ee915f1",
+      "bytes": 101834,
       "width": 1920,
       "height": 1080
     },
     {
       "checkpoint": "social_trade_15_matches_empty",
       "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/social_trade_15_matches_empty.png",
-      "sha256": "f0babd1839418a27b12b7e4310959a2d844f5521d8046e2719870ff7e7fcd776",
-      "bytes": 62425,
+      "sha256": "0e7931a1725df100cb6a7eabadc49b72f22c72559647340ff98b9da8a535801a",
+      "bytes": 62727,
       "width": 1920,
       "height": 1080
     }

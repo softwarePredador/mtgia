@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T22:46:15.152997Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-05T17:39:40.493363Z",
+  "source_digest": "4fc91724eb8a8f8a64e53725dd245086c3689c06ec2e0ecd63c0fe6ece6637af",
   "surface": "visual_system_workspace",
   "profile": "web_visual_system_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "a9ae96a6f117e96b0c1b66de0b018f1b497d5873e310f5f7d55ede7bb9bc6c2c",
+  "log_sha256": "1c4d69b3983b3c014c0ef656fe96e09726af34426d44bc8ae3118d334a138c4f",
   "checkpoint_count": 10,
   "required_checkpoints": [
     "visual_system_00_profile_clean",
@@ -30,80 +30,80 @@
     {
       "checkpoint": "visual_system_00_profile_clean",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_00_profile_clean.png",
-      "sha256": "4c11503f566ab60b05dd8a26a49ce5e47d518212a162bb605b50e6716fa38e8a",
-      "bytes": 80043,
+      "sha256": "f977044fb2c45d8c8dedce7c46805c0eaa1f055e12e65e3467c5673e01cfd653",
+      "bytes": 75614,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_01_profile_dirty",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_01_profile_dirty.png",
-      "sha256": "ebd6bcc32b9c0bf94ff87b28a5c0ec761e433fcc4f26573beba3e56b50c852e8",
-      "bytes": 55928,
+      "sha256": "7952ebd3b7d152b49aa14c3f14af54f15c625787b5bddf040c343a4406f945de",
+      "bytes": 55973,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_02_profile_saving",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_02_profile_saving.png",
-      "sha256": "0c23ffb292439dff0535c7e5e1697268b56f4501d6a78b29996cd6237a540c38",
-      "bytes": 55255,
+      "sha256": "7cd59b087c441960b4bdebb4bb09556ff570c43721ecd084ef291f3a89ac6c78",
+      "bytes": 55183,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_03_profile_error",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_03_profile_error.png",
-      "sha256": "2fe15c96310b9816fc27d164239c9da17ac78412bdfe71dad15a8b4c90fb2d4c",
-      "bytes": 58623,
+      "sha256": "c3a3ea48378e3e01560ead2dd19d6074b3d1cd8dcd5ca9ba430c596591765617",
+      "bytes": 58848,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_04_profile_saved",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_04_profile_saved.png",
-      "sha256": "5307b51ed1657740aab43992f4bf3fe26194daed74c7938b65af7fb7f92e9366",
-      "bytes": 55696,
+      "sha256": "d430df56bc45e71ea04c99d4b35abb74341d8f89eea11306c879a039f20fe62e",
+      "bytes": 55744,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_05_public_profile",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_05_public_profile.png",
-      "sha256": "9182da50fe8a704425034a0999465814a4b045b9976422b307a48535db0bacb8",
-      "bytes": 83845,
+      "sha256": "c980290226bf9c2b92f91c5a0b199cac6e7852ddeb6513aa1908267ad157c312",
+      "bytes": 68556,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_06_decks_first_use",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_06_decks_first_use.png",
-      "sha256": "10cd2dcb198abd3908c3b3b83981e5341b91307da79492ade0f1f2741f049580",
-      "bytes": 49101,
+      "sha256": "fce7142c6483ef9fc3b69e7f9f575b25f33baf53eaa0c66d76a79b29ddab406b",
+      "bytes": 49042,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_07_no_results",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_07_no_results.png",
-      "sha256": "40df3af9b4c62e8b8430633604265bcd3f0090a81c474c0875fce163915f2883",
-      "bytes": 34146,
+      "sha256": "0e849226ea84fca4c8e9df527eee3405a8d7373a8690de7d13719c4a9e6523d2",
+      "bytes": 34133,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_08_offline",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_08_offline.png",
-      "sha256": "b20cf8c3909fd31f5ba89ddf7d38f1943137e411943114f046f81e4fed804917",
-      "bytes": 35005,
+      "sha256": "854f7ad1730467aafa499010dee1f27ad56fceb11b4e2961b1d1411b235301df",
+      "bytes": 35075,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "visual_system_09_unavailable",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/visual_system_09_unavailable.png",
-      "sha256": "83317adb9c5aef73b2c649ff704003f05fb8a6bef22e0ba5e3926fa01701459a",
-      "bytes": 35414,
+      "sha256": "8578086ae4345211aaf85eba3c2f1e24878d6d0834007f4d0f0d71b3616c0c34",
+      "bytes": 35465,
       "width": 390,
       "height": 844
     }
