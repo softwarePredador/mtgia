@@ -39,6 +39,12 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   (`BT-CI-001`). As três frentes terminaram no mesmo dia e foram integradas em `c0f907108`, que
   subiu às 14:49 UTC.
 
+Desde 2026-10-05 (D-87, em `docs/status/DECISOES_PENDENTES_2026-09-22.md`), o trabalho do MVP
+corre em quatro frentes paralelas, cada uma com várias tarefas abertas e PR em rascunho na
+`master`: gate e evidência, servidor e release, app e contador de vida. O escopo fica fechado nas
+P0 CORE e P0 LIFE. O slot `NOW` abaixo continua no formato que o gerador valida e marca a frente
+de servidor; as frentes de app e de contador de vida só fazem merge depois do `BT-UIEV-001`.
+
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
 backlog mestre e o registry gerado.
 
