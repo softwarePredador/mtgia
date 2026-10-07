@@ -18,7 +18,9 @@ import 'package:manaloom/core/widgets/app_tile_overlay.dart';
 /// docs/design/ui-kit/specimen-390.png and specimen-1440.png, so a visual
 /// regression of the kit is caught by image and not only by regex.
 ///
-/// Regenerate with:
+/// Regenerate on the Mac that runs the pre-push gate, never in a Linux
+/// container: Linux rasterizes the same fonts differently (4-6% of pixels
+/// here), so a Linux baseline fails the gate. Run:
 /// `flutter test --update-goldens test/core/widgets/bt_kit_specimen_test.dart`
 Future<void> _loadFonts() async {
   await Future.wait([
