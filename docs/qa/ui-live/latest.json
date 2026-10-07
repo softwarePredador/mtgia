@@ -1,10 +1,10 @@
 {
   "schema_version": "manaloom_ui_live_review_v1",
   "status": "PASS",
-  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "automated": {
     "status": "PASS_AUTOMATED",
-    "verified_at": "2026-08-26T11:46:54Z",
+    "verified_at": "2026-10-07T11:59:42Z",
     "commands": [
       "Flutter analyze and 180 focused Flutter tests for capability, deck, battle and UI contracts",
       "31 focused server tests for interactive battle and release contracts",
@@ -25,112 +25,113 @@
     "capture_manifests": [
       {
         "path": "docs/qa/ui-live/current/p0-matrix/android_emulator_manaloom_api34.json",
-        "sha256": "838b233cf9eae6261c1168c03d5429fdb3728bb99a88d2c8d27b426751887f14"
+        "sha256": "a7995c4c0fb5554015eb364ca049b9d7401a7e0e3df5135d750e9e3cd67a8239"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_mobile_390x844.json",
-        "sha256": "80821f6f3c9ade2f28643f91fea9d41a80bfe1f076ded422c1dac2f8907042e8"
+        "sha256": "9f22dc9c0f741ee15b209c062bffc88ec573495e3b6de85de2acf4a26c527913"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_desktop_1440x900.json",
-        "sha256": "057d7a0c0e83a7ba7683d4fb2af9416758e5f9b7035252147ec25d7b190bec6d"
+        "sha256": "7ff2e7b8811cd25c2944b590208291112a08a1eb298210637b38fbe53944dcd2"
       },
       {
         "path": "docs/qa/ui-live/current/p0-matrix/web_wide_1920x1080.json",
-        "sha256": "cb9734d2f097342f1f6e5e1c22ec151b3d1cfd01f54a0b8e6d1c95c478a29a44"
+        "sha256": "681061b08a2cbfa01288bae1868cac618c571c4e294cb85872d35d3700e7442a"
       },
       {
         "path": "docs/qa/ui-live/current/play-vs-ai-web-real/capture-manifest.json",
-        "sha256": "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d"
+        "sha256": "d228aa004e4a8a9e1d25ff179040420dae644d55e194f03f4a067d5262fef669"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-mobile/capture-manifest.json",
-        "sha256": "03c62c9c1dc8dfe96ce308c9e6d2821643255d3bb735d87e04166e6bd0ed426f"
+        "sha256": "8ac3f14dc4a9b1ce1d04616741ffa35a4f635539fb94f8b09d753ce8d82ade38"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/capture-manifest.json",
-        "sha256": "4c212262ec20ded0eea26b0b69f83c52ec1bd184d5f1b547bd5134b6da9bca65"
+        "sha256": "a61043089d44c31e25129896254ccc3f99b32205700344e2231a82c93bf228e5"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-wide/capture-manifest.json",
-        "sha256": "b82ee7961d9bee44d992ff8435881d03106ae3419165e3bbbf8e41976eb79af0"
+        "sha256": "0dc6dc19f20830bfba24cfc8ad2dec3f128b04bbe4e2438384459857de944986"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/capture-manifest.json",
-        "sha256": "c7d71b75557e3769234abbd06c055bb7b8622be1ce92a53904d852e63fbc7285"
+        "sha256": "c2c2fbe602b6b7c533cf0690389adf3d183ea67a0941d011d05fdb2d78fceae7"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/capture-manifest.json",
-        "sha256": "ec9cb61ce57e40b2b308da1975c2313da197f2b8bfba4a6423f0e01877c40d63"
+        "sha256": "ccda16884069838fb1a418e79da2361b043e1d307f09c5dab1f57468096de831"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-wide/capture-manifest.json",
-        "sha256": "e05b82203f43142f25a80456acca2611aeb4bcde94271cd469135c0e1f40374a"
+        "sha256": "1735dddf0a87aef42b54bf00c1b2373595b41964bb3691d8b0b9e7e7d3faa0b9"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-mobile/capture-manifest.json",
-        "sha256": "c40fe82c8727c366447c84590deb390cecd220ffb7607604bd389a6e675a865a"
+        "sha256": "d28b582ba2fc10a2ed3c51afef395a4d1980ec77c866c931d145417af67351ee"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-desktop/capture-manifest.json",
-        "sha256": "3752e27a9c848c618a0b5ff2d25c41a16e348a4a02b5962bacd7c884d0ccecb9"
+        "sha256": "3011881ea78df4327892f3ad30342730bbb322e6ac60d21434b2016769ac8ab2"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-05-social-trade-web-wide/capture-manifest.json",
-        "sha256": "bcbbb447cbc4c11c3fddc185c597aee45c2b72b4b71034b7aee4c42adcba3092"
+        "sha256": "f38d0d39c73560a74d824abe037378cf6972954bfbefcd8fa6f075aef9eb1c18"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-mobile/capture-manifest.json",
-        "sha256": "aaf07bd78ee59d90f9f64e6ab68e5a324e720a9d7a3cfad0026aa50e2e55d5d1"
+        "sha256": "1f0732045ad6edc6b117ef3096d57ca286a1059b430321ecb1ab68195eab50ce"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-desktop/capture-manifest.json",
-        "sha256": "e9a3a37b398967b7b83c9fea1056cd531378a5694a235b7d95e565bf00698ae6"
+        "sha256": "ce0418ce1c91d348cbb0049917ec6b48c38fd78a3d8d4a2247541adc295fad53"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-06-onboarding-intent-web-wide/capture-manifest.json",
-        "sha256": "2552b3b932221734de486868f866517548b55119104207cc1c05f43c1849a0dd"
+        "sha256": "69bb2e5830787f377a009136e0c56933782e4718ed1d1527ea3c1dfc87b7eaf3"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-mobile/capture-manifest.json",
-        "sha256": "032e74b5808439e01a6ae4496a9ac60980598eea246c78f8c60557c6d398a411"
+        "sha256": "128587b2457fa3c861b722f70d0def370409e8aa2da945ed29836f9a18d7b120"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/capture-manifest.json",
-        "sha256": "f884914a474ac2b200a28457582280249610e1604b5a98671814023cb9613b26"
+        "sha256": "b07ebfb93c7d9802dc80adef585341c15574d45ea040e5a86027a9bb76806b0d"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-wide/capture-manifest.json",
-        "sha256": "ec162afdfc9a6816f81b74c0245cee62e25250541653d9ec8ee62203577fa7b8"
+        "sha256": "3f7df85269eee4685f0ef223b36fb0b4ae89ad2b786d7a7b6e7b6a3ba0b315f1"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-mobile/capture-manifest.json",
-        "sha256": "67a5b5707acc86055c6f90686300d1954ae4a54da8f3bd9a581eb0d0fc66407d"
+        "sha256": "f433eb8228675e9b881e26292c1ef453a0953db5ba4a15108cc3e79e0013d056"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-desktop/capture-manifest.json",
-        "sha256": "1214eebdd64dec70b362f5ecbf371a7da1cd37908cfba4b29becd504b374bbe7"
+        "sha256": "b41e59faae1787d8f25366292af9ffc497cdbd2673a498b442bc4e40e48ab2e7"
       },
       {
         "path": "docs/qa/ui-live/current/ux-pack-08-critical-overlays-web-wide/capture-manifest.json",
-        "sha256": "66e277de703363b8c8965f3c67e6a77dea1876ce3879bbdcae56bcdac0af9798"
+        "sha256": "94c6f015fa0cf7d32cadc326c52dc21b00688322280740ace059a4ba9280bf37"
       }
     ],
     "evidence_notes": [
-      "Os quatro perfis P0, Jogar contra IA Web real e os seis pacotes focais públicos foram recapturados integralmente no mesmo digest, sem crédito para Battle Live ou Battle Learning internos e antigos.",
+      "Os 23 manifests foram recapturados no digest a6b70b7b numa rodada única no Mac: quatro perfis P0, Jogar contra IA Web real e os seis pacotes focais em três perfis Web.",
       "Os 23 manifests referenciam 439 capturas PASS_RUNTIME: 385 Web e 54 Android emulator; bytes, PNGs, dimensões e SHA-256 foram reconciliados pelo verificador.",
-      "As 430 capturas fora de Jogar contra IA foram abertas em 44 pranchas de contato, e as nove capturas do jogo real foram abertas individualmente.",
-      "Jogar contra IA atravessou Flutter Web release, proxy same-origin, API loopback, PostgreSQL descartável e XMage pinado; sessão, ação, dano, reconexão, concessão, replay e rematch foram observados sem mutação de produção.",
-      "A matriz Android corrente foi atestada em emulator; ela recebe crédito de runtime Android, mas não de hardware físico, TalkBack humano ou desempenho do fabricante.",
-      "Fixtures de QA ficaram limitadas a PostgreSQL loopback ou gateways em memória, foram encerradas e não escreveram em PostgreSQL live, Hermes ou SQLite."
+      "As 430 capturas fora de Jogar contra IA foram abertas em pranchas de contato; as nove do jogo real foram abertas individualmente.",
+      "As capturas Web usaram Chrome for Testing 153 headless restrito a loopback e fonts.gstatic.com; a P0 Android não fez nenhuma requisição a cards.scryfall.io depois do #26.",
+      "Jogar contra IA atravessou Flutter Web release, proxy same-origin, API loopback, PostgreSQL descartável e XMage pinado; mulligan, terreno, comandante, dano, reconexão, concessão, replay e rematch foram observados sem mutação de produção.",
+      "A matriz Android foi atestada em emulator (sdk_gphone64_arm64, Android 14); recebe crédito de runtime Android, não de hardware físico, TalkBack humano ou desempenho do fabricante.",
+      "Fixtures ficaram limitadas a PostgreSQL loopback descartável e foram encerradas com cleanup pass; nada escreveu em PostgreSQL live, Hermes ou SQLite."
     ]
   },
   "visual_review": {
     "status": "PASS_VISUAL_REVIEWED",
-    "reviewed_at": "2026-08-26T11:46:54Z",
+    "reviewed_at": "2026-10-07T11:59:42Z",
     "reviewer": {
       "kind": "agent",
-      "name": "Codex"
+      "name": "Claude Code (Anthropic)"
     },
     "visual_thesis": "BrewTact apresenta uma mesa tática contemporânea: Abyss organiza o fundo, Frost sustenta leitura, Brass indica prioridade e arte de carta ou ilustração própria ancora as jornadas em Magic sem copiar trade dress proprietário.",
     "content_plan": "Cada superfície prioriza identidade e contexto, depois estado, evidência, próxima ação e recuperação; Jogar contra IA é card-first e mostra ao jogador mão, campo, vida, pilha, opções legais e resultado.",
@@ -158,7 +159,7 @@
       },
       "responsive_fit": {
         "status": "pass",
-        "note": "Foram revisadas 54 capturas Android emulator, 160 Web P0, nove Jogar contra IA Web real e 216 capturas focais; não houve overflow bloqueante ou perda permanente de navegação."
+        "note": "Foram revisadas 54 capturas Android emulator, 385 Web entre P0, Jogar contra IA e pacotes focais; não houve overflow bloqueante ou perda permanente de navegação."
       },
       "interaction_clarity": {
         "status": "pass",
@@ -178,29 +179,29 @@
       }
     },
     "reviewed_capture_manifest_sha256": [
-      "838b233cf9eae6261c1168c03d5429fdb3728bb99a88d2c8d27b426751887f14",
-      "80821f6f3c9ade2f28643f91fea9d41a80bfe1f076ded422c1dac2f8907042e8",
-      "057d7a0c0e83a7ba7683d4fb2af9416758e5f9b7035252147ec25d7b190bec6d",
-      "cb9734d2f097342f1f6e5e1c22ec151b3d1cfd01f54a0b8e6d1c95c478a29a44",
-      "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d",
-      "03c62c9c1dc8dfe96ce308c9e6d2821643255d3bb735d87e04166e6bd0ed426f",
-      "4c212262ec20ded0eea26b0b69f83c52ec1bd184d5f1b547bd5134b6da9bca65",
-      "b82ee7961d9bee44d992ff8435881d03106ae3419165e3bbbf8e41976eb79af0",
-      "c7d71b75557e3769234abbd06c055bb7b8622be1ce92a53904d852e63fbc7285",
-      "ec9cb61ce57e40b2b308da1975c2313da197f2b8bfba4a6423f0e01877c40d63",
-      "e05b82203f43142f25a80456acca2611aeb4bcde94271cd469135c0e1f40374a",
-      "c40fe82c8727c366447c84590deb390cecd220ffb7607604bd389a6e675a865a",
-      "3752e27a9c848c618a0b5ff2d25c41a16e348a4a02b5962bacd7c884d0ccecb9",
-      "bcbbb447cbc4c11c3fddc185c597aee45c2b72b4b71034b7aee4c42adcba3092",
-      "aaf07bd78ee59d90f9f64e6ab68e5a324e720a9d7a3cfad0026aa50e2e55d5d1",
-      "e9a3a37b398967b7b83c9fea1056cd531378a5694a235b7d95e565bf00698ae6",
-      "2552b3b932221734de486868f866517548b55119104207cc1c05f43c1849a0dd",
-      "032e74b5808439e01a6ae4496a9ac60980598eea246c78f8c60557c6d398a411",
-      "f884914a474ac2b200a28457582280249610e1604b5a98671814023cb9613b26",
-      "ec162afdfc9a6816f81b74c0245cee62e25250541653d9ec8ee62203577fa7b8",
-      "67a5b5707acc86055c6f90686300d1954ae4a54da8f3bd9a581eb0d0fc66407d",
-      "1214eebdd64dec70b362f5ecbf371a7da1cd37908cfba4b29becd504b374bbe7",
-      "66e277de703363b8c8965f3c67e6a77dea1876ce3879bbdcae56bcdac0af9798"
+      "a7995c4c0fb5554015eb364ca049b9d7401a7e0e3df5135d750e9e3cd67a8239",
+      "9f22dc9c0f741ee15b209c062bffc88ec573495e3b6de85de2acf4a26c527913",
+      "7ff2e7b8811cd25c2944b590208291112a08a1eb298210637b38fbe53944dcd2",
+      "681061b08a2cbfa01288bae1868cac618c571c4e294cb85872d35d3700e7442a",
+      "d228aa004e4a8a9e1d25ff179040420dae644d55e194f03f4a067d5262fef669",
+      "8ac3f14dc4a9b1ce1d04616741ffa35a4f635539fb94f8b09d753ce8d82ade38",
+      "a61043089d44c31e25129896254ccc3f99b32205700344e2231a82c93bf228e5",
+      "0dc6dc19f20830bfba24cfc8ad2dec3f128b04bbe4e2438384459857de944986",
+      "c2c2fbe602b6b7c533cf0690389adf3d183ea67a0941d011d05fdb2d78fceae7",
+      "ccda16884069838fb1a418e79da2361b043e1d307f09c5dab1f57468096de831",
+      "1735dddf0a87aef42b54bf00c1b2373595b41964bb3691d8b0b9e7e7d3faa0b9",
+      "d28b582ba2fc10a2ed3c51afef395a4d1980ec77c866c931d145417af67351ee",
+      "3011881ea78df4327892f3ad30342730bbb322e6ac60d21434b2016769ac8ab2",
+      "f38d0d39c73560a74d824abe037378cf6972954bfbefcd8fa6f075aef9eb1c18",
+      "1f0732045ad6edc6b117ef3096d57ca286a1059b430321ecb1ab68195eab50ce",
+      "ce0418ce1c91d348cbb0049917ec6b48c38fd78a3d8d4a2247541adc295fad53",
+      "69bb2e5830787f377a009136e0c56933782e4718ed1d1527ea3c1dfc87b7eaf3",
+      "128587b2457fa3c861b722f70d0def370409e8aa2da945ed29836f9a18d7b120",
+      "b07ebfb93c7d9802dc80adef585341c15574d45ea040e5a86027a9bb76806b0d",
+      "3f7df85269eee4685f0ef223b36fb0b4ae89ad2b786d7a7b6e7b6a3ba0b315f1",
+      "f433eb8228675e9b881e26292c1ef453a0953db5ba4a15108cc3e79e0013d056",
+      "b41e59faae1787d8f25366292af9ffc497cdbd2673a498b442bc4e40e48ab2e7",
+      "94c6f015fa0cf7d32cadc326c52dc21b00688322280740ace059a4ba9280bf37"
     ],
     "reviewed_profiles": [
       "android_emulator_manaloom_api34",
@@ -230,6 +231,8 @@
     "reviewed_screenshot_count": 439,
     "blocking_findings": [],
     "follow_up_findings": [
+      "P2 — o replay de uma partida concedida aparece como 'Partida cancelada · sem resultado'.",
+      "P1 — Jogar contra IA: duas sessões terminaram em 'Motor indisponível' (IllegalArgumentException) ao passar prioridade no turno 4 pré-combate; a exceção não aparece nos logs do XMage nem da API.",
       "P1 — a tela de replay ainda expõe os nomes internos legados Battle Lab e interactive_coach; alinhar a cópia pública a Jogar contra IA sem confundir replay pós-partida com modo espectador.",
       "P1 — telas desktop/wide com um único resultado, estado vazio ou conteúdo administrativo subutilizam o canvas e parecem uma composição mobile ampliada.",
       "P1 — Detalhes do Deck corta Visão Geral para Visão Ge em mobile/Android; preservar acesso e corrigir compactação ou affordance das abas.",

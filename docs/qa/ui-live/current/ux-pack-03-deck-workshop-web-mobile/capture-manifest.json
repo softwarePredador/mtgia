@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-10-05T17:23:54.213953Z",
-  "source_digest": "4fc91724eb8a8f8a64e53725dd245086c3689c06ec2e0ecd63c0fe6ece6637af",
+  "generated_at": "2026-10-06T13:57:31.356594Z",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "deck_workshop",
   "profile": "web_deck_workshop_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "65e4b80fe566318d10afec07add96d39e5ebb6cfec980c06d1050dbb16b1fa93",
+  "log_sha256": "467c385a7ab09857dba9f822b0f1c5f65677b7de29e20243e41c0a03d0d01e8f",
   "checkpoint_count": 12,
   "required_checkpoints": [
     "deck_workshop_00_commander",
@@ -32,96 +32,96 @@
     {
       "checkpoint": "deck_workshop_00_commander",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_00_commander.png",
-      "sha256": "7c0cd2b5a14e1433bf8ae9d7e4e98db88253962a762897bf3b167000bd6c6b7c",
-      "bytes": 68564,
+      "sha256": "127cf00acfecbca288189853ebbfd8d90f6c30eb606d1694fae2acef449f9ac5",
+      "bytes": 75884,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_01_import_preflight",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_01_import_preflight.png",
-      "sha256": "44e7f773d6560c6c19ff3977401e75e3ccc474372ce97abc28a4511863d8bfa7",
-      "bytes": 89626,
+      "sha256": "27df025b0691b428a5eafc1af1cf2b7ca6a46004e7a2dc57ddde02c1b5d66448",
+      "bytes": 88340,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_02_sources",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_02_sources.png",
-      "sha256": "be02bf22e73d7310ad0026597c214210b2a3f87ed04ec47a4e766814920bec08",
-      "bytes": 57947,
+      "sha256": "4a8660426fb5343d824bec9448f1697c4fbc18c946faa74798d6d1a8ee0ea5ca",
+      "bytes": 60072,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_03_paired_swaps",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_03_paired_swaps.png",
-      "sha256": "990061ed19f66f57c290571c426edeff29cbc8dcb8f80bb9c865103a0414dbcf",
-      "bytes": 46888,
+      "sha256": "5351081139259e0150cbda5f1b7f8c5521fe605a4c5188b96eb6819bbc8e5ffc",
+      "bytes": 49949,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_04_partial_selection",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_04_partial_selection.png",
-      "sha256": "1481f3c88b877fbb738c08d56736ede3b594b28d4a8da3731650144cad48c3a1",
-      "bytes": 51796,
+      "sha256": "15a6d0cbeb9508700bff76fe4f01498154e793a9fb5ed24813835f5e0f8bde7c",
+      "bytes": 53228,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_05_card_reader",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_05_card_reader.png",
-      "sha256": "c03a71e3b6b19e95dedd945d7dfaa5200a841995ae7b8d15ac8450c6da415368",
-      "bytes": 289365,
+      "sha256": "7d05aa9a96d29eaa996810fa9956c3c78df2a3193258bf121a30255c88e5f74d",
+      "bytes": 286478,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_06_history_undo",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_06_history_undo.png",
-      "sha256": "8916199b00300c126a6b012af89e2b59c9c29fd8cc2ad36ad3442eaf592475d4",
-      "bytes": 61822,
+      "sha256": "91b0eda4471f8c026de19ce89899c6ea9c28d0288f74c8bfd5b6413cfbdbb535",
+      "bytes": 64884,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_07_conflict",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_07_conflict.png",
-      "sha256": "a68c4025c15e4349dde992513f30c864dcea7090163bac898d26839f4ee50304",
-      "bytes": 65391,
+      "sha256": "5390501588bcdaf613967391a1a0f72444685098bb566c051dd7a0e57dcf7f24",
+      "bytes": 67197,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_08_sample_hand_continuity",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_08_sample_hand_continuity.png",
-      "sha256": "265f5cdc7698ce8f0e4eea3066ac9d8ba424f599309689c47e7fc070e58611b2",
-      "bytes": 60988,
+      "sha256": "4a3cb66db91174042e59a014c56ab4f3b4967fd0d5467782e869656bd6314a02",
+      "bytes": 60859,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_09_replace_all_off_empty",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_09_replace_all_off_empty.png",
-      "sha256": "3ba7329b5b9fb8ff03522d8c421311c09501e2115edd306c46db1627ca5c9174",
-      "bytes": 43027,
+      "sha256": "036cac6666dde5fc3394d059b20db3bc3e02467b6154f05d3c6add662f1583f1",
+      "bytes": 43006,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_10_replace_all_off_menu",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_10_replace_all_off_menu.png",
-      "sha256": "211291528d58ff984929e867eef564295da0f85c0c03275f82bd0bb80e7b470b",
-      "bytes": 47045,
+      "sha256": "8930ad06a0d5951aa72500d3d48e182dbac1147b5c0920642a88e6dbef4810a6",
+      "bytes": 47025,
       "width": 390,
       "height": 844
     },
     {
       "checkpoint": "deck_workshop_11_learning_reads_off",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_11_learning_reads_off.png",
-      "sha256": "09d18461129ccc907c47a911cfde2338906bebd06949a8c2c5713c65ca96e41f",
-      "bytes": 58053,
+      "sha256": "98abdfa7a32e49c2d69ef2cb5e742429e081b062586c57b3e8743245dcd71c5e",
+      "bytes": 60096,
       "width": 390,
       "height": 844
     }

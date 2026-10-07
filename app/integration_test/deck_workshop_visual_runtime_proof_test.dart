@@ -546,12 +546,14 @@ void main() {
       );
       await pumpUntilFound(tester, selectedCommander);
       await _reveal(tester, selectedCommander);
+      // The image-led card contract (BT-UX-IMG-001) also prints the name in
+      // the artwork fallback, so the title is not the only match.
       expect(
         find.descendant(
           of: selectedCommander,
           matching: find.text('Lorehold, the Historian'),
         ),
-        findsOneWidget,
+        findsAtLeastNWidgets(1),
       );
       final parentSubmit = find.byKey(
         const Key('deck-generate-submit-cta-frame'),

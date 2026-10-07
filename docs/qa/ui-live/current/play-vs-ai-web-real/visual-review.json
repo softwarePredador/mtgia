@@ -2,60 +2,60 @@
   "schema_version": "manaloom_ui_surface_visual_review_v1",
   "status": "PASS_VISUAL_REVIEWED",
   "scope": "focal_play_vs_ai_real_xmage",
-  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "play_vs_ai",
   "profile": "web_play_vs_ai_1440x900",
-  "reviewed_at": "2026-08-26T11:36:32Z",
+  "reviewed_at": "2026-10-06T15:25:10Z",
   "reviewer": {
     "kind": "agent",
-    "name": "Codex primary agent"
+    "name": "Claude Code (Anthropic)"
   },
-  "visual_thesis": "A mesa mantém cartas, zonas, vida e ações legais como foco principal, deixando claro que o usuário joga diretamente contra a IA.",
-  "content_plan": "Os nove checkpoints cobrem escolha do adversário, mão privada, progressão de turno, dano, reconexão, terminal, replay e rematch.",
-  "interaction_thesis": "A bandeja contextual apresenta somente decisões legais do XMage e mantém a continuidade da mesma sessão após recarregar a página.",
+  "visual_thesis": "A mesa mantém mão, campo, pilha, vida e ações legais como foco, deixando claro que o jogador controla seu lado contra a IA do XMage.",
+  "content_plan": "Os nove checkpoints cobrem escolha do adversário, mão privada com mulligan, terreno, comandante na pilha, dano de combate, reconexão, concessão, replay e rematch.",
+  "interaction_thesis": "O painel lateral oferece só decisões legais do motor, com prazo visível, e a mesma sessão volta intacta depois de recarregar a página.",
   "criteria": {
     "visual_hierarchy": {
       "status": "pass",
-      "note": "Mesa e bandeja de decisões dominam a composição, enquanto navegação e status permanecem claramente secundários."
+      "note": "Placar do adversário, pilha e seu lado ficam empilhados; o painel de decisão à direita concentra a próxima ação."
     },
     "brand_and_mtg_identity": {
       "status": "pass",
-      "note": "A paleta escura, cartas reais, zonas e acentos dourados preservam a identidade BrewTact e a linguagem visual de MTG."
+      "note": "Zonas de Magic (campo, mão, pilha, comando, cemitério) e linguagem de prioridade e combate são explícitas."
     },
     "color_and_contrast": {
       "status": "pass",
-      "note": "Textos, estados de prioridade, vida e botões mantêm contraste suficiente em todos os nove estados revisados."
+      "note": "Brass marca prioridade e CTA, vermelho só em vida e concessão; texto Frost sobre Obsidian segue legível."
     },
     "typography": {
       "status": "pass",
-      "note": "Títulos serifados e textos funcionais sans-serif formam uma hierarquia consistente e legível no perfil 1440 por 900."
+      "note": "Serifada nos títulos e sans-serif na operação; nomes longos de deck truncam sem quebrar o layout em 1440x900."
     },
     "spacing_and_density": {
       "status": "pass",
-      "note": "A densidade elevada da mesa permanece organizada por zonas, com espaçamento previsível entre cartas, painéis e ações."
+      "note": "Cartas da mão em fileira com respiro; a lista de ações rola sem cobrir a mesa; há área vazia abaixo do campo em 1440."
     },
     "responsive_fit": {
       "status": "pass",
-      "note": "Nenhum controle necessário ficou cortado no viewport governado de 1440 por 900 durante a jornada completa."
+      "note": "Todas as nove capturas cabem em 1440x900 sem overflow; o painel de ações rola quando há muitas opções de terreno."
     },
     "interaction_clarity": {
       "status": "pass",
-      "note": "Mulligan, terreno, mana, conjuração, combate, concessão, replay e rematch têm ações explícitas e estados reconhecíveis."
+      "note": "Cada prompt diz o que decidir (mulligan, mana, alvo, prioridade) e mostra o cronômetro de 60 segundos."
     },
     "state_coverage": {
       "status": "pass",
-      "note": "Os checkpoints mostram entrada, mão privada, ações de jogo, dano real, reconexão, terminal, replay e reinício da jornada."
+      "note": "Cobertos seleção, mulligan, terreno, conjuração, dano, reconexão, concessão, replay e rematch na mesma corrida."
     },
     "accessibility_visual": {
       "status": "pass",
-      "note": "Ícones são acompanhados por texto, foco visual e estados não dependem apenas de cor; crédito humano de teclado e TalkBack não é reivindicado."
+      "note": "Botões têm rótulos semânticos e foco visível; estados usam ícone e texto além de cor."
     },
     "attractiveness": {
       "status": "pass",
-      "note": "A apresentação é coesa e temática, com cartas reconhecíveis, mesa limpa e feedback visual suficiente para sustentar a partida."
+      "note": "A mesa é funcional e coerente com o tema, mas as cartas aparecem como placeholder de nome sem arte no ambiente isolado."
     }
   },
-  "reviewed_capture_manifest_sha256": "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d",
+  "reviewed_capture_manifest_sha256": "d228aa004e4a8a9e1d25ff179040420dae644d55e194f03f4a067d5262fef669",
   "reviewed_screenshot_count": 9,
   "reviewed_checkpoints": [
     "01-opponent-picker",
@@ -69,15 +69,15 @@
     "09-rematch-picker"
   ],
   "reviewed_screenshot_sha256": [
-    "18f8f293bba4fdcf4b9926e0d65bbd5501fa7b745f37e6b2f4cb6c9b828f16db",
-    "bc3f0074509aa19fae6ce5b9d491489c37987e003200fffafd142f20ad0455b3",
-    "6b0a20d98bc1efdd952196c2cf2989aa321486dc974af85f0665d6c03254b45d",
-    "2b798e1a052f0b0e2b0050ede6c4995f2da00a3e83cb0378dfb7f743db8612a7",
-    "c932a1f5300fbb2303957c012def0e8d27aa9bf3093b16800d36ad77e0589aab",
-    "6590a5ee3c701eb4706c1070d01f9f0bd38f274c72445a8731e5cc411dec16f6",
-    "f8993443fef321bd487f155d1c947320db1bc96a8175a15ff413d26f1b2dc42e",
-    "3b20c151a9b47ba8488c84693860cbedd22173d9109380b1225eb1ded892bc06",
-    "6479a5b2cea509aa02e8699921769c4f0aebac0bc24cc6cb5fac9247f11fe889"
+    "edb4ee46086ca2dbe2cc8395fa16d3cd521ab598110848556c50052618615d69",
+    "977fabfc75ab172132fbb711b247220a8b36ced5f7db1cd212c069adb55e8b98",
+    "e7c5c1e79e87f56413c44792078d6cfeb2a736041b2839fd10cb04beb18fba77",
+    "03de98de874520135530c83ced594993635da9c5372311b7a942e84d409c1167",
+    "c69b62d1c26afc5e26f68ac588ead6eb9e5344978c9e4642ad6eeb939ac3ffc6",
+    "09d99ca4fdc46a16e5e158528cb08b8ffb318ce4624fa8427833b7237a50c223",
+    "0b3938066cf655a4bee33e3d85ceb419058f43ffc09e89cf72f646d8b6f380d6",
+    "5e9a0a224bc75472dc6fcc433a3d8f7d7e1789ebeb3d8f2e88e65300a5e8d236",
+    "146e285de29162d27215cc9741317fe9fc8ddd5301289fbf2eb65a0f0bdaf6df"
   ],
   "blocking_findings": [],
   "release_scope": {
