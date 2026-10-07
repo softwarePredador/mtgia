@@ -6,6 +6,8 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
+import os
+import subprocess
 import tempfile
 import unittest
 from datetime import datetime, timedelta, timezone
@@ -409,6 +411,119 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
             validator.ReceiptValidationError, "source state changed"
         ):
             validator.verify_source_stable(dirty, changed, require_clean=False)
+
+
+    # BT-GATE-002, linhas 2, 5, 9 e 11 da medição de 2026-09-22: comportamentos
+    # que só tinham teste de texto ou que o teste antigo não alcançava.
+
+    def test_capture_reads_a_real_git_checkout(self) -> None:
+        repo = self.root / "checkout"
+        (repo / "server" / "bin").mkdir(parents=True)
+        (repo / "project_logic_manifest.json").write_text(
+            json.dumps({"source_digest_sha256": "1" * 64}) + "\n", encoding="utf-8"
+        )
+        (repo / "server" / "bin" / "migrate.dart").write_text(
+            "final m = [Migration(version: '057'), Migration(version: '058')];\n",
+            encoding="utf-8",
+        )
+        policy = repo / "policy.json"
+        policy.write_text(
+            json.dumps({"source": {"guarded_local_artifacts": ["guarded.db"]}}),
+            encoding="utf-8",
+        )
+
+        def git(*args: str) -> str:
+            return subprocess.run(
+                ["git", "-C", str(repo), *args],
+                check=True,
+                text=True,
+                capture_output=True,
+            ).stdout.strip()
+
+        git("init", "-q")
+        git("config", "user.name", "ManaLoom Test")
+        git("config", "user.email", "manaloom-test@example.invalid")
+        git("add", "--all")
+        git("commit", "-q", "--no-gpg-sign", "-m", "base")
+
+        clean = validator.capture_source_state(repo, policy)
+        self.assertEqual(clean["git_sha"], git("rev-parse", "HEAD"))
+        self.assertRegex(clean["git_sha"], r"^[0-9a-f]{40}$")
+        self.assertFalse(clean["git_dirty"])
+        self.assertEqual(clean["latest_migration"], "058")
+        self.assertEqual(clean["guarded_local_artifacts"], {"guarded.db": {"state": "missing"}})
+
+        (repo / "untracked.txt").write_text("x\n", encoding="utf-8")
+        untracked = validator.capture_source_state(repo, policy)
+        self.assertTrue(untracked["git_dirty"])
+        self.assertNotEqual(untracked["worktree_digest_sha256"], clean["worktree_digest_sha256"])
+        os.symlink("untracked.txt", repo / "link")
+        linked = validator.capture_source_state(repo, policy)
+        self.assertNotEqual(linked["worktree_digest_sha256"], untracked["worktree_digest_sha256"])
+        (repo / "guarded.db").write_bytes(b"sqlite")
+        guarded = validator.capture_source_state(repo, policy)
+        self.assertEqual(guarded["guarded_local_artifacts"]["guarded.db"]["state"], "present")
+
+    def test_same_size_artifact_tamper_is_caught_by_hash(self) -> None:
+        first = self.payload["artifacts"][0]
+        path = self.evidence_root / first["path"]
+        original = path.read_bytes()
+        path.write_bytes(original[:-2] + (b"Y" if original[-2:-1] != b"Y" else b"Z") + b"\n")
+        self.assertEqual(path.stat().st_size, first["size_bytes"])
+
+        self.assertBlocked("artifact hash drift")
+
+    def test_artifact_manifest_digest_is_recomputed(self) -> None:
+        self.payload["artifact_manifest_sha256"] = "0" * 64
+
+        self.assertBlocked("artifact_manifest_sha256")
+
+    def test_per_check_rules_are_enforced(self) -> None:
+        def no_pass(payload):
+            payload["checks"][0]["status"] = "SKIP"
+
+        def no_artifacts(payload):
+            payload["checks"][0]["artifact_ids"] = []
+
+        def unknown_artifact(payload):
+            payload["checks"][0]["artifact_ids"] = ["ghost"]
+
+        def reordered(payload):
+            payload["checks"][0], payload["checks"][1] = (
+                payload["checks"][1],
+                payload["checks"][0],
+            )
+
+        def failed_count(payload):
+            payload["summary"]["failed_count"] = 1
+
+        for mutate, message in (
+            (no_pass, r"status must be exactly 'PASS'"),
+            (no_artifacts, "must reference unique evidence artifacts"),
+            (unknown_artifact, "references unknown artifacts"),
+            (reordered, "release check catalog mismatch"),
+            (failed_count, "summary.failed_count"),
+        ):
+            with self.subTest(case=mutate.__name__):
+                self.payload = self._valid_payload()
+                mutate(self.payload)
+                self.assertBlocked(message)
+
+    def test_stale_and_future_receipts_are_rejected(self) -> None:
+        now = datetime.now(timezone.utc).replace(microsecond=0)
+        for name, generated, message in (
+            ("stale", now - timedelta(hours=25), "stale"),
+            ("future", now + timedelta(hours=1), "future"),
+        ):
+            with self.subTest(case=name):
+                self.payload = self._valid_payload()
+                self.payload["generated_at"] = generated.isoformat()
+                self.payload["completed_at"] = generated.isoformat()
+                self.payload["started_at"] = (generated - timedelta(minutes=2)).isoformat()
+                self.assertBlocked(message)
+        self.payload = self._valid_payload()
+        self.payload["started_at"] = (now + timedelta(minutes=1)).isoformat()
+        self.assertBlocked("out of order")
 
 
 if __name__ == "__main__":

@@ -176,6 +176,107 @@ void main() {
     },
   );
 
+  group('strong receipt (BT-GATE-002)', () {
+    Future<(ProcessResult, Map<String, dynamic>)> runFixture({
+      required String receiptRoot,
+      required String body,
+    }) async {
+      final runDir = Directory.systemTemp.createTempSync(
+        'manaloom-e2e-receipt-contract-',
+      );
+      addTearDown(() => runDir.deleteSync(recursive: true));
+      final quotedSuite = e2eSuite.replaceAll("'", "'\\''");
+      final result = await Process.run(
+        'bash',
+        [
+          '-c',
+          "source '$quotedSuite'; "
+              'E2E_EXECUTION_POLICY=strict-gate; '
+              'initialize_run_dir; write_summary_header; '
+              '$body '
+              'write_final_summary; finalize_e2e_receipt; write_summary_json; '
+              'exit "\$(e2e_exit_code_for_status "\$FINAL_STATUS" '
+              '"\$E2E_EXECUTION_POLICY")"',
+        ],
+        environment: {
+          ...Platform.environment,
+          'MANALOOM_E2E_RUN_DIR': runDir.path,
+          'MANALOOM_GATE_RECEIPT_ROOT': receiptRoot,
+        },
+      );
+      final summary =
+          jsonDecode(File('${runDir.path}/summary.json').readAsStringSync())
+              as Map<String, dynamic>;
+      return (result, summary);
+    }
+
+    Directory durableRoot() {
+      final parent = Directory('${Platform.environment['HOME']}/.cache')
+        ..createSync(recursive: true);
+      final root = parent.createTempSync('manaloom-e2e-receipt-durable-');
+      addTearDown(() => root.deleteSync(recursive: true));
+      return root;
+    }
+
+    test('PASS binds SHA, digest and hashed logs in a durable root', () async {
+      final root = durableRoot();
+      final (result, summary) = await runFixture(
+        receiptRoot: root.path,
+        body:
+            'capture_e2e_source_start; '
+            'run_step "Fixture step" "echo fixture"; ',
+      );
+      expect(result.exitCode, 0, reason: '${result.stderr}');
+      expect(summary['result'], 'pass');
+      expect(summary['gate_eligible'], isTrue);
+      final head = (await Process.run('git', [
+        '-C',
+        repoRoot,
+        'rev-parse',
+        'HEAD',
+      ])).stdout.toString().trim();
+      expect(summary['git_sha'], head);
+      final receipt = summary['receipt'] as Map<String, dynamic>;
+      expect(receipt['durable'], isTrue);
+      expect(receipt['source_stable'], isTrue);
+      expect(receipt['path'], startsWith(root.path));
+      final full =
+          jsonDecode(File(receipt['path'] as String).readAsStringSync())
+              as Map<String, dynamic>;
+      final artifacts = (full['artifacts'] as List<dynamic>)
+          .cast<Map<String, dynamic>>();
+      expect(artifacts.single['id'], 'log.fixture_step');
+      expect(artifacts.single['sha256'], matches(RegExp(r'^[0-9a-f]{64}$')));
+    });
+
+    test('PASS in a temporary root is not gate eligible', () async {
+      final tempRoot = Directory.systemTemp.createTempSync(
+        'manaloom-e2e-receipt-temp-',
+      );
+      addTearDown(() => tempRoot.deleteSync(recursive: true));
+      final (result, summary) = await runFixture(
+        receiptRoot: tempRoot.path,
+        body:
+            'capture_e2e_source_start; '
+            'run_step "Fixture step" "echo fixture"; ',
+      );
+      expect(result.exitCode, 0, reason: '${result.stderr}');
+      expect(summary['gate_eligible'], isFalse);
+      expect((summary['receipt'] as Map<String, dynamic>)['durable'], isFalse);
+    });
+
+    test('PASS without a captured source state turns into FAIL', () async {
+      final (result, summary) = await runFixture(
+        receiptRoot: durableRoot().path,
+        body: 'run_step "Fixture step" "echo fixture"; ',
+      );
+      expect(result.exitCode, 1);
+      expect(summary['result'], 'fail');
+      expect(summary['gate_eligible'], isFalse);
+      expect(summary['receipt'], isNull);
+    });
+  });
+
   test('all gate wrappers select strict and PowerShell checks native exit', () {
     final qualityGate =
         File('$repoRoot/scripts/quality_gate.sh').readAsStringSync();

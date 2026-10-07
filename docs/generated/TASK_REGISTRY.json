@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "5e944cf5dad66d0a24f843d217bab00be08b1a6c704f9bea66aac5d4037e789d"
+    "sha256": "f4effb9a83bc4078a724d7d44b0032bd22942880763974e07a8959e0432a6ed6"
   },
   "required_task_fields": [
     "id",
@@ -280,7 +280,7 @@
       "depends_on": [
         "BT-GOV-001"
       ],
-      "acceptance": "Aceite registra versões exatas; versão nova bloqueia só o necessário; mensagens traduzidas e acionáveis. Decisão do dono em 2026-09-22: D-24, o reaceite bloqueia só o que cria ou compartilha dado (deck novo, import, IA); login, exportação e exclusão seguem livres; beta só em pt-BR; texto legal versionado no repositório; histórico de aceites guardado (confirmar com advogado). Parte do servidor feita entre 2026-09-24 e 2026-09-28, na branch `servidor/rodada2-2026-09-24`: a migration 062 cria `user_legal_acceptances` (só cresce: cadastro, reaceite e o retrato do aceite que já estava em `users`, sem conta excluída; rollback manual) e refaz a trava de conta ativa nas chaves para `users` (inclusive a de `beta_invites`, que a 061 deixou sem a trava nos bancos migrados). `GET` e `POST /users/me/legal-acceptance`, no plano de controle, mostram o que falta e gravam o reaceite: versão exata, idempotente, sob `FOR UPDATE`, com request-id. Com `MANALOOM_LEGAL_REACCEPTANCE=enforce`, a conta que não aceitou a versão atual (ou nunca aceitou) recebe 403 `legal_acceptance_required`, com as versões aceitas, as atuais e a rota do reaceite, só em deck novo (criar e copiar), relatório público, import que cria ou troca lista, import aplicado do fichário e IA; ler, editar o que existe, login, exportação e exclusão seguem livres. A trava fica desligada por padrão até a raia do app ter a tela de reaceite. Evidência: `server/test/legal_acceptance_test.dart` (inclui as cadeias reais de `/ai`, `/import` e `/binder`: a trava roda antes da cota e do limite), `server/test/legal_acceptance_db_live_test.dart` (retrato, trigger de conta ativa, cadastro, reaceite, 10 aceites simultâneos e o middleware real de `/decks`) e `server/test/legal_acceptance_e2e_live_test.dart` (2 casos por HTTP com a trava ligada: deck, import, fichário e IA); 17 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-LEGAL-ACCEPT-001-servidor.md`. A tela de reaceite e o tratamento do código no app ficam com a raia do app; publicar deck (`is_public` para `true`) ficou fora da trava, e a recomendação é travá-lo depois da integração com a frente de deck, que reescreve essa rota.",
+      "acceptance": "Aceite registra versões exatas; versão nova bloqueia só o necessário; mensagens traduzidas e acionáveis. Decisão do dono em 2026-09-22: D-24, o reaceite bloqueia só o que cria ou compartilha dado (deck novo, import, IA); login, exportação e exclusão seguem livres; beta só em pt-BR; texto legal versionado no repositório; histórico de aceites guardado (confirmar com advogado). Parte do servidor feita entre 2026-09-24 e 2026-09-28, na branch `servidor/rodada2-2026-09-24`: a migration 062 cria `user_legal_acceptances` (só cresce: cadastro, reaceite e o retrato do aceite que já estava em `users`, sem conta excluída; rollback manual) e refaz a trava de conta ativa nas chaves para `users` (inclusive a de `beta_invites`, que a 061 deixou sem a trava nos bancos migrados). `GET` e `POST /users/me/legal-acceptance`, no plano de controle, mostram o que falta e gravam o reaceite: versão exata, idempotente, sob `FOR UPDATE`, com request-id. Com `MANALOOM_LEGAL_REACCEPTANCE=enforce`, a conta que não aceitou a versão atual (ou nunca aceitou) recebe 403 `legal_acceptance_required`, com as versões aceitas, as atuais e a rota do reaceite, só em deck novo (criar e copiar), relatório público, import que cria ou troca lista, import aplicado do fichário e IA; ler, editar o que existe, login, exportação e exclusão seguem livres. A trava fica desligada por padrão até a raia do app ter a tela de reaceite. Evidência: `server/test/legal_acceptance_test.dart` (inclui as cadeias reais de `/ai`, `/import` e `/binder`: a trava roda antes da cota e do limite), `server/test/legal_acceptance_db_live_test.dart` (retrato, trigger de conta ativa, cadastro, reaceite, 10 aceites simultâneos e o middleware real de `/decks`) e `server/test/legal_acceptance_e2e_live_test.dart` (2 casos por HTTP com a trava ligada: deck, import, fichário e IA); 17 mutações falham; receipt `docs/qa/execution/2026-09-28/BT-LEGAL-ACCEPT-001-servidor.md`. A tela de reaceite e o tratamento do código no app ficam com a raia do app; publicar deck (`is_public` para `true`) ficou fora da trava, e a recomendação é travá-lo depois da integração com a frente de deck, que reescreve essa rota. Em 2026-10-05, na branch `claude/frente-servidor-release-nknr66`: `PATCH` e `PUT /decks/:id` com `is_public: true` passam pela trava antes de tocar o deck; despublicar e editar metadados seguem livres (`server/test/deck_containment_test.dart`, 4 testes; a mutação que tira a trava do `PATCH` falha em 2). A tela de reaceite do app está no PR #20 (`24f4e4c`); ligar a trava no deploy segue decisão do dono.",
       "section": "Épico B — Conta, autorização, privacidade e segurança",
       "source_line": 321
     },
@@ -890,7 +890,7 @@
       "depends_on": [
         "BT-CAT-01"
       ],
-      "acceptance": "Leitura causa 0 DML e 0 upstream calls; `sync=true` rejeitado; app não o envia. Decisão do dono em 2026-09-22: D-35, carta ausente responde 404 `card_not_in_catalog` com frase em português e soma num contador de demanda; nenhuma sincronização disparada por usuário; as linhas-alias Oracle ficam enquanto houver referência e migram numa correção de dados com receipt (escrita em produção com aprovação por execução). Feito em 2026-09-23, na branch `catalogo/2026-09-23`: as 7 rotas de catálogo só leem. `POST /cards/resolve` perdeu o fallback da Scryfall e a escrita em `cards`, `sets` e `card_legalities`, e `GET /cards/printings` (somente leitura desde o `BT-CAT-04`) responde 404 quando não há edição; carta ausente responde 404 `card_not_in_catalog` com frase em português (`server/lib/catalog_read_contract.dart`). Evidência: `server/test/cards_resolve_read_only_test.dart` (carta ausente, token ausente, carta local e nome ambíguo, sempre sem chamada externa e sem DML; a versão da base chama a Scryfall e cai em 500), `server/test/cards_printings_read_only_test.dart` e `server/test/catalog_routes_read_only_guard_test.dart` (as 7 rotas e as bibliotecas que elas importam, sem cliente HTTP nem DML). Falta: `sync=true` é ignorado, não rejeitado, porque o app ainda o envia (`app/lib/features/cards/providers/card_provider.dart:531`) e rejeitar agora quebraria o \"Escolher edição\"; o 400 depende da raia do app tirar o parâmetro e tratar o 404. O contador de demanda exige tabela nova e ficou como proposta de DDL (pendente de decisão). A migração das linhas-alias Oracle é a fase 2 da D-35. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisão do dono em 2026-09-23: D-63, sem tabela de demanda; a contagem sai do log. Na mesma linha da D-35, feito em 2026-09-23 na branch `catalogo/preco-d62-2026-09-23`, ainda fora do ar: `POST /decks/:id/pricing` deixou de buscar preço na Scryfall a pedido do usuário e de gravar em `cards`; lê o preço do banco, que o job do `BT-CAT-01` mantém (D-62), e só grava o snapshot de preço do próprio deck. `force` e `refresh_missing` continuam aceitos e não têm efeito; o contrato de resposta ficou igual, com `cache_status` sempre `cached` e os contadores de busca em zero (`server/doc/API_CONTRACTS_AND_DATA_MAP.md`). Evidência: `server/test/deck_pricing_read_only_test.dart` (carta sem preço com o corpo que o app envia, com `force`, sem corpo e com corpo inválido; `force` repetido 5 vezes; deck de outro usuário; sempre sem chamada externa e sem escrita em `cards`; a versão da base chama a Scryfall) e 6 mutações derrubadas. Decisão do dono em 2026-09-23: D-72, a rota de preço continua gravando o total no próprio deck. D-63 feita no mesmo dia na branch `catalogo/refino-d73-2026-09-23`, ainda fora do ar: cada 404 `card_not_in_catalog` de `GET /cards/printings` e `POST /cards/resolve` escreve no log uma linha `MANALOOM_CATALOG_CARD_DEMAND` com um JSON (evento, rota, `include_tokens` e o nome normalizado: em minúsculas, com espaços e caracteres de controle reduzidos, e-mail e segredo mascarados e no máximo 200 caracteres). A linha não leva dado do usuário, e não há tabela nem escrita no banco. O `POST /cards/resolve/batch` responde 200 com `unresolved` e não escreve a linha. Evidência: `server/test/catalog_card_demand_log_test.dart` (as duas rotas com cabeçalhos de usuário que não aparecem na linha, a busca com tokens, carta encontrada e nome ambíguo sem linha, nome hostil sempre em JSON de uma linha) e 8 mutações derrubadas. Decisões do dono em 2026-09-23 (noite): D-72, a rota de preço continua gravando o total no próprio deck; D-63 implementada em `b9428ea14` (linha `MANALOOM_CATALOG_CARD_DEMAND` por 404, sem dado do usuário). `POST /decks/:id/pricing` só lê o catálogo, no ar desde 2026-09-23 às 18:53 UTC (`41bab49c9`).",
+      "acceptance": "Leitura causa 0 DML e 0 upstream calls; `sync=true` rejeitado; app não o envia. Decisão do dono em 2026-09-22: D-35, carta ausente responde 404 `card_not_in_catalog` com frase em português e soma num contador de demanda; nenhuma sincronização disparada por usuário; as linhas-alias Oracle ficam enquanto houver referência e migram numa correção de dados com receipt (escrita em produção com aprovação por execução). Feito em 2026-09-23, na branch `catalogo/2026-09-23`: as 7 rotas de catálogo só leem. `POST /cards/resolve` perdeu o fallback da Scryfall e a escrita em `cards`, `sets` e `card_legalities`, e `GET /cards/printings` (somente leitura desde o `BT-CAT-04`) responde 404 quando não há edição; carta ausente responde 404 `card_not_in_catalog` com frase em português (`server/lib/catalog_read_contract.dart`). Evidência: `server/test/cards_resolve_read_only_test.dart` (carta ausente, token ausente, carta local e nome ambíguo, sempre sem chamada externa e sem DML; a versão da base chama a Scryfall e cai em 500), `server/test/cards_printings_read_only_test.dart` e `server/test/catalog_routes_read_only_guard_test.dart` (as 7 rotas e as bibliotecas que elas importam, sem cliente HTTP nem DML). Em 2026-10-05, na branch `claude/frente-servidor-release-nknr66`: `sync` com valor diferente de vazio, `false` ou `0` responde 400 `catalog_sync_unsupported` com frase em português, antes de qualquer consulta (`server/lib/catalog_read_contract.dart`, teste em `server/test/cards_printings_read_only_test.dart`). A frente do app tirou o parâmetro no PR #20 (`a6c0859`); o 400 só pode ir ao ar junto com esse app ou depois dele. O contador de demanda exige tabela nova e ficou como proposta de DDL (pendente de decisão). A migração das linhas-alias Oracle é a fase 2 da D-35. No ar desde 2026-09-23 às 14:49 UTC (`c0f907108`). Decisão do dono em 2026-09-23: D-63, sem tabela de demanda; a contagem sai do log. Na mesma linha da D-35, feito em 2026-09-23 na branch `catalogo/preco-d62-2026-09-23`, ainda fora do ar: `POST /decks/:id/pricing` deixou de buscar preço na Scryfall a pedido do usuário e de gravar em `cards`; lê o preço do banco, que o job do `BT-CAT-01` mantém (D-62), e só grava o snapshot de preço do próprio deck. `force` e `refresh_missing` continuam aceitos e não têm efeito; o contrato de resposta ficou igual, com `cache_status` sempre `cached` e os contadores de busca em zero (`server/doc/API_CONTRACTS_AND_DATA_MAP.md`). Evidência: `server/test/deck_pricing_read_only_test.dart` (carta sem preço com o corpo que o app envia, com `force`, sem corpo e com corpo inválido; `force` repetido 5 vezes; deck de outro usuário; sempre sem chamada externa e sem escrita em `cards`; a versão da base chama a Scryfall) e 6 mutações derrubadas. Decisão do dono em 2026-09-23: D-72, a rota de preço continua gravando o total no próprio deck. D-63 feita no mesmo dia na branch `catalogo/refino-d73-2026-09-23`, ainda fora do ar: cada 404 `card_not_in_catalog` de `GET /cards/printings` e `POST /cards/resolve` escreve no log uma linha `MANALOOM_CATALOG_CARD_DEMAND` com um JSON (evento, rota, `include_tokens` e o nome normalizado: em minúsculas, com espaços e caracteres de controle reduzidos, e-mail e segredo mascarados e no máximo 200 caracteres). A linha não leva dado do usuário, e não há tabela nem escrita no banco. O `POST /cards/resolve/batch` responde 200 com `unresolved` e não escreve a linha. Evidência: `server/test/catalog_card_demand_log_test.dart` (as duas rotas com cabeçalhos de usuário que não aparecem na linha, a busca com tokens, carta encontrada e nome ambíguo sem linha, nome hostil sempre em JSON de uma linha) e 8 mutações derrubadas. Decisões do dono em 2026-09-23 (noite): D-72, a rota de preço continua gravando o total no próprio deck; D-63 implementada em `b9428ea14` (linha `MANALOOM_CATALOG_CARD_DEMAND` por 404, sem dado do usuário). `POST /decks/:id/pricing` só lê o catálogo, no ar desde 2026-09-23 às 18:53 UTC (`41bab49c9`).",
       "section": "P0",
       "source_line": 443
     },
@@ -2880,12 +2880,12 @@
     {
       "id": "BT-GATE-002",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Receipt forte ligado a SHA, worktree/project-logic digest, schema/target e checks nomeados.",
       "depends_on": [
         "BT-DOC-004"
       ],
-      "acceptance": "Receipt fresco não pode ser forjado com um check; digest no fim igual ao início; logs/artifacts hasheados; `/tmp` não é prova durável. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta implementação — o receipt do E2E não carrega SHA nem digest (`manaloom_e2e_suite.sh:516-532`) e o `local_ci` apaga o próprio `RUN_DIR` (`manaloom_local_ci.sh:68-75`); ver `docs/flows/_p0/gates-qa-web.md`. Decisão do dono em 2026-09-22: D-17, o receipt forte começa por Deck/IA e cresce para todos os fluxos.",
+      "acceptance": "Receipt fresco não pode ser forjado com um check; digest no fim igual ao início; logs/artifacts hasheados; `/tmp` não é prova durável. Estado corrigido em 2026-09-22 de `EVIDENCE_REQUIRED` para `TODO`: falta implementação — o receipt do E2E não carrega SHA nem digest (`manaloom_e2e_suite.sh:516-532`) e o `local_ci` apaga o próprio `RUN_DIR` (`manaloom_local_ci.sh:68-75`); ver `docs/flows/_p0/gates-qa-web.md`. Decisão do dono em 2026-09-22: D-17, o receipt forte começa por Deck/IA e cresce para todos os fluxos. Feito em 2026-10-05, na branch `claude/frente-servidor-release-nknr66`: `scripts/manaloom_gate_run_receipt.py` captura SHA, digest do worktree e de project logic no início e no fim, copia os logs com sha256 para `~/.manaloom/receipts` e só marca `gate_eligible` com `PASS`, fonte estável e raiz durável; a suíte E2E grava esse receipt; a ligação do `local_ci` (catálogo fechado por modo, sem receipt no `quick --staged-scope`) está pronta e testada, mas o `local_ci` é plano de controle do escopo staged e o commit dele exige a prova de UI do `BT-UIEV-001`; o validador Deck/IA ganhou os testes de captura real, hash de mesmo tamanho, regras por check e frescor. Receipt `docs/qa/execution/2026-10-05/BT-GATE-002-receipt-forte-local-ci-e2e.md`. Falta o primeiro receipt real (o `full` verde depende do `BT-UIEV-001`) e o `release-read-only` do Deck/IA contra o PostgreSQL de produção, com a palavra do dono.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 685
     },
@@ -2941,10 +2941,10 @@
     {
       "id": "BT-GATE-007",
       "priority": "P0 CORE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Fazer o gate `full` executar `app/integration_test/` (147 arquivos hoje rodam só por scripts dedicados; `quality_gate.sh` roda `flutter test` sem alvo).",
       "depends_on": [],
-      "acceptance": "`scripts/quality_gate.sh full` (ou estágio próprio no `melos run quality`) executa a camada de integração com runtime isolado; falha ali derruba o gate; tempo e vermelhos revelados registrados em receipt. Decisão do dono em 2026-09-21; linha registrada em 2026-09-22.",
+      "acceptance": "`scripts/quality_gate.sh full` (ou estágio próprio no `melos run quality`) executa a camada de integração com runtime isolado; falha ali derruba o gate; tempo e vermelhos revelados registrados em receipt. Decisão do dono em 2026-09-21; linha registrada em 2026-09-22. Em 2026-10-05: os 147 arquivos têm trilha em `server/config/integration_test_lanes.json` (42 `web_hermetic`, 7 `web_backend`, 71 `device`, 11 `ui_proof`, 16 `triage`); `quality_gate.sh full` roda a `web_hermetic` no Chrome com API em loopback fechado, 42/42 `PASS` em 66,6 min na nuvem. Falta o `full` inteiro no Mac do dono. Receipt: `docs/qa/execution/2026-10-05/BT-GATE-007-integration-test-no-gate-full.md`.",
       "section": "Épico J — Schema, capacidade, observabilidade, backup e release",
       "source_line": 690
     },
@@ -9907,7 +9907,14 @@
         "gate_eligible",
         "summary.step_count",
         "summary.skipped",
-        "steps"
+        "steps",
+        "git_sha",
+        "source.stable",
+        "source.worktree_digest_sha256",
+        "source.project_logic_source_digest",
+        "receipt.path",
+        "receipt.durable",
+        "receipt.artifact_manifest_sha256"
       ],
       "status_semantics": {
         "PASS": {
@@ -9927,6 +9934,47 @@
           "gate_eligible": false
         }
       }
+    },
+    {
+      "id": "manaloom_gate_run_receipt_v1",
+      "flows": [
+        "release_operations"
+      ],
+      "producers": [
+        "scripts/manaloom_gate_run_receipt.py",
+        "scripts/manaloom_e2e_suite.sh"
+      ],
+      "consumers": [
+        "scripts/manaloom_gate_run_receipt.py",
+        "server/test/gate_run_receipt_test.py"
+      ],
+      "schemas": [
+        "manaloom.gate_run_receipt.v1"
+      ],
+      "durability": "durable_outside_tmp_and_worktree",
+      "allowed_statuses": [
+        "PASS",
+        "FAIL",
+        "BLOCKED",
+        "PARTIAL"
+      ],
+      "required_bindings": [
+        "gate.id",
+        "gate.mode",
+        "git_sha",
+        "worktree_digest_sha256",
+        "project_logic_source_digest",
+        "source.start",
+        "source.end",
+        "source.stable",
+        "checks",
+        "check_catalog_sha256",
+        "artifacts",
+        "artifact_manifest_sha256",
+        "evidence_root",
+        "durable",
+        "gate_eligible"
+      ]
     },
     {
       "id": "ui_live_evidence_v1",
@@ -10049,5 +10097,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "7e03dbaefdcbf2bc14d04523e6cbbf282465817de47fe1a8c154859fe34378cd"
+  "project_logic_source_digest_sha256": "dd0b9ab4fb8a2f329a1e75b1089b1100c8a26efa300dd5c9153b1ea65fb51dd8"
 }
