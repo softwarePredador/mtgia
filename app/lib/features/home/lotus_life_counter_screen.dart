@@ -51,6 +51,8 @@ import 'lotus/lotus_storage_snapshot.dart';
 import 'lotus/lotus_storage_snapshot_store.dart';
 import 'lotus/lotus_webview_contract.dart';
 
+enum _UnsavedExitChoice { retry, keepPlaying, exitWithoutSaving }
+
 class _NativeFallbackDescriptor {
   const _NativeFallbackDescriptor({
     required this.classification,
@@ -496,20 +498,41 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       ),
     );
 
-    var didFlushStorage = false;
-    final hostController = _hostController;
-    if (hostController is LotusStorageFlushBarrier) {
-      try {
-        final storageFlushBarrier = hostController as LotusStorageFlushBarrier;
-        didFlushStorage = await storageFlushBarrier
-            .flushStorageSnapshot(reason: 'flutter_exit_$source')
-            .timeout(_exitStorageFlushTimeout, onTimeout: () => false);
-      } catch (_) {
-        didFlushStorage = false;
-      }
-    }
+    final didFlushStorage = await _flushStorageForExit(source);
     if (!mounted) {
       return;
+    }
+    if (!didFlushStorage) {
+      // LC-P0-03: never leave as if the table were saved. The person picks
+      // between retrying, staying, or leaving without the last plays.
+      final choice = await _askUnsavedExitChoice();
+      if (!mounted) return;
+      unawaited(
+        AppObservability.instance.recordEvent(
+          'exit_unsaved_choice',
+          category: 'life_counter.storage',
+          data: {
+            'route': lifeCounterRoutePath,
+            'source': source,
+            'choice': (choice ?? _UnsavedExitChoice.keepPlaying).name,
+          },
+        ),
+      );
+      switch (choice) {
+        case _UnsavedExitChoice.retry:
+          _isExitInProgress = false;
+          await _exitLifeCounter(
+            source: '${source}_retry',
+            requestedFromShell: requestedFromShell,
+          );
+          return;
+        case _UnsavedExitChoice.exitWithoutSaving:
+          break;
+        case _UnsavedExitChoice.keepPlaying:
+        case null:
+          _isExitInProgress = false;
+          return;
+      }
     }
 
     unawaited(
@@ -544,6 +567,57 @@ class _LotusLifeCounterScreenState extends State<LotusLifeCounterScreen>
       endedAtEpochMs: DateTime.now().millisecondsSinceEpoch,
     );
     closeLifeCounterRoute<LifeCounterExitResult>(context, result: result);
+  }
+
+  Future<bool> _flushStorageForExit(String source) async {
+    final hostController = _hostController;
+    if (hostController is! LotusStorageFlushBarrier) {
+      return false;
+    }
+    try {
+      final storageFlushBarrier = hostController as LotusStorageFlushBarrier;
+      return await storageFlushBarrier
+          .flushStorageSnapshot(reason: 'flutter_exit_$source')
+          .timeout(_exitStorageFlushTimeout, onTimeout: () => false);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<_UnsavedExitChoice?> _askUnsavedExitChoice() {
+    return showDialog<_UnsavedExitChoice>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        key: const Key('life-counter-unsaved-exit-dialog'),
+        title: const Text('A mesa não foi salva'),
+        content: const Text(
+          'Não conseguimos salvar as últimas jogadas neste aparelho. '
+          'Se sair agora, elas podem se perder.',
+        ),
+        actions: [
+          TextButton(
+            key: const Key('life-counter-unsaved-exit-discard'),
+            onPressed: () => Navigator.of(
+              dialogContext,
+            ).pop(_UnsavedExitChoice.exitWithoutSaving),
+            child: const Text('Sair sem salvar'),
+          ),
+          TextButton(
+            key: const Key('life-counter-unsaved-exit-keep-playing'),
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(_UnsavedExitChoice.keepPlaying),
+            child: const Text('Continuar jogando'),
+          ),
+          FilledButton(
+            key: const Key('life-counter-unsaved-exit-retry'),
+            onPressed: () =>
+                Navigator.of(dialogContext).pop(_UnsavedExitChoice.retry),
+            child: const Text('Tentar salvar de novo'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _handleBackNavigationAttempt(bool didPop) {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/core/api/api_client.dart';
 import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
@@ -722,7 +723,7 @@ void main() {
       startedAtEpochMs: DateTime(2026, 8, 5, 12).millisecondsSinceEpoch,
     );
     SharedPreferences.setMockInitialValues({
-      legacyLifeCounterSessionPrefsKey: session.toJsonString(),
+      '$lifeCounterSignedOutKeyPrefix$legacyLifeCounterSessionPrefsKey': session.toJsonString(),
     });
 
     await _pumpNavigationSubject(tester, lifeCounterAvailable: true);

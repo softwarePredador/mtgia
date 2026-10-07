@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T22:47:31.964913Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-06T14:12:51.387074Z",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "visual_system_workspace",
   "profile": "web_visual_system_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "ca67012fe3efb1c74e45b6184b14077f95982086fd2571545471c673c1a42ff6",
+  "log_sha256": "4625f1c2345f590f99017d19a9fd6cea889723b3e340d444fd4a3d32ebfed2a2",
   "checkpoint_count": 10,
   "required_checkpoints": [
     "visual_system_00_profile_clean",
@@ -46,8 +46,8 @@
     {
       "checkpoint": "visual_system_02_profile_saving",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/visual_system_02_profile_saving.png",
-      "sha256": "29f499d547a77608e70666e5ae7660a3547c87a7827e718edd8bbfe721a53cd0",
-      "bytes": 129034,
+      "sha256": "bf8f941d6c5d2428a1f20fb45f50c6d0daed71debb60c0df06d1fe53ec1a7e37",
+      "bytes": 129039,
       "width": 1440,
       "height": 900
     },
@@ -70,8 +70,8 @@
     {
       "checkpoint": "visual_system_05_public_profile",
       "path": "docs/qa/ui-live/current/ux-pack-07-visual-system-web-desktop/visual_system_05_public_profile.png",
-      "sha256": "244ed505ea76568f2b2bb9c1e95fc07754ce58e7b0061f3cb9550c499e0e90f1",
-      "bytes": 121131,
+      "sha256": "cb953d78199e6266b92d62f32dae6f445d0c2ddc6fd19613ea46a6919a8a8d70",
+      "bytes": 121050,
       "width": 1440,
       "height": 900
     },

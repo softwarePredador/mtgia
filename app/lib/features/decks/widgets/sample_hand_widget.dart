@@ -879,6 +879,7 @@ class _SampleHandCard extends StatelessWidget {
                   variant: CardArtworkVariant.gallery,
                   imageUrl: card.printingImageUrl,
                   fallbackImageUrl: card.fallbackImageUrl,
+                  fallbackName: card.name,
                   semanticLabel: card.hasPrintingArtwork
                       ? 'Arte da impressão ${card.name}'
                       : 'Arte de referência de ${card.name}',

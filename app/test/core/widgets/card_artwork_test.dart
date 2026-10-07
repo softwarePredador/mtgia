@@ -124,14 +124,91 @@ void main() {
     }
   });
 
-  test('crop variants are intentional and have stable ratios', () {
-    final artCrop = CardArtworkSpec.forVariant(CardArtworkVariant.artCrop);
-    final setArt = CardArtworkSpec.forVariant(CardArtworkVariant.setArt);
+  test('no variant crops: every one is the whole card at 63:88', () {
+    for (final variant in CardArtworkVariant.values) {
+      final spec = CardArtworkSpec.forVariant(variant);
+      expect(spec.aspectRatio, CardArtworkSpec.mtgCardAspectRatio);
+      expect(spec.fit, BoxFit.contain);
+    }
+  });
 
-    expect(artCrop.aspectRatio, 16 / 9);
-    expect(artCrop.fit, BoxFit.cover);
-    expect(setArt.aspectRatio, 3 / 2);
-    expect(setArt.fit, BoxFit.cover);
+  testWidgets('shows the card name when there is no image to show', (
+    tester,
+  ) async {
+    Future<void> pump({String? imageUrl, bool offline = false}) =>
+        tester.pumpWidget(
+          MaterialApp(
+            home: Center(
+              child: SizedBox(
+                width: 92,
+                child: CardArtwork(
+                  variant: CardArtworkVariant.gallery,
+                  imageUrl: imageUrl,
+                  semanticLabel: 'Carta de teste',
+                  fallbackName: 'Sol Ring',
+                  offline: offline,
+                ),
+              ),
+            ),
+          ),
+        );
+
+    await pump();
+    expect(find.text('Sol Ring'), findsOneWidget);
+
+    await pump(
+      imageUrl: 'https://cards.scryfall.io/normal/front/a/b/card.jpg',
+      offline: true,
+    );
+    expect(find.text('Sol Ring'), findsOneWidget);
+
+    await pump(imageUrl: 'https://cards.scryfall.io/normal/front/a/b/x.jpg');
+    expect(
+      find.text('Sol Ring'),
+      findsNothing,
+      reason: 'while the image loads the name stays out of the way',
+    );
+  });
+
+  testWidgets('the card frame keeps its size across every image state', (
+    tester,
+  ) async {
+    Future<Size> frameFor({String? imageUrl, bool offline = false}) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Center(
+            child: SizedBox(
+              width: 126,
+              child: CardArtwork(
+                key: const Key('artwork-under-test'),
+                variant: CardArtworkVariant.gallery,
+                imageUrl: imageUrl,
+                semanticLabel: 'Carta de teste',
+                fallbackName: 'Nome bem longo de uma carta de teste',
+                offline: offline,
+              ),
+            ),
+          ),
+        ),
+      );
+      return tester.getSize(find.byKey(const Key('artwork-under-test')));
+    }
+
+    final loading = await frameFor(
+      imageUrl: 'https://cards.scryfall.io/normal/front/a/b/card.jpg',
+    );
+    final missing = await frameFor();
+    final offline = await frameFor(
+      imageUrl: 'https://cards.scryfall.io/normal/front/a/b/card.jpg',
+      offline: true,
+    );
+
+    expect(
+      loading.width / loading.height,
+      closeTo(CardArtworkSpec.mtgCardAspectRatio, 0.001),
+    );
+    expect(missing, loading);
+    expect(offline, loading);
   });
 
   test('classifies declared Scryfall image resolution without guessing', () {

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state.dart';
 import 'package:manaloom/features/home/life_counter/life_counter_game_timer_state_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,7 +29,7 @@ void main() {
 
     test('returns null for invalid payloads', () async {
       SharedPreferences.setMockInitialValues({
-        lifeCounterGameTimerStatePrefsKey: '{"start_time_epoch_ms":"oops"}',
+        '$lifeCounterSignedOutKeyPrefix$lifeCounterGameTimerStatePrefsKey': '{"start_time_epoch_ms":"oops"}',
       });
       store = LifeCounterGameTimerStateStore();
 

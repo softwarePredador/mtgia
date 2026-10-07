@@ -615,24 +615,38 @@ capture_core_product() {
 index_p0_matrix() {
   local source_digest android_profile android_target android_device_contract
   local device_id="${MANALOOM_UI_PROOF_DEVICE:-}"
+  # Escopo da indexação: `all` (padrão) indexa os quatro perfis; `web` indexa
+  # só os três perfis Web, que não dependem de Android, e `android` só o perfil
+  # Android. O agregado continua exigindo os quatro manifests no mesmo digest;
+  # isto só permite que Web e Android sejam indexados em máquinas diferentes.
+  local index_scope="${MANALOOM_P0_INDEX_SCOPE:-all}"
+  case "$index_scope" in
+    all | web | android) ;;
+    *)
+      echo "MANALOOM_P0_INDEX_SCOPE must be all, web or android" >&2
+      exit 2
+      ;;
+  esac
   source_digest="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
-  if [[ -z "$device_id" ]]; then
-    echo "MANALOOM_UI_PROOF_DEVICE is required to attest the indexed Android runtime" >&2
-    exit 2
-  fi
-  attest_android_runtime \
-    "$device_id" \
-    "portrait-up with native Life Counter landscape checkpoint"
-  android_target="$MANALOOM_ATTESTED_ANDROID_TARGET"
-  android_device_contract="$MANALOOM_ATTESTED_ANDROID_CONTRACT"
-  if [[ "$MANALOOM_ATTESTED_ANDROID_KIND" == "emulator" ]]; then
-    android_profile="${MANALOOM_P0_ANDROID_PROFILE:-android_emulator_manaloom_api34}"
-  else
-    android_profile="${MANALOOM_P0_ANDROID_PROFILE:-android_physical_sm_a135m}"
-  fi
-  if [[ "$android_profile" != android_"$MANALOOM_ATTESTED_ANDROID_KIND"_* ]]; then
-    echo "Android P0 profile '$android_profile' contradicts attested runtime kind '$MANALOOM_ATTESTED_ANDROID_KIND'" >&2
-    exit 2
+  if [[ "$index_scope" != "web" ]]; then
+    if [[ -z "$device_id" ]]; then
+      echo "MANALOOM_UI_PROOF_DEVICE is required to attest the indexed Android runtime" >&2
+      exit 2
+    fi
+    attest_android_runtime \
+      "$device_id" \
+      "portrait-up with native Life Counter landscape checkpoint"
+    android_target="$MANALOOM_ATTESTED_ANDROID_TARGET"
+    android_device_contract="$MANALOOM_ATTESTED_ANDROID_CONTRACT"
+    if [[ "$MANALOOM_ATTESTED_ANDROID_KIND" == "emulator" ]]; then
+      android_profile="${MANALOOM_P0_ANDROID_PROFILE:-android_emulator_manaloom_api34}"
+    else
+      android_profile="${MANALOOM_P0_ANDROID_PROFILE:-android_physical_sm_a135m}"
+    fi
+    if [[ "$android_profile" != android_"$MANALOOM_ATTESTED_ANDROID_KIND"_* ]]; then
+      echo "Android P0 profile '$android_profile' contradicts attested runtime kind '$MANALOOM_ATTESTED_ANDROID_KIND'" >&2
+      exit 2
+    fi
   fi
 
   index_profile() {
@@ -669,7 +683,8 @@ index_p0_matrix() {
     )
   }
 
-  print_header "Index complete authenticated P0 matrix"
+  print_header "Index authenticated P0 matrix ($index_scope)"
+  if [[ "$index_scope" != "android" ]]; then
   index_profile \
     web_mobile_390x844 \
     web_real_build \
@@ -688,12 +703,15 @@ index_p0_matrix() {
     "$(manaloom_web_runtime_device_contract web_wide_1920x1080)" \
     "${MANALOOM_P0_WEB_WIDE_DIR:-}" \
     "${MANALOOM_P0_WEB_WIDE_LOG:-}"
-  index_profile \
-    "$android_profile" \
-    "$android_target" \
-    "$android_device_contract" \
-    "${MANALOOM_P0_ANDROID_DIR:-}" \
-    "${MANALOOM_P0_ANDROID_LOG:-}"
+  fi
+  if [[ "$index_scope" != "web" ]]; then
+    index_profile \
+      "$android_profile" \
+      "$android_target" \
+      "$android_device_contract" \
+      "${MANALOOM_P0_ANDROID_DIR:-}" \
+      "${MANALOOM_P0_ANDROID_LOG:-}"
+  fi
 }
 
 case "$MODE" in
@@ -722,7 +740,8 @@ case "$MODE" in
       "       $0 --capture-battle-coach  # legacy alias" \
       "       [MANALOOM_CHROMEDRIVER_BIN=<path>] $0 --capture-battle-live-web  # internal evidence only" \
       "       MANALOOM_UI_PROOF_DEVICE=<id> [MANALOOM_UI_ANDROID_RUNTIME_KIND=auto|emulator|physical] $0 --capture-core-product" \
-      "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix"
+      "       MANALOOM_UI_PROOF_DEVICE=<id> MANALOOM_P0_*_DIR=<repo-dir> MANALOOM_P0_*_LOG=<log> $0 --index-p0-matrix" \
+      "       MANALOOM_P0_INDEX_SCOPE=web MANALOOM_P0_WEB_*_DIR=<repo-dir> MANALOOM_P0_WEB_*_LOG=<log> $0 --index-p0-matrix"
     ;;
   *)
     echo "unknown mode: $MODE" >&2

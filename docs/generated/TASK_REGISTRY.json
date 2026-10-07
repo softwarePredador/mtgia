@@ -2,7 +2,7 @@
   "schema_version": 2,
   "generated_from": {
     "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-    "sha256": "17cd0aeb28784f2b43dc63da01cbe8fc0ce7f202c7c4204be4e7d4fe611b7c20"
+    "sha256": "f4effb9a83bc4078a724d7d44b0032bd22942880763974e07a8959e0432a6ed6"
   },
   "required_task_fields": [
     "id",
@@ -2068,48 +2068,48 @@
     {
       "id": "LC-P0-01",
       "priority": "P0 LIFE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Namespace local por usuário para sessão, histórico, Lotus e outbox.",
       "depends_on": [],
-      "acceptance": "Conta B nunca herda nick/deck/sessão/nota de A; legado migra ou é limpo com receipt.",
+      "acceptance": "Conta B nunca herda nick/deck/sessão/nota de A; legado migra ou é limpo com receipt. Feito em 2026-10-05 na branch `claude/frente-contador-de-vida-ibnawb`: `LifeCounterAccountScope` (`app/lib/features/home/life_counter/life_counter_account_scope.dart`) põe as 9 stores do contador, as chaves cruas do host Web e o outbox do pós-jogo sob o prefixo `manaloom.local.v1.account.` seguido do id da conta; uma store aberta para A falha fechada depois da troca de conta; o legado sem dono comprovável é apagado no primeiro login, com receipt local sem conteúdo. Receipt em `docs/qa/execution/2026-10-05/LC-P0-01-namespace-por-conta.md`. Falta: prova de UI e Android físico no lote único do `BT-UIEV-001`.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 589
     },
     {
       "id": "LC-P0-02",
       "priority": "P0 LIFE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Lifecycle de login/logout/troca de conta limpa/reabre stores corretos.",
       "depends_on": [
         "LC-P0-01"
       ],
-      "acceptance": "Logout, forced logout, delete, token expiry e restart cobertos.",
+      "acceptance": "Logout, forced logout, delete, token expiry e restart cobertos. Feito em 2026-10-05: o `AuthProvider` liga o escopo a cada mudança de estado, antes dos listeners (o roteador nunca monta o contador da conta anterior); logout e expiração fecham sem apagar, a exclusão de conta apaga só aquela conta, o restart reabre. Receipt em `docs/qa/execution/2026-10-05/LC-P0-02-ciclo-de-conta.md`.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 590
     },
     {
       "id": "LC-P0-03",
       "priority": "P0 LIFE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Saída fail-closed quando flush não conclui.",
       "depends_on": [
         "LC-P0-01"
       ],
-      "acceptance": "UI não afirma “salvo/pausado” com `storageFlushed=false`; retry/continuar/sair sem salvar claros.",
+      "acceptance": "UI não afirma “salvo/pausado” com `storageFlushed=false`; retry/continuar/sair sem salvar claros. Feito em 2026-10-05: sem flush confirmado, a mesa pergunta \"Tentar salvar de novo\", \"Continuar jogando\" ou \"Sair sem salvar\"; a home e o deck não dizem \"pausada\"/\"salva\" quando `storageFlushed=false`, e o deck ainda oferece o pós-jogo. Receipt em `docs/qa/execution/2026-10-05/LC-P0-03-saida-sem-flush.md`.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 591
     },
     {
       "id": "LC-P0-04",
       "priority": "P0 LIFE",
-      "status": "BLOCKED_BY_P0",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Reconciliar status documental do Life/pós-jogo.",
       "depends_on": [
         "LC-P0-01",
         "LC-P0-02",
         "LC-P0-03"
       ],
-      "acceptance": "Docs não chamam persistência local de durável/server-side.",
+      "acceptance": "Docs não chamam persistência local de durável/server-side. Feito em 2026-10-05: o contrato do fluxo (`docs/project_logic_contracts.json`, `life_counter_post_game`) diz que a sessão é local por conta e nunca durável no servidor, e o `docs/flows/life_counter_post_game.md` ganhou a seção 12 com o estado dos achados. Receipt em `docs/qa/execution/2026-10-05/LC-P0-04-docs-do-life.md`. Fica `PASS` só junto com as três dependências.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 592
     },
@@ -2119,19 +2119,19 @@
       "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "`deck_version_at` deixa de ser o horário da requisição (achado 3 dos fluxos).",
       "depends_on": [],
-      "acceptance": "O seletor de cartas do pós-jogo funciona em partida de mais de 5 minutos; teste de servidor fixa `deck_version_at` na revisão do deck. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration: o `GET /decks/:id` devolve em `deck_version_at` o instante da revisão atual (o `created_at` do evento do ledger que levou o deck a ela, ou a criação do deck na revisão 1), o mesmo a cada leitura da mesma revisão, e a nota do pós-jogo criada sem a versão do app grava o mesmo instante (`deckVersionAtSql` em `server/lib/deck_snapshot_contract.dart`). Evidência: `server/test/deck_version_at_db_live_test.dart` (PostgreSQL descartável), `server/test/deck_snapshot_contract_test.dart` e as mutações do grupo `lc05` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-05-deck-version-at-da-revisao.md`. Falta: a prova de runtime do seletor numa partida de mais de 5 minutos no app (raia do app); o app não precisa mudar, porque já compara com `isAtSameMomentAs`. O servidor ainda aceita o par hash/versão que o app manda sem conferir (achado A17 do fluxo do pós-jogo), fora desta tarefa.",
+      "acceptance": "O seletor de cartas do pós-jogo funciona em partida de mais de 5 minutos; teste de servidor fixa `deck_version_at` na revisão do deck. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration: o `GET /decks/:id` devolve em `deck_version_at` o instante da revisão atual (o `created_at` do evento do ledger que levou o deck a ela, ou a criação do deck na revisão 1), o mesmo a cada leitura da mesma revisão, e a nota do pós-jogo criada sem a versão do app grava o mesmo instante (`deckVersionAtSql` em `server/lib/deck_snapshot_contract.dart`). Evidência: `server/test/deck_version_at_db_live_test.dart` (PostgreSQL descartável), `server/test/deck_snapshot_contract_test.dart` e as mutações do grupo `lc05` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-05-deck-version-at-da-revisao.md`. Falta: a prova de runtime do seletor numa partida de mais de 5 minutos no app (raia do app); o app não precisa mudar, porque já compara com `isAtSameMomentAs`. Em 2026-10-05 o app ganhou o teste de widget dessa travessia (`app/test/features/retention/post_game_card_evidence_test.dart`, caso `LC-P0-05`: o deck recarregado com o mesmo instante de revisão mantém o seletor); a prova de runtime continua no lote do `BT-UIEV-001`. O servidor ainda aceita o par hash/versão que o app manda sem conferir (achado A17 do fluxo do pós-jogo), fora desta tarefa.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 593
     },
     {
       "id": "LC-P0-06",
       "priority": "P0 LIFE",
-      "status": "TODO",
+      "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
       "delivery": "Nota de pós-jogo: o 409 não é engolido e `deleteNote` não trata 404 como sucesso (achado 14 dos fluxos).",
       "depends_on": [
         "LC-P0-01"
       ],
-      "acceptance": "A segunda nota do mesmo pós-jogo mostra o conflito; nota apagada não ressuscita; teste de store. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration (decisão 23 da coordenação): os 404 e 409 do pós-jogo levam o motivo em `error_code`, no contrato de erro tipado do `BT-AUTH-001` (`deck_not_found`, `post_game_note_not_found`, `post_game_play_session_conflict`, `post_game_note_deleted` e `post_game_revision_conflict`, em `server/lib/retention/post_game_error_contract.dart`), e o 409 mantém `error: post_game_conflict`. Evidência: `server/test/post_game_note_error_codes_db_live_test.dart` (PostgreSQL descartável), `server/test/post_game_error_contract_test.dart` e as mutações do grupo `lc06err` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-06-codigos-de-erro-do-pos-jogo.md`. Falta: a raia do app (o store tipado e a tela), que tem rascunho pronto e já lê esses códigos.",
+      "acceptance": "A segunda nota do mesmo pós-jogo mostra o conflito; nota apagada não ressuscita; teste de store. Parte do servidor feita em 2026-09-28 na branch `deck/rodada2-2026-09-24`, ainda fora do ar e sem migration (decisão 23 da coordenação): os 404 e 409 do pós-jogo levam o motivo em `error_code`, no contrato de erro tipado do `BT-AUTH-001` (`deck_not_found`, `post_game_note_not_found`, `post_game_play_session_conflict`, `post_game_note_deleted` e `post_game_revision_conflict`, em `server/lib/retention/post_game_error_contract.dart`), e o 409 mantém `error: post_game_conflict`. Evidência: `server/test/post_game_note_error_codes_db_live_test.dart` (PostgreSQL descartável), `server/test/post_game_error_contract_test.dart` e as mutações do grupo `lc06err` derrubadas; receipt em `docs/qa/execution/2026-09-28/LC-P0-06-codigos-de-erro-do-pos-jogo.md`. Falta: a raia do app (o store tipado e a tela), que tem rascunho pronto e já lê esses códigos.. Raia do app feita em 2026-10-05 na branch `claude/frente-contador-de-vida-ibnawb`, escrita do zero sobre os códigos do servidor: a segunda nota da mesma partida volta com a frase do 409 e o formulário fica preenchido; o DELETE só apaga o tombstone com `post_game_note_not_found` (ou a frase antiga) ou `post_game_note_deleted`, e qualquer outro 404 mantém a nota apagada; nota recusada em segundo plano sai do outbox e a tela avisa uma vez. Receipt em `docs/qa/execution/2026-10-05/LC-P0-06-pos-jogo-no-app.md`.",
       "section": "Épico H — Life Counter, partida e pós-jogo",
       "source_line": 594
     },
@@ -8230,13 +8230,14 @@
         "server/routes/decks/[id]/post-game-notes/index.dart"
       ],
       "flow_consumers": [
+        "app/lib/features/home/life_counter/life_counter_account_scope.dart",
         "app/lib/features/home/life_counter/life_counter_session_store.dart",
         "app/lib/features/home/lotus_life_counter_screen.dart",
         "app/lib/features/retention/services/post_game_note_store.dart"
       ],
       "storage": [
-        "local:life_counter_session",
-        "local:post_game_outbox",
+        "local:account_namespace:life_counter_session",
+        "local:account_namespace:post_game_outbox",
         "post_game_notes",
         "post_game_sync_state"
       ],
@@ -8267,13 +8268,14 @@
         "server/routes/decks/[id]/post-game-notes/index.dart"
       ],
       "flow_consumers": [
+        "app/lib/features/home/life_counter/life_counter_account_scope.dart",
         "app/lib/features/home/life_counter/life_counter_session_store.dart",
         "app/lib/features/home/lotus_life_counter_screen.dart",
         "app/lib/features/retention/services/post_game_note_store.dart"
       ],
       "storage": [
-        "local:life_counter_session",
-        "local:post_game_outbox",
+        "local:account_namespace:life_counter_session",
+        "local:account_namespace:post_game_outbox",
         "post_game_notes",
         "post_game_sync_state"
       ],
@@ -10095,5 +10097,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "9213579532d21e267ce2b424557a62eed045c784c0fcf29fe082b3237e63e285"
+  "project_logic_source_digest_sha256": "a7ff9152e32194944e0296325faab9a1fe7098bba09d0bfcb9b3210353c5f46d"
 }

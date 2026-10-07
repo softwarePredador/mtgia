@@ -8,6 +8,17 @@ SIDECAR_DIR="$ROOT_DIR/services/xmage-sidecar"
 BOOTSTRAP="$SIDECAR_DIR/bin/bootstrap_pinned_xmage_runtime.sh"
 
 BROWSER_QA_MODE="${MANALOOM_PLAY_VS_AI_BROWSER_QA:-0}"
+# D-80: a procedência registra o agente e o navegador de cada corrida, como
+# dado da captura. O contrato não nomeia agente; a exigência de navegador real
+# continua. O nome declarado aqui precisa ser o mesmo que a conclusão atesta.
+BROWSER_QA_BROWSER_NAME="${MANALOOM_PLAY_VS_AI_BROWSER_NAME:-}"
+if [[ "$BROWSER_QA_MODE" == "1" ]]; then
+  if [[ ! "$BROWSER_QA_BROWSER_NAME" =~ ^[A-Za-z0-9][A-Za-z0-9\ ._()-]{2,79}$ ]]; then
+    echo "MANALOOM_PLAY_VS_AI_BROWSER_NAME must name the agent and browser of this run" >&2
+    exit 2
+  fi
+fi
+BROWSER_QA_DEVICE_CONTRACT="$BROWSER_QA_BROWSER_NAME browser real Web build 1440x900"
 case "$BROWSER_QA_MODE" in
   0 | 1) ;;
   *)
@@ -750,7 +761,7 @@ run_browser_qa() {
     printf '%s' "$RUN_ID" | shasum -a 256 | awk '{print substr($1, 1, 12)}'
   )"
   browser_email="play-vs-ai-browser-$browser_seed_suffix@example.invalid"
-  browser_username="play_vs_ai_browser_$browser_seed_suffix"
+  browser_username="pvai_browser_$browser_seed_suffix"
   browser_password="BrowserQA!$browser_seed_suffix"
 
   curl -fsS --max-time 30 \
@@ -870,6 +881,7 @@ run_browser_qa() {
     jq -cn \
       --arg source_digest "$BROWSER_UI_SOURCE_DIGEST" \
       --argjson required_checkpoints "$browser_required_checkpoints_json" \
+      --arg device_contract "$BROWSER_QA_DEVICE_CONTRACT" \
       '{
         schema_version: "manaloom_ui_runtime_context_v1",
         source_digest: $source_digest,
@@ -877,7 +889,7 @@ run_browser_qa() {
         profile: "web_play_vs_ai_1440x900",
         runtime: "flutter_web_release_loopback_api_pinned_xmage",
         target: "web_real_build",
-        device_contract: "Codex in-app Chromium browser real Web build 1440x900",
+        device_contract: $device_contract,
         required_checkpoints: $required_checkpoints
       }'
   )" >"$BROWSER_RUNTIME_LOG"
@@ -907,6 +919,7 @@ run_browser_qa() {
     --arg ui_source_digest "$BROWSER_UI_SOURCE_DIGEST" \
     --arg engine_commit "$XMAGE_COMMIT" \
     --arg engine_patch_commit "$XMAGE_PATCH_COMMIT" \
+    --arg browser_name "$BROWSER_QA_BROWSER_NAME" \
     --argjson required_screenshots "$(printf '%s\n' "${required_screenshots[@]}" | jq -R . | jq -s .)" \
     '{
       status: $status,
@@ -930,6 +943,7 @@ run_browser_qa() {
       ui_source_digest: $ui_source_digest,
       engine_commit: $engine_commit,
       engine_patch_commit: $engine_patch_commit,
+      browser_name: $browser_name,
       cleanup: "trap_registered"
     }' >"$BROWSER_READY_MANIFEST"
 
@@ -960,6 +974,7 @@ run_browser_qa() {
   FAILURE_STAGE="validate_browser_qa_attestation"
   jq -e \
     --arg source_digest "$BROWSER_UI_SOURCE_DIGEST" \
+    --arg browser_name "$BROWSER_QA_BROWSER_NAME" \
     '
     .status == "capture_complete"
     and .runtime_capture_complete == true
@@ -970,7 +985,7 @@ run_browser_qa() {
     and .source_digest == $source_digest
     and .viewport.width == 1440
     and .viewport.height == 900
-    and .browser.name == "Codex in-app Chromium"
+    and .browser.name == $browser_name
     and .browser.console_forbidden_entries == 0
     and .reviewer.kind == "agent"
     and (.reviewer.name | type == "string" and length > 0)
@@ -1046,7 +1061,7 @@ run_browser_qa() {
       --runtime flutter_web_release_loopback_api_pinned_xmage \
       --target web_real_build \
       --device-contract \
-        "Codex in-app Chromium browser real Web build 1440x900"
+        "$BROWSER_QA_DEVICE_CONTRACT"
   ) >"$RUN_DIR/browser-runtime-evidence.log" 2>&1
   jq -e \
     --arg source_digest "$BROWSER_UI_SOURCE_DIGEST" \

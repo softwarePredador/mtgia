@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:manaloom/features/home/life_counter/life_counter_account_scope.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot.dart';
 import 'package:manaloom/features/home/lotus/lotus_storage_snapshot_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -33,7 +34,7 @@ void main() {
 
     test('ignores invalid payloads', () async {
       SharedPreferences.setMockInitialValues({
-        lotusStorageSnapshotPrefsKey: jsonEncode({
+        '$lifeCounterSignedOutKeyPrefix$lotusStorageSnapshotPrefsKey': jsonEncode({
           'values': 'not-a-map',
         }),
       });
@@ -46,7 +47,7 @@ void main() {
 
     test('drops null values while parsing', () async {
       SharedPreferences.setMockInitialValues({
-        lotusStorageSnapshotPrefsKey: jsonEncode({
+        '$lifeCounterSignedOutKeyPrefix$lotusStorageSnapshotPrefsKey': jsonEncode({
           'values': {
             'players': '[1,2,3]',
             'gameSettings': null,

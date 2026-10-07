@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-22T00:17:18.804689Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-07T11:58:25.317667Z",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "authenticated_p0_matrix",
   "profile": "web_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "a87a48056e91cd035ba68cf8c957de584dbb1620e935c98a821a243fe0f41461",
+  "log_sha256": "940ba85c21111851794f3241b92911bdc0a6e815639189841081cb945c379ecc",
   "checkpoint_count": 53,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -137,8 +137,8 @@
     {
       "checkpoint": "checkout_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/checkout_success.png",
-      "sha256": "2abac5ae1e6518e159ea8dfeda625edf4993c9287d95a3aa00596f4258866fb6",
-      "bytes": 189402,
+      "sha256": "d612b7e7e91909c9b3c7390329bcbf97c8daa41a1d2cdf22ce1553c2cdf682d1",
+      "bytes": 189271,
       "width": 1440,
       "height": 900
     },
@@ -153,16 +153,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/community_deck_success.png",
-      "sha256": "3c3b3862bde8dafeea8833bb751d9d92ee375153206f5bf354728d699293915e",
-      "bytes": 86128,
+      "sha256": "f56e07d590a3eb4379e7ff33417893ac1704bf380fe66ce2a65b2ee30c9737c7",
+      "bytes": 86388,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "community_public_decks",
       "path": "app/test/ui/goldens/runtime/web_desktop/community_public_decks.png",
-      "sha256": "ac09ce8acfd8559cb8d7ecd7645364af8f1e83a8f1a1e647bd0b333d9739dfef",
-      "bytes": 135375,
+      "sha256": "a17c700d5a3037d341751a1bbd7da1e6ed09f122407f83a068d5782fad265ca9",
+      "bytes": 135860,
       "width": 1440,
       "height": 900
     },
@@ -209,16 +209,16 @@
     {
       "checkpoint": "deck_detail_top",
       "path": "app/test/ui/goldens/runtime/web_desktop/deck_detail_top.png",
-      "sha256": "442eee00d3a00bd939faaf492fe8a8cb2aac285627bdc9f3aab45a60d788ac35",
-      "bytes": 172029,
+      "sha256": "b4cfee0433694493bcc9fb5ffa393903a9e1f3352d1181a545aa9ce73870c579",
+      "bytes": 172089,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "deck_generate_empty",
       "path": "app/test/ui/goldens/runtime/web_desktop/deck_generate_empty.png",
-      "sha256": "b0da315c05b8f46c4aba7117f5a51dc4d8262546a2c24b470b15d997d17953c4",
-      "bytes": 143398,
+      "sha256": "77f94dc7ba4b7b783b136b541a10dba44a947165d16c18411aaa8a9fab225c08",
+      "bytes": 143281,
       "width": 1440,
       "height": 900
     },
@@ -297,8 +297,8 @@
     {
       "checkpoint": "life_counter_initial",
       "path": "app/test/ui/goldens/runtime/web_desktop/life_counter_initial.png",
-      "sha256": "a97501d7a3f5b7b274540a9761b203b3284d36f3fbbbb4b355c4f1ab9cd6ead4",
-      "bytes": 378359,
+      "sha256": "8b3e1f93b4972389f8b0e71dffab90e2bd96c9d057812327c52fd8bd4ec36849",
+      "bytes": 378376,
       "width": 1440,
       "height": 900
     },
@@ -337,24 +337,24 @@
     {
       "checkpoint": "plans_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/plans_success.png",
-      "sha256": "2abac5ae1e6518e159ea8dfeda625edf4993c9287d95a3aa00596f4258866fb6",
-      "bytes": 189402,
+      "sha256": "d612b7e7e91909c9b3c7390329bcbf97c8daa41a1d2cdf22ce1553c2cdf682d1",
+      "bytes": 189271,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "post_game_empty",
       "path": "app/test/ui/goldens/runtime/web_desktop/post_game_empty.png",
-      "sha256": "b9d163e115bbec6da22f76fee0c4812b96ba3f30395671f284d509df86c20477",
-      "bytes": 198877,
+      "sha256": "29514f0e4a42697725e0ee2934be6b3a9691a94a11ef7fd21383729a826827c2",
+      "bytes": 198706,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/profile_success.png",
-      "sha256": "46c8298ee5bd6b0d81dcadd68f14a75985e322672b28148a9003ef4181d54a08",
-      "bytes": 174561,
+      "sha256": "38c00a347f3c383e8f08fa9ab7d60670744f54dba21caa226f24957e397ceae4",
+      "bytes": 173698,
       "width": 1440,
       "height": 900
     },
@@ -425,8 +425,8 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/web_desktop/splash_boot.png",
-      "sha256": "26256dfe8af218a26bf5b821d8daa792f5609196b678c37a67245c54c6774a17",
-      "bytes": 54608,
+      "sha256": "f0768222040c54c49f3545f46dbe3893dfdbf519d4a83c3d39f1f58e450653cc",
+      "bytes": 54592,
       "width": 1440,
       "height": 900
     },
@@ -457,16 +457,16 @@
     {
       "checkpoint": "upgrade_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/upgrade_success.png",
-      "sha256": "2abac5ae1e6518e159ea8dfeda625edf4993c9287d95a3aa00596f4258866fb6",
-      "bytes": 189402,
+      "sha256": "d612b7e7e91909c9b3c7390329bcbf97c8daa41a1d2cdf22ce1553c2cdf682d1",
+      "bytes": 189271,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/user_profile_success.png",
-      "sha256": "1e3c484e825d98faf2af5f9eb87e5981fc435548dda772f7e610cd9e6b6fddbb",
-      "bytes": 99277,
+      "sha256": "04248fa087bc99b42fb2b326f89a6a982656db1b00fdd5d4da8c4d2e04a0163b",
+      "bytes": 99493,
       "width": 1440,
       "height": 900
     },
@@ -481,8 +481,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/web_desktop/user_search_results.png",
-      "sha256": "22fe8aa3b1aae7266dd575f6917337aa8adccee0a775ed77660a8f529dbc37f8",
-      "bytes": 30045,
+      "sha256": "77cea485da4381bd7684309553849598f720e29c3cc929d3266fba40d92688b8",
+      "bytes": 30766,
       "width": 1440,
       "height": 900
     },

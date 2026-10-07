@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T22:27:29.596870Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-06T13:57:31.356594Z",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "deck_workshop",
   "profile": "web_deck_workshop_mobile_390x844",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "07b2b5208cf4ed56ab720a3b81b6213bf58c11c1319c4231118e2a2c6e796a41",
+  "log_sha256": "467c385a7ab09857dba9f822b0f1c5f65677b7de29e20243e41c0a03d0d01e8f",
   "checkpoint_count": 12,
   "required_checkpoints": [
     "deck_workshop_00_commander",
@@ -40,8 +40,8 @@
     {
       "checkpoint": "deck_workshop_01_import_preflight",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-mobile/deck_workshop_01_import_preflight.png",
-      "sha256": "017d59604ebf0762d16269195941a4af44a132a527c455669a7146607be4f04c",
-      "bytes": 88443,
+      "sha256": "27df025b0691b428a5eafc1af1cf2b7ca6a46004e7a2dc57ddde02c1b5d66448",
+      "bytes": 88340,
       "width": 390,
       "height": 844
     },

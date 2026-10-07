@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T22:34:00.745584Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-06T13:54:05.828412Z",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "binder_import",
   "profile": "web_binder_import_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "3723896d92754498afd60aecf4321ffd5412546845bbe59ebd518a3458612044",
+  "log_sha256": "655e9abb4073cea5800ab6515ce0841476f5dff7ef368eb86f853d632cb5f5ba",
   "checkpoint_count": 7,
   "required_checkpoints": [
     "binder_import_00_source",
@@ -75,8 +75,8 @@
     {
       "checkpoint": "binder_import_06_history",
       "path": "docs/qa/ui-live/current/ux-pack-02-collection-import-web-desktop/binder_import_06_history.png",
-      "sha256": "8da68800f103f5c4bb431ead4961ff9bb8f01323e0b60c22f0b18b97498abeb7",
-      "bytes": 167519,
+      "sha256": "74a8d409eaaf1f188c040cde03b0673b8f87ab35aaa8fe3112c207f895a4c7f1",
+      "bytes": 167159,
       "width": 1440,
       "height": 900
     }

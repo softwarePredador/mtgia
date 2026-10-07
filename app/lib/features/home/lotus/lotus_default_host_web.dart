@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:web/web.dart' as web;
 
 import '../../../core/branding/product_identity.dart';
+import '../life_counter/life_counter_account_scope.dart';
 import '../life_counter/life_counter_day_night_state_store.dart';
 import '../life_counter/life_counter_game_timer_state_store.dart';
 import '../life_counter/life_counter_history_store.dart';
@@ -108,6 +109,14 @@ class LotusWebHostController
   final web.HTMLIFrameElement _frame = web.HTMLIFrameElement();
   final Map<int, Completer<Object?>> _pendingEvaluations =
       <int, Completer<Object?>>{};
+  // LC-P0-01: the raw browser keys live in the signed-in account's namespace,
+  // like the SharedPreferences mirrors below.
+  final LifeCounterStorageNamespace _namespace =
+      LifeCounterAccountScope.instance.current;
+  late final String _webStorageKey = _namespace.keyFor(lotusWebStorageKey);
+  late final String _webStoragePendingFingerprintKey = _namespace.keyFor(
+    lotusWebStoragePendingFingerprintKey,
+  );
   final LifeCounterDayNightStateStore _dayNightStateStore =
       LifeCounterDayNightStateStore();
   final LifeCounterGameTimerStateStore _gameTimerStateStore =
@@ -486,7 +495,7 @@ class LotusWebHostController
 
   Map<String, String> _loadPersistedStorage() {
     try {
-      final rawValue = web.window.localStorage.getItem(lotusWebStorageKey);
+      final rawValue = web.window.localStorage.getItem(_webStorageKey);
       if (rawValue == null || rawValue.isEmpty) {
         return const <String, String>{};
       }
@@ -584,7 +593,7 @@ class LotusWebHostController
   }
 
   void _persistStorage(Object? rawValues) {
-    if (_isCanonicalMutationInProgress) {
+    if (_isCanonicalMutationInProgress || !_namespace.isCurrent) {
       return;
     }
     if (rawValues is! Map) {
@@ -598,10 +607,10 @@ class LotusWebHostController
     final fingerprint = _storageFingerprint(values);
     try {
       web.window.localStorage.setItem(
-        lotusWebStoragePendingFingerprintKey,
+        _webStoragePendingFingerprintKey,
         fingerprint,
       );
-      web.window.localStorage.setItem(lotusWebStorageKey, jsonEncode(values));
+      web.window.localStorage.setItem(_webStorageKey, jsonEncode(values));
     } catch (error) {
       debugPrint('$lotusLogPrefix web storage persist error: $error');
     }
@@ -616,9 +625,7 @@ class LotusWebHostController
 
   String? _loadPendingStorageFingerprint() {
     try {
-      return web.window.localStorage.getItem(
-        lotusWebStoragePendingFingerprintKey,
-      );
+      return web.window.localStorage.getItem(_webStoragePendingFingerprintKey);
     } catch (_) {
       return null;
     }
@@ -644,7 +651,7 @@ class LotusWebHostController
       if (!observedState.hasSameJournalAs(currentState)) {
         return false;
       }
-      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+      web.window.localStorage.removeItem(_webStoragePendingFingerprintKey);
       return true;
     } catch (error) {
       debugPrint('$lotusLogPrefix web storage journal cleanup error: $error');
@@ -654,7 +661,7 @@ class LotusWebHostController
 
   void _invalidatePendingStorageFingerprint() {
     try {
-      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+      web.window.localStorage.removeItem(_webStoragePendingFingerprintKey);
     } catch (error) {
       debugPrint('$lotusLogPrefix web storage journal cleanup error: $error');
     }
@@ -675,8 +682,8 @@ class LotusWebHostController
       snapshot: snapshot,
     );
     try {
-      web.window.localStorage.setItem(lotusWebStorageKey, jsonEncode(values));
-      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+      web.window.localStorage.setItem(_webStorageKey, jsonEncode(values));
+      web.window.localStorage.removeItem(_webStoragePendingFingerprintKey);
     } catch (error) {
       debugPrint('$lotusLogPrefix web storage commit error: $error');
     }
@@ -722,7 +729,7 @@ class LotusWebHostController
       )) {
         return;
       }
-      web.window.localStorage.removeItem(lotusWebStoragePendingFingerprintKey);
+      web.window.localStorage.removeItem(_webStoragePendingFingerprintKey);
     } catch (error) {
       debugPrint('$lotusLogPrefix web storage journal cleanup error: $error');
     }

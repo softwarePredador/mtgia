@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-21T22:29:11.395987Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-10-06T13:59:00.618829Z",
+  "source_digest": "a6b70b7b2db3a2ad3c0969da143bb435c01c389de39f9f55f263cbb8f593824f",
   "surface": "deck_workshop",
   "profile": "web_deck_workshop_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "8b196c510e36e7b55787e46681f58d4d17fa89b309e577a60c1e967e4926d644",
+  "log_sha256": "fe417645ca3dd911e0bb7080dc6f2c9c044d53ad0548f5dc2a9c8ca04a358f27",
   "checkpoint_count": 12,
   "required_checkpoints": [
     "deck_workshop_00_commander",
@@ -40,8 +40,8 @@
     {
       "checkpoint": "deck_workshop_01_import_preflight",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_01_import_preflight.png",
-      "sha256": "c38ebaa1ca4cfded64aa4d6e947859a9822c1fe4a483fadaa2b5d80d64da289b",
-      "bytes": 110420,
+      "sha256": "689588f15bea4fd6a3d606676f02855e1f307ee46759eaa22d956a3ef5bc6534",
+      "bytes": 110250,
       "width": 1440,
       "height": 900
     },
@@ -72,8 +72,8 @@
     {
       "checkpoint": "deck_workshop_05_card_reader",
       "path": "docs/qa/ui-live/current/ux-pack-03-deck-workshop-web-desktop/deck_workshop_05_card_reader.png",
-      "sha256": "13964f387a5294d2acf6c3afc9a852bcfb50acaefdad1a0846433b9776d54fed",
-      "bytes": 254234,
+      "sha256": "1229d2d3b79567c6e9183f727e4bb1a637b42d32ac00ddfcf261bd2a6c9b055a",
+      "bytes": 254268,
       "width": 1440,
       "height": 900
     },

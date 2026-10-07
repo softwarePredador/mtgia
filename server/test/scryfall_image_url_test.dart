@@ -112,5 +112,72 @@ void main() {
         'https://cards.scryfall.io/normal/front/0/0/$printingId.jpg',
       );
     });
+
+    test('refuses card art from any host other than Scryfall (BT-ART-01)', () {
+      for (final foreign in const [
+        'https://evil.example/card.jpg',
+        'https://cards.scryfall.io.example.test/normal/front/0/0/x.jpg',
+        'http://images.example.test/card.jpg',
+        'ftp://cards.scryfall.io/normal/front/0/0/x.jpg',
+      ]) {
+        expect(normalizeScryfallImageUrl(foreign), isNull, reason: foreign);
+        expect(
+          normalizeScryfallImageUrl(
+            foreign,
+            printingId: printingId,
+            oracleId: oracleId,
+          ),
+          'https://cards.scryfall.io/normal/front/0/0/$printingId.jpg',
+          reason: foreign,
+        );
+      }
+    });
+
+    test('keeps loopback fixture art only in the isolated E2E runtime', () {
+      const fixtureUrl =
+          'http://127.0.0.1:53167/app/assets/assets/branding/'
+          'visual_fixture_arcane_ring.webp';
+      const isolated = {
+        'MANALOOM_E2E_ISOLATED_RUNTIME': '1',
+        'MANALOOM_E2E_VALIDATION_RUN_TOKEN': 'server-contract-run_1',
+      };
+      expect(
+        normalizeScryfallImageUrl(
+          fixtureUrl,
+          printingId: printingId,
+          oracleId: oracleId,
+          environment: isolated,
+        ),
+        fixtureUrl,
+      );
+      expect(
+        normalizeScryfallImageUrl(
+          'http://localhost:8080/card.webp',
+          environment: isolated,
+        ),
+        'http://localhost:8080/card.webp',
+      );
+      expect(
+        normalizeScryfallImageUrl(
+          'https://evil.example/card.jpg',
+          environment: isolated,
+        ),
+        isNull,
+      );
+      for (final environment in const <Map<String, String>>[
+        {},
+        {'MANALOOM_E2E_ISOLATED_RUNTIME': '1'},
+        {
+          'MANALOOM_E2E_ISOLATED_RUNTIME': '0',
+          'MANALOOM_E2E_VALIDATION_RUN_TOKEN': 'server-contract-run_1',
+        },
+      ]) {
+        expect(
+          normalizeScryfallImageUrl(fixtureUrl, environment: environment),
+          isNull,
+          reason: '$environment',
+        );
+      }
+    });
   });
 }

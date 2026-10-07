@@ -813,7 +813,7 @@ class _DiagnosticEvidenceListTile extends StatelessWidget {
                     : 'Arte de referência de ${entry.name}',
                 imageIsReference: card?.hasPrintingArtwork != true,
                 width: AppTheme.touchTargetMin,
-                height: 64,
+                height: 67,
                 borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                 constrainAspectRatio: false,
               ),

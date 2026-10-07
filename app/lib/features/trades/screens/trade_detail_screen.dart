@@ -504,7 +504,7 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                 children: [
                   SizedBox(
                     width: AppTheme.touchTargetMin,
-                    height: 64,
+                    height: 67,
                     child: CardArtwork(
                       variant: CardArtworkVariant.gallery,
                       imageUrl: item.card.printingImageUrl,

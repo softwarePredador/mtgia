@@ -118,13 +118,16 @@ DeckMutationResult parseDeckMutationResponse(
   return DeckMutationResult(isSuccess: false, errorMessage: message);
 }
 
+/// Removes every copy of one card line (DCK-P0-00, D-27). The incremental
+/// route stays open under `decks_private`, while `PUT /decks/:id`, which
+/// rewrites the whole list, belongs to the closed `deck_replace_all`.
 Future<DeckMutationResult> removeCardFromDeckRequest(
   ApiClient apiClient, {
   required String deckId,
-  required List<Map<String, dynamic>> cardsPayload,
+  required String cardId,
 }) async {
-  final response = await apiClient.put('/decks/$deckId', {
-    'cards': cardsPayload,
+  final response = await apiClient.post('/decks/$deckId/cards/remove', {
+    'card_id': cardId,
   });
   return parseDeckMutationResponse(
     response,
@@ -256,11 +259,13 @@ Map<String, dynamic> parseDeckPricingResponse(ApiResponse response) {
   if (response.statusCode == 200) {
     return (response.data as Map).cast<String, dynamic>();
   }
-  final data = response.data;
-  final msg = (data is Map && data['error'] != null)
-      ? data['error'].toString()
-      : 'Falha ao calcular custo: ${response.statusCode}';
-  throw Exception(msg);
+  throw Exception(
+    FriendlyErrorMapper.fromApiResponse(
+      response,
+      context: FriendlyErrorContext.deckPricing,
+      fallback: 'Não foi possível calcular o custo deste deck agora.',
+    ),
+  );
 }
 
 Future<Map<String, dynamic>> fetchDeckPricingRequest(
@@ -347,7 +352,7 @@ Future<void> updateDeckDescriptionRequest(
   required String deckId,
   required String description,
 }) async {
-  final response = await apiClient.put('/decks/$deckId', {
+  final response = await apiClient.patch('/decks/$deckId', {
     'description': description,
   });
   ensureSuccessfulDeckMutationResponse(
@@ -362,7 +367,7 @@ Future<void> updateDeckStrategyRequest(
   required String archetype,
   required int bracket,
 }) async {
-  final response = await apiClient.put('/decks/$deckId', {
+  final response = await apiClient.patch('/decks/$deckId', {
     'archetype': archetype,
     'bracket': bracket,
   });

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'life_counter_session.dart';
+import 'life_counter_account_scope.dart';
 
 const String lifeCounterPlayerAppearanceProfilesPrefsKey =
     'life_counter_player_appearance_profiles_v1';
@@ -63,14 +64,21 @@ class LifeCounterPlayerAppearanceProfile {
 class LifeCounterPlayerAppearanceProfileStore {
   LifeCounterPlayerAppearanceProfileStore({
     LifeCounterAppearanceProfilesPreferencesLoader? preferencesLoader,
-    this.prefsKey = lifeCounterPlayerAppearanceProfilesPrefsKey,
-  }) : _preferencesLoader = preferencesLoader ?? SharedPreferences.getInstance;
+    String? prefsKey,
+    LifeCounterStorageNamespace? namespace,
+  }) : _binding = LifeCounterStorageBinding.resolve(
+         baseKey: lifeCounterPlayerAppearanceProfilesPrefsKey,
+         namespace: namespace,
+         prefsKey: prefsKey,
+         preferencesLoader: preferencesLoader,
+       );
 
-  final LifeCounterAppearanceProfilesPreferencesLoader _preferencesLoader;
-  final String prefsKey;
+  final LifeCounterStorageBinding _binding;
+  String get prefsKey => _binding.prefsKey;
+  LifeCounterStorageNamespace get namespace => _binding.namespace;
 
   Future<List<LifeCounterPlayerAppearanceProfile>> load() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     final raw = prefs.getString(prefsKey);
     if (raw == null || raw.isEmpty) {
       return const <LifeCounterPlayerAppearanceProfile>[];
@@ -98,7 +106,7 @@ class LifeCounterPlayerAppearanceProfileStore {
   Future<List<LifeCounterPlayerAppearanceProfile>> saveAll(
     List<LifeCounterPlayerAppearanceProfile> profiles,
   ) async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     final normalized = List<LifeCounterPlayerAppearanceProfile>.unmodifiable(
       profiles,
     );
@@ -128,10 +136,9 @@ class LifeCounterPlayerAppearanceProfileStore {
     );
 
     final profile = LifeCounterPlayerAppearanceProfile(
-      id:
-          existingIndex >= 0
-              ? profiles[existingIndex].id
-              : DateTime.now().microsecondsSinceEpoch.toString(),
+      id: existingIndex >= 0
+          ? profiles[existingIndex].id
+          : DateTime.now().microsecondsSinceEpoch.toString(),
       name: normalizedName,
       appearance: appearance,
     );
@@ -154,7 +161,7 @@ class LifeCounterPlayerAppearanceProfileStore {
   }
 
   Future<void> clear() async {
-    final prefs = await _preferencesLoader();
+    final prefs = await _binding.preferences();
     await prefs.remove(prefsKey);
   }
 }

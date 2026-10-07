@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `9213579532d21e267ce2b424557a62eed045c784c0fcf29fe082b3237e63e285`
+**Digest das fontes:** `a7ff9152e32194944e0296325faab9a1fe7098bba09d0bfcb9b3210353c5f46d`
 
 ## Fontes de verdade
 
@@ -15,15 +15,15 @@
 
 | Superfície | Quantidade |
 |---|---:|
-| `dart_source_files` | 724 |
+| `dart_source_files` | 748 |
 | `non_dart_product_files` | 52 |
 | `battle_sidecar_source_files` | 34 |
-| `dart_symbols` | 5462 |
-| `semantic_resolved_files` | 724 |
+| `dart_symbols` | 5573 |
+| `semantic_resolved_files` | 748 |
 | `semantic_unresolved_files` | 0 |
-| `semantic_resolved_call_edges` | 43718 |
-| `semantic_resolved_call_sites` | 69260 |
-| `semantic_resolved_type_references` | 16757 |
+| `semantic_resolved_call_edges` | 44729 |
+| `semantic_resolved_call_sites` | 70766 |
+| `semantic_resolved_type_references` | 17486 |
 | `modules` | 164 |
 | `app_routes` | 46 |
 | `web_routes` | 11 |
@@ -32,8 +32,8 @@
 | `database_views` | 6 |
 | `migrations` | 74 |
 | `scripts_and_jobs` | 711 |
-| `environment_variables` | 729 |
-| `tests` | 1330 |
+| `environment_variables` | 734 |
+| `tests` | 1345 |
 | `flows` | 13 |
 | `traceability_rules` | 12 |
 | `tasks` | 246 |
@@ -52,7 +52,7 @@
 | Criar, importar, editar e validar deck | `active_release_scope` | decks and deck_cards under DeckRulesService validation |
 | Gerar, analisar e otimizar deck com IA | `experimental_split: analyze_optimize=experimental_p0_open; generate_rebuild=experimental_guarded` | Commander deckbuilding contract plus backend deterministic and quality gates |
 | Battle, Jogar contra IA, evidência de carta e replay | `active_guarded` | persisted battle attempts, jobs and replays plus pinned execution identity; external pins do not promote native rules |
-| Life Counter, sessão e pós-jogo | `active_release_scope` | local game session stores plus PostgreSQL post_game_notes after sync |
+| Life Counter, sessão e pós-jogo | `active_release_scope` | device-local game session stores namespaced per signed-in account (not durable, never server-side) plus PostgreSQL post_game_notes after sync |
 | Comunidade, mensagens, binder e trades | `active_requires_release_e2e` | PostgreSQL ownership and transition services |
 | Build, migração, deploy, observabilidade e rollback | `guarded_no_implicit_live_write` | same-SHA release contract, artifact digests, migration ledger and health/readiness |
 | Plano, cota de IA e comércio (beta gratuita, sem cobrança) | `free_beta_no_commerce` | user_plans and ai_logs in PostgreSQL under PlanService; offer_mode free_beta_no_commerce in server/config/release_capabilities.json; no payment provider exists |
