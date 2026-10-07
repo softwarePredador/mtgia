@@ -18,7 +18,16 @@ import 'package:manaloom/core/widgets/app_tile_overlay.dart';
 /// docs/design/ui-kit/specimen-390.png and specimen-1440.png, so a visual
 /// regression of the kit is caught by image and not only by regex.
 ///
-/// Regenerate with:
+/// Deliberate divergences from those PNGs, which predate D-44: brasa cheia
+/// is vinho (`mesa-brewtact.html:18,320`); the derived pieces are five and
+/// include the legal acceptance rule (F4); the pieces the PNGs mark "novo"
+/// (result, shape, lane, score, live block, swatches) are not in
+/// BT-UX-KIT-001 and are left out; icons are Material, since the task adds
+/// no glyph set or asset.
+///
+/// Regenerate on the Mac that runs the pre-push gate, never in a Linux
+/// container: Linux rasterizes the same fonts differently (4-6% of pixels
+/// here), so a Linux baseline fails the gate. Run:
 /// `flutter test --update-goldens test/core/widgets/bt_kit_specimen_test.dart`
 Future<void> _loadFonts() async {
   await Future.wait([
@@ -54,6 +63,11 @@ void main() {
       addTearDown(tester.view.reset);
 
       await tester.pumpWidget(_SpecimenApp(width: profile.width));
+      await tester.runAsync(() async {
+        for (final element in find.byType(Image).evaluate()) {
+          await precacheImage((element.widget as Image).image, element);
+        }
+      });
       await tester.pump();
       final height = tester.getSize(find.byKey(_specimenKey)).height;
       tester.view.physicalSize = Size(
@@ -292,6 +306,8 @@ class _Mesa extends StatelessWidget {
                       child: _SeatPanel(
                         color: AppTheme.btSeats[(r * columns + c + 3) % 10],
                         value: values[(r * columns + c) % values.length],
+                        art:
+                            _fixtureArt[(r * columns + c) % _fixtureArt.length],
                       ),
                     ),
                   ],
@@ -305,11 +321,21 @@ class _Mesa extends StatelessWidget {
   }
 }
 
+/// Card art already shipped in the app, behind each seat as in
+/// specimen.html (`.esp-mesa img`: opacity .42, luminosity blend).
+const _fixtureArt = [
+  'assets/branding/visual_fixture_arcane_ring.webp',
+  'assets/branding/visual_fixture_ember_raiders.webp',
+  'assets/branding/visual_fixture_blue_spell.webp',
+  'assets/branding/visual_fixture_arcane_artificer.webp',
+];
+
 class _SeatPanel extends StatelessWidget {
-  const _SeatPanel({required this.color, required this.value});
+  const _SeatPanel({required this.color, required this.value, this.art});
 
   final Color color;
   final String value;
+  final String? art;
 
   @override
   Widget build(BuildContext context) {
@@ -320,7 +346,89 @@ class _SeatPanel extends StatelessWidget {
         gradient: tokens.vitral(color, middle: 0.5),
         border: Border.all(color: tokens.palette.filete),
       ),
-      child: AppNumeralMesa(value, semanticsLabel: '$value pontos de vida'),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(tokens.metrics.radiusPanel),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (art != null)
+              Opacity(
+                opacity: 0.42,
+                // The seat keeps its hue; the art gives only light and shade.
+                child: Image.asset(
+                  art!,
+                  fit: BoxFit.cover,
+                  color: color,
+                  colorBlendMode: BlendMode.color,
+                ),
+              ),
+            AppNumeralMesa(value, semanticsLabel: '$value pontos de vida'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The table in miniature, in the tile's 34 dp icon slot (`.t.mesa .mini`).
+class _SeatThumbnail extends StatelessWidget {
+  const _SeatThumbnail();
+
+  @override
+  Widget build(BuildContext context) {
+    Widget seat(Color color) => Expanded(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(3),
+        ),
+        child: const SizedBox.expand(),
+      ),
+    );
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              seat(AppTheme.btSeatMare),
+              const SizedBox(width: 2),
+              seat(AppTheme.btSeatMusgo),
+            ],
+          ),
+        ),
+        const SizedBox(height: 2),
+        Expanded(
+          child: Row(
+            children: [
+              seat(AppTheme.btSeatBrasa),
+              const SizedBox(width: 2),
+              seat(AppTheme.btSeatAmbar),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Starting life in the tile corner: a heart over the value (`.t.mesa .vida`).
+class _StartingLife extends StatelessWidget {
+  const _StartingLife(this.value);
+
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.favorite, size: 12, color: AppTheme.btHeart),
+        AppNumeral(
+          value,
+          scale: AppNumeralScale.canto,
+          semanticsLabel: 'vida inicial $value',
+        ),
+      ],
     );
   }
 }
@@ -414,8 +522,9 @@ class _BoardSection extends StatelessWidget {
           weights: const [2, 1, 1, 1, 1],
           children: [
             const AppTile(
-              icon: Icon(Icons.grid_view_rounded),
+              icon: _SeatThumbnail(),
               label: 'Mesa',
+              estado: _StartingLife('40'),
               numeral: AppNumeral('4', semanticsLabel: '4 jogadores'),
               onTap: _noop,
             ),
@@ -441,7 +550,7 @@ class _BoardSection extends StatelessWidget {
               onTap: _noop,
             ),
             const AppTile(
-              icon: Icon(Icons.outlined_flag),
+              icon: Icon(Icons.sports_score),
               label: 'Encerrar partida',
               onTap: _noop,
             ),
@@ -543,7 +652,7 @@ class _TileStates extends StatelessWidget {
         ),
         cell(
           const AppTile(
-            icon: Icon(Icons.flag),
+            icon: Icon(Icons.sports_score),
             label: 'Brasa',
             tone: AppTileTone.brasaTinta,
             onTap: _noop,
@@ -553,7 +662,7 @@ class _TileStates extends StatelessWidget {
         ),
         cell(
           const AppTile(
-            icon: Icon(Icons.flag),
+            icon: Icon(Icons.sports_score),
             label: 'Armado',
             tone: AppTileTone.brasaTinta,
             armed: true,
@@ -565,7 +674,7 @@ class _TileStates extends StatelessWidget {
         ),
         cell(
           const AppTile(
-            icon: Icon(Icons.flag),
+            icon: Icon(Icons.sports_score),
             label: 'Brasa cheia',
             tone: AppTileTone.brasaCheia,
             onTap: _noop,
@@ -626,11 +735,11 @@ class _Numerals extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [numeral, _Caption(caption)],
     );
-    Widget panel(String value, Color color, String caption) => item(
+    Widget panel(String value, Color color, String art, String caption) => item(
       SizedBox(
         width: wide ? 140 : 160,
         height: 110,
-        child: _SeatPanel(color: color, value: value),
+        child: _SeatPanel(color: color, value: value, art: art),
       ),
       caption,
     );
@@ -648,8 +757,18 @@ class _Numerals extends StatelessWidget {
           const AppNumeral('12', scale: AppNumeralScale.canto),
           'canto · 32 px',
         ),
-        panel('27', AppTheme.btSeatMusgo, 'mesa · medido pelo card'),
-        panel('120', AppTheme.btSeatBrasa, 'mesa · três dígitos'),
+        panel(
+          '27',
+          AppTheme.btSeatMusgo,
+          _fixtureArt[0],
+          'mesa · medido pelo card',
+        ),
+        panel(
+          '120',
+          AppTheme.btSeatBrasa,
+          _fixtureArt[1],
+          'mesa · três dígitos',
+        ),
       ],
     );
   }

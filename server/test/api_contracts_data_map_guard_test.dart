@@ -407,8 +407,10 @@ void main() {
       );
       expect(
         printings,
-        contains('A legacy `sync=true` is accepted and ignored'),
+        contains('returns 400 `catalog_sync_unsupported`'),
       );
+      expect(printings, isNot(contains('accepted and ignored')));
+      expect(printings, isNot(contains('The app still sends `sync=true`')));
       expect(printings, contains('cards_printings_read_only_test.dart'));
       expect(printings, isNot(contains('write-capable')));
 
