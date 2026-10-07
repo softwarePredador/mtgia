@@ -337,7 +337,7 @@ class PostGameNoteStore {
       await _saveNotes(note.deckId, notes);
       throw PostGameNoteRejectedException(rejection);
     } catch (_) {
-      // Offline or a retryable answer: the outbox keeps the note.
+      // No network or a retryable answer: the outbox keeps the note.
     }
   }
 
@@ -449,7 +449,7 @@ class PostGameNoteStore {
         await _removePendingUpsert(deckId, note.id);
       } on PostGameRemoteRejection catch (rejection) {
         if (!rejection.isDefinitive) continue;
-        // Refused for good while offline-queued: stop retrying, drop the
+        // Refused for good while queued without network: stop retrying, drop the
         // local copy and keep the reason for the screen to show once.
         await _removePendingUpsert(deckId, note.id);
         final notes = await _loadLocalNotes(deckId);
