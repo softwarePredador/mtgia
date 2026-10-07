@@ -10,12 +10,16 @@ import '../../../lib/scryfall_image_url.dart';
 ///
 /// Somente leitura (BT-CAT-04, decisão D-35 do dono): a rota consulta o
 /// catálogo local e nunca escreve no banco nem chama a Scryfall. O antigo
-/// `sync=true` não dispara mais nada; o parâmetro é ignorado. O catálogo é
-/// atualizado só pelo job interno de dado de referência (BT-CAT-01). Nome sem
-/// nenhuma edição no catálogo responde 404 `card_not_in_catalog` (BT-CAT-02).
+/// `sync=true` responde 400 `catalog_sync_unsupported` antes de qualquer
+/// consulta (BT-CAT-02); o app parou de mandá-lo. O catálogo é atualizado só
+/// pelo job interno de dado de referência (BT-CAT-01). Nome sem nenhuma
+/// edição no catálogo responde 404 `card_not_in_catalog` (BT-CAT-02).
 Future<Response> onRequest(RequestContext context) async {
   if (context.request.method != HttpMethod.get) {
     return Response(statusCode: HttpStatus.methodNotAllowed);
+  }
+  if (requestsCatalogSync(context.request.uri.queryParameters)) {
+    return catalogSyncUnsupportedResponse();
   }
 
   final pool = context.read<Pool>();

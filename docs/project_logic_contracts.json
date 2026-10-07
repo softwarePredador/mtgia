@@ -357,13 +357,23 @@
       "consumers": ["scripts/quality_gate.sh", "scripts/manaloom_local_ci.sh"],
       "durability": "ephemeral_until_reviewed_and_tracked",
       "allowed_statuses": ["PASS", "PARTIAL", "BLOCKED", "FAIL"],
-      "required_bindings": ["requested_profile", "execution_policy", "result", "gate_eligible", "summary.step_count", "summary.skipped", "steps"],
+      "required_bindings": ["requested_profile", "execution_policy", "result", "gate_eligible", "summary.step_count", "summary.skipped", "steps", "git_sha", "source.stable", "source.worktree_digest_sha256", "source.project_logic_source_digest", "receipt.path", "receipt.durable", "receipt.artifact_manifest_sha256"],
       "status_semantics": {
         "PASS": {"strict_exit_code": 0, "gate_eligible": true},
         "PARTIAL": {"strict_exit_code": 3, "diagnostic_gate_eligible": false},
         "BLOCKED": {"strict_exit_code": 2, "gate_eligible": false},
         "FAIL": {"strict_exit_code": 1, "gate_eligible": false}
       }
+    },
+    {
+      "id": "manaloom_gate_run_receipt_v1",
+      "flows": ["release_operations"],
+      "producers": ["scripts/manaloom_gate_run_receipt.py", "scripts/manaloom_e2e_suite.sh"],
+      "consumers": ["scripts/manaloom_gate_run_receipt.py", "server/test/gate_run_receipt_test.py"],
+      "schemas": ["manaloom.gate_run_receipt.v1"],
+      "durability": "durable_outside_tmp_and_worktree",
+      "allowed_statuses": ["PASS", "FAIL", "BLOCKED", "PARTIAL"],
+      "required_bindings": ["gate.id", "gate.mode", "git_sha", "worktree_digest_sha256", "project_logic_source_digest", "source.start", "source.end", "source.stable", "checks", "check_catalog_sha256", "artifacts", "artifact_manifest_sha256", "evidence_root", "durable", "gate_eligible"]
     },
     {
       "id": "ui_live_evidence_v1",

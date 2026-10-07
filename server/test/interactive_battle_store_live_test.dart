@@ -24,15 +24,24 @@ void main() {
 
   setUpAll(() async {
     if (!enabled) return;
-    pool = Pool.withEndpoints([
-      Endpoint(
-        host: Platform.environment['DB_HOST'] ?? '127.0.0.1',
-        port: int.parse(Platform.environment['DB_PORT'] ?? '5432'),
-        database: Platform.environment['DB_NAME']!,
-        username: Platform.environment['DB_USER']!,
-        password: Platform.environment['DB_PASS'] ?? '',
+    pool = Pool.withEndpoints(
+      [
+        Endpoint(
+          host: Platform.environment['DB_HOST'] ?? '127.0.0.1',
+          port: int.parse(Platform.environment['DB_PORT'] ?? '5432'),
+          database: Platform.environment['DB_NAME']!,
+          username: Platform.environment['DB_USER']!,
+          password: Platform.environment['DB_PASS'] ?? '',
+        ),
+      ],
+      settings: const PoolSettings(
+        sslMode: SslMode.disable,
+        // As corridas abaixo precisam de conexões de verdade em paralelo. Com o
+        // padrão de uma conexão, o pool enfileira no cliente e o banco nunca vê
+        // a disputa.
+        maxConnectionCount: 4,
       ),
-    ], settings: const PoolSettings(sslMode: SslMode.disable));
+    );
     store = InteractiveBattleStore(pool);
     await _seed(pool);
   });
@@ -828,10 +837,22 @@ void main() {
         parameters: {'session_id': _lifecycleSessionId},
       );
       final preservedRow = preserved.single.toColumnMap();
-      expect(preservedRow['deck_a_id'], isNull);
-      expect(preservedRow['deck_b_id'], isNull);
-      expect(preservedRow['attempt_deck_a_id'], isNull);
-      expect(preservedRow['attempt_deck_b_id'], isNull);
+      // DCK-P0-06: apagar manda o deck para a lixeira, então a partida e a
+      // tentativa seguem apontando para ele até a purga por prazo.
+      expect(preservedRow['deck_a_id'], _lifecycleDeckAId);
+      expect(preservedRow['deck_b_id'], _lifecycleDeckBId);
+      expect(preservedRow['attempt_deck_a_id'], _lifecycleDeckAId);
+      expect(preservedRow['attempt_deck_b_id'], _lifecycleDeckBId);
+      final trashed = await pool.execute(
+        Sql.named('''
+          SELECT COUNT(*)::int
+          FROM decks
+          WHERE id IN (CAST(@deck_a AS uuid), CAST(@deck_b AS uuid))
+            AND deleted_at IS NOT NULL
+        '''),
+        parameters: {'deck_a': _lifecycleDeckAId, 'deck_b': _lifecycleDeckBId},
+      );
+      expect(trashed.single.single, 2);
       expect(preservedRow['replay_id'], isNotNull);
       expect(preservedRow['attempt_replay_id'], preservedRow['replay_id']);
       expect(preservedRow['replay_count'], 1);

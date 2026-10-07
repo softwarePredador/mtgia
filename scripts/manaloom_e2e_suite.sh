@@ -12,6 +12,13 @@ RUN_DIR="${MANALOOM_E2E_RUN_DIR:-$REPORT_ROOT/manaloom_e2e_suite_$STAMP}"
 SUMMARY_FILE="$RUN_DIR/summary.md"
 SUMMARY_JSON_FILE="$RUN_DIR/summary.json"
 STEP_MANIFEST_FILE="$RUN_DIR/steps.tsv"
+# BT-GATE-002: o RUN_DIR pode ficar em /tmp; o receipt forte copia os logs, com
+# sha256, para uma raiz durável e liga a execução ao SHA e ao digest do worktree.
+RECEIPT_TOOL="$ROOT_DIR/scripts/manaloom_gate_run_receipt.py"
+RECEIPT_ROOT="${MANALOOM_GATE_RECEIPT_ROOT:-$HOME/.manaloom/receipts}"
+SOURCE_START_FILE="$RUN_DIR/source-start.json"
+RECEIPT_RESULT_FILE="$RUN_DIR/receipt-result.json"
+RUN_STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 FAILED_STEPS=()
 SKIPPED_STEPS=()
 BLOCKED_STEPS=()
@@ -482,7 +489,8 @@ write_summary_json() {
     "$E2E_PROFILE" \
     "$E2E_EXECUTION_POLICY" \
     "$RUN_DIR" \
-    "$STAMP" <<'PY'
+    "$STAMP" \
+    "$RECEIPT_RESULT_FILE" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -494,6 +502,23 @@ profile = sys.argv[4]
 execution_policy = sys.argv[5]
 run_dir = sys.argv[6]
 stamp = sys.argv[7]
+receipt_result_path = Path(sys.argv[8])
+receipt = None
+if receipt_result_path.is_file() and receipt_result_path.stat().st_size:
+    result_line = json.loads(receipt_result_path.read_text(encoding="utf-8"))
+    receipt_file = Path(result_line["receipt"])
+    full = json.loads(receipt_file.read_text(encoding="utf-8"))
+    receipt = {
+        "path": str(receipt_file),
+        "status": full["status"],
+        "durable": full["durable"],
+        "gate_eligible": full["gate_eligible"],
+        "git_sha": full["git_sha"],
+        "worktree_digest_sha256": full["worktree_digest_sha256"],
+        "project_logic_source_digest": full["project_logic_source_digest"],
+        "source_stable": full["source"]["stable"],
+        "artifact_manifest_sha256": full["artifact_manifest_sha256"],
+    }
 
 steps = []
 counts = {"PASS": 0, "FAIL": 0, "SKIP": 0, "BLOCKED": 0}
@@ -514,13 +539,29 @@ for raw_line in manifest_path.read_text(encoding="utf-8").splitlines():
     )
 
 payload = {
-    "schema_version": 1,
+    "schema_version": 2,
     "run_id": f"manaloom_e2e_suite_{stamp}",
     "requested_profile": profile,
     "execution_policy": execution_policy,
     "result": result.lower(),
-    "gate_eligible": execution_policy == "strict-gate" and result == "PASS",
+    "gate_eligible": (
+        execution_policy == "strict-gate"
+        and result == "PASS"
+        and receipt is not None
+        and receipt["gate_eligible"] is True
+    ),
     "run_dir": run_dir,
+    "git_sha": receipt["git_sha"] if receipt else None,
+    "source": (
+        {
+            "stable": receipt["source_stable"],
+            "worktree_digest_sha256": receipt["worktree_digest_sha256"],
+            "project_logic_source_digest": receipt["project_logic_source_digest"],
+        }
+        if receipt
+        else None
+    ),
+    "receipt": receipt,
     "summary": {
         "step_count": len(steps),
         "passed": counts.get("PASS", 0),
@@ -532,6 +573,43 @@ payload = {
 }
 summary_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 PY
+}
+
+capture_e2e_source_start() {
+  if ! python3 "$RECEIPT_TOOL" capture --repo "$ROOT_DIR" --out "$SOURCE_START_FILE"; then
+    rm -f "$SOURCE_START_FILE"
+    echo "FAIL: estado-fonte do checkout não pôde ser capturado" >&2
+    return 1
+  fi
+}
+
+# Fecha o receipt forte. Estado-fonte ausente ou alterado durante a suíte vira
+# FAIL: um PASS sem SHA e sem digest estáveis não é evidência de gate.
+finalize_e2e_receipt() {
+  rm -f "$RECEIPT_RESULT_FILE"
+  if [[ ! -s "$SOURCE_START_FILE" ]]; then
+    FINAL_STATUS="FAIL"
+    printf '\nReceipt: FAIL (estado-fonte não capturado no início)\n' >>"$SUMMARY_FILE"
+    return 0
+  fi
+  local receipt_rc=0
+  python3 "$RECEIPT_TOOL" finalize \
+    --repo "$ROOT_DIR" \
+    --gate e2e_suite \
+    --mode "$E2E_EXECUTION_POLICY" \
+    --run-id "manaloom_e2e_suite_$STAMP" \
+    --started-at "$RUN_STARTED_AT" \
+    --source-start "$SOURCE_START_FILE" \
+    --steps "$STEP_MANIFEST_FILE" \
+    --steps-format e2e-v1 \
+    --status "$FINAL_STATUS" \
+    --receipt-root "$RECEIPT_ROOT" >"$RECEIPT_RESULT_FILE" || receipt_rc=$?
+  if [[ "$receipt_rc" -ne 0 ]]; then
+    FINAL_STATUS="FAIL"
+    printf '\nReceipt: FAIL (estado-fonte mudou durante a suíte ou receipt não gravado)\n' >>"$SUMMARY_FILE"
+    return 0
+  fi
+  printf '\nReceipt: `%s`\n' "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["receipt"])' "$RECEIPT_RESULT_FILE")" >>"$SUMMARY_FILE"
 }
 
 e2e_exit_code_for_status() {
@@ -575,6 +653,7 @@ main() {
 
   initialize_run_dir
   write_summary_header
+  capture_e2e_source_start || true
 
   run_step "Patrol product E2E local" \
     "\"$ROOT_DIR/scripts/quality_gate.sh\" patrol-smoke"
@@ -626,6 +705,7 @@ main() {
   run_optional_live_product_e2e
 
   write_final_summary
+  finalize_e2e_receipt
   write_summary_json
 
   echo ""

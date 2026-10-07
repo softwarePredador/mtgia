@@ -22,6 +22,7 @@ import '../../../lib/basic_land_utils.dart' as land_utils;
 import '../../../lib/card_identity_support.dart';
 import '../../../lib/battle/interactive_battle_deck_lifecycle.dart';
 import '../../../lib/http_responses.dart';
+import '../../../lib/legal_acceptance_middleware.dart';
 import '../../../lib/release_capability_policy.dart';
 import '../../../lib/scryfall_image_url.dart';
 
@@ -170,6 +171,16 @@ Future<Response> _updateDeck(RequestContext context, String deckId) async {
     return badRequest('Invalid JSON body: ${e.message}');
   } on DeckRequestException catch (e) {
     return badRequest(e.message);
+  }
+
+  // BT-LEGAL-ACCEPT-001 (D-24): publicar compartilha dado, então pede o
+  // aceite vigente, como deck novo e relatório público.
+  if (isPublic == true) {
+    final blocked = await legalAcceptanceRequiredResponse(
+      userId: userId,
+      pool: conn,
+    );
+    if (blocked != null) return blocked;
   }
 
   try {
@@ -781,6 +792,16 @@ Future<Response> _patchDeck(RequestContext context, String deckId) async {
       statusCode: HttpStatus.unprocessableEntity,
       body: e.responseBody,
     );
+  }
+
+  // BT-LEGAL-ACCEPT-001 (D-24): publicar compartilha dado e pede o aceite
+  // vigente; despublicar e editar metadados seguem livres.
+  if (isPublic == true) {
+    final blocked = await legalAcceptanceRequiredResponse(
+      userId: userId,
+      pool: conn,
+    );
+    if (blocked != null) return blocked;
   }
 
   try {

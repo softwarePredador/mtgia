@@ -143,6 +143,14 @@ run_frontend_full() {
   run_flutter_tests_with_proof
 }
 
+# BT-GATE-007: os integration_test da trilha web_hermetic rodam no Chrome real
+# com a API presa em loopback fechado. O manifesto de trilhas é conferido antes
+# e reprova arquivo sem trilha; as outras trilhas ficam fora desta etapa.
+run_integration_lanes() {
+  print_header "Integration tests (trilha web_hermetic)"
+  "$ROOT_DIR/scripts/manaloom_integration_lane_gate.sh"
+}
+
 run_public_web_full() {
   print_header "Public web full checks"
   "$ROOT_DIR/scripts/manaloom_public_web_smoke.sh"
@@ -372,6 +380,7 @@ Uso:
   ./scripts/quality_gate.sh resolution # gate recorrente do corpus de resolução
   ./scripts/quality_gate.sh ui-audit # golden/accessibility audit das telas críticas Flutter
   ./scripts/quality_gate.sh ui-proof # prova UI viva, fresca e visualmente revisada
+  ./scripts/quality_gate.sh integration # integration_test web_hermetic no Chrome, API em loopback
   ./scripts/quality_gate.sh web # lint, build, dependency audit e smoke HTTP do site público
   ./scripts/quality_gate.sh deps # valida dependências declaradas no app/server
   ./scripts/quality_gate.sh custom-lint # roda regras customizadas ManaLoom no app/server
@@ -466,6 +475,10 @@ main() {
       run_frontend_full
       run_public_web_full
       run_runtime_performance_contract
+      run_integration_lanes
+      ;;
+    integration)
+      run_integration_lanes
       ;;
     performance)
       run_runtime_performance_contract

@@ -13,6 +13,33 @@ import 'log_sanitizer.dart';
 /// em português, para o app mostrar sem traduzir código cru.
 const cardNotInCatalogCode = 'card_not_in_catalog';
 
+/// `GET /cards/printings?sync=...` (BT-CAT-02, D-35): leitura nunca dispara
+/// sincronização. Desde que o app deixou de mandar o parâmetro, qualquer
+/// pedido de sync é recusado com 400, antes de tocar o banco, em vez de ser
+/// ignorado em silêncio.
+const catalogSyncUnsupportedCode = 'catalog_sync_unsupported';
+
+const catalogSyncUnsupportedMessage =
+    'O catálogo do BrewTact não é sincronizado a pedido. As edições '
+    'disponíveis vêm da última atualização do catálogo.';
+
+/// `sync` ausente, vazio, `false` ou `0` segue como leitura; qualquer outro
+/// valor é um pedido de sincronização.
+bool requestsCatalogSync(Map<String, String> queryParameters) {
+  final raw = queryParameters['sync'];
+  if (raw == null) return false;
+  final value = raw.trim().toLowerCase();
+  return value.isNotEmpty && value != 'false' && value != '0';
+}
+
+Response catalogSyncUnsupportedResponse() => Response.json(
+  statusCode: HttpStatus.badRequest,
+  body: {
+    'error': catalogSyncUnsupportedCode,
+    'message': catalogSyncUnsupportedMessage,
+  },
+);
+
 /// Tamanho máximo do nome devolvido na resposta de carta ausente.
 const cardNotInCatalogNameLimit = 200;
 
