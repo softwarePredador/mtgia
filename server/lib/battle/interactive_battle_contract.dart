@@ -152,10 +152,13 @@ class InteractiveBattlePersistenceException implements Exception {
 ///
 /// Espelha `PromptKind` em
 /// `services/xmage-sidecar/.../HumanVsAiSpikeHarness.java`. As duas listas sao
-/// mantidas a mao. O sidecar ja classificou um GAME_ASK que esta lista nao
-/// conhecia e a mesa morria com `engine_error` antes de chegar aqui;
-/// `server/test/interactive_battle_contract_test.dart` agora le o enum Java e
-/// prova que nenhum kind ficou de fora.
+/// mantidas a mao. No defeito do turno 4 o servidor nao estava envolvido: o
+/// `classify` do sidecar devolvia `null` para a pergunta de sim/nao do motor e
+/// a mesa morria no proprio sidecar, sem prompt nenhum chegar aqui. O conserto
+/// fez o sidecar emitir `question`, e por isso esta lista precisa aceita-lo
+/// antes ou junto do deploy do sidecar.
+/// `server/test/interactive_battle_contract_test.dart` le o enum Java e prova
+/// que nenhum kind ficou de fora.
 const interactiveBattlePromptKinds = <String>{
   'mulligan',
   // Toda pergunta de sim/nao do motor que nao e o mulligan.

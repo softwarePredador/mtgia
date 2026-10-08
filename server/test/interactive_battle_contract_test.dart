@@ -6,14 +6,15 @@ import 'package:test/test.dart';
 void main() {
   // Duas listas mantidas a mao, em linguagens diferentes, que precisam
   // concordar: `PromptKind` no sidecar Java e a allowlist fail-closed do
-  // servidor. Elas divergiram e o custo foi total -- `PromptKind.MULLIGAN` era
-  // o unico GAME_ASK classificado, e a primeira pergunta de sim/nao do motor
-  // derrubava a mesa com `engine_error` no turno 4. Nenhum teste via, porque
-  // cada lado estava internamente coerente.
+  // servidor. Ate o conserto da pergunta do motor elas concordavam (os mesmos
+  // 11 kinds); o defeito do turno 4 morreu dentro do sidecar, que devolvia
+  // `null` em `classify`. O conserto acrescentou `question` nos dois lados ao
+  // mesmo tempo.
   //
-  // Este teste le o enum Java direto da fonte. Se alguem adicionar um kind la
-  // e esquecer daqui, o servidor recusaria o prompt em runtime; a falha passa a
-  // aparecer aqui, de graca.
+  // Este teste protege contra a divergencia FUTURA: le o enum Java direto da
+  // fonte, e se alguem acrescentar um kind la e esquecer daqui -- o servidor
+  // recusaria o prompt em runtime e a mesa morreria do mesmo jeito -- a falha
+  // aparece aqui, de graca.
   test('todo PromptKind do sidecar e aceito pela allowlist do servidor', () {
     final javaSource = File(
       '../services/xmage-sidecar/src/main/java/com/manaloom/xmage/'

@@ -34,9 +34,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -49,8 +49,8 @@ final class HumanVsAiSpikeTest {
         // encerra a sessao com `engine_error`. Ou seja: um null aqui nao e uma
         // lacuna de classificacao, e uma partida perdida pelo jogador.
         //
-        // Por isso a asserção é sobre TODOS os callbacks de decisao e com
-        // mensagens que ninguem previu -- que é exatamente o caso que quebrou:
+        // Por isso a assercao e sobre TODOS os callbacks de decisao e com
+        // mensagens que ninguem previu -- que e exatamente o caso que quebrou:
         // o GAME_ASK do motor chegou com uma frase fora da lista e matou a mesa
         // no turno 4.
         String[] mensagens = {
