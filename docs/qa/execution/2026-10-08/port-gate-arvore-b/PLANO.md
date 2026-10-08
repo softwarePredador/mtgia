@@ -101,6 +101,27 @@ Testes:
 - Mutação omitindo os campos: o teste falha.
 - Do lado do servidor, um PUT com `false`/`null` e a capability fechada responde 200 e zera as colunas. Use o teste que já existir na matriz mista do `server/test/binder_item_contract_test.dart` (PR-A1); se não existir, acrescente.
 
+**Acréscimo obrigatório no B11, servidor de assets órfão (achado de 2026-10-08):**
+
+Nos 5 `*_visual_qa.sh` do master, o servidor de assets sobe assim:
+
+```bash
+(
+  cd "$ROOT_DIR"
+  python3 -m http.server "$ASSET_PORT" --bind 127.0.0.1 >"$RUN_DIR/asset-server.log" 2>&1
+) &
+ASSET_SERVER_PID="$!"
+```
+
+- **Defeito:** o `$!` é o PID do subshell, não o do Python. O `cleanup` mata o subshell e o Python fica órfão (PPID 1). Ele continua servindo a raiz do repo com listagem de diretório, em loopback, até alguém matar à mão.
+  - Em 2026-10-08 havia 4 órfãos assim, de 2026-10-06, com cwd em `mtgia-btuiev001`, nas portas 50470, 50825, 51222 e 53923. A coordenação matou os quatro.
+  - Reproduzido no `/bin/bash` 3.2.57 deste Mac: com o subshell, a porta continua escutando depois do `kill $!`; com `exec python3 ...` dentro do subshell, a porta fecha.
+  - O patch da árvore antiga (patches 28 a 32) só troca o `http.server` pelo `manaloom_fixture_asset_server.py` e **mantém o subshell**, então o vazamento continua.
+- **Conserto:** nos 5 scripts, use `exec python3 "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" ...` dentro do subshell, ou tire o subshell e passe `--directory "$ROOT_DIR"`. Assim o `$!` aponta para o Python. Confira também o `manaloom_ui_live_evidence_gate.sh`: o servidor de imagem dele sobe sem subshell, e o `$!` já é o Python.
+- **Teste:**
+  - Um contrato estático pego pelo `scripts/manaloom_release_ops_contract_test.sh`: todo servidor de assets iniciado em background dentro de `( ... ) &` nesses scripts usa `exec`. A mutação que tira o `exec` faz o teste falhar.
+  - Uma prova comportamental anotada no PR, como a reprodução acima: subir, `kill $!` e conferir com `lsof` que a porta fechou.
+
 **Recibos que entram com o código** (os patches 35 a 38):
 - `pva-primeira-pergunta-mata-a-mesa.md`: corrija o caminho de referência e marque o GAME_SELECT como fechado pelo PR-A2.
 - `itens-1-a-3-antes-do-congelamento.md`
