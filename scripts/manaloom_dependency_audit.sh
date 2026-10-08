@@ -42,6 +42,15 @@ print_header() {
 # validador: o `dart run` que vem depois encontra essa resolucao atual e nao
 # re-resolve nada. O `dart run` nao tem `--no-pub`; e a ordem que garante que
 # nenhuma resolucao implicita escolha versoes por conta propria.
+#
+# `--enforce-lockfile`, como nos scripts de build e deploy: a auditoria le o
+# lock, nunca o escreve. Sem a flag, um pubspec.yaml que divergiu do lock era
+# resolvido de novo e o `pubspec.lock` reescrito em silencio -- o de `app/`
+# move o digest de UI pelo mesmo caminho descrito acima. Com a flag o lock
+# fica como estava, e uma divergencia que ele nao satisfaz (pacote novo,
+# restricao fora da versao travada) para a auditoria no `pub get` com
+# "Unable to satisfy `pubspec.yaml` using `pubspec.lock`" (medido em
+# 2026-10-08 numa copia descartavel).
 run_dependency_validator() {
   local package_dir="$1"
   local label="$2"
@@ -50,9 +59,9 @@ run_dependency_validator() {
   print_header "Dependency validator: ${label}"
   cd "$ROOT_DIR/$package_dir"
   if [[ "$kind" == "flutter" ]]; then
-    "$FLUTTER_BIN" pub get --no-example >/dev/null
+    "$FLUTTER_BIN" pub get --no-example --enforce-lockfile >/dev/null
   else
-    "$DART_BIN" pub get >/dev/null
+    "$DART_BIN" pub get --enforce-lockfile >/dev/null
   fi
   "$DART_BIN" run dependency_validator
 }

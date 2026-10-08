@@ -578,6 +578,20 @@ printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
     // sozinho nao aplica o pin de `meta` que vem do flutter_test do SDK.
     expect(code, contains(r'"$FLUTTER_BIN" pub get'));
     expect(code, contains(r'"$DART_BIN" run dependency_validator'));
+    // A auditoria le o lock e nunca o escreve, como os scripts de build e
+    // deploy: sem `--enforce-lockfile`, um pubspec.yaml divergente era
+    // resolvido de novo e o `pubspec.lock` reescrito em silencio — o de
+    // `app/` move o digest de UI.
+    expect(
+      code,
+      contains(r'"$FLUTTER_BIN" pub get --no-example --enforce-lockfile'),
+    );
+    expect(code, contains(r'"$DART_BIN" pub get --enforce-lockfile'));
+    expect(
+      RegExp(r'pub get(?![^\n]*--enforce-lockfile)').hasMatch(code),
+      isFalse,
+      reason: 'todo pub get da auditoria precisa de --enforce-lockfile',
+    );
   });
 
   test('release Flutter helper accepts only the pinned SDK', () async {

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "198dea7a2e43916e1a597880704c09e451768878894a9b1be58908dd02d830a9",
+  "source_digest_sha256": "5326e584e7e11c58df22ed7b65218720e184accabdfcff193dd2f4f4b9aba862",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -281047,7 +281047,7 @@
     {
       "path": "scripts/manaloom_dependency_audit.sh",
       "role": "audit",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": []
     },
     {
@@ -303202,7 +303202,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "198dea7a2e43916e1a597880704c09e451768878894a9b1be58908dd02d830a9"
+    "project_logic_source_digest_sha256": "5326e584e7e11c58df22ed7b65218720e184accabdfcff193dd2f4f4b9aba862"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
