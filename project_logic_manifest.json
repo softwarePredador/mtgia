@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "5eda39c6644258b97a0df00f58163086c5a46bc3959bc76d052ac618a7c29bfa",
+  "source_digest_sha256": "9fbfc2eb78187d3930a8e3b1397b5a0bc6d6c1673ddc4a7e0f80ef80b790f8e1",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -81,7 +81,7 @@
     "migrations": 74,
     "scripts_and_jobs": 717,
     "environment_variables": 736,
-    "tests": 1347,
+    "tests": 1348,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -291755,6 +291755,7 @@
     "server/test/scope_containment_route_matrix_test.dart",
     "server/test/scryfall_image_url_test.dart",
     "server/test/seed_database_image_selection_test.dart",
+    "server/test/seed_deck_otimizavel_test.py",
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
     "server/test/semantic_layer_v2_backfill_source_test.dart",
     "server/test/semantic_tag_query_contract_test.dart",
@@ -303204,7 +303205,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "5eda39c6644258b97a0df00f58163086c5a46bc3959bc76d052ac618a7c29bfa"
+    "project_logic_source_digest_sha256": "9fbfc2eb78187d3930a8e3b1397b5a0bc6d6c1673ddc4a7e0f80ef80b790f8e1"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -306578,6 +306579,7 @@
       "server/test/scope_containment_route_matrix_test.dart",
       "server/test/scryfall_image_url_test.dart",
       "server/test/seed_database_image_selection_test.dart",
+      "server/test/seed_deck_otimizavel_test.py",
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
       "server/test/semantic_layer_v2_backfill_source_test.dart",
       "server/test/semantic_tag_query_contract_test.dart",

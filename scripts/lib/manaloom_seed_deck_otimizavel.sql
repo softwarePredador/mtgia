@@ -36,17 +36,42 @@
 -- de forma explícita, e as linhas do deck e do comandante entram ANTES de
 -- `deck_cards`, para o deck já nascer sobre legalidade conhecida.
 --
--- CONFERÊNCIA QUE PARA. As duas conferências do fim (deck e pool de
--- candidatos) são blocos `DO` que levantam `RAISE EXCEPTION`: com
+-- CONFERÊNCIA QUE PARA. São duas conferências: a do deck, logo depois dos
+-- `INSERT` em `deck_cards` (no meio do arquivo), e a do pool de candidatos,
+-- no fim. As duas são blocos `DO` que levantam `RAISE EXCEPTION`: com
 -- `ON_ERROR_STOP` o psql sai com código 3 e a corrida para ali, em vez de
 -- depender de alguém ler a contagem impressa. Variável de psql não é
 -- interpolada dentro de `$$ ... $$`, então o `deck_id` entra nos blocos por
 -- `SET manaloom.seed_deck_id` e `current_setting(...)`.
 --
+-- TRANSAÇÃO. O seed inteiro é UMA transação: `BEGIN` logo depois do
+-- `ON_ERROR_STOP` e `COMMIT` na última linha. Parar a corrida não bastava:
+-- sem a transação, cada comando era confirmado sozinho, e uma conferência
+-- reprovada deixava gravados as cartas sintéticas, as legalidades e o deck
+-- já reescrito (o `DELETE` e os `INSERT` em `deck_cards`). Com ela, o erro
+-- encerra o psql com a transação aberta e o servidor desfaz tudo, inclusive
+-- o `DELETE`: o deck volta ao que era antes da corrida. Medido em 2026-10-08
+-- num PostgreSQL 17 descartável -- legalidades apagadas ou só o pool sem
+-- legalidade: código 3 e zero linhas do seed; as mesmas falhas sem o
+-- `BEGIN`/`COMMIT` deixavam 99 ou 111 cartas e 100 linhas de `deck_cards`.
+--
+-- QUEM CHAMA. Nenhum script versionado chama este arquivo; ele roda à mão,
+-- com `psql -f` e as variáveis abaixo, sem `-1`. O `BEGIN`/`COMMIT` ficam no
+-- arquivo para a atomicidade não depender de quem chama lembrar de
+-- `-1`/`--single-transaction`. Chamar com `-1` é redundante e não muda o
+-- resultado (medido: o psql avisa "there is already a transaction in
+-- progress" e "there is no transaction in progress", sai com 0 no caminho
+-- feliz e com 3, sem resto, numa conferência reprovada). Nada aqui exige
+-- rodar fora de transação. A forma -- `BEGIN` primeiro, `COMMIT` por último,
+-- nenhum outro controle de transação nem metacomando do psql no meio -- é
+-- conferida por `server/test/seed_deck_otimizavel_test.py`.
+--
 -- Variáveis exigidas: `deck_id`, `commander_card_id` e `image_url`
 -- (`psql -v deck_id=... -v commander_card_id=... -v image_url=...`).
 
 \set ON_ERROR_STOP on
+
+BEGIN;
 
 SET manaloom.seed_deck_id = :'deck_id';
 
@@ -434,3 +459,6 @@ BEGIN
   END IF;
 END
 $conferencia_pool$;
+
+-- Só chega aqui com as duas conferências aprovadas. Ver TRANSAÇÃO no topo.
+COMMIT;

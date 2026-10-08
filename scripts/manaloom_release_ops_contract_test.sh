@@ -246,6 +246,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/lib/manaloom_captura_optimization_card_reader.py" \
     "$ROOT_DIR/scripts/lib/manaloom_captura_play_vs_ai.py" \
     "$ROOT_DIR/server/test/fixture_asset_server_test.py" \
+    "$ROOT_DIR/server/test/seed_deck_otimizavel_test.py" \
     "$ROOT_DIR/server/test/webdriver_capture_drivers_test.py"
 
 # BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
@@ -293,11 +294,15 @@ PYTHONDONTWRITEBYTECODE=1 \
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/errexit_postdeploy_test.py"
 # BT-UIEV-001: o servidor de assets das fixtures so escuta em loopback, nao
-# lista diretorio e serve com CORS; os roteiros WebDriver recusam argv errado
-# com codigo 2, so usam o ponto de reserva da aba com o rotulo exato "Cartas" e
-# limpam mesas com a listagem em objeto ou lista. Nada abre navegador.
+# lista diretorio e serve com CORS; o seed do deck otimizavel roda numa
+# transacao so (BEGIN primeiro, COMMIT por ultimo, conferencias no meio); os
+# roteiros WebDriver recusam argv errado com codigo 2, so usam o ponto de
+# reserva da aba com o rotulo exato "Cartas" e limpam mesas com a listagem em
+# objeto ou lista. Nada abre navegador nem banco.
 PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
   python3 "$ROOT_DIR/server/test/fixture_asset_server_test.py"
+PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
+  python3 "$ROOT_DIR/server/test/seed_deck_otimizavel_test.py"
 PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
   python3 "$ROOT_DIR/server/test/webdriver_capture_drivers_test.py"
 
