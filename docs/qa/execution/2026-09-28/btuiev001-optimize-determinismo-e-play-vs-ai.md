@@ -7,10 +7,10 @@
 > (`docs/qa/execution/2026-09-28/D-82-optimize-sem-provedor.md`) — sem
 > provedor de IA, `POST /ai/optimize` entrega as trocas determinísticas quando
 > há shortlist, e não tenta o provedor. O seed
-> `scripts/lib/manaloom_seed_deck_otimizavel.sql` entrou no master com a
-> adaptação da D-28: legalidade `commander`/`legal` explícita para cada carta,
-> porque legalidade ausente passou a bloquear. As linhas de arquivo citadas
-> são as daquela árvore.
+> `scripts/lib/manaloom_seed_deck_otimizavel.sql` entra no master com o PR de
+> `port/gate-arvore-a1-fora-do-digest`, com a adaptação da D-28: legalidade
+> `commander`/`legal` explícita para cada carta, porque legalidade ausente
+> passou a bloquear. As linhas de arquivo citadas são as daquela árvore.
 
 Arquivo **não commitado** enquanto o gate de UI está vermelho.
 
