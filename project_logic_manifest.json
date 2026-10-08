@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "7e1a69d3f37209eaee395b4cca140196f6ed81192b1b0213859fb61c75543a1f",
+  "source_digest_sha256": "c53b54b342f89210d1747c01350221e181966969922c0a835935ee14eb65e571",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -51,6 +51,7 @@
     "docs/adr/0011-brewtact-production-domain.md",
     "docs/adr/0012-xmage-human-spike-go.md",
     "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+    "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
@@ -298433,6 +298434,13 @@
           "mutation_authority": false
         },
         {
+          "path": "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
+          "state": "current_contract",
+          "declaration_source": "canonical_documents",
+          "priority_authority": false,
+          "mutation_authority": false
+        },
+        {
           "path": "docs/execution/README.md",
           "state": "current_contract",
           "declaration_source": "canonical_documents",
@@ -303143,7 +303151,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "7e1a69d3f37209eaee395b4cca140196f6ed81192b1b0213859fb61c75543a1f"
+    "project_logic_source_digest_sha256": "c53b54b342f89210d1747c01350221e181966969922c0a835935ee14eb65e571"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -304469,6 +304477,7 @@
       "docs/adr/0011-brewtact-production-domain.md",
       "docs/adr/0012-xmage-human-spike-go.md",
       "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+      "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
       "docs/execution/CURRENT_QUEUE.md",
       "docs/execution/README.md",
       "docs/hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",

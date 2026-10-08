@@ -397,6 +397,33 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 - **Ritmo:** um resumo semanal no chat do projeto, às segundas, com o número de P0 em `PASS`. Uma sessão por semana na máquina do dono para Android físico, emulador e deploy, com as decisões pendentes juntas.
 - **Continua valendo:** escrita live, migration, deploy e merge na `master` pedem a palavra do dono (regra 6 da decisão corrente e D-86).
 
+### Decididas em 2026-10-08
+
+**D-88 · Complemento ao ADR 0012/0004 para a pergunta genérica do motor (ADR 0014 aceito).**
+- **Contexto:** o registro do spike (ADR 0012, relato no histórico `0004-xmage-human-spike-go.md`) manda falhar fechado em qualquer callback fora do contrato. O bridge aplicava isso também ao texto da mensagem: só o `GAME_ASK` do mulligan e quatro frases de `GAME_SELECT` eram reconhecidos. Em 2026-09-23 (`play-vs-ai-web-real`), a primeira pergunta de sim/não do motor matou a mesa no turno 4, dentro do sidecar.
+- **Decisão do dono:** "Aprovar o complemento". O ADR 0014 passa a aceito e entra em `canonical_documents`:
+  - todo `GAME_ASK` que não é o mulligan vira o prompt genérico `question` (Sim/Não);
+  - um `GAME_SELECT` de frase desconhecida vira `combat` quando o payload traz `possibleAttackers`/`possibleBlockers`, e `main_action` quando não traz; cada uso desse fallback sai num log de stderr sem texto nem IDs;
+  - continuam fail-closed o método, o payload, o limite de opções, os IDs opacos, a resposta obsoleta e a allowlist de kinds do servidor;
+  - o servidor aceita `question` antes ou junto do sidecar, nunca depois.
+- **Limitação registrada como follow-up de backlog:** a pergunta genérica aparece como "Sua decisão" com Sim/Não, sem o texto do motor, e descarta os rótulos próprios (`UI.left.btn.text`/`UI.right.btn.text`). Numa pergunta "topo ou fundo?", o "Sim" significa "topo".
+- **Execução:** branch `port/gate-arvore-a2-pergunta-do-motor`: `99b7fa132` (o conserto portado), `088c046cf` (combate decidido pelo payload e log do fallback), `02dc07b30` (comentários) e o commit deste registro. O Battle continua `OFF` e fora do escopo do MVP (D-87); nada disso autoriza deploy.
+
+**D-89 · Consertos de app da árvore antiga do gate vão por PR feito na nuvem, com uma recaptura única da prova de UI.**
+- **Contexto:** a árvore antiga do gate (`refs/backup/2026-10-08/gate-arvore-1419`) traz, além dos consertos de motor e servidor portados à parte, consertos em `app/`. O app entra no digest de UI, e cada merge que muda o digest deixa a prova de UI defasada.
+- **Decisão do dono:** "Na nuvem, depois recapturar".
+- **Execução:** os consertos de app saem num PR feito numa thread da nuvem. Depois do merge, a prova de UI é recapturada uma vez só, como na D-87. Os insumos dessa thread (um patch por arquivo, manifesto e plano B6–B11) estão na branch `port/gate-arvore-b-insumos` (`4b4084582`), em `docs/qa/execution/2026-10-08/port-gate-arvore-b/`.
+
+**D-90 · Fichário com troca e venda desligadas: o editor limpa as flags ao salvar um item antigo.**
+- **Contexto:** com troca e venda desligadas, o servidor devolve 422 quando um item antigo do fichário é salvo ainda com troca, venda ou preço, e o jogador não consegue salvar a edição.
+- **Decisão do dono:** "Limpar as flags ao salvar". O editor deixa de mandar troca, venda e preço nesse caso, em vez de receber o 422.
+- **Execução:** no PR de app da D-89, como acréscimo ao passo B7 do plano, com teste e mutação.
+
+**D-91 · Goldens do herói da Home refeitos no macOS 27 se a diferença for só subpixel.**
+- **Contexto:** os goldens do herói da Home divergem quando gerados no macOS 27.
+- **Decisão do dono:** "Aprovar se for só subpixel". Cada imagem é conferida uma a uma, como foi feito com o `deck_gallery`. Se alguma tiver diferença além de subpixel, ela não é refeita e volta para o dono.
+- **Execução:** `4205d6c1c`, na branch `fix/home-hero-goldens-macos27`. As quatro imagens foram abertas e a diferença ficou só nas bordas de antialiasing do texto, sem mudança de layout, cor ou posição.
+
 **Ficam para depois:**
 - retenção de analytics (proposta de 180 dias) e o texto da política de privacidade, depois do advogado (D-69);
 - rotação do journal do host (D-78), porque o host é compartilhado com outros projetos;
