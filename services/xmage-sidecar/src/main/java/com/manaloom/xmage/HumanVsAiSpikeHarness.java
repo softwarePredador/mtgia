@@ -332,8 +332,13 @@ final class HumanVsAiSpikeHarness {
     /**
      * Linha de stderr do fallback de GAME_ASK: toda pergunta que nao e o
      * mulligan vira QUESTION e chega ao jogador como "Sim"/"Nao", sem o texto
-     * do motor e sem os rotulos proprios dos botoes. Cada linha e uma resposta
-     * dada sem ver a pergunta -- a metrica do follow-up do ADR 0014.
+     * do motor e sem os rotulos proprios dos botoes. Cada linha e uma pergunta
+     * generica aberta para ser mostrada sem o texto do motor -- a metrica do
+     * follow-up do ADR 0014. A linha sai em `PromptRegistry.open`, quando a
+     * pergunta abre, antes de `begin` e de qualquer resposta: conta tambem a
+     * pergunta que `begin` recusa (estado obsoleto, outro prompt ativo, limite
+     * de opcoes) e a que depois expira (o timeout concede a partida) ou falha,
+     * nao so a que recebe resposta.
      *
      * Mesma disciplina do log do select: leva so o kind, se o motor mandou
      * rotulo proprio para cada botao e o tamanho da frase; nunca o texto do

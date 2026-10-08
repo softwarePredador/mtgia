@@ -182,10 +182,12 @@ final class HumanVsAiSpikeTest {
 
     @Test
     void questionFallbackIsLoggedOncePerPromptWithoutTextOrLabels() {
-        // O jogador responde "Sim"/"Nao" a esta pergunta sem ver o texto nem
-        // os rotulos do motor (ADR 0014). Cada linha deste log e uma dessas
-        // respostas: e a metrica do follow-up. Por isso uma linha por prompt,
-        // e nada que identifique jogador, carta ou objeto.
+        // O jogador ve esta pergunta como "Sim"/"Nao", sem o texto nem os
+        // rotulos do motor (ADR 0014). Cada linha deste log e uma pergunta
+        // generica aberta para ser mostrada sem o texto do motor, escrita
+        // quando o prompt abre (antes de qualquer resposta): e a metrica do
+        // follow-up. Por isso uma linha por prompt, e nada que identifique
+        // jogador, carta ou objeto.
         Map<String, Object> engineLabels = new LinkedHashMap<>();
         engineLabels.put(
                 HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION,
@@ -234,6 +236,41 @@ final class HumanVsAiSpikeTest {
                         + "Use replacement effect?".length(),
                 bareLog.trim()
         );
+
+        // Um rotulo so: cada flag le a sua propria chave. Sem estes casos,
+        // `right_label` lendo a chave da esquerda (ou o contrario) passaria,
+        // porque os dois casos acima sao simetricos.
+        Map<String, Object> leftOnly = new LinkedHashMap<>();
+        leftOnly.put(HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION, "Top");
+        String leftOnlyLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                question,
+                leftOnly,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=true right_label=false"
+                        + " message_chars=" + question.length(),
+                leftOnlyLog.trim()
+        );
+        assertFalse(leftOnlyLog.contains("Top"));
+
+        Map<String, Object> rightOnly = new LinkedHashMap<>();
+        rightOnly.put(HumanVsAiSpikeHarness.RIGHT_BUTTON_TEXT_OPTION, "Bottom");
+        String rightOnlyLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                question,
+                rightOnly,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=false right_label=true"
+                        + " message_chars=" + question.length(),
+                rightOnlyLog.trim()
+        );
+        assertFalse(rightOnlyLog.contains("Bottom"));
 
         // O mulligan tem kind proprio e rotulos de produto: nao e fallback.
         Map<String, Object> mulliganOptions = new LinkedHashMap<>();
