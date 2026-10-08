@@ -295,7 +295,9 @@ PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/errexit_postdeploy_test.py"
 # BT-UIEV-001: o servidor de assets das fixtures so escuta em loopback, nao
 # lista diretorio e serve com CORS; o seed do deck otimizavel roda numa
-# transacao so (BEGIN primeiro, COMMIT por ultimo, conferencias no meio); os
+# transacao so (BEGIN primeiro, COMMIT por ultimo, conferencias no meio),
+# recusa antes de qualquer escrita sem -v descartavel=sim e tem
+# `\set ON_ERROR_STOP on` como unico metacomando do psql; os
 # roteiros WebDriver recusam argv errado com codigo 2, so usam o ponto de
 # reserva da aba com o rotulo exato "Cartas" e limpam mesas com a listagem em
 # objeto ou lista. Nada abre navegador nem banco.

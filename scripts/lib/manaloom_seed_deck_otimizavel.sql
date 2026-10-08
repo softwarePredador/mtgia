@@ -55,23 +55,78 @@
 -- legalidade: código 3 e zero linhas do seed; as mesmas falhas sem o
 -- `BEGIN`/`COMMIT` deixavam 99 ou 111 cartas e 100 linhas de `deck_cards`.
 --
--- QUEM CHAMA. Nenhum script versionado chama este arquivo; ele roda à mão,
--- com `psql -f` e as variáveis abaixo, sem `-1`. O `BEGIN`/`COMMIT` ficam no
--- arquivo para a atomicidade não depender de quem chama lembrar de
--- `-1`/`--single-transaction`. Chamar com `-1` é redundante e não muda o
--- resultado (medido: o psql avisa "there is already a transaction in
--- progress" e "there is no transaction in progress", sai com 0 no caminho
--- feliz e com 3, sem resto, numa conferência reprovada). Nada aqui exige
--- rodar fora de transação. A forma -- `BEGIN` primeiro, `COMMIT` por último,
--- nenhum outro controle de transação nem metacomando do psql no meio -- é
--- conferida por `server/test/seed_deck_otimizavel_test.py`.
+-- BANCO DESCARTÁVEL. O seed apaga as linhas de `deck_cards` do deck informado
+-- e grava, com `ON CONFLICT ... DO UPDATE`, cartas sintéticas de id fixo no
+-- catálogo. Só pode rodar contra um PostgreSQL descartável, e quem chama tem
+-- de dizer isso com `-v descartavel=sim`. É a guarda principal: logo depois
+-- do `BEGIN`, antes de qualquer escrita, um bloco `DO` levanta
+-- `RAISE EXCEPTION` se a variável não for exatamente `sim`. Sem a variável o
+-- psql nem chega ao bloco: `:'descartavel'` fica sem interpolar, o `SET`
+-- falha com erro de sintaxe e o `ON_ERROR_STOP` encerra a corrida ali.
+-- A segunda camada é barata e NÃO prova nada sozinha: recusa a conexão TCP
+-- cujo endereço do servidor (`inet_server_addr()`) não seja loopback
+-- (127.0.0.0/8 ou ::1); socket unix (endereço NULL) passa. Loopback não
+-- prova que o banco é descartável -- um proxy ou túnel local pode apontar
+-- para outro banco --, por isso a confirmação explícita é a guarda principal.
+-- Medido em 2026-10-08 num PostgreSQL 17 descartável, com o deck já
+-- populado antes da corrida: com `descartavel=sim`, código 0 e 100/36/1;
+-- sem a variável ou com `descartavel=nao`, código 3, nenhuma carta sintética
+-- nem legalidade gravada e o deck intacto (o `DELETE` não aconteceu). A
+-- camada de endereço, numa cópia com `inet_server_addr()` trocado por valor
+-- fixo: 10.0.0.5, 192.168.0.10 e 2001:db8::1 recusados com código 3 e nada
+-- gravado; NULL, 127.0.0.5 e ::1 passam. Só esses dois intervalos passam:
+-- `::ffff:127.0.0.1` também é recusado.
 --
--- Variáveis exigidas: `deck_id`, `commander_card_id` e `image_url`
--- (`psql -v deck_id=... -v commander_card_id=... -v image_url=...`).
+-- QUEM CHAMA. Nenhum script versionado chama este arquivo; ele roda à mão,
+-- com `psql -f` e as variáveis abaixo, sem `-1` -- numa linha só, aqui
+-- quebrada para caber:
+--
+--   psql -X -h 127.0.0.1 -p <porta> -U <usuario> -d <banco_descartavel>
+--     -v descartavel=sim -v deck_id=<uuid> -v commander_card_id=<uuid>
+--     -v image_url=<url> -f scripts/lib/manaloom_seed_deck_otimizavel.sql
+--
+-- O `BEGIN`/`COMMIT` ficam no arquivo para a atomicidade não depender de
+-- quem chama lembrar de `-1`/`--single-transaction`. Chamar com `-1` é
+-- redundante e não muda o resultado (medido: o psql avisa "there is already
+-- a transaction in progress" e "there is no transaction in progress", sai
+-- com 0 no caminho feliz e com 3, sem resto, numa conferência reprovada).
+-- Nada aqui exige rodar fora de transação. A forma é conferida por
+-- `server/test/seed_deck_otimizavel_test.py`: o único metacomando do psql é
+-- `\set ON_ERROR_STOP on`, uma vez, antes do `BEGIN`; `BEGIN` primeiro, a
+-- guarda de banco descartável logo depois, `COMMIT` por último e nenhum
+-- outro controle de transação no meio.
+--
+-- Variáveis exigidas: `descartavel` (só `sim` passa), `deck_id`,
+-- `commander_card_id` e `image_url`.
 
 \set ON_ERROR_STOP on
 
 BEGIN;
+
+-- Guarda de banco descartável (ver BANCO DESCARTÁVEL no topo). Fica antes de
+-- qualquer escrita: recusada aqui, a corrida para sem ter tocado em nada.
+SET manaloom.seed_descartavel = :'descartavel';
+
+DO $guarda_descartavel$
+DECLARE
+  v_confirmacao text := current_setting('manaloom.seed_descartavel');
+  v_servidor inet := inet_server_addr();
+BEGIN
+  IF v_confirmacao IS DISTINCT FROM 'sim' THEN
+    RAISE EXCEPTION
+      'seed do deck otimizavel: sem confirmacao de banco descartavel '
+      '(descartavel=%); rode com -v descartavel=sim, e so contra um '
+      'PostgreSQL descartavel; nada foi gravado', v_confirmacao;
+  END IF;
+  IF v_servidor IS NOT NULL
+     AND NOT (v_servidor <<= '127.0.0.0/8'::inet
+              OR v_servidor <<= '::1/128'::inet) THEN
+    RAISE EXCEPTION
+      'seed do deck otimizavel: o servidor responde em % (nem loopback nem '
+      'socket unix); nada foi gravado', host(v_servidor);
+  END IF;
+END
+$guarda_descartavel$;
 
 SET manaloom.seed_deck_id = :'deck_id';
 
