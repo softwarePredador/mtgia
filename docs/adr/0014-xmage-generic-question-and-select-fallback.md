@@ -97,7 +97,10 @@ A métrica desse follow-up é a linha `interactive_question_fallback` que
 `PromptRegistry.open` escreve em stderr uma vez por pergunta genérica, na mesma
 disciplina do log do fallback de `GAME_SELECT` (só o kind, se o motor mandou
 rótulo próprio para cada botão e o tamanho da frase; nunca texto, rótulos,
-cartas nem IDs): cada linha é uma resposta Sim/Não dada sem ver a pergunta.
+cartas nem IDs): cada linha é uma pergunta genérica aberta para ser mostrada
+sem o texto do motor. A linha sai quando a pergunta abre, antes de qualquer
+resposta, então conta também a pergunta que o bridge recusa ao abrir e a que
+depois expira (o timeout concede a partida) ou falha, e não só a respondida.
 
 ## Ordem de deploy
 
