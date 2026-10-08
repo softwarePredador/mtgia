@@ -10,7 +10,10 @@ Origem: o workflow de classificação de 2026-10-08 (119 unidades de mudança, c
 
 **Decisões do dono (2026-10-08):**
 - **D-89:** este PR é feito na nuvem, sem os hooks locais, e depois entra uma recaptura única da prova de UI.
-- **D-90:** com troca e venda desligadas, o editor do fichário deixa de mandar troca, venda e preço ao salvar um item antigo. Ele limpa as flags em vez de deixar o servidor devolver 422.
+- **D-90:** com troca ou venda desligadas, o editor do fichário limpa as flags ao salvar um item antigo, em vez de deixar o servidor devolver 422.
+  - Ele manda explicitamente `for_trade: false` (trocas fechadas) e `for_sale: false` com `price: null` (marketplace fechado).
+  - Omitir os campos **não** basta. O `PUT /binder/:id` é parcial: campo ausente mantém o valor antigo no banco (`server/routes/binder/[id]/index.dart`, os blocos `body.containsKey('for_trade' | 'for_sale' | 'price')`).
+  - O servidor aceita `false`/`null` com a capability fechada, que é como se tira uma oferta (`server/lib/binder_item_contract.dart`, `ensureBinderCommerceAllowed`).
 - **D-88:** o ADR 0014, da pergunta genérica do motor, está aceito. Ele vai no PR-A2.
 - **D-91:** os goldens do herói da Home são refeitos no Mac do gate. Não fazem parte deste PR.
 
@@ -90,7 +93,13 @@ Legenda:
   - `bash -n` nos scripts
   - `curl -I` no servidor de assets, conferindo `Access-Control-Allow-Origin`.
 
-**Acréscimo pela D-90, no B7:** o `binder_item_editor.dart` deixa de mandar `for_trade`, `for_sale` e `price` quando a capability correspondente está desligada. Assim, um item antigo com oferta salva sem erro, e as flags caem. Inclua um teste que falhe sem isso (salvar um item antigo com `for_sale` e preço, com marketplace desligado, não manda os campos) e a mutação correspondente.
+**Acréscimo pela D-90, no B7:** com a capability correspondente desligada, o `binder_item_editor.dart` manda `for_trade: false` e, para venda, `for_sale: false` com `price: null`. Ele não omite os campos, porque o PUT é parcial e a omissão deixaria a oferta antiga gravada. Assim, um item antigo com oferta salva sem 422, e as flags caem no banco.
+
+Testes:
+- Salvar um item antigo com `for_trade`, `for_sale` e preço, com trocas e marketplace desligados: o corpo do PUT leva `for_trade: false`, `for_sale: false` e `price: null`.
+- Com as capabilities ligadas, os valores do formulário vão como estão.
+- Mutação omitindo os campos: o teste falha.
+- Do lado do servidor, um PUT com `false`/`null` e a capability fechada responde 200 e zera as colunas. Use o teste que já existir na matriz mista do `server/test/binder_item_contract_test.dart` (PR-A1); se não existir, acrescente.
 
 **Recibos que entram com o código** (os patches 35 a 38):
 - `pva-primeira-pergunta-mata-a-mesa.md`: corrija o caminho de referência e marque o GAME_SELECT como fechado pelo PR-A2.
