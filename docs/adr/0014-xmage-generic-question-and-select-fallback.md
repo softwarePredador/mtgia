@@ -93,6 +93,12 @@ registrado como follow-up de backlog: texto de produto por pergunta e uso dos
 rótulos do motor (saneados e limitados, como os demais textos do prompt). Não
 entra neste ADR, e o Battle segue fora do escopo do MVP (D-87).
 
+A métrica desse follow-up é a linha `interactive_question_fallback` que
+`PromptRegistry.open` escreve em stderr uma vez por pergunta genérica, na mesma
+disciplina do log do fallback de `GAME_SELECT` (só o kind, se o motor mandou
+rótulo próprio para cada botão e o tamanho da frase; nunca texto, rótulos,
+cartas nem IDs): cada linha é uma resposta Sim/Não dada sem ver a pergunta.
+
 ## Ordem de deploy
 
 O sidecar novo emite `kind: "question"`. Um servidor sem `question` na

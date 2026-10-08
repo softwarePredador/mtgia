@@ -406,8 +406,8 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
   - um `GAME_SELECT` de frase desconhecida vira `combat` quando o payload traz `possibleAttackers`/`possibleBlockers`, e `main_action` quando não traz; cada uso desse fallback sai num log de stderr sem texto nem IDs;
   - continuam fail-closed o método, o payload, o limite de opções, os IDs opacos, a resposta obsoleta e a allowlist de kinds do servidor;
   - o servidor aceita `question` antes ou junto do sidecar, nunca depois.
-- **Limitação registrada como follow-up de backlog:** a pergunta genérica aparece como "Sua decisão" com Sim/Não, sem o texto do motor, e descarta os rótulos próprios (`UI.left.btn.text`/`UI.right.btn.text`). Numa pergunta "topo ou fundo?", o "Sim" significa "topo".
-- **Execução:** branch `port/gate-arvore-a2-pergunta-do-motor`: `99b7fa132` (o conserto portado), `088c046cf` (combate decidido pelo payload e log do fallback), `02dc07b30` (comentários) e o commit deste registro. O Battle continua `OFF` e fora do escopo do MVP (D-87); nada disso autoriza deploy.
+- **Limitação registrada como follow-up de backlog:** a pergunta genérica aparece como "Sua decisão" com Sim/Não, sem o texto do motor, e descarta os rótulos próprios (`UI.left.btn.text`/`UI.right.btn.text`). Numa pergunta "topo ou fundo?", o "Sim" significa "topo". A métrica do follow-up é o log `interactive_question_fallback`: uma linha de stderr por pergunta genérica, sem texto, rótulos nem IDs.
+- **Execução:** PR de `port/gate-arvore-a2-pergunta-do-motor`, na branch de mesmo nome: `99b7fa132` (o conserto portado), `088c046cf` (combate decidido pelo payload e log do fallback do `GAME_SELECT`), `02dc07b30` (comentários), `d858fc52b` (este registro e o ADR 0014 aceito), `10d43a4d7` (log da pergunta genérica e testes do sidecar de volta ao Java 8) e o commit que corrige a D-90 e as emendas dos ADRs 0012 e 0005. Os SHAs mudam se a branch for rebaseada; a referência estável é a branch e o PR. O Battle continua `OFF` e fora do escopo do MVP (D-87); nada disso autoriza deploy.
 
 **D-89 · Consertos de app da árvore antiga do gate vão por PR feito na nuvem, com uma recaptura única da prova de UI.**
 - **Contexto:** a árvore antiga do gate (`refs/backup/2026-10-08/gate-arvore-1419`) traz, além dos consertos de motor e servidor portados à parte, consertos em `app/`. O app entra no digest de UI, e cada merge que muda o digest deixa a prova de UI defasada.
@@ -416,8 +416,11 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 
 **D-90 · Fichário com troca e venda desligadas: o editor limpa as flags ao salvar um item antigo.**
 - **Contexto:** com troca e venda desligadas, o servidor devolve 422 quando um item antigo do fichário é salvo ainda com troca, venda ou preço, e o jogador não consegue salvar a edição.
-- **Decisão do dono:** "Limpar as flags ao salvar". O editor deixa de mandar troca, venda e preço nesse caso, em vez de receber o 422.
-- **Execução:** no PR de app da D-89, como acréscimo ao passo B7 do plano, com teste e mutação.
+- **Decisão do dono:** "Limpar as flags ao salvar". Com troca ou venda desligadas, o editor do fichário, ao salvar, manda os campos desligados explicitamente, em vez de omiti-los:
+  - `for_trade: false` quando a capability de trocas está fechada;
+  - `for_sale: false` com `price: null` quando o marketplace está fechado.
+- **Por que não omitir:** o `PUT /binder/:id` é parcial. Campo omitido mantém o valor antigo no banco (`server/routes/binder/[id]/index.dart`, no bloco que só grava `for_trade`, `for_sale` e `price` quando a chave vem no corpo). Já `false` e `null` são aceitos com a capability fechada, porque é assim que se retira uma oferta (`server/lib/binder_item_contract.dart`). Assim o item antigo salva sem 422 e as flags caem no banco.
+- **Execução:** no PR de app da D-89, feito na nuvem, como acréscimo ao passo B7 do plano. O teste do app prova o corpo do PUT: `false`/`false`/`null` com as capabilities fechadas, e a mutação que omite os campos faz o teste falhar. Os insumos estão na branch `port/gate-arvore-b-insumos`, e o `PLANO.md` de lá foi corrigido pela coordenação no mesmo sentido.
 
 **D-91 · Goldens do herói da Home refeitos no macOS 27 se a diferença for só subpixel.**
 - **Contexto:** os goldens do herói da Home divergem quando gerados no macOS 27.

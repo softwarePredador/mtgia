@@ -7,6 +7,8 @@
 - Decisão: `GO` limitado para engenharia
 - Substitui: ADR 0003
 
+> Emenda 2026-10-08 (ADR 0014): a falha fechada deixou de valer para o texto da mensagem de `GAME_ASK` e `GAME_SELECT`. Pergunta de sim/não que não é o mulligan vira o prompt genérico `question` (Sim/Não), e frase de `GAME_SELECT` desconhecida vira `combat` quando o payload traz `possibleAttackers`/`possibleBlockers`, e `main_action` quando não traz. Método, payload, limite de opções, IDs opacos, resposta obsoleta e a allowlist de kinds do servidor continuam fail-closed, e as demais restrições desta decisão continuam válidas.
+
 ## Contexto
 
 O registro original desta decisão foi criado por engano com o identificador
