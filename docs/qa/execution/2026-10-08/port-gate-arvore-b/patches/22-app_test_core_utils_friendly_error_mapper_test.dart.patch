@@ -1,0 +1,35 @@
+diff --git a/app/test/core/utils/friendly_error_mapper_test.dart b/app/test/core/utils/friendly_error_mapper_test.dart
+index fd4746a30..24f2ca4db 100644
+--- a/app/test/core/utils/friendly_error_mapper_test.dart
++++ b/app/test/core/utils/friendly_error_mapper_test.dart
+@@ -73,4 +73,28 @@ void main() {
+       expect(contract.disconnectedMessage, isNotEmpty, reason: context.name);
+     }
+   });
+-}
++
++  group('403 com email_verification_required', () {
++    test('recebe mensagem acionável, não a genérica de permissão', () {
++      final msg = FriendlyErrorMapper.fromStatusCode(
++        403,
++        body: {'error': 'email_verification_required'},
++      );
++      expect(msg, contains('Confirme seu e-mail'));
++      expect(msg, contains('Reenvie'));
++      expect(msg, isNot(contains('não tem permissão')));
++    });
++
++    test('403 sem esse código mantém a mensagem de permissão', () {
++      // Guarda contra alargar o ramo até engolir 403 de verdade.
++      expect(
++        FriendlyErrorMapper.fromStatusCode(403, body: {'error': 'forbidden'}),
++        contains('não tem permissão'),
++      );
++      expect(
++        FriendlyErrorMapper.fromStatusCode(403),
++        contains('não tem permissão'),
++      );
++    });
++  });
++}
+\ No newline at end of file

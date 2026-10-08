@@ -1,0 +1,47 @@
+diff --git a/app/lib/features/profile/account_privacy_service.dart b/app/lib/features/profile/account_privacy_service.dart
+index e1bf168cc..cd56e997a 100644
+--- a/app/lib/features/profile/account_privacy_service.dart
++++ b/app/lib/features/profile/account_privacy_service.dart
+@@ -32,13 +32,21 @@ class AccountPrivacyService {
+ 
+   final ApiClient _apiClient;
+ 
+-  Future<String> exportPortableData() async {
+-    final response = await _apiClient.get('/users/me/export');
++  /// Exporta os dados portáveis da conta.
++  ///
++  /// BT-AUTH-004: exportar os próprios dados passou a exigir reverificação de
++  /// senha, como a exclusão de conta já exigia. O endpoint deixou de aceitar
++  /// `GET` — quem mandar GET recebe 405 e a exportação simplesmente para de
++  /// funcionar, sem mensagem útil.
++  Future<String> exportPortableData({required String password}) async {
++    final response = await _apiClient.post('/users/me/export', {
++      'password': password,
++    });
+     if (response.statusCode != 200 || response.data is! Map) {
+       throw AccountPrivacyException(
+         _messageFor(
+           response,
+-          fallback: 'Não foi possível exportar seus dados.',
++          fallback: _exportFallbackFor(response),
+         ),
+         statusCode: response.statusCode,
+       );
+@@ -47,6 +55,17 @@ class AccountPrivacyService {
+     return const JsonEncoder.withIndent('  ').convert(response.data);
+   }
+ 
++  /// Traduz os três motivos que o servidor distingue nesta rota.
++  ///
++  /// Sem isto, senha errada e excesso de tentativas caíam na mesma frase
++  /// genérica, e quem errou a senha não saberia que basta tentar de novo.
++  String _exportFallbackFor(ApiResponse response) => switch (response.statusCode) {
++    400 => 'Informe sua senha para exportar seus dados.',
++    401 => 'Senha incorreta. Tente novamente.',
++    429 => 'Muitas tentativas. Aguarde um momento antes de exportar de novo.',
++    _ => 'Não foi possível exportar seus dados.',
++  };
++
+   Future<AccountDeletionReceipt> deleteAccount({
+     required String confirmation,
+     required String password,

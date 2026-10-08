@@ -1,0 +1,20 @@
+diff --git a/app/lib/features/battle/services/interactive_battle_service.dart b/app/lib/features/battle/services/interactive_battle_service.dart
+index 7aaab6ab1..174fb84c6 100644
+--- a/app/lib/features/battle/services/interactive_battle_service.dart
++++ b/app/lib/features/battle/services/interactive_battle_service.dart
+@@ -267,7 +267,15 @@ String _friendlyMessage(int statusCode, Map<String, dynamic> payload) {
+   final knownMessage = switch (code) {
+     'interactive_battle_quota_exceeded' =>
+       'Você já tem uma mesa ativa. Retome-a ou encerre-a antes de iniciar outra.',
++    // `not_waiting` é o que o servidor devolve quando a ação chega depois de a
++    // mesa sair de `waiting_for_action` — duplo toque numa opção, ou tocar de
++    // novo com a rede lenta. Medido em 2026-09-21: o reenvio sequencial produz
++    // `not_waiting`, não `action_stale`, porque a primeira ação já pôs
++    // `status='action_pending'` e `active_prompt_id=NULL`. Sem este ramo o
++    // jogador via "Não foi possível atualizar a mesa.", que parece falha, em
++    // vez da mensagem que diz que o app se recupera sozinho.
+     'interactive_battle_action_stale' ||
++    'interactive_battle_not_waiting' ||
+     'interactive_battle_option_not_allowed' =>
+       'A mesa avançou antes desta escolha. O estado será atualizado.',
+     'interactive_battle_not_found' =>

@@ -1,0 +1,13 @@
+diff --git a/scripts/manaloom_battle_learning_visual_qa.sh b/scripts/manaloom_battle_learning_visual_qa.sh
+index e0e0b0a37..6e8984b5b 100755
+--- a/scripts/manaloom_battle_learning_visual_qa.sh
++++ b/scripts/manaloom_battle_learning_visual_qa.sh
+@@ -65,7 +65,7 @@ PY
+ )"
+ (
+   cd "$ROOT_DIR"
+-  python3 -m http.server "$ASSET_PORT" --bind 127.0.0.1 \
++  python3 "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" "$ASSET_PORT" --bind 127.0.0.1 \
+     >"$RUN_DIR/asset-server.log" 2>&1
+ ) &
+ ASSET_SERVER_PID="$!"

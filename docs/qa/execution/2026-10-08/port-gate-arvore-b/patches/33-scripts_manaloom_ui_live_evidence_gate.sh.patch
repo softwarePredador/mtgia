@@ -1,0 +1,13 @@
+diff --git a/scripts/manaloom_ui_live_evidence_gate.sh b/scripts/manaloom_ui_live_evidence_gate.sh
+index 0cf413212..b26e63898 100755
+--- a/scripts/manaloom_ui_live_evidence_gate.sh
++++ b/scripts/manaloom_ui_live_evidence_gate.sh
+@@ -181,7 +181,7 @@ PY
+   }
+   trap cleanup_capture EXIT INT TERM
+ 
+-  python3 -m http.server "$image_port" \
++  python3 "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" "$image_port" \
+     --bind 127.0.0.1 \
+     --directory "$ROOT_DIR/app/assets/branding" \
+     >"$run_dir/card-image-fixture.log" 2>&1 &

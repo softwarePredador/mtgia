@@ -1,0 +1,13 @@
+diff --git a/scripts/manaloom_critical_overlays_states_visual_qa.sh b/scripts/manaloom_critical_overlays_states_visual_qa.sh
+index 05b453d25..95835c786 100755
+--- a/scripts/manaloom_critical_overlays_states_visual_qa.sh
++++ b/scripts/manaloom_critical_overlays_states_visual_qa.sh
+@@ -65,7 +65,7 @@ PY
+ )"
+ (
+   cd "$ROOT_DIR"
+-  python3 -m http.server "$ASSET_PORT" --bind 127.0.0.1 \
++  python3 "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" "$ASSET_PORT" --bind 127.0.0.1 \
+     >"$RUN_DIR/asset-server.log" 2>&1
+ ) &
+ ASSET_SERVER_PID="$!"

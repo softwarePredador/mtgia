@@ -1,0 +1,111 @@
+diff --git a/app/integration_test/core_product_acceptance_runtime_test.dart b/app/integration_test/core_product_acceptance_runtime_test.dart
+index 8f33a7bad..991ba9010 100644
+--- a/app/integration_test/core_product_acceptance_runtime_test.dart
++++ b/app/integration_test/core_product_acceptance_runtime_test.dart
+@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
+ import 'package:flutter_test/flutter_test.dart';
+ import 'package:integration_test/integration_test.dart';
+ import 'package:manaloom/core/api/api_client.dart';
++import 'package:manaloom/core/config/release_capabilities.dart';
+ import 'package:manaloom/core/theme/app_theme.dart';
+ import 'package:manaloom/features/binder/widgets/binder_item_editor.dart';
+ import 'package:manaloom/features/cards/providers/card_provider.dart';
+@@ -504,8 +505,25 @@ void main() {
+     (tester) async {
+       binding.deviceEventDispatcher = null;
+       await tester.pumpWidget(
+-        ChangeNotifierProvider<CardProvider>(
+-          create: (_) => _CollectionCardProvider(),
++        MultiProvider(
++          providers: [
++            ChangeNotifierProvider<CardProvider>(
++              create: (_) => _CollectionCardProvider(),
++            ),
++            // Troca e venda sao capabilities fechadas na beta, e o editor do
++            // Fichario esconde os dois switches quando elas estao desligadas
++            // ou quando nao ha provider (contencao D-04). Este teste exercita
++            // justamente o fluxo de marcar a carta para venda, entao precisa
++            // declarar o caminho LIBERADO -- sem isso ele media a superficie
++            // fechada e falhava em `binder-editor-for-sale-switch` com
++            // "Bad state: No element".
++            ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
++              create: (_) => ReleaseCapabilitiesProvider.seeded(const {
++                ReleaseCapability.trades,
++                ReleaseCapability.marketplace,
++              }),
++            ),
++          ],
+           child: MaterialApp(
+             debugShowCheckedModeBanner: false,
+             theme: AppTheme.darkTheme,
+@@ -591,6 +609,25 @@ void main() {
+             ChangeNotifierProvider<NotificationProvider>(
+               create: (_) => NotificationProvider(apiClient: _NoopApiClient()),
+             ),
++            // `DeckListScreen` troca o corpo inteiro por
++            // `deck-list-capability-unavailable` quando `decks_private` esta
++            // fechada ou quando nao ha provider. Sem declarar o caminho
++            // liberado, este teste media a superficie fechada e falhava ao
++            // procurar `deck-list-empty-create-button`, que nem chega a ser
++            // construido.
++            ChangeNotifierProvider<ReleaseCapabilitiesProvider>(
++              create: (_) => ReleaseCapabilitiesProvider.seeded(const {
++                ReleaseCapability.decksPrivate,
++                ReleaseCapability.catalogPrivate,
++                ReleaseCapability.aiAnalyzeOptimizeAdvisory,
++                ReleaseCapability.aiGenerateRebuild,
++                // O switch "Deck publico" vive dentro de um
++                // Consumer<ReleaseCapabilitiesProvider?> que colapsa para
++                // SizedBox.shrink sem `gallery_public`
++                // (deck_list_screen.dart:321-331).
++                ReleaseCapability.galleryPublic,
++              }),
++            ),
+           ],
+           child: MaterialApp(
+             debugShowCheckedModeBanner: false,
+@@ -745,14 +782,37 @@ void main() {
+       }
+       expect(find.textContaining('Plains'), findsOneWidget);
+       expect(find.textContaining('27'), findsWidgets);
+-      final checkboxes = find.byType(Checkbox);
+-      expect(checkboxes, findsNWidgets(4));
+-      final firstAddition = find.byKey(const Key('optimize-suggestion-add-0'));
+-      await tester.ensureVisible(firstAddition);
+-      await tester.pumpAndSettle();
+-      await tester.tap(
+-        find.descendant(of: firstAddition, matching: find.byType(Checkbox)),
++      // A previa passou a agrupar remocao+adicao em TROCAS, e a selecao e por
++      // troca: `optimize-paired-swap-checkbox-$index`
++      // (deck_optimize_sheet_widgets.dart:2175-2178). As linhas internas de
++      // cada troca reusam a chave `optimize-suggestion-<lado>-<i>` mas sao
++      // renderizadas com `showCheckbox: false` e sem `onChanged`, ou seja, nao
++      // sao clicaveis (mesmo arquivo, :2137-2143).
++      //
++      // Antes isto media `find.byType(Checkbox)` esperando 4. Medido em
++      // 2026-09-24: as quatro linhas existem, nenhuma contem `Checkbox`, e os
++      // 2 `Checkbox` da tela sao os das duas trocas. O teste media a
++      // implementacao antiga, nao a capacidade; a capacidade -- escolher parte
++      // do plano antes de aplicar -- continua inteira.
++      for (final chave in const [
++        'optimize-suggestion-add-0',
++        'optimize-suggestion-add-1',
++        'optimize-suggestion-remove-0',
++        'optimize-suggestion-remove-1',
++      ]) {
++        expect(
++          find.byKey(Key(chave)),
++          findsOneWidget,
++          reason: 'a previa deveria listar a sugestao $chave',
++        );
++      }
++      final primeiraTroca = find.byKey(
++        const Key('optimize-paired-swap-checkbox-0'),
+       );
++      expect(primeiraTroca, findsOneWidget);
++      await tester.ensureVisible(primeiraTroca);
++      await tester.pumpAndSettle();
++      await tester.tap(primeiraTroca);
+       await tester.pumpAndSettle();
+       expect(
+         find.byKey(const Key('optimize-preview-partial-recompute-message')),

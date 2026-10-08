@@ -1,0 +1,61 @@
+diff --git a/app/test/features/battle/models/interactive_battle_ability_art_test.dart b/app/test/features/battle/models/interactive_battle_ability_art_test.dart
+new file mode 100644
+index 000000000..fba18ac27
+--- /dev/null
++++ b/app/test/features/battle/models/interactive_battle_ability_art_test.dart
+@@ -0,0 +1,55 @@
++// Habilidade na pilha não pede arte ao Scryfall.
++//
++// Medido em 2026-09-29, no console de uma partida real do play-vs-ai: o app
++// pedia `api.scryfall.com/cards/named?exact=Ability&...` para cada habilidade
++// que subia na pilha, e cada pedido falhava três vezes com `EncodingError`.
++// Dezoito falhas numa única partida. `Ability` é o nome que o XMage dá a uma
++// habilidade; ela não tem set, número de coleção nem arte.
++//
++// O sinal é o `is_ability` que o normalizador do sidecar grava em cada objeto
++// (`ReplayNormalizer`), e não o nome, que seria frágil.
++
++import 'package:flutter_test/flutter_test.dart';
++import 'package:manaloom/features/battle/models/interactive_battle_session.dart';
++
++void main() {
++  test('habilidade da pilha nao dispara carregamento de arte', () {
++    final habilidade = InteractiveBattleCard.fromJson(const {
++      'name': 'Ability',
++      'is_ability': true,
++    });
++
++    expect(habilidade.isAbility, isTrue);
++    expect(
++      habilidade.effectiveImageUrl,
++      isNull,
++      reason:
++          'sem carta para buscar, o app nao pode emitir pedido nenhum; um '
++          'pedido que falha em silencio ainda gasta rede e suja o console',
++    );
++  });
++
++  test('carta de verdade continua carregando a arte', () {
++    final carta = InteractiveBattleCard.fromJson(const {
++      'name': 'Isamaru, Hound of Konda',
++      'set_code': 'CHK',
++      'collector_number': '19',
++    });
++
++    expect(carta.isAbility, isFalse);
++    expect(
++      carta.effectiveImageUrl,
++      isNotNull,
++      reason: 'a guarda nao pode calar a arte das cartas de verdade',
++    );
++  });
++
++  test('objeto sem a marca continua tratado como carta', () {
++    final semMarca = InteractiveBattleCard.fromJson(const {
++      'name': 'Goblin Token',
++    });
++
++    expect(semMarca.isAbility, isFalse);
++    expect(semMarca.effectiveImageUrl, isNotNull);
++  });
++}

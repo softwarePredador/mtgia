@@ -1,0 +1,75 @@
+diff --git a/app/lib/core/utils/friendly_error_mapper.dart b/app/lib/core/utils/friendly_error_mapper.dart
+index 52dc8d2f9..45ea512cd 100644
+--- a/app/lib/core/utils/friendly_error_mapper.dart
++++ b/app/lib/core/utils/friendly_error_mapper.dart
+@@ -42,6 +42,17 @@ class FriendlyErrorMapper {
+     );
+   }
+ 
++  /// Extrai o código de erro que o servidor envia no corpo.
++  ///
++  /// O mapeamento por status sozinho não basta: o mesmo 403 cobre "não pode"
++  /// e "ainda não confirmou o e-mail", e as duas pedem reações opostas do
++  /// usuário.
++  static String? _codeFrom(Object? body) {
++    if (body is! Map) return null;
++    final code = body['error'] ?? body['code'];
++    return code is String && code.trim().isNotEmpty ? code.trim() : null;
++  }
++
+   static String fromStatusCode(
+     int statusCode, {
+     Object? body,
+@@ -89,6 +100,13 @@ class FriendlyErrorMapper {
+     }
+ 
+     if (statusCode == 403) {
++      // BT-AUTH-010 / BT-UX-ERR-001: `email_verification_required` não é falta
++      // de permissão — a conta TEM direito à ação, só não confirmou o e-mail.
++      // A mensagem genérica de 403 é um beco sem saída: não diz o que fazer.
++      if (_codeFrom(body) == 'email_verification_required') {
++        return 'Confirme seu e-mail para continuar. '
++            'Reenvie a verificação pelo seu perfil e tente de novo.';
++      }
+       return 'Você não tem permissão para realizar esta ação.';
+     }
+ 
+@@ -263,7 +281,11 @@ class FriendlyErrorMapper {
+     required FriendlyErrorContext context,
+   }) {
+     if (body is! Map) return null;
+-    final value = body['error'] ?? body['message'];
++    // `message` primeiro: `error` carrega o CÓDIGO de máquina
++    // (`email_verification_required`, `invalid_password`), e preferi-lo era o
++    // caminho pelo qual códigos do servidor chegavam à tela como se fossem
++    // frase. `message`, quando existe, é o texto escrito para quem lê.
++    final value = body['message'] ?? body['error'];
+     if (value == null) return null;
+ 
+     final text = value.toString().trim();
+@@ -314,13 +336,24 @@ class FriendlyErrorMapper {
+       return 'Muitas tentativas em sequência. Aguarde um instante e tente novamente.';
+     }
+ 
+-    if (!_looksTechnical(text)) {
++    if (!_looksTechnical(text) && !_looksLikeErrorCode(text)) {
+       return text;
+     }
+ 
+     return null;
+   }
+ 
++  /// Identificador de máquina, não frase para o usuário.
++  ///
++  /// Cobre `snake_case` e token único minúsculo: `email_verification_required`,
++  /// `invalid_password`, `forbidden`. Sem isto, todo código novo que o
++  /// servidor passe a devolver aparece cru na tela até alguém notar — foi
++  /// assim que `email_verification_required` virou a mensagem que o jogador
++  /// lia. Frase de verdade tem espaço, ou começa em maiúscula, ou tem acento.
++  static bool _looksLikeErrorCode(String text) {
++    return RegExp(r'^[a-z][a-z0-9]*(_[a-z0-9]+)*$').hasMatch(text);
++  }
++
+   static bool _looksLikeNetworkError(String lower, String runtimeType) {
+     final type = runtimeType.toLowerCase();
+     return type.contains('socketexception') ||

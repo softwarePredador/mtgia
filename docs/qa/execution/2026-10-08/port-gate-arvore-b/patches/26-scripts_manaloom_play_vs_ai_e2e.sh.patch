@@ -1,0 +1,201 @@
+diff --git a/scripts/manaloom_play_vs_ai_e2e.sh b/scripts/manaloom_play_vs_ai_e2e.sh
+index 3ae1c2004..c2db4e335 100755
+--- a/scripts/manaloom_play_vs_ai_e2e.sh
++++ b/scripts/manaloom_play_vs_ai_e2e.sh
+@@ -2,6 +2,13 @@
+ set -euo pipefail
+ umask 077
+ 
++# BT-CI-002: checagem que barra também no /bin/bash 3.2 do macOS, onde um [[ ]] ou
++# (( )) solto que falha não encerra o script com set -e.
++fail_check() {
++  echo "checagem falhou: $*" >&2
++  exit 1
++}
++
+ ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+ APP_DIR="$ROOT_DIR/app"
+ SIDECAR_DIR="$ROOT_DIR/services/xmage-sidecar"
+@@ -207,6 +214,17 @@ BROWSER_WEB_LOG="$RUN_DIR/flutter-web.log"
+ BROWSER_READY_MANIFEST="$RUN_DIR/browser-ready.json"
+ BROWSER_CREDENTIALS_FILE="$RUN_DIR/browser-credentials.env"
+ BROWSER_DONE_FILE="$RUN_DIR/browser-qa-complete.json"
++# Identidade do browser que produz a prova. Era o literal "Codex in-app
++# Chromium" fixado em tres pontos — um contrato de release nomeando o browser
++# de UM agente. Qualquer outro executor teria de declarar-se Codex para
++# passar, o que e falsificar a procedencia da evidencia. Agora o executor
++# declara o que de fato usou, e o contrato exige apenas que seja um nome real.
++BROWSER_QA_BROWSER_NAME="${MANALOOM_PLAY_VS_AI_BROWSER_NAME:-Codex in-app Chromium}"
++if [[ -z "${BROWSER_QA_BROWSER_NAME//[[:space:]]/}" ]]; then
++  echo "MANALOOM_PLAY_VS_AI_BROWSER_NAME nao pode ser vazio" >&2
++  exit 2
++fi
++BROWSER_QA_DEVICE_CONTRACT="$BROWSER_QA_BROWSER_NAME browser real Web build 1440x900"
+ BROWSER_RELEASE_FILE="$RUN_DIR/browser-api-release.txt"
+ BROWSER_WEB_BUILD_DIR="$RUN_DIR/flutter-web-build"
+ BROWSER_SCREENSHOT_DIGESTS="$RUN_DIR/browser-screenshot-digests.json"
+@@ -259,7 +277,8 @@ WORKTREE_STATUS_SHA="$(
+ )"
+ if [[ "$BROWSER_QA_MODE" == "1" ]]; then
+   BROWSER_UI_SOURCE_DIGEST="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
+-  [[ "$BROWSER_UI_SOURCE_DIGEST" =~ ^[0-9a-f]{64}$ ]]
++  [[ "$BROWSER_UI_SOURCE_DIGEST" =~ ^[0-9a-f]{64}$ ]] ||
++    fail_check "digest da fonte de UI invalido"
+ fi
+ 
+ copy_artifact() {
+@@ -770,10 +789,10 @@ run_browser_qa() {
+         '{email: $email, password: $password}')" \
+       "$BROWSER_API_BASE_URL/auth/login" | jq -er '.token'
+   )"
+-  [[ -n "$browser_token" ]]
++  [[ -n "$browser_token" ]] || fail_check "login do browser sem token"
+ 
+   browser_human_deck_name="QA Web Isamaru $browser_seed_suffix"
+-  browser_ai_deck_name="QA Web Krenko $browser_seed_suffix"
++  browser_ai_deck_name="QA Web Kari Zev $browser_seed_suffix"
+   browser_human_deck_response="$(
+     curl -fsS --max-time 30 \
+       -H 'Content-Type: application/json' \
+@@ -802,7 +821,7 @@ run_browser_qa() {
+           format: "commander",
+           is_public: false,
+           cards: [
+-            {name: "Krenko, Mob Boss", quantity: 1, is_commander: true},
++            {name: "Kari Zev, Skyship Raider", quantity: 1, is_commander: true},
+             {name: "Mountain", quantity: 99, is_commander: false}
+           ]
+         }')" \
+@@ -814,8 +833,9 @@ run_browser_qa() {
+     <<<"$browser_ai_deck_response" >/dev/null
+   browser_human_deck_id="$(jq -er '.id' <<<"$browser_human_deck_response")"
+   browser_ai_deck_id="$(jq -er '.id' <<<"$browser_ai_deck_response")"
+-  [[ "$browser_human_deck_id" =~ ^[0-9a-f-]{36}$ ]]
+-  [[ "$browser_ai_deck_id" =~ ^[0-9a-f-]{36}$ ]]
++  [[ "$browser_human_deck_id" =~ ^[0-9a-f-]{36}$ ]] ||
++    fail_check "deck humano sem id valido"
++  [[ "$browser_ai_deck_id" =~ ^[0-9a-f-]{36}$ ]] || fail_check "deck da IA sem id valido"
+ 
+   FAILURE_STAGE="build_browser_qa_flutter_web"
+   (
+@@ -832,7 +852,8 @@ run_browser_qa() {
+       --dart-define=DISABLE_PUSH_INIT=true \
+       --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true
+   ) >"$BROWSER_BUILD_LOG" 2>&1
+-  [[ -s "$BROWSER_WEB_BUILD_DIR/main.dart.js" ]]
++  [[ -s "$BROWSER_WEB_BUILD_DIR/main.dart.js" ]] ||
++    fail_check "build Web sem main.dart.js"
+   BROWSER_BUNDLE_SHA="$(
+     shasum -a 256 "$BROWSER_WEB_BUILD_DIR/main.dart.js" | awk '{print $1}'
+   )"
+@@ -869,6 +890,7 @@ run_browser_qa() {
+   printf 'VISUAL_PROOF_CONTEXT %s\n' "$(
+     jq -cn \
+       --arg source_digest "$BROWSER_UI_SOURCE_DIGEST" \
++      --arg device_contract "$BROWSER_QA_DEVICE_CONTRACT" \
+       --argjson required_checkpoints "$browser_required_checkpoints_json" \
+       '{
+         schema_version: "manaloom_ui_runtime_context_v1",
+@@ -877,7 +899,7 @@ run_browser_qa() {
+         profile: "web_play_vs_ai_1440x900",
+         runtime: "flutter_web_release_loopback_api_pinned_xmage",
+         target: "web_real_build",
+-        device_contract: "Codex in-app Chromium browser real Web build 1440x900",
++        device_contract: $device_contract,
+         required_checkpoints: $required_checkpoints
+       }'
+   )" >"$BROWSER_RUNTIME_LOG"
+@@ -970,7 +992,7 @@ run_browser_qa() {
+     and .source_digest == $source_digest
+     and .viewport.width == 1440
+     and .viewport.height == 900
+-    and .browser.name == "Codex in-app Chromium"
++    and (.browser.name | type == "string" and (. | gsub("\\s";"") | length) > 0)
+     and .browser.console_forbidden_entries == 0
+     and .reviewer.kind == "agent"
+     and (.reviewer.name | type == "string" and length > 0)
+@@ -1046,7 +1068,7 @@ run_browser_qa() {
+       --runtime flutter_web_release_loopback_api_pinned_xmage \
+       --target web_real_build \
+       --device-contract \
+-        "Codex in-app Chromium browser real Web build 1440x900"
++        "$BROWSER_QA_DEVICE_CONTRACT"
+   ) >"$RUN_DIR/browser-runtime-evidence.log" 2>&1
+   jq -e \
+     --arg source_digest "$BROWSER_UI_SOURCE_DIGEST" \
+@@ -1119,8 +1141,10 @@ run_browser_qa() {
+           ORDER BY created_at DESC, id DESC LIMIT 1" |
+       tr -d '[:space:]'
+   )"
+-  [[ "$browser_session_id" =~ ^[0-9a-f-]{36}$ ]]
+-  [[ "$(jq -r '.session_id' "$BROWSER_DONE_FILE")" == "$browser_session_id" ]]
++  [[ "$browser_session_id" =~ ^[0-9a-f-]{36}$ ]] ||
++    fail_check "sessao do browser sem id valido"
++  [[ "$(jq -r '.session_id' "$BROWSER_DONE_FILE")" == "$browser_session_id" ]] ||
++    fail_check "prova do browser de outra sessao"
+ 
+   browser_session_response="$(
+     curl -fsS --max-time 30 \
+@@ -1216,11 +1240,15 @@ run_browser_qa() {
+   )"
+   IFS='|' read -r browser_action_records browser_prompt_records \
+     browser_record_total <<<"$browser_record_counts"
+-  [[ "$browser_action_records" =~ ^[0-9]+$ ]]
+-  [[ "$browser_prompt_records" =~ ^[0-9]+$ ]]
+-  [[ "$browser_record_total" =~ ^[0-9]+$ ]]
+-  ((browser_action_records >= 8))
+-  ((browser_prompt_records >= 8))
++  [[ "$browser_action_records" =~ ^[0-9]+$ ]] ||
++    fail_check "contagem de acoes invalida"
++  [[ "$browser_prompt_records" =~ ^[0-9]+$ ]] ||
++    fail_check "contagem de prompts invalida"
++  [[ "$browser_record_total" =~ ^[0-9]+$ ]] || fail_check "total de registros invalido"
++  ((browser_action_records >= 8)) ||
++    fail_check "menos de 8 acoes registradas: $browser_action_records"
++  ((browser_prompt_records >= 8)) ||
++    fail_check "menos de 8 prompts registrados: $browser_prompt_records"
+ 
+   browser_session_requests="$(
+     grep -c "/api/ai/battle/sessions/$browser_session_id" \
+@@ -1230,8 +1258,10 @@ run_browser_qa() {
+     grep -c "/api/decks/$browser_human_deck_id/battle-replays/$browser_replay_id" \
+       "$BROWSER_WEB_LOG" 2>/dev/null || true
+   )"
+-  ((browser_session_requests >= 2))
+-  ((browser_replay_requests >= 1))
++  ((browser_session_requests >= 2)) ||
++    fail_check "menos de 2 leituras da sessao: $browser_session_requests"
++  ((browser_replay_requests >= 1)) ||
++    fail_check "nenhuma leitura do replay: $browser_replay_requests"
+ 
+   BROWSER_EVIDENCE_JSON="$(
+     jq -n \
+@@ -1321,7 +1351,8 @@ run_browser_qa() {
+   grep -Fq 'api_listeners=0' "$BROWSER_CHILD_CLEANUP"
+   grep -Fq 'email_fixture_listeners=0' "$BROWSER_CHILD_CLEANUP"
+   grep -Fq 'forced_kill_used=0' "$BROWSER_CHILD_CLEANUP"
+-  [[ "$(listener_count "$BROWSER_WEB_PORT")" == "0" ]]
++  [[ "$(listener_count "$BROWSER_WEB_PORT")" == "0" ]] ||
++    fail_check "porta Web do browser ainda escutando"
+   BROWSER_CHILD_CLEANUP_RESULT="pass"
+   BROWSER_QA_RESULT="pass"
+ }
+@@ -1431,7 +1462,7 @@ FAILURE_STAGE="build_current_sidecar"
+   mvn -B -Dstyle.color=never -DskipTests package
+ ) >"$SIDECAR_BUILD_LOG" 2>&1
+ SIDECAR_JAR="$SIDECAR_DIR/target/xmage-sidecar.jar"
+-[[ -s "$SIDECAR_JAR" ]]
++[[ -s "$SIDECAR_JAR" ]] || fail_check "sidecar sem jar: $SIDECAR_JAR"
+ SIDECAR_JAR_SHA="$(shasum -a 256 "$SIDECAR_JAR" | awk '{print $1}')"
+ 
+ FAILURE_STAGE="start_distinct_sidecars"
+@@ -1519,7 +1550,8 @@ jq -e \
+     and .interactive_battle.active == 0' \
+   "$INTERACTIVE_HEALTH" >/dev/null
+ [[ "$(jq -r '.sidecar_process_id' "$BATCH_HEALTH")" != \
+-   "$(jq -r '.sidecar_process_id' "$INTERACTIVE_HEALTH")" ]]
++   "$(jq -r '.sidecar_process_id' "$INTERACTIVE_HEALTH")" ]] ||
++  fail_check "batch e interativo no mesmo processo de sidecar"
+ assert_pid_loopback_listeners "$BATCH_PID" "XMage batch sidecar/H2"
+ assert_pid_loopback_listeners "$INTERACTIVE_PID" \
+   "XMage interactive sidecar/H2"

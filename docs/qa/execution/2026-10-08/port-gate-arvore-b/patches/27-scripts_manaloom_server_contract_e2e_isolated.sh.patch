@@ -1,0 +1,84 @@
+diff --git a/scripts/manaloom_server_contract_e2e_isolated.sh b/scripts/manaloom_server_contract_e2e_isolated.sh
+index 539b4abf2..395b2ba36 100755
+--- a/scripts/manaloom_server_contract_e2e_isolated.sh
++++ b/scripts/manaloom_server_contract_e2e_isolated.sh
+@@ -357,11 +357,31 @@ for output in build .dart_frog; do
+   git -C "$ROOT_DIR" check-ignore -q "server/$output/" || exit 2
+   if [[ -e "$SERVER_DIR/$output" ]]; then
+     [[ -d "$SERVER_DIR/$output" ]] || exit 2
+-    build_consumers="$(lsof -t +D "$SERVER_DIR/$output" 2>"$RUN_DIR/build-consumers.log")" || {
+-      [[ $? == 1 && ! -s "$RUN_DIR/build-consumers.log" ]] || exit 2
+-    }
++    # Espera limitada, em vez de recusa imediata.
++    #
++    # O `manaloom_play_vs_ai_e2e.sh` invoca este script DUAS vezes — contrato e
++    # depois fixture de browser QA. O servidor da primeira invocacao ainda
++    # segura `server/build` por uma fracao de segundo quando a segunda comeca,
++    # e a recusa imediata transformava isso em falha certa: reproduzido 2 de 2
++    # em 2026-09-21, e logo apos a falha `lsof +D` ja nao devolvia nada.
++    #
++    # A intencao do guard continua: nao mexer no diretorio enquanto alguem o
++    # usa. O que muda e dar ao consumidor um prazo para sair, e dizer QUEM
++    # segurava quando o prazo acaba — a mensagem antiga nao permitia diagnostico.
++    build_consumers=""
++    for _ in $(seq 1 60); do
++      build_consumers="$(lsof -t +D "$SERVER_DIR/$output" 2>"$RUN_DIR/build-consumers.log")" || {
++        [[ $? == 1 && ! -s "$RUN_DIR/build-consumers.log" ]] || exit 2
++      }
++      [[ -n "$build_consumers" ]] || break
++      sleep 0.25
++    done
+     [[ -z "$build_consumers" ]] || {
+-      echo "BLOCKED: build output has a consumer" >&2; exit 2;
++      echo "BLOCKED: build output has a consumer after 15s: $output" >&2
++      for consumer_pid in $build_consumers; do
++        echo "  pid $consumer_pid: $(ps -p "$consumer_pid" -o comm= 2>/dev/null || echo desconhecido)" >&2
++      done
++      exit 2
+     }
+     mv -- "$SERVER_DIR/$output" "$RUN_DIR/pre-$output"
+     BUILD_SAVED+=("$output")
+@@ -546,12 +566,42 @@ run_pg psql -X -v ON_ERROR_STOP=1 \
+       '{T}: Create X 1/1 red Goblin creature tokens, where X is the number of Goblins you control.',
+       ARRAY['R']::text[], ARRAY['R']::text[], '3', '3',
+       'FDN', 'rare', 1.00, '204', FALSE, 'normal', 4
++    ),
++    (
++      -- Kari Zev e a comandante do deck adversario do navegador, e existe para
++      -- o checkpoint 05 do play-vs-ai-web-real.
++      --
++      -- Medido em 2026-09-28 e 29, pela API da partida:
++      --   com Krenko e 99 Mountain, o PRIMEIRO dano ja era o letal (40 para
++      --   -23 num golpe), e esse mesmo golpe encerrava a mesa;
++      --   com Zurgo Bellstriker (2/1), a IA simplesmente NAO atacava: turno 22
++      --   com os dois em 40, porque um 2/1 perde a troca contra o Isamaru 2/2
++      --   do sujeito, e o automatico do jogador bloquearia de qualquer forma.
++      --
++      -- Ameaca resolve: uma criatura com ameaca nao pode ser bloqueada por uma
++      -- criatura so, e o sujeito tem apenas o Isamaru no campo. O dano chega
++      -- baixo e nao letal, que e o estado que o checkpoint precisa mostrar.
++      --
++      -- Conferido no jar do motor pinado (mage-sets-1.4.60): KariZevSkyshipRaider
++      -- esta implementada. KariZevPerfectRebel nao existe la.
++      --
++      -- SEM ASPAS DUPLAS NESTE BLOCO: todo o SQL vai dentro de uma string de
++      -- aspas duplas do shell, e uma aspa aqui fecha a string e corta o
++      -- comando, com erro de sintaxe apontando para o comentario.
++      '20000000-0000-4000-8000-000000000005'::uuid,
++      '20000000-0000-4000-8000-000000000014'::uuid,
++      'Kari Zev, Skyship Raider', '{1}{R}',
++      'Legendary Creature — Human Pirate',
++      'First strike, menace',
++      ARRAY['R']::text[], ARRAY['R']::text[], '1', '3',
++      'AER', 'rare', 1.00, '92', FALSE, 'normal', 2
+     )
+     ON CONFLICT (scryfall_id) DO NOTHING;
+     INSERT INTO card_legalities (card_id, format, status)
+     SELECT id, 'commander', 'legal'
+     FROM cards
+-    WHERE name IN ('Mountain', 'Isamaru, Hound of Konda', 'Krenko, Mob Boss')
++    WHERE name IN ('Mountain', 'Isamaru, Hound of Konda', 'Krenko, Mob Boss',
++                   'Kari Zev, Skyship Raider')
+     ON CONFLICT (card_id, format) DO UPDATE SET status = EXCLUDED.status;
+     INSERT INTO cards (
+       scryfall_id, oracle_id, name, mana_cost, type_line, oracle_text,

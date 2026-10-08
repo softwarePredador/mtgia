@@ -1,0 +1,68 @@
+diff --git a/app/test/features/profile/profile_screen_test.dart b/app/test/features/profile/profile_screen_test.dart
+index 69df771b0..61b4c4322 100644
+--- a/app/test/features/profile/profile_screen_test.dart
++++ b/app/test/features/profile/profile_screen_test.dart
+@@ -52,13 +52,6 @@ class _ProfileApiClient extends ApiClient {
+     if (endpoint == '/users/me') {
+       return ApiResponse(200, {'user': Map<String, dynamic>.from(user)});
+     }
+-    if (endpoint == '/users/me/export') {
+-      return ApiResponse(200, {
+-        'schema_version': 1,
+-        'account': {'id': 'user-1', 'email': user['email']},
+-        'data': {'decks': <Object>[]},
+-      });
+-    }
+     if (endpoint == '/users/me/blocks') {
+       return ApiResponse(200, {
+         'data': [
+@@ -80,6 +73,18 @@ class _ProfileApiClient extends ApiClient {
+     Map<String, dynamic> body, {
+     Duration? timeout,
+   }) async {
++    // BT-AUTH-004: a exportacao migrou de GET para POST com reverificacao de
++    // senha. O fake exige a senha no corpo: se o app parar de mandar, o teste
++    // falha aqui em vez de exportar sem confirmar identidade.
++    if (endpoint == '/users/me/export') {
++      expect(body['password'], isA<String>());
++      expect((body['password'] as String).isNotEmpty, isTrue);
++      return ApiResponse(200, {
++        'schema_version': 1,
++        'account': {'id': 'user-1', 'email': user['email']},
++        'data': {'decks': <Object>[]},
++      });
++    }
+     expect(endpoint, '/auth/login');
+     return ApiResponse(200, {
+       'token': 'profile-test-token',
+@@ -244,6 +249,21 @@ void main() {
+         scrollable: find.byType(Scrollable).first,
+       );
+       await tester.tap(exportButton);
++      await tester.pumpAndSettle();
++
++      // BT-AUTH-004: exportar passou a exigir reverificação de senha, como a
++      // exclusão de conta. O fluxo só segue depois do diálogo.
++      expect(
++        find.byKey(const Key('profile-export-data-password-field')),
++        findsOneWidget,
++      );
++      await tester.enterText(
++        find.byKey(const Key('profile-export-data-password-field')),
++        'TestPassword123!',
++      );
++      await tester.tap(
++        find.byKey(const Key('profile-export-data-confirm-button')),
++      );
+       await tester.pump();
+       await tester.pump(const Duration(milliseconds: 300));
+       expect(sharedData, contains('"schema_version": 1'));
+@@ -333,7 +353,7 @@ void main() {
+         findsOneWidget,
+       );
+       expect(
+-        find.byKey(const Key('profile-revoke-password-visibility')),
++        find.byKey(const Key('profile-revoke-sessions-password-visibility')),
+         findsOneWidget,
+       );
+       await tester.tap(

@@ -1,0 +1,103 @@
+diff --git a/app/integration_test/battle_coach_visual_runtime_proof_test.dart b/app/integration_test/battle_coach_visual_runtime_proof_test.dart
+index 2b0fa5ebf..4e1df94df 100644
+--- a/app/integration_test/battle_coach_visual_runtime_proof_test.dart
++++ b/app/integration_test/battle_coach_visual_runtime_proof_test.dart
+@@ -181,11 +181,21 @@ void main() {
+       expect(tester.takeException(), isNull);
+       await _capture(binding, tester, _checkpoints[6]);
+ 
++      // Desmontar antes de remontar. `_pumpSubject` reconstroi a MESMA
++      // `BattleCoachScreen`, entao o Flutter reaproveita o `State` anterior --
++      // e o bloco de cima terminou com a partida concedida. Medido em
++      // 2026-09-24: o tabuleiro remontado trazia
++      // `play-vs-ai-rematch-button`, ou seja, sessao terminal, e a carta legal
++      // nunca podia aparecer por mais tempo que se esperasse.
++      await tester.pumpWidget(const SizedBox.shrink());
++      await tester.pump();
++
+       final actionGateway = _BattleCoachProofGateway();
+       await _pumpSubject(tester, actionGateway, sessionId: 'session-proof');
+       await pumpUntilFound(tester, find.byKey(const Key('battle-coach-board')));
+       await _waitForRenderedCardArt(tester);
+ 
++      await _waitForFinderWithRealTime(tester, legalCard, 'carta legal');
+       await tester.ensureVisible(legalCard);
+       await tester.pump(const Duration(milliseconds: 250));
+       await tester.tap(legalCard);
+@@ -271,6 +281,36 @@ Future<void> _capture(
+   expect(tester.takeException(), isNull, reason: 'After checkpoint $name');
+ }
+ 
++/// Espera um finder aparecer dando TEMPO REAL, nao so frames.
++///
++/// `pumpUntilFound` bombeia frames sem soltar o loop de eventos, e a carta
++/// legal so e destacada depois que a mesa casa a opcao com a carta visivel --
++/// trabalho assincrono que precisa de tempo de verdade.
++///
++/// Isto so passou a ser necessario em 2026-09-24, e a razao merece registro:
++/// antes, `_waitForRenderedCardArt` SEMPRE estourava as 20 tentativas por causa
++/// do limiar `>= 3` que nunca era satisfeito, queimando ~12s de `runAsync`. O
++/// teste dependia desse atraso acidental sem dizer. Corrigido o limiar, a
++/// espera virou explicita -- que e como deveria ter sido desde o comeco.
++Future<void> _waitForFinderWithRealTime(
++  WidgetTester tester,
++  Finder finder,
++  String descricao, {
++  int tentativas = 20,
++}) async {
++  for (var attempt = 0; attempt < tentativas; attempt += 1) {
++    finder.reset();
++    if (finder.evaluate().isNotEmpty) return;
++    await tester.runAsync(
++      () => Future<void>.delayed(const Duration(milliseconds: 500)),
++    );
++    await tester.pump(const Duration(milliseconds: 120));
++  }
++  finder.reset();
++  if (finder.evaluate().isNotEmpty) return;
++  fail('Play vs AI nao exibiu $descricao dentro da janela da prova ao vivo.');
++}
++
+ Future<void> _waitForRenderedCardArt(WidgetTester tester) async {
+   final cardImages = find.descendant(
+     of: find.byKey(const Key('battle-coach-board')),
+@@ -280,20 +320,35 @@ Future<void> _waitForRenderedCardArt(WidgetTester tester) async {
+     of: find.byKey(const Key('battle-coach-board')),
+     matching: find.byType(RawImage),
+   );
++  // O que esta espera protege e a captura sair com arte pela metade: toda
++  // imagem PRESENTE no tabuleiro precisa ter virado pixel antes do checkpoint.
++  //
++  // O limiar era `expectedCount >= 3`, que nao e sobre renderizacao e sim sobre
++  // quantas cartas o tabuleiro tem. Medido no emulador em 2026-09-24, nas 20
++  // tentativas: `esperado=2 renderizado=2`. As duas imagens do tabuleiro
++  // renderizavam sempre, e a captura falhava por causa do numero magico --
++  // `battle-coach-board` cobre o campo, nao a mao, e o campo dessa mesa de
++  // prova tem duas permanentes. Isso bloqueava `battle-coach-android` inteiro.
++  //
++  // Exigir pelo menos uma imagem mantem a protecao contra tabuleiro ainda vazio
++  // sem presumir a composicao da mesa.
++  var expectedCount = 0;
++  var renderedCount = 0;
+   for (var attempt = 0; attempt < 20; attempt += 1) {
+     await tester.runAsync(
+       () => Future<void>.delayed(const Duration(milliseconds: 500)),
+     );
+     await tester.pump(const Duration(milliseconds: 120));
+-    final expectedCount = cardImages.evaluate().length;
+-    final renderedCount = renderedCardArt.evaluate().length;
+-    if (expectedCount >= 3 && renderedCount >= expectedCount) {
++    expectedCount = cardImages.evaluate().length;
++    renderedCount = renderedCardArt.evaluate().length;
++    if (expectedCount >= 1 && renderedCount >= expectedCount) {
+       return;
+     }
+   }
+   fail(
+     'Play vs AI did not finish rendering every visible card image within '
+-    'the live-proof window.',
++    'the live-proof window '
++    '(cartas no tabuleiro: $expectedCount, renderizadas: $renderedCount).',
+   );
+ }
+ 

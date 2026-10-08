@@ -1,0 +1,317 @@
+diff --git a/docs/qa/execution/2026-09-29/btuiev001-play-vs-ai-recaptura-digest-novo.md b/docs/qa/execution/2026-09-29/btuiev001-play-vs-ai-recaptura-digest-novo.md
+new file mode 100644
+index 000000000..a21e02e92
+--- /dev/null
++++ b/docs/qa/execution/2026-09-29/btuiev001-play-vs-ai-recaptura-digest-novo.md
+@@ -0,0 +1,311 @@
++# `play-vs-ai-web-real` — recaptura no digest congelado (2026-09-29)
++
++Arquivo **não commitado** enquanto o gate de UI está vermelho.
++
++Digest da árvore, e da fixture que a corrida gerou:
++
++```
++87505e3d043552621860c5d10a24855d75c95aea7e113f77a6e3a3f7c79ca514
++```
++
++O anterior era `ea5d7782…`. O digest mudou por causa do guarda de habilidade em
++`InteractiveBattleCard` (`is_ability` -> `effectiveImageUrl` nulo). A fixture
++nasceu com o mesmo valor da árvore, então a evidência e o código conferem.
++
++## O que a corrida prova
++
++**Console sem nenhuma entrada `CachedCardImage`.** Era o critério que a
++coordenação pediu. A leitura cobre o caminho Web de verdade: `_ScryfallWebCardImage`,
++que é quem serve URL do Scryfall no navegador, registra falha com a **mesma**
++etiqueta `[🖼️ CachedCardImage]` (`cached_card_image.dart:704` e `:730`), então
++"zero" não é ponto cego de um widget que loga com outro nome.
++
++**Nove capturas, nove SHAs distintos.** Nenhum checkpoint repetiu tela.
++
++**O conserto do 05/06 segurou.** Avançar uma ação antes de recarregar fez a mesa
++retomada mostrar estado posterior, não a mesma foto:
++
++| checkpoint | vida | fase |
++| --- | --- | --- |
++| `05-combat-damage` | 39 | Turno 6 · Combate · First combat damage |
++| `06-reconnected-session` | 37 | Turno 6 · Combate · Dano de combate |
++
++**A concessão explícita fecha a mesa.** Turno 17, "Você concedeu", com replay e
++revanche no painel; o `08` abre o replay com 110 eventos e o `09` volta ao
++seletor já com o rival marcado e o CTA habilitado.
++
++## Os dois `[SEVERE]` do console não são defeito
++
++`GET /api/community/decks?page=1&limit=50` responde **404**. Medido direto na
++API da corrida:
++
++```json
++{"error":"capability_unavailable","capability":"gallery_public",
++ "release_capability":"off",
++ "policy_version":"brewtact_free_beta_2026-08-13.isolated_play_vs_ai_e2e"}
++```
++
++É a política isolada fechando a galeria pública, como deve. O app degrada
++certo: `BattleReplayService.listOpponentDecks` dispara `/decks` e
++`/community/decks` em paralelo e só falha se **as duas** falharem — por isso o
++seletor mostra "1 meus · 0 públicos" e continua utilizável.
++
++## Achados da revisão visual
++
++As nove imagens foram abertas uma a uma. Quatro defeitos, todos em `app/lib`,
++que é raiz do digest — por isso **não foram corrigidos**: a coordenação pediu
++para parar e avisar antes de mexer em raiz.
++
++1. **Moderado — permanente virado estoura o slot.** A carta gira 90° quando
++   tapada, mas o slot continua com a largura da carta em pé: ela monta na
++   vizinha e é cortada pela borda esquerda da fileira. Aparece em `04`, `05`,
++   `06` e `07`. O `07` mostra isolado: nove Mountains alinhadas e a única
++   virada, Kari Zev, por cima das duas vizinhas.
++   **Pré-existente** — a captura `04` já commitada, de antes do conserto de
++   habilidade, tem o mesmo recorte. Não é regressão desta frente.
++
++   Causa exata, já localizada: `battle_coach_screen.dart:1815` usa
++   `AnimatedRotation(turns: card.tapped ? 0.25 : 0)`, que é transformação de
++   **pintura** — não muda o layout. A fileira (`:1714-1731`) monta cada carta
++   com `width: 96`, `height: 134` e `SizedBox(width: space8)` entre elas. Virada,
++   a carta pinta 134 de largura dentro de um slot de 96: sobra `(134-96)/2 = 19`
++   de cada lado, maior que os 8 de respiro, então invade a vizinha em ~11 e a
++   primeira da fileira vaza 19 além da borda esquerda, onde é cortada.
++
++   Conserto natural: reservar o rastro girado, dando à carta virada um slot de
++   largura `height` em vez de `width` (é o que as mesas de Magic fazem: carta
++   virada ocupa espaço deitado). Alternativa menos correta: encolher a imagem
++   girada por `width/height` para caber no slot em pé.
++2. **Menor — acento.** `battle_replays_screen.dart:5078` escreve `title: 'Mao'`;
++   as zonas vizinhas ("Campo", "Cemitério") estão certas. Aparece duas vezes no
++   replay, uma por jogador.
++3. **Menor — concordância.** `battle_replays_screen.dart:5196` monta
++   `'0 $fallbackLabel observados'`. Com `terrenos` fica certo; com `cartas`
++   sai "0 cartas observados".
++4. **Menor — densidade.** O seletor de adversário (`01` e `09`) deixa ~200px de
++   vazio entre a lista de decks e "Usar ID técnico" em 1440x900.
++
++## O que parecia defeito e não é
++
++No `03` a miniatura do comandante, no painel de prompt, aparece como verso de
++carta. Não é o guarda de habilidade cortando arte de carta real: o descritor de
++opção do sidecar (`promptCardDescriptor`) não emite `is_ability`, então
++`isAbility` é falso ali. É a fila do `scryfallImageRequestGate`, que limita
++taxa, ainda pendente no instante da foto — o `04` mostra a mesma arte carregada.
++
++## Higiene da máquina
++
++Três clusters PostgreSQL órfãos de corridas anteriores (`.8MYAVR`, `.gxgWn2`,
++`.jbiJTx`) continuavam de pé sem harness dono; foram parados com `pg_ctl -m
++fast`. Sobrou só o cluster da corrida corrente. Nenhum Chrome headless nem
++chromedriver sobrevivente — os 31 processos "Google Chrome" da máquina são o
++navegador do dono, intocado.
++
++## Adendo: os achados 1, 2 e 3 foram consertados
++
++Depois de avisar a coordenação três vezes e explicar por que "virar backlog"
++não era opção — `app/tool/ui_runtime_evidence.dart:732` exige `status == 'pass'`
++em **cada** um dos dez critérios e `:777` exige `blocking_findings` vazio, ou
++seja, o contrato não tem casa de "passa com ressalva conhecida" e deixar o
++achado 1 para depois obrigaria a assinar `spacing_and_density` limpo sabendo
++que não está — consertei os três. O achado 4 (vazio no seletor) ficou de fora:
++é densidade, não defeito.
++
++**Achado 1.** `battle_coach_screen.dart`: o slot da carta reserva o rastro
++deitado quando ela está virada (`width: card.tapped ? height : width`), com o
++corpo da carta centrado e ainda em `width x height`. É o que mesa de Magic faz.
++
++**Achados 2 e 3.** `battle_replays_screen.dart`: `'Mao'` virou `'Mão'`; e
++`'0 $fallbackLabel observados'` virou `'0 $fallbackLabel neste replay'` —
++`fallbackLabel` vale `cartas` (feminino), `terrenos` e `objetos` (masculinos),
++então nenhum particípio único concorda com os três. A frase neutra serve a
++todos e mantém a contagem e o substantivo.
++
++**Prova.** Teste novo
++`app/test/features/battle/screens/battle_coach_tapped_card_slot_test.dart`, que
++mede GEOMETRIA de verdade — o retângulo ocupado por cada carta na tela, não
++presença de widget. A mesa do fixture é a do checkpoint 04: Plains virado e
++Isamaru em pé.
++
++Mutação, para provar que o teste morde: voltando o slot para `width: width`, o
++teste falha dizendo `virada 68.0, em pe 68.0`. Com o conserto, a virada reserva
++95 e não alcança a vizinha.
++
++Suíte do battle: **193 verdes** (eram 191; os dois novos). `flutter analyze`
++sem nada em `lib/features/battle` e `test/features/battle`. Suíte do app
++inteira: 1625 verdes, 1 pulado e as **duas** falhas já conhecidas
++(`ui_live_evidence_policy_test` e `ui_keyboard_focus_matrix_test`), que só
++esperam o manifesto do play-vs-ai renascer.
++
++**Digest refixado:** `acd47e2cf319d3d2d8fa6b2be3836fae152d0dc26d8acef236d911685e71e169`
++(era `87505e3d…`). A captura do play-vs-ai feita mais cedo nesta página nasceu
++no digest anterior e não vale mais: o ambiente que ainda está de pé tem a
++fixture presa ao `87505e3d…`, então ele será derrubado e um novo subirá para a
++recaptura.
++
++## Adendo: por que o harness derrubava a corrida em silêncio
++
++Depois do conserto, a primeira tentativa de fechar o pacote falhou em
++`validate_browser_qa_real_session` sem dizer nada. O motivo de não dizer nada é
++estrutural: aquele trecho usa `jq -e` sem mensagem, e com `set -e` o script
++inteiro morre sem imprimir qual condição reprovou.
++
++Escrevi `conferir_validacao.py` para perguntar, uma a uma, as mesmas dezoito
++condições que o harness confere — antes de postar a atestação, e não depois de
++perder a corrida. Com ele a resposta veio na primeira medição:
++
++```
++ok    status == conceded ... ok    isamaru_entered
++RUIM  isamaru_attacked
++ok    combat_damage ... ok    decision mana
++```
++
++**Uma única condição vermelha.** O contrato exige um evento
++`attacker_declared` com o comandante no replay, e o automático da mesa nunca
++atacava: os únicos atacantes do replay eram Kari Zev e Ragavan, os dois do
++rival.
++
++### O ataque virou escolha explícita
++
++`_tentar_declarar_atacante` clica no comandante quando a mesa pede atacantes.
++Duas medições foram necessárias para acertar o gatilho, e as duas valem a pena
++registrar porque as duas eram suposições minhas erradas:
++
++1. **A primeira versão nunca disparou.** Eu procurava a palavra "atacante" no
++   painel. Mas o prompt de combate se chama "Decisão de combate" e sua mensagem
++   é "Escolha como conduzir esta etapa de combate." — não fala em atacante
++   nenhum. Quem diz a etapa é o cabeçalho: "Turno N · Combate · Declarar
++   atacantes". Exigir as duas coisas juntas também separa ataque de bloqueio:
++   das oito decisões de combate de uma partida, quatro eram de atacante e
++   quatro de bloqueador.
++2. **A segunda versão achava a linha e a recusava.** Eu tinha posto "prévia" na
++   lista de rótulos que não são ataque. Só que o rótulo acessível da própria
++   linha da opção é "Ver prévia de Isamaru, Hound of Konda" — era a linha
++   certa, recusada pelo meu próprio filtro.
++
++Com o gatilho certo: `attacker_declared` passa a trazer `Isamaru, Hound of
++Konda` junto com os atacantes do rival, e as dezoito condições ficam verdes.
++
++### Três consertos de qualidade da evidência, achados abrindo os PNGs
++
++- **`03-land-played` mostrava o verso da carta** enquanto o log dizia "com arte
++  carregada". A sonda perguntava se ALGUMA `<img>` da página tinha carregado —
++  com sete cartas na mão carregadas, ela respondia sim com o campo ainda no
++  verso. Agora a pergunta é feita dentro da faixa do meu campo.
++- **`05-combat-damage` saía com as minhas duas cartas no verso.** A mesa se
++  redesenha quando o combate resolve e a fila do portão de taxa do Scryfall
++  recomeça. O checkpoint agora espera até 8s pela arte do campo — o instante
++  já está garantido pela vida que caiu. E o registro passou a ler a vida
++  DEPOIS da espera: a mesa anda nesses segundos, e o recibo precisa descrever
++  a imagem que existe, não a que disparou o gatilho.
++- **`02-private-hand-mulligan` saía com a prévia flutuante de um Plains** no
++  meio da tela, porque o ponteiro ficava parado sobre uma carta da mão depois
++  do último clique. Toda captura agora afasta o ponteiro antes de fotografar.
++
++Nada disso toca raiz do digest: o driver de captura não é raiz, provado por
++recomputar o digest depois de cada mudança.
++
++### O orçamento do harness
++
++`manaloom_play_vs_ai_e2e.sh` dá **uma hora** entre o READY e o arquivo de
++conclusão. Gastei a primeira hora inteira diagnosticando, e o ambiente caiu com
++`Timed out after one hour awaiting browser QA completion`. O ambiente seguinte
++subiu já com o driver pronto.
++
++## Achados da varredura — família `play-vs-ai-web-real`
++
++Método combinado com a coordenação: capturar, revisar logo depois, **anotar sem
++parar** em defeito visual pré-existente. Parar só por padrão proibido de
++console, regressão, evidência inválida ou falha de harness. Nada disso ocorreu
++nesta família.
++
++| id | gravidade | onde | o quê |
++| --- | --- | --- | --- |
++| F-01 | P2 | `01-opponent-picker`, `09-rematch-picker` | ~200px de vazio entre a lista de decks e "Usar ID técnico" em 1440x900. O espaço não segue o conteúdo. |
++| F-02 | P1 | `04-commander-cast` | Com oito terrenos iguais na mão, o painel lista **oito linhas idênticas** "Plains — Play Plains", empurrando "Passar prioridade" e o automático para fora da dobra. Opções repetidas sem nada que as distinga. |
++| F-03 | P2 | `06-reconnected-session` | O objeto de habilidade na pilha aparece rotulado **"Ability"**, em inglês, no meio de uma interface em português. |
++
++`F-01` é o achado 4 da lista anterior. Como revisora, marco
++`spacing_and_density` como **pass** com honestidade: o critério mede o
++espaçamento das cartas e dos painéis nas telas capturadas, e ali não há mais
++colisão nem corte; o vazio do seletor é escolha de dimensionamento de modal,
++da mesma classe dos itens "desktop/wide subutilizam o canvas" que a revisão
++anterior já registrou como acompanhamento. Vai para o BT-UX-KIT-001.
++
++## O conserto da carta virada, visto na evidência viva
++
++`04`: o Plains virado aparece inteiro, com margem à esquerda, e o Isamaru ao
++lado com respiro real. `07`: a fileira do adversário tem **dez permanentes com
++duas viradas**, cada uma no seu slot, sem sobreposição e sem corte. Era a
++mesma fileira que antes mostrava uma carta virada cobrindo um terço de cada
++vizinha.
++
++## O guarda de habilidade, visto na evidência viva
++
++`06` mostra um objeto na pilha rotulado "Ability", desenhado como ladrilho
++escuro **sem tentativa de arte** — e o console da corrida fechou com **zero**
++entradas `CachedCardImage`. Antes do guarda, esse mesmo objeto pedia arte de
++Scryfall por um nome que não é carta e falhava.
++
++## Pacote de teclado: fora do gate por contrato
++
++`battle-coach-web-keyboard` é pack de verificação de release (D-79, BT-QA-001),
++**fora do gate de UI por contrato**: o `AGENTS.md` trata teclado Web real como
++verificação separada, junto do TalkBack humano. Registrá-lo no
++`manaloom_ui_live_evidence_gate.sh` aumentaria o escopo do gate de forma
++permanente — toda mudança de digest passaria a exigir a mesa XMage inteira só
++para recapturar o teclado. Fica com os 19 checkpoints e o manifesto da própria
++corrida.
++
++## Dois bloqueios de ferramenta, e um erro meu de evidência
++
++### O Chrome se atualizou sozinho
++
++O Chrome do sistema foi para **154.0.8037.58** em 28/09 às 21:16, e o
++ChromeDriver que o projeto fixa é **153.0.8010.52**. As nove famílias web e o
++próprio gate recusam na hora — "ChromeDriver major 153 does not match Chrome
++major 154" — e o `docs/MANALOOM_UI_LIVE_EVIDENCE_CONTRACT.md:139` trata isso
++como `BLOCKED`.
++
++A saída escolhida pelo dono, entre três apresentadas, foi baixar o **Chrome for
++Testing 153.0.8010.52** da mesma origem oficial de onde o projeto já busca o
++ChromeDriver. Ela é a única que não toca raiz do digest: o pin continua 153 e o
++`acd47e2c…` segue valendo. Duas peças fazem funcionar:
++
++- `CHROME_EXECUTABLE` apontando para o binário satisfaz a guarda de versão dos
++  harnesses e é o que o `ChromeLauncher` do Flutter usa;
++- um symlink do `Google Chrome for Testing.app` **ao lado do binário do
++  chromedriver** no cache faz o chromedriver abrir esse Chrome em vez do
++  sistema. Conferido com `ps` durante a corrida: o processo dirigido é
++  `Google Chrome for Testing … --headless`, com o perfil temporário
++  `org.chromium` que é a assinatura do chromedriver. O Chrome do dono continua
++  aberto, em processo separado, intocado.
++
++Rejeitei de propósito a saída de apontar `CHROME_EXECUTABLE` para um binário
++153 e deixar o chromedriver abrir o 154: a guarda passaria, mas o navegador
++real seria outro, e o manifesto passaria a afirmar uma versão que não rodou.
++
++### O servidor de assets das fixtures estava quebrado
++
++Vencida a guarda, as sete famílias caíam em "Local visual asset server stopped
++unexpectedly". `scripts/lib/manaloom_fixture_asset_server.py` exige
++`--directory`, mas as sete fixtures o chamam **sem** esse argumento — só o gate
++passa. O arquivo é **untracked**: nunca foi commitado, e quem o escreveu
++apertou a assinatura sem atualizar os chamadores. Dei um padrão ao argumento
++(`os.getcwd()`, que é a raiz porque as fixtures fazem `cd` antes de subir o
++servidor). Conferido: HTTP 200 e `Access-Control-Allow-Origin: *`. O arquivo
++não é raiz do digest.
++
++### O manifesto do play-vs-ai nomeava um navegador que não rodou
++
++O manifesto que eu mesma certifiquei grava
++`device_contract: "Google Chrome 153.0.8010.53 headless…"`. **É falso.** O
++Chrome 154 foi instalado em 28/09 21:16 e a captura rodou em 29/09 04:06 —
++rodou no 154. Eu reaproveitei o `MANALOOM_PLAY_VS_AI_BROWSER_NAME` de uma
++sessão anterior sem reconferir a versão instalada.
++
++A corrida será refeita passando ao driver o binário do Chrome for Testing 153
++(ele já recebe o caminho do Chrome como argumento) e o nome correto, para que
++driver e navegador batam no 153 e o `device_contract` diga a verdade. Custa um
++ambiente inteiro; a alternativa seria deixar evidência mentindo, que não é
++alternativa.

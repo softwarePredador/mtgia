@@ -1,0 +1,96 @@
+diff --git a/app/lib/features/binder/screens/binder_screen.dart b/app/lib/features/binder/screens/binder_screen.dart
+index ac05e4349..565943e67 100644
+--- a/app/lib/features/binder/screens/binder_screen.dart
++++ b/app/lib/features/binder/screens/binder_screen.dart
+@@ -442,12 +442,18 @@ class _BinderListViewState extends State<_BinderListView>
+     super.build(context);
+     final isHave = widget.listType == 'have';
+     final stats = context.select<BinderProvider, BinderStats?>((p) => p.stats);
+-    final scannerAllowed = context
+-        .watch<ReleaseCapabilitiesProvider?>()
+-        ?.isAllowed(
+-          ReleaseCapability.scanner,
+-          buildSupported: widget.scannerBuildSupported,
+-        );
++    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
++    final scannerAllowed = capabilities?.isAllowed(
++      ReleaseCapability.scanner,
++      buildSupported: widget.scannerBuildSupported,
++    );
++    // A8: o fichário só apresenta o que a release permite. Provider ausente ou
++    // capability desligada fecham a superfície — `== true` é a mesma leitura
++    // fail-closed que o scanner já usava aqui.
++    final tradesAllowed =
++        capabilities?.isAllowed(ReleaseCapability.trades) == true;
++    final marketplaceAllowed =
++        capabilities?.isAllowed(ReleaseCapability.marketplace) == true;
+ 
+     return LayoutBuilder(
+       builder: (context, constraints) {
+@@ -469,7 +475,11 @@ class _BinderListViewState extends State<_BinderListView>
+                 onAdd: _openAddCard,
+                 onImport: _openBulkImport,
+                 onScan: scannerAllowed == true ? _openScanCard : null,
+-                onMatches: () => context.push(tradeMatchesRouteLocation()),
++                onMatches: tradesAllowed
++                    ? () => context.push(tradeMatchesRouteLocation())
++                    : null,
++                showTrade: tradesAllowed,
++                showSale: marketplaceAllowed,
+               ),
+ 
+             if (!showStats && _items.isNotEmpty)
+@@ -832,12 +842,16 @@ class _StatsBar extends StatefulWidget {
+   final VoidCallback? onImport;
+   final VoidCallback? onScan;
+   final VoidCallback? onMatches;
++  final bool showTrade;
++  final bool showSale;
+   const _StatsBar({
+     required this.stats,
+     this.onAdd,
+     this.onImport,
+     this.onScan,
+     this.onMatches,
++    this.showTrade = false,
++    this.showSale = false,
+   });
+ 
+   @override
+@@ -960,20 +974,22 @@ class _StatsBarState extends State<_StatsBar> {
+                       tooltip: 'Cópias além da primeira',
+                       color: AppTheme.frost400,
+                     ),
+-                    _StatCard(
+-                      icon: Icons.swap_horiz,
+-                      label: 'Troca',
+-                      value: '${stats.forTradeCount}',
+-                      tooltip: 'Itens marcados para troca',
+-                      color: AppTheme.frost400,
+-                    ),
+-                    _StatCard(
+-                      icon: Icons.sell,
+-                      label: 'Venda',
+-                      value: '${stats.forSaleCount}',
+-                      tooltip: 'Itens marcados para venda',
+-                      color: AppTheme.brass400,
+-                    ),
++                    if (widget.showTrade)
++                      _StatCard(
++                        icon: Icons.swap_horiz,
++                        label: 'Troca',
++                        value: '${stats.forTradeCount}',
++                        tooltip: 'Itens marcados para troca',
++                        color: AppTheme.frost400,
++                      ),
++                    if (widget.showSale)
++                      _StatCard(
++                        icon: Icons.sell,
++                        label: 'Venda',
++                        value: '${stats.forSaleCount}',
++                        tooltip: 'Itens marcados para venda',
++                        color: AppTheme.brass400,
++                      ),
+                     _StatCard(
+                       icon: Icons.attach_money,
+                       label: 'Valor conhecido',

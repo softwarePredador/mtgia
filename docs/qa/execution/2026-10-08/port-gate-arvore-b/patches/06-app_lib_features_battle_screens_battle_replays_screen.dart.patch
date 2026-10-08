@@ -1,0 +1,22 @@
+diff --git a/app/lib/features/battle/screens/battle_replays_screen.dart b/app/lib/features/battle/screens/battle_replays_screen.dart
+index 559d828e4..90dc462c5 100644
+--- a/app/lib/features/battle/screens/battle_replays_screen.dart
++++ b/app/lib/features/battle/screens/battle_replays_screen.dart
+@@ -5075,7 +5075,7 @@ class _VisualPlayerBoard extends StatelessWidget {
+           const SizedBox(height: AppTheme.space10),
+           _VisualCardZone(
+             key: Key('battle-visual-zone-hand-${player.name}'),
+-            title: 'Mao',
++            title: 'Mão',
+             cards: player.hand,
+             fallbackCount: player.handSize,
+             fallbackLabel: 'cartas',
+@@ -5193,7 +5193,7 @@ class _VisualCardZone extends StatelessWidget {
+                   ? 'Zona não observada por este motor'
+                   : fallbackCount! > 0
+                   ? '$fallbackCount $fallbackLabel sem imagem neste replay'
+-                  : '0 $fallbackLabel observados',
++                  : '0 $fallbackLabel neste replay',
+               style: theme.textTheme.bodySmall?.copyWith(
+                 color: AppTheme.textHint,
+               ),

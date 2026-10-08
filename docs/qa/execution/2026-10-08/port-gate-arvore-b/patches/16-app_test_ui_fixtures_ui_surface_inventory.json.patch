@@ -1,0 +1,22 @@
+diff --git a/app/test/ui/fixtures/ui_surface_inventory.json b/app/test/ui/fixtures/ui_surface_inventory.json
+index d83b92a6f..8f5b12ddc 100644
+--- a/app/test/ui/fixtures/ui_surface_inventory.json
++++ b/app/test/ui/fixtures/ui_surface_inventory.json
+@@ -18,7 +18,7 @@
+     "go_route": 46,
+     "shell_route": 1,
+     "material_page_route": 7,
+-    "dialog": 51,
++    "dialog": 52,
+     "bottom_sheet": 24,
+     "menu": 9,
+     "tabs": 10,
+@@ -341,7 +341,7 @@
+     {"source":"lib/features/home/lotus_life_counter_screen.dart","domain":"home","occurrences":{"transient":1}},
+     {"source":"lib/features/messages/screens/chat_screen.dart","domain":"messages","occurrences":{"dialog":1,"menu":1,"transient":3}},
+     {"source":"lib/features/notifications/screens/notification_screen.dart","domain":"notifications","occurrences":{"transient":1}},
+-    {"source":"lib/features/profile/profile_screen.dart","domain":"profile","occurrences":{"dialog":6,"transient":8}},
++    {"source":"lib/features/profile/profile_screen.dart","domain":"profile","occurrences":{"dialog":7,"transient":8}},
+     {"source":"lib/features/retention/screens/post_game_notes_screen.dart","domain":"retention","occurrences":{"transient":1}},
+     {"source":"lib/features/scanner/screens/card_scanner_screen.dart","domain":"scanner","occurrences":{"transient":4}},
+     {"source":"lib/features/social/screens/user_profile_screen.dart","domain":"social","occurrences":{"dialog":1,"bottom_sheet":1,"menu":1,"tabs":2,"transient":5}},

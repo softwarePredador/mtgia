@@ -1,0 +1,102 @@
+diff --git a/app/test/features/binder/widgets/binder_item_editor_validation_test.dart b/app/test/features/binder/widgets/binder_item_editor_validation_test.dart
+index 0c951ee7b..ab8d14eef 100644
+--- a/app/test/features/binder/widgets/binder_item_editor_validation_test.dart
++++ b/app/test/features/binder/widgets/binder_item_editor_validation_test.dart
+@@ -3,6 +3,7 @@ import 'dart:async';
+ import 'package:flutter/material.dart';
+ import 'package:flutter_test/flutter_test.dart';
+ import 'package:manaloom/core/api/api_client.dart';
++import 'package:manaloom/core/config/release_capabilities.dart';
+ import 'package:manaloom/core/theme/app_theme.dart';
+ import 'package:manaloom/features/binder/providers/binder_provider.dart';
+ import 'package:manaloom/features/binder/widgets/binder_item_editor.dart';
+@@ -72,6 +73,9 @@ Future<void> _pumpEditor(
+   CardProvider? cardProvider,
+   Future<bool> Function(Map<String, dynamic> data)? onSave,
+   Future<bool> Function()? onDelete,
++  // A8: troca, venda e o campo de preço só existem com a capability ligada.
++  // O padrão vazio é a beta real — quem exercita a venda liga explicitamente.
++  Set<ReleaseCapability> capabilities = const {},
+ }) async {
+   tester.view.physicalSize = viewport;
+   tester.view.devicePixelRatio = 1;
+@@ -91,18 +95,56 @@ Future<void> _pumpEditor(
+       ),
+     ),
+   );
++  final withCards = cardProvider == null
++      ? subject
++      : ChangeNotifierProvider<CardProvider>.value(
++          value: cardProvider,
++          child: subject,
++        );
+   await tester.pumpWidget(
+-    cardProvider == null
+-        ? subject
+-        : ChangeNotifierProvider<CardProvider>.value(
+-            value: cardProvider,
+-            child: subject,
+-          ),
++    ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
++      value: ReleaseCapabilitiesProvider.seeded(capabilities),
++      child: withCards,
++    ),
+   );
+   await tester.pumpAndSettle();
+ }
+ 
+ void main() {
++  // A8 / D-04: o fichário só apresenta o que a release permite. Sem estes
++  // casos, os testes de venda acima passariam a ligar a capability e ninguém
++  // notaria se a contenção sumisse.
++  testWidgets('sem capability, editor não oferece troca nem venda', (
++    tester,
++  ) async {
++    await _pumpEditor(tester, item: _binderItem());
++
++    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsNothing);
++    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsNothing);
++    expect(find.textContaining('Preço'), findsNothing);
++  });
++
++  testWidgets('cada switch responde à SUA capability', (tester) async {
++    // Se os dois lessem a mesma flag, um destes dois casos falharia.
++    await _pumpEditor(
++      tester,
++      item: _binderItem(),
++      capabilities: const {ReleaseCapability.trades},
++    );
++    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsOneWidget);
++    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsNothing);
++  });
++
++  testWidgets('só marketplace mostra venda, não troca', (tester) async {
++    await _pumpEditor(
++      tester,
++      item: _binderItem(),
++      capabilities: const {ReleaseCapability.marketplace},
++    );
++    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsNothing);
++    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsOneWidget);
++  });
++
+   testWidgets('wide editor keeps controls in a centered working frame', (
+     tester,
+   ) async {
+@@ -188,6 +230,8 @@ void main() {
+     await _pumpEditor(
+       tester,
+       item: _binderItem(),
++      // Este teste exercita o preço de venda, que só existe sob `marketplace`.
++      capabilities: const {ReleaseCapability.marketplace},
+       onSave: (data) async {
+         saved.add(data);
+         return false;
+@@ -298,6 +342,7 @@ void main() {
+     await _pumpEditor(
+       tester,
+       item: _binderItem(),
++      capabilities: const {ReleaseCapability.marketplace},
+       onSave: (data) async {
+         saved.add(data);
+         return true;

@@ -1,0 +1,116 @@
+diff --git a/app/lib/features/binder/widgets/binder_item_editor.dart b/app/lib/features/binder/widgets/binder_item_editor.dart
+index b4d9ac64d..4867f0d23 100644
+--- a/app/lib/features/binder/widgets/binder_item_editor.dart
++++ b/app/lib/features/binder/widgets/binder_item_editor.dart
+@@ -1,5 +1,6 @@
+ import 'package:flutter/material.dart';
+ import 'package:provider/provider.dart';
++import '../../../core/config/release_capabilities.dart';
+ import '../../../core/theme/app_theme.dart';
+ import '../../../core/utils/friendly_error_mapper.dart';
+ import '../../../core/utils/scryfall_image_helper.dart';
+@@ -412,6 +413,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
+     final isEditing = widget.item != null;
+     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+     final name = widget.item?.cardName ?? widget.cardName ?? 'Carta';
++    // A8: marcar item para troca ou venda é escrita de uma capability que a
++    // beta mantém desligada. Provider ausente fecha a superfície.
++    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
++    final tradesAllowed =
++        capabilities?.isAllowed(ReleaseCapability.trades) == true;
++    final marketplaceAllowed =
++        capabilities?.isAllowed(ReleaseCapability.marketplace) == true;
+ 
+     return Padding(
+       key: const Key('binder-editor-sheet'),
+@@ -1090,50 +1098,52 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
+                 ),
+ 
+                 // Para Troca
+-                SwitchListTile(
+-                  key: const Key('binder-editor-for-trade-switch'),
+-                  contentPadding: EdgeInsets.zero,
+-                  title: const Text(
+-                    'Disponível para troca',
+-                    style: TextStyle(color: AppTheme.textSecondary),
+-                  ),
+-                  secondary: Icon(
+-                    Icons.swap_horiz,
+-                    color: _forTrade
+-                        ? AppTheme.primarySoft
+-                        : AppTheme.outlineMuted,
++                if (tradesAllowed)
++                  SwitchListTile(
++                    key: const Key('binder-editor-for-trade-switch'),
++                    contentPadding: EdgeInsets.zero,
++                    title: const Text(
++                      'Disponível para troca',
++                      style: TextStyle(color: AppTheme.textSecondary),
++                    ),
++                    secondary: Icon(
++                      Icons.swap_horiz,
++                      color: _forTrade
++                          ? AppTheme.primarySoft
++                          : AppTheme.outlineMuted,
++                    ),
++                    value: _forTrade,
++                    onChanged: (v) => setState(() => _forTrade = v),
++                    activeThumbColor: AppTheme.primarySoft,
+                   ),
+-                  value: _forTrade,
+-                  onChanged: (v) => setState(() => _forTrade = v),
+-                  activeThumbColor: AppTheme.primarySoft,
+-                ),
+ 
+                 // Para Venda
+-                SwitchListTile(
+-                  key: const Key('binder-editor-for-sale-switch'),
+-                  contentPadding: EdgeInsets.zero,
+-                  title: const Text(
+-                    'Disponível para venda',
+-                    style: TextStyle(color: AppTheme.textSecondary),
+-                  ),
+-                  secondary: Icon(
+-                    Icons.sell,
+-                    color: _forSale
+-                        ? AppTheme.mythicGold
+-                        : AppTheme.outlineMuted,
++                if (marketplaceAllowed)
++                  SwitchListTile(
++                    key: const Key('binder-editor-for-sale-switch'),
++                    contentPadding: EdgeInsets.zero,
++                    title: const Text(
++                      'Disponível para venda',
++                      style: TextStyle(color: AppTheme.textSecondary),
++                    ),
++                    secondary: Icon(
++                      Icons.sell,
++                      color: _forSale
++                          ? AppTheme.mythicGold
++                          : AppTheme.outlineMuted,
++                    ),
++                    value: _forSale,
++                    onChanged: (v) {
++                      setState(() {
++                        _forSale = v;
++                        if (!v) _saveError = null;
++                      });
++                    },
++                    activeThumbColor: AppTheme.mythicGold,
+                   ),
+-                  value: _forSale,
+-                  onChanged: (v) {
+-                    setState(() {
+-                      _forSale = v;
+-                      if (!v) _saveError = null;
+-                    });
+-                  },
+-                  activeThumbColor: AppTheme.mythicGold,
+-                ),
+ 
+                 // Preço
+-                if (_forSale) ...[
++                if (marketplaceAllowed && _forSale) ...[
+                   const SizedBox(height: AppTheme.space8),
+                   TextField(
+                     key: const Key('binder-editor-price-field'),
