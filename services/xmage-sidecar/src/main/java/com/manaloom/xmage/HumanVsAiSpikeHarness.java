@@ -98,6 +98,14 @@ final class HumanVsAiSpikeHarness {
     static final String POSSIBLE_BLOCKERS_OPTION =
             Constants.Option.POSSIBLE_BLOCKERS;
 
+    /**
+     * Chaves em que o XMage manda os rotulos proprios dos botoes de um
+     * GAME_ASK. `classify` as usa para reconhecer o mulligan, e
+     * `questionFallbackLog` registra so se vieram, nunca o rotulo.
+     */
+    static final String LEFT_BUTTON_TEXT_OPTION = "UI.left.btn.text";
+    static final String RIGHT_BUTTON_TEXT_OPTION = "UI.right.btn.text";
+
     static final EnumSet<ClientCallbackMethod> DECISION_CALLBACKS = EnumSet.of(
             ClientCallbackMethod.GAME_TARGET,
             ClientCallbackMethod.GAME_CHOOSE_ABILITY,
@@ -186,8 +194,8 @@ final class HumanVsAiSpikeHarness {
         String normalized = normalizedMessage(message);
         if (method == ClientCallbackMethod.GAME_ASK
                 && normalized.startsWith("mulligan ")
-                && "Mulligan".equals(safeOptions.get("UI.left.btn.text"))
-                && "Keep".equals(safeOptions.get("UI.right.btn.text"))) {
+                && "Mulligan".equals(safeOptions.get(LEFT_BUTTON_TEXT_OPTION))
+                && "Keep".equals(safeOptions.get(RIGHT_BUTTON_TEXT_OPTION))) {
             return PromptKind.MULLIGAN;
         }
         // Todo GAME_ASK que nao e o mulligan cai aqui. Antes caia no `return
@@ -199,7 +207,8 @@ final class HumanVsAiSpikeHarness {
         //
         // O tratamento generico ja existia e era inalcancavel: o `else` de
         // `questionPrompt` monta "Sim"/"Nao" com role `choice` e nunca podia
-        // rodar, porque `open` estourava duas linhas antes.
+        // rodar, porque `open` estourava duas linhas antes. Cada uso deste
+        // fallback sai em stderr por `questionFallbackLog`.
         if (method == ClientCallbackMethod.GAME_ASK) {
             return PromptKind.QUESTION;
         }
@@ -316,6 +325,29 @@ final class HumanVsAiSpikeHarness {
                 + " possible_blockers="
                 + (options != null
                         && options.get(POSSIBLE_BLOCKERS_OPTION) != null)
+                + " message_chars="
+                + (message == null ? 0 : message.length());
+    }
+
+    /**
+     * Linha de stderr do fallback de GAME_ASK: toda pergunta que nao e o
+     * mulligan vira QUESTION e chega ao jogador como "Sim"/"Nao", sem o texto
+     * do motor e sem os rotulos proprios dos botoes. Cada linha e uma resposta
+     * dada sem ver a pergunta -- a metrica do follow-up do ADR 0014.
+     *
+     * Mesma disciplina do log do select: leva so o kind, se o motor mandou
+     * rotulo proprio para cada botao e o tamanho da frase; nunca o texto do
+     * motor, os rotulos, opcoes, cartas ou ids.
+     */
+    static String questionFallbackLog(Map<String, ?> options, String message) {
+        return "interactive_question_fallback kind="
+                + PromptKind.QUESTION
+                + " left_label="
+                + (options != null
+                        && options.get(LEFT_BUTTON_TEXT_OPTION) != null)
+                + " right_label="
+                + (options != null
+                        && options.get(RIGHT_BUTTON_TEXT_OPTION) != null)
                 + " message_chars="
                 + (message == null ? 0 : message.length());
     }
@@ -576,13 +608,16 @@ final class HumanVsAiSpikeHarness {
             if (kind == null) {
                 throw new IllegalArgumentException("callback is not allowlisted");
             }
-            // `open` e o ponto unico por onde todo GAME_SELECT passa uma vez
-            // por prompt (`selectPrompt` classifica antes so para montar as
-            // opcoes), entao o log sai aqui e nao em `classify`.
+            // `open` e o ponto unico por onde todo GAME_SELECT e todo GAME_ASK
+            // passam uma vez por prompt (`selectPrompt` classifica antes so
+            // para montar as opcoes), entao os logs de fallback saem aqui e
+            // nao em `classify`.
             if (usesSelectTextFallback(callback.getMethod(), message)) {
                 System.err.println(
                         selectTextFallbackLog(kind, metadata, message)
                 );
+            } else if (kind == PromptKind.QUESTION) {
+                System.err.println(questionFallbackLog(metadata, message));
             }
             return begin(
                     callback,

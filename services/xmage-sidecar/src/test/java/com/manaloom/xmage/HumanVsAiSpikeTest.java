@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -153,8 +154,8 @@ final class HumanVsAiSpikeTest {
         String unknownPhrase = "Alice, declare the creatures that go to war";
 
         String fallbackLog = capturedStderr(() -> {
-            HumanVsAiSpikeHarness.Prompt prompt = selectRegistry().open(
-                    selectCallback(),
+            HumanVsAiSpikeHarness.Prompt prompt = promptRegistry().open(
+                    decisionCallback(ClientCallbackMethod.GAME_SELECT),
                     unknownPhrase,
                     attackers,
                     Arrays.<Object>asList(creature, Boolean.FALSE)
@@ -170,8 +171,8 @@ final class HumanVsAiSpikeTest {
         assertFalse(fallbackLog.contains("Alice"));
         assertFalse(fallbackLog.contains(creature.toString()));
 
-        String recognizedLog = capturedStderr(() -> selectRegistry().open(
-                selectCallback(),
+        String recognizedLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_SELECT),
                 "Select attackers",
                 attackers,
                 Arrays.<Object>asList(creature, Boolean.FALSE)
@@ -179,16 +180,92 @@ final class HumanVsAiSpikeTest {
         assertEquals("", recognizedLog);
     }
 
-    private static HumanVsAiSpikeHarness.PromptRegistry selectRegistry() {
+    @Test
+    void questionFallbackIsLoggedOncePerPromptWithoutTextOrLabels() {
+        // O jogador responde "Sim"/"Nao" a esta pergunta sem ver o texto nem
+        // os rotulos do motor (ADR 0014). Cada linha deste log e uma dessas
+        // respostas: e a metrica do follow-up. Por isso uma linha por prompt,
+        // e nada que identifique jogador, carta ou objeto.
+        Map<String, Object> engineLabels = new LinkedHashMap<>();
+        engineLabels.put(
+                HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION,
+                "Top"
+        );
+        engineLabels.put(
+                HumanVsAiSpikeHarness.RIGHT_BUTTON_TEXT_OPTION,
+                "Bottom"
+        );
+        String question =
+                "Alice, put Llanowar Elves on the top of your library?";
+
+        String labelledLog = capturedStderr(() -> {
+            HumanVsAiSpikeHarness.Prompt prompt = promptRegistry().open(
+                    decisionCallback(ClientCallbackMethod.GAME_ASK),
+                    question,
+                    engineLabels,
+                    Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+            );
+            assertEquals(
+                    HumanVsAiSpikeHarness.PromptKind.QUESTION,
+                    prompt.kind
+            );
+        });
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=true right_label=true"
+                        + " message_chars=" + question.length(),
+                labelledLog.trim()
+        );
+        assertFalse(labelledLog.contains("Alice"));
+        assertFalse(labelledLog.contains("Llanowar"));
+        assertFalse(labelledLog.contains("Top"));
+        assertFalse(labelledLog.contains("Bottom"));
+
+        String bareLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                "Use replacement effect?",
+                null,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=false right_label=false"
+                        + " message_chars="
+                        + "Use replacement effect?".length(),
+                bareLog.trim()
+        );
+
+        // O mulligan tem kind proprio e rotulos de produto: nao e fallback.
+        Map<String, Object> mulliganOptions = new LinkedHashMap<>();
+        mulliganOptions.put(
+                HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION,
+                "Mulligan"
+        );
+        mulliganOptions.put(
+                HumanVsAiSpikeHarness.RIGHT_BUTTON_TEXT_OPTION,
+                "Keep"
+        );
+        String mulliganLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                "Mulligan down to 6 cards?",
+                mulliganOptions,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals("", mulliganLog);
+    }
+
+    private static HumanVsAiSpikeHarness.PromptRegistry promptRegistry() {
         return new HumanVsAiSpikeHarness.PromptRegistry(
                 "0123456789abcdef0123456789abcdef"
                         .getBytes(StandardCharsets.UTF_8)
         );
     }
 
-    private static ClientCallback selectCallback() {
+    private static ClientCallback decisionCallback(
+            ClientCallbackMethod method
+    ) {
         ClientCallback callback = new ClientCallback(
-                ClientCallbackMethod.GAME_SELECT,
+                method,
                 UUID.fromString("99999999-8888-7777-6666-555555555555")
         );
         callback.setMessageId(7);
@@ -198,13 +275,17 @@ final class HumanVsAiSpikeTest {
     private static String capturedStderr(Runnable action) {
         PrintStream original = System.err;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        System.setErr(new PrintStream(buffer, true, StandardCharsets.UTF_8));
         try {
-            action.run();
-        } finally {
-            System.setErr(original);
+            System.setErr(new PrintStream(buffer, true, "UTF-8"));
+            try {
+                action.run();
+            } finally {
+                System.setErr(original);
+            }
+            return buffer.toString("UTF-8");
+        } catch (UnsupportedEncodingException error) {
+            throw new IllegalStateException("UTF-8 is unavailable", error);
         }
-        return buffer.toString(StandardCharsets.UTF_8);
     }
 
     @Test
@@ -257,6 +338,9 @@ final class HumanVsAiSpikeTest {
         mulliganOptions.put("UI.left.btn.text", "Mulligan");
         mulliganOptions.put("UI.right.btn.text", "Keep");
 
+        // O mulligan continua tendo kind proprio, mesmo com todo outro
+        // GAME_ASK virando QUESTION: `questionPrompt` decide por ele se rotula
+        // "Fazer mulligan"/"Manter esta mao" ou "Sim"/"Nao".
         assertEquals(
                 HumanVsAiSpikeHarness.PromptKind.MULLIGAN,
                 HumanVsAiSpikeHarness.classify(
@@ -308,19 +392,6 @@ final class HumanVsAiSpikeTest {
                         ClientCallbackMethod.GAME_ASK,
                         "Use replacement effect?",
                         Collections.emptyMap()
-                )
-        );
-        // O mulligan continua tendo kind proprio: `questionPrompt` decide por
-        // ele se rotula "Fazer mulligan"/"Manter esta mao" ou "Sim"/"Nao".
-        assertEquals(
-                HumanVsAiSpikeHarness.PromptKind.MULLIGAN,
-                HumanVsAiSpikeHarness.classify(
-                        ClientCallbackMethod.GAME_ASK,
-                        "Mulligan to 6?",
-                        Map.of(
-                                "UI.left.btn.text", "Mulligan",
-                                "UI.right.btn.text", "Keep"
-                        )
                 )
         );
         // Mesmo caso do GAME_ASK, e mesma consequencia: `null` nao e "nao sei",
