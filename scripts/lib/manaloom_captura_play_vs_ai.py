@@ -967,8 +967,8 @@ def cp07(nav, destino: str, registrar, api: str = "", token: str = "",
         # (`interactive_battle_service.dart`: /ai/battle/sessions/<id>/concede).
         # O botao da barra nao esta confiavelmente na arvore de semantica
         # depois do fluxo de captura, e o que este checkpoint prova e o PAINEL
-        # TERMINAL, nao o gesto de conceder. A pagina e recarregada em seguida,
-        # e o painel capturado e o que o produto renderiza.
+        # TERMINAL, nao o gesto de conceder. O painel capturado e o que o
+        # produto renderiza ao ver a sessao concedida.
         import json
         import urllib.request
 
@@ -992,6 +992,22 @@ def cp07(nav, destino: str, registrar, api: str = "", token: str = "",
                 json.loads(resposta.read().decode() or "{}")
         except Exception as erro:
             raise ErroDeCaptura(f"a concessao pela API falhou: {erro}") from erro
+        # Esta ida NAO recarrega a pagina. `nav.url()` devolve a URL ja
+        # redirecionada, com a barra (`.../app/#/...`), e ir para a MESMA URL
+        # com fragmento e navegacao de fragmento no mesmo documento. Medido em
+        # 2026-10-08 com Chrome for Testing 153 `--headless=new` e o
+        # ChromeDriver 153 do pin, numa pagina estatica servida em 127.0.0.1
+        # por `python -m http.server` e por `app/tool/serve_flutter_web_app.py`:
+        # um `window.__m` marcado antes sobrevive, o contador de cargas em
+        # sessionStorage e o `performance.timeOrigin` nao mudam, o navegador
+        # dispara `popstate` (sem `hashchange`) e `history.length` sobe 1. O
+        # mesmo vale para uma URL posta por `history.pushState`, que e como o
+        # app muda de rota. Quem recarrega o documento e a ida SEM barra do
+        # cp06 (ver o `rstrip` em `main`; medido no mesmo teste: o marcador
+        # some e o contador sobe). Sem recarga, o painel terminal chega pelo
+        # polling da propria mesa (`battle_coach_screen.dart`,
+        # `_schedulePoll`: um `_refresh` a cada `pollInterval`, 1200 ms,
+        # enquanto a sessao nao e terminal), dentro da espera de 90 s abaixo.
         nav.ir(nav.url(), espera=10)
         espera = time.time() + 90
         while time.time() < espera and not _terminal(nav):

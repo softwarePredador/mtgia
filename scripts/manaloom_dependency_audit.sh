@@ -51,6 +51,23 @@ print_header() {
 # restricao fora da versao travada) para a auditoria no `pub get` com
 # "Unable to satisfy `pubspec.yaml` using `pubspec.lock`" (medido em
 # 2026-10-08 numa copia descartavel).
+#
+# O que a flag NAO barra, medido em 2026-10-08 com o Dart 3.12.2 pinado numa
+# copia descartavel de tools/project_logic: promover a dependencia direta um
+# pacote que o lock ja tem como transitivo (`collection: ^1.19.1`, travado em
+# 1.19.1 como `dependency: transitive`). As versoes nao mudam, entao o
+# `pub get --enforce-lockfile` sai com 0 e deixa o lock byte a byte igual,
+# ainda dizendo `transitive`; ele so imprime "collection 1.19.1 (from
+# transitive dependency to direct dependency)" e "Would change 1
+# dependency.", e essa saida vai para /dev/null aqui. So um `pub get` sem a
+# flag reescreveria o lock para `direct main`. Quem pega essa divergencia e o
+# validador que roda logo depois, o pacote `dependency_validator` (`"$DART_BIN"
+# run dependency_validator`; 5.0.5 no lock do app e dos tools, 3.2.3 no do
+# server): com o pacote promovido e nao importado ele lista "These packages
+# may be unused" e sai com 1, e a auditoria para. Com o pacote promovido E
+# importado em lib/, nenhum dos dois reclama: a auditoria passa e o lock
+# segue com o rotulo `transitive` ate o proximo `pub get` sem a flag, fora
+# desta auditoria.
 run_dependency_validator() {
   local package_dir="$1"
   local label="$2"
