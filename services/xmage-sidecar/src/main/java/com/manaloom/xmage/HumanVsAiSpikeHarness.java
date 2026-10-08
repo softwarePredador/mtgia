@@ -45,6 +45,7 @@ import java.util.UUID;
 final class HumanVsAiSpikeHarness {
     enum PromptKind {
         MULLIGAN,
+        QUESTION,
         MAIN_ACTION,
         TARGET,
         COMBAT,
@@ -179,6 +180,19 @@ final class HumanVsAiSpikeHarness {
                 && "Keep".equals(safeOptions.get("UI.right.btn.text"))) {
             return PromptKind.MULLIGAN;
         }
+        // Todo GAME_ASK que nao e o mulligan cai aqui. Antes caia no `return
+        // null` do fim, e `PromptRegistry.open` traduzia isso em
+        // IllegalArgumentException -- ou seja, a PRIMEIRA pergunta de sim/nao
+        // que o motor fizesse matava a mesa com `engine_error`. Medido em
+        // 2026-09-23: turno 4, fase principal, `engine_error` /
+        // `interactive_callback_failed`.
+        //
+        // O tratamento generico ja existia e era inalcancavel: o `else` de
+        // `questionPrompt` monta "Sim"/"Nao" com role `choice` e nunca podia
+        // rodar, porque `open` estourava duas linhas antes.
+        if (method == ClientCallbackMethod.GAME_ASK) {
+            return PromptKind.QUESTION;
+        }
         if (method == ClientCallbackMethod.GAME_SELECT) {
             if (normalized.startsWith("play spells and abilities")
                     || normalized.startsWith("play instants and activated abilities")) {
@@ -188,6 +202,18 @@ final class HumanVsAiSpikeHarness {
                     || normalized.startsWith("select blockers")) {
                 return PromptKind.COMBAT;
             }
+            // Gemeo do defeito do GAME_ASK: sem este retorno, uma mensagem de
+            // GAME_SELECT fora dos quatro prefixos previstos caia no `null` do
+            // fim e matava a mesa. As frases do XMage mudam entre versoes e
+            // situacoes; quatro prefixos nao cobrem o jogo.
+            //
+            // MAIN_ACTION e o fallback correto porque `selectPrompt` monta as
+            // jogadas legais a partir de `getCanPlayObjects` e SEMPRE inclui
+            // "Passar prioridade" quando a lista sai vazia -- ele nunca lanca.
+            // O unico que se perde e o realce de combate
+            // (`combatSelectableIds`), que depende de reconhecer a frase;
+            // perder realce e barato, perder a partida nao.
+            return PromptKind.MAIN_ACTION;
         }
         if (method == ClientCallbackMethod.GAME_TARGET) {
             if (normalized.startsWith("select attacker to block")

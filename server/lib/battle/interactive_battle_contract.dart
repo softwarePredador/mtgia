@@ -148,6 +148,30 @@ class InteractiveBattlePersistenceException implements Exception {
   String toString() => 'InteractiveBattlePersistenceException($code)';
 }
 
+/// Kinds de prompt que o servidor aceita do runtime, fail-closed.
+///
+/// Espelha `PromptKind` em
+/// `services/xmage-sidecar/.../HumanVsAiSpikeHarness.java`. As duas listas sao
+/// mantidas a mao. O sidecar ja classificou um GAME_ASK que esta lista nao
+/// conhecia e a mesa morria com `engine_error` antes de chegar aqui;
+/// `server/test/interactive_battle_contract_test.dart` agora le o enum Java e
+/// prova que nenhum kind ficou de fora.
+const interactiveBattlePromptKinds = <String>{
+  'mulligan',
+  // Toda pergunta de sim/nao do motor que nao e o mulligan.
+  'question',
+  'main_action',
+  'target',
+  'combat',
+  'ability',
+  'pile',
+  'choice',
+  'mana',
+  'x_mana',
+  'amount',
+  'multi_amount',
+};
+
 class InteractiveBattleCreateInput {
   const InteractiveBattleCreateInput({
     required this.deckId,
@@ -590,19 +614,7 @@ class InteractiveBattlePrompt {
         stateVersion is! int ||
         stateVersion < 1 ||
         stateVersion > 20000000 ||
-        !const {
-          'mulligan',
-          'main_action',
-          'target',
-          'combat',
-          'ability',
-          'pile',
-          'choice',
-          'mana',
-          'x_mana',
-          'amount',
-          'multi_amount',
-        }.contains(kind) ||
+        !interactiveBattlePromptKinds.contains(kind) ||
         !const {'options', 'integer', 'multi_amount'}.contains(inputMode) ||
         deadlineAt == null ||
         rawOptions is! List ||

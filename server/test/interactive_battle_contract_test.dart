@@ -1,7 +1,60 @@
+import 'dart:io';
+
 import 'package:server/battle/interactive_battle_contract.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Duas listas mantidas a mao, em linguagens diferentes, que precisam
+  // concordar: `PromptKind` no sidecar Java e a allowlist fail-closed do
+  // servidor. Elas divergiram e o custo foi total -- `PromptKind.MULLIGAN` era
+  // o unico GAME_ASK classificado, e a primeira pergunta de sim/nao do motor
+  // derrubava a mesa com `engine_error` no turno 4. Nenhum teste via, porque
+  // cada lado estava internamente coerente.
+  //
+  // Este teste le o enum Java direto da fonte. Se alguem adicionar um kind la
+  // e esquecer daqui, o servidor recusaria o prompt em runtime; a falha passa a
+  // aparecer aqui, de graca.
+  test('todo PromptKind do sidecar e aceito pela allowlist do servidor', () {
+    final javaSource = File(
+      '../services/xmage-sidecar/src/main/java/com/manaloom/xmage/'
+      'HumanVsAiSpikeHarness.java',
+    );
+    expect(
+      javaSource.existsSync(),
+      isTrue,
+      reason: 'fonte do sidecar nao encontrada: ${javaSource.path}',
+    );
+    final body = RegExp(
+      r'enum PromptKind \{([^}]*)\}',
+    ).firstMatch(javaSource.readAsStringSync());
+    expect(body, isNotNull, reason: 'enum PromptKind nao encontrado');
+
+    final kinds =
+        body!
+            .group(1)!
+            .split(',')
+            .map((raw) => raw.trim())
+            .where((raw) => RegExp(r'^[A-Z][A-Z_]*$').hasMatch(raw))
+            .map((raw) => raw.toLowerCase())
+            .toList();
+
+    // Sanidade: se a extracao falhar e devolver pouca coisa, o teste passaria
+    // vazio e nao provaria nada.
+    expect(kinds.length, greaterThanOrEqualTo(11));
+    expect(kinds, contains('mulligan'));
+    expect(kinds, contains('question'));
+
+    for (final kind in kinds) {
+      expect(
+        interactiveBattlePromptKinds,
+        contains(kind),
+        reason:
+            'PromptKind.${kind.toUpperCase()} existe no sidecar mas o servidor '
+            'recusaria o prompt: adicione "$kind" a allowlist.',
+      );
+    }
+  });
+
   group('interactive battle request contract', () {
     test('parses bounded create input and requires a distinct opponent', () {
       final input = InteractiveBattleCreateInput.parse({

@@ -32,12 +32,49 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class HumanVsAiSpikeTest {
+    @Test
+    void everyDecisionCallbackClassifiesOrTheTableDies() {
+        // `classify` devolvendo null vira
+        // IllegalArgumentException("callback is not allowlisted") em
+        // `PromptRegistry.open`, e o `catch` do InteractiveBattleRegistry
+        // encerra a sessao com `engine_error`. Ou seja: um null aqui nao e uma
+        // lacuna de classificacao, e uma partida perdida pelo jogador.
+        //
+        // Por isso a asserção é sobre TODOS os callbacks de decisao e com
+        // mensagens que ninguem previu -- que é exatamente o caso que quebrou:
+        // o GAME_ASK do motor chegou com uma frase fora da lista e matou a mesa
+        // no turno 4.
+        String[] mensagens = {
+                "",
+                "Use replacement effect?",
+                "Mensagem que ninguem previu",
+                "SELECT something entirely different",
+                "Escolha algo",
+        };
+        for (ClientCallbackMethod metodo
+                : HumanVsAiSpikeHarness.DECISION_CALLBACKS) {
+            for (String mensagem : mensagens) {
+                assertNotNull(
+                        HumanVsAiSpikeHarness.classify(
+                                metodo,
+                                mensagem,
+                                Collections.emptyMap()
+                        ),
+                        "classify(" + metodo + ", \"" + mensagem
+                                + "\") devolveu null: a mesa morreria com "
+                                + "engine_error"
+                );
+            }
+        }
+    }
+
     @Test
     void onlyDeckAUsesHumanAndDeckBRemainsComputerMad() {
         MatchOptions options = HumanVsAiSpikeHarness.matchOptions(
@@ -129,16 +166,39 @@ final class HumanVsAiSpikeTest {
                 )
         );
 
+        // Este caso afirmava `null`, e `null` significa
+        // IllegalArgumentException em `PromptRegistry.open`: a pergunta mais
+        // banal do motor -- "Use replacement effect?" -- derrubava a mesa com
+        // `engine_error`. O teste pinava o defeito como esperado.
         assertEquals(
-                null,
+                HumanVsAiSpikeHarness.PromptKind.QUESTION,
                 HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_ASK,
                         "Use replacement effect?",
                         Collections.emptyMap()
                 )
         );
+        // O mulligan continua tendo kind proprio: `questionPrompt` decide por
+        // ele se rotula "Fazer mulligan"/"Manter esta mao" ou "Sim"/"Nao".
         assertEquals(
-                null,
+                HumanVsAiSpikeHarness.PromptKind.MULLIGAN,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_ASK,
+                        "Mulligan to 6?",
+                        Map.of(
+                                "UI.left.btn.text", "Mulligan",
+                                "UI.right.btn.text", "Keep"
+                        )
+                )
+        );
+        // Mesmo caso do GAME_ASK, e mesma consequencia: `null` nao e "nao sei",
+        // e IllegalArgumentException em `PromptRegistry.open` e mesa morta. A
+        // mensagem do GAME_SELECT muda entre versoes e situacoes do XMage, e
+        // so quatro prefixos eram reconhecidos. Sem alvo conhecido, o certo e
+        // MAIN_ACTION: `selectPrompt` monta as jogadas legais e sempre inclui
+        // "Passar prioridade", entao a partida segue.
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
                 HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_SELECT,
                         "Unknown selection",
