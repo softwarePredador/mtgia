@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "38391153dd82d781b6cf49bf1b7024f80564a9ae999f0305a8d348401fac7e88",
+  "source_digest_sha256": "198dea7a2e43916e1a597880704c09e451768878894a9b1be58908dd02d830a9",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,8 +79,8 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 711,
-    "environment_variables": 734,
+    "scripts_and_jobs": 717,
+    "environment_variables": 736,
     "tests": 1345,
     "flows": 13,
     "traceability_rules": 12,
@@ -280593,6 +280593,34 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
+      "role": "battle",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_BCK_DIAG_18"
+      ]
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_card_details_navigation.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_optimization_card_reader.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_play_vs_ai.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_DEBUG_COMBATE"
+      ]
+    },
+    {
       "path": "scripts/lib/manaloom_chromedriver.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -280612,6 +280640,12 @@
         "MANALOOM_FLUTTER_ROOT",
         "MANALOOM_NODE_BIN"
       ]
+    },
+    {
+      "path": "scripts/lib/manaloom_fixture_asset_server.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
     },
     {
       "path": "scripts/lib/manaloom_flutter_release_sdk.sh",
@@ -280673,6 +280707,14 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_webdriver_capture.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "CHROME_EXECUTABLE"
+      ]
     },
     {
       "path": "scripts/manaloom_ai_generation_benchmark.sh",
@@ -283969,6 +284011,7 @@
       "name": "CHROME_EXECUTABLE",
       "classification": "configuration",
       "sources": [
+        "scripts/lib/manaloom_webdriver_capture.py",
         "scripts/manaloom_battle_learning_visual_qa.sh",
         "scripts/manaloom_binder_import_visual_qa.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
@@ -286049,6 +286092,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_BCK_DIAG_18",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_captura_battle_coach_keyboard.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_BOOT_PULL_PENDING_EVENTS",
       "classification": "configuration",
       "sources": [
@@ -286293,6 +286344,14 @@
         "scripts/manaloom_visual_system_workspace_qa.sh",
         "server/bin/auto_sync_learned_decks.py",
         "server/bin/manaloom_ops_daemon.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_DEBUG_COMBATE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_captura_play_vs_ai.py"
       ],
       "value_captured": false
     },
@@ -303143,7 +303202,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "38391153dd82d781b6cf49bf1b7024f80564a9ae999f0305a8d348401fac7e88"
+    "project_logic_source_digest_sha256": "198dea7a2e43916e1a597880704c09e451768878894a9b1be58908dd02d830a9"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305344,8 +305403,13 @@
       "scripts/dev_full_with_integration.sh",
       "scripts/flutter_run_with_local_sentry.sh",
       "scripts/generate_brewtact_brand_assets.py",
+      "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
+      "scripts/lib/manaloom_captura_card_details_navigation.py",
+      "scripts/lib/manaloom_captura_optimization_card_reader.py",
+      "scripts/lib/manaloom_captura_play_vs_ai.py",
       "scripts/lib/manaloom_chromedriver.sh",
       "scripts/lib/manaloom_dart_toolchain.sh",
+      "scripts/lib/manaloom_fixture_asset_server.py",
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
       "scripts/lib/manaloom_public_web_surface_contract.sh",
@@ -305353,6 +305417,7 @@
       "scripts/lib/manaloom_release_runtime_contract.sh",
       "scripts/lib/manaloom_safe_env.sh",
       "scripts/lib/manaloom_ui_runtime_contract.sh",
+      "scripts/lib/manaloom_webdriver_capture.py",
       "scripts/manaloom_ai_generation_benchmark.sh",
       "scripts/manaloom_ai_paywall_e2e.sh",
       "scripts/manaloom_ai_prompt_eval.sh",
