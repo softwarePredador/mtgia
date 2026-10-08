@@ -18,6 +18,8 @@ import mage.view.GameClientMessage;
 import mage.view.ManaPoolView;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
@@ -73,6 +75,136 @@ final class HumanVsAiSpikeTest {
                 );
             }
         }
+    }
+
+    @Test
+    void unknownSelectPhraseWithCombatPayloadStaysCombat() {
+        // O fallback do GAME_SELECT nao pode olhar so a frase. Se uma frase
+        // de declarar atacantes/bloqueadores mudar de texto e cair em
+        // MAIN_ACTION, `selectPrompt` deixa de oferecer as criaturas de
+        // `possibleAttackers`/`possibleBlockers` e o jogador so pode passar:
+        // perde o ataque ou o bloqueio sem saber por que.
+        UUID creature = UUID.fromString(
+                "11111111-2222-3333-4444-555555555555"
+        );
+        Map<String, Object> attackers = new LinkedHashMap<>();
+        attackers.put(
+                HumanVsAiSpikeHarness.POSSIBLE_ATTACKERS_OPTION,
+                new ArrayList<>(Collections.singletonList(creature))
+        );
+        Map<String, Object> blockers = new LinkedHashMap<>();
+        blockers.put(
+                HumanVsAiSpikeHarness.POSSIBLE_BLOCKERS_OPTION,
+                new ArrayList<>(Collections.singletonList(creature))
+        );
+        Map<String, Object> noCombat = new LinkedHashMap<>();
+        noCombat.put("hintText", "Escolha algo");
+
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.COMBAT,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that go to war",
+                        attackers
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.COMBAT,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that hold the line",
+                        blockers
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that go to war",
+                        noCombat
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that go to war",
+                        null
+                )
+        );
+        // As chaves sao as que o XMage escreve, e as mesmas que
+        // `InteractiveBattleRegistry.combatSelectableIds` le.
+        assertEquals(
+                Collections.singletonList(creature),
+                InteractiveBattleRegistry.combatSelectableIds(attackers)
+        );
+    }
+
+    @Test
+    void selectTextFallbackIsLoggedOncePerPromptWithoutTextOrIds() {
+        UUID creature = UUID.fromString(
+                "11111111-2222-3333-4444-555555555555"
+        );
+        Map<String, Object> attackers = new LinkedHashMap<>();
+        attackers.put(
+                HumanVsAiSpikeHarness.POSSIBLE_ATTACKERS_OPTION,
+                new ArrayList<>(Collections.singletonList(creature))
+        );
+        String unknownPhrase = "Alice, declare the creatures that go to war";
+
+        String fallbackLog = capturedStderr(() -> {
+            HumanVsAiSpikeHarness.Prompt prompt = selectRegistry().open(
+                    selectCallback(),
+                    unknownPhrase,
+                    attackers,
+                    Arrays.<Object>asList(creature, Boolean.FALSE)
+            );
+            assertEquals(HumanVsAiSpikeHarness.PromptKind.COMBAT, prompt.kind);
+        });
+        assertEquals(
+                "interactive_select_text_fallback kind=COMBAT"
+                        + " possible_attackers=true possible_blockers=false"
+                        + " message_chars=" + unknownPhrase.length(),
+                fallbackLog.trim()
+        );
+        assertFalse(fallbackLog.contains("Alice"));
+        assertFalse(fallbackLog.contains(creature.toString()));
+
+        String recognizedLog = capturedStderr(() -> selectRegistry().open(
+                selectCallback(),
+                "Select attackers",
+                attackers,
+                Arrays.<Object>asList(creature, Boolean.FALSE)
+        ));
+        assertEquals("", recognizedLog);
+    }
+
+    private static HumanVsAiSpikeHarness.PromptRegistry selectRegistry() {
+        return new HumanVsAiSpikeHarness.PromptRegistry(
+                "0123456789abcdef0123456789abcdef"
+                        .getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    private static ClientCallback selectCallback() {
+        ClientCallback callback = new ClientCallback(
+                ClientCallbackMethod.GAME_SELECT,
+                UUID.fromString("99999999-8888-7777-6666-555555555555")
+        );
+        callback.setMessageId(7);
+        return callback;
+    }
+
+    private static String capturedStderr(Runnable action) {
+        PrintStream original = System.err;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        System.setErr(new PrintStream(buffer, true, StandardCharsets.UTF_8));
+        try {
+            action.run();
+        } finally {
+            System.setErr(original);
+        }
+        return buffer.toString(StandardCharsets.UTF_8);
     }
 
     @Test
@@ -194,9 +326,11 @@ final class HumanVsAiSpikeTest {
         // Mesmo caso do GAME_ASK, e mesma consequencia: `null` nao e "nao sei",
         // e IllegalArgumentException em `PromptRegistry.open` e mesa morta. A
         // mensagem do GAME_SELECT muda entre versoes e situacoes do XMage, e
-        // so quatro prefixos eram reconhecidos. Sem alvo conhecido, o certo e
-        // MAIN_ACTION: `selectPrompt` monta as jogadas legais e sempre inclui
-        // "Passar prioridade", entao a partida segue.
+        // so quatro prefixos eram reconhecidos. Sem frase conhecida e sem dado
+        // de combate no payload, o certo e MAIN_ACTION: `selectPrompt` monta as
+        // jogadas legais e inclui "Passar prioridade", entao a partida segue.
+        // O caso com dado de combate esta em
+        // `unknownSelectPhraseWithCombatPayloadStaysCombat`.
         assertEquals(
                 HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
                 HumanVsAiSpikeHarness.classify(

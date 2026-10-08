@@ -2375,8 +2375,16 @@ final class InteractiveBattleRegistry {
 
     static List<UUID> combatSelectableIds(Map<String, ?> metadata) {
         Set<UUID> ids = new LinkedHashSet<>();
-        addCombatSelectableIds(ids, metadata, "possibleAttackers");
-        addCombatSelectableIds(ids, metadata, "possibleBlockers");
+        addCombatSelectableIds(
+                ids,
+                metadata,
+                HumanVsAiSpikeHarness.POSSIBLE_ATTACKERS_OPTION
+        );
+        addCombatSelectableIds(
+                ids,
+                metadata,
+                HumanVsAiSpikeHarness.POSSIBLE_BLOCKERS_OPTION
+        );
         List<UUID> result = new ArrayList<>(ids);
         result.sort(Comparator.comparing(UUID::toString));
         return result;

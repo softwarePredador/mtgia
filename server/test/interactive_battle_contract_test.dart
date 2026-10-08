@@ -273,6 +273,44 @@ void main() {
       );
     });
 
+    test('prompt parser accepts the engine question kind, rejects unknown', () {
+      // O teste de paridade acima prova a constante; este prova o parser.
+      // Se `parse` voltar a uma lista propria sem 'question', o prompt da
+      // pergunta generica do motor e recusado com
+      // `interactive_battle_prompt_invalid` e a mesa morre do mesmo jeito.
+      Map<String, Object?> promptWithKind(String kind) => {
+        'schema_version': interactiveBattlePromptSchema,
+        'id': _promptId,
+        'state_version': 9,
+        'kind': kind,
+        'input_mode': 'options',
+        'title': 'Sua decisão',
+        'message': 'Escolha uma ação legal para continuar.',
+        'deadline_at': '2026-07-27T15:00:00Z',
+        'options': [
+          {'id': _optionId, 'label': 'Sim', 'role': 'choice'},
+          {'id': 'o_qrstuvwxyzabcdef', 'label': 'Não', 'role': 'choice'},
+        ],
+      };
+
+      final question = InteractiveBattlePrompt.parse(
+        promptWithKind('question'),
+      );
+      expect(question.kind, 'question');
+      expect(question.options.map((option) => option.label), ['Sim', 'Não']);
+
+      expect(
+        () => InteractiveBattlePrompt.parse(promptWithKind('engine_surprise')),
+        throwsA(
+          isA<InteractiveBattlePersistenceException>().having(
+            (error) => error.code,
+            'code',
+            'interactive_battle_prompt_invalid',
+          ),
+        ),
+      );
+    });
+
     test('prompt card object id is optional but UUID-strict when present', () {
       final withObjectId = InteractiveBattlePrompt.parse({
         'schema_version': interactiveBattlePromptSchema,
