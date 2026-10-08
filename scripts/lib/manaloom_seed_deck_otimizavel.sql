@@ -36,10 +36,19 @@
 -- de forma explícita, e as linhas do deck e do comandante entram ANTES de
 -- `deck_cards`, para o deck já nascer sobre legalidade conhecida.
 --
+-- CONFERÊNCIA QUE PARA. As duas conferências do fim (deck e pool de
+-- candidatos) são blocos `DO` que levantam `RAISE EXCEPTION`: com
+-- `ON_ERROR_STOP` o psql sai com código 3 e a corrida para ali, em vez de
+-- depender de alguém ler a contagem impressa. Variável de psql não é
+-- interpolada dentro de `$$ ... $$`, então o `deck_id` entra nos blocos por
+-- `SET manaloom.seed_deck_id` e `current_setting(...)`.
+--
 -- Variáveis exigidas: `deck_id`, `commander_card_id` e `image_url`
 -- (`psql -v deck_id=... -v commander_card_id=... -v image_url=...`).
 
 \set ON_ERROR_STOP on
+
+SET manaloom.seed_deck_id = :'deck_id';
 
 -- ---------------------------------------------------------------------------
 -- Terrenos: 36 no total, com fontes azuis para a identidade do comandante.
@@ -177,8 +186,8 @@ ON CONFLICT (id) DO UPDATE SET
 -- As sintéticas têm id próprio deste seed, então a linha é afirmada como
 -- 'legal'. O comandante vem do catálogo da fixture: a linha só é criada se
 -- não existir. Uma legalidade já registrada para ele não é reescrita -- se
--- ela não for 'legal', a conferência abaixo mostra e a corrida para, em vez
--- de o seed esconder um comandante ilegal.
+-- ela não for 'legal', a conferência do deck levanta exceção e a corrida
+-- para, em vez de o seed esconder um comandante ilegal.
 -- ---------------------------------------------------------------------------
 INSERT INTO card_legalities (card_id, format, status)
 SELECT ('20000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid,
@@ -214,22 +223,61 @@ FROM generate_series(1, 63) AS i;
 INSERT INTO deck_cards (deck_id, card_id, quantity, is_commander)
 VALUES (:'deck_id'::uuid, :'commander_card_id'::uuid, 1, TRUE);
 
--- Conferência. Variável de psql não é visível dentro de bloco DO, então a
--- contagem sai daqui e quem confere é o roteiro que chamou -- que para a
--- corrida se não bater, em vez de capturar um deck que não é o combinado.
-SELECT
-  coalesce(sum(dc.quantity), 0) AS total,
-  coalesce(sum(dc.quantity) FILTER (WHERE c.type_line ILIKE '%land%'), 0)
-    AS terrenos,
-  coalesce(sum(dc.quantity) FILTER (WHERE dc.is_commander), 0) AS comandantes,
-  coalesce(sum(dc.quantity) FILTER (WHERE cl.status = 'legal'), 0)
-    AS cartas_legais,
-  bool_and(cl.status = 'legal') FILTER (WHERE dc.is_commander)
-    AS comandante_legal
-FROM deck_cards dc
-JOIN cards c ON c.id = dc.card_id
-LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-WHERE dc.deck_id = :'deck_id'::uuid;
+-- Conferência do deck. PARA a corrida (RAISE EXCEPTION) se o comandante não
+-- estiver 'legal' em commander -- linha ausente conta como não legal (D-28)
+-- -- ou se o deck não for o combinado (100 cartas, 36 terrenos, 1
+-- comandante, todas legais). Capturar sobre um deck diferente provaria outra
+-- coisa; a contagem também sai como NOTICE para o log da corrida.
+DO $conferencia_deck$
+DECLARE
+  v_deck uuid := current_setting('manaloom.seed_deck_id')::uuid;
+  v_total integer;
+  v_terrenos integer;
+  v_comandantes integer;
+  v_cartas_legais integer;
+  v_status_comandante text;
+BEGIN
+  SELECT
+    coalesce(sum(dc.quantity), 0),
+    coalesce(sum(dc.quantity) FILTER (WHERE c.type_line ILIKE '%land%'), 0),
+    coalesce(sum(dc.quantity) FILTER (WHERE dc.is_commander), 0),
+    coalesce(sum(dc.quantity) FILTER (WHERE cl.status = 'legal'), 0)
+  INTO v_total, v_terrenos, v_comandantes, v_cartas_legais
+  FROM deck_cards dc
+  JOIN cards c ON c.id = dc.card_id
+  LEFT JOIN card_legalities cl
+    ON cl.card_id = c.id AND cl.format = 'commander'
+  WHERE dc.deck_id = v_deck;
+
+  SELECT coalesce(min(cl.status), 'sem linha de legalidade')
+  INTO v_status_comandante
+  FROM deck_cards dc
+  LEFT JOIN card_legalities cl
+    ON cl.card_id = dc.card_id AND cl.format = 'commander'
+  WHERE dc.deck_id = v_deck AND dc.is_commander;
+
+  RAISE NOTICE 'deck semeado: total=%, terrenos=%, comandantes=%, '
+    'cartas_legais=%, comandante=%',
+    v_total, v_terrenos, v_comandantes, v_cartas_legais, v_status_comandante;
+
+  IF v_total <> 100 OR v_terrenos <> 36 OR v_comandantes <> 1 THEN
+    RAISE EXCEPTION
+      'seed do deck otimizavel: deck fora do combinado (total=%, '
+      'terrenos=%, comandantes=%; esperado 100/36/1); a corrida para aqui',
+      v_total, v_terrenos, v_comandantes;
+  END IF;
+  IF v_status_comandante IS DISTINCT FROM 'legal' THEN
+    RAISE EXCEPTION
+      'seed do deck otimizavel: comandante nao e legal em commander (%); '
+      'a corrida para aqui', v_status_comandante;
+  END IF;
+  IF v_cartas_legais <> 100 THEN
+    RAISE EXCEPTION
+      'seed do deck otimizavel: % de 100 cartas legais em commander; '
+      'a corrida para aqui', v_cartas_legais;
+  END IF;
+END
+$conferencia_deck$;
 
 -- ---------------------------------------------------------------------------
 -- Pool de candidatos de ADIÇÃO, deliberadamente FORA do deck.
@@ -335,35 +383,54 @@ WHERE deck_id = :'deck_id'::uuid
     FROM generate_series(1, 12) AS i
   );
 
--- Conferência do pool, com os MESMOS filtros da consulta de candidatos, para o
--- roteiro parar a corrida antes de capturar em vez de descobrir a shortlist
--- vazia só quando a rota devolver o mock. `DISTINCT ON` replicado porque é
--- ele que colapsou os dois "Sol Ring" do catálogo em um só. Legalidade
--- ausente NÃO conta (D-28), exatamente como na consulta do otimizador.
-WITH deck AS (
-  SELECT LOWER(c.name) AS n
-  FROM deck_cards dc JOIN cards c ON c.id = dc.card_id
-  WHERE dc.deck_id = :'deck_id'::uuid
-), ident AS (
-  SELECT c.color_identity AS ci
-  FROM deck_cards dc JOIN cards c ON c.id = dc.card_id
-  WHERE dc.deck_id = :'deck_id'::uuid AND dc.is_commander
-  LIMIT 1
-), elegiveis AS (
-  SELECT DISTINCT ON (LOWER(c.name)) c.name
-  FROM cards c
-  LEFT JOIN card_legalities cl ON cl.card_id = c.id AND cl.format = 'commander'
-  WHERE (cl.status = 'legal' OR cl.status = 'restricted')
-    AND LOWER(c.name) NOT IN (SELECT n FROM deck)
-    AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|$)')
-    AND c.name NOT LIKE 'A-%'
-    AND c.name NOT LIKE '\_%' ESCAPE '\'
-    AND c.name NOT LIKE '%World Champion%'
-    AND c.name NOT LIKE '%Heroes of the Realm%'
-    AND c.oracle_text IS NOT NULL
-    AND LENGTH(TRIM(c.oracle_text)) > 0
-    AND (c.color_identity <@ (SELECT ci FROM ident)
-         OR c.color_identity = '{}' OR c.color_identity IS NULL)
-  ORDER BY LOWER(c.name)
-)
-SELECT count(*) AS candidatos_adicao FROM elegiveis;
+-- Conferência do pool, com os MESMOS filtros da consulta de candidatos. PARA
+-- a corrida (RAISE EXCEPTION) com menos de 12 candidatos de adição, antes de
+-- capturar, em vez de descobrir a shortlist vazia só quando a rota devolver o
+-- mock. `DISTINCT ON` replicado porque é ele que colapsou os dois "Sol Ring"
+-- do catálogo em um só. Legalidade ausente NÃO conta (D-28), exatamente como
+-- na consulta do otimizador. 12 é o pool que este seed semeia: abaixo disso
+-- algum candidato dele sumiu do filtro, e a corrida já não é a combinada.
+DO $conferencia_pool$
+DECLARE
+  v_deck uuid := current_setting('manaloom.seed_deck_id')::uuid;
+  v_candidatos integer;
+BEGIN
+  WITH deck AS (
+    SELECT LOWER(c.name) AS n
+    FROM deck_cards dc JOIN cards c ON c.id = dc.card_id
+    WHERE dc.deck_id = v_deck
+  ), ident AS (
+    SELECT c.color_identity AS ci
+    FROM deck_cards dc JOIN cards c ON c.id = dc.card_id
+    WHERE dc.deck_id = v_deck AND dc.is_commander
+    LIMIT 1
+  ), elegiveis AS (
+    SELECT DISTINCT ON (LOWER(c.name)) c.name
+    FROM cards c
+    LEFT JOIN card_legalities cl
+      ON cl.card_id = c.id AND cl.format = 'commander'
+    WHERE (cl.status = 'legal' OR cl.status = 'restricted')
+      AND LOWER(c.name) NOT IN (SELECT n FROM deck)
+      AND NOT (COALESCE(c.type_line, '') ~* '(^|[^a-z])land([^a-z]|$)')
+      AND c.name NOT LIKE 'A-%'
+      AND c.name NOT LIKE '\_%' ESCAPE '\'
+      AND c.name NOT LIKE '%World Champion%'
+      AND c.name NOT LIKE '%Heroes of the Realm%'
+      AND c.oracle_text IS NOT NULL
+      AND LENGTH(TRIM(c.oracle_text)) > 0
+      AND (c.color_identity <@ (SELECT ci FROM ident)
+           OR c.color_identity = '{}' OR c.color_identity IS NULL)
+    ORDER BY LOWER(c.name)
+  )
+  SELECT count(*) INTO v_candidatos FROM elegiveis;
+
+  RAISE NOTICE 'candidatos_adicao=%', v_candidatos;
+
+  IF v_candidatos < 12 THEN
+    RAISE EXCEPTION
+      'seed do deck otimizavel: candidatos_adicao=% (minimo 12); sem pool '
+      'a shortlist sai vazia e a rota volta ao mock; a corrida para aqui',
+      v_candidatos;
+  END IF;
+END
+$conferencia_pool$;

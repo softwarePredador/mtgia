@@ -238,7 +238,9 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
     "$ROOT_DIR/server/test/slo_alerts_test.py" \
-    "$ROOT_DIR/server/test/support/production_drift_fixture.py"
+    "$ROOT_DIR/server/test/support/production_drift_fixture.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" \
+    "$ROOT_DIR/server/test/fixture_asset_server_test.py"
 
 # BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
 # conferem o schema do PostgreSQL e param; não o alteram.
@@ -284,6 +286,10 @@ PYTHONDONTWRITEBYTECODE=1 \
     --pending "$ROOT_DIR/scripts/manaloom_errexit_lint_pending.json"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/errexit_postdeploy_test.py"
+# BT-UIEV-001: o servidor de assets das fixtures so escuta em loopback, nao
+# lista diretorio e serve com CORS.
+PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
+  python3 "$ROOT_DIR/server/test/fixture_asset_server_test.py"
 
 SAFE_ENV_FIXTURE="$TMP_DIR/safe.env"
 SAFE_ENV_MARKER="$TMP_DIR/env-code-executed"

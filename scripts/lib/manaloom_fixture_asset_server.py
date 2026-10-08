@@ -15,18 +15,28 @@ Medido em 2026-09-24: `curl -I` na fixture nao trazia
 `Access-Control-Allow-Origin`, e as capturas do `ux-pack-02` saiam com o
 marcador de imagem quebrada no lugar da arte.
 
-`--bind 127.0.0.1` continua obrigatorio: isto serve arquivo local para prova
-visual, nunca para rede.
+So loopback: isto serve arquivo local para prova visual, nunca para rede.
+`--bind` aceita apenas `127.0.0.1` (padrao), `::1` ou `localhost`; qualquer
+outro endereco, inclusive `0.0.0.0`, e recusado antes de abrir o socket.
+Listagem de diretorio fica desligada: um diretorio sem `index.html` responde
+404 em vez de expor os nomes dos arquivos da raiz servida.
 
 Uso: `python3 scripts/lib/manaloom_fixture_asset_server.py <porta>
 [--bind 127.0.0.1] [--directory <raiz>]`; sem `--directory`, serve o
 diretorio corrente.
 """
 
+from __future__ import annotations
+
 import argparse
 import functools
 import http.server
 import os
+import socket
+
+# Lista fechada, por texto. Nao e `ipaddress.is_loopback`: aquilo aceitaria
+# qualquer 127.x e enderecos mapeados, e o contrato aqui e o mais estreito.
+BINDS_LOOPBACK = ("127.0.0.1", "::1", "localhost")
 
 
 class _ServidorComCors(http.server.SimpleHTTPRequestHandler):
@@ -34,6 +44,13 @@ class _ServidorComCors(http.server.SimpleHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Cache-Control", "no-store")
         super().end_headers()
+
+    def list_directory(self, path):
+        # A classe base chama isto para diretorio sem `index.html` e devolve a
+        # listagem em HTML. A fixture so precisa servir arquivo por caminho
+        # conhecido; a listagem e desligada e o diretorio vira 404.
+        self.send_error(404, "Listagem de diretorio desligada")
+        return None
 
     def log_message(self, formato, *args):
         # O log padrao escreve uma linha em stderr por requisicao e polui o
@@ -43,7 +60,31 @@ class _ServidorComCors(http.server.SimpleHTTPRequestHandler):
         return
 
 
-def main() -> None:
+def validar_bind(bind: str) -> str:
+    """Devolve o bind se for loopback; senao levanta `ValueError` claro."""
+    if bind not in BINDS_LOOPBACK:
+        raise ValueError(
+            f"--bind {bind!r} recusado: o servidor de assets da fixture so "
+            f"escuta em loopback ({', '.join(BINDS_LOOPBACK)})"
+        )
+    return bind
+
+
+def criar_servidor(
+    bind: str, porta: int, diretorio: str
+) -> http.server.ThreadingHTTPServer:
+    """Abre o servidor ja ligado ao socket, sem comecar a atender."""
+    validar_bind(bind)
+
+    class _Servidor(http.server.ThreadingHTTPServer):
+        # `::1` exige socket IPv6; o padrao da classe e IPv4.
+        address_family = socket.AF_INET6 if bind == "::1" else socket.AF_INET
+
+    handler = functools.partial(_ServidorComCors, directory=diretorio)
+    return _Servidor((bind, porta), handler)
+
+
+def main(argv: list[str] | None = None) -> None:
     p = argparse.ArgumentParser()
     p.add_argument("porta", type=int)
     p.add_argument("--bind", default="127.0.0.1")
@@ -54,10 +95,14 @@ def main() -> None:
     # "Local visual asset server stopped unexpectedly", medido em 2026-09-29.
     # Quem quer outra raiz passa o diretorio explicito.
     p.add_argument("--directory", default=os.getcwd())
-    args = p.parse_args()
+    args = p.parse_args(argv)
+    try:
+        validar_bind(args.bind)
+    except ValueError as erro:
+        # `p.error` sai com codigo 2 e a mensagem, sem traceback.
+        p.error(str(erro))
 
-    handler = functools.partial(_ServidorComCors, directory=args.directory)
-    with http.server.ThreadingHTTPServer((args.bind, args.porta), handler) as s:
+    with criar_servidor(args.bind, args.porta, args.directory) as s:
         s.serve_forever()
 
 

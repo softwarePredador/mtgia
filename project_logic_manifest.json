@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "5326e584e7e11c58df22ed7b65218720e184accabdfcff193dd2f4f4b9aba862",
+  "source_digest_sha256": "a542346a09f69d716194ff569b55eefa1a749f7f207c3c6f6647d14b25cf289d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -81,7 +81,7 @@
     "migrations": 74,
     "scripts_and_jobs": 717,
     "environment_variables": 736,
-    "tests": 1345,
+    "tests": 1346,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -291516,6 +291516,7 @@
     "server/test/external_commander_meta_operational_runner_support_test.dart",
     "server/test/external_commander_meta_promotion_support_test.dart",
     "server/test/external_commander_meta_staging_support_test.dart",
+    "server/test/fixture_asset_server_test.py",
     "server/test/flashback_pg879_exact_runtime_and_cmc_source_test.dart",
     "server/test/flutter_release_sdk_contract_test.dart",
     "server/test/flutter_web_deploy_contract_test.dart",
@@ -303202,7 +303203,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "5326e584e7e11c58df22ed7b65218720e184accabdfcff193dd2f4f4b9aba862"
+    "project_logic_source_digest_sha256": "a542346a09f69d716194ff569b55eefa1a749f7f207c3c6f6647d14b25cf289d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -306337,6 +306338,7 @@
       "server/test/external_commander_meta_operational_runner_support_test.dart",
       "server/test/external_commander_meta_promotion_support_test.dart",
       "server/test/external_commander_meta_staging_support_test.dart",
+      "server/test/fixture_asset_server_test.py",
       "server/test/flashback_pg879_exact_runtime_and_cmc_source_test.dart",
       "server/test/flutter_release_sdk_contract_test.dart",
       "server/test/flutter_web_deploy_contract_test.dart",
