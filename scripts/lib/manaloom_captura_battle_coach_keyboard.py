@@ -724,6 +724,16 @@ def main() -> int:
         return 2
     porta, destino, web, deck, rival, email, senha, saida_console = sys.argv[1:9]
     # Sem barra final: as rotas sao montadas como `{web}#/decks/...`.
+    #
+    # Efeito INTENCIONAL, o mesmo de `manaloom_captura_play_vs_ai.py`: com
+    # `web` = `.../app`, cada `nav.ir(f"{web}#/...")` pede `/app`, que o
+    # `app/tool/serve_flutter_web_app.py` responde com 302 para `/app/` (o
+    # fragmento sobrevive ao redirect), e a navegacao vira RECARGA COMPLETA da
+    # pagina, nao troca de fragmento. O cp06 do play-vs-ai depende disso para
+    # provar a reconexao, e aqui o checkpoint 01 tambem: o `nav.ir` de
+    # `capturar` "recarrega para o foco nascer em Back", o que so acontece com
+    # documento novo. Com a barra final (`/app/#/...`) seria so troca de
+    # fragmento e o foco ficaria onde estava.
     web = web.rstrip("/")
 
     try:

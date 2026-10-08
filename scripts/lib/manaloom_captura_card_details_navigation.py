@@ -20,8 +20,9 @@ As posições de clique são medidas na própria tela quando a árvore de semân
 não publica o elemento — o CanvasKit desenha a linha da carta sem expô-la. Isso
 é aceitável aqui porque o contrato pede ponteiro real numa posição real; o que
 não seria aceitável é presumir a posição sem conferir o que há nela. Por isso
-o ponto de reserva da aba "Cartas" só é usado depois de o texto do menor nó de
-semântica naquele ponto dizer "Cartas"; se não disser, a corrida aborta.
+o ponto de reserva da aba "Cartas" só é usado depois de o rótulo do menor nó
+de semântica naquele ponto ser exatamente "Cartas" (igualdade depois de
+normalizar espaços, não "contém"); se não for, a corrida aborta.
 
 Uso (o Chrome é `CHROME_EXECUTABLE`; o ChromeDriver vem do pin de
 `scripts/lib/manaloom_chromedriver.sh` e vive só durante a corrida):
@@ -69,6 +70,30 @@ def _entrar(nav, app: str, email: str, senha: str) -> None:
     time.sleep(9)
 
 
+def _normalizar_espacos(texto: str) -> str:
+    return " ".join(texto.split())
+
+
+def rotulo_e_aba_cartas(aria_label: str, texto: str) -> bool:
+    """O menor nó no ponto de reserva é a aba "Cartas", e só ela.
+
+    Igualdade EXATA depois de normalizar espaços, não "contém": "Cartas" dentro
+    de "Cartas do deck", "Sem cartas" ou de um contêiner que junta a barra de
+    abas inteira não prova que o ponto é a aba. O nó pode publicar o rótulo em
+    `aria-label`, no texto, ou nos dois; todo rótulo publicado precisa ser
+    exatamente "Cartas", e pelo menos um precisa existir.
+    """
+    publicados = {
+        normalizado
+        for normalizado in (
+            _normalizar_espacos(aria_label),
+            _normalizar_espacos(texto),
+        )
+        if normalizado
+    }
+    return publicados == {"Cartas"}
+
+
 def _centro_da_aba_cartas(nav) -> tuple[int, int]:
     """Mede a aba em vez de fixar coordenada."""
     from manaloom_webdriver_capture import ErroDeCaptura
@@ -88,11 +113,12 @@ def _centro_da_aba_cartas(nav) -> tuple[int, int]:
     if achado:
         return tuple(achado)
     # A barra de abas nem sempre publica semântica como folha. O ponto de
-    # reserva só vale se o MENOR nó de semântica que cobre aquele ponto disser
-    # "Cartas": clicar numa coordenada sem conferir o que há nela seria
-    # presumir a posição, e a captura provaria a aba errada sem ninguém notar.
+    # reserva só vale se o rótulo do MENOR nó de semântica que cobre aquele
+    # ponto for exatamente "Cartas" (`rotulo_e_aba_cartas`): clicar numa
+    # coordenada sem conferir o que há nela seria presumir a posição, e a
+    # captura provaria a aba errada sem ninguém notar.
     x, y = _RESERVA_ABA_CARTAS
-    texto = nav.js(
+    no = nav.js(
         r"""
         const x = arguments[0], y = arguments[1];
         const cobrem = [...document.querySelectorAll('flt-semantics')]
@@ -100,19 +126,23 @@ def _centro_da_aba_cartas(nav) -> tuple[int, int]:
           .filter(o => o.r.left <= x && x <= o.r.right
                        && o.r.top <= y && y <= o.r.bottom
                        && o.r.width * o.r.height > 0);
-        if (!cobrem.length) return '';
+        if (!cobrem.length) return null;
         cobrem.sort((a, b) => a.r.width * a.r.height - b.r.width * b.r.height);
         const e = cobrem[0].e;
-        return ((e.getAttribute('aria-label') || '') + ' ' +
-                (e.textContent || '')).replace(/\s+/g, ' ').trim();
+        return {al: e.getAttribute('aria-label') || '',
+                t: e.textContent || ''};
         """,
         x,
         y,
-    ) or ""
-    if "cartas" not in texto.lower():
+    )
+    if not isinstance(no, dict):
+        no = {}
+    rotulo = (no.get("al") or "", no.get("t") or "")
+    if not rotulo_e_aba_cartas(*rotulo):
         raise ErroDeCaptura(
             "a aba 'Cartas' nao publicou semantica, e o ponto de reserva "
-            f"({x},{y}) mostra {texto[:80]!r}; clicar ali seria presumir a "
+            f"({x},{y}) mostra {' / '.join(r for r in rotulo if r)[:80]!r} "
+            "em vez de exatamente 'Cartas'; clicar ali seria presumir a "
             "posicao"
         )
     return (x, y)

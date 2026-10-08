@@ -715,6 +715,24 @@ def _chave_de_concessao() -> str:
     return f"battle-concede:{uuid.uuid4()}"
 
 
+def _sessoes_da_lista(lista) -> list:
+    """As mesas da resposta da listagem, seja ela objeto ou lista crua.
+
+    A rota responde `{"sessions": [...]}`
+    (`server/routes/ai/battle/sessions/index.dart`); o preparo aceita tambem
+    `{"items": [...]}` e lista crua. O tipo e conferido ANTES de `.get`: com
+    `lista.get(...)` primeiro, uma lista crua derrubava o preparo com
+    `AttributeError` fora do `try`, e a corrida morria antes do checkpoint 01.
+    Qualquer outra forma (texto, numero, `null`) vale como nenhuma mesa.
+    """
+    if isinstance(lista, list):
+        return lista
+    if isinstance(lista, dict):
+        sessoes = lista.get("sessions") or lista.get("items") or []
+        return sessoes if isinstance(sessoes, list) else []
+    return []
+
+
 def limpar_mesas_pela_api(api: str, token: str, deck: str, registrar) -> int:
     """Concede, pela API, qualquer mesa ainda viva deste deck.
 
@@ -747,9 +765,7 @@ def limpar_mesas_pela_api(api: str, token: str, deck: str, registrar) -> int:
     except Exception as erro:
         registrar(f"nao consegui listar mesas pela API: {erro}")
         return 0
-    sessoes = lista.get("sessions") or lista.get("items") or (
-        lista if isinstance(lista, list) else []
-    )
+    sessoes = _sessoes_da_lista(lista)
     encerradas = 0
     for sessao in sessoes:
         if not isinstance(sessao, dict) or sessao.get("terminal"):
@@ -1137,6 +1153,16 @@ def main() -> int:
      saida_sessao, api, saida_console) = sys.argv[1:12]
     # Sem barra final: as rotas sao montadas como `{web}#/decks/...` e
     # `{api}/ai/...`, e uma barra a mais vira `//` na URL.
+    #
+    # Efeito INTENCIONAL do `rstrip` em `web`: com `web` = `.../app`, cada
+    # `nav.ir(f"{web}#/...")` pede o caminho `/app`, que o
+    # `app/tool/serve_flutter_web_app.py` responde com 302 para `/app/` (o
+    # navegador preserva o fragmento no redirect). O documento muda de
+    # caminho, entao cada navegacao e uma RECARGA COMPLETA da pagina, nunca so
+    # troca de fragmento no mesmo documento. O cp06 depende disso: e esse
+    # `nav.ir` que recarrega a pagina e prova a mesma mesa de volta. Com a
+    # barra final (`/app/#/...`) a ida seria troca de fragmento, sem recarga,
+    # e o checkpoint 06 deixaria de provar a reconexao.
     web = web.rstrip("/")
     api = api.rstrip("/")
 

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "a542346a09f69d716194ff569b55eefa1a749f7f207c3c6f6647d14b25cf289d",
+  "source_digest_sha256": "5eda39c6644258b97a0df00f58163086c5a46bc3959bc76d052ac618a7c29bfa",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -81,7 +81,7 @@
     "migrations": 74,
     "scripts_and_jobs": 717,
     "environment_variables": 736,
-    "tests": 1346,
+    "tests": 1347,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -291786,6 +291786,7 @@
     "server/test/user_data_privacy_contract_test.dart",
     "server/test/user_facing_brand_contract_test.dart",
     "server/test/web_artifact_identity_contract_test.dart",
+    "server/test/webdriver_capture_drivers_test.py",
     "server/test/xmage_battle_client_test.dart",
     "server/test/xmage_interactive_release_contract_test.dart",
     "services/forge-sidecar/test_sidecar.py",
@@ -303203,7 +303204,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "a542346a09f69d716194ff569b55eefa1a749f7f207c3c6f6647d14b25cf289d"
+    "project_logic_source_digest_sha256": "5eda39c6644258b97a0df00f58163086c5a46bc3959bc76d052ac618a7c29bfa"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -306608,6 +306609,7 @@
       "server/test/user_data_privacy_contract_test.dart",
       "server/test/user_facing_brand_contract_test.dart",
       "server/test/web_artifact_identity_contract_test.dart",
+      "server/test/webdriver_capture_drivers_test.py",
       "server/test/xmage_battle_client_test.dart",
       "server/test/xmage_interactive_release_contract_test.dart",
       "services/forge-sidecar/.dockerignore",

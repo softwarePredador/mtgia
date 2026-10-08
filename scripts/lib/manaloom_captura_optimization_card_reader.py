@@ -270,15 +270,56 @@ def cp02_leitor(nav, destino: str, alvo: dict, registrar) -> None:
     registrar("Escape fisico fechou o leitor e preservou as sugestoes")
 
 
+_ARGUMENTOS = (
+    "porta-webdriver", "destino", "web-url", "deck-id", "email", "senha",
+    "chrome", "chromedriver", "saida-console",
+)
+
+
+def _ler_argumentos(argv: list[str]) -> tuple[int, list[str]] | None:
+    """Confere o argv antes de tocar em navegador; `None` se nao servir.
+
+    Antes, `sys.argv[1:10]` era desempacotado direto: argumento a menos
+    (ou a mais) virava `ValueError` com traceback, e uma porta nao numerica,
+    outro traceback no `int(porta)`. Agora a falha e de uso: mensagem curta,
+    o modo de uso e codigo 2.
+    """
+    valores = argv[1:]
+    if len(valores) != len(_ARGUMENTOS):
+        print(
+            f"FALHA: esperados {len(_ARGUMENTOS)} argumentos "
+            f"({' '.join(f'<{a}>' for a in _ARGUMENTOS)}), recebidos "
+            f"{len(valores)}.",
+            file=sys.stderr,
+        )
+        print(__doc__, file=sys.stderr)
+        return None
+    try:
+        porta = int(valores[0])
+    except ValueError:
+        porta = 0
+    if not 0 < porta < 65536:
+        print(
+            f"FALHA: <porta-webdriver> precisa ser uma porta TCP (1-65535), "
+            f"recebido {valores[0]!r}.",
+            file=sys.stderr,
+        )
+        return None
+    return porta, valores[1:]
+
+
 def main() -> int:
+    lidos = _ler_argumentos(sys.argv)
+    if lidos is None:
+        return 2
+    porta, (destino, web, deck, email, senha, chrome, chromedriver,
+            saida_console) = lidos
+
     sys.path.insert(0, __file__.rsplit("/", 1)[0])
     from manaloom_webdriver_capture import ChromeDriver, ErroDeCaptura, Navegador
 
-    (porta, destino, web, deck, email, senha, chrome, chromedriver,
-     saida_console) = sys.argv[1:10]
-
-    with ChromeDriver(chromedriver, int(porta)):
-        nav = Navegador(int(porta), 1280, 720)
+    with ChromeDriver(chromedriver, porta):
+        nav = Navegador(porta, 1280, 720)
         try:
             nav.abrir(chrome)
             entrar(nav, web, email, senha)
