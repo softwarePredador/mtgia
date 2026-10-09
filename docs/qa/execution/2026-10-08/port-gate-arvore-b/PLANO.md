@@ -58,9 +58,23 @@ Legenda:
 - `account_privacy_service.dart` e o teste dele (**P**).
 - `profile_screen.dart` (**P**; a linha mudada por 5d1e7cf56 fica fora dos hunks). Trocar a chave fixa por `Key('${widget.keyPrefix}-dialog')`.
 - `profile_screen_test.dart` (**P**), acrescentando asserts de `profile-export-data-dialog` e `profile-revoke-sessions-dialog`.
-- `app/test/ui/fixtures/ui_surface_inventory.json` (**R**): `profile_screen` com `dialog` 7; `expected_totals.dialog` de 52 para 53.
-- `ui_surface_inventory_test.dart` (**R**): baseline de 267 para 268, com a reason citando 24f4e4c9f e BT-AUTH-004.
-- Rodar: `flutter test test/features/profile/ test/ui/ui_surface_inventory_test.dart`.
+- `app/test/ui/fixtures/ui_surface_inventory.json` (**R**). Os patches 16 e 17 têm base 51/266 e **não** aplicam. Conta revisada em 2026-10-09:
+  - No master `a02b4ff0e`, o inventário já falha por uma única diferença: `lib/features/home/lotus_life_counter_screen.dart` tem `{'dialog': 1, 'transient': 1}` no código e só `{"transient":1}` no JSON.
+    - É o diálogo "A mesa não foi salva" (`Key('life-counter-unsaved-exit-dialog')`, linha 588), que entrou com 5d1e7cf56 (LC-P0-03, PR #22).
+    - O [PR #29](https://github.com/softwarePredador/mtgia/pull/29), da frente LC, já classifica esse diálogo: `dialog` de 52 para 53, baseline de 267 para 268.
+  - **Se o #29 já entrou no master** (`dialog` 53, baseline 268): substitua só a entrada existente de `lib/features/profile/profile_screen.dart` por `{"dialog":7,"transient":8}`, e `expected_totals.dialog` vai de 53 para **54**. Não mexa na linha do lotus.
+  - **Se o #29 não entrou:** substitua a entrada existente do lotus por `{"source":"lib/features/home/lotus_life_counter_screen.dart","domain":"home","occurrences":{"dialog":1,"transient":1}}` e a do profile por `{"dialog":7,"transient":8}`, e `expected_totals.dialog` vai de 52 para **54**. Avise no PR que o #29 precisa ser fechado ou rebaseado.
+  - Substitua as entradas, não acrescente: uma fonte duplicada falha com `duplicate source contract`. Os outros totais não mudam: 46/1/7/24/9/10/2/116.
+- `ui_surface_inventory_test.dart` (**R**): baseline **269**, com a reason "A baseline corrente classifica exatamente 269 superfícies." e este comentário:
+  ```
+  // 267 desde 24f4e4c9f (BT-LEGAL-ACCEPT-001): diálogo de reaceite legal.
+  // 268 desde 5d1e7cf56 (LC-P0-03): saída da mesa sem flush confirmado abre
+  // "A mesa não foi salva" em `lotus_life_counter_screen.dart`.
+  // 269 desde BT-AUTH-004: exportar os próprios dados exige reverificação de
+  // senha; `profile_screen.dart` subiu de 6 para 7 diálogos.
+  ```
+- Prova da conta, num worktree descartável a partir de `a02b4ff0e`: com os patches de `app/lib` do PR-B e o JSON acima, a varredura dá `dialog` 54 e soma 269, e o teste passa (`+4`). Entre todos os patches, só o 14 acrescenta superfície (`showDialog<String>`).
+- Rodar: `flutter test test/features/profile/ test/ui/ui_surface_inventory_test.dart`. Rode o `ui_surface_inventory_test.dart` de novo **no fim do PR**, porque as reescritas de B6, B7 e B9 não passaram pela varredura.
 - Atualizar no backlog BT-AUTH-004 e BT-PRIV-001, e `CURRENT_QUEUE.md:84`.
 
 **B9. Núcleo do app** (risco médio)
