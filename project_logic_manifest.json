@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "b1747ede08b8fa175eea92f42b1420841b01ee5a5695ce37800c338b149a4cdc",
+  "source_digest_sha256": "6e03fdd0c990337780776e9a4797795a6914e9f8d1f56692204e3164e9f6bc88",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -51,6 +51,7 @@
     "docs/adr/0011-brewtact-production-domain.md",
     "docs/adr/0012-xmage-human-spike-go.md",
     "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+    "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
@@ -33306,7 +33307,7 @@
       "name": "InteractiveBattleActionInput",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 241,
+      "line": 268,
       "members": [
         "parse",
         "requestFingerprint",
@@ -33317,7 +33318,7 @@
       "name": "InteractiveBattleCreateInput",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 151,
+      "line": 178,
       "members": [
         "parse"
       ]
@@ -33353,7 +33354,7 @@
       "name": "InteractiveBattlePrompt",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 480,
+      "line": 507,
       "members": [
         "parse",
         "toJson",
@@ -33364,7 +33365,7 @@
       "name": "InteractiveBattlePromptOption",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 403,
+      "line": 430,
       "members": [
         "parse",
         "toJson"
@@ -33374,13 +33375,13 @@
       "name": "InteractiveBattleResponseKind",
       "kind": "enum",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 239
+      "line": 266
     },
     {
       "name": "InteractiveBattleSession",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 646,
+      "line": 661,
       "members": [
         "toPrivateJson"
       ]
@@ -33422,49 +33423,49 @@
       "name": "_boundedInteger",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 776
+      "line": 791
     },
     {
       "name": "_optionalString",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 804
+      "line": 819
     },
     {
       "name": "_requiredString",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 793
+      "line": 808
     },
     {
       "name": "_runtimeString",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 811
+      "line": 826
     },
     {
       "name": "_stringMap",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 826
+      "line": 841
     },
     {
       "name": "_uuid",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 765
+      "line": 780
     },
     {
       "name": "interactiveBattleConcedeFingerprint",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 752
+      "line": 767
     },
     {
       "name": "interactiveBattleCreateFingerprint",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 741
+      "line": 756
     },
     {
       "name": "parseInteractiveBattleStatus",
@@ -160089,7 +160090,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 179,
+        "line": 206,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160100,7 +160101,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 191,
+        "line": 218,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "method",
         "lexical_target": "_uuid",
@@ -160111,7 +160112,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 199,
+        "line": 226,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "method",
         "lexical_target": "_boundedInteger",
@@ -160122,7 +160123,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 213,
+        "line": 240,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "method",
         "lexical_target": "_optionalString",
@@ -160133,7 +160134,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 229,
+        "line": 256,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleCreateInput",
@@ -160144,7 +160145,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 275,
+        "line": 302,
         "caller": "InteractiveBattleActionInput.requestFingerprint",
         "kind": "method",
         "lexical_target": "canonicalBattlePayloadHash",
@@ -160155,7 +160156,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 292,
+        "line": 319,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160166,7 +160167,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 311,
+        "line": 338,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "method",
         "lexical_target": "_requiredString",
@@ -160177,7 +160178,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 319,
+        "line": 346,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "method",
         "lexical_target": "_optionalString",
@@ -160188,7 +160189,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 391,
+        "line": 418,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleActionInput",
@@ -160199,7 +160200,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 424,
+        "line": 451,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "method",
         "lexical_target": "_stringMap",
@@ -160210,7 +160211,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 426,
+        "line": 453,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -160221,7 +160222,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 430,
+        "line": 457,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "method",
         "lexical_target": "_runtimeString",
@@ -160232,7 +160233,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 471,
+        "line": 498,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePromptOption",
@@ -160243,7 +160244,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 516,
+        "line": 543,
         "caller": "InteractiveBattlePrompt.toJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -160254,7 +160255,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 524,
+        "line": 551,
         "caller": "InteractiveBattlePrompt.validateAction",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleStaleActionException",
@@ -160265,7 +160266,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 562,
+        "line": 589,
         "caller": "InteractiveBattlePrompt.validateAction",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -160276,7 +160277,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 569,
+        "line": 596,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "method",
         "lexical_target": "_stringMap",
@@ -160287,7 +160288,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 572,
+        "line": 599,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -160298,7 +160299,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 576,
+        "line": 603,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "method",
         "lexical_target": "_runtimeString",
@@ -160309,7 +160310,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 630,
+        "line": 645,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePrompt",
@@ -160320,7 +160321,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 725,
+        "line": 740,
         "caller": "InteractiveBattleSession.toPrivateJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -160331,7 +160332,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 743,
+        "line": 758,
         "caller": "interactiveBattleCreateFingerprint",
         "kind": "method",
         "lexical_target": "canonicalBattlePayloadHash",
@@ -160342,7 +160343,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 766,
+        "line": 781,
         "caller": "_uuid",
         "kind": "method",
         "lexical_target": "_requiredString",
@@ -160353,7 +160354,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 768,
+        "line": 783,
         "caller": "_uuid",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160364,7 +160365,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 785,
+        "line": 800,
         "caller": "_boundedInteger",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160375,7 +160376,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 794,
+        "line": 809,
         "caller": "_requiredString",
         "kind": "method",
         "lexical_target": "_optionalString",
@@ -160386,7 +160387,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 796,
+        "line": 811,
         "caller": "_requiredString",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160397,7 +160398,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 813,
+        "line": 828,
         "caller": "_runtimeString",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -241465,7 +241466,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 166,
+        "line": 193,
         "lexical_type": "InteractiveBattleCreateInput",
         "resolved_type": "InteractiveBattleCreateInput",
         "target": "InteractiveBattleCreateInput",
@@ -241475,7 +241476,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 179,
+        "line": 206,
         "lexical_type": "InteractiveBattleValidationException",
         "resolved_type": "InteractiveBattleValidationException",
         "target": "InteractiveBattleValidationException",
@@ -241485,7 +241486,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 256,
+        "line": 283,
         "lexical_type": "InteractiveBattleResponseKind",
         "resolved_type": "InteractiveBattleResponseKind",
         "target": "InteractiveBattleResponseKind",
@@ -241495,7 +241496,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 277,
+        "line": 304,
         "lexical_type": "InteractiveBattleActionInput",
         "resolved_type": "InteractiveBattleActionInput",
         "target": "InteractiveBattleActionInput",
@@ -241505,7 +241506,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 423,
+        "line": 450,
         "lexical_type": "InteractiveBattlePromptOption",
         "resolved_type": "InteractiveBattlePromptOption",
         "target": "InteractiveBattlePromptOption",
@@ -241515,7 +241516,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 524,
+        "line": 551,
         "lexical_type": "InteractiveBattleStaleActionException",
         "resolved_type": "InteractiveBattleStaleActionException",
         "target": "InteractiveBattleStaleActionException",
@@ -241525,7 +241526,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 568,
+        "line": 595,
         "lexical_type": "InteractiveBattlePrompt",
         "resolved_type": "InteractiveBattlePrompt",
         "target": "InteractiveBattlePrompt",
@@ -241545,7 +241546,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 693,
+        "line": 708,
         "lexical_type": "InteractiveBattlePrompt?",
         "resolved_type": "InteractiveBattlePrompt?",
         "target": "InteractiveBattlePrompt",
@@ -248683,7 +248684,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6651,
-        "occurrences": 41224
+        "occurrences": 41225
       },
       {
         "target_scope": "dart_sdk",
@@ -254839,7 +254840,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 522,
+        "line": 549,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -298495,6 +298496,13 @@
           "mutation_authority": false
         },
         {
+          "path": "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
+          "state": "current_contract",
+          "declaration_source": "canonical_documents",
+          "priority_authority": false,
+          "mutation_authority": false
+        },
+        {
           "path": "docs/execution/README.md",
           "state": "current_contract",
           "declaration_source": "canonical_documents",
@@ -303205,7 +303213,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "b1747ede08b8fa175eea92f42b1420841b01ee5a5695ce37800c338b149a4cdc"
+    "project_logic_source_digest_sha256": "6e03fdd0c990337780776e9a4797795a6914e9f8d1f56692204e3164e9f6bc88"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -304531,6 +304539,7 @@
       "docs/adr/0011-brewtact-production-domain.md",
       "docs/adr/0012-xmage-human-spike-go.md",
       "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+      "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
       "docs/execution/CURRENT_QUEUE.md",
       "docs/execution/README.md",
       "docs/hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",

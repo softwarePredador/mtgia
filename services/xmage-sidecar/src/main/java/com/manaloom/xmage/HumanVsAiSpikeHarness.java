@@ -3,6 +3,7 @@ package com.manaloom.xmage;
 import mage.abilities.Modes;
 import mage.cards.decks.DeckCardLists;
 import mage.choices.Choice;
+import mage.constants.Constants;
 import mage.constants.ManaType;
 import mage.constants.MultiAmountType;
 import mage.constants.PlayerAction;
@@ -45,6 +46,7 @@ import java.util.UUID;
 final class HumanVsAiSpikeHarness {
     enum PromptKind {
         MULLIGAN,
+        QUESTION,
         MAIN_ACTION,
         TARGET,
         COMBAT,
@@ -84,6 +86,25 @@ final class HumanVsAiSpikeHarness {
         GO,
         NO_GO
     }
+
+    /**
+     * Chaves que o XMage poe nas opcoes do GAME_SELECT de declarar atacantes
+     * e bloqueadores. `classify` as usa para manter o kind COMBAT quando a
+     * frase nao e reconhecida, e `InteractiveBattleRegistry.combatSelectableIds`
+     * le delas as criaturas selecionaveis.
+     */
+    static final String POSSIBLE_ATTACKERS_OPTION =
+            Constants.Option.POSSIBLE_ATTACKERS;
+    static final String POSSIBLE_BLOCKERS_OPTION =
+            Constants.Option.POSSIBLE_BLOCKERS;
+
+    /**
+     * Chaves em que o XMage manda os rotulos proprios dos botoes de um
+     * GAME_ASK. `classify` as usa para reconhecer o mulligan, e
+     * `questionFallbackLog` registra so se vieram, nunca o rotulo.
+     */
+    static final String LEFT_BUTTON_TEXT_OPTION = "UI.left.btn.text";
+    static final String RIGHT_BUTTON_TEXT_OPTION = "UI.right.btn.text";
 
     static final EnumSet<ClientCallbackMethod> DECISION_CALLBACKS = EnumSet.of(
             ClientCallbackMethod.GAME_TARGET,
@@ -170,24 +191,54 @@ final class HumanVsAiSpikeHarness {
         Map<String, ?> safeOptions = options == null
                 ? Collections.<String, Object>emptyMap()
                 : options;
-        String normalized = message == null
-                ? ""
-                : message.trim().toLowerCase(Locale.ROOT);
+        String normalized = normalizedMessage(message);
         if (method == ClientCallbackMethod.GAME_ASK
                 && normalized.startsWith("mulligan ")
-                && "Mulligan".equals(safeOptions.get("UI.left.btn.text"))
-                && "Keep".equals(safeOptions.get("UI.right.btn.text"))) {
+                && "Mulligan".equals(safeOptions.get(LEFT_BUTTON_TEXT_OPTION))
+                && "Keep".equals(safeOptions.get(RIGHT_BUTTON_TEXT_OPTION))) {
             return PromptKind.MULLIGAN;
         }
+        // Todo GAME_ASK que nao e o mulligan cai aqui. Antes caia no `return
+        // null` do fim, e `PromptRegistry.open` traduzia isso em
+        // IllegalArgumentException -- ou seja, a PRIMEIRA pergunta de sim/nao
+        // que o motor fizesse matava a mesa com `engine_error`. Medido em
+        // 2026-09-23: turno 4, fase principal, `engine_error` /
+        // `interactive_callback_failed`.
+        //
+        // O tratamento generico ja existia e era inalcancavel: o `else` de
+        // `questionPrompt` monta "Sim"/"Nao" com role `choice` e nunca podia
+        // rodar, porque `open` estourava duas linhas antes. Cada uso deste
+        // fallback sai em stderr por `questionFallbackLog`.
+        if (method == ClientCallbackMethod.GAME_ASK) {
+            return PromptKind.QUESTION;
+        }
         if (method == ClientCallbackMethod.GAME_SELECT) {
-            if (normalized.startsWith("play spells and abilities")
-                    || normalized.startsWith("play instants and activated abilities")) {
-                return PromptKind.MAIN_ACTION;
+            PromptKind recognized = recognizedSelectKind(normalized);
+            if (recognized != null) {
+                return recognized;
             }
-            if (normalized.startsWith("select attackers")
-                    || normalized.startsWith("select blockers")) {
-                return PromptKind.COMBAT;
-            }
+            // Fallback por texto. Gemeo do defeito do GAME_ASK: sem ele, uma
+            // mensagem de GAME_SELECT fora dos quatro prefixos previstos caia
+            // no `null` do fim e matava a mesa. As frases do XMage mudam entre
+            // versoes e situacoes; quatro prefixos nao cobrem o jogo.
+            //
+            // A frase nao decide sozinha: o XMage poe `possibleAttackers` /
+            // `possibleBlockers` nas opcoes do GAME_SELECT de declarar
+            // atacantes/bloqueadores, e `selectPrompt` so oferece essas
+            // criaturas quando o kind e COMBAT. Se o fallback ignorasse o
+            // payload, o jogador ficaria sem atacar nem bloquear -- so poderia
+            // passar. Payload de combate malformado continua fail-closed em
+            // `combatSelectableIds`.
+            //
+            // Sem dado de combate, MAIN_ACTION: `selectPrompt` monta as jogadas
+            // legais a partir de `getCanPlayObjects` e inclui "Passar
+            // prioridade" quando a lista sai vazia. Isso nao deixa
+            // `selectPrompt` imune a falhas: payload que nao e
+            // GameClientMessage (`requirePayload`) e opcoes acima de
+            // `MAX_OPTION_COUNT` continuam lancando e encerrando a mesa.
+            return hasCombatPayload(safeOptions)
+                    ? PromptKind.COMBAT
+                    : PromptKind.MAIN_ACTION;
         }
         if (method == ClientCallbackMethod.GAME_TARGET) {
             if (normalized.startsWith("select attacker to block")
@@ -218,6 +269,92 @@ final class HumanVsAiSpikeHarness {
             return PromptKind.MULTI_AMOUNT;
         }
         return null;
+    }
+
+    private static String normalizedMessage(String message) {
+        return message == null
+                ? ""
+                : message.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static PromptKind recognizedSelectKind(String normalized) {
+        if (normalized.startsWith("play spells and abilities")
+                || normalized.startsWith("play instants and activated abilities")) {
+            return PromptKind.MAIN_ACTION;
+        }
+        if (normalized.startsWith("select attackers")
+                || normalized.startsWith("select blockers")) {
+            return PromptKind.COMBAT;
+        }
+        return null;
+    }
+
+    static boolean hasCombatPayload(Map<String, ?> options) {
+        return options != null
+                && (options.get(POSSIBLE_ATTACKERS_OPTION) != null
+                        || options.get(POSSIBLE_BLOCKERS_OPTION) != null);
+    }
+
+    /**
+     * True quando o kind de um GAME_SELECT nao veio de uma frase conhecida e
+     * sim do fallback (payload de combate ou MAIN_ACTION).
+     */
+    static boolean usesSelectTextFallback(
+            ClientCallbackMethod method,
+            String message
+    ) {
+        return method == ClientCallbackMethod.GAME_SELECT
+                && recognizedSelectKind(normalizedMessage(message)) == null;
+    }
+
+    /**
+     * Linha de stderr do fallback de GAME_SELECT. Leva so o kind escolhido,
+     * quais chaves de combate vieram e o tamanho da frase: nunca o texto do
+     * motor (pode trazer nome de jogador), opcoes, cartas ou ids.
+     */
+    static String selectTextFallbackLog(
+            PromptKind kind,
+            Map<String, ?> options,
+            String message
+    ) {
+        return "interactive_select_text_fallback kind="
+                + kind
+                + " possible_attackers="
+                + (options != null
+                        && options.get(POSSIBLE_ATTACKERS_OPTION) != null)
+                + " possible_blockers="
+                + (options != null
+                        && options.get(POSSIBLE_BLOCKERS_OPTION) != null)
+                + " message_chars="
+                + (message == null ? 0 : message.length());
+    }
+
+    /**
+     * Linha de stderr do fallback de GAME_ASK: toda pergunta que nao e o
+     * mulligan vira QUESTION e chega ao jogador como "Sim"/"Nao", sem o texto
+     * do motor e sem os rotulos proprios dos botoes. Cada linha e uma pergunta
+     * generica aberta para ser mostrada sem o texto do motor -- a metrica do
+     * follow-up do ADR 0014. A linha sai em `PromptRegistry.open`, quando a
+     * pergunta abre, antes de `begin` e de qualquer resposta: conta tambem a
+     * pergunta que `begin` recusa (estado obsoleto, outro prompt ativo, limite
+     * de opcoes) e a que depois expira (o timeout concede a partida) ou falha,
+     * nao so a que recebe resposta.
+     *
+     * Mesma disciplina do log do select: leva so o kind, se o motor mandou
+     * rotulo proprio para cada botao e o tamanho da frase; nunca o texto do
+     * motor, os rotulos, opcoes, cartas ou ids.
+     */
+    static String questionFallbackLog(Map<String, ?> options, String message) {
+        return "interactive_question_fallback kind="
+                + PromptKind.QUESTION
+                + " left_label="
+                + (options != null
+                        && options.get(LEFT_BUTTON_TEXT_OPTION) != null)
+                + " right_label="
+                + (options != null
+                        && options.get(RIGHT_BUTTON_TEXT_OPTION) != null)
+                + " message_chars="
+                + (message == null ? 0 : message.length());
     }
 
     static CallbackDisposition callbackDisposition(ClientCallbackMethod method) {
@@ -475,6 +612,17 @@ final class HumanVsAiSpikeHarness {
             PromptKind kind = classify(callback.getMethod(), message, metadata);
             if (kind == null) {
                 throw new IllegalArgumentException("callback is not allowlisted");
+            }
+            // `open` e o ponto unico por onde todo GAME_SELECT e todo GAME_ASK
+            // passam uma vez por prompt (`selectPrompt` classifica antes so
+            // para montar as opcoes), entao os logs de fallback saem aqui e
+            // nao em `classify`.
+            if (usesSelectTextFallback(callback.getMethod(), message)) {
+                System.err.println(
+                        selectTextFallbackLog(kind, metadata, message)
+                );
+            } else if (kind == PromptKind.QUESTION) {
+                System.err.println(questionFallbackLog(metadata, message));
             }
             return begin(
                     callback,

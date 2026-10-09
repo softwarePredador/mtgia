@@ -33,6 +33,7 @@
     "docs/adr/0011-brewtact-production-domain.md",
     "docs/adr/0012-xmage-human-spike-go.md",
     "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+    "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
