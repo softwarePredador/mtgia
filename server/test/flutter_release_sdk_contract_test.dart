@@ -542,6 +542,58 @@ printf 'Dart SDK version: %s (stable) on "test"\\n' "\${FAKE_DART_VERSION}"
     }
   });
 
+  // A auditoria de dependencia rodava `dart run dependency_validator` puro. O
+  // `dart` do PATH desta maquina e o 3.11.4 do Flutter antigo, e o `pub get`
+  // implicito que `dart run` dispara num pacote Flutter resolve sem a
+  // restricao do SDK que fixa `meta` em 1.18.0. Medido: rebaixava `meta` para
+  // 1.17.0 e `test_api` para 0.7.10, quebrando o build de integration_test e
+  // — porque `app/pubspec.lock` esta no escopo do digest de UI — movendo o
+  // digest e invalidando toda a evidencia capturada. Um gate de auditoria
+  // corrompia a evidencia que o gate de UI exige.
+  test('dependency audit runs only on the pinned toolchain pair', () {
+    final source = File(
+      '../scripts/manaloom_dependency_audit.sh',
+    ).readAsStringSync();
+    final code = source
+        .split('\n')
+        .where((line) => !line.trimLeft().startsWith('#'))
+        .join('\n');
+
+    // O par pinado, o mesmo do quality_gate: Flutter conferido contra o pin e
+    // o Dart do proprio SDK desse Flutter, nunca um Dart avulso.
+    expect(code, contains('resolve_manaloom_flutter_dart_pair'));
+    expect(code, contains(r'FLUTTER_BIN="$MANALOOM_FLUTTER_BIN_RESOLVED"'));
+    expect(code, contains(r'DART_BIN="$MANALOOM_DART_BIN_RESOLVED"'));
+    expect(
+      RegExp(r'(?<![-\w"/])dart\s+(run|pub)\b').hasMatch(code),
+      isFalse,
+      reason: 'nao pode invocar o dart do PATH',
+    );
+    expect(
+      RegExp(r'(?<![-\w"/$])flutter\s+pub\b').hasMatch(code),
+      isFalse,
+      reason: 'nao pode invocar o flutter do PATH',
+    );
+    // O pacote Flutter precisa ser resolvido pelo Flutter pinado: o Dart
+    // sozinho nao aplica o pin de `meta` que vem do flutter_test do SDK.
+    expect(code, contains(r'"$FLUTTER_BIN" pub get'));
+    expect(code, contains(r'"$DART_BIN" run dependency_validator'));
+    // A auditoria le o lock e nunca o escreve, como os scripts de build e
+    // deploy: sem `--enforce-lockfile`, um pubspec.yaml divergente era
+    // resolvido de novo e o `pubspec.lock` reescrito em silencio — o de
+    // `app/` move o digest de UI.
+    expect(
+      code,
+      contains(r'"$FLUTTER_BIN" pub get --no-example --enforce-lockfile'),
+    );
+    expect(code, contains(r'"$DART_BIN" pub get --enforce-lockfile'));
+    expect(
+      RegExp(r'pub get(?![^\n]*--enforce-lockfile)').hasMatch(code),
+      isFalse,
+      reason: 'todo pub get da auditoria precisa de --enforce-lockfile',
+    );
+  });
+
   test('release Flutter helper accepts only the pinned SDK', () async {
     final helper =
         File(

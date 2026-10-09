@@ -50,4 +50,80 @@ void main() {
       );
     });
   });
+
+  /// Matriz mista de troca e venda (D-39): cada oferta responde à SUA
+  /// capability. A beta fecha as duas, e o kill switch das rotas só prova a
+  /// matriz toda fechada ou toda aberta; nessas duas pontas uma checagem que
+  /// lesse a capability errada passaria. Aqui uma fica aberta e a outra
+  /// fechada, então trocar `trades` por `marketplace` (ou o contrário) em
+  /// qualquer uma das três checagens derruba um caso.
+  group('binder commerce mixed capability matrix', () {
+    bool Function(String capability) onlyOpen(String open) =>
+        (capability) => capability == open;
+
+    Matcher refusedAs(String field, String capability) => throwsA(
+      isA<BinderCommerceUnavailableException>()
+          .having((error) => error.field, 'field', field)
+          .having((error) => error.capability, 'capability', capability),
+    );
+
+    test('marketplace open alone still refuses a trade offer', () {
+      final isAllowed = onlyOpen('marketplace');
+
+      expect(
+        () => ensureBinderCommerceAllowed(
+          forTrade: true,
+          forSale: null,
+          price: null,
+          isAllowed: isAllowed,
+        ),
+        refusedAs('for_trade', 'trades'),
+      );
+      // A oferta de venda, que é desta capability, continua passando.
+      expect(
+        () => ensureBinderCommerceAllowed(
+          forTrade: false,
+          forSale: true,
+          price: 7.0,
+          isAllowed: isAllowed,
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('trades open alone still refuses a sale offer', () {
+      final isAllowed = onlyOpen('trades');
+
+      expect(
+        () => ensureBinderCommerceAllowed(
+          forTrade: null,
+          forSale: true,
+          price: null,
+          isAllowed: isAllowed,
+        ),
+        refusedAs('for_sale', 'marketplace'),
+      );
+      expect(
+        () => ensureBinderCommerceAllowed(
+          forTrade: true,
+          forSale: false,
+          price: null,
+          isAllowed: isAllowed,
+        ),
+        returnsNormally,
+      );
+    });
+
+    test('trades open alone still refuses a sale price', () {
+      expect(
+        () => ensureBinderCommerceAllowed(
+          forTrade: true,
+          forSale: null,
+          price: 7.0,
+          isAllowed: onlyOpen('trades'),
+        ),
+        refusedAs('price', 'marketplace'),
+      );
+    });
+  });
 }
