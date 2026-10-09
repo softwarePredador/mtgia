@@ -255,7 +255,7 @@ class _PostGameNotesScreenState extends State<PostGameNotesScreen> {
     }
   }
 
-  /// A note queued offline that the account refused while syncing.
+  /// A note queued without network that the account refused while syncing.
   static String? _syncRejectionMessage(List<PostGameSyncRejection> rejections) {
     if (rejections.isEmpty) return null;
     if (rejections.length == 1) {
