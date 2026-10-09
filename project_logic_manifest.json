@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "543fd65c732284c19611337a03dfac90a6bd2eef2c916cae7e4df6c2b9e57d9d",
+  "source_digest_sha256": "3c83ec9b365189e9edcb5f029cacbbe442a1a692b82c805b7ad28312a9c4073b",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -303213,7 +303213,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "543fd65c732284c19611337a03dfac90a6bd2eef2c916cae7e4df6c2b9e57d9d"
+    "project_logic_source_digest_sha256": "3c83ec9b365189e9edcb5f029cacbbe442a1a692b82c805b7ad28312a9c4073b"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
