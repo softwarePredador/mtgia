@@ -17,3 +17,16 @@ ignore:
   # Flutter's Web build resolves the Cupertino icon font through this package;
   # it is an asset dependency even though app Dart code does not import it.
   - cupertino_icons
+  # `package:file` é usado só em test/core/widgets/cached_card_image_test.dart,
+  # porque `FileInfo`, do flutter_cache_manager, exige um `file.File` — não
+  # serve `dart:io`. O teste usa deliberadamente a versão que o próprio
+  # flutter_cache_manager trava, e diz isso com um
+  # `// ignore: depend_on_referenced_packages` logo acima do import.
+  #
+  # Declarar `file:` aqui como dev_dependency cria uma SEGUNDA fonte de verdade
+  # para essa versão: medido, `file: ^7.0.1` faz o solver rebaixar `meta`
+  # 1.18.0 -> 1.17.0 e `test_api` 0.7.11 -> 0.7.10, e esse par rebaixado quebra
+  # o build de integration_test com
+  # `_TestFlutterView implements FlutterView` sem `displayCornerRadii`. Sem a
+  # declaração, o mesmo `pub get` mantém 1.18.0.
+  - file

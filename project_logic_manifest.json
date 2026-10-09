@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "579ca84857d82f3da5ea06f8e641f193883f2e0be9e99f4450405a2da8dca4c5",
+  "source_digest_sha256": "01dd45d784d58497ef217ba330386255b6d74d6fb22c970126e9a0b24c72cce3",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -51,6 +51,7 @@
     "docs/adr/0011-brewtact-production-domain.md",
     "docs/adr/0012-xmage-human-spike-go.md",
     "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+    "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
     "server/doc/API_CONTRACTS_AND_DATA_MAP.md",
     "docs/hermes-analysis/EXTERNAL_BATTLE_EXECUTION_CONTRACT.md",
     "docs/hermes-analysis/EXTERNAL_ENGINE_CAPABILITY_CONTRACT.json",
@@ -79,9 +80,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 711,
-    "environment_variables": 734,
-    "tests": 1345,
+    "scripts_and_jobs": 717,
+    "environment_variables": 736,
+    "tests": 1348,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -33306,7 +33307,7 @@
       "name": "InteractiveBattleActionInput",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 241,
+      "line": 268,
       "members": [
         "parse",
         "requestFingerprint",
@@ -33317,7 +33318,7 @@
       "name": "InteractiveBattleCreateInput",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 151,
+      "line": 178,
       "members": [
         "parse"
       ]
@@ -33353,7 +33354,7 @@
       "name": "InteractiveBattlePrompt",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 480,
+      "line": 507,
       "members": [
         "parse",
         "toJson",
@@ -33364,7 +33365,7 @@
       "name": "InteractiveBattlePromptOption",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 403,
+      "line": 430,
       "members": [
         "parse",
         "toJson"
@@ -33374,13 +33375,13 @@
       "name": "InteractiveBattleResponseKind",
       "kind": "enum",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 239
+      "line": 266
     },
     {
       "name": "InteractiveBattleSession",
       "kind": "class",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 646,
+      "line": 661,
       "members": [
         "toPrivateJson"
       ]
@@ -33422,49 +33423,49 @@
       "name": "_boundedInteger",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 776
+      "line": 791
     },
     {
       "name": "_optionalString",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 804
+      "line": 819
     },
     {
       "name": "_requiredString",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 793
+      "line": 808
     },
     {
       "name": "_runtimeString",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 811
+      "line": 826
     },
     {
       "name": "_stringMap",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 826
+      "line": 841
     },
     {
       "name": "_uuid",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 765
+      "line": 780
     },
     {
       "name": "interactiveBattleConcedeFingerprint",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 752
+      "line": 767
     },
     {
       "name": "interactiveBattleCreateFingerprint",
       "kind": "function",
       "source": "server/lib/battle/interactive_battle_contract.dart",
-      "line": 741
+      "line": 756
     },
     {
       "name": "parseInteractiveBattleStatus",
@@ -160089,7 +160090,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 179,
+        "line": 206,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160100,7 +160101,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 191,
+        "line": 218,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "method",
         "lexical_target": "_uuid",
@@ -160111,7 +160112,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 199,
+        "line": 226,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "method",
         "lexical_target": "_boundedInteger",
@@ -160122,7 +160123,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 213,
+        "line": 240,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "method",
         "lexical_target": "_optionalString",
@@ -160133,7 +160134,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 229,
+        "line": 256,
         "caller": "InteractiveBattleCreateInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleCreateInput",
@@ -160144,7 +160145,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 275,
+        "line": 302,
         "caller": "InteractiveBattleActionInput.requestFingerprint",
         "kind": "method",
         "lexical_target": "canonicalBattlePayloadHash",
@@ -160155,7 +160156,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 292,
+        "line": 319,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160166,7 +160167,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 311,
+        "line": 338,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "method",
         "lexical_target": "_requiredString",
@@ -160177,7 +160178,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 319,
+        "line": 346,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "method",
         "lexical_target": "_optionalString",
@@ -160188,7 +160189,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 391,
+        "line": 418,
         "caller": "InteractiveBattleActionInput.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleActionInput",
@@ -160199,7 +160200,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 424,
+        "line": 451,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "method",
         "lexical_target": "_stringMap",
@@ -160210,7 +160211,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 426,
+        "line": 453,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -160221,7 +160222,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 430,
+        "line": 457,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "method",
         "lexical_target": "_runtimeString",
@@ -160232,7 +160233,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 471,
+        "line": 498,
         "caller": "InteractiveBattlePromptOption.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePromptOption",
@@ -160243,7 +160244,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 516,
+        "line": 543,
         "caller": "InteractiveBattlePrompt.toJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -160254,7 +160255,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 524,
+        "line": 551,
         "caller": "InteractiveBattlePrompt.validateAction",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleStaleActionException",
@@ -160265,7 +160266,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 562,
+        "line": 589,
         "caller": "InteractiveBattlePrompt.validateAction",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -160276,7 +160277,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 569,
+        "line": 596,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "method",
         "lexical_target": "_stringMap",
@@ -160287,7 +160288,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 572,
+        "line": 599,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -160298,7 +160299,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 576,
+        "line": 603,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "method",
         "lexical_target": "_runtimeString",
@@ -160309,7 +160310,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 630,
+        "line": 645,
         "caller": "InteractiveBattlePrompt.parse",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePrompt",
@@ -160320,7 +160321,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 725,
+        "line": 740,
         "caller": "InteractiveBattleSession.toPrivateJson",
         "kind": "method",
         "lexical_target": "toJson",
@@ -160331,7 +160332,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 743,
+        "line": 758,
         "caller": "interactiveBattleCreateFingerprint",
         "kind": "method",
         "lexical_target": "canonicalBattlePayloadHash",
@@ -160342,7 +160343,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 766,
+        "line": 781,
         "caller": "_uuid",
         "kind": "method",
         "lexical_target": "_requiredString",
@@ -160353,7 +160354,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 768,
+        "line": 783,
         "caller": "_uuid",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160364,7 +160365,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 785,
+        "line": 800,
         "caller": "_boundedInteger",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160375,7 +160376,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 794,
+        "line": 809,
         "caller": "_requiredString",
         "kind": "method",
         "lexical_target": "_optionalString",
@@ -160386,7 +160387,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 796,
+        "line": 811,
         "caller": "_requiredString",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleValidationException",
@@ -160397,7 +160398,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 813,
+        "line": 828,
         "caller": "_runtimeString",
         "kind": "constructor",
         "lexical_target": "InteractiveBattlePersistenceException",
@@ -241465,7 +241466,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 166,
+        "line": 193,
         "lexical_type": "InteractiveBattleCreateInput",
         "resolved_type": "InteractiveBattleCreateInput",
         "target": "InteractiveBattleCreateInput",
@@ -241475,7 +241476,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 179,
+        "line": 206,
         "lexical_type": "InteractiveBattleValidationException",
         "resolved_type": "InteractiveBattleValidationException",
         "target": "InteractiveBattleValidationException",
@@ -241485,7 +241486,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 256,
+        "line": 283,
         "lexical_type": "InteractiveBattleResponseKind",
         "resolved_type": "InteractiveBattleResponseKind",
         "target": "InteractiveBattleResponseKind",
@@ -241495,7 +241496,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 277,
+        "line": 304,
         "lexical_type": "InteractiveBattleActionInput",
         "resolved_type": "InteractiveBattleActionInput",
         "target": "InteractiveBattleActionInput",
@@ -241505,7 +241506,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 423,
+        "line": 450,
         "lexical_type": "InteractiveBattlePromptOption",
         "resolved_type": "InteractiveBattlePromptOption",
         "target": "InteractiveBattlePromptOption",
@@ -241515,7 +241516,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 524,
+        "line": 551,
         "lexical_type": "InteractiveBattleStaleActionException",
         "resolved_type": "InteractiveBattleStaleActionException",
         "target": "InteractiveBattleStaleActionException",
@@ -241525,7 +241526,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 568,
+        "line": 595,
         "lexical_type": "InteractiveBattlePrompt",
         "resolved_type": "InteractiveBattlePrompt",
         "target": "InteractiveBattlePrompt",
@@ -241545,7 +241546,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 693,
+        "line": 708,
         "lexical_type": "InteractiveBattlePrompt?",
         "resolved_type": "InteractiveBattlePrompt?",
         "target": "InteractiveBattlePrompt",
@@ -248683,7 +248684,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6651,
-        "occurrences": 41224
+        "occurrences": 41225
       },
       {
         "target_scope": "dart_sdk",
@@ -254839,7 +254840,7 @@
       },
       {
         "source": "server/lib/battle/interactive_battle_contract.dart",
-        "line": 522,
+        "line": 549,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -280593,6 +280594,34 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
+      "role": "battle",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_BCK_DIAG_18"
+      ]
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_card_details_navigation.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_optimization_card_reader.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_play_vs_ai.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_DEBUG_COMBATE"
+      ]
+    },
+    {
       "path": "scripts/lib/manaloom_chromedriver.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -280612,6 +280641,12 @@
         "MANALOOM_FLUTTER_ROOT",
         "MANALOOM_NODE_BIN"
       ]
+    },
+    {
+      "path": "scripts/lib/manaloom_fixture_asset_server.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
     },
     {
       "path": "scripts/lib/manaloom_flutter_release_sdk.sh",
@@ -280673,6 +280708,14 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_webdriver_capture.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "CHROME_EXECUTABLE"
+      ]
     },
     {
       "path": "scripts/manaloom_ai_generation_benchmark.sh",
@@ -281005,7 +281048,7 @@
     {
       "path": "scripts/manaloom_dependency_audit.sh",
       "role": "audit",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": []
     },
     {
@@ -283969,6 +284012,7 @@
       "name": "CHROME_EXECUTABLE",
       "classification": "configuration",
       "sources": [
+        "scripts/lib/manaloom_webdriver_capture.py",
         "scripts/manaloom_battle_learning_visual_qa.sh",
         "scripts/manaloom_binder_import_visual_qa.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
@@ -286049,6 +286093,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_BCK_DIAG_18",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_captura_battle_coach_keyboard.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_BOOT_PULL_PENDING_EVENTS",
       "classification": "configuration",
       "sources": [
@@ -286293,6 +286345,14 @@
         "scripts/manaloom_visual_system_workspace_qa.sh",
         "server/bin/auto_sync_learned_decks.py",
         "server/bin/manaloom_ops_daemon.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_DEBUG_COMBATE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_captura_play_vs_ai.py"
       ],
       "value_captured": false
     },
@@ -291457,6 +291517,7 @@
     "server/test/external_commander_meta_operational_runner_support_test.dart",
     "server/test/external_commander_meta_promotion_support_test.dart",
     "server/test/external_commander_meta_staging_support_test.dart",
+    "server/test/fixture_asset_server_test.py",
     "server/test/flashback_pg879_exact_runtime_and_cmc_source_test.dart",
     "server/test/flutter_release_sdk_contract_test.dart",
     "server/test/flutter_web_deploy_contract_test.dart",
@@ -291695,6 +291756,7 @@
     "server/test/scope_containment_route_matrix_test.dart",
     "server/test/scryfall_image_url_test.dart",
     "server/test/seed_database_image_selection_test.dart",
+    "server/test/seed_deck_otimizavel_test.py",
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
     "server/test/semantic_layer_v2_backfill_source_test.dart",
     "server/test/semantic_tag_query_contract_test.dart",
@@ -291726,6 +291788,7 @@
     "server/test/user_data_privacy_contract_test.dart",
     "server/test/user_facing_brand_contract_test.dart",
     "server/test/web_artifact_identity_contract_test.dart",
+    "server/test/webdriver_capture_drivers_test.py",
     "server/test/xmage_battle_client_test.dart",
     "server/test/xmage_interactive_release_contract_test.dart",
     "services/forge-sidecar/test_sidecar.py",
@@ -298433,6 +298496,13 @@
           "mutation_authority": false
         },
         {
+          "path": "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
+          "state": "current_contract",
+          "declaration_source": "canonical_documents",
+          "priority_authority": false,
+          "mutation_authority": false
+        },
+        {
           "path": "docs/execution/README.md",
           "state": "current_contract",
           "declaration_source": "canonical_documents",
@@ -303143,7 +303213,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "579ca84857d82f3da5ea06f8e641f193883f2e0be9e99f4450405a2da8dca4c5"
+    "project_logic_source_digest_sha256": "01dd45d784d58497ef217ba330386255b6d74d6fb22c970126e9a0b24c72cce3"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -304469,6 +304539,7 @@
       "docs/adr/0011-brewtact-production-domain.md",
       "docs/adr/0012-xmage-human-spike-go.md",
       "docs/adr/0013-play-vs-ai-is-the-only-interactive-battle-product.md",
+      "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
       "docs/execution/CURRENT_QUEUE.md",
       "docs/execution/README.md",
       "docs/hermes-analysis/APP_AI_KNOWLEDGE_BRIDGE_CONTRACT_2026-07-06.md",
@@ -305344,8 +305415,13 @@
       "scripts/dev_full_with_integration.sh",
       "scripts/flutter_run_with_local_sentry.sh",
       "scripts/generate_brewtact_brand_assets.py",
+      "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
+      "scripts/lib/manaloom_captura_card_details_navigation.py",
+      "scripts/lib/manaloom_captura_optimization_card_reader.py",
+      "scripts/lib/manaloom_captura_play_vs_ai.py",
       "scripts/lib/manaloom_chromedriver.sh",
       "scripts/lib/manaloom_dart_toolchain.sh",
+      "scripts/lib/manaloom_fixture_asset_server.py",
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
       "scripts/lib/manaloom_public_web_surface_contract.sh",
@@ -305353,6 +305429,7 @@
       "scripts/lib/manaloom_release_runtime_contract.sh",
       "scripts/lib/manaloom_safe_env.sh",
       "scripts/lib/manaloom_ui_runtime_contract.sh",
+      "scripts/lib/manaloom_webdriver_capture.py",
       "scripts/manaloom_ai_generation_benchmark.sh",
       "scripts/manaloom_ai_paywall_e2e.sh",
       "scripts/manaloom_ai_prompt_eval.sh",
@@ -306272,6 +306349,7 @@
       "server/test/external_commander_meta_operational_runner_support_test.dart",
       "server/test/external_commander_meta_promotion_support_test.dart",
       "server/test/external_commander_meta_staging_support_test.dart",
+      "server/test/fixture_asset_server_test.py",
       "server/test/flashback_pg879_exact_runtime_and_cmc_source_test.dart",
       "server/test/flutter_release_sdk_contract_test.dart",
       "server/test/flutter_web_deploy_contract_test.dart",
@@ -306510,6 +306588,7 @@
       "server/test/scope_containment_route_matrix_test.dart",
       "server/test/scryfall_image_url_test.dart",
       "server/test/seed_database_image_selection_test.dart",
+      "server/test/seed_deck_otimizavel_test.py",
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
       "server/test/semantic_layer_v2_backfill_source_test.dart",
       "server/test/semantic_tag_query_contract_test.dart",
@@ -306541,6 +306620,7 @@
       "server/test/user_data_privacy_contract_test.dart",
       "server/test/user_facing_brand_contract_test.dart",
       "server/test/web_artifact_identity_contract_test.dart",
+      "server/test/webdriver_capture_drivers_test.py",
       "server/test/xmage_battle_client_test.dart",
       "server/test/xmage_interactive_release_contract_test.dart",
       "services/forge-sidecar/.dockerignore",

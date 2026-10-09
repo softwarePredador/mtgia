@@ -1,7 +1,61 @@
+import 'dart:io';
+
 import 'package:server/battle/interactive_battle_contract.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // Duas listas mantidas a mao, em linguagens diferentes, que precisam
+  // concordar: `PromptKind` no sidecar Java e a allowlist fail-closed do
+  // servidor. Ate o conserto da pergunta do motor elas concordavam (os mesmos
+  // 11 kinds); o defeito do turno 4 morreu dentro do sidecar, que devolvia
+  // `null` em `classify`. O conserto acrescentou `question` nos dois lados ao
+  // mesmo tempo.
+  //
+  // Este teste protege contra a divergencia FUTURA: le o enum Java direto da
+  // fonte, e se alguem acrescentar um kind la e esquecer daqui -- o servidor
+  // recusaria o prompt em runtime e a mesa morreria do mesmo jeito -- a falha
+  // aparece aqui, de graca.
+  test('todo PromptKind do sidecar e aceito pela allowlist do servidor', () {
+    final javaSource = File(
+      '../services/xmage-sidecar/src/main/java/com/manaloom/xmage/'
+      'HumanVsAiSpikeHarness.java',
+    );
+    expect(
+      javaSource.existsSync(),
+      isTrue,
+      reason: 'fonte do sidecar nao encontrada: ${javaSource.path}',
+    );
+    final body = RegExp(
+      r'enum PromptKind \{([^}]*)\}',
+    ).firstMatch(javaSource.readAsStringSync());
+    expect(body, isNotNull, reason: 'enum PromptKind nao encontrado');
+
+    final kinds =
+        body!
+            .group(1)!
+            .split(',')
+            .map((raw) => raw.trim())
+            .where((raw) => RegExp(r'^[A-Z][A-Z_]*$').hasMatch(raw))
+            .map((raw) => raw.toLowerCase())
+            .toList();
+
+    // Sanidade: se a extracao falhar e devolver pouca coisa, o teste passaria
+    // vazio e nao provaria nada.
+    expect(kinds.length, greaterThanOrEqualTo(11));
+    expect(kinds, contains('mulligan'));
+    expect(kinds, contains('question'));
+
+    for (final kind in kinds) {
+      expect(
+        interactiveBattlePromptKinds,
+        contains(kind),
+        reason:
+            'PromptKind.${kind.toUpperCase()} existe no sidecar mas o servidor '
+            'recusaria o prompt: adicione "$kind" a allowlist.',
+      );
+    }
+  });
+
   group('interactive battle request contract', () {
     test('parses bounded create input and requires a distinct opponent', () {
       final input = InteractiveBattleCreateInput.parse({
@@ -215,6 +269,44 @@ void main() {
             (error) => error.code,
             'code',
             'interactive_battle_action_stale',
+          ),
+        ),
+      );
+    });
+
+    test('prompt parser accepts the engine question kind, rejects unknown', () {
+      // O teste de paridade acima prova a constante; este prova o parser.
+      // Se `parse` voltar a uma lista propria sem 'question', o prompt da
+      // pergunta generica do motor e recusado com
+      // `interactive_battle_prompt_invalid` e a mesa morre do mesmo jeito.
+      Map<String, Object?> promptWithKind(String kind) => {
+        'schema_version': interactiveBattlePromptSchema,
+        'id': _promptId,
+        'state_version': 9,
+        'kind': kind,
+        'input_mode': 'options',
+        'title': 'Sua decisão',
+        'message': 'Escolha uma ação legal para continuar.',
+        'deadline_at': '2026-07-27T15:00:00Z',
+        'options': [
+          {'id': _optionId, 'label': 'Sim', 'role': 'choice'},
+          {'id': 'o_qrstuvwxyzabcdef', 'label': 'Não', 'role': 'choice'},
+        ],
+      };
+
+      final question = InteractiveBattlePrompt.parse(
+        promptWithKind('question'),
+      );
+      expect(question.kind, 'question');
+      expect(question.options.map((option) => option.label), ['Sim', 'Não']);
+
+      expect(
+        () => InteractiveBattlePrompt.parse(promptWithKind('engine_surprise')),
+        throwsA(
+          isA<InteractiveBattlePersistenceException>().having(
+            (error) => error.code,
+            'code',
+            'interactive_battle_prompt_invalid',
           ),
         ),
       );

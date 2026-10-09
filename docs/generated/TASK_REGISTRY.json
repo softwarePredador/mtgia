@@ -5387,6 +5387,13 @@
         "mutation_authority": false
       },
       {
+        "path": "docs/adr/0014-xmage-generic-question-and-select-fallback.md",
+        "state": "current_contract",
+        "declaration_source": "canonical_documents",
+        "priority_authority": false,
+        "mutation_authority": false
+      },
+      {
         "path": "docs/execution/README.md",
         "state": "current_contract",
         "declaration_source": "canonical_documents",
@@ -10097,5 +10104,5 @@
     "project_logic_receipt_source_digest_bound": true,
     "registry_source_digest_bound": true
   },
-  "project_logic_source_digest_sha256": "579ca84857d82f3da5ea06f8e641f193883f2e0be9e99f4450405a2da8dca4c5"
+  "project_logic_source_digest_sha256": "01dd45d784d58497ef217ba330386255b6d74d6fb22c970126e9a0b24c72cce3"
 }

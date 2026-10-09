@@ -23,3 +23,14 @@ O ADR 0013 substitui o ADR 0005 quanto ao produto e à UX: a superfície
 interativa é **Jogar contra IA**, e Battle Live não é uma visão pública. Os
 limites técnicos de privacidade, autenticação, persistência e respostas tipadas
 do ADR 0005 continuam válidos.
+
+## Pergunta genérica do motor no Jogar contra IA
+
+O ADR 0014, aceito em 2026-10-08 (D-88), complementa o ADR 0012 (e o registro
+histórico `0004-xmage-human-spike-go.md`) e o ADR 0005 sem substituí-los. A
+falha fechada deixa de valer para o **texto** de `GAME_ASK` e `GAME_SELECT`:
+pergunta de sim/não que não é o mulligan vira o prompt genérico `question`, e
+frase de `GAME_SELECT` desconhecida vira `combat` quando o payload traz
+atacantes ou bloqueadores possíveis, e `main_action` quando não traz. Método,
+payload, limites, IDs opacos e a allowlist de kinds do servidor continuam
+fail-closed. O servidor aceita `question` antes ou junto do sidecar.

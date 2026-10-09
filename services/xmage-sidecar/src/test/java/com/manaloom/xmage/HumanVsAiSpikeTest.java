@@ -18,7 +18,10 @@ import mage.view.GameClientMessage;
 import mage.view.ManaPoolView;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Proxy;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -34,10 +37,294 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 final class HumanVsAiSpikeTest {
+    @Test
+    void everyDecisionCallbackClassifiesOrTheTableDies() {
+        // `classify` devolvendo null vira
+        // IllegalArgumentException("callback is not allowlisted") em
+        // `PromptRegistry.open`, e o `catch` do InteractiveBattleRegistry
+        // encerra a sessao com `engine_error`. Ou seja: um null aqui nao e uma
+        // lacuna de classificacao, e uma partida perdida pelo jogador.
+        //
+        // Por isso a assercao e sobre TODOS os callbacks de decisao e com
+        // mensagens que ninguem previu -- que e exatamente o caso que quebrou:
+        // o GAME_ASK do motor chegou com uma frase fora da lista e matou a mesa
+        // no turno 4.
+        String[] mensagens = {
+                "",
+                "Use replacement effect?",
+                "Mensagem que ninguem previu",
+                "SELECT something entirely different",
+                "Escolha algo",
+        };
+        for (ClientCallbackMethod metodo
+                : HumanVsAiSpikeHarness.DECISION_CALLBACKS) {
+            for (String mensagem : mensagens) {
+                assertNotNull(
+                        HumanVsAiSpikeHarness.classify(
+                                metodo,
+                                mensagem,
+                                Collections.emptyMap()
+                        ),
+                        "classify(" + metodo + ", \"" + mensagem
+                                + "\") devolveu null: a mesa morreria com "
+                                + "engine_error"
+                );
+            }
+        }
+    }
+
+    @Test
+    void unknownSelectPhraseWithCombatPayloadStaysCombat() {
+        // O fallback do GAME_SELECT nao pode olhar so a frase. Se uma frase
+        // de declarar atacantes/bloqueadores mudar de texto e cair em
+        // MAIN_ACTION, `selectPrompt` deixa de oferecer as criaturas de
+        // `possibleAttackers`/`possibleBlockers` e o jogador so pode passar:
+        // perde o ataque ou o bloqueio sem saber por que.
+        UUID creature = UUID.fromString(
+                "11111111-2222-3333-4444-555555555555"
+        );
+        Map<String, Object> attackers = new LinkedHashMap<>();
+        attackers.put(
+                HumanVsAiSpikeHarness.POSSIBLE_ATTACKERS_OPTION,
+                new ArrayList<>(Collections.singletonList(creature))
+        );
+        Map<String, Object> blockers = new LinkedHashMap<>();
+        blockers.put(
+                HumanVsAiSpikeHarness.POSSIBLE_BLOCKERS_OPTION,
+                new ArrayList<>(Collections.singletonList(creature))
+        );
+        Map<String, Object> noCombat = new LinkedHashMap<>();
+        noCombat.put("hintText", "Escolha algo");
+
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.COMBAT,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that go to war",
+                        attackers
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.COMBAT,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that hold the line",
+                        blockers
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that go to war",
+                        noCombat
+                )
+        );
+        assertEquals(
+                HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
+                HumanVsAiSpikeHarness.classify(
+                        ClientCallbackMethod.GAME_SELECT,
+                        "Declare the creatures that go to war",
+                        null
+                )
+        );
+        // As chaves sao as que o XMage escreve, e as mesmas que
+        // `InteractiveBattleRegistry.combatSelectableIds` le.
+        assertEquals(
+                Collections.singletonList(creature),
+                InteractiveBattleRegistry.combatSelectableIds(attackers)
+        );
+    }
+
+    @Test
+    void selectTextFallbackIsLoggedOncePerPromptWithoutTextOrIds() {
+        UUID creature = UUID.fromString(
+                "11111111-2222-3333-4444-555555555555"
+        );
+        Map<String, Object> attackers = new LinkedHashMap<>();
+        attackers.put(
+                HumanVsAiSpikeHarness.POSSIBLE_ATTACKERS_OPTION,
+                new ArrayList<>(Collections.singletonList(creature))
+        );
+        String unknownPhrase = "Alice, declare the creatures that go to war";
+
+        String fallbackLog = capturedStderr(() -> {
+            HumanVsAiSpikeHarness.Prompt prompt = promptRegistry().open(
+                    decisionCallback(ClientCallbackMethod.GAME_SELECT),
+                    unknownPhrase,
+                    attackers,
+                    Arrays.<Object>asList(creature, Boolean.FALSE)
+            );
+            assertEquals(HumanVsAiSpikeHarness.PromptKind.COMBAT, prompt.kind);
+        });
+        assertEquals(
+                "interactive_select_text_fallback kind=COMBAT"
+                        + " possible_attackers=true possible_blockers=false"
+                        + " message_chars=" + unknownPhrase.length(),
+                fallbackLog.trim()
+        );
+        assertFalse(fallbackLog.contains("Alice"));
+        assertFalse(fallbackLog.contains(creature.toString()));
+
+        String recognizedLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_SELECT),
+                "Select attackers",
+                attackers,
+                Arrays.<Object>asList(creature, Boolean.FALSE)
+        ));
+        assertEquals("", recognizedLog);
+    }
+
+    @Test
+    void questionFallbackIsLoggedOncePerPromptWithoutTextOrLabels() {
+        // O jogador ve esta pergunta como "Sim"/"Nao", sem o texto nem os
+        // rotulos do motor (ADR 0014). Cada linha deste log e uma pergunta
+        // generica aberta para ser mostrada sem o texto do motor, escrita
+        // quando o prompt abre (antes de qualquer resposta): e a metrica do
+        // follow-up. Por isso uma linha por prompt, e nada que identifique
+        // jogador, carta ou objeto.
+        Map<String, Object> engineLabels = new LinkedHashMap<>();
+        engineLabels.put(
+                HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION,
+                "Top"
+        );
+        engineLabels.put(
+                HumanVsAiSpikeHarness.RIGHT_BUTTON_TEXT_OPTION,
+                "Bottom"
+        );
+        String question =
+                "Alice, put Llanowar Elves on the top of your library?";
+
+        String labelledLog = capturedStderr(() -> {
+            HumanVsAiSpikeHarness.Prompt prompt = promptRegistry().open(
+                    decisionCallback(ClientCallbackMethod.GAME_ASK),
+                    question,
+                    engineLabels,
+                    Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+            );
+            assertEquals(
+                    HumanVsAiSpikeHarness.PromptKind.QUESTION,
+                    prompt.kind
+            );
+        });
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=true right_label=true"
+                        + " message_chars=" + question.length(),
+                labelledLog.trim()
+        );
+        assertFalse(labelledLog.contains("Alice"));
+        assertFalse(labelledLog.contains("Llanowar"));
+        assertFalse(labelledLog.contains("Top"));
+        assertFalse(labelledLog.contains("Bottom"));
+
+        String bareLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                "Use replacement effect?",
+                null,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=false right_label=false"
+                        + " message_chars="
+                        + "Use replacement effect?".length(),
+                bareLog.trim()
+        );
+
+        // Um rotulo so: cada flag le a sua propria chave. Sem estes casos,
+        // `right_label` lendo a chave da esquerda (ou o contrario) passaria,
+        // porque os dois casos acima sao simetricos.
+        Map<String, Object> leftOnly = new LinkedHashMap<>();
+        leftOnly.put(HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION, "Top");
+        String leftOnlyLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                question,
+                leftOnly,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=true right_label=false"
+                        + " message_chars=" + question.length(),
+                leftOnlyLog.trim()
+        );
+        assertFalse(leftOnlyLog.contains("Top"));
+
+        Map<String, Object> rightOnly = new LinkedHashMap<>();
+        rightOnly.put(HumanVsAiSpikeHarness.RIGHT_BUTTON_TEXT_OPTION, "Bottom");
+        String rightOnlyLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                question,
+                rightOnly,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals(
+                "interactive_question_fallback kind=QUESTION"
+                        + " left_label=false right_label=true"
+                        + " message_chars=" + question.length(),
+                rightOnlyLog.trim()
+        );
+        assertFalse(rightOnlyLog.contains("Bottom"));
+
+        // O mulligan tem kind proprio e rotulos de produto: nao e fallback.
+        Map<String, Object> mulliganOptions = new LinkedHashMap<>();
+        mulliganOptions.put(
+                HumanVsAiSpikeHarness.LEFT_BUTTON_TEXT_OPTION,
+                "Mulligan"
+        );
+        mulliganOptions.put(
+                HumanVsAiSpikeHarness.RIGHT_BUTTON_TEXT_OPTION,
+                "Keep"
+        );
+        String mulliganLog = capturedStderr(() -> promptRegistry().open(
+                decisionCallback(ClientCallbackMethod.GAME_ASK),
+                "Mulligan down to 6 cards?",
+                mulliganOptions,
+                Arrays.<Object>asList(Boolean.TRUE, Boolean.FALSE)
+        ));
+        assertEquals("", mulliganLog);
+    }
+
+    private static HumanVsAiSpikeHarness.PromptRegistry promptRegistry() {
+        return new HumanVsAiSpikeHarness.PromptRegistry(
+                "0123456789abcdef0123456789abcdef"
+                        .getBytes(StandardCharsets.UTF_8)
+        );
+    }
+
+    private static ClientCallback decisionCallback(
+            ClientCallbackMethod method
+    ) {
+        ClientCallback callback = new ClientCallback(
+                method,
+                UUID.fromString("99999999-8888-7777-6666-555555555555")
+        );
+        callback.setMessageId(7);
+        return callback;
+    }
+
+    private static String capturedStderr(Runnable action) {
+        PrintStream original = System.err;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try {
+            System.setErr(new PrintStream(buffer, true, "UTF-8"));
+            try {
+                action.run();
+            } finally {
+                System.setErr(original);
+            }
+            return buffer.toString("UTF-8");
+        } catch (UnsupportedEncodingException error) {
+            throw new IllegalStateException("UTF-8 is unavailable", error);
+        }
+    }
+
     @Test
     void onlyDeckAUsesHumanAndDeckBRemainsComputerMad() {
         MatchOptions options = HumanVsAiSpikeHarness.matchOptions(
@@ -88,6 +375,9 @@ final class HumanVsAiSpikeTest {
         mulliganOptions.put("UI.left.btn.text", "Mulligan");
         mulliganOptions.put("UI.right.btn.text", "Keep");
 
+        // O mulligan continua tendo kind proprio, mesmo com todo outro
+        // GAME_ASK virando QUESTION: `questionPrompt` decide por ele se rotula
+        // "Fazer mulligan"/"Manter esta mao" ou "Sim"/"Nao".
         assertEquals(
                 HumanVsAiSpikeHarness.PromptKind.MULLIGAN,
                 HumanVsAiSpikeHarness.classify(
@@ -129,16 +419,28 @@ final class HumanVsAiSpikeTest {
                 )
         );
 
+        // Este caso afirmava `null`, e `null` significa
+        // IllegalArgumentException em `PromptRegistry.open`: a pergunta mais
+        // banal do motor -- "Use replacement effect?" -- derrubava a mesa com
+        // `engine_error`. O teste pinava o defeito como esperado.
         assertEquals(
-                null,
+                HumanVsAiSpikeHarness.PromptKind.QUESTION,
                 HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_ASK,
                         "Use replacement effect?",
                         Collections.emptyMap()
                 )
         );
+        // Mesmo caso do GAME_ASK, e mesma consequencia: `null` nao e "nao sei",
+        // e IllegalArgumentException em `PromptRegistry.open` e mesa morta. A
+        // mensagem do GAME_SELECT muda entre versoes e situacoes do XMage, e
+        // so quatro prefixos eram reconhecidos. Sem frase conhecida e sem dado
+        // de combate no payload, o certo e MAIN_ACTION: `selectPrompt` monta as
+        // jogadas legais e inclui "Passar prioridade", entao a partida segue.
+        // O caso com dado de combate esta em
+        // `unknownSelectPhraseWithCombatPayloadStaysCombat`.
         assertEquals(
-                null,
+                HumanVsAiSpikeHarness.PromptKind.MAIN_ACTION,
                 HumanVsAiSpikeHarness.classify(
                         ClientCallbackMethod.GAME_SELECT,
                         "Unknown selection",

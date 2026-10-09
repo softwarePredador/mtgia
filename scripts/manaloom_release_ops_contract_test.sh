@@ -238,7 +238,16 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
     "$ROOT_DIR/server/test/slo_alerts_test.py" \
-    "$ROOT_DIR/server/test/support/production_drift_fixture.py"
+    "$ROOT_DIR/server/test/support/production_drift_fixture.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_webdriver_capture.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_captura_battle_coach_keyboard.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_captura_card_details_navigation.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_captura_optimization_card_reader.py" \
+    "$ROOT_DIR/scripts/lib/manaloom_captura_play_vs_ai.py" \
+    "$ROOT_DIR/server/test/fixture_asset_server_test.py" \
+    "$ROOT_DIR/server/test/seed_deck_otimizavel_test.py" \
+    "$ROOT_DIR/server/test/webdriver_capture_drivers_test.py"
 
 # BT-DB-004: os CLIs Python de cartas e o sync Hermes de card_battle_rules
 # conferem o schema do PostgreSQL e param; não o alteram.
@@ -284,6 +293,20 @@ PYTHONDONTWRITEBYTECODE=1 \
     --pending "$ROOT_DIR/scripts/manaloom_errexit_lint_pending.json"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/errexit_postdeploy_test.py"
+# BT-UIEV-001: o servidor de assets das fixtures so escuta em loopback, nao
+# lista diretorio e serve com CORS; o seed do deck otimizavel roda numa
+# transacao so (BEGIN primeiro, COMMIT por ultimo, conferencias no meio),
+# recusa antes de qualquer escrita sem -v descartavel=sim e tem
+# `\set ON_ERROR_STOP on` como unico metacomando do psql; os
+# roteiros WebDriver recusam argv errado com codigo 2, so usam o ponto de
+# reserva da aba com o rotulo exato "Cartas" e limpam mesas com a listagem em
+# objeto ou lista. Nada abre navegador nem banco.
+PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
+  python3 "$ROOT_DIR/server/test/fixture_asset_server_test.py"
+PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
+  python3 "$ROOT_DIR/server/test/seed_deck_otimizavel_test.py"
+PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
+  python3 "$ROOT_DIR/server/test/webdriver_capture_drivers_test.py"
 
 SAFE_ENV_FIXTURE="$TMP_DIR/safe.env"
 SAFE_ENV_MARKER="$TMP_DIR/env-code-executed"

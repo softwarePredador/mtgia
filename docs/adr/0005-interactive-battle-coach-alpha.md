@@ -12,6 +12,8 @@
 
 > Emenda 2026-08-25: o ADR 0013 substitui este ADR quanto ao nome ("Jogar contra IA"), à rota canônica (/decks/:id/play-vs-ai[/sessionId]) e à experiência (mesa card-first, sem espectador público). Os limites de privacidade, persistência, autenticação e resposta tipada abaixo continuam válidos. Onde este texto diz "ADR 0004", leia ADR 0012.
 
+> Emenda 2026-10-08 (ADR 0014): a resposta tipada ganhou o kind `question`, o prompt genérico Sim/Não (role `choice`, resposta booleana) de todo `GAME_ASK` que não é o mulligan, e o servidor o aceita em `interactiveBattlePromptKinds` antes ou junto do sidecar. Um `GAME_SELECT` de frase desconhecida usa `combat` ou `main_action`, kinds que já existiam. Os demais limites de privacidade, persistência, autenticação e resposta tipada continuam válidos.
+
 ## Contexto
 
 O GO limitado do ADR 0012 provou que um participante humano pode responder a
