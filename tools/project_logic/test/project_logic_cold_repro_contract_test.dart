@@ -281,6 +281,29 @@ void main() {
       expect(_typeOf(harness.dotTool(_testPackage)), FileSystemEntityType.link);
     });
 
+    for (final package in const [_testPackage, 'app']) {
+      test(
+        '--test flags a dangling .dart_tool symlink created in "$package"',
+        () async {
+          final harness = _RestoreHarness.create();
+          final result = await harness.run(
+            mode: '--test',
+            simulatedRun:
+                'ln -s -- "\$HARNESS_OUTSIDE/missing" '
+                '"\$ROOT_DIR/$package/.dart_tool"\n',
+          );
+          final packageDir = harness.packageDir(package);
+          expect(result.stdout, contains('SNAPSHOT_OK'));
+          expect(result.exitCode, isNot(0));
+          expect(
+            result.stderr,
+            contains('Diretório .dart_tool residual em $packageDir.'),
+          );
+          expect(_typeOf(harness.dotTool(package)), FileSystemEntityType.link);
+        },
+      );
+    }
+
     test(
       '--test refuses a test package that resolves outside ROOT_DIR',
       () async {
