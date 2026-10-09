@@ -483,15 +483,45 @@ restore_package_metadata() {
         restore_status=1
       fi
     fi
-    if [[ "$(cat "$state_dir/directory-state")" == "absent" && -d "$package_dir/.dart_tool" ]]; then
-      rmdir "$package_dir/.dart_tool" 2>/dev/null || {
-        echo "Diretório .dart_tool residual em $package_dir." >&2
-        restore_status=1
-      }
+    if [[ "$(cat "$state_dir/directory-state")" == "absent" ]] &&
+      [[ -d "$package_dir/.dart_tool" || -L "$package_dir/.dart_tool" ]]; then
+      # O diretório não existia antes, então tudo nele foi criado por esta
+      # execução. Num checkout novo (worktree limpo, clone, nuvem), --test
+      # deixa ali o cache de build do `dart test` tolerado acima; ele é
+      # removido inteiro, só no pacote de teste e só por
+      # remove_test_build_cache. Raiz, app e server — e o pacote de teste
+      # fora de --test — continuam estritos: o diretório tem de voltar vazio
+      # e o rmdir falha em qualquer resíduo.
+      if [[ "$MODE" == "--test" && "$package_dir" == "$ROOT_DIR/tools/project_logic" ]]; then
+        remove_test_build_cache "$package_dir/.dart_tool" || {
+          echo "Diretório .dart_tool residual em $package_dir." >&2
+          restore_status=1
+        }
+      else
+        rmdir "$package_dir/.dart_tool" 2>/dev/null || {
+          echo "Diretório .dart_tool residual em $package_dir." >&2
+          restore_status=1
+        }
+      fi
     fi
     index=$((index + 1))
   done
   return "$restore_status"
+}
+
+remove_test_build_cache() {
+  # Remove só $ROOT_DIR/tools/project_logic/.dart_tool, e só quando ele é um
+  # diretório real (nunca symlink) cujo pai resolve fisicamente para o pacote
+  # de teste dentro de $ROOT_DIR. Qualquer outro alvo é recusado.
+  local directory="$1"
+  local package_dir="$ROOT_DIR/tools/project_logic"
+  if [[ "$directory" != "$package_dir/.dart_tool" || -L "$directory" || ! -d "$directory" ]] ||
+    [[ "$(canonical_path "$package_dir" 2>/dev/null)" != "$package_dir" ]]; then
+    echo "Recusa ao remover .dart_tool não governado: $directory" >&2
+    return 2
+  fi
+  /bin/rm -rf -- "$directory"
+  [[ ! -e "$directory" && ! -L "$directory" ]]
 }
 
 remove_owned_directory() {

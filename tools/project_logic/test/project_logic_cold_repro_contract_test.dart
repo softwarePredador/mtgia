@@ -154,6 +154,159 @@ void main() {
     },
   );
 
+  // The launcher cannot run end to end inside this suite (it pins the real
+  // Dart and --test would recurse into itself), so these cases execute the
+  // launcher's own function definitions and PACKAGE_DIRS, sliced from the
+  // script, against a disposable ROOT_DIR. Only the work between
+  // snapshot_package_metadata and restore_package_metadata (pub get and the
+  // `dart test` build cache) is simulated.
+  group('launcher restores package .dart_tool state', () {
+    test(
+      '--test removes the build cache it created in a fresh checkout',
+      () async {
+        final harness = _RestoreHarness.create();
+        final result = await harness.run(
+          mode: '--test',
+          simulatedRun: _simulatedPubGet + _simulatedBuildCache(_testPackage),
+        );
+        expect(result.stdout, contains('SNAPSHOT_OK'));
+        expect(result.stderr, isEmpty);
+        expect(result.exitCode, 0);
+        for (final package in _launcherPackages) {
+          expect(_typeOf(harness.dotTool(package)), _absent, reason: package);
+        }
+      },
+    );
+
+    test('--test keeps a .dart_tool that existed before the run', () async {
+      final harness = _RestoreHarness.create();
+      final dotTool = harness.dotTool(_testPackage);
+      Directory(dotTool).createSync(recursive: true);
+      File(
+        p.join(dotTool, 'package_config.json'),
+      ).writeAsStringSync('{"before":true}\n');
+      final result = await harness.run(
+        mode: '--test',
+        simulatedRun: _simulatedPubGet + _simulatedBuildCache(_testPackage),
+      );
+      expect(result.stdout, contains('SNAPSHOT_OK'));
+      expect(result.stderr, isEmpty);
+      expect(result.exitCode, 0);
+      expect(_typeOf(dotTool), FileSystemEntityType.directory);
+      expect(
+        File(p.join(dotTool, 'package_config.json')).readAsStringSync(),
+        '{"before":true}\n',
+      );
+      expect(_typeOf(p.join(dotTool, 'package_graph.json')), _absent);
+      expect(
+        _typeOf(p.join(dotTool, _buildCacheFile)),
+        FileSystemEntityType.file,
+      );
+    });
+
+    for (final package in const ['.', 'app', 'server']) {
+      test(
+        '--test stays strict for "$package" and leaves its residue',
+        () async {
+          final harness = _RestoreHarness.create();
+          final result = await harness.run(
+            mode: '--test',
+            simulatedRun:
+                _simulatedPubGet +
+                _simulatedBuildCache(_testPackage) +
+                _simulatedBuildCache(package),
+          );
+          final packageDir = harness.packageDir(package);
+          expect(result.stdout, contains('SNAPSHOT_OK'));
+          expect(result.exitCode, isNot(0));
+          expect(
+            result.stderr,
+            contains(
+              'Bootstrap criou/alterou conteúdo inesperado em '
+              '$packageDir/.dart_tool.',
+            ),
+          );
+          expect(
+            result.stderr,
+            contains('Diretório .dart_tool residual em $packageDir.'),
+          );
+          expect(
+            _typeOf(p.join(harness.dotTool(package), _buildCacheFile)),
+            FileSystemEntityType.file,
+          );
+          expect(_typeOf(harness.dotTool(_testPackage)), _absent);
+        },
+      );
+    }
+
+    for (final mode in const ['--check', '--write']) {
+      test('$mode stays strict for the test package', () async {
+        final harness = _RestoreHarness.create();
+        final result = await harness.run(
+          mode: mode,
+          simulatedRun: _simulatedPubGet + _simulatedBuildCache(_testPackage),
+        );
+        final packageDir = harness.packageDir(_testPackage);
+        expect(result.stdout, contains('SNAPSHOT_OK'));
+        expect(result.exitCode, isNot(0));
+        expect(
+          result.stderr,
+          contains('Diretório .dart_tool residual em $packageDir.'),
+        );
+        expect(
+          _typeOf(p.join(harness.dotTool(_testPackage), _buildCacheFile)),
+          FileSystemEntityType.file,
+        );
+      });
+    }
+
+    test('--test refuses to remove a symlinked .dart_tool', () async {
+      final harness = _RestoreHarness.create();
+      final sentinel = File(p.join(harness.outside.path, 'sentinel'))
+        ..writeAsStringSync('keep\n');
+      final result = await harness.run(
+        mode: '--test',
+        simulatedRun:
+            r'ln -s -- "$HARNESS_OUTSIDE" '
+            r'"$ROOT_DIR/tools/project_logic/.dart_tool"'
+            '\n',
+      );
+      expect(result.stdout, contains('SNAPSHOT_OK'));
+      expect(result.exitCode, isNot(0));
+      expect(
+        result.stderr,
+        contains('Recusa ao remover .dart_tool não governado:'),
+      );
+      expect(sentinel.readAsStringSync(), 'keep\n');
+      expect(_typeOf(harness.dotTool(_testPackage)), FileSystemEntityType.link);
+    });
+
+    test(
+      '--test refuses a test package that resolves outside ROOT_DIR',
+      () async {
+        final harness = _RestoreHarness.create();
+        final redirected = Directory(p.join(harness.outside.path, 'pl'))
+          ..createSync();
+        Directory(harness.packageDir(_testPackage)).deleteSync();
+        Link(harness.packageDir(_testPackage)).createSync(redirected.path);
+        final result = await harness.run(
+          mode: '--test',
+          simulatedRun: _simulatedPubGet + _simulatedBuildCache(_testPackage),
+        );
+        expect(result.stdout, contains('SNAPSHOT_OK'));
+        expect(result.exitCode, isNot(0));
+        expect(
+          result.stderr,
+          contains('Recusa ao remover .dart_tool não governado:'),
+        );
+        expect(
+          _typeOf(p.join(redirected.path, '.dart_tool', _buildCacheFile)),
+          FileSystemEntityType.file,
+        );
+      },
+    );
+  });
+
   test('PowerShell static result is source-bound and runtime-limited', () {
     final proof = _powerShellStaticContract(_findWorkspaceRoot());
     expect(proof['status'], 'POWERSHELL_SOURCE_CONTRACT_PASS_STATIC');
@@ -1041,6 +1194,122 @@ Directory _findWorkspaceRoot() {
       throw StateError('Unable to locate the ManaLoom workspace root.');
     }
     current = current.parent;
+  }
+}
+
+const _testPackage = 'tools/project_logic';
+const _launcherPackages = <String>['tools/project_logic', '.', 'app', 'server'];
+const _buildCacheFile = 'test/incremental/suite.dill';
+const _absent = FileSystemEntityType.notFound;
+
+const _simulatedPubGet = r'''
+for package_dir in "${PACKAGE_DIRS[@]}"; do
+  mkdir -p -- "$package_dir/.dart_tool"
+  printf '{"run":true}\n' >"$package_dir/.dart_tool/package_config.json"
+  printf '{"run":true}\n' >"$package_dir/.dart_tool/package_graph.json"
+done
+''';
+
+String _simulatedBuildCache(String package) =>
+    '''
+mkdir -p -- "\$ROOT_DIR/$package/.dart_tool/${p.posix.dirname(_buildCacheFile)}"
+printf 'kernel\\n' >"\$ROOT_DIR/$package/.dart_tool/$_buildCacheFile"
+''';
+
+FileSystemEntityType _typeOf(String path) =>
+    FileSystemEntity.typeSync(path, followLinks: false);
+
+/// PACKAGE_DIRS and every top-level function definition of the launcher,
+/// without any of its top-level code, so the harness runs the real restore
+/// logic without the pinned toolchain, the Pub caches or `dart test`.
+final ({String packageDirs, String functions}) _launcherSlice = () {
+  final source = File(
+    p.join(_findWorkspaceRoot().path, 'scripts', 'manaloom_project_logic.sh'),
+  ).readAsStringSync();
+  final packageDirs = RegExp(
+    r'^readonly PACKAGE_DIRS=\(\n.*?\n\)$',
+    multiLine: true,
+    dotAll: true,
+  ).firstMatch(source)?.group(0);
+  final functions = RegExp(
+    r'^[a-z_][a-z0-9_]*\(\) \{\n.*?\n\}$',
+    multiLine: true,
+    dotAll: true,
+  ).allMatches(source).map((match) => match.group(0)!).toList();
+  final names = functions
+      .map((definition) => definition.substring(0, definition.indexOf('(')))
+      .toSet();
+  if (packageDirs == null ||
+      !names.containsAll(const [
+        'canonical_path',
+        'snapshot_package_metadata',
+        'restore_package_metadata',
+      ])) {
+    throw StateError('Launcher slice lost PACKAGE_DIRS or the restore code.');
+  }
+  return (packageDirs: packageDirs, functions: functions.join('\n\n'));
+}();
+
+class _RestoreHarness {
+  _RestoreHarness._(this.root, this.state, this.outside);
+
+  /// Physical ROOT_DIR with the four launcher packages and no .dart_tool,
+  /// like a fresh worktree or clone.
+  final String root;
+  final Directory state;
+  final Directory outside;
+
+  static _RestoreHarness create() {
+    final fixture = Directory(
+      Directory.systemTemp
+          .createTempSync('manaloom_project_logic_restore.')
+          .resolveSymbolicLinksSync(),
+    );
+    addTearDown(() {
+      if (fixture.existsSync()) fixture.deleteSync(recursive: true);
+    });
+    final root = p.join(fixture.path, 'root');
+    for (final package in _launcherPackages) {
+      Directory(p.join(root, package)).createSync(recursive: true);
+    }
+    return _RestoreHarness._(
+      root,
+      Directory(p.join(fixture.path, 'state'))..createSync(),
+      Directory(p.join(fixture.path, 'outside'))..createSync(),
+    );
+  }
+
+  String packageDir(String package) =>
+      package == '.' ? root : p.join(root, package);
+
+  String dotTool(String package) => p.join(packageDir(package), '.dart_tool');
+
+  /// Mirrors the launcher: snapshot under `set -euo pipefail`, then the
+  /// simulated run, then restore under `set +e` as `cleanup` does. The exit
+  /// code is restore_package_metadata's status.
+  Future<ProcessResult> run({
+    required String mode,
+    required String simulatedRun,
+  }) {
+    final script = [
+      'set -euo pipefail',
+      r'ROOT_DIR="$1"',
+      r'MODE="$2"',
+      r'STATE_DIR="$3"',
+      _launcherSlice.packageDirs,
+      _launcherSlice.functions,
+      'snapshot_package_metadata',
+      r"printf 'SNAPSHOT_OK\n'",
+      simulatedRun,
+      'set +e',
+      'restore_package_metadata',
+      r'exit "$?"',
+    ].join('\n');
+    return Process.run(
+      '/bin/bash',
+      ['-c', script, 'restore-harness', root, mode, state.path],
+      environment: {...Platform.environment, 'HARNESS_OUTSIDE': outside.path},
+    );
   }
 }
 
