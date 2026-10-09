@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "dd0b9ab4fb8a2f329a1e75b1089b1100c8a26efa300dd5c9153b1ea65fb51dd8",
+  "source_digest_sha256": "b1747ede08b8fa175eea92f42b1420841b01ee5a5695ce37800c338b149a4cdc",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -79,9 +79,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 711,
-    "environment_variables": 734,
-    "tests": 1345,
+    "scripts_and_jobs": 717,
+    "environment_variables": 736,
+    "tests": 1348,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -280593,6 +280593,34 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
+      "role": "battle",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_BCK_DIAG_18"
+      ]
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_card_details_navigation.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_optimization_card_reader.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_captura_play_vs_ai.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "MANALOOM_DEBUG_COMBATE"
+      ]
+    },
+    {
       "path": "scripts/lib/manaloom_chromedriver.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -280612,6 +280640,12 @@
         "MANALOOM_FLUTTER_ROOT",
         "MANALOOM_NODE_BIN"
       ]
+    },
+    {
+      "path": "scripts/lib/manaloom_fixture_asset_server.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
     },
     {
       "path": "scripts/lib/manaloom_flutter_release_sdk.sh",
@@ -280673,6 +280707,14 @@
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
       "environment_variables": []
+    },
+    {
+      "path": "scripts/lib/manaloom_webdriver_capture.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": [
+        "CHROME_EXECUTABLE"
+      ]
     },
     {
       "path": "scripts/manaloom_ai_generation_benchmark.sh",
@@ -281005,7 +281047,7 @@
     {
       "path": "scripts/manaloom_dependency_audit.sh",
       "role": "audit",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": []
     },
     {
@@ -283969,6 +284011,7 @@
       "name": "CHROME_EXECUTABLE",
       "classification": "configuration",
       "sources": [
+        "scripts/lib/manaloom_webdriver_capture.py",
         "scripts/manaloom_battle_learning_visual_qa.sh",
         "scripts/manaloom_binder_import_visual_qa.sh",
         "scripts/manaloom_critical_overlays_states_visual_qa.sh",
@@ -286049,6 +286092,14 @@
       "value_captured": false
     },
     {
+      "name": "MANALOOM_BCK_DIAG_18",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_captura_battle_coach_keyboard.py"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "MANALOOM_BOOT_PULL_PENDING_EVENTS",
       "classification": "configuration",
       "sources": [
@@ -286293,6 +286344,14 @@
         "scripts/manaloom_visual_system_workspace_qa.sh",
         "server/bin/auto_sync_learned_decks.py",
         "server/bin/manaloom_ops_daemon.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_DEBUG_COMBATE",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_captura_play_vs_ai.py"
       ],
       "value_captured": false
     },
@@ -291457,6 +291516,7 @@
     "server/test/external_commander_meta_operational_runner_support_test.dart",
     "server/test/external_commander_meta_promotion_support_test.dart",
     "server/test/external_commander_meta_staging_support_test.dart",
+    "server/test/fixture_asset_server_test.py",
     "server/test/flashback_pg879_exact_runtime_and_cmc_source_test.dart",
     "server/test/flutter_release_sdk_contract_test.dart",
     "server/test/flutter_web_deploy_contract_test.dart",
@@ -291695,6 +291755,7 @@
     "server/test/scope_containment_route_matrix_test.dart",
     "server/test/scryfall_image_url_test.dart",
     "server/test/seed_database_image_selection_test.dart",
+    "server/test/seed_deck_otimizavel_test.py",
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
     "server/test/semantic_layer_v2_backfill_source_test.dart",
     "server/test/semantic_tag_query_contract_test.dart",
@@ -291726,6 +291787,7 @@
     "server/test/user_data_privacy_contract_test.dart",
     "server/test/user_facing_brand_contract_test.dart",
     "server/test/web_artifact_identity_contract_test.dart",
+    "server/test/webdriver_capture_drivers_test.py",
     "server/test/xmage_battle_client_test.dart",
     "server/test/xmage_interactive_release_contract_test.dart",
     "services/forge-sidecar/test_sidecar.py",
@@ -303143,7 +303205,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "dd0b9ab4fb8a2f329a1e75b1089b1100c8a26efa300dd5c9153b1ea65fb51dd8"
+    "project_logic_source_digest_sha256": "b1747ede08b8fa175eea92f42b1420841b01ee5a5695ce37800c338b149a4cdc"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305344,8 +305406,13 @@
       "scripts/dev_full_with_integration.sh",
       "scripts/flutter_run_with_local_sentry.sh",
       "scripts/generate_brewtact_brand_assets.py",
+      "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
+      "scripts/lib/manaloom_captura_card_details_navigation.py",
+      "scripts/lib/manaloom_captura_optimization_card_reader.py",
+      "scripts/lib/manaloom_captura_play_vs_ai.py",
       "scripts/lib/manaloom_chromedriver.sh",
       "scripts/lib/manaloom_dart_toolchain.sh",
+      "scripts/lib/manaloom_fixture_asset_server.py",
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
       "scripts/lib/manaloom_public_web_surface_contract.sh",
@@ -305353,6 +305420,7 @@
       "scripts/lib/manaloom_release_runtime_contract.sh",
       "scripts/lib/manaloom_safe_env.sh",
       "scripts/lib/manaloom_ui_runtime_contract.sh",
+      "scripts/lib/manaloom_webdriver_capture.py",
       "scripts/manaloom_ai_generation_benchmark.sh",
       "scripts/manaloom_ai_paywall_e2e.sh",
       "scripts/manaloom_ai_prompt_eval.sh",
@@ -306272,6 +306340,7 @@
       "server/test/external_commander_meta_operational_runner_support_test.dart",
       "server/test/external_commander_meta_promotion_support_test.dart",
       "server/test/external_commander_meta_staging_support_test.dart",
+      "server/test/fixture_asset_server_test.py",
       "server/test/flashback_pg879_exact_runtime_and_cmc_source_test.dart",
       "server/test/flutter_release_sdk_contract_test.dart",
       "server/test/flutter_web_deploy_contract_test.dart",
@@ -306510,6 +306579,7 @@
       "server/test/scope_containment_route_matrix_test.dart",
       "server/test/scryfall_image_url_test.dart",
       "server/test/seed_database_image_selection_test.dart",
+      "server/test/seed_deck_otimizavel_test.py",
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
       "server/test/semantic_layer_v2_backfill_source_test.dart",
       "server/test/semantic_tag_query_contract_test.dart",
@@ -306541,6 +306611,7 @@
       "server/test/user_data_privacy_contract_test.dart",
       "server/test/user_facing_brand_contract_test.dart",
       "server/test/web_artifact_identity_contract_test.dart",
+      "server/test/webdriver_capture_drivers_test.py",
       "server/test/xmage_battle_client_test.dart",
       "server/test/xmage_interactive_release_contract_test.dart",
       "services/forge-sidecar/.dockerignore",

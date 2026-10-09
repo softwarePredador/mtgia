@@ -311,6 +311,7 @@ void main() {
           ReleaseCapability.socialPush,
           ReleaseCapability.decksPrivate,
           ReleaseCapability.collectionPrivate,
+          ReleaseCapability.battleCoach,
         };
         final pending = Completer<ApiResponse>();
         var requestCount = 0;
@@ -330,12 +331,21 @@ void main() {
 
         final resumeRefresh = provider.refresh();
         expect(provider.loadState, ReleaseCapabilitiesLoadState.loading);
-        for (final path in ['/notifications', '/decks', '/collection']) {
+        // A mesa do Jogar contra IA é a rota que mais perdia com isso: em
+        // Flutter Web cada foco da aba dispara `resumed` e um refresh, e uma
+        // matriz zerada na janela do fetch levava a partida em andamento para
+        // fora da mesa (docs/qa/execution/2026-09-23).
+        for (final path in [
+          '/notifications',
+          '/decks',
+          '/collection',
+          '/decks/abc/play-vs-ai',
+        ]) {
           expect(
             ReleaseCapabilityRouteGuard.redirectFor(
               uri: Uri.parse(path),
               capabilities: provider.snapshot,
-              buildSupport: const ReleaseRouteBuildSupport(),
+              buildSupport: const ReleaseRouteBuildSupport(battleCoach: true),
             ),
             isNull,
             reason: '$path must survive a refresh in flight',
@@ -351,6 +361,69 @@ void main() {
             buildSupport: const ReleaseRouteBuildSupport(),
           ),
           '/home',
+        );
+      },
+    );
+
+    test(
+      'a refresh in flight that lands 200 with a smaller matrix revokes it',
+      () async {
+        // O contraponto do caso acima: manter a matriz carregada durante o
+        // fetch não pode deixar acesso velho sobreviver à resposta. Quando o
+        // servidor responde 200 sem `battleCoach`, a mesa fecha na hora.
+        final pending = Completer<ApiResponse>();
+        var requestCount = 0;
+        final provider = ReleaseCapabilitiesProvider(
+          fetcher: (_) {
+            requestCount++;
+            if (requestCount == 1) {
+              return Future.value(
+                ApiResponse(
+                  200,
+                  _validPayload(
+                    allowed: const {
+                      ReleaseCapability.decksPrivate,
+                      ReleaseCapability.battleCoach,
+                    },
+                  ),
+                ),
+              );
+            }
+            return pending.future;
+          },
+        );
+        addTearDown(provider.dispose);
+        expect(await provider.refresh(), isTrue);
+
+        final resumeRefresh = provider.refresh();
+        expect(provider.isAllowed(ReleaseCapability.battleCoach), isTrue);
+        expect(
+          ReleaseCapabilityRouteGuard.redirectFor(
+            uri: Uri.parse('/decks/abc/play-vs-ai'),
+            capabilities: provider.snapshot,
+            buildSupport: const ReleaseRouteBuildSupport(battleCoach: true),
+          ),
+          isNull,
+        );
+
+        pending.complete(
+          ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.decksPrivate}),
+          ),
+        );
+        expect(await resumeRefresh, isTrue);
+        expect(provider.loadState, ReleaseCapabilitiesLoadState.ready);
+        expect(provider.isAllowed(ReleaseCapability.decksPrivate), isTrue);
+        expect(provider.isAllowed(ReleaseCapability.battleCoach), isFalse);
+        expect(
+          ReleaseCapabilityRouteGuard.redirectFor(
+            uri: Uri.parse('/decks/abc/play-vs-ai'),
+            capabilities: provider.snapshot,
+            buildSupport: const ReleaseRouteBuildSupport(battleCoach: true),
+          ),
+          '/decks/abc',
+          reason: 'a resposta nova manda: sem battleCoach, a mesa fecha',
         );
       },
     );
