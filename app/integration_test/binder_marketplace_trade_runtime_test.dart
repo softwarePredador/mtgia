@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
 import 'package:integration_test/integration_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/auth/providers/auth_provider.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
@@ -1018,6 +1019,14 @@ Widget _runtimeApp({
 }) {
   return MultiProvider(
     providers: [
+      // A8: troca e venda do fichário só existem com a capability ligada. Esta
+      // prova exercita as duas, então semeia ambas explicitamente.
+      ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+        value: ReleaseCapabilitiesProvider.seeded(const {
+          ReleaseCapability.trades,
+          ReleaseCapability.marketplace,
+        }),
+      ),
       ChangeNotifierProvider<AuthProvider>.value(value: auth),
       ChangeNotifierProvider<BinderProvider>.value(value: binder),
       ChangeNotifierProvider<CardProvider>(create: (_) => CardProvider()),

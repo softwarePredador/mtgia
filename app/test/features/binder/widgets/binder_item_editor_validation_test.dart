@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:manaloom/core/api/api_client.dart';
+import 'package:manaloom/core/config/release_capabilities.dart';
 import 'package:manaloom/core/theme/app_theme.dart';
 import 'package:manaloom/features/binder/providers/binder_provider.dart';
 import 'package:manaloom/features/binder/widgets/binder_item_editor.dart';
@@ -72,6 +73,9 @@ Future<void> _pumpEditor(
   CardProvider? cardProvider,
   Future<bool> Function(Map<String, dynamic> data)? onSave,
   Future<bool> Function()? onDelete,
+  // A8: troca, venda e o campo de preço só existem com a capability ligada.
+  // O padrão vazio é a beta real — quem exercita a venda liga explicitamente.
+  Set<ReleaseCapability> capabilities = const {},
 }) async {
   tester.view.physicalSize = viewport;
   tester.view.devicePixelRatio = 1;
@@ -91,18 +95,124 @@ Future<void> _pumpEditor(
       ),
     ),
   );
+  final withCards = cardProvider == null
+      ? subject
+      : ChangeNotifierProvider<CardProvider>.value(
+          value: cardProvider,
+          child: subject,
+        );
   await tester.pumpWidget(
-    cardProvider == null
-        ? subject
-        : ChangeNotifierProvider<CardProvider>.value(
-            value: cardProvider,
-            child: subject,
-          ),
+    ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+      value: ReleaseCapabilitiesProvider.seeded(capabilities),
+      child: withCards,
+    ),
   );
   await tester.pumpAndSettle();
 }
 
 void main() {
+  // A8 / D-04: o fichário só apresenta o que a release permite. Sem estes
+  // casos, os testes de venda acima passariam a ligar a capability e ninguém
+  // notaria se a contenção sumisse.
+  testWidgets('sem capability, editor não oferece troca nem venda', (
+    tester,
+  ) async {
+    await _pumpEditor(tester, item: _binderItem());
+
+    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsNothing);
+    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsNothing);
+    expect(find.textContaining('Preço'), findsNothing);
+  });
+
+  testWidgets('cada switch responde à SUA capability', (tester) async {
+    // Se os dois lessem a mesma flag, um destes dois casos falharia.
+    await _pumpEditor(
+      tester,
+      item: _binderItem(),
+      capabilities: const {ReleaseCapability.trades},
+    );
+    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsOneWidget);
+    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsNothing);
+  });
+
+  testWidgets('só marketplace mostra venda, não troca', (tester) async {
+    await _pumpEditor(
+      tester,
+      item: _binderItem(),
+      capabilities: const {ReleaseCapability.marketplace},
+    );
+    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsNothing);
+    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsOneWidget);
+  });
+
+  // D-90: item antigo com oferta gravada, capabilities desligadas. O PUT de
+  // `/binder/:id` é parcial (campo ausente mantém o valor no banco); omitir os
+  // campos deixaria a oferta antiga gravada. O corpo tem de levar os três
+  // explícitos: `for_trade: false`, `for_sale: false`, `price: null`.
+  testWidgets('capabilities fechadas limpam a oferta antiga no corpo do PUT', (
+    tester,
+  ) async {
+    final saved = <Map<String, dynamic>>[];
+    final item = _binderItem()
+      ..forTrade = true
+      ..forSale = true
+      ..price = 12.5;
+    await _pumpEditor(
+      tester,
+      item: item,
+      onSave: (data) async {
+        saved.add(data);
+        return true;
+      },
+    );
+
+    final save = find.byKey(const Key('binder-editor-save-button'));
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+
+    expect(saved, hasLength(1));
+    expect(saved.single.containsKey('for_trade'), isTrue);
+    expect(saved.single.containsKey('for_sale'), isTrue);
+    expect(saved.single.containsKey('price'), isTrue);
+    expect(saved.single['for_trade'], isFalse);
+    expect(saved.single['for_sale'], isFalse);
+    expect(saved.single['price'], isNull);
+    expect(find.byKey(const Key('binder-editor-save-error')), findsNothing);
+  });
+
+  testWidgets('capabilities abertas enviam os valores do formulário', (
+    tester,
+  ) async {
+    final saved = <Map<String, dynamic>>[];
+    final item = _binderItem()
+      ..forTrade = true
+      ..forSale = true
+      ..price = 12.5;
+    await _pumpEditor(
+      tester,
+      item: item,
+      capabilities: const {
+        ReleaseCapability.trades,
+        ReleaseCapability.marketplace,
+      },
+      onSave: (data) async {
+        saved.add(data);
+        return true;
+      },
+    );
+
+    final save = find.byKey(const Key('binder-editor-save-button'));
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+
+    expect(saved, hasLength(1));
+    expect(saved.single['for_trade'], isTrue);
+    expect(saved.single['for_sale'], isTrue);
+    expect(saved.single['price'], 12.5);
+  });
+
   testWidgets('wide editor keeps controls in a centered working frame', (
     tester,
   ) async {
@@ -188,6 +298,8 @@ void main() {
     await _pumpEditor(
       tester,
       item: _binderItem(),
+      // Este teste exercita o preço de venda, que só existe sob `marketplace`.
+      capabilities: const {ReleaseCapability.marketplace},
       onSave: (data) async {
         saved.add(data);
         return false;
@@ -298,6 +410,7 @@ void main() {
     await _pumpEditor(
       tester,
       item: _binderItem(),
+      capabilities: const {ReleaseCapability.marketplace},
       onSave: (data) async {
         saved.add(data);
         return true;

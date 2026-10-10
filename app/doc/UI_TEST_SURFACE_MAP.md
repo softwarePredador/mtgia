@@ -505,8 +505,8 @@ dart run tool/authenticated_visual_diff.dart \
 | Ação adicionar no fichário | `BinderTabContent` | `binder-add-card-action` | Abre busca para adicionar. | Tap por key. |
 | Ação scanner no fichário | `BinderTabContent` | `binder-scan-card-action` | Scanner, fora de escopo quando explicitamente ignorado. | Não usar em non-scanner QA. |
 | Editor foil | `BinderItemEditor` | `binder-editor-foil-switch` | Liga/desliga foil. | Tap por key + validar request. |
-| Editor trade/sale | `BinderItemEditor` | `binder-editor-for-trade-switch`, `binder-editor-for-sale-switch` | Define disponibilidade pública. | Tap por key. |
-| Editor preço | `BinderItemEditor` | `binder-editor-price-field` | Preço opcional. | `enterText` por key. |
+| Editor trade/sale | `BinderItemEditor` | `binder-editor-for-trade-switch`, `binder-editor-for-sale-switch` | Define disponibilidade pública. Cada switch só existe com a sua capability (`trades`/`marketplace`); fechadas, o save envia `for_trade:false`, `for_sale:false`, `price:null` (D-90). | Semear `ReleaseCapabilitiesProvider.seeded`; tap por key. |
+| Editor preço | `BinderItemEditor` | `binder-editor-price-field` | Preço opcional; só com `marketplace` e venda ligada. | `enterText` por key. |
 | Editor notas | `BinderItemEditor` | `binder-editor-notes-field` | Nota privada/pública conforme contrato atual. | `enterText` por key. |
 | Editor condição/idioma | `BinderItemEditor` | `binder-editor-condition-<condition>`, `binder-editor-language-<language>` | Seleciona condição e idioma. | Tap por key. |
 | Editor quantidade | `BinderItemEditor` | `binder-editor-quantity-decrement`, `binder-editor-quantity-value`, `binder-editor-quantity-increment` | Ajusta quantidade. | Tap por key + validar valor. |
