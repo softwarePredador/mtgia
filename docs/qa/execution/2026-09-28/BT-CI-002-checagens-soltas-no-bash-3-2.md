@@ -54,8 +54,8 @@ restore e as bibliotecas que eles carregam.
   - `manaloom_release_capabilities_contract_test.sh`: 1;
   - `manaloom_release_ops_contract_test.sh`: 6.
 - **Depois:** nenhuma.
-- **Raízes do digest de UI:** 21 checagens soltas, que viraram a lista pendente e o
-  rascunho abaixo:
+- **Raízes do digest de UI:** 21 checagens soltas, que eram a lista pendente e foram
+  convertidas no PR `port(gate-arvore-b)` (B11):
   - `manaloom_play_vs_ai_e2e.sh`: 17;
   - `manaloom_authenticated_visual_qa_isolated.sh`: 4.
 - **Scripts da coordenação fora do repositório:** 150 `.sh`, 41 com `set -e`, nenhum achado.
@@ -110,11 +110,13 @@ scripts rodam contra um `curl` falso:
   porque o CLI quebrava com caminho fora da raiz. O rótulo foi corrigido, e o teste passou a
   exigir a linha acusada.
 
-## Rascunho sem commit: raízes do digest de UI e contrato E2E
+## Raízes do digest de UI e contrato E2E (feito no PR `port(gate-arvore-b)`, B11)
 
 `manaloom_play_vs_ai_e2e.sh` e `manaloom_authenticated_visual_qa_isolated.sh` estão no
-`SOURCE_ROOTS` de `scripts/manaloom_ui_source_digest.sh`, então o conserto deles está em
-rascunho, fora do repositório, em `~/.manaloom/coordenacao/banco/errexit/rascunho_digest/`.
+`SOURCE_ROOTS` de `scripts/manaloom_ui_source_digest.sh`. O conserto deles, que ficava fora
+do repositório, entrou no repositório neste PR (a prova de UI fica por recapturar, D-89).
+
+Histórico do que foi conferido na época:
 
 - **Base:** a árvore do gate `679f0d35f`.
 - **Patch 1:** as 21 checagens viram `... || fail_check "..."`.
@@ -125,7 +127,7 @@ rascunho, fora do repositório, em `~/.manaloom/coordenacao/banco/errexit/rascun
 - **Patch 3:** a regra invariante nova em `docs/MANALOOM_E2E_RELEASE_CONTRACT.md`.
   - Esse documento é do plano de controle do escopo staged (`BOOTSTRAP_SOURCE_PATHS` de
     `scripts/manaloom_staged_ui_scope.py`), e mudar ele exige a prova de UI integral.
-  - O hook barrou o commit com a prova de UI vencida, então a regra ficou em rascunho.
+  - O hook barrou o commit com a prova de UI vencida, então a regra ficou de fora do primeiro commit; entrou junto com o conserto das raízes.
   - Enquanto isso, a regra está no próprio contrato: o comentário e a chamada em
     `scripts/manaloom_release_ops_contract_test.sh`.
 

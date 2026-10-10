@@ -65,7 +65,7 @@ PY
 )"
 (
   cd "$ROOT_DIR"
-  python3 -m http.server "$ASSET_PORT" --bind 127.0.0.1 \
+  exec python3 "$ROOT_DIR/scripts/lib/manaloom_fixture_asset_server.py" "$ASSET_PORT" --bind 127.0.0.1 \
     >"$RUN_DIR/asset-server.log" 2>&1
 ) &
 ASSET_SERVER_PID="$!"

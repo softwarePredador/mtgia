@@ -369,9 +369,15 @@ for output in build .dart_frog; do
       [[ -n "$build_consumers" ]] || break
       sleep 0.25
     done
-    [[ -z "$build_consumers" ]] || {
-      echo "BLOCKED: build output has a consumer" >&2; exit 2;
-    }
+    # Diz QUEM segurava quando o prazo acaba: a mensagem antiga não permitia
+    # diagnóstico.
+    if [[ -n "$build_consumers" ]]; then
+      echo "BLOCKED: build output has a consumer after 30s: $output" >&2
+      for consumer_pid in $build_consumers; do
+        echo "  pid $consumer_pid: $(ps -p "$consumer_pid" -o command= 2>/dev/null || echo desconhecido)" >&2
+      done
+      exit 2
+    fi
     mv -- "$SERVER_DIR/$output" "$RUN_DIR/pre-$output"
     BUILD_SAVED+=("$output")
   fi

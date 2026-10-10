@@ -2,6 +2,13 @@
 set -euo pipefail
 umask 077
 
+# BT-CI-002: checagem que barra também no /bin/bash 3.2 do macOS, onde um [[ ]] ou
+# (( )) solto que falha não encerra o script com set -e.
+fail_check() {
+  echo "checagem falhou: $*" >&2
+  exit 1
+}
+
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 APP_DIR="$ROOT_DIR/app"
 SIDECAR_DIR="$ROOT_DIR/services/xmage-sidecar"
@@ -270,7 +277,8 @@ WORKTREE_STATUS_SHA="$(
 )"
 if [[ "$BROWSER_QA_MODE" == "1" ]]; then
   BROWSER_UI_SOURCE_DIGEST="$("$ROOT_DIR/scripts/manaloom_ui_source_digest.sh")"
-  [[ "$BROWSER_UI_SOURCE_DIGEST" =~ ^[0-9a-f]{64}$ ]]
+  [[ "$BROWSER_UI_SOURCE_DIGEST" =~ ^[0-9a-f]{64}$ ]] ||
+    fail_check "digest da fonte de UI invalido"
 fi
 
 copy_artifact() {
@@ -781,7 +789,8 @@ run_browser_qa() {
         '{email: $email, password: $password}')" \
       "$BROWSER_API_BASE_URL/auth/login" | jq -er '.token'
   )"
-  [[ -n "$browser_token" ]]
+  [[ -n "$browser_token" ]] ||
+    fail_check "login do browser sem token"
 
   browser_human_deck_name="QA Web Isamaru $browser_seed_suffix"
   browser_ai_deck_name="QA Web Krenko $browser_seed_suffix"
@@ -825,8 +834,10 @@ run_browser_qa() {
     <<<"$browser_ai_deck_response" >/dev/null
   browser_human_deck_id="$(jq -er '.id' <<<"$browser_human_deck_response")"
   browser_ai_deck_id="$(jq -er '.id' <<<"$browser_ai_deck_response")"
-  [[ "$browser_human_deck_id" =~ ^[0-9a-f-]{36}$ ]]
-  [[ "$browser_ai_deck_id" =~ ^[0-9a-f-]{36}$ ]]
+  [[ "$browser_human_deck_id" =~ ^[0-9a-f-]{36}$ ]] ||
+    fail_check "deck humano sem id valido"
+  [[ "$browser_ai_deck_id" =~ ^[0-9a-f-]{36}$ ]] ||
+    fail_check "deck da IA sem id valido"
 
   FAILURE_STAGE="build_browser_qa_flutter_web"
   (
@@ -843,7 +854,8 @@ run_browser_qa() {
       --dart-define=DISABLE_PUSH_INIT=true \
       --dart-define=DISABLE_FIREBASE_PERFORMANCE_INIT=true
   ) >"$BROWSER_BUILD_LOG" 2>&1
-  [[ -s "$BROWSER_WEB_BUILD_DIR/main.dart.js" ]]
+  [[ -s "$BROWSER_WEB_BUILD_DIR/main.dart.js" ]] ||
+    fail_check "build Web sem main.dart.js"
   BROWSER_BUNDLE_SHA="$(
     shasum -a 256 "$BROWSER_WEB_BUILD_DIR/main.dart.js" | awk '{print $1}'
   )"
@@ -1134,8 +1146,10 @@ run_browser_qa() {
           ORDER BY created_at DESC, id DESC LIMIT 1" |
       tr -d '[:space:]'
   )"
-  [[ "$browser_session_id" =~ ^[0-9a-f-]{36}$ ]]
-  [[ "$(jq -r '.session_id' "$BROWSER_DONE_FILE")" == "$browser_session_id" ]]
+  [[ "$browser_session_id" =~ ^[0-9a-f-]{36}$ ]] ||
+    fail_check "sessao do browser sem id valido"
+  [[ "$(jq -r '.session_id' "$BROWSER_DONE_FILE")" == "$browser_session_id" ]] ||
+    fail_check "session_id do browser difere do concluido"
 
   browser_session_response="$(
     curl -fsS --max-time 30 \
@@ -1231,11 +1245,16 @@ run_browser_qa() {
   )"
   IFS='|' read -r browser_action_records browser_prompt_records \
     browser_record_total <<<"$browser_record_counts"
-  [[ "$browser_action_records" =~ ^[0-9]+$ ]]
-  [[ "$browser_prompt_records" =~ ^[0-9]+$ ]]
-  [[ "$browser_record_total" =~ ^[0-9]+$ ]]
-  ((browser_action_records >= 8))
-  ((browser_prompt_records >= 8))
+  [[ "$browser_action_records" =~ ^[0-9]+$ ]] ||
+    fail_check "contagem de acoes do browser nao numerica"
+  [[ "$browser_prompt_records" =~ ^[0-9]+$ ]] ||
+    fail_check "contagem de prompts do browser nao numerica"
+  [[ "$browser_record_total" =~ ^[0-9]+$ ]] ||
+    fail_check "total de registros do browser nao numerico"
+  ((browser_action_records >= 8)) ||
+    fail_check "menos de 8 acoes registradas no browser"
+  ((browser_prompt_records >= 8)) ||
+    fail_check "menos de 8 prompts registrados no browser"
 
   browser_session_requests="$(
     grep -c "/api/ai/battle/sessions/$browser_session_id" \
@@ -1245,8 +1264,10 @@ run_browser_qa() {
     grep -c "/api/decks/$browser_human_deck_id/battle-replays/$browser_replay_id" \
       "$BROWSER_WEB_LOG" 2>/dev/null || true
   )"
-  ((browser_session_requests >= 2))
-  ((browser_replay_requests >= 1))
+  ((browser_session_requests >= 2)) ||
+    fail_check "menos de 2 requisicoes de sessao no browser"
+  ((browser_replay_requests >= 1)) ||
+    fail_check "nenhuma requisicao de replay no browser"
 
   BROWSER_EVIDENCE_JSON="$(
     jq -n \
@@ -1336,7 +1357,8 @@ run_browser_qa() {
   grep -Fq 'api_listeners=0' "$BROWSER_CHILD_CLEANUP"
   grep -Fq 'email_fixture_listeners=0' "$BROWSER_CHILD_CLEANUP"
   grep -Fq 'forced_kill_used=0' "$BROWSER_CHILD_CLEANUP"
-  [[ "$(listener_count "$BROWSER_WEB_PORT")" == "0" ]]
+  [[ "$(listener_count "$BROWSER_WEB_PORT")" == "0" ]] ||
+    fail_check "porta Web do browser ainda escutando"
   BROWSER_CHILD_CLEANUP_RESULT="pass"
   BROWSER_QA_RESULT="pass"
 }
@@ -1446,7 +1468,8 @@ FAILURE_STAGE="build_current_sidecar"
   mvn -B -Dstyle.color=never -DskipTests package
 ) >"$SIDECAR_BUILD_LOG" 2>&1
 SIDECAR_JAR="$SIDECAR_DIR/target/xmage-sidecar.jar"
-[[ -s "$SIDECAR_JAR" ]]
+[[ -s "$SIDECAR_JAR" ]] ||
+  fail_check "jar do sidecar ausente"
 SIDECAR_JAR_SHA="$(shasum -a 256 "$SIDECAR_JAR" | awk '{print $1}')"
 
 FAILURE_STAGE="start_distinct_sidecars"
@@ -1534,7 +1557,8 @@ jq -e \
     and .interactive_battle.active == 0' \
   "$INTERACTIVE_HEALTH" >/dev/null
 [[ "$(jq -r '.sidecar_process_id' "$BATCH_HEALTH")" != \
-   "$(jq -r '.sidecar_process_id' "$INTERACTIVE_HEALTH")" ]]
+   "$(jq -r '.sidecar_process_id' "$INTERACTIVE_HEALTH")" ]] ||
+  fail_check "sidecars batch e interativo com o mesmo PID"
 assert_pid_loopback_listeners "$BATCH_PID" "XMage batch sidecar/H2"
 assert_pid_loopback_listeners "$INTERACTIVE_PID" \
   "XMage interactive sidecar/H2"

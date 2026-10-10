@@ -24,6 +24,15 @@ eles não substituem este contrato.
   conhecido de produção é bloqueado nelas.
 - Um `SKIP` precisa declarar pré-requisito e comando de ativação. Ele não pode
   ser apresentado como `PASS`.
+- Checagem de shell barra também no `/bin/bash` 3.2 do macOS, de onde a
+  coordenação roda deploy, promoção, ops e backup (`BT-CI-002`). Ali um
+  `[[ ... ]]` ou `(( ... ))` solto que falha não encerra o script com `set -e`,
+  e um `!` solto não encerra em versão nenhuma. A forma certa é
+  `[[ ... ]] || fail "..."` ou `if ...; then ...; exit 1; fi`.
+  `scripts/manaloom_errexit_lint.py` varre `scripts/` e `server/bin/` dentro de
+  `scripts/manaloom_release_ops_contract_test.sh`. As raízes do digest de UI
+  ficam em `scripts/manaloom_errexit_lint_pending.json`, uma lista fechada que
+  só encolhe.
 - Gate e release são fail-closed: `PASS` é o único resultado com exit code
   zero. O modo diagnóstico que tolera `PARTIAL` exige `--allow-partial`, é
   marcado como não elegível para gate/release e nunca pode ser descrito como
