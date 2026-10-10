@@ -63,27 +63,45 @@ class GateRunReceiptTest(unittest.TestCase):
         path.write_text(json.dumps(tool.capture_source_state(self.repo)), encoding="utf-8")
         return path
 
-    def steps(self, *rows: tuple[str, str, int]) -> Path:
+    def steps(self, *rows: tuple[str, str, int], source_overrides=None) -> Path:
+        """steps.tsv no formato local-ci-v2: cada etapa leva o estado-fonte do fim dela."""
         lines = []
+        source_overrides = source_overrides or {}
         for step_id, status, exit_code in rows:
             log = self.work / f"{step_id}.log"
             log.write_text(f"log of {step_id}\n", encoding="utf-8")
-            lines.append(f"{step_id}\t{status}\t{exit_code}\t{log}")
+            source = self.work / f"{step_id}.source.json"
+            state = tool.capture_source_state(self.repo)
+            state.update(source_overrides.get(step_id, {}))
+            source.write_text(json.dumps(state), encoding="utf-8")
+            lines.append(f"{step_id}\t{status}\t{exit_code}\t{log}\t{source}")
         path = self.work / "steps.tsv"
         path.write_text("\n".join(lines) + "\n", encoding="utf-8")
         return path
 
-    def finalize(self, *, status: str = "PASS", root: Path | None = None, rows=None, start=None):
+    def finalize(
+        self,
+        *,
+        status: str = "PASS",
+        root: Path | None = None,
+        rows=None,
+        start=None,
+        mode: str = "schema",
+        source_overrides=None,
+    ):
         self.run_counter = getattr(self, "run_counter", 0) + 1
         return tool.finalize(
             repo=self.repo,
             gate="local_ci",
-            mode="schema",
+            mode=mode,
             run_id=f"20261005T000000Z_schema_{self.run_counter}",
             started_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             source_start_path=start or self.start(),
-            steps_path=self.steps(*(rows or tuple((step, "PASS", 0) for step in tool.LOCAL_CI_CHECKS["schema"]))),
-            steps_format="local-ci-v1",
+            steps_path=self.steps(
+                *(rows or tuple((step, "PASS", 0) for step in tool.LOCAL_CI_CHECKS[mode])),
+                source_overrides=source_overrides,
+            ),
+            steps_format="local-ci-v2",
             status=status,
             receipt_root=root or self.durable_root,
         )
@@ -101,6 +119,7 @@ class GateRunReceiptTest(unittest.TestCase):
         clean = tool.capture_source_state(self.repo)
         self.assertEqual(clean["git_sha"], git(self.repo, "rev-parse", "HEAD"))
         self.assertRegex(clean["git_sha"], r"^[0-9a-f]{40}$")
+        self.assertEqual(clean["git_tree"], git(self.repo, "rev-parse", "HEAD^{tree}"))
         self.assertFalse(clean["git_dirty"])
 
         (self.repo / "untracked.txt").write_text("new\n", encoding="utf-8")
@@ -195,8 +214,10 @@ class GateRunReceiptTest(unittest.TestCase):
         self.rewrite(path, forge)
         self.assert_rejected(path, "artifact not referenced|check catalog drift")
         # Um receipt honesto, mas com um check só, não cobre o modo.
-        path2, _ = self.finalize(rows=(("shell-contracts", "PASS", 0),))
-        self.assert_rejected(path2, "check catalog mismatch")
+        path2, receipt2 = self.finalize(rows=(("shell-contracts", "PASS", 0),))
+        self.assertEqual(receipt2["status"], "FAIL")
+        self.assertIn("check_catalog_mismatch", receipt2["reasons"])
+        self.assert_rejected(path2, "status must be exactly")
 
     def test_reordered_catalog_is_rejected(self) -> None:
         path, _ = self.finalize()
@@ -211,6 +232,8 @@ class GateRunReceiptTest(unittest.TestCase):
             "unknown artifact": lambda r: r["checks"][0].update(artifact_ids=["log.ghost"]),
             "summary does not match": lambda r: r["summary"].update(failed=1),
             "status must be exactly": lambda r: r.update(status="PARTIAL"),
+            "different SHA/tree/digest": lambda r: r["checks"][0]["source"].update(git_sha="f" * 40),
+            "log_sha256 does not match": lambda r: r["checks"][0].update(log_sha256="e" * 64),
             "carries no reasons": lambda r: r.update(reasons=["x"]),
         }
         for message, mutate in cases.items():
@@ -301,7 +324,7 @@ class GateRunReceiptTest(unittest.TestCase):
             "--gate", "local_ci", "--mode", "schema",
             "--started-at", datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "--source-start", str(start), "--steps", str(steps),
-            "--steps-format", "local-ci-v1", "--status", "PASS",
+            "--steps-format", "local-ci-v2", "--status", "PASS",
             "--receipt-root", str(self.durable_root),
         ]
         stable = subprocess.run(base + ["--run-id", "stable"], text=True, capture_output=True)
@@ -317,6 +340,112 @@ class GateRunReceiptTest(unittest.TestCase):
         moved = subprocess.run(base + ["--run-id", "moved"], text=True, capture_output=True)
         self.assertEqual(moved.returncode, 1)
         self.assertFalse(json.loads(moved.stdout)["source_stable"])
+
+    # BT-GATE-001/002/003: PARTIAL, SHA por etapa e reaproveitamento por fatia.
+
+    def test_partial_step_never_yields_pass_or_eligibility(self) -> None:
+        rows = tuple(
+            (step, "PARTIAL" if step == "schema-gate" else "PASS", 3 if step == "schema-gate" else 0)
+            for step in tool.LOCAL_CI_CHECKS["schema"]
+        )
+        path, receipt = self.finalize(rows=rows)
+        self.assertEqual(receipt["status"], "FAIL")
+        self.assertIn("non_pass_check_with_pass_status", receipt["reasons"])
+        self.assertFalse(receipt["gate_eligible"])
+        self.assertEqual(receipt["summary"]["partial"], 1)
+        path2, receipt2 = self.finalize(rows=rows, status="PARTIAL")
+        self.assertEqual(receipt2["status"], "PARTIAL")
+        self.assertFalse(receipt2["gate_eligible"])
+        self.assert_rejected(path2, "status must be exactly")
+
+    def test_step_on_another_sha_turns_the_receipt_into_fail(self) -> None:
+        step = tool.LOCAL_CI_CHECKS["schema"][1]
+        for key, value in (
+            ("git_sha", "f" * 40),
+            ("git_tree", "e" * 40),
+            ("worktree_digest_sha256", "d" * 64),
+        ):
+            with self.subTest(key=key):
+                _, receipt = self.finalize(source_overrides={step: {key: value}})
+                self.assertEqual(receipt["status"], "FAIL")
+                self.assertIn(f"step_source_drift:{step}", receipt["reasons"])
+                self.assertFalse(receipt["gate_eligible"])
+
+    def test_tree_drift_after_gate_is_rejected(self) -> None:
+        path, _ = self.finalize()
+        self.rewrite(path, lambda r: r.update(git_tree="0" * 40))
+        self.assert_rejected(path, "git_tree drift")
+
+    def test_full_catalog_carries_the_deck_ai_learning_slice_once(self) -> None:
+        for mode in ("full", "e2e", "release"):
+            with self.subTest(mode=mode):
+                self.assertEqual(tool.LOCAL_CI_CHECKS[mode].count("deck-ai-learning"), 1)
+        self.assertNotIn("deck-ai-learning", tool.LOCAL_CI_CHECKS["quick"])
+        self.assertNotIn("deck-ai-learning", tool.LOCAL_CI_CHECKS["schema"])
+
+    def test_reuse_requires_pass_on_the_same_sha_tree_and_digest(self) -> None:
+        rows = (("project-logic", "PASS", 0), ("full-quality", "PASS", 0))
+        steps = self.steps(*rows)
+        self.assertEqual(
+            tool.reusable_check(steps_path=steps, repo=self.repo, candidate_ids=["project-logic", "full-quality"]),
+            "project-logic",
+        )
+        # etapa que não passou não é reaproveitada
+        steps = self.steps(("project-logic", "PARTIAL", 3), ("full-quality", "PASS", 0))
+        self.assertEqual(
+            tool.reusable_check(steps_path=steps, repo=self.repo, candidate_ids=["project-logic", "full-quality"]),
+            "full-quality",
+        )
+        steps = self.steps(("project-logic", "FAIL", 1))
+        with self.assertRaisesRegex(tool.ReceiptValidationError, "no local_ci check"):
+            tool.reusable_check(steps_path=steps, repo=self.repo, candidate_ids=["project-logic"])
+        # etapa ausente
+        with self.assertRaisesRegex(tool.ReceiptValidationError, "no local_ci check"):
+            tool.reusable_check(steps_path=steps, repo=self.repo, candidate_ids=["guardrail-audits"])
+
+    def test_reuse_is_refused_after_the_worktree_moves(self) -> None:
+        steps = self.steps(("guardrail-audits", "PASS", 0))
+        (self.repo / "tracked.txt").write_text("moved after the step\n", encoding="utf-8")
+        with self.assertRaisesRegex(tool.ReceiptValidationError, "no local_ci check"):
+            tool.reusable_check(steps_path=steps, repo=self.repo, candidate_ids=["guardrail-audits"])
+
+    def test_cli_reuse_exit_codes(self) -> None:
+        steps = self.steps(("guardrail-audits", "PASS", 0))
+        base = ["python3", str(TOOL_PATH), "reuse", "--repo", str(self.repo), "--steps", str(steps)]
+        ok = subprocess.run(base + ["--check", "guardrail-audits"], text=True, capture_output=True)
+        self.assertEqual((ok.returncode, ok.stdout.strip()), (0, "guardrail-audits"))
+        missing = subprocess.run(base + ["--check", "full-quality"], text=True, capture_output=True)
+        self.assertEqual(missing.returncode, 1)
+
+    def test_e2e_receipt_round_trips_and_a_skip_never_validates(self) -> None:
+        def e2e(rows, status):
+            lines = []
+            for status_text, label in rows:
+                log = self.work / f"{label.replace(' ', '_')}.log"
+                log.write_text("log\n", encoding="utf-8")
+                lines.append(f"{status_text}\t{label}\t{0 if status_text == 'PASS' else ''}\t{log if status_text == 'PASS' else ''}\treason")
+            steps = self.work / "e2e-steps.tsv"
+            steps.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            self.run_counter = getattr(self, "run_counter", 0) + 1
+            return tool.finalize(
+                repo=self.repo, gate="e2e_suite", mode="strict-gate",
+                run_id=f"e2e_{self.run_counter}",
+                started_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                source_start_path=self.start(), steps_path=steps, steps_format="e2e-v1",
+                status=status, receipt_root=self.durable_root,
+            )
+
+        path, receipt = e2e([("PASS", "Public web product E2E")], "PASS")
+        self.assertEqual(receipt["status"], "PASS")
+        tool.validate(path, repo=self.repo, expected_gate="e2e_suite")
+        path2, receipt2 = e2e([("PASS", "Public web"), ("SKIP", "Optimizer isolated E2E")], "PARTIAL")
+        self.assertEqual(receipt2["status"], "PARTIAL")
+        self.assertFalse(receipt2["gate_eligible"])
+        self.assertEqual(receipt2["summary"]["skipped"], 1)
+        self.assert_rejected(path2, "status must be exactly")
+        # PASS pedido com um SKIP no meio é rebaixado pelo próprio receipt.
+        _, receipt3 = e2e([("PASS", "Public web"), ("SKIP", "Optimizer isolated E2E")], "PASS")
+        self.assertEqual(receipt3["status"], "FAIL")
 
 
 if __name__ == "__main__":

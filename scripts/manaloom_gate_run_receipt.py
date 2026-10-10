@@ -55,6 +55,9 @@ _FULL_CHECKS = (
     "guardrail-audits",
     "release-contracts",
     "full-quality",
+    # BT-GATE-003: o gate Deck/IA/Learning roda uma vez, depois do full-quality,
+    # e reaproveita o que o local_ci já provou no mesmo SHA (ver `reuse`).
+    "deck-ai-learning",
     "schema-gate",
 )
 # Catálogo fechado de cada modo do local_ci, na ordem em que o script roda.
@@ -79,7 +82,8 @@ LOCAL_CI_CHECKS = {
     "release": _FULL_CHECKS + ("battle-gate", "android-release-build"),
 }
 STATUSES = ("PASS", "FAIL", "BLOCKED", "PARTIAL")
-STEP_STATUSES = ("PASS", "FAIL", "SKIP", "BLOCKED")
+STEP_STATUSES = ("PASS", "FAIL", "SKIP", "BLOCKED", "PARTIAL")
+STEP_SOURCE_KEYS = ("git_sha", "git_tree", "worktree_digest_sha256")
 STEP_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]*$")
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]*$")
 
@@ -128,6 +132,9 @@ def capture_source_state(repo: Path) -> dict[str, Any]:
     git_sha = _core._git_bytes(repo, "rev-parse", "HEAD").decode().strip()
     if not GIT_SHA_RE.fullmatch(git_sha):
         raise ReceiptValidationError("source checkout has no full Git SHA")
+    git_tree = _core._git_bytes(repo, "rev-parse", "HEAD^{tree}").decode().strip()
+    if not GIT_SHA_RE.fullmatch(git_tree):
+        raise ReceiptValidationError("source checkout has no full Git tree")
     git_dirty = bool(
         _core._git_bytes(
             repo, "status", "--porcelain", "--untracked-files=normal"
@@ -138,6 +145,7 @@ def capture_source_state(repo: Path) -> dict[str, Any]:
         raise ReceiptValidationError("project logic source digest is invalid")
     return {
         "git_sha": git_sha,
+        "git_tree": git_tree,
         "git_dirty": git_dirty,
         "worktree_digest_sha256": worktree_digest_sha256(repo),
         "project_logic_source_digest": source_digest,
@@ -161,6 +169,8 @@ def parse_steps(path: Path, steps_format: str) -> list[dict[str, Any]]:
     """Lê o manifesto de etapas que o shell escreveu, uma etapa por linha.
 
     local-ci-v1: id, status, exit_code, log (TAB)
+    local-ci-v2: id, status, exit_code, log, source (TAB); `source` é o JSON do
+    estado-fonte capturado ao fim da etapa (BT-GATE-002)
     e2e-v1: status, label, exit_code, log, reason (TAB; o formato do steps.tsv)
     """
     steps: list[dict[str, Any]] = []
@@ -170,11 +180,15 @@ def parse_steps(path: Path, steps_format: str) -> list[dict[str, Any]]:
     ):
         if not raw_line.strip():
             continue
-        if steps_format == "local-ci-v1":
+        source_path = ""
+        if steps_format in ("local-ci-v1", "local-ci-v2"):
             fields = raw_line.split("\t")
-            if len(fields) != 4:
+            expected_fields = 4 if steps_format == "local-ci-v1" else 5
+            if len(fields) != expected_fields:
                 raise ReceiptValidationError(f"step line {line_number} is malformed")
-            step_id, status, exit_code, log = fields
+            step_id, status, exit_code, log = fields[:4]
+            if expected_fields == 5:
+                source_path = fields[4]
             label = step_id
         elif steps_format == "e2e-v1":
             fields = raw_line.split("\t", 4)
@@ -203,9 +217,19 @@ def parse_steps(path: Path, steps_format: str) -> list[dict[str, Any]]:
                 "status": status,
                 "exit_code": int(exit_code) if exit_code else None,
                 "log": log or None,
+                "source_path": source_path or None,
             }
         )
     return steps
+
+
+def load_step_source(step: dict[str, Any]) -> dict[str, Any] | None:
+    """Estado-fonte de uma etapa: só as chaves que provam o mesmo SHA/tree/digest."""
+    raw = step.get("source_path")
+    if not raw:
+        return None
+    source = load_json_strict(Path(raw))
+    return {key: source.get(key) for key in STEP_SOURCE_KEYS}
 
 
 def finalize(
@@ -245,8 +269,10 @@ def finalize(
 
     artifacts: list[dict[str, Any]] = []
     checks: list[dict[str, Any]] = []
+    step_drift: list[str] = []
     for index, step in enumerate(steps, start=1):
         artifact_ids: list[str] = []
+        log_sha256 = None
         raw_log = step["log"]
         if raw_log:
             source_log = Path(raw_log)
@@ -256,15 +282,21 @@ def finalize(
             shutil.copyfile(source_log, evidence_root / relative)
             copied = evidence_root / relative
             artifact_id = f"log.{step['id']}"
+            log_sha256 = file_sha256(copied)
             artifacts.append(
                 {
                     "id": artifact_id,
                     "path": relative,
-                    "sha256": file_sha256(copied),
+                    "sha256": log_sha256,
                     "size_bytes": copied.stat().st_size,
                 }
             )
             artifact_ids.append(artifact_id)
+        check_source = load_step_source(step)
+        if check_source is not None and any(
+            check_source[key] != source_start.get(key) for key in STEP_SOURCE_KEYS
+        ):
+            step_drift.append(step["id"])
         checks.append(
             {
                 "id": step["id"],
@@ -272,6 +304,8 @@ def finalize(
                 "status": step["status"],
                 "exit_code": step["exit_code"],
                 "artifact_ids": artifact_ids,
+                "log_sha256": log_sha256,
+                "source": check_source,
             }
         )
 
@@ -285,9 +319,24 @@ def finalize(
             if source_start.get(key) != source_end.get(key)
         )
         reasons.append("source_changed:" + ",".join(changed))
+    if step_drift:
+        final_status = "FAIL"
+        reasons.append("step_source_drift:" + ",".join(step_drift))
     if final_status == "PASS" and any(check["status"] != "PASS" for check in checks):
         final_status = "FAIL"
         reasons.append("non_pass_check_with_pass_status")
+    if (
+        final_status == "PASS"
+        and gate == "local_ci"
+        and [check["id"] for check in checks] != list(LOCAL_CI_CHECKS[mode])
+    ):
+        final_status = "FAIL"
+        reasons.append("check_catalog_mismatch")
+    if final_status == "PASS" and steps_format == "local-ci-v2" and any(
+        check["source"] is None for check in checks
+    ):
+        final_status = "FAIL"
+        reasons.append("step_without_source")
     if final_status == "PASS" and not checks:
         final_status = "FAIL"
         reasons.append("no_checks")
@@ -301,6 +350,7 @@ def finalize(
         "failed": sum(1 for check in checks if check["status"] == "FAIL"),
         "skipped": sum(1 for check in checks if check["status"] == "SKIP"),
         "blocked": sum(1 for check in checks if check["status"] == "BLOCKED"),
+        "partial": sum(1 for check in checks if check["status"] == "PARTIAL"),
     }
     receipt = {
         "schema": SCHEMA,
@@ -312,6 +362,7 @@ def finalize(
         "completed_at": _iso(completed),
         "generated_at": _iso(completed),
         "git_sha": git_sha,
+        "git_tree": source_start.get("git_tree"),
         "worktree_digest_sha256": source_start.get("worktree_digest_sha256"),
         "project_logic_source_digest": source_start.get("project_logic_source_digest"),
         "source": {"start": source_start, "end": source_end, "stable": stable},
@@ -331,6 +382,36 @@ def finalize(
         json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return receipt_path, receipt
+
+
+def reusable_check(
+    *,
+    steps_path: Path,
+    repo: Path,
+    candidate_ids: list[str],
+    current_source: dict[str, Any] | None = None,
+) -> str:
+    """Devolve o id de um check do local_ci que já provou a mesma fatia.
+
+    Reaproveitar é permitido só quando o check passou (status PASS, exit 0) e o
+    estado-fonte capturado ao fim dele (SHA, tree e digest do worktree) é igual
+    ao do checkout agora. Qualquer divergência, ou ausência, obriga a rodar a
+    fatia de novo. BT-GATE-003: cada fatia roda uma vez por SHA.
+    """
+    current = current_source or capture_source_state(repo)
+    steps = {step["id"]: step for step in parse_steps(steps_path, "local-ci-v2")}
+    for candidate in candidate_ids:
+        step = steps.get(candidate)
+        if step is None or step["status"] != "PASS" or step["exit_code"] != 0:
+            continue
+        step_source = load_step_source(step)
+        if step_source is None:
+            continue
+        if all(step_source[key] == current.get(key) for key in STEP_SOURCE_KEYS):
+            return candidate
+    raise ReceiptValidationError(
+        "no local_ci check with PASS on this SHA/tree/digest: " + ",".join(candidate_ids)
+    )
 
 
 def _require(condition: bool, message: str) -> None:
@@ -391,6 +472,7 @@ def validate(
         _require(start.get(key) == current[key], f"source drift against checkout: {key}")
     _require(set(start) == set(current), "source.start keys differ from capture")
     _require(receipt.get("git_sha") == current["git_sha"], "git_sha drift")
+    _require(receipt.get("git_tree") == current["git_tree"], "git_tree drift")
     _require(
         receipt.get("worktree_digest_sha256") == current["worktree_digest_sha256"],
         "worktree_digest_sha256 drift",
@@ -465,12 +547,25 @@ def validate(
         check_ids.append(check_id)
         _require(check.get("status") == "PASS", f"check did not pass: {check_id}")
         _require(check.get("exit_code") == 0, f"check exit code is not 0: {check_id}")
+        if gate.get("id") == "local_ci":
+            check_source = check.get("source")
+            _require(
+                isinstance(check_source, dict)
+                and all(check_source.get(key) == start.get(key) for key in STEP_SOURCE_KEYS),
+                f"check ran on a different SHA/tree/digest: {check_id}",
+            )
         ids = check.get("artifact_ids")
         _require(isinstance(ids, list) and ids, f"check has no log artifact: {check_id}")
         for artifact_id in ids:
             _require(artifact_id in indexed, f"check references unknown artifact: {check_id}")
             _require(artifact_id not in referenced, f"artifact shared by two checks: {artifact_id}")
             referenced.add(artifact_id)
+        if gate.get("id") == "local_ci":
+            _require(
+                len(ids) == 1
+                and check.get("log_sha256") == indexed.get(ids[0], {}).get("sha256"),
+                f"check log_sha256 does not match its artifact: {check_id}",
+            )
     _require(referenced == set(indexed), "artifact not referenced by any check")
     _require(
         receipt.get("check_catalog_sha256") == canonical_sha256(check_ids),
@@ -489,6 +584,7 @@ def validate(
             "failed": 0,
             "skipped": 0,
             "blocked": 0,
+            "partial": 0,
         },
         "summary does not match checks",
     )
@@ -512,10 +608,15 @@ def _main(argv: list[str]) -> int:
     finalize_parser.add_argument("--source-start", type=Path, required=True)
     finalize_parser.add_argument("--steps", type=Path, required=True)
     finalize_parser.add_argument(
-        "--steps-format", required=True, choices=("local-ci-v1", "e2e-v1")
+        "--steps-format", required=True, choices=("local-ci-v1", "local-ci-v2", "e2e-v1")
     )
     finalize_parser.add_argument("--status", required=True, choices=STATUSES)
     finalize_parser.add_argument("--receipt-root", type=Path, required=True)
+
+    reuse_parser = sub.add_parser("reuse")
+    reuse_parser.add_argument("--repo", type=Path, default=ROOT_DIR)
+    reuse_parser.add_argument("--steps", type=Path, required=True)
+    reuse_parser.add_argument("--check", required=True, help="ids separados por vírgula")
 
     validate_parser = sub.add_parser("validate")
     validate_parser.add_argument("receipt", type=Path)
@@ -532,6 +633,14 @@ def _main(argv: list[str]) -> int:
             args.out.write_text(
                 json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8"
             )
+            return 0
+        if args.command == "reuse":
+            used = reusable_check(
+                steps_path=args.steps,
+                repo=args.repo,
+                candidate_ids=[item for item in args.check.split(",") if item],
+            )
+            print(used)
             return 0
         if args.command == "finalize":
             path, receipt = finalize(

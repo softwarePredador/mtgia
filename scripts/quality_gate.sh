@@ -56,10 +56,58 @@ print_header() {
   echo "============================================================"
 }
 
+# BT-GATE-001 (D-17): teste pulado nunca é PASS silencioso. Todo comando de teste
+# roda com um reporter JSON em arquivo e o inventário confere cada skip contra a
+# allowlist versionada. Skip fora da lista é PARTIAL (exit 3); relatório
+# ausente ou truncado é BLOCKED (exit 2). O código do teste tem precedência.
+SKIP_INVENTORY_TOOL="$ROOT_DIR/scripts/manaloom_gate_skip_inventory.py"
+SKIP_INVENTORY_ALLOWLIST="${MANALOOM_GATE_SKIP_ALLOWLIST:-$ROOT_DIR/server/config/gate_skip_allowlist.json}"
+
+check_skip_inventory() {
+  local label="$1"
+  local json_file="$2"
+  local inventory_rc=0
+  python3 "$SKIP_INVENTORY_TOOL" test-report \
+    --json "$json_file" \
+    --label "$label" \
+    --allowlist "$SKIP_INVENTORY_ALLOWLIST" || inventory_rc=$?
+  case "$inventory_rc" in
+    0) return 0 ;;
+    3)
+      echo "PARTIAL: $label tem teste pulado fora da allowlist; SKIP nao recebe credito de PASS." >&2
+      return 3
+      ;;
+    *)
+      echo "BLOCKED: $label sem inventario de skip confiavel (exit $inventory_rc)." >&2
+      return 2
+      ;;
+  esac
+}
+
+run_inventoried_test() {
+  local label="$1"
+  shift
+  local json_file test_rc=0
+  json_file="$(mktemp)"
+  "$@" --file-reporter "json:$json_file" || test_rc=$?
+  if [[ "$test_rc" -ne 0 ]]; then
+    rm -f "$json_file"
+    return "$test_rc"
+  fi
+  local inventory_rc=0
+  check_skip_inventory "$label" "$json_file" || inventory_rc=$?
+  rm -f "$json_file"
+  return "$inventory_rc"
+}
+
 run_backend_quick() {
   print_header "Backend quick checks"
   cd "$ROOT_DIR/server"
-  RUN_INTEGRATION_TESTS=0 JWT_SECRET="$BACKEND_TEST_JWT_SECRET" dart test
+  echo "ℹ️ Perfil determinístico: tags live/live_backend/live_db_write/live_external ficam excluídas (nunca como skip)."
+  RUN_INTEGRATION_TESTS=0 JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
+    run_inventoried_test backend-quick \
+      dart test \
+        --exclude-tags "live || live_backend || live_db_write || live_external || historical_external_snapshot"
 }
 
 run_backend_full() {
@@ -85,10 +133,11 @@ run_backend_full() {
     )
     echo "ℹ️ Backend batch $((batch_start / BACKEND_TEST_BATCH_SIZE + 1)): ${#batch[@]} arquivos."
     RUN_INTEGRATION_TESTS=0 JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
-      dart test \
-        --exclude-tags "live || live_backend || live_db_write || live_external || historical_external_snapshot" \
-        --concurrency="$TEST_CONCURRENCY" \
-        "${batch[@]}"
+      run_inventoried_test "backend-full-batch-$((batch_start / BACKEND_TEST_BATCH_SIZE + 1))" \
+        dart test \
+          --exclude-tags "live || live_backend || live_db_write || live_external || historical_external_snapshot" \
+          --concurrency="$TEST_CONCURRENCY" \
+          "${batch[@]}"
   done
 }
 
@@ -104,12 +153,14 @@ run_flutter_tests_with_proof() {
     return 2
   fi
 
-  local output_file status tee_status
+  local output_file status tee_status json_file
   output_file="$(mktemp)"
+  json_file="$(mktemp)"
   set +e
   perl -e 'alarm shift; exec @ARGV' \
     "$FLUTTER_TEST_TIMEOUT_SECONDS" \
     "$FLUTTER_BIN" test --no-pub --no-version-check --reporter compact \
+      --file-reporter "json:$json_file" \
       --concurrency="$TEST_CONCURRENCY" --timeout 2m \
     2>&1 | tee "$output_file"
   local pipeline_status=("${PIPESTATUS[@]}")
@@ -122,18 +173,21 @@ run_flutter_tests_with_proof() {
 
   if [[ "$status" -ne 0 ]]; then
     echo "❌ Flutter tests falharam ou excederam ${FLUTTER_TEST_TIMEOUT_SECONDS}s."
-    rm -f "$output_file"
+    rm -f "$output_file" "$json_file"
     return "$status"
   fi
-  # Flutter prints "All other tests passed!" when the suite succeeds with one
-  # or more declared skips. Keep the process exit status as the primary gate
-  # and accept both official success summaries as the explicit proof.
+  # "All other tests passed!" e o resumo do Flutter quando ha skip declarado.
+  # BT-GATE-001: ele nao e mais aceito por si so. O inventario JSON lista cada
+  # teste pulado e so a allowlist versionada (motivo, dono, prazo) o aceita.
   if ! grep -Eq "All (other )?tests passed!" "$output_file"; then
-    echo "❌ Flutter tests terminaram sem prova explícita de conclusão."
-    rm -f "$output_file"
+    echo "❌ Flutter tests terminaram sem prova explicita de conclusao."
+    rm -f "$output_file" "$json_file"
     return 1
   fi
-  rm -f "$output_file"
+  local inventory_rc=0
+  check_skip_inventory flutter-full "$json_file" || inventory_rc=$?
+  rm -f "$output_file" "$json_file"
+  return "$inventory_rc"
 }
 
 run_frontend_full() {
@@ -177,16 +231,18 @@ run_runtime_performance_contract() {
     cd "$ROOT_DIR/server"
     RUN_INTEGRATION_TESTS=0 \
       JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
-      "$DART_BIN" test \
-        --reporter compact \
-        test/ai_generate_provider_failure_matrix_e2e_test.dart \
-        test/battle_live_local_load_homologation_test.dart
+      run_inventoried_test performance-server \
+        "$DART_BIN" test \
+          --reporter compact \
+          test/ai_generate_provider_failure_matrix_e2e_test.dart \
+          test/battle_live_local_load_homologation_test.dart
   )
   (
     cd "$ROOT_DIR/app"
-    "$FLUTTER_BIN" test \
-      test/features/battle/battle_local_homologation_test.dart \
-      --no-pub --no-version-check --reporter compact --timeout 2m
+    run_inventoried_test performance-app \
+      "$FLUTTER_BIN" test \
+        test/features/battle/battle_local_homologation_test.dart \
+        --no-pub --no-version-check --reporter compact --timeout 2m
   )
 }
 
@@ -199,10 +255,11 @@ run_ui_audit() {
   print_header "ManaLoom Flutter UI audit"
   cd "$ROOT_DIR/app"
   "$FLUTTER_BIN" analyze lib test --no-pub --no-version-check --no-fatal-infos
-  "$FLUTTER_BIN" test test/ui \
-    test/core/widgets/debug_accessibility_tools_test.dart \
-    test/features/home/onboarding_core_flow_screen_test.dart \
-    --no-pub --no-version-check
+  run_inventoried_test ui-audit \
+    "$FLUTTER_BIN" test test/ui \
+      test/core/widgets/debug_accessibility_tools_test.dart \
+      test/features/home/onboarding_core_flow_screen_test.dart \
+      --no-pub --no-version-check
   run_ui_live_evidence
 }
 
@@ -285,10 +342,11 @@ run_battle_lab_gate() {
     cd "$ROOT_DIR/server"
     RUN_INTEGRATION_TESTS=0 \
       JWT_SECRET="$BACKEND_TEST_JWT_SECRET" \
-      "$DART_BIN" test \
-        --exclude-tags "live || live_backend || live_db_write || live_external" \
-        --reporter compact \
-        test/battle_*_test.dart
+      run_inventoried_test battle-lab-server \
+        "$DART_BIN" test \
+          --exclude-tags "live || live_backend || live_db_write || live_external" \
+          --reporter compact \
+          test/battle_*_test.dart
   )
   (
     cd "$ROOT_DIR/app"
@@ -301,11 +359,12 @@ run_battle_lab_gate() {
       test/features/decks/models/deck_analysis_test.dart \
       test/features/decks/widgets/deck_analysis_tab_test.dart \
       --no-pub --no-version-check --no-fatal-infos
-    "$FLUTTER_BIN" test \
-      test/features/battle \
-      test/features/decks/models/deck_analysis_test.dart \
-      test/features/decks/widgets/deck_analysis_tab_test.dart \
-      --no-pub --no-version-check --reporter compact --timeout 2m
+    run_inventoried_test battle-lab-app \
+      "$FLUTTER_BIN" test \
+        test/features/battle \
+        test/features/decks/models/deck_analysis_test.dart \
+        test/features/decks/widgets/deck_analysis_tab_test.dart \
+        --no-pub --no-version-check --reporter compact --timeout 2m
   )
   run_battle_product_gate
   run_runtime_performance_contract
@@ -429,6 +488,11 @@ Dica:
   superfícies Commander sem Flutter, pub ou rede. O perfil local retorna
   PASS_CODE_ONLY; release-read-only exige receipt PG read-only fresco.
   Use 'project-logic' para bloquear drift entre código, rotas, migrations, manifesto e documentação gerada.
+  BT-GATE-001: teste pulado em quick/full/performance/ui-audit/battle-lab nunca e
+  PASS. Cada skip e inventariado (manaloom_gate_skip_inventory.py) e so a
+  allowlist versionada server/config/gate_skip_allowlist.json (motivo, dono,
+  prazo) o aceita; fora dela o modo retorna 3 (PARTIAL). Inventario ausente ou
+  truncado retorna 2 (BLOCKED).
   Use 'e2e' como gate estrito da varredura completa: somente PASS retorna zero;
   PARTIAL/SKIP retorna 3, BLOCKED retorna 2 e FAIL retorna 1. Para inventario
   diagnostico sem credito de gate/release, execute diretamente

@@ -81,6 +81,32 @@ export DISABLE_PUSH_INIT="${DISABLE_PUSH_INIT:-true}"
 export DISABLE_FIREBASE_PERFORMANCE_INIT="${DISABLE_FIREBASE_PERFORMANCE_INIT:-true}"
 
 RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom_local_ci.XXXXXX")"
+
+# BT-GATE-001/002: cada etapa nomeada roda por run_named_step, que grava log,
+# classifica o resultado (PASS, PARTIAL, BLOCKED ou FAIL) e, fora do escopo
+# staged do pre-commit, o estado-fonte ao fim da etapa. O fim do gate fecha o
+# receipt forte (manaloom_gate_run_receipt.py) em ~/.manaloom/receipts.
+RECEIPT_TOOL="$ROOT_DIR/scripts/manaloom_gate_run_receipt.py"
+SKIP_INVENTORY_TOOL="$ROOT_DIR/scripts/manaloom_gate_skip_inventory.py"
+SKIP_ALLOWLIST="${MANALOOM_GATE_SKIP_ALLOWLIST:-$ROOT_DIR/server/config/gate_skip_allowlist.json}"
+RECEIPT_ROOT="${MANALOOM_GATE_RECEIPT_ROOT:-$HOME/.manaloom/receipts}"
+STEPS_FILE="$RUN_DIR/steps.tsv"
+STEP_LOG_DIR="$RUN_DIR/step-logs"
+STEP_SOURCE_DIR="$RUN_DIR/step-sources"
+SOURCE_START_FILE="$RUN_DIR/source-start.json"
+RECEIPT_RESULT_FILE="$RUN_DIR/receipt-result.json"
+RUN_STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+RUN_ID="local_ci_${MODE}_$(date -u +%Y%m%dT%H%M%SZ)_$$"
+STEP_COUNTER=0
+PARTIAL_STEPS=()
+RECEIPT_ENABLED=1
+if [[ "$MODE" == "quick" && "$STAGED_SCOPE" == "1" ]]; then
+  # O quick do pre-commit é aceite de commit, sem crédito local: sem receipt.
+  RECEIPT_ENABLED=0
+fi
+mkdir -p "$STEP_LOG_DIR" "$STEP_SOURCE_DIR"
+: >"$STEPS_FILE"
+
 cleanup() {
   local status="$?"
   trap - EXIT INT TERM
@@ -91,6 +117,126 @@ trap cleanup EXIT INT TERM
 
 print_header() {
   printf '\n== %s ==\n' "$1"
+}
+
+capture_source_state_to() {
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$RECEIPT_TOOL" capture --repo "$ROOT_DIR" --out "$1"
+}
+
+finalize_receipt() {
+  # $1 = PASS|PARTIAL|FAIL|BLOCKED. Escreve o status final do receipt em
+  # RECEIPT_FINAL_STATUS. O receipt só diz PASS se todos os passos do catálogo
+  # do modo passaram no mesmo SHA, tree e digest do início.
+  local requested_status="$1"
+  RECEIPT_FINAL_STATUS="$requested_status"
+  if [[ "$RECEIPT_ENABLED" != "1" ]]; then
+    return 0
+  fi
+  local finalize_rc=0
+  PYTHONDONTWRITEBYTECODE=1 python3 "$RECEIPT_TOOL" finalize \
+    --repo "$ROOT_DIR" \
+    --gate local_ci \
+    --mode "$MODE" \
+    --run-id "$RUN_ID" \
+    --started-at "$RUN_STARTED_AT" \
+    --source-start "$SOURCE_START_FILE" \
+    --steps "$STEPS_FILE" \
+    --steps-format local-ci-v2 \
+    --status "$requested_status" \
+    --receipt-root "$RECEIPT_ROOT" >"$RECEIPT_RESULT_FILE" || finalize_rc=$?
+  if [[ ! -s "$RECEIPT_RESULT_FILE" ]]; then
+    echo "FAIL: receipt do gate não foi gravado" >&2
+    RECEIPT_FINAL_STATUS="FAIL"
+    return 0
+  fi
+  RECEIPT_FINAL_STATUS="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$RECEIPT_RESULT_FILE")"
+  printf 'Receipt (%s): %s\n' "$RECEIPT_FINAL_STATUS" \
+    "$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["receipt"])' "$RECEIPT_RESULT_FILE")"
+  if [[ "$finalize_rc" -ne 0 ]]; then
+    echo "FAIL: estado-fonte mudou durante o gate" >&2
+  fi
+}
+
+run_named_step() {
+  # Uso: run_named_step <id-do-catalogo> <comando...>
+  # Etapa roda em subshell com errexit próprio; o log vai para arquivo e para o
+  # terminal. Resultado: PASS (0), PARTIAL (3), BLOCKED (2) ou FAIL (demais).
+  # PARTIAL é inventariado e o gate segue; BLOCKED e FAIL encerram o gate.
+  local step_id="$1"
+  shift
+  local step_rc=0 scan_rc=0 step_status="PASS" log_file source_file
+  STEP_COUNTER=$((STEP_COUNTER + 1))
+  log_file="$STEP_LOG_DIR/$(printf '%02d' "$STEP_COUNTER")-$step_id.log"
+  source_file="$STEP_SOURCE_DIR/$(printf '%02d' "$STEP_COUNTER")-$step_id.json"
+
+  set +e
+  ( set -euo pipefail; "$@" ) 2>&1 | tee "$log_file"
+  step_rc="${PIPESTATUS[0]}"
+  set -e
+
+  if [[ "$step_rc" -eq 0 ]]; then
+    PYTHONDONTWRITEBYTECODE=1 python3 "$SKIP_INVENTORY_TOOL" scan-log \
+      --log "$log_file" --allowlist "$SKIP_ALLOWLIST" || scan_rc=$?
+    case "$scan_rc" in
+      0) ;;
+      3) step_rc=3 ;;
+      *) step_rc=2 ;;
+    esac
+  fi
+  case "$step_rc" in
+    0) step_status="PASS" ;;
+    3) step_status="PARTIAL" ;;
+    2) step_status="BLOCKED" ;;
+    *) step_status="FAIL" ;;
+  esac
+
+  if [[ "$RECEIPT_ENABLED" == "1" ]]; then
+    if ! capture_source_state_to "$source_file"; then
+      echo "BLOCKED: estado-fonte da etapa $step_id não pôde ser capturado" >&2
+      step_status="BLOCKED"
+      step_rc=2
+      : >"$source_file"
+    fi
+    printf '%s\t%s\t%s\t%s\t%s\n' \
+      "$step_id" "$step_status" "$step_rc" "$log_file" "$source_file" >>"$STEPS_FILE"
+  fi
+
+  case "$step_status" in
+    PASS)
+      return 0
+      ;;
+    PARTIAL)
+      echo "PARTIAL: etapa $step_id tem skip fora da allowlist; sem crédito de PASS." >&2
+      PARTIAL_STEPS+=("$step_id")
+      return 0
+      ;;
+    BLOCKED)
+      echo "BLOCKED: etapa $step_id (exit $step_rc)" >&2
+      ;;
+    *)
+      echo "FAIL: etapa $step_id (exit $step_rc)" >&2
+      ;;
+  esac
+  finalize_receipt "$step_status"
+  exit "$step_rc"
+}
+
+finish_gate() {
+  # Fim do gate: PARTIAL nunca vira sucesso (exit 3); PASS exige receipt PASS.
+  local gate_status="PASS"
+  if [[ "${#PARTIAL_STEPS[@]}" -gt 0 ]]; then
+    gate_status="PARTIAL"
+  fi
+  finalize_receipt "$gate_status"
+  if [[ "$RECEIPT_FINAL_STATUS" == "FAIL" ]]; then
+    exit 1
+  fi
+  if [[ "$gate_status" == "PARTIAL" ]]; then
+    printf '\nPARTIAL: gate local (%s) incompleto; etapas com skip: %s. Sem crédito de PASS.\n' \
+      "$MODE" "${PARTIAL_STEPS[*]}" >&2
+    exit 3
+  fi
 }
 
 run_shell_contracts() {
@@ -114,6 +260,11 @@ run_shell_contracts() {
     python3 "$ROOT_DIR/server/test/staged_ui_scope_classifier_test.py"
   PYTHONDONTWRITEBYTECODE=1 \
     python3 "$ROOT_DIR/server/test/local_ci_staged_scope_dispatcher_test.py"
+  # BT-GATE-001/002: contratos rápidos de skip estrito e de receipt forte.
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/gate_skip_inventory_test.py"
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/gate_run_receipt_test.py"
 }
 
 run_mcp_preflight() {
@@ -240,6 +391,17 @@ PY
   python3 "$scripts_dir/report_retention_audit.py" \
     --fail-on-ignored-local \
     --out-prefix "$RUN_DIR/report-retention"
+
+  # BT-GATE-001/002/003: o local_ci estrito de ponta a ponta (dublês) e a mutação
+  # que remove cada propagação e exige o teste vermelho. Só no full: são lentos.
+  # O produtor do receipt de release roda só contra PostgreSQL descartável em
+  # loopback (nunca produção): ele própria sobe e remove o cluster em /tmp.
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/deck_ai_learning_release_producer_loopback_test.py"
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/local_ci_strict_gate_test.py"
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/local_ci_strict_gate_mutation_test.py"
 }
 
 run_full_quality() {
@@ -256,6 +418,35 @@ run_schema_gate() {
 run_release_contracts() {
   print_header "Contratos operacionais de release"
   "$ROOT_DIR/scripts/manaloom_release_ops_contract_test.sh"
+}
+
+run_deck_ai_learning_gate() {
+  print_header "Deckbuilder / IA / Learning (cada fatia roda uma vez por SHA)"
+  # BT-GATE-003: o gate Deck/IA/Learning entra no full e no release. O full
+  # roda o perfil local (PASS_CODE_ONLY). O release exige o receipt do PostgreSQL
+  # de produção lido em modo somente leitura; sem ele o gate retorna BLOCKED (2).
+  # MANALOOM_GATE_REUSE_STEPS aponta para o ledger deste local_ci: as fatias que
+  # ele já provou no mesmo SHA/tree/digest (drift de project logic e auditoria de
+  # superfície operacional) são reaproveitadas, não rodadas de novo.
+  local profile="local"
+  if [[ "$MODE" == "release" ]]; then
+    profile="release-read-only"
+  fi
+  MANALOOM_GATE_REUSE_STEPS="$STEPS_FILE" \
+    "$ROOT_DIR/scripts/quality_gate.sh" deck-ai-learning "$profile"
+}
+
+require_release_pg_receipt() {
+  # Falha cedo, antes de horas de gate: o release não existe sem o receipt do PG
+  # de produção (somente leitura). Este script nunca lê credencial nem abre rede.
+  if [[ -z "${MANALOOM_DECK_AI_RELEASE_RECEIPT:-}" || ! -r "${MANALOOM_DECK_AI_RELEASE_RECEIPT:-}" ]]; then
+    echo "BLOCKED: release exige MANALOOM_DECK_AI_RELEASE_RECEIPT (receipt v2 do PG de produção, somente leitura)" >&2
+    exit 2
+  fi
+  if [[ -z "${MANALOOM_NEW_SERVER_ENV:-}" || ! -r "${MANALOOM_NEW_SERVER_ENV:-}" ]]; then
+    echo "BLOCKED: release exige MANALOOM_NEW_SERVER_ENV legível para validar o alvo do receipt" >&2
+    exit 2
+  fi
 }
 
 run_battle_gate() {
@@ -284,19 +475,19 @@ run_quick() {
     initial_head_oid="$PARSED_SCOPE_HEAD_OID"
     initial_index_tree_oid="$PARSED_SCOPE_INDEX_TREE_OID"
   fi
-  run_shell_contracts
-  run_commander_game_changer_source
-  run_mcp_preflight
-  run_secret_scan
-  run_project_logic
+  run_named_step shell-contracts run_shell_contracts
+  run_named_step commander-game-changer-source run_commander_game_changer_source
+  run_named_step dart-mcp-preflight run_mcp_preflight
+  run_named_step secret-scan run_secret_scan
+  run_named_step project-logic run_project_logic
   if [[ "$STAGED_SCOPE" != "1" ]]; then
-    run_ui_live_evidence
+    run_named_step ui-live-evidence run_ui_live_evidence
     return 0
   fi
 
   if [[ "$initial_scope_status" == "AFFECTS_UI" ]]; then
     print_header "Escopo UI do índice staged"
-    run_ui_live_evidence
+    run_named_step ui-live-evidence run_ui_live_evidence
   fi
 
   local final_scope_record=""
@@ -324,43 +515,53 @@ run_quick() {
 }
 
 run_full() {
-  run_shell_contracts
-  run_commander_game_changer_source
-  run_mcp_preflight
-  run_secret_scan
-  run_guardrail_audits
-  run_release_contracts
-  run_full_quality
-  run_schema_gate
+  run_named_step shell-contracts run_shell_contracts
+  run_named_step commander-game-changer-source run_commander_game_changer_source
+  run_named_step dart-mcp-preflight run_mcp_preflight
+  run_named_step secret-scan run_secret_scan
+  run_named_step guardrail-audits run_guardrail_audits
+  run_named_step release-contracts run_release_contracts
+  run_named_step full-quality run_full_quality
+  run_named_step deck-ai-learning run_deck_ai_learning_gate
+  run_named_step schema-gate run_schema_gate
 }
+
+if [[ "$RECEIPT_ENABLED" == "1" ]] && \
+  ! capture_source_state_to "$SOURCE_START_FILE"; then
+  echo "BLOCKED: estado-fonte inicial não pôde ser capturado; sem receipt não há gate" >&2
+  exit 2
+fi
 
 case "$MODE" in
   quick)
     run_quick
     ;;
   schema)
-    run_shell_contracts
-    run_commander_game_changer_source
-    run_project_logic
-    run_schema_gate
+    run_named_step shell-contracts run_shell_contracts
+    run_named_step commander-game-changer-source run_commander_game_changer_source
+    run_named_step project-logic run_project_logic
+    run_named_step schema-gate run_schema_gate
     ;;
   full)
     run_full
     ;;
   e2e)
     run_full
-    run_strict_e2e_gate
+    run_named_step strict-e2e run_strict_e2e_gate
     ;;
   release)
+    require_release_pg_receipt
     run_full
-    run_battle_gate
-    "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
+    run_named_step battle-gate run_battle_gate
+    run_named_step android-release-build "$ROOT_DIR/scripts/manaloom_build_android_release.sh"
     ;;
   *)
     echo "uso: $0 quick [--staged-scope]|schema|full|e2e|release" >&2
     exit 2
     ;;
 esac
+
+finish_gate
 
 if [[ "$MODE" == "quick" && "$STAGED_SCOPE" == "1" ]] && \
   [[ "${staged_non_ui_accepted:-0}" == "1" ]]; then

@@ -7,6 +7,10 @@ REPORT_ROOT="${MANALOOM_DECK_AI_GATE_REPORT_DIR:-/tmp/manaloom_deck_ai_learning_
 RECEIPT_MAX_AGE_HOURS="${MANALOOM_DECK_AI_RECEIPT_MAX_AGE_HOURS:-24}"
 POLICY_FILE="$ROOT_DIR/server/config/deck_ai_learning_gate_policy.json"
 RECEIPT_VALIDATOR="$ROOT_DIR/scripts/manaloom_deck_ai_learning_receipt_validator.py"
+GATE_RECEIPT_TOOL="$ROOT_DIR/scripts/manaloom_gate_run_receipt.py"
+# BT-GATE-003: ledger (steps.tsv) do local_ci que chamou este gate. Quando existe,
+# fatias que o local_ci já provou no mesmo SHA, tree e digest não rodam de novo.
+REUSE_STEPS_FILE="${MANALOOM_GATE_REUSE_STEPS:-}"
 
 usage() {
   cat <<'EOF'
@@ -20,7 +24,7 @@ Perfis:
                      unico sucesso possivel e PASS_CODE_ONLY.
   release-read-only  Executa a mesma camada local e exige uma evidencia PG
                      read-only v2 fresca, duravel, ligada ao mesmo checkout,
-                     target, schema 058, checks e artifacts, em
+                     target, schema ate a ultima migration do manifesto, checks e artifacts, em
                      MANALOOM_DECK_AI_RELEASE_RECEIPT. Tambem exige que
                      MANALOOM_NEW_SERVER_ENV aponte para a configuracao de
                      credenciais existente. Este gate valida a evidencia; ele
@@ -146,6 +150,31 @@ Path(record_path).write_text(
 PY
 }
 
+# Fatia deste gate -> checks do local_ci que já a provaram (qualquer um serve).
+# Só entram fatias cuja evidência é a mesma: `quality_gate.sh project-logic` está
+# dentro de `melos run quality` (full-quality) e a auditoria de superfície
+# operacional roda igual em guardrail-audits. As fatias Dart/Python de contenção
+# ficam de fora: aqui elas rodam sob isolamento de rede, o que o local_ci não faz.
+reuse_candidates_for() {
+  case "$1" in
+    project_logic.drift_check) printf '%s\n' "project-logic,full-quality" ;;
+    audit.operational_surface_alignment) printf '%s\n' "guardrail-audits" ;;
+    *) return 1 ;;
+  esac
+}
+
+try_reuse_step() {
+  # Retorna 0 só com prova do local_ci no mesmo SHA/tree/digest; senão a fatia roda.
+  local step_id="$1"
+  local candidates reused_from
+  [[ -n "$REUSE_STEPS_FILE" && -f "$REUSE_STEPS_FILE" ]] || return 1
+  candidates="$(reuse_candidates_for "$step_id")" || return 1
+  reused_from="$(python3 "$GATE_RECEIPT_TOOL" reuse \
+    --repo "$ROOT_DIR" --steps "$REUSE_STEPS_FILE" --check "$candidates" 2>/dev/null)" || return 1
+  REUSED_FROM="$reused_from"
+  return 0
+}
+
 run_step() {
   local step_id="$1"
   local label="$2"
@@ -171,6 +200,14 @@ run_step() {
   printf '\n============================================================\n'
   printf '%s\n' "$label"
   printf '============================================================\n'
+  REUSED_FROM=""
+  if try_reuse_step "$step_id"; then
+    printf 'REUSED: %s ja provado pelo check local_ci "%s" no mesmo SHA/tree/digest; nao roda de novo.\n' \
+      "$step_id" "$REUSED_FROM" | tee "$log_file"
+    record_pass "$label (reaproveitado de $REUSED_FROM)"
+    record_step_json "$step_id" "$label" "PASS" 0 "$log_file"
+    return
+  fi
   printf '$ (cd %q &&' "$working_dir" | tee "$log_file"
   printf ' %q' "$@" | tee -a "$log_file"
   printf ')\n' | tee -a "$log_file"

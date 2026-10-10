@@ -24,6 +24,9 @@ from typing import Any, Iterable
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 GIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 MIGRATION_RE = re.compile(r"version:\s*'([0-9]{3})'")
+# O id do check não carrega mais um número de migration: a faixa vai de
+# `required_migration_floor` até a última migration do manifesto (BT-GATE-003).
+MIGRATION_CHECK_ID = "pg_schema_migrations.range"
 
 
 class ReceiptValidationError(ValueError):
@@ -296,6 +299,69 @@ def _is_relative_to(path: Path, parent: Path) -> bool:
     return True
 
 
+def resolve_migration_policy(policy: dict[str, Any], repo: Path) -> dict[str, Any]:
+    """Deriva faixa, versões e última migration do manifesto, não de um número fixo.
+
+    A política guarda só o piso (`required_migration_floor`). A última migration
+    vem de `project_logic_manifest.json` (`database.latest_migration`), que o
+    gerador deriva do `migrate.dart`; assim a 077 planejada não exige editar a
+    política e uma política velha nunca aprova um release com migration a menos.
+    """
+    source = policy.get("source")
+    if not isinstance(source, dict):
+        raise ReceiptValidationError("policy.source is invalid")
+    floor = source.get("required_migration_floor")
+    if not isinstance(floor, str) or not re.fullmatch(r"[0-9]{3}", floor):
+        raise ReceiptValidationError("policy required_migration_floor is invalid")
+    manifest = load_json_strict(repo / "project_logic_manifest.json")
+    database = manifest.get("database")
+    latest = database.get("latest_migration") if isinstance(database, dict) else None
+    if not isinstance(latest, str) or not re.fullmatch(r"[0-9]{3}", latest):
+        raise ReceiptValidationError("manifest database.latest_migration is invalid")
+    if int(latest) < int(floor):
+        raise ReceiptValidationError("manifest latest migration is below the policy floor")
+    source["required_latest_migration"] = latest
+    source["required_migration_range"] = f"{floor}-{latest}"
+    source["required_migration_versions"] = [
+        f"{number:03d}" for number in range(int(floor), int(latest) + 1)
+    ]
+    return policy
+
+
+def load_policy(policy_path: Path, repo: Path) -> dict[str, Any]:
+    return resolve_migration_policy(load_json_strict(policy_path), repo.resolve())
+
+
+def migration_status_sql(policy: dict[str, Any]) -> str:
+    source = policy["source"]
+    floor = int(source["required_migration_floor"])
+    latest = int(source["required_latest_migration"])
+    return f"""WITH required(version) AS (
+  SELECT lpad(value::text, 3, '0')
+  FROM generate_series({floor}, {latest}) AS value
+), applied AS (
+  SELECT version FROM public.schema_migrations
+)
+SELECT jsonb_build_object(
+  'generated_at', clock_timestamp(),
+  'transaction_read_only', current_setting('transaction_read_only'),
+  'database', current_database(),
+  'required_range', '{source["required_migration_range"]}',
+  'required_versions', (SELECT jsonb_agg(version ORDER BY version) FROM required),
+  'applied_versions', (SELECT jsonb_agg(version ORDER BY version) FROM applied),
+  'latest_applied', (SELECT max(version) FROM applied),
+  'pending_versions', COALESCE(
+    (
+      SELECT jsonb_agg(required.version ORDER BY required.version)
+      FROM required
+      LEFT JOIN applied USING (version)
+      WHERE applied.version IS NULL
+    ),
+    '[]'::jsonb
+  )
+)::text;"""
+
+
 def is_temporary_path(path: Path, policy: dict[str, Any]) -> bool:
     resolved = path.resolve()
     prefixes = _require_list(
@@ -489,7 +555,7 @@ def _validate_artifact_semantics(
     expected_checks = [
         check_id
         for check_id in policy["release_check_ids"]
-        if check_id != "pg_schema_migrations.038_058"
+        if check_id != MIGRATION_CHECK_ID
     ]
     raw_checks = _require_list(audit.get("checks"), "PG audit checks")
     actual_checks: list[str] = []
@@ -783,7 +849,7 @@ def validate_release_receipt(
         raise ReceiptValidationError("release receipt is missing")
     if not credential_file.is_file():
         raise ReceiptValidationError("credential configuration is not readable")
-    policy = load_json_strict(policy_path)
+    policy = load_policy(policy_path, repo)
     receipt = load_json_strict(receipt_path)
     _require_exact(
         receipt.get("schema"),
@@ -903,7 +969,7 @@ def assemble_release_receipt(
         raise ReceiptValidationError("evidence root cannot be a symlink")
     evidence_root = evidence_root.resolve()
     output_path = output_path.resolve()
-    policy = load_json_strict(policy_path)
+    policy = load_policy(policy_path, repo)
     require_durable_evidence_path(evidence_root, policy=policy, repo=repo)
     if not _is_relative_to(output_path, evidence_root):
         raise ReceiptValidationError("release receipt output must be under evidence root")
@@ -962,7 +1028,7 @@ def assemble_release_receipt(
     for check_id in policy["release_check_ids"]:
         evidence_ids = (
             ["migration_status_log", "read_only_preflight_log"]
-            if check_id == "pg_schema_migrations.038_058"
+            if check_id == MIGRATION_CHECK_ID
             else ["pg_hermes_sqlite_audit_json", "pg_hermes_sqlite_audit_log"]
         )
         if not set(evidence_ids).issubset(artifact_ids):
@@ -975,7 +1041,9 @@ def assemble_release_receipt(
     for field, value in source_start.items():
         source[f"{field}_start"] = value
         source[f"{field}_end"] = source_end.get(field)
-    now = datetime.now(timezone.utc).replace(microsecond=0)
+    # Sem truncar para o segundo: artefato gerado na mesma fração de segundo que
+    # a montagem ficaria depois de `completed_at` e o receipt se recusaria sozinho.
+    now = datetime.now(timezone.utc)
     target = target_binding(credential_file)
     target["schema"] = {
         "required_range": migration.get("required_range"),
@@ -1036,14 +1104,19 @@ def assemble_release_receipt(
         },
     }
     _write_json(output_path, payload)
-    validate_release_receipt(
-        output_path,
-        policy_path,
-        repo,
-        credential_file,
-        max_age_hours=1,
-        require_durable=True,
-    )
+    try:
+        validate_release_receipt(
+            output_path,
+            policy_path,
+            repo,
+            credential_file,
+            max_age_hours=1,
+            require_durable=True,
+        )
+    except ReceiptValidationError:
+        # Receipt recusado não fica no disco com cara de receipt: BT-GATE-003.
+        output_path.unlink(missing_ok=True)
+        raise
     return payload
 
 
@@ -1074,6 +1147,10 @@ def _build_parser() -> argparse.ArgumentParser:
     durable.add_argument("--policy", type=Path, required=True)
     durable.add_argument("--repo", type=Path, required=True)
 
+    migration_sql = subparsers.add_parser("migration-status-sql")
+    migration_sql.add_argument("--policy", type=Path, required=True)
+    migration_sql.add_argument("--repo", type=Path, required=True)
+
     validate = subparsers.add_parser("validate-release")
     validate.add_argument("--receipt", type=Path, required=True)
     validate.add_argument("--policy", type=Path, required=True)
@@ -1103,6 +1180,9 @@ def main(argv: Iterable[str] | None = None) -> int:
     try:
         if args.command == "snapshot-source":
             _write_json(args.out, capture_source_state(args.repo, args.policy))
+            return 0
+        if args.command == "migration-status-sql":
+            print(migration_status_sql(load_policy(args.policy, args.repo)))
             return 0
         if args.command == "verify-source-stable":
             result = verify_source_stable(
