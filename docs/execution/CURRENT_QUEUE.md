@@ -16,7 +16,7 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
 - Backlog/registry SHA-256 corrente (decisões D-92 a D-116 e reconciliação de 2026-10-10):
-  `7fae54b558174d102a8a4c608b8ebe11d982316aa87a7c97ce7c9fe9bbd149c5` (250 tasks; o valor vivo está em
+  `f0ce9086466498b064366bfa359da88d51cefeca4c4005c4a2b97f55d9552647` (250 tasks; o valor vivo está em
   `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `f4effb9a…` com 246 em
   `1f525a1c1`, e `8a73ebe6…` com 244 nas decisões D-79 e D-80 do gate de UI, branch
   `integracao/2026-09-23`; antes, `811f5409…` na rodada 2 da privacidade, `810d588d…` no registro do preço de deck, `320ebd9d…` nas decisões D-72 a D-75, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
