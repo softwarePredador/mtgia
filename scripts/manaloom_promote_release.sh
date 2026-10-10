@@ -6,9 +6,9 @@
 #   scripts/manaloom_promote_release.sh                              descreve, sem conectar
 #   scripts/manaloom_promote_release.sh --status --receipt-dir D     só lê os diários locais
 #   scripts/manaloom_promote_release.sh --execute --preflight --sha SHA [--surfaces a,b]
-#       [--capacity-snapshot F]
+#       [--capacity-snapshot F] [--schema-snapshot L]
 #   scripts/manaloom_promote_release.sh --execute --promote --sha SHA --receipt-dir D
-#       --capacity-snapshot F [--surfaces a,b]
+#       --capacity-snapshot F --schema-snapshot L [--surfaces a,b]
 #   scripts/manaloom_promote_release.sh --execute --resolve DIARIO --receipt-dir D
 #       --reason TEXTO
 #
@@ -27,6 +27,21 @@
 # já promovidas voltam na ordem inversa, e cada volta é provada. Enquanto um diário
 # estiver sem fim ou com rollback não provado, o marcador D/EM_ANDAMENTO fica e
 # nenhuma promoção começa: a falha nunca some.
+#
+# Banco migrado (S-02): depois da 059, rollback é restore. O readiness do backend
+# exige que o MAX(version) do banco seja a última migration que a imagem conhece
+# (server/lib/health_readiness_support.dart do SHA dela); 41bab49c9 exige a 058 e,
+# com o banco na 076, responde 503 para sempre. Por isso o --promote com o backend
+# exige --schema-snapshot: o ledger lido só para leitura há no máximo 30 minutos
+# (scripts/manaloom_lot_apply_migrations.sh --execute --read-ledger --out L). O
+# preflight para se o candidato exige outra migration que não a do banco. Se a
+# imagem de base do backend exige uma migration menor que a do banco, ou uma que
+# não se lê, a volta automática do backend fica recusada, inclusive na compensação:
+# se a promoção falhar, as outras superfícies voltam, o backend fica onde está, nada
+# é mandado ao Swarm nem ao EasyPanel para ele, e a transação termina
+# rollback_failed (CRITICAL, EM_ANDAMENTO). A saída é corrigir para frente ou
+# restaurar o dump do lote (docs/runbooks/BACKUP_E_RESTAURACAO.md, "Restauração
+# da produção"), com a palavra do dono, e depois o --resolve.
 #
 # Códigos: 0 feito (ou preflight PASS); 1 falhou (rollback provado ou não, ver o
 # diário); 2 entrada ou ambiente recusado, nada mudou; 3 BLOCKED pelo preflight,
@@ -47,11 +62,14 @@ SHA=""
 SURFACES=""
 RECEIPT_DIR=""
 SNAPSHOT=""
+SCHEMA_SNAPSHOT=""
 RESOLVE_JOURNAL=""
 REASON=""
+# De onde vem a exigência de schema de uma imagem; o contrato confere com o módulo.
+READINESS_SOURCE="server/lib/health_readiness_support.dart"
 
 usage() {
-  sed -n '2,33p' "$0" | sed 's/^# \{0,1\}//'
+  awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"
 }
 
 while (( $# > 0 )); do
@@ -65,6 +83,7 @@ while (( $# > 0 )); do
     --surfaces) SURFACES="${2:-}"; shift 2 ;;
     --receipt-dir) RECEIPT_DIR="${2:-}"; shift 2 ;;
     --capacity-snapshot) SNAPSHOT="${2:-}"; shift 2 ;;
+    --schema-snapshot) SCHEMA_SNAPSHOT="${2:-}"; shift 2 ;;
     --reason) REASON="${2:-}"; shift 2 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "argumento desconhecido: $1" >&2; usage >&2; exit 2 ;;
@@ -138,8 +157,11 @@ print(json.dumps({
     "easypanel": ["projects.listProjectsAndServices", "services.app.updateSourceImage",
                   "services.app.deployService"],
     "execute": "--execute --preflight|--promote --sha <sha> [--surfaces a,b] "
-               "[--receipt-dir <dir>] [--capacity-snapshot <arquivo>] ou "
+               "[--receipt-dir <dir>] [--capacity-snapshot <arquivo>] "
+               "[--schema-snapshot <ledger>] ou "
                "--execute --resolve <diario> --receipt-dir <dir> --reason <texto>",
+    "backend_rollback": "recusado quando a imagem de base exige uma migration menor que "
+                        "o MAX(version) do banco: depois da 059, rollback é restore",
 }, ensure_ascii=False, indent=2))
 PY
   exit 0
@@ -165,9 +187,18 @@ if [[ "$MODE" != "preflight" ]]; then
   source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
   require_live_mutation_approval "BrewTact full-stack release promotion"
 fi
+PLAN_HAS_BACKEND=0
+if awk -F'\t' '$1 == "backend" { found = 1 } END { exit !found }' <<<"$PLAN_TSV"; then
+  PLAN_HAS_BACKEND=1
+fi
 if [[ "$MODE" == "promote" ]]; then
   [[ -f "$SNAPSHOT" ]] || {
     echo "--promote exige --capacity-snapshot (BT-CAP-001, no máximo 30 minutos)" >&2; exit 2; }
+  if [[ "$PLAN_HAS_BACKEND" == "1" && ! -f "$SCHEMA_SNAPSHOT" ]]; then
+    echo "--promote com o backend exige --schema-snapshot: o ledger do banco lido há no" \
+      "máximo 30 minutos (scripts/manaloom_lot_apply_migrations.sh --execute --read-ledger)" >&2
+    exit 2
+  fi
   if [[ -e "$RECEIPT_DIR/EM_ANDAMENTO" ]]; then
     echo "BLOCKED: há uma promoção em andamento ou interrompida: $(cat "$RECEIPT_DIR/EM_ANDAMENTO")" >&2
     exit 4
@@ -320,9 +351,11 @@ compensate_surface() {
       '{surface:$surface, problems:["não li o estado da superfície"]}')"
     return 1
   fi
+  # S-02: o backend só volta com a guarda de schema do preflight dizendo allowed.
   python3 "$LOGIC" compensation-decision --surface "$id" \
     --baseline "$RUN_DIR/$id.baseline.view.json" \
-    --view "$RUN_DIR/$id.restore.view.json" >"$RUN_DIR/$id.decision.json" || decision_rc=$?
+    --view "$RUN_DIR/$id.restore.view.json" \
+    --schema-guard "$RUN_DIR/schema-guard.json" >"$RUN_DIR/$id.decision.json" || decision_rc=$?
   if [[ "$decision_rc" != "0" ]]; then
     event surface_restore_failed "$(jq -c --arg surface "$id" \
       '{surface:$surface, decision:., problems:(.reasons // [.error // "decisão ilegível"])}' \
@@ -524,6 +557,44 @@ while IFS=$'\t' read -r id _; do
   fi
 done <<<"$PLAN_TSV"
 
+# S-02: o banco contra o candidato e contra a imagem de base do backend. A imagem de
+# base é a do git_sha que o /health da linha de base mostrou; a exigência dela vem do
+# código desse SHA. SHA que não se lê vira exigência desconhecida: a volta fica recusada.
+schema_status='"not_checked"'
+if [[ "$PLAN_HAS_BACKEND" == "1" && -n "$SCHEMA_SNAPSHOT" ]]; then
+  base_marker="$(jq -r '.marker // ""' "$RUN_DIR/backend.baseline.view.json" 2>/dev/null || true)"
+  base_sha="${base_marker#field:}"
+  git -C "$ROOT_DIR" show "$SHA:$READINESS_SOURCE" >"$RUN_DIR/candidate.readiness" 2>/dev/null ||
+    : >"$RUN_DIR/candidate.readiness"
+  : >"$RUN_DIR/baseline.readiness"
+  if [[ "$base_sha" =~ ^[0-9a-f]{40}$ ]]; then
+    git -C "$ROOT_DIR" show "$base_sha:$READINESS_SOURCE" >"$RUN_DIR/baseline.readiness" \
+      2>/dev/null || : >"$RUN_DIR/baseline.readiness"
+  fi
+  schema_args=(--candidate-readiness "$RUN_DIR/candidate.readiness"
+    --baseline-sha "$base_sha" --baseline-readiness "$RUN_DIR/baseline.readiness")
+  if [[ -f "$SCHEMA_SNAPSHOT" ]]; then
+    schema_args+=(--snapshot "$SCHEMA_SNAPSHOT")
+  fi
+  schema_rc=0
+  python3 "$LOGIC" schema-guard "${schema_args[@]}" >"$RUN_DIR/schema-guard.json" || schema_rc=$?
+  if ! schema_status="$(jq -ec '.' "$RUN_DIR/schema-guard.json" 2>/dev/null)"; then
+    schema_status='{"status":"BLOCKED","problems":["guarda de schema ilegível"]}'
+    schema_rc=3
+  fi
+  if [[ "$schema_rc" != "0" ]]; then
+    preflight_failed=1
+    blocked_reasons="$(jq -c --argjson guard "$schema_status" \
+      '. + ($guard.problems // ["guarda de schema BLOCKED"])' <<<"$blocked_reasons")"
+  fi
+  if [[ "$(jq -r '.backend_rollback // ""' <<<"$schema_status")" != "allowed" ]]; then
+    echo "AVISO: a volta automática do backend está recusada:" \
+      "$(jq -r '.rollback_refused_because // "guarda de schema sem decisão"' <<<"$schema_status")." \
+      "Se a promoção falhar, o backend fica onde está; depois da 059, rollback é restore" \
+      "($(jq -r '.restore_runbook // "docs/runbooks/BACKUP_E_RESTAURACAO.md"' <<<"$schema_status"))." >&2
+  fi
+fi
+
 baselines="$(for id in "${SURFACE_IDS[@]}"; do
   if [[ -f "$RUN_DIR/$id.baseline.view.json" ]]; then
     jq -c --arg id "$id" '{($id): .}' "$RUN_DIR/$id.baseline.view.json"
@@ -532,7 +603,8 @@ done | jq -cs 'add // {}')"
 summary="$(jq -cn --arg sha "$SHA" --arg mode "$RELEASE_MODE" --arg capacity "$capacity_status" \
   --argjson surfaces "$(printf '%s\n' "${SURFACE_IDS[@]}" | jq -Rsc 'split("\n") | map(select(length > 0))')" \
   --argjson reasons "$blocked_reasons" --argjson baselines "$baselines" \
-  '{sha:$sha, release_mode:$mode, capacity:$capacity, surfaces:$surfaces,
+  --argjson schema "$schema_status" \
+  '{sha:$sha, release_mode:$mode, capacity:$capacity, schema:$schema, surfaces:$surfaces,
     status:(if ($reasons | length) == 0 then "PASS" else "BLOCKED" end), reasons:$reasons,
     baselines:$baselines}')"
 
@@ -549,7 +621,7 @@ JOURNAL_NAME="promocao-${SHA:0:12}-$STAMP.jsonl"
 JOURNAL="$RECEIPT_DIR/$JOURNAL_NAME"
 printf '%s\n' "$JOURNAL_NAME" >"$RECEIPT_DIR/EM_ANDAMENTO"
 chmod 600 "$RECEIPT_DIR/EM_ANDAMENTO"
-event begin "$(jq -c '{sha, release_mode, capacity, surfaces, baselines,
+event begin "$(jq -c '{sha, release_mode, capacity, schema, surfaces, baselines,
   tool: "scripts/manaloom_promote_release.sh"}' <<<"$summary")"
 JOURNAL_OPEN=1
 if [[ "$preflight_failed" != "0" ]]; then
