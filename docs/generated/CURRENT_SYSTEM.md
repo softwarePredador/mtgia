@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `1e44288a625799aec4f8e7837eb5de517802f0b5d5d6f09eaba55d4c65876496`
+**Digest das fontes:** `2311e5c5b05b6553266aca2bc71d7f2024daf6231c14898fccb535f7bd892095`
 
 ## Fontes de verdade
 
@@ -22,7 +22,7 @@
 | `semantic_resolved_files` | 749 |
 | `semantic_unresolved_files` | 0 |
 | `semantic_resolved_call_edges` | 44743 |
-| `semantic_resolved_call_sites` | 70782 |
+| `semantic_resolved_call_sites` | 70783 |
 | `semantic_resolved_type_references` | 17493 |
 | `modules` | 164 |
 | `app_routes` | 46 |

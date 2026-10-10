@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "1e44288a625799aec4f8e7837eb5de517802f0b5d5d6f09eaba55d4c65876496",
+  "source_digest_sha256": "2311e5c5b05b6553266aca2bc71d7f2024daf6231c14898fccb535f7bd892095",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -71,7 +71,7 @@
     "semantic_resolved_files": 749,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 44743,
-    "semantic_resolved_call_sites": 70782,
+    "semantic_resolved_call_sites": 70783,
     "semantic_resolved_type_references": 17493,
     "modules": 164,
     "app_routes": 46,
@@ -17526,7 +17526,7 @@
       "name": "_DeleteAccountDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2108,
+      "line": 2118,
       "members": [
         "createState"
       ]
@@ -17535,7 +17535,7 @@
       "name": "_DeleteAccountDialogState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2117,
+      "line": 2127,
       "members": [
         "build",
         "dispose"
@@ -17551,7 +17551,7 @@
       "name": "_EscapeDismissibleDialog",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2292,
+      "line": 2302,
       "members": [
         "build"
       ]
@@ -17587,7 +17587,7 @@
       "name": "_InlineSecurityHint",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2253,
+      "line": 2263,
       "members": [
         "build"
       ]
@@ -17611,7 +17611,7 @@
       "name": "_PasswordConfirmationDialogState",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2053,
+      "line": 2063,
       "members": [
         "build",
         "dispose"
@@ -17621,7 +17621,7 @@
       "name": "_PasswordVisibilityButton",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2235,
+      "line": 2245,
       "members": [
         "build"
       ]
@@ -17694,7 +17694,7 @@
       "name": "_ProfileSectionPanel",
       "kind": "class",
       "source": "app/lib/features/profile/profile_screen.dart",
-      "line": 2310,
+      "line": 2320,
       "members": [
         "build"
       ]
@@ -44117,8 +44117,8 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 44743,
-    "resolved_call_site_count": 70782,
-    "workspace_call_edge_count": 14289,
+    "resolved_call_site_count": 70783,
+    "workspace_call_edge_count": 14288,
     "unresolved_call_edge_count": 544,
     "unresolved_call_site_count": 766,
     "resolved_call_edges_scope": "workspace_targets_only",
@@ -47227,18 +47227,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 189,
-        "caller": "FriendlyErrorMapper.fromException",
-        "kind": "method",
-        "lexical_target": "isMachineErrorCode",
-        "target": "FriendlyErrorMapper.isMachineErrorCode",
-        "target_library": "package:manaloom/core/utils/friendly_error_mapper.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 192,
+        "line": 195,
         "caller": "FriendlyErrorMapper.fromException",
         "kind": "method",
         "lexical_target": "_fallbackForContext",
@@ -47249,7 +47238,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 195,
+        "line": 198,
         "caller": "FriendlyErrorMapper.fromException",
         "kind": "method",
         "lexical_target": "_looksTechnical",
@@ -47260,7 +47249,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 264,
+        "line": 267,
         "caller": "FriendlyErrorMapper.offlineContractForContext",
         "kind": "method",
         "lexical_target": "offlineContractFor",
@@ -47271,7 +47260,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 278,
+        "line": 281,
         "caller": "FriendlyErrorMapper.serverMessageFromBody",
         "kind": "method",
         "lexical_target": "isMachineErrorCode",
@@ -47282,7 +47271,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 279,
+        "line": 282,
         "caller": "FriendlyErrorMapper.serverMessageFromBody",
         "kind": "method",
         "lexical_target": "_looksTechnical",
@@ -47293,7 +47282,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 295,
+        "line": 298,
         "caller": "FriendlyErrorMapper.errorCodeFromBody",
         "kind": "method",
         "lexical_target": "isMachineErrorCode",
@@ -47304,7 +47293,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 353,
+        "line": 362,
         "caller": "FriendlyErrorMapper._messageFromBody",
         "kind": "method",
         "lexical_target": "serverMessageFromBody",
@@ -104471,7 +104460,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2050,
+        "line": 2060,
         "caller": "_PasswordConfirmationDialog.createState",
         "kind": "constructor",
         "lexical_target": "_PasswordConfirmationDialogState",
@@ -104482,7 +104471,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2066,
+        "line": 2076,
         "caller": "_PasswordConfirmationDialogState.build",
         "kind": "constructor",
         "lexical_target": "_EscapeDismissibleDialog",
@@ -104493,7 +104482,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2078,
+        "line": 2088,
         "caller": "_PasswordConfirmationDialogState.build",
         "kind": "constructor",
         "lexical_target": "_PasswordVisibilityButton",
@@ -104504,7 +104493,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2114,
+        "line": 2124,
         "caller": "_DeleteAccountDialog.createState",
         "kind": "constructor",
         "lexical_target": "_DeleteAccountDialogState",
@@ -104515,7 +104504,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2132,
+        "line": 2142,
         "caller": "_DeleteAccountDialogState.build",
         "kind": "constructor",
         "lexical_target": "_EscapeDismissibleDialog",
@@ -104537,7 +104526,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2189,
+        "line": 2199,
         "caller": "_DeleteAccountDialogState.build",
         "kind": "constructor",
         "lexical_target": "_PasswordVisibilityButton",
@@ -104559,7 +104548,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2221,
+        "line": 2231,
         "caller": "_DeleteAccountDialogState.build",
         "kind": "constructor",
         "lexical_target": "_DeletionCredentials",
@@ -201331,8 +201320,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14532,
-        "occurrences": 24942
+        "unique_references": 14533,
+        "occurrences": 24944
       },
       {
         "target_scope": "dart_sdk",
@@ -202999,8 +202988,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:manaloom/core/utils/friendly_error_mapper.dart",
-        "unique_references": 121,
-        "occurrences": 125
+        "unique_references": 120,
+        "occurrences": 124
       },
       {
         "target_scope": "workspace",
@@ -211996,7 +211985,7 @@
       },
       {
         "source": "app/lib/core/utils/friendly_error_mapper.dart",
-        "line": 238,
+        "line": 241,
         "lexical_type": "OfflineFlowContract",
         "resolved_type": "OfflineFlowContract",
         "target": "OfflineFlowContract",
@@ -230976,7 +230965,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2050,
+        "line": 2060,
         "lexical_type": "_PasswordConfirmationDialogState",
         "resolved_type": "_PasswordConfirmationDialogState",
         "target": "_PasswordConfirmationDialogState",
@@ -230986,7 +230975,7 @@
       },
       {
         "source": "app/lib/features/profile/profile_screen.dart",
-        "line": 2114,
+        "line": 2124,
         "lexical_type": "_DeleteAccountDialogState",
         "resolved_type": "_DeleteAccountDialogState",
         "target": "_DeleteAccountDialogState",
@@ -248824,7 +248813,7 @@
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
         "unique_references": 6654,
-        "occurrences": 41248
+        "occurrences": 41249
       },
       {
         "target_scope": "dart_sdk",
@@ -303361,7 +303350,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "1e44288a625799aec4f8e7837eb5de517802f0b5d5d6f09eaba55d4c65876496"
+    "project_logic_source_digest_sha256": "2311e5c5b05b6553266aca2bc71d7f2024daf6231c14898fccb535f7bd892095"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
