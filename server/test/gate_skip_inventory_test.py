@@ -393,17 +393,23 @@ class QualityGateSkipWiringTest(unittest.TestCase):
         self.assertEqual(clean.returncode, 0, clean.stdout + clean.stderr)
 
     def test_every_test_runner_in_quality_gate_goes_through_the_inventory(self) -> None:
+        import re
+
         source = QUALITY_GATE.read_text(encoding="utf-8").replace("\\\n", " ")
-        runners = ('"$FLUTTER_BIN" test', '"$DART_BIN" test', "dart test", "flutter test")
+        runner = re.compile(r'\bdart test\b|\bflutter test\b|"\$FLUTTER_BIN" test|"\$DART_BIN" test')
+        seen = 0
         for line in source.splitlines():
             stripped = line.strip()
-            if stripped.startswith("#") or not stripped.startswith(runners):
+            if stripped.startswith(("#", "./scripts", "echo")) or "echo " in stripped:
                 continue
-            self.assertIn(
-                "--file-reporter",
-                stripped,
+            if not runner.search(stripped):
+                continue
+            seen += 1
+            self.assertTrue(
+                "run_inventoried_test" in stripped or "--file-reporter" in stripped,
                 f"quality_gate.sh roda teste fora do inventário de skip: {stripped}",
             )
+        self.assertGreaterEqual(seen, 7)
 
 
 if __name__ == "__main__":

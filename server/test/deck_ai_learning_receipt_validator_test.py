@@ -41,7 +41,9 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
         self.target_kwargs = {
             "expected_ssh_host_key_sha256": self.expected_host_key
         }
-        self.policy = validator.load_json_strict(POLICY_PATH)
+        # A faixa de migrations vem do manifesto (database.latest_migration), não de um 058 fixo.
+        self.policy = validator.load_policy(POLICY_PATH, REPO_ROOT)
+        self.latest = self.policy["source"]["required_latest_migration"]
         policy_sha = validator.file_sha256(POLICY_PATH)
         self.current_source = {
             "git_sha": "a" * 40,
@@ -50,7 +52,7 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
             "project_logic_source_digest": "c" * 64,
             "project_logic_manifest_sha256": "d" * 64,
             "migration_source_sha256": "e" * 64,
-            "latest_migration": "058",
+            "latest_migration": self.latest,
             "policy_sha256": policy_sha,
             "guarded_local_artifacts": {
                 "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db": {
@@ -69,7 +71,7 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
         now = datetime.now(timezone.utc).replace(microsecond=0)
         artifact_ids = self.policy["required_artifact_ids"]
         required_versions = self.policy["source"]["required_migration_versions"]
-        applied_versions = [f"{version:03d}" for version in range(1, 59)]
+        applied_versions = [f"{version:03d}" for version in range(1, int(self.latest) + 1)]
         semantic_content = {
             "pg_hermes_sqlite_audit_json": json.dumps(
                 {
@@ -87,7 +89,7 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
                     "checks": [
                         {"name": check_id, "status": "pass", "detail": "ok"}
                         for check_id in self.policy["release_check_ids"]
-                        if check_id != "pg_schema_migrations.038_058"
+                        if check_id != validator.MIGRATION_CHECK_ID
                     ],
                 },
                 sort_keys=True,
@@ -99,10 +101,10 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
                     "generated_at": now.isoformat(),
                     "transaction_read_only": "on",
                     "database": "halder",
-                    "required_range": "038-058",
+                    "required_range": self.policy["source"]["required_migration_range"],
                     "required_versions": required_versions,
                     "applied_versions": applied_versions,
-                    "latest_applied": "058",
+                    "latest_applied": self.latest,
                     "pending_versions": [],
                     "applied_versions_sha256": validator.canonical_sha256(
                         applied_versions
@@ -146,7 +148,7 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
             "required_range": self.policy["source"]["required_migration_range"],
             "required_versions": required_versions,
             "applied_versions": applied_versions,
-            "latest_applied": "058",
+            "latest_applied": self.latest,
             "pending_versions": [],
             "applied_versions_sha256": validator.canonical_sha256(applied_versions),
         }
@@ -333,8 +335,8 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
 
         self.assertBlocked("target.(identity|expected_ssh_host_key_sha256)")
 
-    def test_schema_058_must_be_applied_with_no_pending_versions(self) -> None:
-        self.payload["target"]["schema"]["applied_versions"].remove("058")
+    def test_latest_manifest_migration_must_be_applied_with_no_pending_versions(self) -> None:
+        self.payload["target"]["schema"]["applied_versions"].remove(self.latest)
         self.payload["target"]["schema"]["applied_versions_sha256"] = (
             validator.canonical_sha256(
                 self.payload["target"]["schema"]["applied_versions"]
@@ -524,6 +526,61 @@ class DeckAiLearningReceiptValidatorTest(unittest.TestCase):
         self.payload = self._valid_payload()
         self.payload["started_at"] = (now + timedelta(minutes=1)).isoformat()
         self.assertBlocked("out of order")
+
+    # BT-GATE-003: a faixa de migrations vem do manifesto, não de um 058 fixo.
+
+    def _manifest_repo(self, manifest: dict) -> Path:
+        repo = self.root / "manifest-repo"
+        repo.mkdir(exist_ok=True)
+        (repo / "project_logic_manifest.json").write_text(
+            json.dumps(manifest) + "\n", encoding="utf-8"
+        )
+        return repo
+
+    def test_policy_range_follows_the_manifest_latest_migration(self) -> None:
+        for latest in ("076", "077"):
+            with self.subTest(latest=latest):
+                repo = self._manifest_repo({"database": {"latest_migration": latest}})
+                policy = validator.load_policy(POLICY_PATH, repo)
+                source = policy["source"]
+                self.assertEqual(source["required_latest_migration"], latest)
+                self.assertEqual(source["required_migration_range"], f"038-{latest}")
+                self.assertEqual(source["required_migration_versions"][0], "038")
+                self.assertEqual(source["required_migration_versions"][-1], latest)
+                self.assertEqual(
+                    len(source["required_migration_versions"]), int(latest) - 37
+                )
+                self.assertIn(
+                    f"generate_series(38, {int(latest)})",
+                    validator.migration_status_sql(policy),
+                )
+
+    def test_policy_rejects_a_missing_or_regressed_manifest_migration(self) -> None:
+        for manifest in (
+            {},
+            {"database": {}},
+            {"database": {"latest_migration": "76"}},
+            {"database": {"latest_migration": "037"}},
+        ):
+            with self.subTest(manifest=manifest):
+                repo = self._manifest_repo(manifest)
+                with self.assertRaises(validator.ReceiptValidationError):
+                    validator.load_policy(POLICY_PATH, repo)
+
+    def test_receipt_for_an_older_schema_is_refused_when_the_manifest_moves_on(self) -> None:
+        # O receipt foi montado para a última migration de hoje; o manifesto avança
+        # (077 planejada) e o mesmo receipt deixa de valer sem editar a política.
+        repo = self._manifest_repo(
+            {"database": {"latest_migration": str(int(self.latest) + 1).zfill(3)}}
+        )
+        newer = validator.load_policy(POLICY_PATH, repo)
+        self.assertNotEqual(
+            newer["source"]["required_migration_versions"],
+            self.policy["source"]["required_migration_versions"],
+        )
+        self.assertNotEqual(
+            newer["source"]["required_latest_migration"], self.latest
+        )
 
 
 if __name__ == "__main__":

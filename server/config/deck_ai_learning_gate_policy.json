@@ -10,31 +10,8 @@
   },
   "source": {
     "require_clean_worktree": true,
-    "required_latest_migration": "058",
-    "required_migration_range": "038-058",
-    "required_migration_versions": [
-      "038",
-      "039",
-      "040",
-      "041",
-      "042",
-      "043",
-      "044",
-      "045",
-      "046",
-      "047",
-      "048",
-      "049",
-      "050",
-      "051",
-      "052",
-      "053",
-      "054",
-      "055",
-      "056",
-      "057",
-      "058"
-    ],
+    "required_migration_floor": "038",
+    "latest_migration_source": "project_logic_manifest.json#database.latest_migration",
     "guarded_local_artifacts": [
       "docs/hermes-analysis/manaloom-knowledge/scripts/knowledge.db"
     ]
@@ -93,7 +70,7 @@
     "pg_sqlite_parity.protected_deck_607_pg_snapshot",
     "pg_sqlite_parity.legacy_deck_6_pg_snapshot",
     "pg_connection",
-    "pg_schema_migrations.038_058",
+    "pg_schema_migrations.range",
     "pg_schema.card_battle_rules",
     "pg_rows.card_battle_rules",
     "pg_schema.card_intelligence_snapshot",

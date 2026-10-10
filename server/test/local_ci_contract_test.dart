@@ -56,6 +56,43 @@ void main() {
     expect(installer, contains('manaloom.localGates.disposablePostgres true'));
   });
 
+  test('BT-GATE-001..003: skip is PARTIAL, receipt is per step, deck gate is wired', () {
+    final localCi = File('../scripts/manaloom_local_ci.sh').readAsStringSync();
+    final qualityGate = File('../scripts/quality_gate.sh').readAsStringSync();
+    final inventory =
+        File('../scripts/manaloom_gate_skip_inventory.py').readAsStringSync();
+    final allowlist =
+        File('../server/config/gate_skip_allowlist.json').readAsStringSync();
+
+    // BT-GATE-001: nenhum skip vira PASS; BLOCKED nunca vira sucesso.
+    expect(localCi, contains('run_named_step'));
+    expect(localCi, contains('manaloom_gate_skip_inventory.py'));
+    expect(localCi, contains('3) step_rc=3 ;;'));
+    expect(localCi, contains('*) step_rc=2 ;;'));
+    expect(localCi, contains('exit 3'));
+    expect(qualityGate, contains('run_inventoried_test'));
+    expect(qualityGate, contains('check_skip_inventory flutter-full'));
+    expect(qualityGate, contains('--file-reporter'));
+    expect(inventory, contains('EXIT_PARTIAL = 3'));
+    expect(inventory, contains('EXIT_BLOCKED = 2'));
+    expect(allowlist, contains('flutter.lotus_web_host_runtime_vm_stub'));
+    expect(allowlist, contains('"owner"'));
+    expect(allowlist, contains('"review_by"'));
+
+    // BT-GATE-002: receipt forte por etapa nomeada, no mesmo SHA.
+    expect(localCi, contains('manaloom_gate_run_receipt.py'));
+    expect(localCi, contains('--steps-format local-ci-v2'));
+    expect(localCi, contains('finalize_receipt'));
+    expect(localCi, contains('finish_gate'));
+
+    // BT-GATE-003: Deck/IA/Learning no full e no release, reaproveitando o ledger.
+    expect(localCi, contains('run_named_step deck-ai-learning'));
+    expect(localCi, contains('MANALOOM_GATE_REUSE_STEPS'));
+    expect(localCi, contains('profile="release-read-only"'));
+    expect(localCi, contains('require_release_pg_receipt'));
+    expect(localCi, contains('MANALOOM_DECK_AI_RELEASE_RECEIPT'));
+  });
+
   test('tbls gate owns and removes a loopback disposable PostgreSQL', () {
     final gate =
         File('../scripts/manaloom_tbls_local_gate.sh').readAsStringSync();

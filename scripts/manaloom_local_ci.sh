@@ -260,16 +260,11 @@ run_shell_contracts() {
     python3 "$ROOT_DIR/server/test/staged_ui_scope_classifier_test.py"
   PYTHONDONTWRITEBYTECODE=1 \
     python3 "$ROOT_DIR/server/test/local_ci_staged_scope_dispatcher_test.py"
-  # BT-GATE-001/002/003: contratos de skip estrito, receipt forte e fatias únicas,
-  # com a mutação que remove cada propagação e exige o teste vermelho.
+  # BT-GATE-001/002: contratos rápidos de skip estrito e de receipt forte.
   PYTHONDONTWRITEBYTECODE=1 \
     python3 "$ROOT_DIR/server/test/gate_skip_inventory_test.py"
   PYTHONDONTWRITEBYTECODE=1 \
     python3 "$ROOT_DIR/server/test/gate_run_receipt_test.py"
-  PYTHONDONTWRITEBYTECODE=1 \
-    python3 "$ROOT_DIR/server/test/local_ci_strict_gate_test.py"
-  PYTHONDONTWRITEBYTECODE=1 \
-    python3 "$ROOT_DIR/server/test/local_ci_strict_gate_mutation_test.py"
 }
 
 run_mcp_preflight() {
@@ -396,6 +391,17 @@ PY
   python3 "$scripts_dir/report_retention_audit.py" \
     --fail-on-ignored-local \
     --out-prefix "$RUN_DIR/report-retention"
+
+  # BT-GATE-001/002/003: o local_ci estrito de ponta a ponta (dublês) e a mutação
+  # que remove cada propagação e exige o teste vermelho. Só no full: são lentos.
+  # O produtor do receipt de release roda só contra PostgreSQL descartável em
+  # loopback (nunca produção): ele própria sobe e remove o cluster em /tmp.
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/deck_ai_learning_release_producer_loopback_test.py"
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/local_ci_strict_gate_test.py"
+  PYTHONDONTWRITEBYTECODE=1 \
+    python3 "$ROOT_DIR/server/test/local_ci_strict_gate_mutation_test.py"
 }
 
 run_full_quality() {

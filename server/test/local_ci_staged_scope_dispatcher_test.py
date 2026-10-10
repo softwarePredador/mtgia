@@ -70,6 +70,7 @@ class LocalCiFixture:
             "server/test/gate_run_receipt_test.py",
             "server/test/local_ci_strict_gate_test.py",
             "server/test/local_ci_strict_gate_mutation_test.py",
+            "server/test/deck_ai_learning_release_producer_loopback_test.py",
         ):
             self.write(relative, "raise SystemExit(0)\n")
         self.write("scripts/manaloom_release_ops_contract_test.sh", "#!/usr/bin/env bash\nexit 0\n")
@@ -109,6 +110,7 @@ class LocalCiFixture:
             ".githooks/pre-commit",
             (REPO_ROOT / ".githooks/pre-commit").read_text(),
         )
+        self.write(".gitignore", "__pycache__/\n*.pyc\n")
         self.write("AGENTS.md", "dispatcher fixture\n")
         self.write("docs/MANALOOM_E2E_RELEASE_CONTRACT.md", "dispatcher fixture\n")
         self.write("server/test/local_ci_contract_test.dart", "void main() {}\n")

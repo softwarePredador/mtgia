@@ -417,6 +417,36 @@ class GateRunReceiptTest(unittest.TestCase):
         missing = subprocess.run(base + ["--check", "full-quality"], text=True, capture_output=True)
         self.assertEqual(missing.returncode, 1)
 
+    def test_e2e_receipt_round_trips_and_a_skip_never_validates(self) -> None:
+        def e2e(rows, status):
+            lines = []
+            for status_text, label in rows:
+                log = self.work / f"{label.replace(' ', '_')}.log"
+                log.write_text("log\n", encoding="utf-8")
+                lines.append(f"{status_text}\t{label}\t{0 if status_text == 'PASS' else ''}\t{log if status_text == 'PASS' else ''}\treason")
+            steps = self.work / "e2e-steps.tsv"
+            steps.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            self.run_counter = getattr(self, "run_counter", 0) + 1
+            return tool.finalize(
+                repo=self.repo, gate="e2e_suite", mode="strict-gate",
+                run_id=f"e2e_{self.run_counter}",
+                started_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                source_start_path=self.start(), steps_path=steps, steps_format="e2e-v1",
+                status=status, receipt_root=self.durable_root,
+            )
+
+        path, receipt = e2e([("PASS", "Public web product E2E")], "PASS")
+        self.assertEqual(receipt["status"], "PASS")
+        tool.validate(path, repo=self.repo, expected_gate="e2e_suite")
+        path2, receipt2 = e2e([("PASS", "Public web"), ("SKIP", "Optimizer isolated E2E")], "PARTIAL")
+        self.assertEqual(receipt2["status"], "PARTIAL")
+        self.assertFalse(receipt2["gate_eligible"])
+        self.assertEqual(receipt2["summary"]["skipped"], 1)
+        self.assert_rejected(path2, "status must be exactly")
+        # PASS pedido com um SKIP no meio é rebaixado pelo próprio receipt.
+        _, receipt3 = e2e([("PASS", "Public web"), ("SKIP", "Optimizer isolated E2E")], "PASS")
+        self.assertEqual(receipt3["status"], "FAIL")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

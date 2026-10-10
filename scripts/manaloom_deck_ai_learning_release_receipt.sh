@@ -21,7 +21,7 @@ Uso:
     --evidence-root /caminho/duravel/fora-de-tmp
 
 O produtor abre somente o tunnel PostgreSQL read-only canonico, executa o
-auditor PG/Hermes/SQLite e o preflight das migrations 038-058, e emite um
+auditor PG/Hermes/SQLite e o preflight das migrations (piso da politica ate a ultima do manifesto), e emite um
 receipt v2 ligado ao checkout limpo. Nao faz deploy, DDL, DML ou chamada de API.
 EOF
 }
@@ -120,30 +120,11 @@ printf '%s\n' "$PREFLIGHT_SQL" | \
       -v "expected_ssh_host_key_sha256=$MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256" \
   >"$READ_ONLY_PREFLIGHT"
 
-MIGRATION_SQL="WITH required(version) AS (
-  SELECT lpad(value::text, 3, '0')
-  FROM generate_series(38, 58) AS value
-), applied AS (
-  SELECT version FROM public.schema_migrations
-)
-SELECT jsonb_build_object(
-  'generated_at', clock_timestamp(),
-  'transaction_read_only', current_setting('transaction_read_only'),
-  'database', current_database(),
-  'required_range', '038-058',
-  'required_versions', (SELECT jsonb_agg(version ORDER BY version) FROM required),
-  'applied_versions', (SELECT jsonb_agg(version ORDER BY version) FROM applied),
-  'latest_applied', (SELECT max(version) FROM applied),
-  'pending_versions', COALESCE(
-    (
-      SELECT jsonb_agg(required.version ORDER BY required.version)
-      FROM required
-      LEFT JOIN applied USING (version)
-      WHERE applied.version IS NULL
-    ),
-    '[]'::jsonb
-  )
-)::text;"
+# A faixa de migrations vem da politica (piso) e do manifesto (ultima migration):
+# nenhum numero fixo aqui. O SQL e somente leitura, como o resto do produtor.
+MIGRATION_SQL="$(python3 "$VALIDATOR" migration-status-sql \
+  --policy "$POLICY_FILE" \
+  --repo "$ROOT_DIR")"
 "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
   psql -X -v ON_ERROR_STOP=1 -qAt -c "$MIGRATION_SQL" \
   >"$MIGRATION_STATUS"
