@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "01dd45d784d58497ef217ba330386255b6d74d6fb22c970126e9a0b24c72cce3",
+  "source_digest_sha256": "aa5bf2c3050de7e3a512fa0a965dc5f8cdb9049ef61e2eebf1e0498ef63b1a25",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -82,7 +82,7 @@
     "migrations": 74,
     "scripts_and_jobs": 717,
     "environment_variables": 736,
-    "tests": 1348,
+    "tests": 1350,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -291572,6 +291572,8 @@
     "server/test/local_ci_staged_scope_dispatcher_test.py",
     "server/test/lorehold_candidate_patch_contract_test.dart",
     "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
+    "server/test/lote_d85_corrections_db_live_test.dart",
+    "server/test/lote_scripts_contract_test.dart",
     "server/test/magic_rules_source_test.dart",
     "server/test/manaloom_battle_product_e2e_audit_test.py",
     "server/test/manaloom_battle_strategy_audit_runner_test.py",
@@ -292627,6 +292629,7 @@
         "server/test/data_model_migration_test.dart",
         "server/test/active_user_trigger_rule_test.dart",
         "server/test/production_shape_adoption_test.dart",
+        "server/test/lote_scripts_contract_test.dart",
         "server/test/release_capability_policy_test.dart",
         "app/test/core/config/release_capabilities_test.dart",
         "app/test/core/config/release_capability_surface_contract_test.dart",
@@ -303213,7 +303216,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "01dd45d784d58497ef217ba330386255b6d74d6fb22c970126e9a0b24c72cce3"
+    "project_logic_source_digest_sha256": "aa5bf2c3050de7e3a512fa0a965dc5f8cdb9049ef61e2eebf1e0498ef63b1a25"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -306404,6 +306407,8 @@
       "server/test/local_ci_staged_scope_dispatcher_test.py",
       "server/test/lorehold_candidate_patch_contract_test.dart",
       "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
+      "server/test/lote_d85_corrections_db_live_test.dart",
+      "server/test/lote_scripts_contract_test.dart",
       "server/test/magic_rules_source_test.dart",
       "server/test/manaloom_battle_product_e2e_audit_test.py",
       "server/test/manaloom_battle_strategy_audit_runner_test.py",
