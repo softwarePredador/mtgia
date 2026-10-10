@@ -119,8 +119,14 @@ void main() {
   ) async {
     await _pumpEditor(tester, item: _binderItem());
 
-    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsNothing);
-    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsNothing);
+    expect(
+      find.byKey(const Key('binder-editor-for-trade-switch')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('binder-editor-for-sale-switch')),
+      findsNothing,
+    );
     expect(find.textContaining('Preço'), findsNothing);
   });
 
@@ -131,8 +137,14 @@ void main() {
       item: _binderItem(),
       capabilities: const {ReleaseCapability.trades},
     );
-    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsOneWidget);
-    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsNothing);
+    expect(
+      find.byKey(const Key('binder-editor-for-trade-switch')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('binder-editor-for-sale-switch')),
+      findsNothing,
+    );
   });
 
   testWidgets('só marketplace mostra venda, não troca', (tester) async {
@@ -141,8 +153,14 @@ void main() {
       item: _binderItem(),
       capabilities: const {ReleaseCapability.marketplace},
     );
-    expect(find.byKey(const Key('binder-editor-for-trade-switch')), findsNothing);
-    expect(find.byKey(const Key('binder-editor-for-sale-switch')), findsOneWidget);
+    expect(
+      find.byKey(const Key('binder-editor-for-trade-switch')),
+      findsNothing,
+    );
+    expect(
+      find.byKey(const Key('binder-editor-for-sale-switch')),
+      findsOneWidget,
+    );
   });
 
   // D-90: item antigo com oferta gravada, capabilities desligadas. O PUT de

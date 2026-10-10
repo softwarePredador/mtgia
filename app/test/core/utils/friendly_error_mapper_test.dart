@@ -120,8 +120,10 @@ void main() {
       });
 
       test('403 without body or with access_forbidden shows permission', () {
-        expect(FriendlyErrorMapper.fromApiResponse(ApiResponse(403, null)),
-            permission);
+        expect(
+          FriendlyErrorMapper.fromApiResponse(ApiResponse(403, null)),
+          permission,
+        );
         expect(
           FriendlyErrorMapper.fromApiResponse(
             ApiResponse(403, {'error': 'access_forbidden'}),

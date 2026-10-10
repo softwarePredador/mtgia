@@ -2392,7 +2392,9 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppTheme.surfaceElevated,
             borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-            border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.55)),
+            border: Border.all(
+              color: AppTheme.brass400.withValues(alpha: 0.55),
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

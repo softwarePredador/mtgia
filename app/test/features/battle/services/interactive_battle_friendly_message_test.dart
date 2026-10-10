@@ -15,7 +15,8 @@ class _ErrorApiClient extends ApiClient {
 }
 
 void main() {
-  const recoverable = 'A mesa avançou antes desta escolha. O estado será atualizado.';
+  const recoverable =
+      'A mesa avançou antes desta escolha. O estado será atualizado.';
 
   Future<InteractiveBattleGatewayException> failureFor(String code) async {
     final service = InteractiveBattleService(apiClient: _ErrorApiClient(code));
@@ -27,13 +28,16 @@ void main() {
     }
   }
 
-  test('not_waiting recebe a mesma mensagem de recuperação que action_stale', () async {
-    // É o erro que o servidor realmente devolve num duplo toque ou quando a
-    // rede demora: a primeira ação já pôs a sessão em `action_pending`, e a
-    // segunda bate na checagem de status antes do UPDATE condicional.
-    final notWaiting = await failureFor('interactive_battle_not_waiting');
-    expect(notWaiting.message, recoverable);
-  });
+  test(
+    'not_waiting recebe a mesma mensagem de recuperação que action_stale',
+    () async {
+      // É o erro que o servidor realmente devolve num duplo toque ou quando a
+      // rede demora: a primeira ação já pôs a sessão em `action_pending`, e a
+      // segunda bate na checagem de status antes do UPDATE condicional.
+      final notWaiting = await failureFor('interactive_battle_not_waiting');
+      expect(notWaiting.message, recoverable);
+    },
+  );
 
   test('action_stale continua com a mensagem de recuperação', () async {
     final stale = await failureFor('interactive_battle_action_stale');

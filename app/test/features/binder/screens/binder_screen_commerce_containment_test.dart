@@ -93,7 +93,10 @@ void main() {
   ) async {
     await _pump(tester);
 
-    expect(find.byKey(const Key('binder-item-card-binder-oferta')), findsOneWidget);
+    expect(
+      find.byKey(const Key('binder-item-card-binder-oferta')),
+      findsOneWidget,
+    );
     expect(_chip('Troca'), findsNothing);
     expect(_chip('Venda'), findsNothing);
     expect(find.text('Troca', skipOffstage: false), findsNothing);
@@ -106,7 +109,10 @@ void main() {
   ) async {
     await _pump(tester, capabilities: const {});
 
-    expect(find.byKey(const Key('binder-item-card-binder-oferta')), findsOneWidget);
+    expect(
+      find.byKey(const Key('binder-item-card-binder-oferta')),
+      findsOneWidget,
+    );
     expect(_chip('Troca'), findsNothing);
     expect(_chip('Venda'), findsNothing);
     expect(find.text('Troca', skipOffstage: false), findsNothing);

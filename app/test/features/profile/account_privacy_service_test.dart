@@ -109,9 +109,8 @@ void main() {
   });
 
   test('não encerra a sessão sem confirmação positiva do servidor', () async {
-    final api =
-        _PrivacyApiClient()
-          ..deletionResponse = ApiResponse(200, {'account_deleted': false});
+    final api = _PrivacyApiClient()
+      ..deletionResponse = ApiResponse(200, {'account_deleted': false});
     final service = AccountPrivacyService(apiClient: api);
 
     await expectLater(
@@ -130,9 +129,8 @@ void main() {
   });
 
   test('senha inválida recebe mensagem segura e orientada', () async {
-    final api =
-        _PrivacyApiClient()
-          ..deletionResponse = ApiResponse(401, {'error': 'invalid_password'});
+    final api = _PrivacyApiClient()
+      ..deletionResponse = ApiResponse(401, {'error': 'invalid_password'});
     final service = AccountPrivacyService(apiClient: api);
 
     await expectLater(

@@ -37,41 +37,47 @@ void main() {
     expect(gate(follower, allowed: {ReleaseCapability.socialPush}), isFalse);
 
     expect(
-      gate(dm, allowed: {
-        ReleaseCapability.socialPush,
-        ReleaseCapability.directMessages,
-      }),
+      gate(
+        dm,
+        allowed: {
+          ReleaseCapability.socialPush,
+          ReleaseCapability.directMessages,
+        },
+      ),
       isTrue,
     );
     expect(
-      gate(trade, allowed: {
-        ReleaseCapability.socialPush,
-        ReleaseCapability.trades,
-      }),
+      gate(
+        trade,
+        allowed: {ReleaseCapability.socialPush, ReleaseCapability.trades},
+      ),
       isTrue,
     );
     expect(
-      gate(follower, allowed: {
-        ReleaseCapability.socialPush,
-        ReleaseCapability.follows,
-      }),
+      gate(
+        follower,
+        allowed: {ReleaseCapability.socialPush, ReleaseCapability.follows},
+      ),
       isTrue,
     );
   });
 
   test('capability do tipo errado não destrava o tipo', () {
     expect(
-      gate(trade, allowed: {
-        ReleaseCapability.socialPush,
-        ReleaseCapability.directMessages,
-      }),
+      gate(
+        trade,
+        allowed: {
+          ReleaseCapability.socialPush,
+          ReleaseCapability.directMessages,
+        },
+      ),
       isFalse,
     );
     expect(
-      gate(dm, allowed: {
-        ReleaseCapability.socialPush,
-        ReleaseCapability.follows,
-      }),
+      gate(
+        dm,
+        allowed: {ReleaseCapability.socialPush, ReleaseCapability.follows},
+      ),
       isFalse,
     );
   });

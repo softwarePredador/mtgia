@@ -44,10 +44,7 @@ class AccountPrivacyService {
     });
     if (response.statusCode != 200 || response.data is! Map) {
       throw AccountPrivacyException(
-        _messageFor(
-          response,
-          fallback: _exportFallbackFor(response),
-        ),
+        _messageFor(response, fallback: _exportFallbackFor(response)),
         statusCode: response.statusCode,
       );
     }
@@ -59,12 +56,14 @@ class AccountPrivacyService {
   ///
   /// Sem isto, senha errada e excesso de tentativas caíam na mesma frase
   /// genérica, e quem errou a senha não saberia que basta tentar de novo.
-  String _exportFallbackFor(ApiResponse response) => switch (response.statusCode) {
-    400 => 'Informe sua senha para exportar seus dados.',
-    401 => 'Senha incorreta. Tente novamente.',
-    429 => 'Muitas tentativas. Aguarde um momento antes de exportar de novo.',
-    _ => 'Não foi possível exportar seus dados.',
-  };
+  String _exportFallbackFor(ApiResponse response) =>
+      switch (response.statusCode) {
+        400 => 'Informe sua senha para exportar seus dados.',
+        401 => 'Senha incorreta. Tente novamente.',
+        429 =>
+          'Muitas tentativas. Aguarde um momento antes de exportar de novo.',
+        _ => 'Não foi possível exportar seus dados.',
+      };
 
   Future<AccountDeletionReceipt> deleteAccount({
     required String confirmation,

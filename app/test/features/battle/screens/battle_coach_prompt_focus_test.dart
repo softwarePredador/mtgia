@@ -34,7 +34,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // O prompt novo está na tela.
-      expect(find.byKey(const Key('battle-coach-option-o_dois')), findsOneWidget);
+      expect(
+        find.byKey(const Key('battle-coach-option-o_dois')),
+        findsOneWidget,
+      );
 
       final foco = FocusManager.instance.primaryFocus;
       expect(foco, isNotNull, reason: 'nada recebeu o foco apos a troca');
@@ -77,6 +80,11 @@ void main() {
           isNotNull,
           reason: 'o foco tem de estar numa arvore montada',
         );
+        // O nó focado é o envoltório do painel do prompt (não o escopo da rota,
+        // que contém tudo): é um nó de foco comum, `skipTraversal`, que só
+        // existe para receber o foco programático.
+        expect(foco, isNot(isA<FocusScopeNode>()), reason: 'foco no escopo');
+        expect(foco.skipTraversal, isTrue, reason: 'nao e o no do painel');
         // O nó focado é o envoltório do painel do prompt: o título está dentro.
         expect(
           find.descendant(
@@ -84,7 +92,8 @@ void main() {
             matching: find.text('Quantos?'),
           ),
           findsOneWidget,
-          reason: 'o foco nao esta no painel do prompt; foco em '
+          reason:
+              'o foco nao esta no painel do prompt; foco em '
               '${foco.debugLabel} (${foco.context!.widget.runtimeType})',
         );
 
@@ -120,10 +129,9 @@ class _GatewayComSegundoPrompt implements InteractiveBattleGateway {
   }) async => _sessao(promptId: 'p_um', opcaoId: 'o_um');
 
   @override
-  Future<InteractiveBattleSession> get(String sessionId) async =>
-      jaRespondeu
-          ? _sessao(promptId: 'p_dois', opcaoId: 'o_dois')
-          : _sessao(promptId: 'p_um', opcaoId: 'o_um');
+  Future<InteractiveBattleSession> get(String sessionId) async => jaRespondeu
+      ? _sessao(promptId: 'p_dois', opcaoId: 'o_dois')
+      : _sessao(promptId: 'p_um', opcaoId: 'o_um');
 
   @override
   Future<InteractiveBattleSession> respond({
