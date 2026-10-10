@@ -246,6 +246,17 @@ void main() {
       MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
+        // A8: o editor só oferece venda com a capability ligada; este smoke
+        // exercita o preço de venda, então semeia trades e marketplace acima
+        // do Navigator (o sheet herda o provider).
+        builder: (context, child) =>
+            ChangeNotifierProvider<ReleaseCapabilitiesProvider>.value(
+              value: ReleaseCapabilitiesProvider.seeded(const {
+                ReleaseCapability.trades,
+                ReleaseCapability.marketplace,
+              }),
+              child: child!,
+            ),
         home: Scaffold(
           body: Center(
             child: ElevatedButton(

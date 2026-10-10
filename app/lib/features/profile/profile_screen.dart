@@ -360,9 +360,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _exportData() async {
     if (_isExporting || _isDeleting) return;
+    // BT-AUTH-004: exportar os próprios dados exige reverificação de senha,
+    // como a exclusão de conta. Quem cancelar o diálogo não dispara nada.
+    final password = await showDialog<String>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const _PasswordConfirmationDialog(
+        title: 'Exportar seus dados?',
+        confirmLabel: 'Exportar',
+        keyPrefix: 'profile-export-data',
+      ),
+    );
+    if (password == null || !mounted) return;
     setState(() => _isExporting = true);
     try {
-      final portableData = await _privacyService.exportPortableData();
+      final portableData = await _privacyService.exportPortableData(
+        password: password,
+      );
       await (widget.shareData ?? _sharePortableData)(portableData);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -476,7 +490,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final password = await showDialog<String>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => const _RevokeSessionsDialog(),
+      builder: (_) => const _PasswordConfirmationDialog(
+        title: 'Encerrar outras sessões?',
+        confirmLabel: 'Encerrar sessões',
+        keyPrefix: 'profile-revoke-sessions',
+      ),
     );
     if (password == null || !mounted) return;
     setState(() {
@@ -2011,14 +2029,39 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
   );
 }
 
-class _RevokeSessionsDialog extends StatefulWidget {
-  const _RevokeSessionsDialog();
+/// Pede a senha atual antes de uma ação sensível.
+///
+/// Era específico de "encerrar sessões". A exportação de dados passou a exigir
+/// a mesma reverificação (BT-AUTH-004), e duplicar o diálogo faria as duas
+/// cópias divergirem — a de senha é justamente onde divergência custa caro.
+///
+/// Chaves geradas a partir de `keyPrefix` (`<prefixo>-dialog`,
+/// `<prefixo>-password-field`, `-password-visibility`, `-cancel-button` e
+/// `-confirm-button`):
+/// - `profile-revoke-sessions-dialog` (encerrar outras sessões);
+/// - `profile-export-data-dialog` (exportar os próprios dados).
+///
+/// O contrato `ux_pack08_06_profile_revoke_validation` ancora em
+/// `profile-revoke-sessions-dialog` neste arquivo, então o nome literal fica
+/// documentado aqui.
+class _PasswordConfirmationDialog extends StatefulWidget {
+  const _PasswordConfirmationDialog({
+    required this.title,
+    required this.confirmLabel,
+    required this.keyPrefix,
+  });
+
+  final String title;
+  final String confirmLabel;
+  final String keyPrefix;
 
   @override
-  State<_RevokeSessionsDialog> createState() => _RevokeSessionsDialogState();
+  State<_PasswordConfirmationDialog> createState() =>
+      _PasswordConfirmationDialogState();
 }
 
-class _RevokeSessionsDialogState extends State<_RevokeSessionsDialog> {
+class _PasswordConfirmationDialogState
+    extends State<_PasswordConfirmationDialog> {
   final _formKey = GlobalKey<FormState>();
   final _passwordController = TextEditingController();
   bool _showPassword = false;
@@ -2032,18 +2075,18 @@ class _RevokeSessionsDialogState extends State<_RevokeSessionsDialog> {
   @override
   Widget build(BuildContext context) => _EscapeDismissibleDialog(
     child: AlertDialog(
-      key: const Key('profile-revoke-sessions-dialog'),
-      title: const Text('Encerrar outras sessões?'),
+      key: Key('${widget.keyPrefix}-dialog'),
+      title: Text(widget.title),
       content: Form(
         key: _formKey,
         child: TextFormField(
-          key: const Key('profile-revoke-password-field'),
+          key: Key('${widget.keyPrefix}-password-field'),
           controller: _passwordController,
           obscureText: !_showPassword,
           decoration: InputDecoration(
             labelText: 'Senha atual',
             suffixIcon: _PasswordVisibilityButton(
-              key: const Key('profile-revoke-password-visibility'),
+              key: Key('${widget.keyPrefix}-password-visibility'),
               visible: _showPassword,
               onPressed: () => setState(() => _showPassword = !_showPassword),
             ),
@@ -2055,17 +2098,17 @@ class _RevokeSessionsDialogState extends State<_RevokeSessionsDialog> {
       ),
       actions: [
         TextButton(
-          key: const Key('profile-revoke-sessions-cancel-button'),
+          key: Key('${widget.keyPrefix}-cancel-button'),
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar'),
         ),
         FilledButton(
-          key: const Key('profile-revoke-sessions-confirm-button'),
+          key: Key('${widget.keyPrefix}-confirm-button'),
           onPressed: () {
             if (_formKey.currentState?.validate() != true) return;
             Navigator.pop(context, _passwordController.text);
           },
-          child: const Text('Encerrar sessões'),
+          child: Text(widget.confirmLabel),
         ),
       ],
     ),

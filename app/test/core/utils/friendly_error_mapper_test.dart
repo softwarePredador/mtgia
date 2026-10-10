@@ -89,6 +89,73 @@ void main() {
       });
     }
 
+    test('never shows the single-word code forbidden from a server body', () {
+      for (final status in const [400, 403, 404, 409, 422]) {
+        final message = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(status, {'error': 'forbidden'}),
+        );
+        expect(message, isNot(contains('forbidden')));
+      }
+      expect(
+        FriendlyErrorMapper.serverMessageFromBody({'error': 'forbidden'}),
+        isNull,
+      );
+    });
+
+    test('keeps a one-word exception message as the thrower wrote it', () {
+      expect(
+        FriendlyErrorMapper.fromException(Exception('offline')),
+        isNotEmpty,
+      );
+      expect(
+        FriendlyErrorMapper.fromException(Exception('offline')),
+        contains('offline'),
+      );
+    });
+
+    group('403 (BT-AUTH-010)', () {
+      const permission = 'Você não tem permissão para realizar esta ação.';
+
+      test('single-word code forbidden shows the permission phrase', () {
+        final message = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(403, {'error': 'forbidden'}),
+        );
+
+        expect(message, permission);
+        expect(message, isNot(contains('forbidden')));
+      });
+
+      test('email_verification_required is not a permission denial', () {
+        final withoutMessage = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(403, {'error': 'email_verification_required'}),
+        );
+        final withMessage = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(403, {
+            'error': 'email_verification_required',
+            'message': 'Confirme seu email para continuar.',
+          }),
+        );
+
+        expect(withoutMessage, isNot(contains('não tem permissão')));
+        expect(withoutMessage, contains('Confirme seu email'));
+        expect(withMessage, 'Confirme seu email para continuar.');
+        expect(withMessage, isNot(contains('não tem permissão')));
+      });
+
+      test('403 without body or with access_forbidden shows permission', () {
+        expect(
+          FriendlyErrorMapper.fromApiResponse(ApiResponse(403, null)),
+          permission,
+        );
+        expect(
+          FriendlyErrorMapper.fromApiResponse(
+            ApiResponse(403, {'error': 'access_forbidden'}),
+          ),
+          permission,
+        );
+      });
+    });
+
     test('exposes the stable code for callers that branch on it', () {
       expect(
         FriendlyErrorMapper.errorCodeFromBody({

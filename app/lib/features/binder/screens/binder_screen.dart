@@ -442,12 +442,18 @@ class _BinderListViewState extends State<_BinderListView>
     super.build(context);
     final isHave = widget.listType == 'have';
     final stats = context.select<BinderProvider, BinderStats?>((p) => p.stats);
-    final scannerAllowed = context
-        .watch<ReleaseCapabilitiesProvider?>()
-        ?.isAllowed(
-          ReleaseCapability.scanner,
-          buildSupported: widget.scannerBuildSupported,
-        );
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final scannerAllowed = capabilities?.isAllowed(
+      ReleaseCapability.scanner,
+      buildSupported: widget.scannerBuildSupported,
+    );
+    // A8: o fichário só apresenta o que a release permite. Provider ausente ou
+    // capability desligada fecham a superfície — `== true` é a mesma leitura
+    // fail-closed que o scanner já usava aqui.
+    final tradesAllowed =
+        capabilities?.isAllowed(ReleaseCapability.trades) == true;
+    final marketplaceAllowed =
+        capabilities?.isAllowed(ReleaseCapability.marketplace) == true;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -456,8 +462,8 @@ class _BinderListViewState extends State<_BinderListView>
             (stats.totalItems > 0 ||
                 stats.uniqueCards > 0 ||
                 stats.wishlistCount > 0 ||
-                stats.forTradeCount > 0 ||
-                stats.forSaleCount > 0);
+                (tradesAllowed && stats.forTradeCount > 0) ||
+                (marketplaceAllowed && stats.forSaleCount > 0));
         final showStats = hasStatsData && constraints.maxHeight > 300;
 
         return Column(
@@ -469,7 +475,11 @@ class _BinderListViewState extends State<_BinderListView>
                 onAdd: _openAddCard,
                 onImport: _openBulkImport,
                 onScan: scannerAllowed == true ? _openScanCard : null,
-                onMatches: () => context.push(tradeMatchesRouteLocation()),
+                onMatches: tradesAllowed
+                    ? () => context.push(tradeMatchesRouteLocation())
+                    : null,
+                showTrade: tradesAllowed,
+                showSale: marketplaceAllowed,
               ),
 
             if (!showStats && _items.isNotEmpty)
@@ -519,6 +529,8 @@ class _BinderListViewState extends State<_BinderListView>
                 });
                 _applyFilters();
               },
+              showTrade: tradesAllowed,
+              showSale: marketplaceAllowed,
               onTradeToggle: () {
                 setState(() {
                   _tradeFilter = _tradeFilter == true ? null : true;
@@ -535,7 +547,12 @@ class _BinderListViewState extends State<_BinderListView>
 
             // List
             Expanded(
-              child: _buildList(isHave, scannerAllowed: scannerAllowed == true),
+              child: _buildList(
+                isHave,
+                scannerAllowed: scannerAllowed == true,
+                tradesAllowed: tradesAllowed,
+                marketplaceAllowed: marketplaceAllowed,
+              ),
             ),
           ],
         );
@@ -543,7 +560,12 @@ class _BinderListViewState extends State<_BinderListView>
     );
   }
 
-  Widget _buildList(bool isHave, {required bool scannerAllowed}) {
+  Widget _buildList(
+    bool isHave, {
+    required bool scannerAllowed,
+    required bool tradesAllowed,
+    required bool marketplaceAllowed,
+  }) {
     if (_isLoading && _items.isEmpty) {
       return AppStatePanel.loading(
         key: Key('binder-list-loading-${widget.listType}'),
@@ -730,6 +752,8 @@ class _BinderListViewState extends State<_BinderListView>
               margin: useGrid
                   ? EdgeInsets.zero
                   : const EdgeInsets.only(bottom: AppTheme.space8),
+              showTrade: tradesAllowed,
+              showSale: marketplaceAllowed,
               onTap: () => _editItem(_items[index]),
             );
           }
@@ -832,12 +856,16 @@ class _StatsBar extends StatefulWidget {
   final VoidCallback? onImport;
   final VoidCallback? onScan;
   final VoidCallback? onMatches;
+  final bool showTrade;
+  final bool showSale;
   const _StatsBar({
     required this.stats,
     this.onAdd,
     this.onImport,
     this.onScan,
     this.onMatches,
+    this.showTrade = false,
+    this.showSale = false,
   });
 
   @override
@@ -960,20 +988,22 @@ class _StatsBarState extends State<_StatsBar> {
                       tooltip: 'Cópias além da primeira',
                       color: AppTheme.frost400,
                     ),
-                    _StatCard(
-                      icon: Icons.swap_horiz,
-                      label: 'Troca',
-                      value: '${stats.forTradeCount}',
-                      tooltip: 'Itens marcados para troca',
-                      color: AppTheme.frost400,
-                    ),
-                    _StatCard(
-                      icon: Icons.sell,
-                      label: 'Venda',
-                      value: '${stats.forSaleCount}',
-                      tooltip: 'Itens marcados para venda',
-                      color: AppTheme.brass400,
-                    ),
+                    if (widget.showTrade)
+                      _StatCard(
+                        icon: Icons.swap_horiz,
+                        label: 'Troca',
+                        value: '${stats.forTradeCount}',
+                        tooltip: 'Itens marcados para troca',
+                        color: AppTheme.frost400,
+                      ),
+                    if (widget.showSale)
+                      _StatCard(
+                        icon: Icons.sell,
+                        label: 'Venda',
+                        value: '${stats.forSaleCount}',
+                        tooltip: 'Itens marcados para venda',
+                        color: AppTheme.brass400,
+                      ),
                     _StatCard(
                       icon: Icons.attach_money,
                       label: 'Valor conhecido',
@@ -1482,6 +1512,8 @@ class _SearchFilterBar extends StatelessWidget {
   final VoidCallback onSortOrderToggle;
   final VoidCallback onTradeToggle;
   final VoidCallback onSaleToggle;
+  final bool showTrade;
+  final bool showSale;
 
   const _SearchFilterBar({
     required this.searchController,
@@ -1503,6 +1535,8 @@ class _SearchFilterBar extends StatelessWidget {
     required this.onSortOrderToggle,
     required this.onTradeToggle,
     required this.onSaleToggle,
+    this.showTrade = false,
+    this.showSale = false,
   });
 
   @override
@@ -1698,58 +1732,62 @@ class _SearchFilterBar extends StatelessWidget {
                           : AppTheme.outlineMuted,
                     ),
                   ),
-                  const SizedBox(width: AppTheme.space8),
-                  FilterChip(
-                    label: const Text('Troca'),
-                    selected: tradeFilter == true,
-                    onSelected: (_) => onTradeToggle(),
-                    selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
-                    backgroundColor: AppTheme.surfaceSlate,
-                    labelStyle: TextStyle(
-                      color: tradeFilter == true
-                          ? AppTheme.brass400
-                          : AppTheme.textSecondary,
-                      fontSize: AppTheme.fontSm,
+                  if (showTrade) ...[
+                    const SizedBox(width: AppTheme.space8),
+                    FilterChip(
+                      label: const Text('Troca'),
+                      selected: tradeFilter == true,
+                      onSelected: (_) => onTradeToggle(),
+                      selectedColor: AppTheme.brass400.withValues(alpha: 0.16),
+                      backgroundColor: AppTheme.surfaceSlate,
+                      labelStyle: TextStyle(
+                        color: tradeFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                      side: BorderSide(
+                        color: tradeFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.outlineMuted,
+                      ),
+                      avatar: Icon(
+                        Icons.swap_horiz,
+                        size: 14,
+                        color: tradeFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
+                      ),
                     ),
-                    side: BorderSide(
-                      color: tradeFilter == true
-                          ? AppTheme.brass400
-                          : AppTheme.outlineMuted,
+                  ],
+                  if (showSale) ...[
+                    const SizedBox(width: AppTheme.space8),
+                    FilterChip(
+                      label: const Text('Venda'),
+                      selected: saleFilter == true,
+                      onSelected: (_) => onSaleToggle(),
+                      selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
+                      backgroundColor: AppTheme.surfaceSlate,
+                      labelStyle: TextStyle(
+                        color: saleFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
+                        fontSize: AppTheme.fontSm,
+                      ),
+                      side: BorderSide(
+                        color: saleFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.outlineMuted,
+                      ),
+                      avatar: Icon(
+                        Icons.sell,
+                        size: 14,
+                        color: saleFilter == true
+                            ? AppTheme.brass400
+                            : AppTheme.textSecondary,
+                      ),
                     ),
-                    avatar: Icon(
-                      Icons.swap_horiz,
-                      size: 14,
-                      color: tradeFilter == true
-                          ? AppTheme.brass400
-                          : AppTheme.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(width: AppTheme.space8),
-                  FilterChip(
-                    label: const Text('Venda'),
-                    selected: saleFilter == true,
-                    onSelected: (_) => onSaleToggle(),
-                    selectedColor: AppTheme.brass400.withValues(alpha: 0.22),
-                    backgroundColor: AppTheme.surfaceSlate,
-                    labelStyle: TextStyle(
-                      color: saleFilter == true
-                          ? AppTheme.brass400
-                          : AppTheme.textSecondary,
-                      fontSize: AppTheme.fontSm,
-                    ),
-                    side: BorderSide(
-                      color: saleFilter == true
-                          ? AppTheme.brass400
-                          : AppTheme.outlineMuted,
-                    ),
-                    avatar: Icon(
-                      Icons.sell,
-                      size: 14,
-                      color: saleFilter == true
-                          ? AppTheme.brass400
-                          : AppTheme.textSecondary,
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -1880,11 +1918,15 @@ class _BinderItemCard extends StatelessWidget {
   final BinderItem item;
   final VoidCallback onTap;
   final EdgeInsetsGeometry margin;
+  final bool showTrade;
+  final bool showSale;
 
   const _BinderItemCard({
     required this.item,
     required this.onTap,
     this.margin = EdgeInsets.zero,
+    this.showTrade = false,
+    this.showSale = false,
   });
 
   @override
@@ -2009,19 +2051,18 @@ class _BinderItemCard extends StatelessWidget {
                         ),
                       ),
                     ],
-                    if (item.forTrade ||
-                        item.forSale ||
-                        item.price != null) ...[
+                    if ((showTrade && item.forTrade) ||
+                        (showSale && (item.forSale || item.price != null))) ...[
                       const SizedBox(height: AppTheme.space2),
                       Wrap(
                         spacing: 6,
                         runSpacing: 4,
                         children: [
-                          if (item.forTrade)
+                          if (showTrade && item.forTrade)
                             _statusTag('Troca', AppTheme.frost400),
-                          if (item.forSale)
+                          if (showSale && item.forSale)
                             _statusTag('Venda', AppTheme.brass400),
-                          if (item.price != null) ...[
+                          if (showSale && item.price != null) ...[
                             Text(
                               'R\$ ${item.price!.toStringAsFixed(2)}',
                               style: const TextStyle(

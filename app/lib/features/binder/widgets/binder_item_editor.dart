@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/config/release_capabilities.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/friendly_error_mapper.dart';
 import '../../../core/utils/scryfall_image_helper.dart';
@@ -283,11 +284,22 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       return;
     }
 
+    // D-90: com a capability desligada o controle some, mas o item antigo pode
+    // trazer a oferta gravada. O PUT é parcial (campo ausente mantém o valor no
+    // banco) e o servidor só aceita `false`/`null` com a capability fechada.
+    // Por isso o corpo leva `for_trade: false`, `for_sale: false` e
+    // `price: null` explícitos, nunca os omite.
+    final capabilities = context.read<ReleaseCapabilitiesProvider?>();
+    final forTrade =
+        capabilities?.isAllowed(ReleaseCapability.trades) == true && _forTrade;
+    final forSale =
+        capabilities?.isAllowed(ReleaseCapability.marketplace) == true &&
+        _forSale;
     final priceText = _priceController.text.trim();
-    final parsedPrice = !_forSale || priceText.isEmpty
+    final parsedPrice = !forSale || priceText.isEmpty
         ? null
         : double.tryParse(priceText.replaceAll(',', '.'));
-    if (_forSale &&
+    if (forSale &&
         (parsedPrice == null || !parsedPrice.isFinite || parsedPrice <= 0)) {
       setState(() {
         _saveError = 'Informe um preço válido maior que zero.';
@@ -305,8 +317,8 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
       'quantity': _quantity,
       'condition': _condition,
       'is_foil': _isFoil,
-      'for_trade': _forTrade,
-      'for_sale': _forSale,
+      'for_trade': forTrade,
+      'for_sale': forSale,
       'language': _language,
       'list_type': _listType,
       'notes': _notesController.text.trim().isEmpty
@@ -401,6 +413,13 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
     final isEditing = widget.item != null;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final name = widget.item?.cardName ?? widget.cardName ?? 'Carta';
+    // A8: marcar item para troca ou venda é escrita de uma capability que a
+    // beta mantém desligada. Provider ausente fecha a superfície.
+    final capabilities = context.watch<ReleaseCapabilitiesProvider?>();
+    final tradesAllowed =
+        capabilities?.isAllowed(ReleaseCapability.trades) == true;
+    final marketplaceAllowed =
+        capabilities?.isAllowed(ReleaseCapability.marketplace) == true;
 
     return Padding(
       key: const Key('binder-editor-sheet'),
@@ -1079,50 +1098,52 @@ class _BinderItemEditorState extends State<BinderItemEditor> {
                 ),
 
                 // Para Troca
-                SwitchListTile(
-                  key: const Key('binder-editor-for-trade-switch'),
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Disponível para troca',
-                    style: TextStyle(color: AppTheme.textSecondary),
+                if (tradesAllowed)
+                  SwitchListTile(
+                    key: const Key('binder-editor-for-trade-switch'),
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text(
+                      'Disponível para troca',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    secondary: Icon(
+                      Icons.swap_horiz,
+                      color: _forTrade
+                          ? AppTheme.primarySoft
+                          : AppTheme.outlineMuted,
+                    ),
+                    value: _forTrade,
+                    onChanged: (v) => setState(() => _forTrade = v),
+                    activeThumbColor: AppTheme.primarySoft,
                   ),
-                  secondary: Icon(
-                    Icons.swap_horiz,
-                    color: _forTrade
-                        ? AppTheme.primarySoft
-                        : AppTheme.outlineMuted,
-                  ),
-                  value: _forTrade,
-                  onChanged: (v) => setState(() => _forTrade = v),
-                  activeThumbColor: AppTheme.primarySoft,
-                ),
 
                 // Para Venda
-                SwitchListTile(
-                  key: const Key('binder-editor-for-sale-switch'),
-                  contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Disponível para venda',
-                    style: TextStyle(color: AppTheme.textSecondary),
+                if (marketplaceAllowed)
+                  SwitchListTile(
+                    key: const Key('binder-editor-for-sale-switch'),
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text(
+                      'Disponível para venda',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    secondary: Icon(
+                      Icons.sell,
+                      color: _forSale
+                          ? AppTheme.mythicGold
+                          : AppTheme.outlineMuted,
+                    ),
+                    value: _forSale,
+                    onChanged: (v) {
+                      setState(() {
+                        _forSale = v;
+                        if (!v) _saveError = null;
+                      });
+                    },
+                    activeThumbColor: AppTheme.mythicGold,
                   ),
-                  secondary: Icon(
-                    Icons.sell,
-                    color: _forSale
-                        ? AppTheme.mythicGold
-                        : AppTheme.outlineMuted,
-                  ),
-                  value: _forSale,
-                  onChanged: (v) {
-                    setState(() {
-                      _forSale = v;
-                      if (!v) _saveError = null;
-                    });
-                  },
-                  activeThumbColor: AppTheme.mythicGold,
-                ),
 
                 // Preço
-                if (_forSale) ...[
+                if (marketplaceAllowed && _forSale) ...[
                   const SizedBox(height: AppTheme.space8),
                   TextField(
                     key: const Key('binder-editor-price-field'),

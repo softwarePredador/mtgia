@@ -989,18 +989,49 @@ class _ActiveBattleSessionCard extends StatelessWidget {
   );
 }
 
+/// Dá foco ao contêiner do prompt quando ele não oferece ação legal.
+///
+/// Quando há ação, este envoltório é transparente: nenhum nó de foco entra na
+/// árvore, e a ordem de Tab da mesa fica exatamente como era.
+class _EnvoltorioDeFocoDoPrompt extends StatelessWidget {
+  const _EnvoltorioDeFocoDoPrompt({
+    super.key,
+    required this.ativo,
+    required this.child,
+  });
+
+  final bool ativo;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!ativo) return child;
+    return Focus(autofocus: true, skipTraversal: true, child: child);
+  }
+}
+
 class _BattleCoachKeyboardFocusHalo extends StatefulWidget {
   const _BattleCoachKeyboardFocusHalo({
     this.haloKey,
     required this.borderRadius,
     required this.debugLabel,
     required this.builder,
+    this.autofocus = false,
   });
 
   final Key? haloKey;
   final BorderRadius borderRadius;
   final String debugLabel;
   final Widget Function(FocusNode focusNode) builder;
+
+  /// Pede o foco assim que este halo entra na árvore.
+  ///
+  /// O prompt da mesa é substituído de forma assíncrona pelo motor. Sem isto,
+  /// o elemento focado some da árvore e o navegador devolve o foco à barra do
+  /// app: medido em 2026-09-28, depois de Enter em "Manter esta mão" o foco ia
+  /// parar em "Abrir replays". Quem joga por teclado perdia o lugar a cada
+  /// decisão e tinha de percorrer a ordem de foco inteira de novo.
+  final bool autofocus;
 
   @override
   State<_BattleCoachKeyboardFocusHalo> createState() =>
@@ -1019,6 +1050,30 @@ class _BattleCoachKeyboardFocusHaloState
       ..addListener(_syncHalo);
     FocusManager.instance.addHighlightModeListener(_handleHighlightMode);
     _syncHalo();
+    if (widget.autofocus) {
+      // Depois do frame: o nó ainda não está anexado quando `initState` roda.
+      //
+      // A troca de prompt acontece dentro de um `AnimatedSwitcher`, e durante a
+      // transição o pedido do primeiro frame pode cair num nó que ainda vai
+      // sair da árvore. Medido em 2026-09-28: o foco acabava no contêiner do
+      // prompt em vez da primeira ação. Por isso o pedido é repetido enquanto a
+      // transição assenta, e para assim que o foco chega. Quatro frames bastam,
+      // conferido no navegador em 2026-09-28: o halo aparece na primeira ação
+      // do prompt novo.
+      _pedirFocoAteAssentar(4);
+    }
+  }
+
+  void _pedirFocoAteAssentar(int tentativas) {
+    if (tentativas <= 0) return;
+    // Encadeia FRAMES, nunca `Future.delayed`: um timer pendente sobrevive ao
+    // descarte da árvore e quebra `flutter_test` com "A Timer is still
+    // pending" -- medido em 2026-09-28, derrubou os trinta testes da tela.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _focusNode.hasFocus) return;
+      _focusNode.requestFocus();
+      if (!_focusNode.hasFocus) _pedirFocoAteAssentar(tentativas - 1);
+    });
   }
 
   void _handleHighlightMode(FocusHighlightMode _) => _syncHalo();
@@ -1853,7 +1908,22 @@ class _BattleCard extends StatelessWidget {
       child: Semantics(
         image: !isLegal,
         label: '${card.name}${card.tapped ? ', virada' : ''}',
-        child: SizedBox(width: width, height: height, child: highlightedBody),
+        // Virar a carta é `AnimatedRotation`, que gira na PINTURA e não no
+        // layout: girada, ela ocupa `height` de largura dentro de um slot de
+        // `width` e pinta por cima da vizinha e além da borda da fileira. O
+        // slot reserva o rastro deitado, como mesa de Magic faz; o corpo da
+        // carta continua `width x height`, centrado.
+        child: SizedBox(
+          width: card.tapped ? height : width,
+          height: height,
+          child: Center(
+            child: SizedBox(
+              width: width,
+              height: height,
+              child: highlightedBody,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -2302,115 +2372,131 @@ class _BattleCoachDecisionPanel extends StatelessWidget {
         : remaining.isNegative
         ? 0
         : remaining.inSeconds;
+    // Prompt sem ação legal (entrada numérica, múltipla, ou indisponível): o
+    // foco pousa no PRÓPRIO contêiner, nunca na barra do app. `skipTraversal`
+    // mantém a ordem de Tab intacta — o nó só existe para receber o foco
+    // programático quando não há ação para focar.
+    final semAcaoLegal =
+        prompt.inputMode != 'options' || prompt.options.isEmpty;
     return AnimatedSwitcher(
       duration: _motionDuration(context),
-      child: Container(
+      // O envoltório de foco só existe quando NÃO há ação legal para focar.
+      // Deixá-lo sempre ligado punha um nó a mais no caminho do foco num
+      // prompt que já tem ações, e eu não quero essa dúvida pairando sobre a
+      // ordem de Tab da mesa: se o nó não é necessário, ele não entra.
+      child: _EnvoltorioDeFocoDoPrompt(
         key: ValueKey(prompt.id),
-        padding: const EdgeInsets.all(AppTheme.space16),
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceElevated,
-          borderRadius: BorderRadius.circular(AppTheme.radiusMd),
-          border: Border.all(color: AppTheme.brass400.withValues(alpha: 0.55)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.touch_app_rounded,
-                  color: AppTheme.brass400,
-                  size: 20,
-                ),
-                const SizedBox(width: AppTheme.space8),
-                Expanded(
-                  child: Text(
-                    prompt.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppTheme.textPrimary,
-                      fontWeight: FontWeight.w800,
+        ativo: semAcaoLegal,
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.space16),
+          decoration: BoxDecoration(
+            color: AppTheme.surfaceElevated,
+            borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+            border: Border.all(
+              color: AppTheme.brass400.withValues(alpha: 0.55),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.touch_app_rounded,
+                    color: AppTheme.brass400,
+                    size: 20,
+                  ),
+                  const SizedBox(width: AppTheme.space8),
+                  Expanded(
+                    child: Text(
+                      prompt.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: AppTheme.textPrimary,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
-                ),
-                _DecisionClock(seconds: seconds),
-              ],
-            ),
-            const SizedBox(height: AppTheme.space8),
-            Text(
-              prompt.message,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.textSecondary,
-                height: 1.4,
+                  _DecisionClock(seconds: seconds),
+                ],
               ),
-            ),
-            if (prompt.inputMode == 'options' && hasDirectCardAction) ...[
               const SizedBox(height: AppTheme.space8),
               Text(
-                'Toque em uma carta destacada na mesa ou escolha a mesma ação abaixo.',
-                key: const Key('play-vs-ai-card-action-hint'),
+                prompt.message,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.textSecondary,
+                  height: 1.4,
+                ),
+              ),
+              if (prompt.inputMode == 'options' && hasDirectCardAction) ...[
+                const SizedBox(height: AppTheme.space8),
+                Text(
+                  'Toque em uma carta destacada na mesa ou escolha a mesma ação abaixo.',
+                  key: const Key('play-vs-ai-card-action-hint'),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppTheme.brass400,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppTheme.space14),
+              if (busy)
+                const LinearProgressIndicator(
+                  key: Key('battle-coach-action-progress'),
+                  minHeight: AppTheme.space3,
+                )
+              else if (prompt.inputMode == 'options')
+                for (final (indice, option) in prompt.options.indexed)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppTheme.space8),
+                    child: _PromptOptionTile(
+                      option: option,
+                      autofocus: indice == 0,
+                      onPressed: () => onOption(option),
+                    ),
+                  )
+              else if (prompt.inputMode == 'integer' &&
+                  prompt.minimum != null &&
+                  prompt.maximum != null)
+                _IntegerDecision(
+                  prompt: prompt,
+                  value: integerValue ?? prompt.minimum!,
+                  onChanged: onIntegerChanged,
+                  onSubmit: onIntegerSubmit,
+                )
+              else if (prompt.inputMode == 'multi_amount' &&
+                  prompt.multiAmountCount > 0)
+                _MultiAmountDecision(
+                  prompt: prompt,
+                  controller: multiAmountController,
+                  onSubmit: onMultiSubmit,
+                )
+              else
+                const _DecisionInputUnavailable(),
+              const SizedBox(height: AppTheme.space6),
+              _BattleCoachKeyboardFocusHalo(
+                haloKey: const Key('battle-coach-delegate-focus-halo'),
+                borderRadius: BorderRadius.circular(AppTheme.radiusPill),
+                debugLabel: 'Play vs AI delegate decision',
+                builder: (focusNode) => OutlinedButton.icon(
+                  key: const Key('battle-coach-delegate-button'),
+                  focusNode: focusNode,
+                  onPressed: busy ? null : onDelegate,
+                  icon: const Icon(Icons.auto_mode_rounded),
+                  label: const Text('Deixar esta ação no automático'),
+                ),
+              ),
+              const SizedBox(height: AppTheme.space6),
+              Text(
+                'O automático vale somente para esta ação. A próxima jogada '
+                'legal volta para você.',
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppTheme.brass400,
-                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textHint,
+                  height: 1.3,
                 ),
               ),
             ],
-            const SizedBox(height: AppTheme.space14),
-            if (busy)
-              const LinearProgressIndicator(
-                key: Key('battle-coach-action-progress'),
-                minHeight: AppTheme.space3,
-              )
-            else if (prompt.inputMode == 'options')
-              for (final option in prompt.options)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppTheme.space8),
-                  child: _PromptOptionTile(
-                    option: option,
-                    onPressed: () => onOption(option),
-                  ),
-                )
-            else if (prompt.inputMode == 'integer' &&
-                prompt.minimum != null &&
-                prompt.maximum != null)
-              _IntegerDecision(
-                prompt: prompt,
-                value: integerValue ?? prompt.minimum!,
-                onChanged: onIntegerChanged,
-                onSubmit: onIntegerSubmit,
-              )
-            else if (prompt.inputMode == 'multi_amount' &&
-                prompt.multiAmountCount > 0)
-              _MultiAmountDecision(
-                prompt: prompt,
-                controller: multiAmountController,
-                onSubmit: onMultiSubmit,
-              )
-            else
-              const _DecisionInputUnavailable(),
-            const SizedBox(height: AppTheme.space6),
-            _BattleCoachKeyboardFocusHalo(
-              haloKey: const Key('battle-coach-delegate-focus-halo'),
-              borderRadius: BorderRadius.circular(AppTheme.radiusPill),
-              debugLabel: 'Play vs AI delegate decision',
-              builder: (focusNode) => OutlinedButton.icon(
-                key: const Key('battle-coach-delegate-button'),
-                focusNode: focusNode,
-                onPressed: busy ? null : onDelegate,
-                icon: const Icon(Icons.auto_mode_rounded),
-                label: const Text('Deixar esta ação no automático'),
-              ),
-            ),
-            const SizedBox(height: AppTheme.space6),
-            Text(
-              'O automático vale somente para esta ação. A próxima jogada '
-              'legal volta para você.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppTheme.textHint,
-                height: 1.3,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -2458,10 +2544,17 @@ class _DecisionClock extends StatelessWidget {
 }
 
 class _PromptOptionTile extends StatelessWidget {
-  const _PromptOptionTile({required this.option, required this.onPressed});
+  const _PromptOptionTile({
+    required this.option,
+    required this.onPressed,
+    this.autofocus = false,
+  });
 
   final InteractiveBattlePromptOption option;
   final VoidCallback onPressed;
+
+  /// Verdadeiro na PRIMEIRA ação legal do prompt, para o foco pousar nela.
+  final bool autofocus;
 
   @override
   Widget build(BuildContext context) {
@@ -2470,6 +2563,7 @@ class _PromptOptionTile extends StatelessWidget {
       haloKey: Key('battle-coach-option-${option.id}-focus-halo'),
       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
       debugLabel: 'Play vs AI option ${option.label}',
+      autofocus: autofocus,
       builder: (focusNode) => Material(
         color: AppTheme.backgroundAbyss.withValues(alpha: 0.62),
         borderRadius: BorderRadius.circular(AppTheme.radiusSm),

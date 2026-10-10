@@ -246,6 +246,7 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/scripts/lib/manaloom_captura_optimization_card_reader.py" \
     "$ROOT_DIR/scripts/lib/manaloom_captura_play_vs_ai.py" \
     "$ROOT_DIR/server/test/fixture_asset_server_test.py" \
+    "$ROOT_DIR/server/test/asset_server_exec_contract_test.py" \
     "$ROOT_DIR/server/test/seed_deck_otimizavel_test.py" \
     "$ROOT_DIR/server/test/webdriver_capture_drivers_test.py"
 
@@ -303,6 +304,11 @@ PYTHONDONTWRITEBYTECODE=1 \
 # objeto ou lista. Nada abre navegador nem banco.
 PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
   python3 "$ROOT_DIR/server/test/fixture_asset_server_test.py"
+# D-89 (B11): o `$!` de `( ... ) &` e o PID do subshell; sem `exec` o cleanup mata
+# o subshell e o servidor de assets segue escutando, orfao. Contrato estatico dos
+# cinco `*_visual_qa.sh` (com mutacao) e prova de que o kill fecha a porta.
+PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
+  python3 "$ROOT_DIR/server/test/asset_server_exec_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \
   python3 "$ROOT_DIR/server/test/seed_deck_otimizavel_test.py"
 PYTHONDONTWRITEBYTECODE=1 PYTHONWARNINGS=error::ResourceWarning \

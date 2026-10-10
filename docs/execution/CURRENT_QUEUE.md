@@ -81,7 +81,7 @@ coordenação. Até lá, só a raia de servidor tem slot.
 | 2 | `BT-GOV-002` | fila com duas raias (D-02); abre a raia do app |
 | 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`); o reinício do host (D-58) trocou o IP do balanceador e o login ficou em 503 até `22a7749a7` (11:01 UTC) |
 | 4 | `BT-AUTH-003` | login fechado e no ar em 2026-09-23 (`166aaed57`); tempo da recuperação de senha fechado e no ar às 14:49 UTC (`c0f907108`) |
-| 5 | `BT-AUTH-004` | feito e no ar em 2026-09-23 (`166aaed57`); falta a tela de senha no app (lote da sessão do gate) |
+| 5 | `BT-AUTH-004` | feito e no ar em 2026-09-23 (`166aaed57`); a tela de senha no app entrou no PR `port(gate-arvore-b)` (B8); falta a recaptura da prova de UI |
 | 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); falta o teste de app |
 | 7 | `BT-AUTH-010` | import no ar em 2026-09-23 (`166aaed57`); escrita de deck com e-mail verificado (D-56) no ar desde as 11:01 UTC (`22a7749a7`) |
 | 8 | `BT-DB-001` | baseline PostgreSQL fresco; cabeça da corrente mais longa; auditor de schema feito e integrado em 2026-09-23 (`e3d306a6c`), com as diferenças decididas na D-65 a D-67 |

@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "01dd45d784d58497ef217ba330386255b6d74d6fb22c970126e9a0b24c72cce3",
+  "x-manaloom-source-digest-sha256": "2311e5c5b05b6553266aca2bc71d7f2024daf6231c14898fccb535f7bd892095",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -52,14 +52,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -87,14 +87,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -120,14 +120,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -155,14 +155,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -198,14 +198,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -243,14 +243,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -288,14 +288,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -321,14 +321,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -356,14 +356,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -401,14 +401,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -446,14 +446,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -491,14 +491,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -526,14 +526,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -561,14 +561,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -596,14 +596,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -631,14 +631,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -674,14 +674,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -719,14 +719,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -764,14 +764,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -809,14 +809,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -844,14 +844,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -879,14 +879,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -922,14 +922,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "parameters": [
           {
@@ -967,14 +967,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -1002,14 +1002,14 @@
           "app/test/core/widgets/horizontal_discovery_rail_test.dart",
           "app/test/core/widgets/main_scaffold_test.dart",
           "app/test/features/auth/screens/verify_email_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/cards/providers/card_provider_ai_test.dart",
           "app/test/features/cards/screens/card_detail_screen_responsive_test.dart",
           "app/test/features/commercial/ai_usage_gate_test.dart",
           "app/test/features/commercial/ai_usage_meter_test.dart",
           "app/test/features/community/screens/community_deck_detail_screen_test.dart",
           "app/test/features/decks/models/deck_details_test.dart",
-          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart",
-          "app/test/features/decks/screens/deck_details_screen_smoke_test.dart"
+          "app/test/features/decks/providers/deck_provider_ai_runtime_contract_test.dart"
         ],
         "security": [
           {
@@ -1351,11 +1351,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "security": [
           {
@@ -1384,11 +1384,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "security": [
           {
@@ -1419,11 +1419,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "security": [
           {
@@ -1454,11 +1454,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "security": [
           {
@@ -1489,11 +1489,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "parameters": [
           {
@@ -1532,11 +1532,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "parameters": [
           {
@@ -1575,11 +1575,11 @@
           "app/test/features/binder/providers/binder_import_provider_test.dart",
           "app/test/features/binder/providers/binder_provider_test.dart",
           "app/test/features/binder/screens/binder_import_screen_test.dart",
+          "app/test/features/binder/screens/binder_screen_commerce_containment_test.dart",
           "app/test/features/binder/screens/binder_screen_overflow_test.dart",
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
-          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "app/test/features/binder/widgets/binder_item_editor_validation_test.dart"
         ],
         "parameters": [
           {

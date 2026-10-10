@@ -114,6 +114,23 @@ void main() {
       );
     });
 
+    // D-90: é assim que o app tira uma oferta antiga com tudo fechado. O PUT é
+    // parcial, então o app manda `false`/`null` explícitos e o servidor os aceita.
+    test(
+      'all closed still accepts false/null, which is how an offer is cleared',
+      () {
+        expect(
+          () => ensureBinderCommerceAllowed(
+            forTrade: false,
+            forSale: false,
+            price: null,
+            isAllowed: (_) => false,
+          ),
+          returnsNormally,
+        );
+      },
+    );
+
     test('trades open alone still refuses a sale price', () {
       expect(
         () => ensureBinderCommerceAllowed(

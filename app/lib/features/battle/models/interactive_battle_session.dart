@@ -59,6 +59,7 @@ class InteractiveBattleCard {
     required this.tapped,
     required this.damage,
     required this.counters,
+    this.isAbility = false,
   });
 
   final String? id;
@@ -70,15 +71,38 @@ class InteractiveBattleCard {
   final int? damage;
   final List<InteractiveBattleCounter> counters;
 
-  String? get effectiveImageUrl => ScryfallImageHelper.preferredImageUrl(
-    explicitUrl: imageUrl,
-    cardName: name,
-    version: 'normal',
-  );
+  /// Objeto da pilha que é uma HABILIDADE, não uma carta.
+  ///
+  /// O XMage chama esses objetos de `Ability`, e o normalizador do sidecar
+  /// marca cada um com `is_ability` (`ReplayNormalizer`). Eles não têm
+  /// identidade de carta: nem set, nem número de coleção, nem arte.
+  final bool isAbility;
+
+  /// A arte da carta, ou `null` quando não há carta para buscar.
+  ///
+  /// Medido em 2026-09-29, no console de uma partida real: sem esta guarda o
+  /// app pedia
+  /// `api.scryfall.com/cards/named?exact=Ability&format=image&version=normal`
+  /// para cada habilidade que subia na pilha, e cada pedido falhava três vezes
+  /// com `EncodingError`. Foram 18 falhas numa única partida. Em produção é
+  /// rede gasta à toa; no gate de evidência, `CachedCardImage falha` é entrada
+  /// proibida de console.
+  ///
+  /// A guarda devolve `null` para não haver pedido NENHUM — e não um pedido
+  /// que falha em silêncio. Quem desenha decide o marcador sem rede.
+  String? get effectiveImageUrl => isAbility
+      ? null
+      : ScryfallImageHelper.preferredImageUrl(
+          explicitUrl: imageUrl,
+          cardName: name,
+          version: 'normal',
+        );
 
   factory InteractiveBattleCard.fromJson(Map<String, dynamic> json) {
     final name = _text(json['name']) ?? 'Objeto desconhecido';
+    final marcadoComoHabilidade = json['is_ability'] == true;
     return InteractiveBattleCard(
+      isAbility: marcadoComoHabilidade,
       id: _text(json['id']),
       name: name,
       setCode: _text(json['set_code']),
