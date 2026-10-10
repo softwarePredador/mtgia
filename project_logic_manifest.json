@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "70babbd5ed1cd9cbc41fcc9d43ae5853dc3ad02dab047c6174a40ea026eaea50",
+  "source_digest_sha256": "50e97f77417d6be7053ceb0cb1a1f7418bb94db48ca0324e7114b2b91889b17e",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,9 +80,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 75,
-    "scripts_and_jobs": 717,
+    "scripts_and_jobs": 718,
     "environment_variables": 736,
-    "tests": 1353,
+    "tests": 1354,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -280672,6 +280672,14 @@
       ]
     },
     {
+      "path": "scripts/lib/manaloom_proxy_body_ceiling.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "TMPDIR"
+      ]
+    },
+    {
       "path": "scripts/lib/manaloom_public_web_surface_contract.sh",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -290045,6 +290053,7 @@
       "name": "TMPDIR",
       "classification": "configuration",
       "sources": [
+        "scripts/lib/manaloom_proxy_body_ceiling.sh",
         "scripts/manaloom_authenticated_visual_qa_isolated.sh",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_battle_learning_visual_qa.sh",
@@ -291714,6 +291723,7 @@
     "server/test/production_shape_adoption_db_live_test.dart",
     "server/test/production_shape_adoption_test.dart",
     "server/test/profile_community_live_test.dart",
+    "server/test/proxy_body_ceiling_test.py",
     "server/test/public_error_contract_test.dart",
     "server/test/public_error_db_live_test.dart",
     "server/test/public_error_e2e_live_test.dart",
@@ -292639,6 +292649,7 @@
         "server/test/active_user_trigger_rule_test.dart",
         "server/test/production_shape_adoption_test.dart",
         "server/test/lote_scripts_contract_test.dart",
+        "server/test/proxy_body_ceiling_test.py",
         "server/test/release_capability_policy_test.dart",
         "app/test/core/config/release_capabilities_test.dart",
         "app/test/core/config/release_capability_surface_contract_test.dart",
@@ -303225,7 +303236,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "70babbd5ed1cd9cbc41fcc9d43ae5853dc3ad02dab047c6174a40ea026eaea50"
+    "project_logic_source_digest_sha256": "50e97f77417d6be7053ceb0cb1a1f7418bb94db48ca0324e7114b2b91889b17e"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305436,6 +305447,7 @@
       "scripts/lib/manaloom_fixture_asset_server.py",
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
+      "scripts/lib/manaloom_proxy_body_ceiling.sh",
       "scripts/lib/manaloom_public_web_surface_contract.sh",
       "scripts/lib/manaloom_release_capabilities_contract.sh",
       "scripts/lib/manaloom_release_runtime_contract.sh",
@@ -306552,6 +306564,7 @@
       "server/test/production_shape_adoption_db_live_test.dart",
       "server/test/production_shape_adoption_test.dart",
       "server/test/profile_community_live_test.dart",
+      "server/test/proxy_body_ceiling_test.py",
       "server/test/public_error_contract_test.dart",
       "server/test/public_error_db_live_test.dart",
       "server/test/public_error_e2e_live_test.dart",

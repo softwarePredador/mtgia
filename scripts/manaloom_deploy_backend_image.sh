@@ -121,6 +121,8 @@ fi
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 # shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
+# shellcheck source=scripts/lib/manaloom_proxy_body_ceiling.sh
+source "$ROOT_DIR/scripts/lib/manaloom_proxy_body_ceiling.sh"
 XMAGE_INTERACTIVE_SERVICE="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE"
 XMAGE_INTERACTIVE_DNS="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS"
 XMAGE_INTERACTIVE_URL="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL"
@@ -131,6 +133,10 @@ readonly XMAGE_INTERACTIVE_SERVICE XMAGE_INTERACTIVE_DNS
 readonly XMAGE_INTERACTIVE_URL PROJECT_NETWORK INTERACTIVE_BATTLE_ENABLED
 readonly BATTLE_LIVE_SPECTATOR_ENABLED
 validate_manaloom_release_api_base_url "$API_BASE_URL"
+# D-83: o maior corpo que o backend aceita (o import) vem do código que vai
+# subir; o pré-voo confere que o proxy da produção o leva até o backend.
+IMPORT_BODY_LIMIT_BYTES="$(manaloom_import_body_limit_bytes "$ROOT_DIR/server/lib/request_body_limits.dart")"
+readonly IMPORT_BODY_LIMIT_BYTES
 validate_manaloom_exact_coordinate project "$EASYPANEL_PROJECT" \
   "$MANALOOM_PRODUCTION_EASYPANEL_PROJECT"
 validate_manaloom_exact_coordinate backend_service "$SERVICE" \
@@ -1177,6 +1183,7 @@ exit 1
 cd "$ROOT_DIR"
 require_clean_worktree
 require_trusted_proxy_topology
+manaloom_require_proxy_body_ceiling "$API_BASE_URL" "$IMPORT_BODY_LIMIT_BYTES"
 require_auth_runtime_contract
 "$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
 require_clean_worktree
