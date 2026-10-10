@@ -114,7 +114,8 @@ class PolicyTest(unittest.TestCase):
         self.assertEqual(policy["backup"]["retention_days"], 30)
         self.assertIn("FileVault", policy["backup"]["encryption"])
         self.assertIn("D-84", policy["backup"]["retention_note"])
-        self.assertIn("sim do dono", policy["backup"]["retention_note"])
+        self.assertIn("rotate --apply", policy["backup"]["retention_note"])
+        self.assertIn("rotate --backup-dir", policy["backup"]["rotation"]["command"])
         # D-83: ensaio semanal e antes de toda migration na produção.
         self.assertEqual(policy["cadence"]["drill_max_interval_days"], 7)
         self.assertIs(policy["cadence"]["drill_after_production_migration"], True)
@@ -234,7 +235,7 @@ class CheckTest(unittest.TestCase):
         self.assertEqual(retention["days"], 30)
         self.assertEqual(retention["keep"], sorted([drilled.name, newest.name]))
         self.assertEqual(retention["expired"], [oldest.name, failed.name])
-        self.assertIn("sim do dono", retention["delete"])
+        self.assertIn("o check não apaga nada", retention["delete"])
         for path in (oldest, drilled, recent, newest, failed):
             self.assertTrue(path.exists(), path.name)
 
@@ -246,6 +247,119 @@ class CheckTest(unittest.TestCase):
             with self.subTest(path=str(path)):
                 with self.assertRaises(cadence.InvalidInput):
                     cadence.check(path, self.policy, NOW)
+
+
+class RotationTest(unittest.TestCase):
+    """D-84: a rotação apaga só o padrão governado vencido, e só com --apply."""
+
+    def setUp(self) -> None:
+        self.root = _durable_root()
+        self.backup_dir = self.root / "backups" / "manaloom-postgres"
+        self.policy = _policy()
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.root, ignore_errors=True)
+
+    def _layout(self) -> dict[str, Path]:
+        d = self.backup_dir
+        files = {
+            "oldest": _write_backup(d, NOW - dt.timedelta(days=45)),
+            "partial_old": _write_backup(d, NOW - dt.timedelta(days=40), b"x" * 10),
+            "drilled": _write_backup(d, NOW - dt.timedelta(days=35)),
+            "boundary": _write_backup(d, NOW - dt.timedelta(days=30)),
+            "recent": _write_backup(d, NOW - dt.timedelta(days=10)),
+            "newest": _write_backup(d, NOW - dt.timedelta(hours=3)),
+        }
+        _write_drill(d, files["drilled"], NOW - dt.timedelta(days=34))
+        # Fora do padrão governado, todos velhos: nada disso pode sair.
+        old_stamp = _stamp(NOW - dt.timedelta(days=90))
+        outside = {
+            "other_prefix": d / f"halder-{old_stamp}.dump",
+            "suffix": d / f"manaloom-postgres-{old_stamp}.dump.bak",
+            "plain_sql": d / f"manaloom-postgres-{old_stamp}.sql",
+            "lowercase_stamp": d / f"manaloom-postgres-{old_stamp.lower()}.dump",
+            "receipt": d / "receipts" / f"{old_stamp}.json",
+            "nested_dump": d / "arquivo" / f"manaloom-postgres-{old_stamp}.dump",
+        }
+        for path in outside.values():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"y" * 4096)
+        files.update(outside)
+        # Link com o nome do padrão: nunca segue nem apaga.
+        target = self.root / "fora" / "alvo.dump"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"z" * 4096)
+        link = d / f"manaloom-postgres-{_stamp(NOW - dt.timedelta(days=60))}.dump"
+        link.symlink_to(target)
+        files["link"] = link
+        files["link_target"] = target
+        return files
+
+    def test_dry_run_lists_and_deletes_nothing(self) -> None:
+        files = self._layout()
+        result = cadence.rotate(self.backup_dir, self.policy, NOW, apply=False)
+        self.assertEqual(result["status"], "dry_run")
+        self.assertEqual(
+            result["expired"], sorted([files["oldest"].name, files["partial_old"].name])
+        )
+        self.assertEqual(result["deleted"], [])
+        for path in files.values():
+            self.assertTrue(path.exists() or path.is_symlink(), path)
+
+    def test_apply_deletes_only_governed_dumps_older_than_30_days(self) -> None:
+        files = self._layout()
+        result = cadence.rotate(self.backup_dir, self.policy, NOW, apply=True)
+        self.assertEqual(result["status"], "applied")
+        self.assertEqual(result["days"], 30)
+        gone = {"oldest", "partial_old"}
+        self.assertEqual(sorted(result["deleted"]),
+                         sorted(files[name].name for name in gone))
+        for name in gone:
+            self.assertFalse(files[name].exists(), name)
+        # Fica: o mais novo com ensaio aprovado (vencido), o de 30 dias exatos,
+        # os recentes e tudo que está fora do padrão, inclusive o link e o alvo.
+        for name, path in files.items():
+            if name in gone:
+                continue
+            self.assertTrue(path.exists() or path.is_symlink(), name)
+        self.assertEqual(result["keep"],
+                         sorted([files["drilled"].name, files["newest"].name]))
+        self.assertIn(files["link"].name, result["skipped"])
+        # Idempotente: a segunda rodada não acha mais nada.
+        again = cadence.rotate(self.backup_dir, self.policy, NOW, apply=True)
+        self.assertEqual(again["deleted"], [])
+
+    def test_cli_requires_apply_to_delete_and_writes_the_receipt(self) -> None:
+        files = self._layout()
+        dry = subprocess.run(
+            [sys.executable, str(MODULE_PATH), "rotate", "--backup-dir",
+             str(self.backup_dir), "--now", _iso(NOW)],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(dry.returncode, 0, dry.stderr)
+        self.assertTrue(files["oldest"].exists())
+        receipt = self.backup_dir / "rotations" / "r.json"
+        applied = subprocess.run(
+            [sys.executable, str(MODULE_PATH), "rotate", "--backup-dir",
+             str(self.backup_dir), "--apply", "--out", str(receipt), "--now", _iso(NOW)],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertEqual(applied.returncode, 0, applied.stderr)
+        self.assertFalse(files["oldest"].exists())
+        written = json.loads(receipt.read_text(encoding="utf-8"))
+        self.assertEqual(written["kind"], "brewtact-backup-rotation")
+        self.assertIn(files["oldest"].name, written["deleted"])
+        self.assertEqual(oct(receipt.stat().st_mode & 0o777), "0o600")
+
+    def test_refuses_temporary_directory_and_policy_without_retention(self) -> None:
+        with self.assertRaises(cadence.InvalidInput):
+            cadence.rotate(Path("/tmp/manaloom-backups"), self.policy, NOW, apply=True)
+        policy = _policy()
+        policy["backup"]["retention_days"] = None
+        self._layout()
+        with self.assertRaises(cadence.InvalidInput):
+            cadence.rotate(self.backup_dir, policy, NOW, apply=True)
+        self.assertTrue(any(self.backup_dir.glob("manaloom-postgres-*.dump")))
 
 
 class ScriptInterfaceTest(unittest.TestCase):
@@ -387,7 +501,8 @@ class CycleTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         described = json.loads(result.stdout)
         self.assertEqual(described["status"], "dry_run")
-        self.assertEqual(len(described["steps"]), 3)
+        self.assertEqual(len(described["steps"]), 4)
+        self.assertIn("rotate --apply", described["steps"][-1])
         self.assertEqual(self._calls(), [])
         self.assertFalse(self.backup_dir.exists())
 
@@ -412,6 +527,29 @@ class CycleTest(unittest.TestCase):
         self.assertEqual(receipt["drill"]["status"], "passed")
         self.assertEqual(receipt["backup"]["bytes"], 4096)
         self.assertEqual(oct(receipts[0].stat().st_mode & 0o777), "0o600")
+
+    def test_cycle_rotates_expired_governed_dumps_after_the_backup(self) -> None:
+        now = dt.datetime.now(dt.timezone.utc)
+        expired = _write_backup(self.backup_dir, now - dt.timedelta(days=40))
+        recent = _write_backup(self.backup_dir, now - dt.timedelta(days=5))
+        outside = self.backup_dir / f"manaloom-postgres-{_stamp(now - dt.timedelta(days=40))}.dump.bak"
+        outside.write_bytes(b"y" * 4096)
+        result = self._run("--execute", "--drill")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertFalse(expired.exists())
+        self.assertTrue(recent.exists())
+        self.assertTrue(outside.exists())
+        rotations = sorted((self.backup_dir / "rotations").glob("*.json"))
+        self.assertEqual(len(rotations), 1)
+        rotation = json.loads(rotations[0].read_text(encoding="utf-8"))
+        self.assertEqual(rotation["deleted"], [expired.name])
+
+    def test_cycle_rotates_even_when_the_cadence_is_blocked(self) -> None:
+        now = dt.datetime.now(dt.timezone.utc)
+        expired = _write_backup(self.backup_dir, now - dt.timedelta(days=40))
+        result = self._run("--execute")
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        self.assertFalse(expired.exists())
 
     def test_cycle_without_drill_is_blocked_until_a_drill_exists(self) -> None:
         result = self._run("--execute")
