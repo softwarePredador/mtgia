@@ -10,6 +10,7 @@ import 'package:test/test.dart';
 void main() {
   const readOnlyScripts = {'d85_5a_legacy_ruling_poststatus_archive.sql'};
   const writeScripts = {
+    'binder_drop_uq_binder_user_card_cond_foil_list.sql',
     'd85_1_deck_description_generate_prompt.sql',
     'd85_2_orphan_public_deck_reports.sql',
     'd85_3_activation_event_legacy_metadata.sql',

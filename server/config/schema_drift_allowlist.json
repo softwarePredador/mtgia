@@ -427,7 +427,7 @@
       "categoria": "indices",
       "tipo": "sobrando",
       "objeto": "public.uq_binder_user_card_cond_foil_list",
-      "motivo": "não adotado (D-83): UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); na produção a rota POST /binder devolve 500 para a mesma carta em outro idioma, e tirá-lo de lá pede um passo governado",
+      "motivo": "não adotado (D-83): UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); na produção a rota POST /binder devolve 500 para a mesma carta em outro idioma. Sai da produção no lote (decisão do dono de 2026-10-10, item 9) pelo passo governado server/sql/lote/binder_drop_uq_binder_user_card_cond_foil_list.sql",
       "decisao": "D-83"
     },
     {

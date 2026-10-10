@@ -16,10 +16,11 @@ const auditOutputPath =
 const d67NullCountsPath = 'sql/readonly/d67_not_null_null_counts.sql';
 
 /// A D-67 manda os seis `UNIQUE` que só a produção tinha virarem migration.
-/// Este fica de fora, pendente de decisão do dono: não tem `language` e, na
-/// produção, recusa a mesma carta em outro idioma, que a 049 (identidade
-/// física da cópia, ADR 0008) permite e a rota `POST /binder` trata pelo
-/// `ON CONFLICT` da identidade física.
+/// Este fica de fora (D-83): não tem `language` e, na produção, recusa a mesma
+/// carta em outro idioma, que a 049 (identidade física da cópia, ADR 0008)
+/// permite e a rota `POST /binder` trata pelo `ON CONFLICT` da identidade
+/// física. O dono decidiu tirá-lo da produção no lote (2026-10-10, item 9), com
+/// `sql/lote/binder_drop_uq_binder_user_card_cond_foil_list.sql`.
 const pendingBinderUniqueIndex = 'uq_binder_user_card_cond_foil_list';
 
 /// Os índices do `server/database_indexes.sql`, aposentado pela D-48. A D-48

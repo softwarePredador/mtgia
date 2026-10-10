@@ -67,6 +67,24 @@ class LoteCopy {
 
   final String name;
   final Connection connection;
+  Pool? _pool;
+
+  /// Um `Pool` da cópia, para chamar uma rota de verdade.
+  Pool pool() => _pool ??= Pool.withEndpoints(
+    [
+      Endpoint(
+        host: LoteDatabase._host,
+        port: LoteDatabase._port,
+        database: name,
+        username: LoteDatabase._user,
+        password: LoteDatabase._password,
+      ),
+    ],
+    settings: const PoolSettings(
+      sslMode: SslMode.disable,
+      maxConnectionCount: 1,
+    ),
+  );
 
   /// Roda um arquivo de `server/sql/lote/` como no lote: `psql -X`,
   /// `ON_ERROR_STOP`, saída sem alinhamento e separada por TAB.
@@ -117,6 +135,7 @@ class LoteCopy {
       ((await sql(statement, parameters)).single[0] as num).toInt();
 
   Future<void> drop() async {
+    await _pool?.close();
     await connection.close();
     final admin = await LoteDatabase._connect('postgres');
     try {
