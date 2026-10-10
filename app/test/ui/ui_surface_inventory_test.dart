@@ -142,10 +142,15 @@ void main() {
     }
 
     expect(totals, inventory.expectedTotals);
+    // 267 desde 24f4e4c9f (BT-LEGAL-ACCEPT-001): diálogo de reaceite legal.
+    // 268 desde 5d1e7cf56 (LC-P0-03): saída da mesa sem flush confirmado abre
+    // "A mesa não foi salva" em `lotus_life_counter_screen.dart`.
+    // 269 desde BT-AUTH-004: exportar os próprios dados exige reverificação de
+    // senha; `profile_screen.dart` subiu de 6 para 7 diálogos.
     expect(
       totals.values.reduce((a, b) => a + b),
-      268,
-      reason: 'A baseline corrente classifica exatamente 268 superfícies.',
+      269,
+      reason: 'A baseline corrente classifica exatamente 269 superfícies.',
     );
   });
 }
