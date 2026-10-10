@@ -300,9 +300,11 @@ class FriendlyErrorMapper {
   static bool isMachineErrorCode(String text) =>
       _machineErrorCodePattern.hasMatch(text);
 
-  static final _machineErrorCodePattern = RegExp(
-    r'^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$',
-  );
+  /// Mesmo formato do `isStablePublicErrorCode` do servidor
+  /// (`server/lib/public_error_contract.dart`): minúsculas, dígitos e
+  /// sublinhado, de 3 a 64 caracteres. Inclui o código de uma palavra só
+  /// (`forbidden`), que o servidor também emite e que antes aparecia cru.
+  static final _machineErrorCodePattern = RegExp(r'^[a-z][a-z0-9_]{2,63}$');
 
   static const _capabilityUnavailableMessage =
       'Este recurso não está disponível nesta versão da beta.';

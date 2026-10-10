@@ -69,6 +69,7 @@ void main() {
       'deck_revision_conflict',
       'resource_not_found',
       'legal_acceptance_required',
+      'forbidden',
     ]) {
       test('never shows the raw code $code', () {
         for (final status in const [400, 403, 404, 409, 422]) {
@@ -88,6 +89,47 @@ void main() {
         );
       });
     }
+
+    group('403 (BT-AUTH-010)', () {
+      const permission = 'Você não tem permissão para realizar esta ação.';
+
+      test('single-word code forbidden shows the permission phrase', () {
+        final message = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(403, {'error': 'forbidden'}),
+        );
+
+        expect(message, permission);
+        expect(message, isNot(contains('forbidden')));
+      });
+
+      test('email_verification_required is not a permission denial', () {
+        final withoutMessage = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(403, {'error': 'email_verification_required'}),
+        );
+        final withMessage = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(403, {
+            'error': 'email_verification_required',
+            'message': 'Confirme seu email para continuar.',
+          }),
+        );
+
+        expect(withoutMessage, isNot(contains('não tem permissão')));
+        expect(withoutMessage, contains('Confirme seu email'));
+        expect(withMessage, 'Confirme seu email para continuar.');
+        expect(withMessage, isNot(contains('não tem permissão')));
+      });
+
+      test('403 without body or with access_forbidden shows permission', () {
+        expect(FriendlyErrorMapper.fromApiResponse(ApiResponse(403, null)),
+            permission);
+        expect(
+          FriendlyErrorMapper.fromApiResponse(
+            ApiResponse(403, {'error': 'access_forbidden'}),
+          ),
+          permission,
+        );
+      });
+    });
 
     test('exposes the stable code for callers that branch on it', () {
       expect(

@@ -17,6 +17,7 @@ import 'core/services/scryfall_image_cache_manager.dart';
 import 'core/services/activation_funnel_service.dart';
 import 'core/services/push_notification_service.dart';
 import 'core/services/realtime_notification_coordinator.dart';
+import 'core/services/realtime_push_gate.dart';
 import 'core/services/performance_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/debug_accessibility_tools.dart';
@@ -960,24 +961,12 @@ class _ManaLoomAppState extends State<ManaLoomApp> with WidgetsBindingObserver {
   }
 
   bool _canHandleRealtimeData(Map<String, dynamic> data) {
-    if (!_releaseCapabilitiesProvider.isAllowed(ReleaseCapability.socialPush)) {
-      return false;
-    }
-
-    final payload = PushNotificationPayload.fromData(data);
-    if (payload == null) return false;
-    if (payload.isDirectMessage) {
-      return _releaseCapabilitiesProvider.isAllowed(
-        ReleaseCapability.directMessages,
-      );
-    }
-    if (payload.isTradeEvent) {
-      return _releaseCapabilitiesProvider.isAllowed(ReleaseCapability.trades);
-    }
-    if (payload.isFollower) {
-      return _releaseCapabilitiesProvider.isAllowed(ReleaseCapability.follows);
-    }
-    return true;
+    // A regra vive em `core/services/realtime_push_gate.dart` para poder ser
+    // testada sem montar a árvore do app. Ver A9.
+    return canHandleRealtimePushData(
+      data,
+      isAllowed: _releaseCapabilitiesProvider.isAllowed,
+    );
   }
 
   void _onAuthChanged() {
