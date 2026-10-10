@@ -16,7 +16,7 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
 - Backlog/registry SHA-256 corrente (decisões D-92 a D-116 e reconciliação de 2026-10-10):
-  `f0ce9086466498b064366bfa359da88d51cefeca4c4005c4a2b97f55d9552647` (250 tasks; o valor vivo está em
+  `ba95660b4d51de462dc624e71fb2442df7a78d00e20072cbe750459dea33ce08` (250 tasks; o valor vivo está em
   `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `f4effb9a…` com 246 em
   `1f525a1c1`, e `8a73ebe6…` com 244 nas decisões D-79 e D-80 do gate de UI, branch
   `integracao/2026-09-23`; antes, `811f5409…` na rodada 2 da privacidade, `810d588d…` no registro do preço de deck, `320ebd9d…` nas decisões D-72 a D-75, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
@@ -105,7 +105,7 @@ coordenação. Até lá, só a raia de servidor tem slot.
 | 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`); o reinício do host (D-58) trocou o IP do balanceador e o login ficou em 503 até `22a7749a7` (11:01 UTC) |
 | 4 | `BT-AUTH-003` | login fechado e no ar em 2026-09-23 (`166aaed57`); tempo da recuperação de senha fechado e no ar às 14:49 UTC (`c0f907108`) |
 | 5 | `BT-AUTH-004` | feito e no ar em 2026-09-23 (`166aaed57`); falta a tela de senha no app (lote da sessão do gate) |
-| 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); falta o teste de app |
+| 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); o teste de app entrou em 2026-10-10 (`docs/qa/execution/2026-10-10/BT-AUTH-007-teste-de-app.md`) |
 | 7 | `BT-AUTH-010` | import no ar em 2026-09-23 (`166aaed57`); escrita de deck com e-mail verificado (D-56) no ar desde as 11:01 UTC (`22a7749a7`) |
 | 8 | `BT-DB-001` | baseline PostgreSQL fresco; cabeça da corrente mais longa; auditor de schema feito e integrado em 2026-09-23 (`e3d306a6c`), com as diferenças decididas na D-65 a D-67 |
 | 9 | `BT-DB-004` | só migrations alteram schema (D-48) |

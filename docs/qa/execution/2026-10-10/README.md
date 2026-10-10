@@ -29,6 +29,7 @@ Estes receipts fecham a divergência DIV-07 do mapa de 2026-10-10. Cobrem tarefa
 | BT-CI-001 | [BT-CI-001-project-logic-no-bootstrap-frio.md](BT-CI-001-project-logic-no-bootstrap-frio.md) | project logic no bootstrap frio |
 | BT-LEGAL-ACCEPT-001 | [BT-LEGAL-ACCEPT-001-parte-do-app.md](BT-LEGAL-ACCEPT-001-parte-do-app.md) | reaceite legal, parte do app |
 | BT-REL-002 | [BT-REL-002-parte-do-app.md](BT-REL-002-parte-do-app.md) | identidade de release, parte do app |
+| BT-AUTH-007 | [BT-AUTH-007-teste-de-app.md](BT-AUTH-007-teste-de-app.md) | o teste de app da troca de senha (com o teste novo; não é só evidência de código) |
 
 **Ficaram de fora, e por quê:**
 - **`BT-AUTH-004` e `BT-PRIV-001`:** as linhas são do PR-B, que muda a exportação no app (B8).

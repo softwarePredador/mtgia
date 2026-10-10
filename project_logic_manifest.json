@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "6dc60dcf0905ea5169a4c4190af551f0cc23c4f5bef0267f84228811086439ef",
+  "source_digest_sha256": "099422ab368bbef08ba534dce5ee1d8ef16caa2b6c87c89bdda81c6c0bffa502",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -82,7 +82,7 @@
     "migrations": 74,
     "scripts_and_jobs": 717,
     "environment_variables": 736,
-    "tests": 1348,
+    "tests": 1349,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 250,
@@ -266964,12 +266964,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -266990,12 +266990,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267016,12 +267016,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267042,12 +267042,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267068,12 +267068,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267094,12 +267094,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267120,12 +267120,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267146,12 +267146,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -267172,12 +267172,12 @@
         "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
         "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
         "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+        "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
         "app/test/features/auth/providers/auth_provider_security_test.dart",
         "app/test/features/auth/screens/auth_screens_test.dart",
         "app/test/tool/authenticated_visual_diff_test.dart",
         "app/test/ui/manaloom_auth_ui_audit_test.dart",
-        "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-        "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+        "app/test/ui/ui_authenticated_visual_matrix_test.dart"
       ],
       "method_contract": "source"
     },
@@ -290650,6 +290650,7 @@
     "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
     "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
     "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+    "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
     "app/test/features/auth/providers/auth_provider_security_test.dart",
     "app/test/features/auth/providers/legal_acceptance_provider_test.dart",
     "app/test/features/auth/router_log_sanitization_test.dart",
@@ -293111,7 +293112,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "f0ce9086466498b064366bfa359da88d51cefeca4c4005c4a2b97f55d9552647"
+      "sha256": "ba95660b4d51de462dc624e71fb2442df7a78d00e20072cbe750459dea33ce08"
     },
     "required_task_fields": [
       "id",
@@ -293347,7 +293348,7 @@
         "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Trocar a senha não sobrescreve o usuário completo com um `user` truncado (achado 6 dos fluxos; alcançável hoje).",
         "depends_on": [],
-        "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app. Corrigido no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `POST /auth/change-password` e `POST /auth/revoke-sessions` devolvem o usuário completo, no formato de `GET /users/me`, lido do próprio `UPDATE ... RETURNING`; o app, que já troca o usuário guardado pelo da resposta, deixa de perder os campos sem mudar código. Evidência: `server/test/account_security_full_user_test.dart` (4 testes; a volta do `user` truncado falha em 2). Falta o teste de app pedido no aceite, na raia do app. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`).",
+        "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app. Corrigido no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `POST /auth/change-password` e `POST /auth/revoke-sessions` devolvem o usuário completo, no formato de `GET /users/me`, lido do próprio `UPDATE ... RETURNING`; o app, que já troca o usuário guardado pelo da resposta, deixa de perder os campos sem mudar código. Evidência: `server/test/account_security_full_user_test.dart` (4 testes; a volta do `user` truncado falha em 2). O teste de app pedido no aceite entrou em 2026-10-10: `app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart` faz login com o perfil completo, troca a senha e encerra as outras sessões com a resposta no formato de `GET /users/me` e confere e-mail verificado, nome e avatar na memória e no usuário guardado no aparelho. As duas mutações do app (o usuário truncado no lugar do da resposta e o avatar fora do usuário guardado) fazem o teste falhar. Receipt: `docs/qa/execution/2026-10-10/BT-AUTH-007-teste-de-app.md`. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`).",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 376
       },
@@ -298334,7 +298335,7 @@
       "schema_version": 1,
       "generated_from": {
         "path": "docs/execution/CURRENT_QUEUE.md",
-        "sha256": "40bbf8b61faf23c318b40bde2d08ff6637c4d6c2b58a74adde6361eb13dfdf6d"
+        "sha256": "0fb3d1cd0294f11b3c08be31a90ab7702b4d5d8d56bd361400efa18ffa2e89e1"
       },
       "wip_limit": 1,
       "wip_scope": "per_lane",
@@ -303311,7 +303312,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "6dc60dcf0905ea5169a4c4190af551f0cc23c4f5bef0267f84228811086439ef"
+    "project_logic_source_digest_sha256": "099422ab368bbef08ba534dce5ee1d8ef16caa2b6c87c89bdda81c6c0bffa502"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -304399,6 +304400,7 @@
       "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
       "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
       "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+      "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
       "app/test/features/auth/providers/auth_provider_security_test.dart",
       "app/test/features/auth/providers/legal_acceptance_provider_test.dart",
       "app/test/features/auth/router_log_sanitization_test.dart",
