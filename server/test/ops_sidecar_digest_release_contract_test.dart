@@ -104,12 +104,23 @@ void main() {
       ]) {
         expect(ops, contains(marker), reason: marker);
       }
+      // S-01: the job list comes from the daemon of the same SHA, never from
+      // a copy in the deploy.
+      expect(
+        ops,
+        contains(r'manaloom_load_ops_enabled_jobs_from_git "$ROOT_DIR" "$sha"'),
+      );
+      expect(
+        ops,
+        contains(r"assert data['enabled_jobs']==$OPS_ENABLED_JOBS_PYTHON"),
+      );
       expect(
         ops,
         contains(
-          "['manaloom_ai_runtime_cleanup', 'manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
+          r"assert [row['name'] for row in jobs]==$OPS_ENABLED_JOBS_PYTHON",
         ),
       );
+      expect(ops, isNot(contains("==['manaloom_")));
       expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));
       expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1')));
       expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1')));

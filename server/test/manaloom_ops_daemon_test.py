@@ -5,6 +5,7 @@ import importlib.util
 import json
 import os
 import sqlite3
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -822,6 +823,195 @@ class ManaLoomOpsDaemonTest(unittest.TestCase):
         self.assertTrue(module._matches_schedule(hourly.schedule, module.datetime(2026, 7, 15, 5, 5)))
         self.assertFalse(module._matches_schedule(hourly.schedule, module.datetime(2026, 7, 15, 6, 5)))
         self.assertTrue(module._matches_schedule(nightly.schedule, module.datetime(2026, 7, 15, 6, 5)))
+
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_DAEMON = _REPO_ROOT / "server/bin/manaloom_ops_daemon.py"
+_POLICY = _REPO_ROOT / "server/config/release_capabilities.json"
+_OPS_DEPLOY = _REPO_ROOT / "scripts/manaloom_deploy_ops_image.sh"
+_OPS_JOBS_LIB = _REPO_ROOT / "scripts/lib/manaloom_ops_jobs_contract.sh"
+
+
+def _git(repo: Path, *args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(repo), *args],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
+class OpsEnabledJobsContractTest(unittest.TestCase):
+    """S-01: the deploy checks the jobs the daemon of the same SHA schedules.
+
+    The daemon is the only list. The deploy reads it through
+    scripts/lib/manaloom_ops_jobs_contract.sh and checks /health and jobs.json
+    against it, so a job added to the scheduler (manaloom_slo_alerts was the
+    fifth) never makes the post-deploy check fail to converge.
+    """
+
+    def _cli(self, *args: str, env: dict[str, str] | None = None):
+        return subprocess.run(
+            [sys.executable, str(_DAEMON), *args],
+            capture_output=True,
+            text=True,
+            env=env,
+            check=False,
+        )
+
+    def _load_from_git(self, repo: Path, sha: str):
+        return subprocess.run(
+            [
+                "bash",
+                "-c",
+                'set -euo pipefail; source "$1"; '
+                'manaloom_load_ops_enabled_jobs_from_git "$2" "$3"; '
+                'printf "%s\\n%s\\n" "$MANALOOM_OPS_ENABLED_JOBS_JSON" '
+                '"$MANALOOM_OPS_ENABLED_JOBS_PYTHON"',
+                "_",
+                str(_OPS_JOBS_LIB),
+                str(repo),
+                sha,
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+    def _fixture_repo(self, tmp: Path) -> tuple[Path, str]:
+        repo = tmp / "repo"
+        (repo / "server/bin").mkdir(parents=True)
+        (repo / "server/config").mkdir(parents=True)
+        (repo / "server/bin/manaloom_ops_daemon.py").write_bytes(_DAEMON.read_bytes())
+        (repo / "server/config/release_capabilities.json").write_bytes(
+            _POLICY.read_bytes()
+        )
+        _git(repo.parent, "init", "--quiet", str(repo))
+        _git(repo, "config", "user.name", "ops-jobs-contract")
+        _git(repo, "config", "user.email", "ops-jobs-contract@localhost")
+        _git(repo, "add", ".")
+        _git(repo, "commit", "--quiet", "-m", "fixture")
+        return repo, _git(repo, "rev-parse", "HEAD")
+
+    def test_cli_prints_the_jobs_the_scheduler_runs_for_the_policy(self) -> None:
+        module = _load_module()
+        expected = [
+            job.name
+            for job in module._jobs_for_release_policy(
+                module._load_release_policy(_POLICY)
+            )
+        ]
+        result = self._cli("--print-enabled-jobs", str(_POLICY))
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout), expected)
+        self.assertEqual(
+            module.enabled_job_names(module._load_release_policy(_POLICY)), expected
+        )
+        self.assertIn("manaloom_slo_alerts", expected)
+
+    def test_cli_has_no_side_effects_and_refuses_an_invalid_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_dir = Path(tmp) / "ops-data"
+            env = {**os.environ, "MANALOOM_OPS_DATA_DIR": str(data_dir)}
+            ok = self._cli("--print-enabled-jobs", str(_POLICY), env=env)
+            self.assertEqual(ok.returncode, 0, ok.stderr)
+            self.assertFalse(data_dir.exists())
+
+            invalid = Path(tmp) / "invalid.json"
+            payload = json.loads(_POLICY.read_text(encoding="utf-8"))
+            payload["capabilities"]["ads"]["allowed"] = True
+            invalid.write_text(json.dumps(payload), encoding="utf-8")
+            refused = self._cli("--print-enabled-jobs", str(invalid), env=env)
+            self.assertEqual(refused.returncode, 2)
+            self.assertEqual(refused.stdout, "")
+
+            usage = self._cli("--print-enabled-jobs", env=env)
+            self.assertEqual(usage.returncode, 2)
+            self.assertFalse(data_dir.exists())
+
+    def test_deploy_library_reads_the_list_from_the_daemon_of_the_sha(self) -> None:
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            repo, sha = self._fixture_repo(Path(tmp))
+            loaded = self._load_from_git(repo, sha)
+            self.assertEqual(loaded.returncode, 0, loaded.stderr)
+            names_json, names_python = loaded.stdout.splitlines()
+            expected = module.enabled_job_names(module._load_release_policy(_POLICY))
+            self.assertEqual(json.loads(names_json), expected)
+            self.assertEqual(names_python, repr(expected))
+
+            # A daemon that schedules something else in a later commit changes
+            # what the deploy expects: there is no copy to forget.
+            daemon = repo / "server/bin/manaloom_ops_daemon.py"
+            daemon.write_text(
+                daemon.read_text(encoding="utf-8").replace(
+                    '    "manaloom_slo_alerts": (),\n',
+                    '    "manaloom_slo_alerts": ("battle_batch",),\n',
+                ),
+                encoding="utf-8",
+            )
+            _git(repo, "commit", "--quiet", "-am", "slo alerts gated")
+            changed = self._load_from_git(repo, _git(repo, "rev-parse", "HEAD"))
+            self.assertEqual(changed.returncode, 0, changed.stderr)
+            self.assertNotIn("manaloom_slo_alerts", changed.stdout)
+
+            # The working tree is never evidence: the old SHA still answers
+            # with the daemon committed there.
+            again = self._load_from_git(repo, sha)
+            self.assertEqual(again.stdout.splitlines()[0], names_json)
+
+            policy = repo / "server/config/release_capabilities.json"
+            payload = json.loads(policy.read_text(encoding="utf-8"))
+            payload["capabilities"]["ads"]["allowed"] = True
+            policy.write_text(json.dumps(payload), encoding="utf-8")
+            _git(repo, "commit", "--quiet", "-am", "invalid policy")
+            refused = self._load_from_git(repo, _git(repo, "rev-parse", "HEAD"))
+            self.assertEqual(refused.returncode, 2, refused.stdout)
+            self.assertIn("BLOCKED", refused.stderr)
+
+            missing = self._load_from_git(repo, "0" * 40)
+            self.assertEqual(missing.returncode, 2, missing.stdout)
+
+    def test_deploy_post_checks_accept_what_the_daemon_writes(self) -> None:
+        module = _load_module()
+        deploy = _OPS_DEPLOY.read_text(encoding="utf-8")
+        self.assertIn(
+            'manaloom_load_ops_enabled_jobs_from_git "$ROOT_DIR" "$sha"', deploy
+        )
+        self.assertIn(
+            'readonly OPS_ENABLED_JOBS_PYTHON="$MANALOOM_OPS_ENABLED_JOBS_PYTHON"',
+            deploy,
+        )
+        self.assertNotIn("==['manaloom_", deploy)
+        self.assertIn(
+            "assert data['enabled_jobs']==$OPS_ENABLED_JOBS_PYTHON;", deploy
+        )
+
+        # The jobs.json check of the deploy, run against the manifest the
+        # daemon writes for the committed policy.
+        jobs_check = next(
+            line.strip().removesuffix("\\").strip().strip('"')
+            for line in deploy.splitlines()
+            if "jobs=json.load(open('/data/manaloom-ops/cron/jobs.json'))" in line
+        )
+        policy = module._load_release_policy(_POLICY)
+        names_python = repr(module.enabled_job_names(policy))
+        with tempfile.TemporaryDirectory() as tmp:
+            manifest = Path(tmp) / "jobs.json"
+            original = module.JOBS_JSON
+            try:
+                module.JOBS_JSON = manifest
+                module._write_jobs_manifest(module._jobs_for_release_policy(policy), {})
+            finally:
+                module.JOBS_JSON = original
+            script = jobs_check.replace(
+                "/data/manaloom-ops/cron/jobs.json", str(manifest)
+            ).replace("$OPS_ENABLED_JOBS_PYTHON", names_python)
+            result = subprocess.run(
+                [sys.executable, "-c", script], capture_output=True, text=True
+            )
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 if __name__ == "__main__":

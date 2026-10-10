@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "0aeaae010baa178aa3b8cfd4306a312abc8cc20f80c98f9e28f7fb827cbf9b71",
+  "source_digest_sha256": "dc29317a6a7ef3bcd8a9b99b40c18467496f4e9b3443fc03b067ea76e231c8c7",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,7 +80,7 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 717,
+    "scripts_and_jobs": 718,
     "environment_variables": 736,
     "tests": 1348,
     "flows": 13,
@@ -280666,6 +280666,14 @@
       ]
     },
     {
+      "path": "scripts/lib/manaloom_ops_jobs_contract.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "TMPDIR"
+      ]
+    },
+    {
       "path": "scripts/lib/manaloom_public_web_surface_contract.sh",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -282888,7 +282896,7 @@
     {
       "path": "server/bin/manaloom_ops_daemon.py",
       "role": "operation",
-      "mutation_class": "read_only_or_unknown",
+      "mutation_class": "guarded_or_review_required",
       "environment_variables": [
         "AUTO_PROMOTE_LEARNED_DECKS_CRON",
         "AUTO_SYNC_LEARNED_DECKS_CRON",
@@ -290039,6 +290047,7 @@
       "name": "TMPDIR",
       "classification": "configuration",
       "sources": [
+        "scripts/lib/manaloom_ops_jobs_contract.sh",
         "scripts/manaloom_authenticated_visual_qa_isolated.sh",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_battle_learning_visual_qa.sh",
@@ -303213,7 +303222,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "0aeaae010baa178aa3b8cfd4306a312abc8cc20f80c98f9e28f7fb827cbf9b71"
+    "project_logic_source_digest_sha256": "dc29317a6a7ef3bcd8a9b99b40c18467496f4e9b3443fc03b067ea76e231c8c7"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305424,6 +305433,7 @@
       "scripts/lib/manaloom_fixture_asset_server.py",
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
+      "scripts/lib/manaloom_ops_jobs_contract.sh",
       "scripts/lib/manaloom_public_web_surface_contract.sh",
       "scripts/lib/manaloom_release_capabilities_contract.sh",
       "scripts/lib/manaloom_release_runtime_contract.sh",
