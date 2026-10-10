@@ -5075,7 +5075,7 @@ class _VisualPlayerBoard extends StatelessWidget {
           const SizedBox(height: AppTheme.space10),
           _VisualCardZone(
             key: Key('battle-visual-zone-hand-${player.name}'),
-            title: 'Mao',
+            title: 'Mão',
             cards: player.hand,
             fallbackCount: player.handSize,
             fallbackLabel: 'cartas',
@@ -5104,7 +5104,7 @@ class _VisualPlayerBoard extends StatelessWidget {
             const SizedBox(height: AppTheme.space10),
             _VisualCardZone(
               key: Key('battle-visual-zone-exile-${player.name}'),
-              title: 'Exilio',
+              title: 'Exílio',
               cards: player.exile,
               fallbackCount: player.exile.length,
               fallbackLabel: 'cartas',
@@ -5193,7 +5193,7 @@ class _VisualCardZone extends StatelessWidget {
                   ? 'Zona não observada por este motor'
                   : fallbackCount! > 0
                   ? '$fallbackCount $fallbackLabel sem imagem neste replay'
-                  : '0 $fallbackLabel observados',
+                  : '0 $fallbackLabel neste replay',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: AppTheme.textHint,
               ),
