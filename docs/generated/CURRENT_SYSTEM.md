@@ -2,7 +2,7 @@
 
 > Gerado por `scripts/manaloom_project_logic.sh --write`. Não editar manualmente.
 
-**Digest das fontes:** `8b94b4e282736bb7da9223d68ef578dc1bbc90c86c35f69094d125d7b950f320`
+**Digest das fontes:** `c6dd8a1b1171c173e2eba71a0eec0a6dac97930ca105ccd7db867b49f7944d40`
 
 ## Fontes de verdade
 
@@ -37,7 +37,7 @@
 | `flows` | 13 |
 | `traceability_rules` | 12 |
 | `tasks` | 250 |
-| `task_dependency_edges` | 447 |
+| `task_dependency_edges` | 464 |
 | `route_consumer_bindings` | 57 |
 | `receipt_contracts` | 7 |
 

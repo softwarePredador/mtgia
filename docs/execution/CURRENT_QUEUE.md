@@ -15,9 +15,11 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (decisões D-92 a D-116 e reconciliação de 2026-10-10):
-  `ba95660b4d51de462dc624e71fb2442df7a78d00e20072cbe750459dea33ce08` (250 tasks; o valor vivo está em
-  `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `f4effb9a…` com 246 em
+- Backlog/registry SHA-256 corrente (decisões D-92 a D-116, reconciliação de 2026-10-10 e a revisão
+  dela sobre `eac4f401b`):
+  `dc8a4202832cf4b03b88ced1a7d08fb3c9794736d270547afeebf4fe46a95a75` (250 tasks; o valor vivo está em
+  `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `ba95660b…` na reconciliação
+  de 2026-10-10 e `f4effb9a…` com 246 em
   `1f525a1c1`, e `8a73ebe6…` com 244 nas decisões D-79 e D-80 do gate de UI, branch
   `integracao/2026-09-23`; antes, `811f5409…` na rodada 2 da privacidade, `810d588d…` no registro do preço de deck, `320ebd9d…` nas decisões D-72 a D-75, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
   `d15beb05b`, `333b6c0b…` com 220 tasks e 402 arestas, valor de `f6f791098`)
@@ -64,9 +66,9 @@ Em 2026-10-10 o dono aceitou o caminho até o GO (D-92 a D-116). A ordem é esta
 13. GO (`BT-DEC-001`);
 14. coorte (`BT-COH-001`).
 
-Entre o congelamento e a promoção, nada entra no `master` (D-110). Em paralelo e fora do digest
-de UI correm o conserto do `npm audit` do site (D-115), o gate estrito na nuvem (D-116) e as
-frentes de banco e de promoção. Elas entram antes do `full` da R1.
+Entre o congelamento e a promoção, nada entra no `master` (D-110). O conserto do `npm audit` do
+site (D-115) entrou pelo PR #37 (`eac4f401b`). Em paralelo e fora do digest de UI correm o gate
+estrito na nuvem (D-116) e as frentes de banco e de promoção. Elas entram antes do `full` da R1.
 
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
 backlog mestre e o registry gerado.
@@ -99,7 +101,7 @@ coordenação. Até lá, só a raia de servidor tem slot.
 | Ordem | ID | Por que vem aqui |
 | ---: | --- | --- |
 | 1 | `BT-SCP-001` | fechar com o classificador de escopo (D-03), as correções de UI da contenção social, de trade e do scanner (D-04) e a prova de mecanismo (D-05) |
-| 1a | `BT-WEB-003` | bump feito em 2026-09-22 (D-01): `npm audit` com 0 vulnerabilidades; falta o receipt same-SHA |
+| 1a | `BT-WEB-003` | o bump de 2026-09-22 (D-01) regrediu no `full` de 2026-10-09; o PR #37 (`eac4f401b`, D-115) levou `next` 15.5.27, `sharp` 0.35.5 e `source-map-js` 1.2.2, e o gate (`npm audit --omit=dev`) está em 0. O audit completo, com as dependências de desenvolvimento, tem 10 achados de ferramenta de build (`tailwindcss` 3, `fast-glob`, `brace-expansion`) que pedem major e ficam como follow-up; falta o receipt same-SHA |
 | 1b | `BT-UIEV-001` | recaptura em lote (23/23 e `latest.json`) depois das correções da D-04. A recaptura 23/23 entrou em `e873943a0` (2026-10-07) e ficou defasada pelo `4f3820934` (PR #29), que mexeu em 3 raízes do digest; a R1 da D-92 vem depois do merge do PR-B |
 | 2 | `BT-GOV-002` | fila com duas raias (D-02); abre a raia do app |
 | 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`); o reinício do host (D-58) trocou o IP do balanceador e o login ficou em 503 até `22a7749a7` (11:01 UTC) |
@@ -131,8 +133,8 @@ listava já está no `master`, sem `PASS`:
 | Ordem | ID | Por que vem aqui |
 | ---: | --- | --- |
 | 1 | `BT-UX-BATCH-001` | PR-C: o que falta do app para o GO, na nuvem, depois do merge do PR-B e da R1 (D-92) |
-| 2 | `BT-UX-PROOF-001` | R2: prova de UI do lote, com a assinatura do dono (D-15, D-92) |
-| 3 | `BT-UX-DEVICE-001` | sessão de aparelho junto da R2: TalkBack e teclado (D-113) |
+| 2 | `BT-UX-DEVICE-001` | sessão de aparelho junto da R2: TalkBack e teclado (D-113); o `BT-UX-PROOF-001` depende dela |
+| 3 | `BT-UX-PROOF-001` | R2: prova de UI do lote, com a assinatura do dono (D-15, D-92) |
 
 Analyze/Optimize e suas P0 AI ficam para a segunda onda (D-07).
 
@@ -182,7 +184,9 @@ contador de vida.
   15.5.21 → 15.5.25; `sharp`) e nunca chega a
   ui-audit/custom-lint/patrol-smoke/dependency-audit. 16 dos 19 commits desde
   2026-09-18 declaram `--no-verify`. Em 2026-09-22 o bump foi feito
-  (`BT-WEB-003`) e o `npm audit` do site zerou; o `full` ainda não rodou de novo.
+  (`BT-WEB-003`) e o `npm audit` do site zerou. O `full` de 2026-10-09 caiu de novo nele, com
+  avisos novos, e o PR #37 (`eac4f401b`) zerou o gate (`--omit=dev`) em 2026-10-10; o `full`
+  ainda não rodou de novo.
 - Os registros de abertura e de agosto abaixo são históricos, não uma nova
   observação de Git, runtime ou produção em setembro.
 - Na abertura de `BT-SCP-001`, a branch local estava um commit à frente do

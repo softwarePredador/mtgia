@@ -2,7 +2,7 @@
 
 Estes receipts fecham a divergência DIV-07 do mapa de 2026-10-10. Cobrem tarefas em `IMPLEMENTED_LOCAL_PENDING_FULL_GATE` que não tinham receipt próprio no backlog.
 
-- **Como foram feitos:** só por leitura no `master` `1f525a1c1`. Cada commit citado é ancestral dele, e cada arquivo citado existe nele.
+- **Como foram feitos:** só por leitura no `master` `1f525a1c1`. Cada commit citado é ancestral dele, e cada arquivo citado existe nele, com uma exceção: o teste de app do `BT-AUTH-007` (`app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart`) entra no `master` com este PR.
 - **O que não houve:** nenhum gate rodou, e nada tocou a produção.
 - **O que muda:** nenhuma tarefa muda para `PASS`. O `PASS` espera o `full` verde e, nas tarefas de UI, a recaptura da prova de UI (D-92).
 
@@ -36,3 +36,5 @@ Estes receipts fecham a divergência DIV-07 do mapa de 2026-10-10. Cobrem tarefa
 - **`BT-WEB-003`:** a frente do site faz o bump da D-115 e o receipt same-SHA.
 - **`BT-UX-KIT-001`:** a tarefa está em `TODO`, e a linha é do PR-B.
 - **`BT-CAT-02` e `BT-SCN-00`:** estão em `IN_PROGRESS_CONTAINED`.
+
+**Mudou depois:** na revisão de 2026-10-10 o `BT-NAV-02` voltou para `IN_PROGRESS_CONTAINED`, porque o buraco do boot segue aberto e vai no PR-C (`BT-UX-BATCH-001`). O receipt dele continua valendo como evidência de código do refresh.

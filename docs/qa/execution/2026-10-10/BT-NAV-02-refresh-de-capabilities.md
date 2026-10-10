@@ -1,8 +1,8 @@
 # Receipt — BT-NAV-02: o refresh de capabilities não expulsa o usuário (evidência de código) — 2026-10-10
 
-- **Estado no backlog:** `IMPLEMENTED_LOCAL_PENDING_FULL_GATE`.
+- **Estado no backlog:** `IN_PROGRESS_CONTAINED`, desde a revisão de 2026-10-10. O receipt foi escrito com a linha em `IMPLEMENTED_LOCAL_PENDING_FULL_GATE`; ela voltou porque o buraco do boot segue aberto, e passou a depender do `BT-UX-BATCH-001` (PR-C).
 - **O que é:** evidência de código, conferida só por leitura no `master` `1f525a1c1`. Nenhum gate rodou nesta sessão, e nada tocou a produção.
-- **O que falta para o PASS:** o `full` verde no SHA candidato. O PASS também espera a recaptura da prova de UI: a R1 para o que já está no `master`, ou a R2 para o que entra no PR-C (D-92).
+- **O que falta para o PASS:** o conserto do boot no PR-C, o `full` verde no SHA candidato e a recaptura da prova de UI: a R1 para o que já está no `master`, ou a R2 para o que entra no PR-C (D-92).
 - **Por que este receipt existe:** a linha do backlog não tinha receipt próprio (divergência DIV-07 do mapa de 2026-10-10).
 
 ## O que o código faz

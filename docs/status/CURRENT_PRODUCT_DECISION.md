@@ -151,7 +151,8 @@ Decidido em 2026-09-22:
   (`price_history` desligada até depois da coorte).
 - Em 2026-09-24 o dono decidiu que o MVP não precisa de backup fora do servidor
   (D-81). O `BT-DR-001` fica com o backup local e o ensaio de restauração.
-- O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção no
+- O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, menos a abertura da
+  coorte (`BT-COH-001`), que vem depois do GO porque depende dele, e exige produção no
   candidato congelado (ver as decisões de 2026-10-10 abaixo; até lá dizia "na linha
   de base contida com a 058"), catálogo com menos de 7 dias, rollback treinado uma
   vez e a assinatura do dono (D-18, `BT-DEC-001`). O catálogo está atualizado desde
@@ -165,7 +166,8 @@ Decidido em 2026-10-10 (D-92 a D-116, em `docs/status/DECISOES_PENDENTES_2026-09
 
 - **Critério de produção do GO (D-93).** Troca "produção na 058" por produção no
   candidato congelado, com as migrations até a última do lote (hoje a 076; a 077
-  da D-112 entra no mesmo lote), 29/29 capabilities `off` e same-SHA. Os outros
+  da D-112 entra no mesmo lote, e o contrato do deploy e o readiness vão até ela junto),
+  29/29 capabilities `off` e same-SHA. Os outros
   critérios da D-18 continuam.
 - **Rollback treinado (D-103).** Conta como treino uma promoção com falha induzida,
   que dispara a compensação automática, somada ao ensaio de restauração do backup

@@ -604,6 +604,7 @@ As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenaç
 **D-109 · E-mail dos convites (item 19).**
 - **Decisão do dono:** antes de emitir o primeiro lote, conferir as variáveis `BETA_INVITE_WEBHOOK_URL`, `BETA_INVITE_WEBHOOK_TOKEN` e `BETA_INVITE_APP_URL` (`server/bin/beta_invites.dart`) e o domínio.
 - **Execução:** faz parte do aceite do `BT-COH-001`.
+- **Precisão (revisão de 2026-10-10):** as três variáveis acima são só as do webhook e do link. O `server/bin/beta_invites.dart` (linhas 19-20) entrega pela configuração de e-mail da API: `MANALOOM_EMAIL_DELIVERY_PROVIDER` escolhe `webhook` (o padrão) ou `resend` (`server/lib/account_email_delivery_config.dart`). Com `resend`, conferir `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_FROM_NAME` e `RESEND_VERIFIED_DOMAIN`; com `webhook`, `BETA_INVITE_WEBHOOK_URL` e `BETA_INVITE_WEBHOOK_TOKEN`. Nos dois casos, `BETA_INVITE_APP_URL` monta o link, e o domínio é conferido.
 
 **D-110 · Ordem do fecho (item 20; críticas C3 e C4).**
 - **Decisão do dono:**
@@ -637,6 +638,7 @@ As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenaç
   - A limpeza dos 84 sets duplicados.
   - As duas no lote, com contagem.
 - **Execução:** feita pela frente de banco, com teste em PostgreSQL descartável. Pela D-93, a 077 passa a ser a última do lote.
+- **O que vai junto (revisão de 2026-10-10):** a 077 não sobe sozinha. O deploy do backend (`scripts/manaloom_deploy_backend_image.sh`, `require_migrations_041_076_contract` e a checagem `latest_migration_076`) e o readiness (`server/lib/health_readiness_support.dart`, `latest_migration_ready` e `required_range` 038-076) exigem que a última migration seja a 076. Com a 077 aplicada e os dois ainda na 076, o deploy recusa e o readiness responde 503. Os dois vão até a 077 no mesmo lote. A branch da frente de banco (`feat/db-lot-corrections-077`, `49a81efd1`) já faz isso.
 
 **D-113 · A sessão de aparelho vem junto da R2 (item 23; crítica C13).**
 - **Contexto:** o `BT-UX-A11Y-001` exige TalkBack lógico e teclado real. Ele vem antes do `BT-UX-PROOF-001`, que vem antes do `BT-REL-003`. Já a D-15 autoriza o aparelho uma vez, perto do release.
