@@ -1,0 +1,17 @@
+{
+  "schema": "manaloom.gate_skip_allowlist.v1",
+  "policy": "BT-GATE-001 / D-17: todo skip é PARTIAL (exit 3) salvo entrada aqui, com motivo, dono e prazo. Entrada vencida deixa de valer. BLOCKED nunca entra nesta lista.",
+  "entries": [
+    {
+      "id": "flutter.lotus_web_host_runtime_vm_stub",
+      "kind": "test",
+      "suite": "app/test/features/home/lotus_web_host_runtime_test.dart",
+      "test_name": "Lotus browser host runtime is covered on Chrome",
+      "reason": "Stub da VM do `flutter test`: o contrato real do host Web do Lotus vive em lotus_web_host_runtime_test_web.dart e só compila com dart.library.js_interop, ou seja, em `flutter test --platform chrome`. Na VM o teste é um espaço reservado declarado como skip.",
+      "owner": "frente-app-lotus",
+      "added": "2026-10-10",
+      "review_by": "2026-12-31",
+      "follow_up": "Ligar `flutter test --platform chrome test/features/home/lotus_web_host_runtime_test.dart` ao gate integration/web e então remover esta entrada."
+    }
+  ]
+}
