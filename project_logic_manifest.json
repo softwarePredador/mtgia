@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "dc29317a6a7ef3bcd8a9b99b40c18467496f4e9b3443fc03b067ea76e231c8c7",
+  "source_digest_sha256": "96037bd175c0594abdcb8836fc24af94f9e091e4019ff0d2460f154a32db2e8f",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -81,7 +81,7 @@
     "database_views": 6,
     "migrations": 74,
     "scripts_and_jobs": 718,
-    "environment_variables": 736,
+    "environment_variables": 737,
     "tests": 1348,
     "flows": 13,
     "traceability_rules": 12,
@@ -280682,8 +280682,10 @@
     {
       "path": "scripts/lib/manaloom_release_capabilities_contract.sh",
       "role": "operation",
-      "mutation_class": "read_only_or_unknown",
-      "environment_variables": []
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "MANALOOM_RELEASE_CAPABILITY_MATRIX"
+      ]
     },
     {
       "path": "scripts/lib/manaloom_release_runtime_contract.sh",
@@ -288138,6 +288140,14 @@
       "classification": "configuration",
       "sources": [
         "server/bin/manaloom_ops_daemon.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "MANALOOM_RELEASE_CAPABILITY_MATRIX",
+      "classification": "configuration",
+      "sources": [
+        "scripts/lib/manaloom_release_capabilities_contract.sh"
       ],
       "value_captured": false
     },
@@ -303222,7 +303232,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "dc29317a6a7ef3bcd8a9b99b40c18467496f4e9b3443fc03b067ea76e231c8c7"
+    "project_logic_source_digest_sha256": "96037bd175c0594abdcb8836fc24af94f9e091e4019ff0d2460f154a32db2e8f"
   },
   "documentation_lifecycle": {
     "schema_version": 1,

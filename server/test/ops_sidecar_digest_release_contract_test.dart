@@ -121,6 +121,20 @@ void main() {
         ),
       );
       expect(ops, isNot(contains("==['manaloom_")));
+      // S-07: the runtime policy must turn on exactly the set the contract
+      // accepted (none by default, the cohort matrix only when asked for).
+      expect(
+        ops,
+        contains(
+          r'readonly OPS_CAPABILITIES_ON_PYTHON="$MANALOOM_RELEASE_CAPABILITIES_ON_PYTHON"',
+        ),
+      );
+      expect(
+        ops,
+        contains(
+          r"if row['release_capability']=='on')==$OPS_CAPABILITIES_ON_PYTHON;",
+        ),
+      );
       expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));
       expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_HTTP_ENABLED=1')));
       expect(ops, isNot(contains('MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=1')));

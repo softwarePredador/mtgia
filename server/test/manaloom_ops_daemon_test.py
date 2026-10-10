@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import json
 import os
@@ -1012,6 +1013,104 @@ class OpsEnabledJobsContractTest(unittest.TestCase):
                 [sys.executable, "-c", script], capture_output=True, text=True
             )
         self.assertEqual(result.returncode, 0, result.stderr)
+
+
+_COHORT_MATRIX = _REPO_ROOT / "server/config/release_capabilities_cohort.json"
+
+
+class OpsDeployCapabilityMatrixTest(unittest.TestCase):
+    """S-07: the ops post-deploy check accepts the matrix the contract accepted.
+
+    The deploy asks the capabilities contract which capabilities are on (none
+    by default, the cohort five only with MANALOOM_RELEASE_CAPABILITY_MATRIX)
+    and checks the policy inside the running image against that set.
+    """
+
+    def _policy_check(self) -> str:
+        deploy = _OPS_DEPLOY.read_text(encoding="utf-8")
+        self.assertIn(
+            'readonly OPS_CAPABILITIES_ON_PYTHON="$MANALOOM_RELEASE_CAPABILITIES_ON_PYTHON"',
+            deploy,
+        )
+        line = next(
+            line
+            for line in deploy.splitlines()
+            if "policy_path='/app/server/config/release_capabilities.json'" in line
+        )
+        script = line.strip().strip('"')
+        # Only the policy part: the rest reads the live /health.
+        return script[: script.index("data=json.load(")]
+
+    def _run(self, payload: dict, on_python: str) -> subprocess.CompletedProcess:
+        with tempfile.TemporaryDirectory() as tmp:
+            policy = Path(tmp) / "release_capabilities.json"
+            policy.write_text(json.dumps(payload), encoding="utf-8")
+            digest = hashlib.sha256(policy.read_bytes()).hexdigest()
+            script = (
+                self._policy_check()
+                .replace("/app/server/config/release_capabilities.json", str(policy))
+                .replace("$RELEASE_CAPABILITIES_DIGEST_SHA256", digest)
+                .replace("$OPS_CAPABILITIES_ON_PYTHON", on_python)
+            )
+            self.assertNotIn("$", script)
+            return subprocess.run(
+                [sys.executable, "-c", script], capture_output=True, text=True
+            )
+
+    def _cohort_policy(self) -> dict:
+        payload = json.loads(_POLICY.read_text(encoding="utf-8"))
+        matrix = json.loads(_COHORT_MATRIX.read_text(encoding="utf-8"))
+        for key in matrix["capabilities_on"]:
+            payload["capabilities"][key].update(
+                {"release_capability": "on", "allowed": True}
+            )
+        return payload
+
+    def test_all_off_policy_passes_only_with_the_empty_set(self) -> None:
+        all_off = json.loads(_POLICY.read_text(encoding="utf-8"))
+        self.assertEqual(self._run(all_off, "[]").returncode, 0)
+        self.assertNotEqual(
+            self._run(all_off, "['account_registration']").returncode, 0
+        )
+
+    def test_cohort_policy_passes_only_with_the_cohort_set(self) -> None:
+        matrix = json.loads(_COHORT_MATRIX.read_text(encoding="utf-8"))
+        cohort = self._cohort_policy()
+        on_python = repr(sorted(matrix["capabilities_on"]))
+        self.assertEqual(self._run(cohort, on_python).returncode, 0)
+        self.assertNotEqual(self._run(cohort, "[]").returncode, 0)
+
+        extra = deepcopy(cohort)
+        extra["capabilities"]["ads"].update(
+            {"release_capability": "on", "allowed": True}
+        )
+        self.assertNotEqual(self._run(extra, on_python).returncode, 0)
+
+        incoherent = deepcopy(cohort)
+        incoherent["capabilities"]["decks_private"]["allowed"] = False
+        self.assertNotEqual(self._run(incoherent, on_python).returncode, 0)
+
+    def test_cohort_policy_enables_the_daemon_jobs_of_its_capabilities(self) -> None:
+        # Opening catalog_private also schedules the catalog review jobs; the
+        # S-01 derivation makes the deploy expect exactly that set.
+        module = _load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            policy = Path(tmp) / "release_capabilities.json"
+            policy.write_text(json.dumps(self._cohort_policy()), encoding="utf-8")
+            names = module.enabled_job_names(module._load_release_policy(policy))
+        all_off = module.enabled_job_names(module._load_release_policy(_POLICY))
+        self.assertLessEqual(set(all_off), set(names))
+        cohort_on = set(
+            json.loads(_COHORT_MATRIX.read_text(encoding="utf-8"))["capabilities_on"]
+        )
+        self.assertEqual(
+            sorted(set(names) - set(all_off)),
+            sorted(
+                name
+                for name, capabilities in module.JOB_REQUIRED_CAPABILITIES.items()
+                if capabilities and set(capabilities) <= cohort_on
+            ),
+        )
 
 
 if __name__ == "__main__":

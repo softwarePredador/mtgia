@@ -215,10 +215,12 @@ fi
 
 # The candidate image and the runtime health must carry the exact policy blob
 # committed in this SHA. The current Free Beta contract accepts only the
-# canonical 29-key all-OFF matrix; a dirty or permissive working-tree file
-# cannot enable an ops job.
+# canonical 29-key all-OFF matrix, or the named cohort matrix when
+# MANALOOM_RELEASE_CAPABILITY_MATRIX asks for it (S-07); a dirty or permissive
+# working-tree file cannot enable an ops job.
 manaloom_load_release_capabilities_from_git "$ROOT_DIR" "$sha"
 readonly RELEASE_CAPABILITIES_DIGEST_SHA256="$MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256"
+readonly OPS_CAPABILITIES_ON_PYTHON="$MANALOOM_RELEASE_CAPABILITIES_ON_PYTHON"
 # S-01: the jobs /health and jobs.json must list are the ones the daemon of
 # this SHA schedules for this policy, read from the daemon itself.
 manaloom_load_ops_enabled_jobs_from_git "$ROOT_DIR" "$sha"
@@ -372,7 +374,7 @@ for attempt in \$(seq 1 60); do
         ( -z "\$update_state" || "\$update_state" == completed ) ]]; then
     container="\$(docker ps --filter label=com.docker.swarm.service.name='$SERVICE' -q | head -1)"
     if docker exec "\$container" python3 -c \
-        "import hashlib,json,urllib.request; policy_path='/app/server/config/release_capabilities.json'; raw=open(policy_path,'rb').read(); assert hashlib.sha256(raw).hexdigest()=='$RELEASE_CAPABILITIES_DIGEST_SHA256'; policy=json.loads(raw); assert len(policy['capabilities'])==29; assert all(row['release_capability']=='off' and row['allowed'] is False for row in policy['capabilities'].values()); data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='disabled_by_release_capability'; assert data['git_sha']=='$sha'; assert data['operational_mode']=='safe_housekeeping_only'; assert data['enabled_jobs']==$OPS_ENABLED_JOBS_PYTHON; caps=data['release_capabilities']; assert caps['configuration_status']=='valid'; assert caps['policy_digest_sha256']=='$RELEASE_CAPABILITIES_DIGEST_SHA256'; assert caps['battle_batch']=='off'; assert caps['learning_writes']=='off'" \
+        "import hashlib,json,urllib.request; policy_path='/app/server/config/release_capabilities.json'; raw=open(policy_path,'rb').read(); assert hashlib.sha256(raw).hexdigest()=='$RELEASE_CAPABILITIES_DIGEST_SHA256'; policy=json.loads(raw); assert len(policy['capabilities'])==29; assert all((row['release_capability'],row['allowed']) in (('off',False),('on',True)) for row in policy['capabilities'].values()); assert sorted(k for k,row in policy['capabilities'].items() if row['release_capability']=='on')==$OPS_CAPABILITIES_ON_PYTHON; data=json.load(urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=5)); assert data['status']=='ok'; assert data['engine_contract']=='disabled_by_release_capability'; assert data['git_sha']=='$sha'; assert data['operational_mode']=='safe_housekeeping_only'; assert data['enabled_jobs']==$OPS_ENABLED_JOBS_PYTHON; caps=data['release_capabilities']; assert caps['configuration_status']=='valid'; assert caps['policy_digest_sha256']=='$RELEASE_CAPABILITIES_DIGEST_SHA256'; assert caps['battle_batch']=='off'; assert caps['learning_writes']=='off'" \
         >/dev/null 2>&1 && \
       docker exec "\$container" python3 -c \
         "import json; jobs=json.load(open('/data/manaloom-ops/cron/jobs.json')); assert [row['name'] for row in jobs]==$OPS_ENABLED_JOBS_PYTHON; assert all(row['enabled'] is True for row in jobs)" \
