@@ -216,6 +216,8 @@ CREATE TABLE IF NOT EXISTS sets (
 );
 
 CREATE INDEX IF NOT EXISTS idx_sets_name ON sets (name);
+-- BT-CAT-01 (migration 077, D-74): um set por código sem diferença de caixa.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_sets_code_lower ON sets (LOWER(code));
 
 -- 3. Tabela de Legalidade/Banidas (Relacionamento 1:N com Cartas)
 -- Ex: Card X -> Commander: Banned

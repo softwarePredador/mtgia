@@ -164,7 +164,7 @@ Future<List<Map<String, dynamic>>> _searchLocal(
       c.price_source, c.price_updated_at,
       c.collector_number, c.foil
     FROM cards c
-    LEFT JOIN sets s ON s.code = c.set_code
+    LEFT JOIN sets s ON LOWER(s.code) = LOWER(c.set_code)
     WHERE $condition$tokenCondition
     ORDER BY s.release_date DESC NULLS LAST, c.set_code ASC
     LIMIT 50
