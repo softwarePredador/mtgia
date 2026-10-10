@@ -69,7 +69,6 @@ void main() {
       'deck_revision_conflict',
       'resource_not_found',
       'legal_acceptance_required',
-      'forbidden',
     ]) {
       test('never shows the raw code $code', () {
         for (final status in const [400, 403, 404, 409, 422]) {
@@ -89,6 +88,30 @@ void main() {
         );
       });
     }
+
+    test('never shows the single-word code forbidden from a server body', () {
+      for (final status in const [400, 403, 404, 409, 422]) {
+        final message = FriendlyErrorMapper.fromApiResponse(
+          ApiResponse(status, {'error': 'forbidden'}),
+        );
+        expect(message, isNot(contains('forbidden')));
+      }
+      expect(
+        FriendlyErrorMapper.serverMessageFromBody({'error': 'forbidden'}),
+        isNull,
+      );
+    });
+
+    test('keeps a one-word exception message as the thrower wrote it', () {
+      expect(
+        FriendlyErrorMapper.fromException(Exception('offline')),
+        isNotEmpty,
+      );
+      expect(
+        FriendlyErrorMapper.fromException(Exception('offline')),
+        contains('offline'),
+      );
+    });
 
     group('403 (BT-AUTH-010)', () {
       const permission = 'Você não tem permissão para realizar esta ação.';

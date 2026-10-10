@@ -2034,6 +2034,16 @@ class _ChangePasswordDialogState extends State<_ChangePasswordDialog> {
 /// Era específico de "encerrar sessões". A exportação de dados passou a exigir
 /// a mesma reverificação (BT-AUTH-004), e duplicar o diálogo faria as duas
 /// cópias divergirem — a de senha é justamente onde divergência custa caro.
+///
+/// Chaves geradas a partir de `keyPrefix` (`<prefixo>-dialog`,
+/// `<prefixo>-password-field`, `-password-visibility`, `-cancel-button` e
+/// `-confirm-button`):
+/// - `profile-revoke-sessions-dialog` (encerrar outras sessões);
+/// - `profile-export-data-dialog` (exportar os próprios dados).
+///
+/// O contrato `ux_pack08_06_profile_revoke_validation` ancora em
+/// `profile-revoke-sessions-dialog` neste arquivo, então o nome literal fica
+/// documentado aqui.
 class _PasswordConfirmationDialog extends StatefulWidget {
   const _PasswordConfirmationDialog({
     required this.title,

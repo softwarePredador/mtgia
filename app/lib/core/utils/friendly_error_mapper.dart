@@ -186,7 +186,10 @@ class FriendlyErrorMapper {
       return 'Recebemos uma resposta inesperada. Atualize a tela e tente novamente.';
     }
 
-    if (isMachineErrorCode(normalized)) {
+    // Aqui o texto vem de uma exceção, não do corpo do servidor: uma palavra só
+    // (`offline`, `timeout`) é mensagem de quem lançou, não código estável, e
+    // continua visível. O formato de uma palavra só vale para o corpo.
+    if (_snakeCaseErrorCodePattern.hasMatch(normalized)) {
       return _knownErrorCodeMessages[normalized] ??
           fallback ??
           _fallbackForContext(context);
@@ -305,6 +308,12 @@ class FriendlyErrorMapper {
   /// sublinhado, de 3 a 64 caracteres. Inclui o código de uma palavra só
   /// (`forbidden`), que o servidor também emite e que antes aparecia cru.
   static final _machineErrorCodePattern = RegExp(r'^[a-z][a-z0-9_]{2,63}$');
+
+  /// Código composto (`dominio_motivo`): o único formato que se reconhece em
+  /// texto de exceção, onde uma palavra só é frase de quem lançou.
+  static final _snakeCaseErrorCodePattern = RegExp(
+    r'^[a-z][a-z0-9]*(?:_[a-z0-9]+)+$',
+  );
 
   static const _capabilityUnavailableMessage =
       'Este recurso não está disponível nesta versão da beta.';
