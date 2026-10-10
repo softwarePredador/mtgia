@@ -123,6 +123,19 @@ if ! MANALOOM_DART_BIN="$DART_BIN" \
   exit 1
 fi
 
+# S-05: o passo de migrations do lote (scripts/manaloom_lot_apply_migrations.sh), com
+# o wrapper de verdade e um túnel falso, num PostgreSQL 17 descartável próprio: do
+# banco na 058 à última migration, com as recusas de lacuna antes de escrever.
+if ! MANALOOM_DART_BIN="$DART_BIN" \
+  MANALOOM_APPROVE_DISPOSABLE_POSTGRES="$APPROVAL_PHRASE" \
+  RUN_SCHEMA_DB_TESTS=1 \
+  PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/lot_migrations_step_test.py" \
+  >"$RUN_DIR/lot-migrations.log" 2>&1; then
+  tail -80 "$RUN_DIR/lot-migrations.log" >&2
+  exit 1
+fi
+
 if ! (
   cd "$ROOT_DIR/server"
   DB_HOST=127.0.0.1 \

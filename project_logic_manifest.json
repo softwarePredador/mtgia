@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "d9e568d323550fa61fbf8a38804241ba33de1bf103d80f93e3332134cfd51e6c",
+  "source_digest_sha256": "9e163625b4436e4d930b96d90d0e72925978308f0f160cc62770738373ab2b67",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,9 +80,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 717,
+    "scripts_and_jobs": 719,
     "environment_variables": 736,
-    "tests": 1348,
+    "tests": 1349,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -281421,6 +281421,21 @@
       ]
     },
     {
+      "path": "scripts/manaloom_lot_apply_migrations.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "SHA",
+        "TMPDIR"
+      ]
+    },
+    {
+      "path": "scripts/manaloom_lot_migrations.py",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_migration_rehearsal.py",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
@@ -289874,6 +289889,7 @@
       "classification": "configuration",
       "sources": [
         "scripts/manaloom_deploy_public_web.sh",
+        "scripts/manaloom_lot_apply_migrations.sh",
         "scripts/manaloom_promote_release.sh"
       ],
       "value_captured": false
@@ -290053,6 +290069,7 @@
         "scripts/manaloom_install_external_engine_delta_schedule.sh",
         "scripts/manaloom_integration_lane_gate.sh",
         "scripts/manaloom_local_ci.sh",
+        "scripts/manaloom_lot_apply_migrations.sh",
         "scripts/manaloom_migrations_038_040_isolated.sh",
         "scripts/manaloom_onboarding_intent_visual_qa.sh",
         "scripts/manaloom_p0_runtime_capture.sh",
@@ -291572,6 +291589,7 @@
     "server/test/local_ci_staged_scope_dispatcher_test.py",
     "server/test/lorehold_candidate_patch_contract_test.dart",
     "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
+    "server/test/lot_migrations_step_test.py",
     "server/test/magic_rules_source_test.dart",
     "server/test/manaloom_battle_product_e2e_audit_test.py",
     "server/test/manaloom_battle_strategy_audit_runner_test.py",
@@ -292596,6 +292614,8 @@
         "scripts/manaloom_capacity_resources.py",
         "scripts/manaloom_promote_release.sh",
         "scripts/manaloom_promote_release.py",
+        "scripts/manaloom_lot_apply_migrations.sh",
+        "scripts/manaloom_lot_migrations.py",
         "scripts/manaloom_release_identity_gate.py",
         "scripts/manaloom_errexit_lint.py",
         "scripts/manaloom_errexit_lint_pending.json",
@@ -292619,6 +292639,7 @@
         "server/test/capacity_policy_test.py",
         "server/test/capacity_resources_test.py",
         "server/test/release_promotion_test.py",
+        "server/test/lot_migrations_step_test.py",
         "server/test/release_identity_gate_test.py",
         "server/test/errexit_postdeploy_test.py",
         "server/test/migration_preflight_test.dart",
@@ -302645,6 +302666,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302678,6 +302701,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302711,6 +302736,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302744,6 +302771,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302777,6 +302806,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302810,6 +302841,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302843,6 +302876,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302876,6 +302911,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -302909,6 +302946,8 @@
           "scripts/manaloom_errexit_lint.py",
           "scripts/manaloom_errexit_lint_pending.json",
           "scripts/manaloom_generate_release_sbom.py",
+          "scripts/manaloom_lot_apply_migrations.sh",
+          "scripts/manaloom_lot_migrations.py",
           "scripts/manaloom_migration_rehearsal.py",
           "scripts/manaloom_promote_release.py",
           "scripts/manaloom_promote_release.sh",
@@ -303213,7 +303252,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "d9e568d323550fa61fbf8a38804241ba33de1bf103d80f93e3332134cfd51e6c"
+    "project_logic_source_digest_sha256": "9e163625b4436e4d930b96d90d0e72925978308f0f160cc62770738373ab2b67"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305482,6 +305521,8 @@
       "scripts/manaloom_integration_lanes.py",
       "scripts/manaloom_live_credential_audit.py",
       "scripts/manaloom_local_ci.sh",
+      "scripts/manaloom_lot_apply_migrations.sh",
+      "scripts/manaloom_lot_migrations.py",
       "scripts/manaloom_migration_rehearsal.py",
       "scripts/manaloom_migrations_038_040_isolated.sh",
       "scripts/manaloom_mobile_authenticated_qa.sh",
@@ -306404,6 +306445,7 @@
       "server/test/local_ci_staged_scope_dispatcher_test.py",
       "server/test/lorehold_candidate_patch_contract_test.dart",
       "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
+      "server/test/lot_migrations_step_test.py",
       "server/test/magic_rules_source_test.dart",
       "server/test/manaloom_battle_product_e2e_audit_test.py",
       "server/test/manaloom_battle_strategy_audit_runner_test.py",
