@@ -665,9 +665,10 @@ As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenaç
   - `source-map-js` 1.2.2;
   - `eslint-config-next` 15.5.27.
 - **Execução:**
-  - O bump fica em `web-public/`, fora do digest de UI e do bootstrap do pre-commit.
+  - O bump fica em `web-public/`, fora do digest de UI e do bootstrap do pre-commit, numa frente
+    própria (branch `fix/web-public-audit-2026-10`).
   - Ele entra antes do `full` da R1.
-  - Registrado na linha do `BT-WEB-003`.
+  - A linha do `BT-WEB-003` e o receipt same-SHA ficam com essa frente.
 
 **D-116 · Rotinas de nuvem de disparo manual para o PR-B, a Frente 2 e o PR-C (2026-10-10).**
 - **Contexto:**
