@@ -120,9 +120,58 @@ Só com a palavra do dono: é escrita na produção.
 5. `pg_restore --exit-on-error --no-owner --no-privileges` no banco novo.
 6. Conferir como no ensaio: número de tabelas, chaves estrangeiras, `SET CONSTRAINTS ALL
    IMMEDIATE` e as contagens de `users`, `cards`, `decks` e `deck_cards`.
-7. Apontar a API para o banco restaurado e conferir `/health/ready` (a última migration
-   tem de ser a que o deploy exige).
+7. Apontar a API para o banco restaurado, com uma imagem do backend que aceite esse banco,
+   e conferir `/health/ready`. O readiness exige que a última migration do banco seja a que
+   a imagem conhece; o dump do passo 1 do lote está na 058, que só a imagem anterior ao
+   lote aceita. Depois de um deploy do backend que falhou com o banco migrado, o serviço
+   pode estar na imagem nova (veja a seção seguinte):
+   - confira o estado com `docker service inspect <serviço> --format
+     '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{end}}'` e
+     `docker service ls --filter name=<serviço>`;
+   - só com o banco já restaurado, volte o serviço para a spec anterior com
+     `docker service rollback <serviço>`, a partir de `paused`, `updating` ou `completed`.
+     Espere `rollback_completed`, 1/1 e a imagem anterior (a que a mensagem do deploy
+     imprime) na spec e na tarefa;
+   - se o deploy já tinha trocado a origem no EasyPanel (a mensagem do deploy diz), volte-a
+     para o mesmo digest. Sem isso, um redeploy pelo painel sobe a imagem nova de novo;
+   - `/health/ready` tem de responder `ready`. Nesse estado (1/1, spec igual à tarefa,
+     `rollback_completed`), o próximo deploy volta a aceitar o serviço.
 8. Registrar o fim e o tempo total no receipt da coordenação.
 
 O ensaio semanal mede só a restauração (passos 4 a 6). Os outros passos dependem de onde a
 produção for reerguida e estão fora do ensaio.
+
+## Deploy do backend que falhou depois do lote
+
+Depois do lote, o banco está numa migration que a imagem anterior do backend não aceita
+(D-104, item 12 do pacote de decisões de 2026-10-10). Por isso o
+`scripts/manaloom_deploy_backend_image.sh` não volta sozinho: o Swarm roda o update com
+`--update-failure-action pause`, e o trap recusa a volta e imprime o caminho. Toda saída
+abaixo é escrita na produção e pede a palavra do dono.
+
+O estado em que o serviço fica depende de onde o deploy falhou. A mensagem do deploy diz qual:
+
+| Onde falhou | Estado do Swarm | O próximo deploy |
+| --- | --- | --- |
+| No update do Swarm (a tarefa nova não subiu em 90 s) | `paused`, ou ainda `updating`; a réplica pode estar 0/1 | recusa ("baseline backend nao e rollback-safe") |
+| Numa conferência depois do update (spec, readiness, origem no EasyPanel) | `completed`, com a imagem nova 1/1 | aceita |
+
+O deploy só aceita um serviço com 1/1, a imagem da spec igual à da tarefa e o update vazio,
+`completed` ou `rollback_completed`. Para sair de `paused` ou `updating` antes de um deploy
+de correção:
+
+1. `docker service update --force <serviço>` refaz o update da mesma imagem. Serve quando
+   a falha foi passageira. Se ele convergir (`completed`, 1/1), siga para o deploy de
+   correção.
+2. Se a imagem nova não sobe, `docker service rollback <serviço>` volta a spec para a
+   imagem anterior. O serviço pode voltar a 1/1, porque o healthcheck do container é o
+   `/health/live`, que não olha o banco. Mas `/health/ready` segue em 503, porque essa
+   imagem exige a migration de antes do lote. A API já estava fora; o rollback só limpa o
+   estado do Swarm.
+3. Com o serviço em 1/1 e `completed` ou `rollback_completed`, rode o deploy de uma imagem
+   que exige a migration em que o banco está. A guarda decide de novo pela imagem que
+   estiver no serviço: depois do passo 2, ela é a de antes do lote, e o deploy segue sem
+   volta automática (`pause`).
+
+Se a correção não sair a tempo do RTO, o caminho é o restore da seção anterior, com o
+dump do passo 1 do lote, e o passo 7 dela.

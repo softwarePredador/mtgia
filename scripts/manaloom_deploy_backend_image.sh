@@ -264,6 +264,9 @@ PREVIOUS_REQUIRED_MIGRATION=""
 DATABASE_LATEST_MIGRATION=""
 BACKEND_ROLLBACK_POLICY=""
 SWARM_UPDATE_FAILURE_ACTION="pause"
+# 1 depois que o update do Swarm convergiu (imagem nova 1/1, completed): uma falha
+# daqui em diante não deixa o Swarm em paused, e a mensagem de restore diz isso.
+SWARM_UPDATE_CONVERGED=0
 cleanup_release_runtime() {
   local status="${1:-$?}"
   trap - EXIT
@@ -1103,7 +1106,8 @@ rollback_backend_deploy() {
   # restore. Nada vai para o Swarm nem para o EasyPanel.
   if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
     echo "deploy backend falhou" >&2
-    manaloom_backend_restore_path "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION"
+    manaloom_backend_restore_path "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION" \
+      "$SWARM_UPDATE_CONVERGED" "$SOURCE_MUTATED" "$SERVICE" "$PREVIOUS_SPEC_IMAGE"
     return 1
   fi
 
@@ -1411,7 +1415,7 @@ SWARM_UPDATE_FAILURE_ACTION="$(
   manaloom_swarm_update_failure_action "$BACKEND_ROLLBACK_POLICY"
 )"
 if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
-  echo "aviso: sem volta automatica do backend: a imagem anterior (GIT_SHA ${PREVIOUS_GIT_SHA:-ausente}) exige a migration ${PREVIOUS_REQUIRED_MIGRATION:-desconhecida} e o banco esta na ${DATABASE_LATEST_MIGRATION:-desconhecida}; se o update falhar, o Swarm pausa e o caminho e restore" >&2
+  echo "aviso: sem volta automatica do backend: a imagem anterior (GIT_SHA ${PREVIOUS_GIT_SHA:-ausente}) exige a migration ${PREVIOUS_REQUIRED_MIGRATION:-desconhecida} e o banco esta na ${DATABASE_LATEST_MIGRATION:-desconhecida}; se o update do Swarm falhar, ele pausa (paused); se uma conferencia depois dele falhar, a imagem nova fica no ar; nos dois casos o caminho e um deploy de correcao ou o restore (docs/runbooks/BACKUP_E_RESTAURACAO.md)" >&2
 fi
 # <<< guarda do rollback automatico
 
@@ -1544,6 +1548,7 @@ docker service inspect '$SERVICE' --format 'image={{.Spec.TaskTemplate.Container
 docker service ps '$SERVICE' --no-trunc
 exit 1
 REMOTE
+SWARM_UPDATE_CONVERGED=1
 
 spec_allowed_origins_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |

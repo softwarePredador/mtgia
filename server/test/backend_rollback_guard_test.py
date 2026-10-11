@@ -11,12 +11,18 @@ sob o /bin/bash de verdade:
 - a biblioteca `scripts/lib/manaloom_backend_rollback_guard.sh`: a migration que a
   imagem de um commit exige (as duas formas do readiness têm de concordar), a
   política (`rollback` só com a mesma migration do banco) e a ação do Swarm;
-- o bloco da guarda do deploy, recortado do script e rodado com `ssh` e o wrapper
-  do PostgreSQL falsos: com a imagem anterior na 058 e o banco na 077, o Swarm
-  pausa; com a mesma migration, volta;
+- o bloco da guarda do deploy, recortado do script e rodado com `ssh` falso e um
+  wrapper do PostgreSQL que roda a consulta de verdade num `schema_migrations` em
+  SQLite: o lado do banco é o MAX(version) do ledger (trocar a consulta por um valor
+  fixo derruba o teste); com a imagem anterior na 058 e o banco na 077, o Swarm pausa;
+  com a mesma migration, volta;
 - o trap `rollback_backend_deploy`, recortado do script e rodado com `ssh`,
   `trpc_post` e `curl` falsos: com a política `restore` (ou sem política) ele
-  recusa sem chamar nada e imprime o caminho de restore; com `rollback`, volta.
+  recusa sem chamar nada e imprime o caminho de restore com o estado verdadeiro do
+  Swarm (paused quando o update não convergiu; completed, sem pausa, quando a falha
+  veio depois) e como sair dele antes de um deploy de correção; com `rollback`, volta;
+- o runbook `docs/runbooks/BACKUP_E_RESTAURACAO.md` tem os dois caminhos que a
+  mensagem cita.
 """
 
 from __future__ import annotations
@@ -26,6 +32,7 @@ import re
 import shutil
 import stat
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -38,6 +45,32 @@ READINESS = "server/lib/health_readiness_support.dart"
 BASH = "/bin/bash"
 GUARD_START = "# >>> guarda do rollback automatico"
 GUARD_END = "# <<< guarda do rollback automatico"
+# O wrapper do PostgreSQL falso: roda a consulta do deploy (psql -c) num
+# public.schema_migrations em SQLite com as versões de FAKE_DB_VERSIONS (na ordem dada).
+FAKE_WRAPPER = f"""#!{sys.executable} -I
+import os
+import sqlite3
+import sys
+
+arguments = sys.argv[1:]
+if arguments[:2] != ["--read-only", "psql"] or "-c" not in arguments:
+    sys.exit(9)
+database = sqlite3.connect(":memory:")
+database.execute("ATTACH DATABASE ':memory:' AS public")
+database.execute("CREATE TABLE public.schema_migrations (version TEXT PRIMARY KEY, name TEXT)")
+for version in filter(None, os.environ.get("FAKE_DB_VERSIONS", "").split(",")):
+    database.execute("INSERT INTO public.schema_migrations VALUES (?, ?)", (version, "m" + version))
+for row in database.execute(arguments[arguments.index("-c") + 1]):
+    print("|".join("" if value is None else str(value) for value in row))
+"""
+
+
+def _ledger(latest: str) -> str:
+    """As versões de um ledger da 001 até [latest], fora de ordem (vazio sem latest)."""
+    if not latest:
+        return ""
+    versions = [f"{number:03d}" for number in range(1, int(latest) + 1)]
+    return ",".join(versions[-2:] + versions[:-2])
 
 
 def _readiness(sql: str, declared: str) -> str:
@@ -81,11 +114,10 @@ class _Repo:
         (self.root / READINESS).unlink()
         _git(self.root, "commit", "-q", "-a", "-m", "sem_arquivo")
         self.commits["sem_arquivo"] = _git(self.root, "rev-parse", "HEAD")
-        # O wrapper do PostgreSQL falso: devolve o MAX(version) que o teste manda.
+        # O wrapper do PostgreSQL falso: roda a consulta num ledger em SQLite.
         wrapper = self.root / "server" / "bin" / "with_new_server_pg.sh"
         wrapper.parent.mkdir(parents=True, exist_ok=True)
-        wrapper.write_text('#!/bin/bash\n[[ "$1" == "--read-only" ]] || exit 9\n'
-                           'printf "%s\\n" "$FAKE_DB_LATEST"\n', encoding="utf-8")
+        wrapper.write_text(FAKE_WRAPPER, encoding="utf-8")
         wrapper.chmod(wrapper.stat().st_mode | stat.S_IXUSR)
 
     def close(self) -> None:
@@ -181,7 +213,21 @@ class LibraryTest(unittest.TestCase):
         self.assertIn("rollback automatico do backend recusado", result.stderr)
         self.assertIn("exige a migration 058; o banco esta na 077", result.stderr)
         self.assertIn("docs/runbooks/BACKUP_E_RESTAURACAO.md", result.stderr)
-        self.assertIn("Restauração da produção (RTO de 4 h)", RUNBOOK.read_text(encoding="utf-8"))
+        # Sem saber onde o deploy parou, a mensagem não afirma que o Swarm pausou.
+        self.assertIn("estado do Swarm: desconhecido nesta saida", result.stderr)
+        self.assertNotIn("Swarm para o update em paused", result.stderr)
+        runbook = RUNBOOK.read_text(encoding="utf-8")
+        self.assertIn("## Restauração da produção (RTO de 4 h)", runbook)
+        self.assertIn("## Deploy do backend que falhou depois do lote", runbook)
+        # O passo 7 volta o backend para a imagem que aceita o dump, só depois do banco, e
+        # a seção nova diz como sair do paused antes de um deploy de correção.
+        step7 = runbook[runbook.index("\n7. "):runbook.index("\n8. ")]
+        self.assertIn("só com o banco já restaurado", step7)
+        self.assertIn("docker service rollback <serviço>", step7)
+        section = runbook[runbook.index("## Deploy do backend que falhou depois do lote"):]
+        for text in ("`paused`", "docker service update --force <serviço>",
+                     "docker service rollback <serviço>", "baseline backend nao e rollback-safe"):
+            self.assertIn(text, section)
 
 
 class DeployGuardBlockTest(unittest.TestCase):
@@ -196,7 +242,8 @@ class DeployGuardBlockTest(unittest.TestCase):
     def tearDownClass(cls) -> None:
         cls.repo.close()
 
-    def run_block(self, git_sha: str, database: str, ssh_fails: bool = False):
+    def run_block(self, git_sha: str, database: str, ssh_fails: bool = False,
+                  versions: str | None = None):
         script = (
             'set -euo pipefail\n'
             'source "$LIB"\n'
@@ -209,7 +256,8 @@ class DeployGuardBlockTest(unittest.TestCase):
         return _bash(script, env={
             "LIB": str(LIB), "ROOT_DIR": str(self.repo.root), "SSH_KEY": "/dev/null",
             "SSH_HOST": "deploy@example.invalid", "SERVICE": "manaloom_api",
-            "FAKE_GIT_SHA": git_sha, "FAKE_DB_LATEST": database,
+            "FAKE_GIT_SHA": git_sha,
+            "FAKE_DB_VERSIONS": _ledger(database) if versions is None else versions,
             "FAKE_SSH_FAILS": "1" if ssh_fails else "0",
         })
 
@@ -226,6 +274,20 @@ class DeployGuardBlockTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout, f"{sha}|077|077|rollback|rollback")
         self.assertNotIn("sem volta automatica", result.stderr)
+
+    def test_the_database_side_is_the_max_version_of_the_ledger(self) -> None:
+        # A consulta de verdade do deploy num ledger em SQLite: o lado do banco é o
+        # MAX(version), não a primeira nem a última linha, e um ledger vazio não é migration.
+        sha = self.repo.commits["058"]
+        for label, versions, latest, policy in (
+            ("banco na 058", "057,058,056", "058", "rollback"),
+            ("banco na 077", "058,077,059", "077", "restore"),
+            ("ledger vazio", "", "", "restore"),
+        ):
+            with self.subTest(caso=label):
+                result = self.run_block(sha, "", versions=versions)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout.split("|")[2:4], [latest, policy], result.stdout)
 
     def test_unknown_previous_image_pauses(self) -> None:
         for label, sha, ssh_fails in (
@@ -247,7 +309,8 @@ class RollbackTrapTest(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.function = _deploy_section("rollback_backend_deploy() {", r"^}\n")
 
-    def run_trap(self, policy: str | None) -> tuple[subprocess.CompletedProcess, list[str]]:
+    def run_trap(self, policy: str | None, converged: str = "0", source_mutated: str = "0"
+                 ) -> tuple[subprocess.CompletedProcess, list[str]]:
         with tempfile.TemporaryDirectory() as folder:
             calls = Path(folder) / "chamadas"
             calls.touch()
@@ -262,7 +325,8 @@ class RollbackTrapTest(unittest.TestCase):
                 + (f'BACKEND_ROLLBACK_POLICY={policy}\n' if policy is not None
                    else 'BACKEND_ROLLBACK_POLICY=""\n')
                 + 'PREVIOUS_REQUIRED_MIGRATION=058\nDATABASE_LATEST_MIGRATION=077\n'
-                'SOURCE_MUTATED=0\nROLLBACK_SOURCE_IMAGE=registry/api@sha256:aa\n'
+                f'SWARM_UPDATE_CONVERGED={converged}\nSOURCE_MUTATED={source_mutated}\n'
+                'ROLLBACK_SOURCE_IMAGE=registry/api@sha256:aa\n'
                 'PREVIOUS_SPEC_IMAGE=registry/api@sha256:aa\nSERVICE=manaloom_api\n'
                 'SSH_KEY=/dev/null\nSSH_HOST=deploy@example.invalid\n'
                 'API_BASE_URL=http://api.example.invalid\n'
@@ -283,6 +347,42 @@ class RollbackTrapTest(unittest.TestCase):
                 self.assertIn("rollback automatico do backend recusado", result.stderr)
                 self.assertIn("docs/runbooks/BACKUP_E_RESTAURACAO.md", result.stderr)
                 self.assertNotIn("restaurando spec e origem anteriores", result.stderr)
+
+    def test_the_refusal_tells_the_true_swarm_state_and_the_way_out(self) -> None:
+        # O update não convergiu: o Swarm está em paused (ou updating), o deploy seguinte
+        # recusa, e a mensagem diz como sair antes de um deploy de correção.
+        result, calls = self.run_trap("restore", converged="0")
+        self.assertEqual((result.returncode, calls), (1, []))
+        for text in ("o update nao convergiu", "Swarm para o update em paused",
+                     "O proximo deploy recusa esse servico",
+                     "docker service inspect 'manaloom_api'",
+                     "docker service update --force 'manaloom_api'",
+                     "docker service rollback 'manaloom_api' volta a spec para "
+                     "registry/api@sha256:aa", "/health/ready segue 503",
+                     "rode o deploy de uma imagem que exige a migration 077",
+                     "Deploy do backend que falhou depois do lote",
+                     "Restauracao da producao (RTO de 4 h)"):
+            self.assertIn(text, result.stderr)
+        self.assertNotIn("o update terminou (completed)", result.stderr)
+        self.assertNotIn("a origem no EasyPanel ja aponta", result.stderr)
+        # A falha veio depois do update que convergiu: nada pausou, a imagem nova roda e
+        # o deploy seguinte aceita o serviço.
+        result, calls = self.run_trap("restore", converged="1", source_mutated="1")
+        self.assertEqual((result.returncode, calls), (1, []))
+        self.assertIn("o update terminou (completed) e a imagem nova esta rodando",
+                      result.stderr)
+        self.assertIn("O Swarm nao pausou nada", result.stderr)
+        self.assertIn("a origem no EasyPanel ja aponta para a imagem nova", result.stderr)
+        self.assertNotIn("Swarm para o update em paused", result.stderr)
+
+    def test_the_deploy_marks_the_convergence_right_after_the_swarm_update(self) -> None:
+        source = DEPLOY.read_text(encoding="utf-8")
+        update = source.index("docker service update \\\n  --update-order stop-first")
+        heredoc_end = source.index("\nREMOTE\n", update)
+        self.assertTrue(source.startswith("\nREMOTE\nSWARM_UPDATE_CONVERGED=1\n", heredoc_end),
+                        source[heredoc_end:heredoc_end + 40])
+        self.assertEqual(source.count("SWARM_UPDATE_CONVERGED=1"), 1)
+        self.assertLess(source.index("SWARM_UPDATE_CONVERGED=0"), update)
 
     def test_rollback_policy_still_restores_the_previous_image(self) -> None:
         result, calls = self.run_trap("rollback")
