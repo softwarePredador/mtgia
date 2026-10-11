@@ -104,10 +104,35 @@ void main() {
       ]) {
         expect(ops, contains(marker), reason: marker);
       }
+      // S-01: the job list comes from the daemon of the same SHA, never from
+      // a copy in the deploy.
+      expect(
+        ops,
+        contains(r'manaloom_load_ops_enabled_jobs_from_git "$ROOT_DIR" "$sha"'),
+      );
+      expect(
+        ops,
+        contains(r"assert data['enabled_jobs']==$OPS_ENABLED_JOBS_PYTHON"),
+      );
       expect(
         ops,
         contains(
-          "['manaloom_ai_runtime_cleanup', 'manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']",
+          r"assert [row['name'] for row in jobs]==$OPS_ENABLED_JOBS_PYTHON",
+        ),
+      );
+      expect(ops, isNot(contains("==['manaloom_")));
+      // S-07: the runtime policy must turn on exactly the set the contract
+      // accepted (none by default, the cohort matrix only when asked for).
+      expect(
+        ops,
+        contains(
+          r'readonly OPS_CAPABILITIES_ON_PYTHON="$MANALOOM_RELEASE_CAPABILITIES_ON_PYTHON"',
+        ),
+      );
+      expect(
+        ops,
+        contains(
+          r"if row['release_capability']=='on')==$OPS_CAPABILITIES_ON_PYTHON;",
         ),
       );
       expect(ops, isNot(contains('sync_pg_target_deck_to_hermes.py')));

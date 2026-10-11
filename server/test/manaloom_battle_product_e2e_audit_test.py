@@ -177,7 +177,15 @@ class ManaLoomBattleProductE2EAuditTest(unittest.TestCase):
         self.assertIn("MANALOOM_NATIVE_BATTLE_SYNC_ON_BOOT=0", ops_deploy)
         self.assertIn("MANALOOM_BATTLE_RULES_APPLY_PG=0", ops_deploy)
         self.assertIn("disabled_by_release_capability", ops_deploy)
-        self.assertIn("['manaloom_ai_runtime_cleanup', 'manaloom_account_deletion_outbox', 'manaloom_catalog_reference_refresh', 'hermes_cron_governor_report']", ops_deploy)
+        # S-01: the deploy reads the job list from the daemon of the same SHA.
+        self.assertIn(
+            'manaloom_load_ops_enabled_jobs_from_git "$ROOT_DIR" "$sha"',
+            ops_deploy,
+        )
+        self.assertIn(
+            "assert data['enabled_jobs']==$OPS_ENABLED_JOBS_PYTHON", ops_deploy
+        )
+        self.assertNotIn("==['manaloom_", ops_deploy)
         self.assertNotIn("sync_pg_target_deck_to_hermes.py", ops_deploy)
         self.assertNotIn("battle_target_deck_identity_guard.py", ops_deploy)
         self.assertNotIn("--protected-pg-deck-id", ops_deploy)
