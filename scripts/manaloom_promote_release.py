@@ -18,13 +18,27 @@ começa outra promoção.
 As leituras chegam já redigidas (`manaloom_capacity_resources.py redact-*`):
 nenhum valor de env entra no diário, só nomes e impressões digitais.
 
+Banco migrado (S-02): o readiness do backend (`/health/ready`) exige que o
+MAX(version) de `schema_migrations` seja exatamente a última migration que a
+imagem conhece (`latest_migration_ready` em `server/lib/health_readiness_support.dart`
+do SHA da imagem). Uma imagem que exige outra migration que não a do banco nunca
+fica pronta: 41bab49c9 exige a 058, e depois da 059 ela responde 503. O
+`schema-guard` lê o ledger do banco (snapshot de no máximo 30 minutos, com o nome
+do banco e o system_identifier do cluster) e a exigência do candidato e da imagem
+de base; a volta do backend para uma imagem assim é recusada, inclusive na
+compensação automática. Depois da 059, rollback é restore
+(docs/runbooks/BACKUP_E_RESTAURACAO.md) ou correção para frente. No --resolve, o
+`resolve-baseline` marca o backend na base que não fica pronta.
+
 Subcomandos:
   validate-config [--config C]
   plan [--config C] [--surfaces a,b]            linhas id, serviço, deploy e sonda
   view --surface ID --inspect I --easypanel E --running R --marker M
   baseline-check --surface ID --view V
   check-deployed --surface ID --baseline V0 --view V --result R --sha SHA --release-mode M
-  compensation-decision --surface ID --baseline V0 --view V
+  schema-guard --snapshot S --candidate-readiness F --baseline-sha SHA --baseline-readiness F
+  resolve-baseline --begin-schema G [--snapshot S]   a base do backend fica pronta?
+  compensation-decision --surface ID --baseline V0 --view V [--schema-guard G]
   check-restored --surface ID --baseline V0 --view V
   check-converged --surface ID --committed C --view V
   journal-append --journal J --event E [--data-file F]
@@ -62,6 +76,18 @@ DIGEST_IMAGE = re.compile(r"@sha256:[0-9a-f]{64}$")
 GIT_SHA = re.compile(r"^[0-9a-f]{40}$")
 SURFACE_ID = re.compile(r"^[a-z][a-z0-9_]*$")
 END_STATUSES = {"committed", "rolled_back", "rollback_failed", "blocked"}
+# S-02: a exigência de schema de uma imagem e o ledger do banco.
+READINESS_SOURCE = "server/lib/health_readiness_support.dart"
+RESTORE_RUNBOOK = "docs/runbooks/BACKUP_E_RESTAURACAO.md"
+SCHEMA_LEDGER_KIND = "manaloom-schema-ledger"
+SCHEMA_SNAPSHOT_MAX_AGE = dt.timedelta(minutes=30)
+SCHEMA_SNAPSHOT_MAX_SKEW = dt.timedelta(minutes=5)
+MIGRATION_VERSION = re.compile(r"^[0-9]{3}$")
+# O banco de uma leitura do ledger: current_database() e o system_identifier do cluster.
+DATABASE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,62}$")
+SYSTEM_IDENTIFIER = re.compile(r"^[0-9]{1,20}$")
+READINESS_SQL_LATEST = re.compile(r"=\s*'([0-9]{3})'\s+AS\s+latest_migration_ready\b")
+READINESS_DECLARED_LATEST = re.compile(r"'latest_migration'\s*:\s*'([0-9]{3})'")
 EVENTS = {
     "begin", "surface_started", "surface_committed", "surface_failed",
     "compensation_started", "surface_restored", "surface_restore_failed",
@@ -102,6 +128,30 @@ def _now() -> str:
 # ------------------------------------------------------------ configuração
 
 
+def schema_guard_problems(surface_id: str, guard: Any) -> list[str]:
+    """O backend declara de onde vem a exigência de schema da imagem (S-02)."""
+    label = f"surfaces.{surface_id}.schema_guard"
+    if guard is None:
+        # Só o backend fala com o banco; sem a guarda, a compensação o voltaria às cegas.
+        return [f"{label} ausente: a volta do backend depende do schema"] if (
+            surface_id == "backend") else []
+    if surface_id != "backend":
+        return [f"{label}: só o backend tem guarda de schema"]
+    if not isinstance(guard, dict):
+        return [f"{label} inválido"]
+    problems = []
+    if guard.get("readiness_source") != READINESS_SOURCE:
+        problems.append(f"{label}.readiness_source deve ser {READINESS_SOURCE}")
+    if guard.get("restore_runbook") != RESTORE_RUNBOOK:
+        problems.append(f"{label}.restore_runbook deve ser {RESTORE_RUNBOOK}")
+    if guard.get("snapshot_max_age_minutes") != int(SCHEMA_SNAPSHOT_MAX_AGE.total_seconds() // 60):
+        problems.append(f"{label}.snapshot_max_age_minutes deve ser "
+                        f"{int(SCHEMA_SNAPSHOT_MAX_AGE.total_seconds() // 60)}")
+    if not isinstance(guard.get("rationale"), str) or "restore" not in guard["rationale"]:
+        problems.append(f"{label}.rationale deve dizer que a volta é restore")
+    return problems
+
+
 def config_problems(config: dict[str, Any], repo_root: Path = REPO_ROOT) -> list[str]:
     problems: list[str] = []
     if config.get("schema_version") != 1 or config.get("policy") != "brewtact-release-promotion":
@@ -120,6 +170,10 @@ def config_problems(config: dict[str, Any], repo_root: Path = REPO_ROOT) -> list
     transaction = config.get("transaction")
     if not isinstance(transaction, dict) or transaction.get("all_or_nothing") is not True:
         problems.append("transaction.all_or_nothing deve ser true")
+    elif not (isinstance(transaction.get("after_migration_rollback"), str)
+              and "restore" in transaction["after_migration_rollback"]):
+        problems.append("transaction.after_migration_rollback deve dizer que, com o banco "
+                        "migrado, a volta é restore")
     surfaces = config.get("surfaces")
     if not isinstance(surfaces, list) or not surfaces:
         return problems + ["surfaces vazio"]
@@ -189,6 +243,7 @@ def config_problems(config: dict[str, Any], repo_root: Path = REPO_ROOT) -> list
                     problems.append(f"{label}.probe.field ausente")
         if not isinstance(surface.get("rationale"), str) or not surface["rationale"].strip():
             problems.append(f"{label}.rationale ausente")
+        problems += schema_guard_problems(surface_id, surface.get("schema_guard"))
         problems += identity.identity_problems(surface_id, surface.get("identity"))
     gate_config = config.get("identity_gate")
     if not isinstance(gate_config, dict) or gate_config.get("task") != "BT-REL-002":
@@ -231,6 +286,219 @@ def selected_surfaces(config: dict[str, Any], wanted: str | None) -> list[dict[s
         if unknown or len(set(chosen)) != len(chosen) or not chosen:
             raise InvalidInput("superfícies inválidas: " + wanted)
     return [surface_config(config, surface_id) for surface_id in ids if surface_id in chosen]
+
+
+# ------------------------------------------------------------ banco migrado (S-02)
+
+
+def readiness_requirement(text: str | None) -> str | None:
+    """A migration que o readiness de uma imagem exige como a última do banco.
+
+    O `/health/ready` compara o MAX(version) de schema_migrations com uma versão fixa
+    (`... = 'NNN' AS latest_migration_ready`) e devolve 503 com qualquer outra. O mesmo
+    arquivo declara `'latest_migration': 'NNN'` no check. Os dois têm de concordar e
+    aparecer; senão a exigência é desconhecida (None) e quem chama falha fechado.
+    """
+    if not text:
+        return None
+    in_sql = set(READINESS_SQL_LATEST.findall(text))
+    declared = set(READINESS_DECLARED_LATEST.findall(text))
+    if len(in_sql) != 1 or declared != in_sql:
+        return None
+    return next(iter(in_sql))
+
+
+def _parse_utc(value: Any) -> dt.datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return dt.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
+    except ValueError:
+        return None
+
+
+def database_identity(value: Any) -> dict[str, str] | None:
+    """O banco de uma leitura: `current_database()` e o `system_identifier` do cluster.
+
+    O system_identifier nasce no initdb e muda com outro cluster (o do ensaio L-02, um
+    restore num PostgreSQL novo); o nome separa os bancos do mesmo cluster.
+    """
+    if not isinstance(value, dict):
+        return None
+    name, system = value.get("name"), value.get("system_identifier")
+    if not (isinstance(name, str) and DATABASE_NAME.match(name)
+            and isinstance(system, str) and SYSTEM_IDENTIFIER.match(system)):
+        return None
+    return {"name": name, "system_identifier": system}
+
+
+def database_label(database: dict[str, str] | None) -> str:
+    if not database:
+        return "banco desconhecido"
+    return f"{database['name']} do cluster {database['system_identifier']}"
+
+
+def load_schema_snapshot(raw: str, now: dt.datetime) -> dict[str, Any]:
+    """O ledger do banco lido só para leitura (scripts/manaloom_lot_apply_migrations.sh).
+
+    Vale por no máximo 30 minutos, como o snapshot de capacidade: a promoção decide a
+    volta do backend pelo banco de agora, não pelo de ontem. Diz de qual banco veio
+    (`database`), para a promoção conferir que é o mesmo do preflight.
+    """
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as error:
+        raise InvalidInput(f"o ledger do banco não é JSON: {error}") from error
+    if not isinstance(data, dict) or data.get("kind") != SCHEMA_LEDGER_KIND \
+            or data.get("schema_version") != 1:
+        raise InvalidInput(f"o ledger do banco não é um {SCHEMA_LEDGER_KIND} v1")
+    measured = _parse_utc(data.get("measured_at"))
+    if measured is None:
+        raise InvalidInput("o ledger do banco não tem measured_at em UTC")
+    if now - measured > SCHEMA_SNAPSHOT_MAX_AGE:
+        raise InvalidInput(f"o ledger do banco foi lido em {data['measured_at']}, há mais de "
+                           f"{int(SCHEMA_SNAPSHOT_MAX_AGE.total_seconds() // 60)} minutos")
+    if measured - now > SCHEMA_SNAPSHOT_MAX_SKEW:
+        raise InvalidInput(f"o ledger do banco diz ter sido lido no futuro: {data['measured_at']}")
+    versions = data.get("versions")
+    if not (isinstance(versions, list) and versions
+            and all(isinstance(item, str) and MIGRATION_VERSION.match(item) for item in versions)
+            and versions == sorted(set(versions))):
+        raise InvalidInput("o ledger do banco não traz as versões em ordem, sem repetição")
+    if data.get("latest_migration") != versions[-1]:
+        raise InvalidInput("latest_migration do ledger não é o MAX(version) das versões")
+    if database_identity(data.get("database")) is None:
+        raise InvalidInput("o ledger do banco não diz de qual banco veio (database: nome e "
+                           "system_identifier)")
+    return data
+
+
+def schema_guard(
+    snapshot_raw: str | None, candidate_readiness: str | None, baseline_sha: str,
+    baseline_readiness: str | None, now: dt.datetime,
+) -> dict[str, Any]:
+    """Confere o candidato contra o banco e decide se o backend pode voltar à base.
+
+    BLOCKED (o preflight para) quando o ledger falta, está velho ou ilegível, ou quando o
+    candidato exige outra migration que não a do banco. A volta do backend só é
+    `allowed` quando a imagem de base exige exatamente o MAX(version) do banco: o
+    readiness compara por igualdade, então uma base atrás do banco (ou à frente dele)
+    responderia 503 para sempre. Senão é `refused`, e a saída é restore ou correção para
+    frente.
+    """
+    problems: list[str] = []
+    snapshot = None
+    if snapshot_raw is None:
+        problems.append("sem o ledger do banco (--schema-snapshot)")
+    else:
+        try:
+            snapshot = load_schema_snapshot(snapshot_raw, now)
+        except InvalidInput as error:
+            problems.append(str(error))
+    database = snapshot["latest_migration"] if snapshot else None
+    candidate = readiness_requirement(candidate_readiness)
+    baseline = readiness_requirement(baseline_readiness)
+    if candidate is None:
+        problems.append(f"não li qual migration o candidato exige ({READINESS_SOURCE})")
+    elif database is not None and candidate != database:
+        problems.append(
+            f"o candidato exige a migration {candidate} e o banco está na {database}: o "
+            "readiness do backend novo daria 503; rode antes o passo de migrations do lote "
+            "(scripts/manaloom_lot_apply_migrations.sh)")
+    short = baseline_sha[:12] if GIT_SHA.match(baseline_sha or "") else "desconhecida"
+    if database is None:
+        rollback, reason = "refused", "sem o ledger do banco, não sei se a imagem de base fica pronta"
+    elif baseline is None:
+        rollback, reason = "refused", (
+            f"não sei qual migration a imagem de base do backend ({short}) exige")
+    elif baseline != database:
+        rollback, reason = "refused", (
+            f"a imagem de base do backend ({short}) exige a migration {baseline} e o banco está "
+            f"na {database}: voltar deixaria o /health/ready em 503")
+    else:
+        rollback, reason = "allowed", None
+    return {
+        "status": "PASS" if not problems else "BLOCKED",
+        "database": database_identity(snapshot.get("database")) if snapshot else None,
+        "database_latest": database,
+        "measured_at": snapshot.get("measured_at") if snapshot else None,
+        "candidate_requires": candidate,
+        "baseline_sha": baseline_sha if GIT_SHA.match(baseline_sha or "") else None,
+        "baseline_requires": baseline,
+        "backend_rollback": rollback,
+        "rollback_refused_because": reason,
+        "restore_runbook": RESTORE_RUNBOOK,
+        "problems": problems,
+    }
+
+
+def resolve_baseline(
+    begin_schema: Any, snapshot_raw: str | None, now: dt.datetime,
+) -> dict[str, Any]:
+    """No --resolve, com o backend na imagem de base: ela fica pronta com o banco?
+
+    Só fica se exige exatamente o MAX(version) do banco (o readiness compara por
+    igualdade). Sem ledger novo, vale o banco que o preflight leu (o `schema` do begin).
+    Com --schema-snapshot, o ledger tem de ser fresco e do mesmo banco do preflight
+    (nome e system_identifier): o backend na base fala com esse banco, e o ledger de
+    outro (o do ensaio, um cluster novo) não diz nada dele; é BLOCKED. A resposta nunca
+    some no `baseline`: `ready` false vira `baseline_not_ready` no diário.
+    """
+    guard = begin_schema if isinstance(begin_schema, dict) else {}
+    preflight_database = database_identity(guard.get("database"))
+    requires = guard.get("baseline_requires")
+    requires = requires if isinstance(requires, str) and MIGRATION_VERSION.match(requires) else None
+    latest = guard.get("database_latest")
+    latest = latest if isinstance(latest, str) and MIGRATION_VERSION.match(latest) else None
+    measured = guard.get("measured_at") if latest else None
+    source = "preflight"
+    same_database = None
+    problems: list[str] = []
+    if snapshot_raw is not None:
+        try:
+            snapshot = load_schema_snapshot(snapshot_raw, now)
+        except InvalidInput as error:
+            problems.append(str(error))
+        else:
+            current = database_identity(snapshot.get("database"))
+            same_database = preflight_database is not None and current == preflight_database
+            if same_database:
+                latest, measured = snapshot["latest_migration"], snapshot["measured_at"]
+                source = "schema_snapshot"
+            else:
+                problems.append(
+                    f"o ledger é do {database_label(current)}, e o preflight leu o "
+                    f"{database_label(preflight_database)}: não é o banco do backend")
+    sha = guard.get("baseline_sha")
+    short = sha[:12] if isinstance(sha, str) and GIT_SHA.match(sha) else "desconhecida"
+    if problems:
+        ready, reason = None, None
+    elif requires is None:
+        ready, reason = False, (
+            f"não sei qual migration a imagem de base do backend ({short}) exige")
+    elif latest is None:
+        ready, reason = False, "não sei em que migration o banco está"
+    elif requires != latest:
+        ready, reason = False, (
+            f"a imagem de base do backend ({short}) exige a migration {requires} e o banco "
+            f"está na {latest} (lido no {source} em {measured}): o /health/ready dela "
+            f"responde 503; só fica pronta com o banco na {requires}, pelo restore "
+            f"({RESTORE_RUNBOOK})")
+    else:
+        ready, reason = True, None
+    return {
+        "status": "PASS" if not problems else "BLOCKED",
+        "ready": ready,
+        "baseline_sha": sha if isinstance(sha, str) and GIT_SHA.match(sha) else None,
+        "baseline_requires": requires,
+        "database": preflight_database,
+        "database_latest": latest,
+        "measured_at": measured,
+        "source": source,
+        "same_database_as_preflight": same_database,
+        "not_ready_because": reason,
+        "problems": problems,
+    }
 
 
 # ------------------------------------------------------------ leitura de uma superfície
@@ -348,10 +616,26 @@ def check_deployed(
 
 def compensation_decision(
     surface: dict[str, Any], baseline: dict[str, Any], current: dict[str, Any],
+    guard: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Como voltar esta superfície à linha de base, ou por que não dá."""
+    """Como voltar esta superfície à linha de base, ou por que não dá.
+
+    O backend só volta com a guarda de schema do preflight dizendo `allowed` (S-02).
+    Recusado, nada é mandado ao Swarm nem ao EasyPanel, mesmo que ele já esteja na
+    imagem de base: com o banco à frente dela, a base não é um estado são, e a
+    transação termina em rollback_failed, visível, até restore ou correção para frente.
+    """
     reasons: list[str] = []
     base_spec = baseline["spec"]
+    if "schema_guard" in surface and (
+            not isinstance(guard, dict) or guard.get("backend_rollback") != "allowed"):
+        because = (guard or {}).get("rollback_refused_because") if isinstance(guard, dict) else None
+        return {"status": "BLOCKED", "swarm": None, "easypanel": None,
+                "image": base_spec["image"],
+                "reasons": [
+                    f"{surface['id']}: volta recusada: "
+                    f"{because or 'sem a guarda de schema do preflight'}. Com o banco "
+                    f"migrado, a volta é restore ({RESTORE_RUNBOOK}) ou correção para frente"]}
     if current["identity_sha256"] == baseline["identity_sha256"]:
         swarm = "already"
     elif (current["spec"]["previous_spec_sha256"] == base_spec["spec_sha256"]
@@ -630,6 +914,15 @@ def _read(path: Path) -> str:
         raise InvalidInput(f"não li {path}: {error}") from error
 
 
+def _optional_text(path: Path) -> str | None:
+    """Conteúdo de um arquivo, ou None se ele não existe ou está vazio (git show falhou)."""
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return None
+    return text or None
+
+
 def _json(path: Path) -> Any:
     try:
         return json.loads(_read(path))
@@ -681,6 +974,15 @@ def main(argv: list[str] | None = None) -> int:
         command.add_argument("--surface", required=True)
         command.add_argument("--baseline", type=Path, required=True)
         command.add_argument("--view", type=Path, required=True)
+    decision.add_argument("--schema-guard", type=Path)
+    guarded = commands.add_parser("schema-guard")
+    guarded.add_argument("--snapshot", type=Path)
+    guarded.add_argument("--candidate-readiness", type=Path, required=True)
+    guarded.add_argument("--baseline-sha", default="")
+    guarded.add_argument("--baseline-readiness", type=Path, required=True)
+    resolving = commands.add_parser("resolve-baseline")
+    resolving.add_argument("--begin-schema", type=Path, required=True)
+    resolving.add_argument("--snapshot", type=Path)
     converged = commands.add_parser("check-converged")
     converged.add_argument("--surface", required=True)
     converged.add_argument("--committed", type=Path, required=True)
@@ -718,6 +1020,19 @@ def main(argv: list[str] | None = None) -> int:
             state = latest_open(args.dir)
             print(json.dumps(state, ensure_ascii=False))
             return state["exit_code"]
+        if args.command == "schema-guard":
+            result = schema_guard(
+                _optional_text(args.snapshot) if args.snapshot else None,
+                _optional_text(args.candidate_readiness), args.baseline_sha,
+                _optional_text(args.baseline_readiness), dt.datetime.now(dt.timezone.utc))
+            print(json.dumps(result, ensure_ascii=False))
+            return 0 if result["status"] == "PASS" else 3
+        if args.command == "resolve-baseline":
+            result = resolve_baseline(
+                _json(args.begin_schema), _read(args.snapshot) if args.snapshot else None,
+                dt.datetime.now(dt.timezone.utc))
+            print(json.dumps(result, ensure_ascii=False))
+            return 0 if result["status"] == "PASS" else 3
         config = load_config(args.config)
         if args.command == "validate-config":
             print(json.dumps({"status": "valid", "version": config["version"]}))
@@ -767,7 +1082,11 @@ def main(argv: list[str] | None = None) -> int:
             print(json.dumps(result, ensure_ascii=False))
             return 0 if result["status"] == "PASS" else 1
         if args.command == "compensation-decision":
-            result = compensation_decision(surface, _json(args.baseline), _json(args.view))
+            guard = None
+            if args.schema_guard is not None and args.schema_guard.is_file():
+                guard = _json(args.schema_guard)
+            result = compensation_decision(surface, _json(args.baseline), _json(args.view),
+                                           guard)
             print(json.dumps(result, ensure_ascii=False))
             return 0 if result["status"] == "PASS" else 3
         if args.command == "check-restored":
