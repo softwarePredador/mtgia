@@ -36,12 +36,26 @@
   (`keep`):
   - o dump mais novo com ensaio aprovado;
   - o dump mais novo de todos.
-- **O check não apaga nada.** Apagar dump pede o sim do dono na hora, até a rotação ser
-  automatizada:
-  1. mostrar ao dono a lista `expired`;
-  2. ele confirma;
-  3. apagar só esses arquivos;
-  4. registrar no receipt do ciclo.
+- **O check não apaga nada.**
+- **A rotação é automática (2026-10-10):** cada `scripts/manaloom_backup_cycle.sh --execute`,
+  depois do receipt do backup novo, roda
+  `python3 scripts/manaloom_backup_cadence.py rotate --backup-dir <dir> --apply` e grava
+  `<dir>/rotations/<carimbo>.json`. Roda com a cadência cumprida ou não; se o backup ou o ensaio
+  falharem, o ciclo para antes e nada é apagado.
+- **O que a rotação apaga:** só o padrão governado:
+  - arquivo comum, nunca link, na raiz do diretório (não desce em `receipts/`, `drills/`,
+    `rotations/` nem em outra pasta);
+  - nome `manaloom-postgres-AAAAMMDDTHHMMSSZ.dump`, exatamente;
+  - carimbo do nome com mais de 30 dias (`retention_days`); 30 dias exatos ficam;
+  - fora do `keep`.
+
+  Um dump parcial, menor que 1 KiB, também sai quando vence, porque pode ter dado de conta.
+- **Sem `--apply`, a rotação só lista** (`status: dry_run`). Rodar à mão fora do ciclo é para
+  conferir antes; apagar à mão continua pedindo o sim do dono.
+- **Consumidor `backups` da exclusão de conta (BT-PRIV-002):** segue bloqueado até o ciclo rodar
+  agendado de fato. A D-84 manda fechar pelo tempo (30 dias mais 1) quando a rotação estiver
+  automatizada. Atenção: o `keep` guarda o dump mais novo com ensaio aprovado mesmo vencido.
+  Fechar pelo tempo só é verdade se houver ensaio aprovado a cada 7 dias (D-83).
 
 ## Antes de migration na produção (lote de deploy)
 

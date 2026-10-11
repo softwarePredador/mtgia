@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "policy": "brewtact-backup",
-  "version": "2026-09-28.1",
+  "version": "2026-10-10.1",
   "task": "BT-DR-001",
   "decisions": [
     "D-12",
@@ -27,7 +27,13 @@
     "encryption": "cifra do disco em repouso (FileVault) na máquina de operação",
     "encryption_note": "D-84: a cifra em repouso do MVP é o FileVault do disco da máquina de operação; o age volta quando houver cópia fora da máquina (D-12).",
     "retention_days": 30,
-    "retention_note": "D-84: cada dump fica 30 dias, e o mais novo com ensaio aprovado fica sempre, com o mais novo de todos. Apagar dump pede o sim do dono na hora até a rotação ser automatizada: o check só lista os vencidos."
+    "retention_note": "D-84: cada dump fica 30 dias, e o mais novo com ensaio aprovado fica sempre, com o mais novo de todos. A rotação é automática: cada ciclo (scripts/manaloom_backup_cycle.sh --execute) roda scripts/manaloom_backup_cadence.py rotate --apply, que apaga só os dumps vencidos do padrão governado (arquivo comum, na raiz do diretório, com o nome manaloom-postgres-AAAAMMDDTHHMMSSZ.dump) e grava rotations/<carimbo>.json. Fora do ciclo, o check só lista os vencidos.",
+    "rotation": {
+      "command": "python3 scripts/manaloom_backup_cadence.py rotate --backup-dir <dir> --apply",
+      "runs_in": "scripts/manaloom_backup_cycle.sh --execute, depois do receipt de cada backup novo",
+      "deletes_only": "manaloom-postgres-AAAAMMDDTHHMMSSZ.dump, arquivo comum na raiz do diretório, com carimbo de mais de retention_days dias, fora do keep",
+      "receipt": "backups/manaloom-postgres/rotations/<carimbo>.json"
+    }
   },
   "drill": {
     "script": "scripts/manaloom_full_restore_drill.sh",

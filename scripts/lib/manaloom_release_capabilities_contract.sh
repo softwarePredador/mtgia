@@ -43,15 +43,99 @@ readonly MANALOOM_RELEASE_IMPLEMENTATION_STATUS_VALUES_JSON='[
   "not_implemented"
 ]'
 
+# S-07 / BT-COH-001 (D-104, item 13 do pacote de 2026-10-10): sem pedido, o
+# contrato exige as 29 capabilities off. A unica outra matriz aceita e a da
+# primeira coorte, e so quando MANALOOM_RELEASE_CAPABILITY_MATRIX a nomeia: a
+# politica candidata tem de ligar exatamente estas cinco (on e allowed=true) e
+# deixar as outras off, e a politica versionada da matriz, no mesmo SHA, tem de
+# dizer o mesmo. Qualquer outro nome, ou qualquer outro conjunto, e recusado.
+readonly MANALOOM_RELEASE_COHORT_MATRIX_NAME="cohort-2026-10"
+readonly MANALOOM_RELEASE_COHORT_MATRIX_PATH="server/config/release_capabilities_cohort.json"
+readonly MANALOOM_RELEASE_COHORT_CAPABILITIES_ON_JSON='[
+  "account_registration",
+  "catalog_private",
+  "collection_private",
+  "decks_private",
+  "life_counter_local"
+]'
+
 manaloom_release_capabilities_block() {
   echo "BLOCKED: release capabilities: $1" >&2
   return 2
+}
+
+# Le e valida, no SHA candidato, a politica versionada da matriz nomeada.
+manaloom_require_named_capability_matrix_from_git() {
+  local source_root="$1"
+  local source_sha="$2"
+  local matrix_name="$3"
+  local expected_on_json="$4"
+  local raw_matrix
+
+  if ! raw_matrix="$(
+    git -C "$source_root" show \
+      "$source_sha:$MANALOOM_RELEASE_COHORT_MATRIX_PATH" 2>/dev/null
+  )"; then
+    manaloom_release_capabilities_block \
+      "$MANALOOM_RELEASE_COHORT_MATRIX_PATH ausente no SHA candidato"
+    return 2
+  fi
+  if ! jq -e \
+    --arg matrix_name "$matrix_name" \
+    --argjson expected_on "$expected_on_json" '
+    type == "object" and
+    keys == [
+      "capabilities_on",
+      "decision",
+      "matrix",
+      "note",
+      "offer_mode",
+      "product",
+      "registration_admission",
+      "release_channel",
+      "schema_version"
+    ] and
+    .schema_version == "release_capability_matrix_v1" and
+    .matrix == $matrix_name and
+    .product == "brewtact" and
+    .release_channel == "free_beta" and
+    .offer_mode == "free_beta_no_commerce" and
+    (.decision | type == "string" and length > 0) and
+    (.note | type == "string" and length > 0) and
+    .registration_admission == "invite" and
+    .capabilities_on == $expected_on
+  ' >/dev/null 2>&1 <<<"$raw_matrix"; then
+    manaloom_release_capabilities_block \
+      "$MANALOOM_RELEASE_COHORT_MATRIX_PATH diverge da matriz $matrix_name aprovada"
+    return 2
+  fi
 }
 
 manaloom_load_release_capabilities_from_git() {
   local source_root="$1"
   local source_sha="$2"
   local raw_policy digest policy_json capability_count
+  local matrix_name expected_on_json
+
+  # Sem pedido: as 29 off. Com pedido: so a matriz nomeada aprovada.
+  matrix_name="${MANALOOM_RELEASE_CAPABILITY_MATRIX:-}"
+  case "$matrix_name" in
+    "")
+      matrix_name="all-off"
+      expected_on_json='[]'
+      ;;
+    "$MANALOOM_RELEASE_COHORT_MATRIX_NAME")
+      expected_on_json="$(jq -c . <<<"$MANALOOM_RELEASE_COHORT_CAPABILITIES_ON_JSON")"
+      manaloom_require_named_capability_matrix_from_git \
+        "$source_root" "$source_sha" "$matrix_name" "$expected_on_json" ||
+        return 2
+      ;;
+    *)
+      manaloom_release_capabilities_block \
+        "matriz desconhecida em MANALOOM_RELEASE_CAPABILITY_MATRIX: $matrix_name; so $MANALOOM_RELEASE_COHORT_MATRIX_NAME pode ser pedida"
+      return 2
+      ;;
+  esac
 
   if ! git -C "$source_root" cat-file -e \
       "$source_sha:$MANALOOM_RELEASE_CAPABILITIES_PATH" 2>/dev/null; then
@@ -72,7 +156,8 @@ manaloom_load_release_capabilities_from_git() {
     --argjson expected_capability_keys \
       "$MANALOOM_RELEASE_CAPABILITY_KEYS_JSON" \
     --argjson implementation_status_values \
-      "$MANALOOM_RELEASE_IMPLEMENTATION_STATUS_VALUES_JSON" '
+      "$MANALOOM_RELEASE_IMPLEMENTATION_STATUS_VALUES_JSON" \
+    --argjson expected_on "$expected_on_json" '
     def nonempty_string:
       type == "string" and length > 0;
     def timestamp_or_null:
@@ -111,13 +196,15 @@ manaloom_load_release_capabilities_from_git() {
       ] and
       (.implementation_status as $status |
         $implementation_status_values | index($status) != null) and
-      (.release_capability == "off") and
-      (.allowed == false) and
+      ((.release_capability == "off" and .allowed == false) or
+       (.release_capability == "on" and .allowed == true)) and
       (.live_verified_as_of | timestamp_or_null)
-    )
+    ) and
+    ([.capabilities | to_entries[] |
+      select(.value.release_capability == "on") | .key] | sort) == $expected_on
   ' >/dev/null 2>&1 <<<"$raw_policy"; then
     manaloom_release_capabilities_block \
-      "schema, chave ou valor desconhecido; a Free Beta exige matriz canonical default-deny"
+      "schema, chave ou valor desconhecido; a matriz $matrix_name exige exatamente $(jq -c . <<<"$expected_on_json") on e o resto off (default-deny)"
     return 2
   fi
 
@@ -151,6 +238,20 @@ manaloom_load_release_capabilities_from_git() {
   readonly MANALOOM_RELEASE_CAPABILITIES_DIGEST_SHA256="$digest"
   # shellcheck disable=SC2034
   readonly MANALOOM_RELEASE_CAPABILITIES_COUNT="$capability_count"
+  # S-07: a matriz aceita e o conjunto ligado, em JSON e como literal Python
+  # de aspas simples (o deploy do ops confere o runtime com ele). As chaves ja
+  # passaram por ^[a-z][a-z0-9_]*$.
+  # shellcheck disable=SC2034
+  readonly MANALOOM_RELEASE_CAPABILITY_MATRIX_NAME="$matrix_name"
+  # shellcheck disable=SC2034
+  readonly MANALOOM_RELEASE_CAPABILITIES_ON_JSON="$expected_on_json"
+  local on_python
+  on_python="$(
+    jq -r '"[" + (map("\u0027" + . + "\u0027") | join(", ")) + "]"' \
+      <<<"$expected_on_json"
+  )"
+  # shellcheck disable=SC2034
+  readonly MANALOOM_RELEASE_CAPABILITIES_ON_PYTHON="$on_python"
 }
 
 manaloom_require_exact_release_capabilities() {
