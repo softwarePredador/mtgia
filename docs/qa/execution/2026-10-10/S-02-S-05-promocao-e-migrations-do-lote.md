@@ -6,7 +6,9 @@
   depois dela, rollback é restore.
 - **Executado por:** agente local, frente `promo-guard`, no worktree
   `~/.manaloom/coordenacao/wt/promo`, branch `fix/release-promotion-schema-guard`, a partir do
-  `origin/master` `1f525a1c1`.
+  `origin/master` `1f525a1c1`. A rodada 2 (frentes `promo-fix2` e `promo-fix2b`, os consertos
+  da revisão, abaixo) partiu do merge do `origin/master` `eac4f401b` e foi fechada depois do
+  merge do `8f371030a` (#38).
 - **Limites:**
   - nada tocou a produção: sem SSH, EasyPanel, deploy, `.env` nem banco live;
   - os bancos foram PostgreSQL 17 descartáveis em loopback (`LC_ALL=C`, `127.0.0.1`, sem
@@ -51,8 +53,8 @@ O porquê está na `BT-DB-007` (`docs/qa/execution/2026-09-28/BT-DB-007-gatilhos
 | `scripts/manaloom_lot_apply_migrations.sh` | O passo do lote (modos abaixo) |
 | `scripts/manaloom_lot_migrations.py` | A lógica sem conexão: política, plano contra o código, ledger de antes e de depois, snapshot e receipt |
 | `server/config/lot_migrations.json` (`2026-10-10.1`) | O lote: `from` 058, as 16 migrations de 059 a 069 e de 072 a 076 (a 070 e a 071 não existem) e o `same_lot` da 074 com a 067 e a 069, com o porquê |
-| `server/test/release_promotion_test.py` | 49 testes, 10 novos |
-| `server/test/lot_migrations_step_test.py` | 9 testes, 1 com banco |
+| `server/test/release_promotion_test.py` | 53 testes, 14 novos (4 da rodada 2) |
+| `server/test/lot_migrations_step_test.py` | 14 testes, 1 com banco (5 novos na rodada 2) |
 | `server/test/new_server_pg_caller_mode_contract_test.py` | O script novo entra no inventário dos chamadores do wrapper, com os modos `--write-approved` (uso), `--read-only` (ledger) e `--write-approved` (migrate) |
 | `scripts/manaloom_tbls_local_gate.sh` | O gate de schema roda o teste da S-05 com `RUN_SCHEMA_DB_TESTS=1` |
 | `docs/project_logic_contracts.json` | O script, o módulo e o teste novos no fluxo `release_operations` |
@@ -79,7 +81,8 @@ O porquê está na `BT-DB-007` (`docs/qa/execution/2026-09-28/BT-DB-007-gatilhos
 
 ## Como a promoção decide (S-02)
 
-**Preflight.** Com o backend na transação e o `--schema-snapshot`, ele lê três coisas:
+**Preflight.** Com o backend na transação, ele exige o `--schema-snapshot` (sem ele, sai
+BLOCKED; rodada 2) e lê três coisas:
 
 - a exigência do candidato (o `health_readiness_support.dart` no SHA promovido);
 - a exigência da imagem de base (o mesmo arquivo no `git_sha` que o `/health` da linha de
@@ -93,7 +96,8 @@ O porquê está na `BT-DB-007` (`docs/qa/execution/2026-09-28/BT-DB-007-gatilhos
   rodou: o backend novo daria 503.
 
 **Volta do backend.** Ela é `allowed` só quando a imagem de base exige uma migration conhecida
-e não menor que a do banco. Senão, é `refused`, e o preflight avisa no stderr. Exigência
+e igual à do banco (o readiness compara por igualdade; na rodada 1 a regra era "não menor",
+e a rodada 2 a trocou por `!=`). Senão, é `refused`, e o preflight avisa no stderr. Exigência
 desconhecida conta como recusa: SHA fora do repositório, ou SQL e check que discordam.
 
 **Compensação.** Com a volta recusada, o backend não recebe nada: nem `docker service rollback`,
@@ -119,8 +123,8 @@ recusa a volta e mostra o caminho do restore. O ensaio de restore em si é o do 
 | Modo | O que faz |
 | --- | --- |
 | sem `--execute` | Descreve o lote e confere com o código deste SHA, sem conectar |
-| `--execute --read-ledger --out L` | Lê o ledger pelo `with_new_server_pg.sh --read-only psql` e grava o snapshot que a promoção pede em `--schema-snapshot` (`chmod 600`, vale 30 minutos) |
-| `--execute --apply --receipt-dir D` | Exige `MANALOOM_CONFIRM_LIVE_MUTATIONS` e `MANALOOM_CONFIRM_POSTGRES_WRITES` de quem chama, checkout limpo no `origin/master` e diretório durável. Aplica pelo `with_new_server_pg.sh --write-approved dart run bin/migrate.dart --target <última>`, a partir de `server/` |
+| `--execute --read-ledger --out L` | Lê a identidade do banco e o ledger pelo `with_new_server_pg.sh --read-only psql` e grava o snapshot que a promoção pede em `--schema-snapshot` (`chmod 600`, vale 30 minutos; `L` não pode existir) |
+| `--execute --apply --receipt-dir D --backup-receipt B --upgrade-rehearsal E` | Exige `MANALOOM_CONFIRM_LIVE_MUTATIONS` e `MANALOOM_CONFIRM_POSTGRES_WRITES` de quem chama, checkout limpo no `origin/master`, diretório durável fora do repositório e as provas do L-01 e do L-02. Aplica pelo `with_new_server_pg.sh --write-approved dart run bin/migrate.dart --target <última>`, a partir de `server/` |
 
 **Antes de qualquer escrita, o passo recusa (código 3)** quando há:
 
@@ -129,22 +133,30 @@ recusa a volta e mostra o caminho do restore. O ensaio de restore em si é o do 
 - lote que não termina na última do código;
 - `same_lot` quebrado (sem a 074 com a 067 ou a 069);
 - readiness deste SHA que exige outra migration que não a última do lote;
+- prova do L-01 ou do L-02 que não passou, tem mais de 24 h ou não casa (abaixo);
 - ledger fora do `from`, com lacuna, com versão ou nome de outro código, ou o lote já aplicado.
 
-**Depois de aplicar,** o ledger tem de ser o de antes mais o lote, nem mais nem menos. Senão, o
-código é 1, e o receipt diz onde parou (cada migration é atômica).
+**Depois de aplicar,** o ledger tem de ser o de antes mais o lote, nem mais nem menos, e do mesmo
+banco (nome e `system_identifier`) que o de antes. Senão, o código é 1, e o receipt diz onde
+parou (cada migration é atômica).
 
 **O que fica no diretório:**
 
-- o receipt `lote-migrations-<sha>-<carimbo>.json`, com o ledger de antes e o de depois
-  (versões, contagem e SHA-256), as aplicadas, a saída do migrate e os problemas;
-- o `.log` do `migrate.dart`;
-- o ledger de depois, já no formato do `--schema-snapshot`.
+- o receipt `lote-migrations-<sha>-<carimbo>-<pid>.json`, com as provas, o banco, o ledger de
+  antes e o de depois (versões, contagem e SHA-256), as aplicadas, a saída do migrate e os
+  problemas;
+- o `.log` do `migrate.dart`, de mesmo nome;
+- o ledger de depois (`ledger-<sha>-<carimbo>-<pid>.json`), já no formato do `--schema-snapshot`.
+
+Cada arquivo nasce com `O_EXCL` e `chmod 600` (o script roda com `umask 077`): um nome que já
+existe é recusado, e nenhuma evidência é sobrescrita.
 
 **Sequência no lote:**
 
-1. L-01 e L-02 (backup e ensaio);
-2. `scripts/manaloom_lot_apply_migrations.sh --execute --apply --receipt-dir D` (L-03);
+1. L-01 e L-02 (backup com ensaio de restauração e ensaio do upgrade, `completo`, com o dump novo);
+2. `scripts/manaloom_lot_apply_migrations.sh --execute --apply --receipt-dir D --backup-receipt
+   <dir do backup>/receipts/<carimbo>.json --upgrade-rehearsal <saída do ensaio>/rehearsal.json`
+   (L-03);
 3. `scripts/manaloom_promote_release.sh --execute --promote ... --schema-snapshot D/ledger-...json`
    (L-06), dentro dos 30 minutos; senão, um `--read-ledger` novo.
 
@@ -213,16 +225,78 @@ testes-alvo):
 | N6 | o checkout sujo é aceito | teste com banco |
 | N7 | sem o laço com o readiness | plano |
 
+## Rodada 2: os consertos da revisão
+
+A revisão independente da rodada 1 apontou sete pontos. Todos entraram neste branch, cada um com
+teste que falha sem ele (as mutações estão abaixo).
+
+| # | Severidade | O que era | O que ficou |
+| --- | --- | --- | --- |
+| 1 | média | Receipt, log e ledger do passo do lote com carimbo de 1 s e `O_TRUNC`/`: >`: duas execuções no mesmo segundo davam o mesmo nome, a segunda truncava a primeira, e o teste com banco ficava intermitente (os passos 3 e 4 gravam um receipt blocked cada um) | Nome com carimbo e PID; todo arquivo de evidência nasce com `O_EXCL` (`_create_private`, subcomandos `receipt`, `snapshot` e `create`); um nome que existe é recusado; o `--out` do `--read-ledger` que já existe é recusado antes de conectar; `umask 077` |
+| 2 | baixa | `--preflight` com o backend e sem `--schema-snapshot` dava PASS com `schema: not_checked` | A guarda roda sempre que o backend está no plano; sem o ledger, sai BLOCKED ("sem o ledger do banco (--schema-snapshot)"). Sem o backend, segue `not_checked` |
+| 3 | baixa | O `--resolve` registrava o backend na imagem de base como `baseline`, mesmo com o banco à frente dela | O `resolve-baseline` decide se a base fica pronta. Se não fica, o estado é `baseline_not_ready`, com `backend_baseline` (exigência, banco, fonte e o porquê) no evento `resolved` e na saída, mais um AVISO |
+| 4 | baixa | O snapshot do ledger não dizia de qual banco veio | A leitura grava `current_database()` e o `system_identifier` do cluster (`pg_control_system()`, na mesma sessão do ledger). A promoção recusa o snapshot sem eles; a guarda leva o banco ao resumo do preflight e ao `begin`. O `--resolve --schema-snapshot` exige o mesmo banco do preflight (outro banco: BLOCKED, o diário segue aberto), e o passo do lote exige o mesmo banco antes e depois |
+| 5 | baixa | O `--apply` não exigia as provas do L-01 e do L-02 | `--backup-receipt` (o receipt `brewtact-backup-cycle` com ensaio `passed` e cadência PASS) e `--upgrade-rehearsal` (o `rehearsal.json` `brewtact-migration-rehearsal`, `completo`, PASS), os dois com no máximo 24 h (o RPO da D-12), arquivo regular, e o ensaio sobre o dump do backup (mesmo SHA-256). Sem as flags, código 2; prova velha, reprovada ou que não casa, BLOCKED (3) com receipt, antes de conectar |
+| 6 | baixa | `--receipt-dir` dentro do repositório era aceito | Recusado nos dois scripts: dentro deste checkout ou de outro worktree do mesmo repositório (mesmo `git-common-dir`) |
+| 7 | info | A volta do backend era recusada só com a base atrás do banco (`<`) | Recusada com a exigência da base diferente do banco (`!=`): o readiness compara por igualdade, e uma base à frente do banco também daria 503 |
+
+Sobre o 4: o `system_identifier` muda com outro cluster (o do ensaio L-02 ou um restore num
+PostgreSQL novo). Por isso o `--resolve` com ledger de outro banco é recusado: o backend na
+imagem de base fala com o banco do preflight, e o ledger de outro não diz nada dele. A leitura
+precisa de `EXECUTE` em `pg_control_system()`, que o PostgreSQL 17 dá a `PUBLIC` (conferido no
+cluster descartável); sem ela, a leitura falha fechada (código 2, nada muda).
+
+**Provas da rodada 2** (no worktree da frente, depois do merge do `origin/master` `8f371030a`):
+
+- `server/test/lot_migrations_step_test.py` sem banco: 13 verdes e o com banco pulado (cerca de
+  5 s); com banco (`RUN_SCHEMA_DB_TESTS=1`, PostgreSQL 17 descartável em loopback), os 14 verdes
+  em 5 execuções seguidas (5/5), dentro da trava da coordenação;
+- `server/test/release_promotion_test.py`: 53 verdes (cerca de 6,5 min);
+- `server/test/new_server_pg_caller_mode_contract_test.py`: 5 verdes (os modos do script do lote
+  não mudaram);
+- `shellcheck -x`, `bash -n` e `scripts/manaloom_errexit_lint.py` limpos nos dois scripts.
+
+**Mutações da rodada 2** (cada uma aplicada numa cópia do worktree, com os testes-alvo rodados,
+desfeita e conferida com `cmp` contra o worktree; as 17 derrubaram os testes-alvo):
+
+| Id | Mutação | Testes que caíram |
+| --- | --- | --- |
+| R1 | `_create_private` volta a `O_TRUNC` | a segunda escrita no mesmo nome nunca trunca (receipt, snapshot e log: 3 falhas) |
+| R2 | o nome volta a só o carimbo (sem PID), com `O_EXCL` | duas execuções no mesmo segundo guardam os dois receipts (a segunda sai com 2: "recuso sobrescrever") |
+| R3 | o nome só com o carimbo e `O_TRUNC` (o estado da rodada 1) | as duas acima |
+| R4 | o preflight volta a exigir o `--schema-snapshot` para rodar a guarda | preflight com o backend sem o ledger |
+| R5 | o `--resolve` não chama o `resolve-baseline` | `--resolve` marca o backend na base atrás do banco |
+| R6 | o `resolve_baseline` aceita ledger de outro banco | lógica do `resolve_baseline` e `--resolve` com ledger de outro banco |
+| R7 | a promoção aceita snapshot sem `database` | `schema_guard` e snapshot aceito pela promoção |
+| R8 | o `check-after` ignora o banco | ledger de depois |
+| R9 | o `--apply` ignora as provas reprovadas | `--apply` sem provas em dia |
+| R10 | a regra do repositório sai do passo do lote | `--receipt-dir` dentro do repositório (lote) |
+| R11 | a regra do repositório sai da promoção | diário dentro do repositório (promoção) |
+| R12 | a guarda volta a `<` | `schema_guard` (base à frente do banco) |
+| R13 | o `--apply` não exige as flags das provas | recusas antes de qualquer conexão |
+| R14 | prova com mais de 24 h aceita | provas do L-01 e do L-02 e `--apply` sem provas em dia |
+| R15 | o L-02 de outro dump aceito | provas do L-01 e do L-02 e `--apply` sem provas em dia |
+| R16 | o `--read-ledger` sem a recusa do `--out` que já existe | recusas antes de qualquer conexão |
+| R17 | a leitura do banco sem a identidade na primeira linha | snapshot aceito pela promoção |
+
 ## O que fica aberto
 
 - **Rodar na produção:** o passo do lote e a promoção, pelo roteiro da coordenação, com a
   palavra do dono.
-- **O rollback próprio de `scripts/manaloom_deploy_backend_image.sh`** (`rollback_backend_deploy`)
-  ainda volta a spec quando o deploy falha depois de mudar. Ele confere o readiness e acusa
-  CRITICAL, mas não recusa antes. Esse arquivo é da frente do banco e não mudou aqui. A
-  promoção já trata o resultado: com a volta recusada, a base não conta como restaurada.
-- **A migration 077 (BT-CAT-01), da frente do banco:** quando entrar no `migrate.dart` e no
-  readiness, o `server/config/lot_migrations.json` precisa listar a 077. Até lá, o plano e o
-  teste com banco recusam, de propósito, o código com uma migration fora do lote.
+- **Riscos fora deste branch** (registrados na rodada 2):
+  - **(a) O deploy do backend volta sozinho.** Em `scripts/manaloom_deploy_backend_image.sh`, o
+    `docker service update --update-failure-action rollback` do Swarm e o trap
+    `rollback_backend_deploy` voltavam o backend para a spec anterior quando o deploy falhava
+    depois de mudar, sem a guarda de schema. Com o banco migrado, essa volta deixa o backend
+    numa imagem que não fica pronta (503). O conserto está no branch do banco
+    (`feat/db-lot-corrections-077`, commit `631849826`, "no automatic backend rollback behind
+    a migrated database"), ainda fora do `master`; este arquivo não mudou aqui. Até esse
+    branch entrar, vale o que a promoção já faz: com a volta recusada, a base não conta como
+    restaurada, e o `--resolve` marca `baseline_not_ready`.
+  - **(b) A migration 077.** O `server/config/lot_migrations.json` deste branch termina na 076.
+    O branch do banco estende o lote com a 077 depois deste merge, junto com o `migrate.dart`
+    e o readiness. Até lá, o plano e o teste com banco recusam, de propósito, o código com uma
+    migration fora do lote; quem fizer o merge do branch do banco tem de estender o arquivo
+    no mesmo PR.
 - **Linhas do backlog** (`BT-REL-001`, `BT-DB-*`): não foram editadas aqui. A coordenação
   registra o avanço.
