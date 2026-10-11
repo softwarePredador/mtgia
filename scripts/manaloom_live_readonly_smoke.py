@@ -14,7 +14,9 @@ Lê do próprio SHA, pelo Git, a política de promoção
   `--expect-allowed` quando dada.
 
 Nunca manda POST, cookie, token ou cabeçalho de autorização, e só aceita URL
-`https://` (ou loopback, para o teste). Não grava nada fora de `--out`.
+`https://` (ou loopback, para o teste) sem usuário nem senha: URL com `@` é
+recusada antes de qualquer pedido, e a mensagem não repete a credencial. Não
+grava nada fora de `--out`.
 
 Uso:
   scripts/manaloom_live_readonly_smoke.py --sha SHA --out DIR
@@ -82,13 +84,22 @@ def _resolve_sha(repo: Path, sha: str) -> str:
     return resolved
 
 
+def _redact(url: str) -> str:
+    """A URL sem usuário e senha, para a mensagem de erro."""
+    parsed = urllib.parse.urlsplit(url)
+    host = parsed.netloc.rpartition("@")[2]
+    return urllib.parse.urlunsplit(parsed._replace(netloc=f"***@{host}"))
+
+
 def _check_url(url: Any) -> str:
     if not isinstance(url, str):
         raise InvalidInput("URL ausente na política de promoção")
     parsed = urllib.parse.urlsplit(url)
+    if "@" in parsed.netloc:
+        raise InvalidInput(
+            f"URL com usuário ou senha (o smoke não leva credencial): {_redact(url)}")
     loopback = parsed.scheme == "http" and parsed.hostname in LOOPBACK_HOSTS
-    if (parsed.scheme != "https" and not loopback) or not parsed.hostname \
-            or parsed.username or parsed.password:
+    if (parsed.scheme != "https" and not loopback) or not parsed.hostname:
         raise InvalidInput(f"URL fora do contrato (só https ou loopback): {url}")
     return url
 

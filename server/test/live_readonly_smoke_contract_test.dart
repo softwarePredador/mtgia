@@ -8,7 +8,8 @@ import 'package:test/test.dart';
 /// identidade, a prontidão e a matriz da produção só com GET, sem credencial,
 /// e roda o portão same-SHA do BT-REL-002 com as fontes HTTP. O teste serve as
 /// superfícies num servidor em loopback e confere o PASS, cada FAIL, a entrada
-/// inválida e que nenhum pedido além de GET sai.
+/// inválida (inclusive usuário e senha na URL, mesmo em loopback) e que nenhum
+/// pedido além de GET sai.
 void main() {
   final root = Directory.current.parent.path;
   final script = File('$root/scripts/manaloom_live_readonly_smoke.py');
@@ -361,4 +362,70 @@ void main() {
     expect(result.stdout, contains('só https ou loopback'));
     expect(requests, isEmpty);
   });
+
+  test(
+    'entrada inválida: usuário ou senha na URL, mesmo em loopback, sem ecoar',
+    () async {
+      final policyFile = File('${dir.path}/release_capabilities.json')
+        ..writeAsBytesSync(policy);
+      const secret = 'segredo-de-teste-123';
+      final loopback = '127.0.0.1:${server.port}';
+      // Os casos em loopback vêm primeiro: se a recusa sumir, o pedido chega
+      // ao servidor do teste e nada sai da máquina.
+      for (final url in [
+        'http://smoke:$secret@$loopback/site/release.json',
+        'http://$secret@$loopback/site/release.json',
+        'http://:$secret@$loopback/site/release.json',
+        'http://@$loopback/site/release.json',
+        'https://smoke:$secret@example.invalid/release.json',
+      ]) {
+        final bad = File('${dir.path}/userinfo.json')..writeAsStringSync(
+          jsonEncode({
+            'surfaces': [
+              {
+                'id': 'site',
+                'identity': {
+                  'sources': [
+                    {
+                      'kind': 'http_json',
+                      'url': url,
+                      'fields': {'git_sha': 'git_sha'},
+                    },
+                  ],
+                },
+              },
+            ],
+          }),
+        );
+        final out = Directory('${dir.path}/userinfo');
+
+        final result = await Process.run(
+          'python3',
+          [
+            script.path,
+            '--sha',
+            sha,
+            '--out',
+            out.path,
+            '--surfaces',
+            'site',
+            '--config-file',
+            bad.path,
+            '--policy-file',
+            policyFile.path,
+            '--timeout',
+            '5',
+          ],
+          environment: {'PYTHONDONTWRITEBYTECODE': '1'},
+        );
+
+        final output = '${result.stdout}${result.stderr}';
+        expect(result.exitCode, 2, reason: '$url: $output');
+        expect(output, contains('usuário ou senha'), reason: url);
+        expect(output, isNot(contains(secret)), reason: url);
+        expect(requests, isEmpty, reason: url);
+        expect(File('${out.path}/summary.json').existsSync(), isFalse);
+      }
+    },
+  );
 }
