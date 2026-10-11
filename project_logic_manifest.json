@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "115eade050905bd6d8d0482d7261fa7049216c72193ad5ed9bbf65470df51b44",
+  "source_digest_sha256": "a898e4e555b6b6fb68e8f38fa855405f109bf99d221db71760dad52e9c25b007",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,9 +80,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 720,
+    "scripts_and_jobs": 721,
     "environment_variables": 738,
-    "tests": 1351,
+    "tests": 1352,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -281648,6 +281648,12 @@
       ]
     },
     {
+      "path": "scripts/manaloom_full_gate_eligibility.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_full_restore_drill.sh",
       "role": "disaster_recovery",
       "mutation_class": "read_only_or_unknown",
@@ -291907,6 +291913,7 @@
     "server/test/flutter_release_sdk_contract_test.dart",
     "server/test/flutter_web_deploy_contract_test.dart",
     "server/test/forge_battle_client_test.dart",
+    "server/test/full_gate_eligibility_contract_test.dart",
     "server/test/functional_card_tags_commander_probe_test.dart",
     "server/test/functional_card_tags_test.dart",
     "server/test/gate_run_receipt_test.py",
@@ -303599,7 +303606,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "115eade050905bd6d8d0482d7261fa7049216c72193ad5ed9bbf65470df51b44"
+    "project_logic_source_digest_sha256": "a898e4e555b6b6fb68e8f38fa855405f109bf99d221db71760dad52e9c25b007"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305859,6 +305866,7 @@
       "scripts/manaloom_external_engine_capability_audit.sh",
       "scripts/manaloom_external_engine_delta_audit.sh",
       "scripts/manaloom_external_engine_delta_weekly.sh",
+      "scripts/manaloom_full_gate_eligibility.py",
       "scripts/manaloom_full_restore_drill.sh",
       "scripts/manaloom_gate_run_receipt.py",
       "scripts/manaloom_generate_release_sbom.py",
@@ -306745,6 +306753,7 @@
       "server/test/flutter_release_sdk_contract_test.dart",
       "server/test/flutter_web_deploy_contract_test.dart",
       "server/test/forge_battle_client_test.dart",
+      "server/test/full_gate_eligibility_contract_test.dart",
       "server/test/functional_card_tags_commander_probe_test.dart",
       "server/test/functional_card_tags_test.dart",
       "server/test/gate_run_receipt_test.py",
