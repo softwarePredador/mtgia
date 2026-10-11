@@ -38,6 +38,9 @@ MODULE_PATH = REPO_ROOT / "scripts" / "manaloom_promote_release.py"
 CONFIG_PATH = REPO_ROOT / "server" / "config" / "release_promotion.json"
 FIXTURE_PATH = REPO_ROOT / "server" / "test" / "fixtures" / "capacity" / (
     "evolution_services_2026-09-23.json")
+MANIFEST_PATH = REPO_ROOT / "project_logic_manifest.json"
+# S-02: de onde vem a exigência de schema de cada imagem (o SHA dela).
+READINESS = "server/lib/health_readiness_support.dart"
 FAKE_HOST_KEY = "SHA256:" + "A" * 43
 SSH_TARGET = "root@evolution-cartinhas.2ta7qx.easypanel.host"
 EASYPANEL_URL = "https://painel.exemplo.invalid"
@@ -454,7 +457,7 @@ def _fixture() -> dict[str, Any]:
     return json.loads(FIXTURE_PATH.read_text(encoding="utf-8"))
 
 
-def initial_plane() -> dict[str, Any]:
+def initial_plane(old_sha: str = OLD_SHA) -> dict[str, Any]:
     fixture = _fixture()
     plane = {
         "swarm": copy.deepcopy(fixture["swarm"]),
@@ -471,10 +474,10 @@ def initial_plane() -> dict[str, Any]:
     for surface in ORDER:
         name = swarm_name(surface)
         spec = plane["swarm"][name]["Spec"]
-        plane["image_sha"][spec["TaskTemplate"]["ContainerSpec"]["Image"]] = OLD_SHA
+        plane["image_sha"][spec["TaskTemplate"]["ContainerSpec"]["Image"]] = old_sha
         if surface in ENV_IN_SPEC:
             # O env que o deploy grava direto na spec (o EasyPanel não o tem).
-            _set_env(spec, "GIT_SHA", OLD_SHA)
+            _set_env(spec, "GIT_SHA", old_sha)
     # O ops sobe direto no Swarm: o EasyPanel não é a origem dele.
     plane["easypanel"]["json"]["services"] = [
         entry for entry in plane["easypanel"]["json"]["services"]
@@ -510,6 +513,46 @@ def _marker(plane: dict[str, Any], surface: str) -> str:
 
 def _view(plane: dict[str, Any], surface: str) -> dict[str, Any]:
     return _redacted_view(surface, plane, _marker(plane, surface))
+
+
+def readiness_declaring(version: str | None) -> str:
+    """O readiness deste código exigindo outra migration (a de uma imagem antiga).
+
+    None tira a exigência do SQL: uma imagem cuja exigência não se lê.
+    """
+    text = (REPO_ROOT / READINESS).read_text(encoding="utf-8")
+    if version is None:
+        return re.sub(r"=\s*'[0-9]{3}'\s+AS\s+latest_migration_ready", "AS sem_exigencia", text)
+    text = re.sub(r"(=\s*')[0-9]{3}('\s+AS\s+latest_migration_ready)",
+                  lambda match: match.group(1) + version + match.group(2), text)
+    return re.sub(r"('latest_migration'\s*:\s*')[0-9]{3}(')",
+                  lambda match: match.group(1) + version + match.group(2), text)
+
+
+def code_latest_migration() -> str:
+    """A última migration deste código (o manifesto gerado do migrate.dart)."""
+    return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))["database"]["latest_migration"]
+
+
+# O banco de produção dos testes, e outro (outro cluster: o do ensaio, um restore novo).
+DATABASE = {"name": "halder", "system_identifier": "7400000000000000001"}
+OTHER_DATABASE = {"name": "halder", "system_identifier": "7400000000000000002"}
+
+
+def ledger_snapshot(latest: str, measured: dt.datetime | None = None, **changes: Any) -> str:
+    """O ledger que scripts/manaloom_lot_apply_migrations.sh --read-ledger grava."""
+    measured = measured or dt.datetime.now(dt.timezone.utc)
+    data = {"kind": "manaloom-schema-ledger", "schema_version": 1,
+            "measured_at": measured.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "database": DATABASE,
+            "latest_migration": latest,
+            "versions": [f"{number:03d}" for number in range(1, int(latest) + 1)],
+            "source": "server/bin/with_new_server_pg.sh --read-only psql"}
+    data.update(changes)
+    return json.dumps(data)
+
+
+ALLOWED = {"backend_rollback": "allowed"}
 
 
 # ------------------------------------------------------------------ política
@@ -554,11 +597,25 @@ class ConfigTest(unittest.TestCase):
             "service repetido": lambda c: c["surfaces"][1].update(service="cartinhas"),
             "identity ausente": lambda c: c["surfaces"][0].pop("identity"),
             "identity_gate deve ser do BT-REL-002": lambda c: c.pop("identity_gate"),
+            "schema_guard ausente": lambda c: c["surfaces"][0].pop("schema_guard"),
+            "só o backend tem guarda de schema": lambda c: c["surfaces"][1].update(
+                schema_guard=dict(c["surfaces"][0]["schema_guard"])),
+            "readiness_source deve ser": lambda c: c["surfaces"][0]["schema_guard"].update(
+                readiness_source="server/lib/outro.dart"),
+            "snapshot_max_age_minutes deve ser": lambda c: c["surfaces"][0][
+                "schema_guard"].update(snapshot_max_age_minutes=600),
+            "a volta é restore": lambda c: c["transaction"].pop("after_migration_rollback"),
         }
         for expected, mutate in cases.items():
             with self.subTest(expected=expected):
                 problems = self._problems(mutate)
                 self.assertTrue(any(expected in problem for problem in problems), problems)
+
+    def test_the_tool_reads_the_readiness_the_module_names(self) -> None:
+        script = SCRIPT.read_text(encoding="utf-8")
+        self.assertIn(f'READINESS_SOURCE="{promote.READINESS_SOURCE}"', script)
+        self.assertEqual(promote.READINESS_SOURCE, READINESS)
+        self.assertEqual(_config()["surfaces"][0]["schema_guard"]["readiness_source"], READINESS)
 
     def test_subset_keeps_the_order(self) -> None:
         config = _config()
@@ -689,9 +746,9 @@ class LogicTest(unittest.TestCase):
         self.assertEqual(len(check["problems"]), 1, check["problems"])
         self.assertIn("a origem do EasyPanel está em", check["problems"][0])
 
-    def _decide(self, surface: str) -> dict[str, Any]:
+    def _decide(self, surface: str, guard: dict[str, Any] | None = ALLOWED) -> dict[str, Any]:
         return promote.compensation_decision(self.surface(surface), self.baseline[surface],
-                                             _view(self.plane, surface))
+                                             _view(self.plane, surface), guard)
 
     def test_compensation_decision_per_surface(self) -> None:
         self.deploy("backend")
@@ -710,6 +767,147 @@ class LogicTest(unittest.TestCase):
         decision = self._decide("backend")
         self.assertEqual(decision["status"], "BLOCKED")
         self.assertTrue(any("não seria exato" in reason for reason in decision["reasons"]))
+
+    # -- S-02: banco migrado
+
+    def test_readiness_requirement_is_the_migration_the_image_demands(self) -> None:
+        latest = code_latest_migration()
+        self.assertEqual(promote.readiness_requirement(readiness_declaring(latest)), latest)
+        self.assertEqual(promote.readiness_requirement(
+            (REPO_ROOT / READINESS).read_text(encoding="utf-8")), latest)
+        # O código de 41bab49c9 (a produção) exige a 058, no SQL e no check.
+        self.assertEqual(promote.readiness_requirement(readiness_declaring("058")), "058")
+        # SQL e check que discordam, exigência ausente ou arquivo vazio: desconhecida.
+        disagreeing = re.sub(r"('latest_migration'\s*:\s*')[0-9]{3}(')",
+                             lambda match: match.group(1) + "057" + match.group(2),
+                             readiness_declaring("058"), count=1)
+        for text in (disagreeing, readiness_declaring(None), "", None):
+            with self.subTest(text=(text or "")[:20]):
+                self.assertIsNone(promote.readiness_requirement(text))
+
+    def test_schema_guard_compares_the_database_with_the_candidate_and_the_baseline(self) -> None:
+        now = dt.datetime(2026, 10, 10, 12, 0, tzinfo=dt.timezone.utc)
+        sha = "4" * 40
+
+        def guard(database: str | None, baseline: str | None, candidate: str = "076",
+                  snapshot: str | None = None) -> dict[str, Any]:
+            raw = snapshot if snapshot is not None else (
+                ledger_snapshot(database, now - dt.timedelta(minutes=5)) if database else None)
+            return promote.schema_guard(raw, readiness_declaring(candidate), sha,
+                                        readiness_declaring(baseline), now)
+
+        same = guard("076", "076")
+        self.assertEqual((same["status"], same["backend_rollback"], same["problems"]),
+                         ("PASS", "allowed", []))
+        # Depois da 059: a base (058) nunca fica pronta com o banco na 076.
+        after = guard("076", "058")
+        self.assertEqual((after["status"], after["backend_rollback"]), ("PASS", "refused"))
+        self.assertIn("(444444444444) exige a migration 058 e o banco está na 076",
+                      after["rollback_refused_because"])
+        self.assertEqual(after["restore_runbook"], "docs/runbooks/BACKUP_E_RESTAURACAO.md")
+        unknown = guard("076", None)
+        self.assertEqual(unknown["backend_rollback"], "refused")
+        self.assertIn("não sei qual migration", unknown["rollback_refused_because"])
+        # A base na migration do banco volta ao estado de antes.
+        self.assertEqual(guard("058", "058", candidate="058")["backend_rollback"], "allowed")
+        # O readiness compara por igualdade: a base à frente do banco (exige a 077 com o
+        # banco na 076) também daria 503, e a volta é recusada.
+        ahead = guard("076", "077")
+        self.assertEqual((ahead["status"], ahead["backend_rollback"]), ("PASS", "refused"))
+        self.assertIn("exige a migration 077 e o banco está na 076",
+                      ahead["rollback_refused_because"])
+        # A guarda diz de qual banco é o ledger (vai para o preflight e para o begin).
+        self.assertEqual(same["database"], DATABASE)
+        # O lote não rodou: o candidato exige a 076 e o banco está na 058.
+        behind = guard("058", "058")
+        self.assertEqual(behind["status"], "BLOCKED")
+        self.assertTrue(any("o candidato exige a migration 076 e o banco está na 058" in problem
+                            for problem in behind["problems"]))
+        missing = guard(None, "076")
+        self.assertEqual((missing["status"], missing["backend_rollback"]), ("BLOCKED", "refused"))
+        cases = {
+            "há mais de 30 minutos": ledger_snapshot("076", now - dt.timedelta(minutes=31)),
+            "no futuro": ledger_snapshot("076", now + dt.timedelta(minutes=6)),
+            "em ordem": ledger_snapshot("076", now, versions=["076", "058"]),
+            "não é o MAX(version)": ledger_snapshot("076", now, latest_migration="058"),
+            "v1": ledger_snapshot("076", now, schema_version=2),
+            "measured_at": ledger_snapshot("076", now, measured_at="ontem"),
+            "não diz de qual banco veio": ledger_snapshot("076", now, database=None),
+            "não diz de qual banco": ledger_snapshot(
+                "076", now, database={"name": "halder", "system_identifier": "x"}),
+        }
+        for expected, raw in cases.items():
+            with self.subTest(snapshot=expected):
+                result = guard("076", "076", snapshot=raw)
+                self.assertEqual(result["status"], "BLOCKED")
+                self.assertEqual(result["backend_rollback"], "refused")
+                self.assertTrue(any(expected in problem for problem in result["problems"]),
+                                result["problems"])
+
+    def test_compensation_refuses_the_backend_without_an_allowed_guard(self) -> None:
+        self.deploy("backend")
+        self.assertEqual(self._decide("backend")["swarm"], "swarm_rollback")
+        refused = {"backend_rollback": "refused",
+                   "rollback_refused_because": "a imagem de base do backend (444444444444) "
+                                               "exige a migration 058 e o banco está na 076"}
+        for guard, expected in ((refused, "exige a migration 058"),
+                                (None, "sem a guarda de schema do preflight"),
+                                ({}, "sem a guarda de schema do preflight")):
+            with self.subTest(guard=guard):
+                decision = self._decide("backend", guard)
+                self.assertEqual((decision["status"], decision["swarm"], decision["easypanel"]),
+                                 ("BLOCKED", None, None))
+                self.assertTrue(any(expected in reason and "restore" in reason
+                                    for reason in decision["reasons"]), decision["reasons"])
+        # A guarda vale para o backend, que fala com o banco; as outras voltam como sempre.
+        self.deploy("ops")
+        self.assertEqual(self._decide("ops", refused)["status"], "PASS")
+        self.assertEqual(self._decide("ops", None)["swarm"], "swarm_rollback")
+        # Mesmo já na imagem de base, o backend recusado não conta como de volta.
+        self.setUp()
+        self.deploy("backend", "fail_self_rollback")
+        self.assertEqual(self._decide("backend")["swarm"], "already")
+        self.assertEqual(self._decide("backend", refused)["status"], "BLOCKED")
+
+    def test_resolve_marks_a_baseline_the_database_left_behind(self) -> None:
+        now = dt.datetime.now(dt.timezone.utc)
+        latest = code_latest_migration()
+        begin = promote.schema_guard(
+            ledger_snapshot(latest, now - dt.timedelta(minutes=40)),
+            readiness_declaring(latest), "4" * 40, readiness_declaring("058"),
+            now - dt.timedelta(minutes=35))
+        self.assertEqual((begin["backend_rollback"], begin["database"]), ("refused", DATABASE))
+        # Sem ledger novo, vale o banco do preflight: a base na 058 não fica pronta.
+        behind = promote.resolve_baseline(begin, None, now)
+        self.assertEqual((behind["status"], behind["ready"], behind["source"]),
+                         ("PASS", False, "preflight"))
+        self.assertIn(f"exige a migration 058 e o banco está na {latest}",
+                      behind["not_ready_because"])
+        self.assertIn("restore", behind["not_ready_because"])
+        # Um ledger novo do mesmo banco, que voltou à 058 (o restore): a base fica pronta.
+        restored = promote.resolve_baseline(begin, ledger_snapshot("058", now), now)
+        self.assertEqual((restored["status"], restored["ready"], restored["source"],
+                          restored["same_database_as_preflight"]),
+                         ("PASS", True, "schema_snapshot", True))
+        still = promote.resolve_baseline(begin, ledger_snapshot(latest, now), now)
+        self.assertEqual((still["status"], still["ready"]), ("PASS", False))
+        # Um ledger de outro banco não diz nada do backend: BLOCKED, sem decidir.
+        other = promote.resolve_baseline(
+            begin, ledger_snapshot("058", now, database=OTHER_DATABASE), now)
+        self.assertEqual((other["status"], other["ready"], other["same_database_as_preflight"]),
+                         ("BLOCKED", None, False))
+        self.assertTrue(any("o ledger é do halder do cluster 7400000000000000002" in problem
+                            for problem in other["problems"]), other["problems"])
+        stale = promote.resolve_baseline(
+            begin, ledger_snapshot("058", now - dt.timedelta(minutes=31)), now)
+        self.assertEqual(stale["status"], "BLOCKED")
+        # Sem guarda no begin (exigência ou banco desconhecidos): nunca conta como pronta.
+        for schema in ("not_checked", {}, dict(begin, baseline_requires=None)):
+            with self.subTest(schema=str(schema)[:30]):
+                unknown = promote.resolve_baseline(schema, None, now)
+                self.assertEqual((unknown["status"], unknown["ready"]), ("PASS", False))
+        same = promote.resolve_baseline(dict(begin, baseline_requires=latest), None, now)
+        self.assertEqual(same["ready"], True)
 
     def test_restore_is_proven_exact_or_by_identity(self) -> None:
         self.deploy("backend")
@@ -865,19 +1063,27 @@ class ToolTest(unittest.TestCase):
         "server/config/release_promotion.json",
         "server/config/release_capabilities.json",
         "server/config/capacity_policy.json",
+        READINESS,
         "docs/qa/execution/2026-09-23/host-xmage-e-reinicio.md",
     )
 
     def setUp(self) -> None:
+        self.build()
+
+    def build(self, baseline_requires: str | None = "") -> None:
+        """Monta o repositório descartável, o plano falso e os snapshots.
+
+        A imagem de base de cada superfície é a do commit "linha de base", cujo readiness
+        exige `baseline_requires` ("" é a mesma do candidato; None, uma exigência que não
+        se lê). O candidato é o commit seguinte, no origin/master, com o readiness deste
+        código. O ledger do banco fica na migration que o candidato exige.
+        """
         self.tmp = Path(tempfile.mkdtemp(prefix="bt-rel-001-"))
         base = Path.home() / ".cache" / "manaloom-release-promotion-test"
         base.mkdir(parents=True, exist_ok=True)
         self.receipts = Path(tempfile.mkdtemp(prefix="receipts-", dir=base))
         self.state = self.tmp / "plane"
         self.state.mkdir()
-        plane = initial_plane()
-        plane["watch_dir"] = str(self.tmp)
-        save_plane(self.state, plane)
         self.repo = self.tmp / "repo"
         for relative in self.FILES:
             target = self.repo / relative
@@ -889,7 +1095,15 @@ class ToolTest(unittest.TestCase):
                             f'{surface} "{self.state}"\n', encoding="utf-8")
             stub.chmod(0o755)
         (self.repo / ".gitignore").write_text("__pycache__/\n", encoding="utf-8")
-        self.sha = self._commit_and_push()
+        self.sha = self._commit_and_push(
+            readiness_declaring(code_latest_migration() if baseline_requires == ""
+                                else baseline_requires))
+        plane = initial_plane(self.old_sha)
+        plane["watch_dir"] = str(self.tmp)
+        save_plane(self.state, plane)
+        self.schema_snapshot = self.tmp / "ledger.json"
+        self.schema_snapshot.write_text(ledger_snapshot(code_latest_migration()),
+                                        encoding="utf-8")
         bin_dir = self.tmp / "bin"
         bin_dir.mkdir()
 
@@ -947,13 +1161,24 @@ class ToolTest(unittest.TestCase):
                               env={"PATH": "/usr/bin:/bin", "HOME": str(self.tmp),
                                    "GIT_CONFIG_NOSYSTEM": "1"}).stdout.strip()
 
-    def _commit_and_push(self) -> str:
+    def _commit_and_push(self, baseline_readiness: str) -> str:
         origin = self.tmp / "origin.git"
         subprocess.run(["git", "init", "--bare", "--quiet", str(origin)], check=True,
                        env={"PATH": "/usr/bin:/bin", "HOME": str(self.tmp)})
         self._git("init", "--quiet")
         self._git("config", "user.name", "contract-test")
         self._git("config", "user.email", "contract-test@localhost")
+        # O código da imagem que está no ar (o git_sha do /health da linha de base).
+        readiness = self.repo / READINESS
+        candidate = readiness.read_text(encoding="utf-8")
+        readiness.write_text(baseline_readiness, encoding="utf-8")
+        marker = self.repo / "LINHA_DE_BASE"
+        marker.write_text("o código da imagem no ar antes da promoção\n", encoding="utf-8")
+        self._git("add", "-A")
+        self._git("commit", "--quiet", "-m", "linha de base")
+        self.old_sha = self._git("rev-parse", "HEAD")
+        readiness.write_text(candidate, encoding="utf-8")
+        marker.unlink()
         self._git("add", "-A")
         self._git("commit", "--quiet", "-m", "candidato")
         self._git("branch", "-M", "master")
@@ -972,7 +1197,8 @@ class ToolTest(unittest.TestCase):
 
     def promote(self, surfaces: str = "", **env_overrides: str) -> subprocess.CompletedProcess:
         args = ["--execute", "--promote", "--sha", self.sha, "--receipt-dir", str(self.receipts),
-                "--capacity-snapshot", str(self.snapshot)]
+                "--capacity-snapshot", str(self.snapshot),
+                "--schema-snapshot", str(self.schema_snapshot)]
         if surfaces:
             args += ["--surfaces", surfaces]
         return self.run_tool(*args, env=dict(self.env, **env_overrides))
@@ -1012,7 +1238,7 @@ class ToolTest(unittest.TestCase):
 
     def assert_at_baseline(self, surfaces=ORDER) -> None:
         plane = load_plane(self.state)
-        original = initial_plane()
+        original = initial_plane(self.old_sha)
         for surface in surfaces:
             with self.subTest(baseline=surface):
                 now = _view(plane, surface)
@@ -1056,11 +1282,20 @@ class ToolTest(unittest.TestCase):
 
     def test_preflight_only_reads_and_sees_a_control_plane_release(self) -> None:
         result = self.run_tool("--execute", "--preflight", "--sha", self.sha,
-                               "--capacity-snapshot", str(self.snapshot))
+                               "--capacity-snapshot", str(self.snapshot),
+                               "--schema-snapshot", str(self.schema_snapshot))
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         summary = json.loads(result.stdout)
         self.assertEqual((summary["status"], summary["release_mode"], summary["capacity"]),
                          ("PASS", "control_plane", "PASS"))
+        # S-02: base, candidato e banco na mesma migration; o backend pode voltar.
+        latest = code_latest_migration()
+        schema = summary["schema"]
+        self.assertEqual((schema["status"], schema["backend_rollback"], schema["baseline_sha"],
+                          schema["baseline_requires"], schema["candidate_requires"],
+                          schema["database_latest"]),
+                         ("PASS", "allowed", self.old_sha, latest, latest, latest))
+        self.assertNotIn("AVISO", result.stderr)
         self.assertEqual(summary["surfaces"], list(ORDER))
         self.assertEqual(self.deployed(), [])
         self.assertEqual(self.mutations(), [])
@@ -1249,7 +1484,7 @@ class ToolTest(unittest.TestCase):
         self.assertEqual(len(self.deployed()), 3)
         # A coordenação conserta à mão e resolve com o motivo: o marcador sai.
         plane = load_plane(self.state)
-        original = initial_plane()
+        original = initial_plane(self.old_sha)
         plane["swarm"][swarm_name("backend")] = original["swarm"][swarm_name("backend")]
         plane["tasks"][swarm_name("backend")] = original["tasks"][swarm_name("backend")]
         easypanel_entry(plane, "backend")["source"]["image"] = (
@@ -1337,7 +1572,7 @@ class ToolTest(unittest.TestCase):
                                 str(self.receipts), "--reason", "sem conferir")
         self.assertEqual(refused.returncode, 3, refused.stdout + refused.stderr)
         plane = load_plane(self.state)
-        original = initial_plane()
+        original = initial_plane(self.old_sha)
         plane["swarm"][swarm_name("app")] = original["swarm"][swarm_name("app")]
         plane["tasks"][swarm_name("app")] = original["tasks"][swarm_name("app")]
         easypanel_entry(plane, "app")["source"]["image"] = _view(original, "app")["spec"]["image"]
@@ -1391,6 +1626,253 @@ class ToolTest(unittest.TestCase):
         self.assertEqual(records[-1]["data"]["status"], "rolled_back")
         self.assert_at_baseline()
 
+    # -- S-02: banco migrado
+
+    def test_help_says_that_after_the_059_rollback_is_restore(self) -> None:
+        result = self.run_tool("--help")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        for expected in ("--schema-snapshot", "depois da 059, rollback é restore",
+                         "docs/runbooks/BACKUP_E_RESTAURACAO.md", "rollback_failed"):
+            self.assertIn(expected, result.stdout)
+        self.assertIn("rollback é restore", json.loads(self.run_tool().stdout)["backend_rollback"])
+
+    def test_with_the_database_ahead_of_the_baseline_the_backend_never_goes_back(self) -> None:
+        # Depois da 059, a imagem de base (como 41bab49c9, que exige a 058) responderia 503
+        # para sempre. A falha do /app desfaz o resto na ordem inversa, mas o backend fica
+        # no promovido: nada vai ao Swarm nem ao EasyPanel dele, e a transação termina
+        # CRITICAL até a coordenação resolver (correção para frente ou restore).
+        self.tearDown()
+        self.build(baseline_requires="058")
+        latest = code_latest_migration()
+        self.faults(app="fail_after")
+        result = self.promote()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("AVISO: a volta automática do backend está recusada", result.stderr)
+        self.assertIn("CRITICAL", result.stderr)
+        self.assertEqual(self.deployed(), ["backend", "ops", "site", "app"])
+        self.assertEqual(self.mutations(), [
+            "updateSourceImage:manaloom-app", "rollback:evolution_manaloom-app",
+            "updateSourceImage:manaloom-web-public", "rollback:evolution_manaloom-web-public",
+            "rollback:evolution_manaloom-ops"])
+        path, records = self.journal()
+        schema = records[0]["data"]["schema"]
+        self.assertEqual((schema["baseline_sha"], schema["baseline_requires"],
+                          schema["database_latest"], schema["backend_rollback"]),
+                         (self.old_sha, "058", latest, "refused"))
+        failed = [record["data"] for record in records
+                  if record["event"] == "surface_restore_failed"]
+        self.assertEqual([item["surface"] for item in failed], ["backend"])
+        self.assertTrue(any(f"exige a migration 058 e o banco está na {latest}" in problem
+                            and "restore" in problem for problem in failed[0]["problems"]),
+                        failed)
+        restored = [record["data"]["surface"] for record in records
+                    if record["event"] == "surface_restored"]
+        self.assertEqual(restored, ["app", "site", "ops"])
+        self.assertEqual(records[-1]["data"]["status"], "rollback_failed")
+        self.assertTrue((self.receipts / "EM_ANDAMENTO").exists())
+        plane = load_plane(self.state)
+        self.assertEqual(_current_image(plane, "backend"), new_image("backend", self.sha))
+        self.assert_at_baseline(("ops", "site", "app", "android"))
+        # A coordenação corrige para frente (o backend segue no candidato) e resolve.
+        resolved = self.run_tool("--execute", "--resolve", str(path), "--receipt-dir",
+                                 str(self.receipts), "--reason",
+                                 "backend fica no candidato; o banco está na última migration")
+        self.assertEqual(resolved.returncode, 0, resolved.stdout + resolved.stderr)
+        self.assertEqual(json.loads(resolved.stdout)["surfaces"]["backend"], "committed")
+        self.assertFalse((self.receipts / "EM_ANDAMENTO").exists())
+        self.assert_contract_kept()
+
+    def test_a_backend_left_on_a_stale_baseline_is_never_called_restored(self) -> None:
+        # O deploy do backend recusa antes de mudar: o backend nunca saiu da base, mas a base
+        # não fica pronta com o banco à frente. Nada muda, e a falha fica CRITICAL.
+        self.tearDown()
+        self.build(baseline_requires="058")
+        self.faults(backend="fail_before")
+        result = self.promote()
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(self.mutations(), [])
+        _, records = self.journal()
+        failed = [record["data"]["surface"] for record in records
+                  if record["event"] == "surface_restore_failed"]
+        self.assertEqual(failed, ["backend"])
+        self.assertEqual(records[-1]["data"]["status"], "rollback_failed")
+        self.assert_at_baseline()
+
+    def test_a_baseline_whose_requirement_cannot_be_read_does_not_come_back(self) -> None:
+        for label in ("SHA fora do repositório", "readiness sem a exigência"):
+            with self.subTest(case=label):
+                self.tearDown()
+                if label == "SHA fora do repositório":
+                    self.build()
+                    plane = load_plane(self.state)
+                    image = _current_image(plane, "backend")
+                    plane["image_sha"][image] = "9" * 40
+                    save_plane(self.state, plane)
+                    expected = "(999999999999) exige"
+                else:
+                    self.build(baseline_requires=None)
+                    expected = f"({self.old_sha[:12]}) exige"
+                self.faults(app="fail_after")
+                result = self.promote()
+                self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+                self.assertNotIn("rollback:evolution_cartinhas", self.mutations())
+                self.assertNotIn("updateSourceImage:cartinhas", self.mutations())
+                _, records = self.journal()
+                failed = next(record["data"] for record in records
+                              if record["event"] == "surface_restore_failed")
+                self.assertEqual(failed["surface"], "backend")
+                self.assertTrue(any("não sei qual migration" in problem and expected in problem
+                                    for problem in failed["problems"]), failed)
+                self.assertEqual(records[-1]["data"]["status"], "rollback_failed")
+
+    def test_a_backend_preflight_without_the_ledger_is_blocked(self) -> None:
+        # Sem --schema-snapshot, o preflight com o backend não sabe se o candidato fica
+        # pronto nem se o backend pode voltar: BLOCKED, nunca PASS com schema not_checked.
+        result = self.run_tool("--execute", "--preflight", "--sha", self.sha,
+                               "--capacity-snapshot", str(self.snapshot))
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        summary = json.loads(result.stdout)
+        self.assertEqual((summary["status"], summary["schema"]["status"],
+                          summary["schema"]["backend_rollback"]),
+                         ("BLOCKED", "BLOCKED", "refused"))
+        self.assertIn("sem o ledger do banco (--schema-snapshot)", summary["reasons"])
+        # Sem o backend no plano, não há o que conferir no banco.
+        site = self.run_tool("--execute", "--preflight", "--sha", self.sha, "--surfaces", "site",
+                             "--capacity-snapshot", str(self.snapshot))
+        self.assertEqual(site.returncode, 0, site.stdout + site.stderr)
+        self.assertEqual(json.loads(site.stdout)["schema"], "not_checked")
+        self.assertEqual(self.deployed(), [])
+        self.assertEqual(self.mutations(), [])
+
+    def test_resolve_marks_a_backend_left_on_a_baseline_behind_the_database(self) -> None:
+        # O deploy do backend recusa antes de mudar: o backend fica na base (058) com o
+        # banco na última. O --resolve não chama isso de "baseline": marca
+        # baseline_not_ready, com o porquê, no diário e na saída.
+        latest = code_latest_migration()
+        self.tearDown()
+        self.build(baseline_requires="058")
+        self.faults(backend="fail_before")
+        self.assertEqual(self.promote().returncode, 1)
+        path, _ = self.journal()
+        resolved = self.run_tool("--execute", "--resolve", str(path), "--receipt-dir",
+                                 str(self.receipts), "--reason", "backend na base, sem restore")
+        self.assertEqual(resolved.returncode, 0, resolved.stdout + resolved.stderr)
+        output = json.loads(resolved.stdout)
+        self.assertEqual(output["surfaces"]["backend"], "baseline_not_ready")
+        self.assertEqual((output["backend_baseline"]["ready"],
+                          output["backend_baseline"]["source"]), (False, "preflight"))
+        self.assertIn(f"exige a migration 058 e o banco está na {latest}",
+                      output["backend_baseline"]["not_ready_because"])
+        self.assertIn("AVISO: o backend está na imagem de base, que não fica pronta",
+                      resolved.stderr)
+        _, records = self.journal()
+        self.assertEqual(records[-1]["event"], "resolved")
+        self.assertEqual(records[-1]["data"]["surfaces"]["backend"], "baseline_not_ready")
+        self.assertFalse(records[-1]["data"]["backend_baseline"]["ready"])
+        # Com um ledger novo: o de outro banco é recusado (o diário segue aberto); o do
+        # mesmo banco do preflight, de volta na 058 (o restore), deixa a base pronta.
+        self.tearDown()
+        self.build(baseline_requires="058")
+        self.faults(backend="fail_before")
+        self.assertEqual(self.promote().returncode, 1)
+        path, _ = self.journal()
+        args = ["--execute", "--resolve", str(path), "--receipt-dir", str(self.receipts),
+                "--reason", "restore conferido", "--schema-snapshot", str(self.schema_snapshot)]
+        self.schema_snapshot.write_text(ledger_snapshot("058", database=OTHER_DATABASE),
+                                        encoding="utf-8")
+        refused = self.run_tool(*args)
+        self.assertEqual(refused.returncode, 3, refused.stdout + refused.stderr)
+        self.assertIn("não é o banco do backend", refused.stderr)
+        self.assertEqual(promote.journal_status(path)["status"], "rollback_failed")
+        self.assertTrue((self.receipts / "EM_ANDAMENTO").exists())
+        self.schema_snapshot.write_text(ledger_snapshot("058"), encoding="utf-8")
+        ready = self.run_tool(*args)
+        self.assertEqual(ready.returncode, 0, ready.stdout + ready.stderr)
+        output = json.loads(ready.stdout)
+        self.assertEqual(output["surfaces"]["backend"], "baseline")
+        self.assertEqual((output["backend_baseline"]["ready"], output["backend_baseline"]["source"],
+                          output["backend_baseline"]["same_database_as_preflight"]),
+                         (True, "schema_snapshot", True))
+        self.assertFalse((self.receipts / "EM_ANDAMENTO").exists())
+        self.assert_contract_kept()
+
+    def test_a_journal_inside_the_repository_is_refused(self) -> None:
+        # Uma cópia durável (fora de /tmp) do repositório descartável e um outro worktree
+        # dele: o diário não fica em nenhum dos dois, mesmo em diretório durável.
+        base = Path.home() / ".cache" / "manaloom-release-promotion-test"
+        durable = Path(tempfile.mkdtemp(prefix="repo-", dir=base))
+        self.addCleanup(shutil.rmtree, durable, True)
+        repo = durable / "repo"
+        shutil.copytree(self.repo, repo, symlinks=True)
+        other = durable / "outro-checkout"
+        subprocess.run(["git", "-C", str(repo), "worktree", "add", "--quiet", "--detach",
+                        str(other)], check=True, capture_output=True,
+                       env={"PATH": "/usr/bin:/bin", "HOME": str(self.tmp),
+                            "GIT_CONFIG_NOSYSTEM": "1"})
+        script = str(repo / "scripts" / "manaloom_promote_release.sh")
+        for receipts in (repo / "diarios", other / "diarios"):
+            receipts.mkdir()
+            for args in (["--status"],
+                         ["--execute", "--promote", "--sha", self.sha,
+                          "--capacity-snapshot", str(self.snapshot),
+                          "--schema-snapshot", str(self.schema_snapshot)]):
+                with self.subTest(receipts=receipts.parent.name, mode=args[0]):
+                    result = subprocess.run(["/bin/bash", script, *args, "--receipt-dir",
+                                             str(receipts)], capture_output=True, text=True,
+                                            env=self.env, check=False, timeout=120)
+                    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                    self.assertIn("o diário não pode ficar dentro do repositório", result.stderr)
+                    self.assertEqual(list(receipts.iterdir()), [])
+        self.assertEqual(self.calls(), [])
+
+    def test_preflight_blocks_a_candidate_the_database_is_not_ready_for(self) -> None:
+        # O passo de migrations do lote não rodou: o candidato exige a última e o banco
+        # está na 058. O backend novo daria 503; nada começa.
+        latest = code_latest_migration()
+        self.schema_snapshot.write_text(ledger_snapshot("058"), encoding="utf-8")
+        result = self.run_tool("--execute", "--preflight", "--sha", self.sha,
+                               "--capacity-snapshot", str(self.snapshot),
+                               "--schema-snapshot", str(self.schema_snapshot))
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        summary = json.loads(result.stdout)
+        self.assertEqual(summary["status"], "BLOCKED")
+        self.assertTrue(any(f"o candidato exige a migration {latest} e o banco está na 058"
+                            in reason for reason in summary["reasons"]), summary["reasons"])
+        blocked = self.promote()
+        self.assertEqual(blocked.returncode, 3, blocked.stdout + blocked.stderr)
+        self.assertEqual(self.deployed(), [])
+        self.assertEqual(self.mutations(), [])
+        _, records = self.journal()
+        self.assertEqual(records[-1]["data"]["status"], "blocked")
+
+    def test_the_backend_promotion_demands_a_fresh_and_well_formed_ledger(self) -> None:
+        args = ["--execute", "--promote", "--sha", self.sha, "--receipt-dir", str(self.receipts),
+                "--capacity-snapshot", str(self.snapshot)]
+        missing = self.run_tool(*args)
+        self.assertEqual(missing.returncode, 2, missing.stdout + missing.stderr)
+        self.assertIn("--promote com o backend exige --schema-snapshot", missing.stderr)
+        self.assertEqual(self.calls(), [])
+        self.assertEqual(list(self.receipts.glob("promocao-*")), [])
+        old = dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=2)
+        future = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=2)
+        latest = code_latest_migration()
+        cases = {
+            "há mais de 30 minutos": ledger_snapshot(latest, old),
+            "no futuro": ledger_snapshot(latest, future),
+            "não é um manaloom-schema-ledger": ledger_snapshot(latest, kind="outro"),
+            "não é o MAX(version)": ledger_snapshot(latest, latest_migration="001"),
+            "não é JSON": "{",
+        }
+        for expected, content in cases.items():
+            with self.subTest(case=expected):
+                self.schema_snapshot.write_text(content, encoding="utf-8")
+                result = self.run_tool("--execute", "--preflight", "--sha", self.sha,
+                                       "--schema-snapshot", str(self.schema_snapshot))
+                self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                reasons = json.loads(result.stdout)["reasons"]
+                self.assertTrue(any(expected in reason for reason in reasons), reasons)
+        self.assertEqual(self.deployed(), [])
+
     def test_refusals_before_anything_happens(self) -> None:
         env = dict(self.env)
         del env["MANALOOM_CONFIRM_LIVE_MUTATIONS"]
@@ -1407,7 +1889,9 @@ class ToolTest(unittest.TestCase):
                                        "--receipt-dir", str(self.receipts)).returncode, 2)
         self.assertEqual(self.run_tool("--execute", "--promote", "--sha", "9" * 40,
                                        "--receipt-dir", str(self.receipts),
-                                       "--capacity-snapshot", str(self.snapshot)).returncode, 2)
+                                       "--capacity-snapshot", str(self.snapshot),
+                                       "--schema-snapshot", str(self.schema_snapshot)
+                                       ).returncode, 2)
         for key, value in (("MANALOOM_EXPECTED_EASYPANEL_BASE_URL_SHA256", "f" * 64),
                            ("MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256", "SHA256:" + "B" * 43)):
             with self.subTest(anchor=key):
@@ -1422,7 +1906,9 @@ class ToolTest(unittest.TestCase):
         local = self._git("rev-parse", "HEAD")
         self.assertEqual(self.run_tool("--execute", "--promote", "--sha", local,
                                        "--receipt-dir", str(self.receipts),
-                                       "--capacity-snapshot", str(self.snapshot)).returncode, 2)
+                                       "--capacity-snapshot", str(self.snapshot),
+                                       "--schema-snapshot", str(self.schema_snapshot)
+                                       ).returncode, 2)
         self.assertEqual(self.calls(), [])
         self.assertEqual(list(self.receipts.glob("promocao-*")), [])
 
@@ -1457,7 +1943,8 @@ class ToolTest(unittest.TestCase):
         self._git("commit", "--quiet", "-am", "capability on verificada")
         self._git("push", "--quiet", "origin", "master")
         sha = self._git("rev-parse", "HEAD")
-        opened = self.run_tool("--execute", "--preflight", "--sha", sha, env=cohort_env)
+        opened = self.run_tool("--execute", "--preflight", "--sha", sha,
+                               "--schema-snapshot", str(self.schema_snapshot), env=cohort_env)
         self.assertEqual(opened.returncode, 0, opened.stdout + opened.stderr)
         self.assertEqual(json.loads(opened.stdout)["release_mode"], "product_open")
         self.assertEqual(self.deployed(), [])

@@ -1,17 +1,19 @@
 {
   "schema_version": 1,
   "policy": "brewtact-release-promotion",
-  "version": "2026-09-28.2",
+  "version": "2026-10-10.1",
   "task": "BT-REL-001",
   "decisions": [
-    "D-13"
+    "D-13",
+    "D-18"
   ],
   "project": "evolution",
   "control_plane_release": "D-13: com as 29 capabilities off, o /app sai como release de plano de controle (conta, recuperação, verificação, perfil, exportação e exclusão); a regra de ao menos uma capability on, com verificação live datada, vale só quando uma capability abrir.",
   "order_rationale": "D-13: backend, site público, /app e Android, nesta ordem. O ops entra logo depois do backend, cuja API e cujas capabilities ele consome. Cada superfície só sobe com a anterior no ar e provada.",
   "transaction": {
     "all_or_nothing": true,
-    "rationale": "Uma superfície que falha desfaz as já promovidas, na ordem inversa, até o estado de antes, provado por superfície. Uma falha antes do receipt fica no diário: o marcador de transação em andamento bloqueia a próxima promoção até o diário fechar ou ser resolvido com a palavra do dono."
+    "rationale": "Uma superfície que falha desfaz as já promovidas, na ordem inversa, até o estado de antes, provado por superfície. Uma falha antes do receipt fica no diário: o marcador de transação em andamento bloqueia a próxima promoção até o diário fechar ou ser resolvido com a palavra do dono.",
+    "after_migration_rollback": "S-02 (D-18 e item 12 do pacote de decisões de 2026-10-10): com o banco migrado depois da 059, a volta do backend para 41bab49c9 (ou para qualquer imagem cujo readiness exige uma migration menor que o MAX(version) do banco) é recusada, inclusive na compensação automática: a imagem antiga responderia 503 para sempre. Nesse caso a transação termina rollback_failed (CRITICAL, marcador EM_ANDAMENTO), as outras superfícies voltam como sempre e o backend fica onde está; a saída é corrigir para frente ou restaurar o dump do L-01 (docs/runbooks/BACKUP_E_RESTAURACAO.md). Depois da 059, rollback é restore."
   },
   "identity_gate": {
     "task": "BT-REL-002",
@@ -57,6 +59,12 @@
       "compensation": [
         "swarm_rollback"
       ],
+      "schema_guard": {
+        "readiness_source": "server/lib/health_readiness_support.dart",
+        "snapshot_max_age_minutes": 30,
+        "restore_runbook": "docs/runbooks/BACKUP_E_RESTAURACAO.md",
+        "rationale": "O /health/ready exige MAX(version) igual à última migration que a imagem conhece (latest_migration_ready no health_readiness_support.dart do SHA da imagem, lido pelo git_sha do /health da linha de base). O --promote com o backend exige o ledger do banco lido há no máximo 30 minutos (scripts/manaloom_lot_apply_migrations.sh --execute --read-ledger). O preflight para se o candidato exige outra migration que não a do banco; a volta do backend só acontece se a imagem de base exige uma migration conhecida e não menor que a do banco. Senão, a volta é restore ou correção para frente, nunca o swarm_rollback."
+      },
       "rationale": "O deploy do backend grava imagem e env numa única atualização da spec do Swarm (o e-mail herdado vive só na spec): voltar exige a spec anterior exata, e um redeploy pelo EasyPanel perderia o env."
     },
     {
