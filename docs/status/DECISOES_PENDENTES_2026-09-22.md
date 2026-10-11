@@ -436,7 +436,7 @@ plano até o GO (`mvp_plan.md`) e da crítica a esse plano (`mvp_critic.md`), pr
 `wf_21d790dd-9c9` da sessão de coordenação `4d2db55c` sobre o `master` `1f525a1c1`; os dois também
 ficam fora do repositório. Os itens 1 a 14 e 16 a 24 do pacote viraram a D-92 a D-114, nesta ordem. O
 item 15 não é decisão e ficou como nota no fim. A D-115 e a D-116 registram duas autorizações do dono
-no mesmo dia.
+no mesmo dia, e a D-117 e a D-118, duas decisões da noite.
 
 **Caminho crítico aceito:** PR-B → R1 → PR-C → R2 → congelar o candidato → `scope_e2e` → lote →
 leituras da produção → PASS do `BT-REL-001` e do `BT-REL-002` → `release` verde → `BT-REL-003` →
@@ -453,8 +453,9 @@ leituras da produção → PASS do `BT-REL-001` e do `BT-REL-002` → `release` 
 - **Dependências:** o `BT-REL-001` troca o `BT-CAP-002` pelo `BT-CAP-001`, e o `BT-CAP-002` passa a
   vir depois da promoção (D-114).
 
-Continuam pedindo a palavra do dono na hora: merge na `master`, migration, deploy, escrita ou leitura
-na produção, emissão de convites e ligar capabilities (regra 6 da decisão corrente e D-87). Nada
+Continuam pedindo a palavra do dono na hora: merge na `master` (a não ser o que a D-117 cobre),
+migration, deploy, escrita ou leitura na produção, emissão de convites e ligar capabilities (regra 6
+da decisão corrente e D-87). Nada
 aqui muda tarefa para `PASS`: isso espera o `full` verde e a recaptura de cada lote.
 
 **D-92 · Duas recapturas da prova de UI: R1 depois do PR-B e R2 depois do PR-C (item 1).**
@@ -678,6 +679,30 @@ As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenaç
   - A Frente 2 (`BT-GATE-001`, `BT-GATE-003` e o receipt forte no `local_ci`) mexe em arquivos de bootstrap do pre-commit (`BOOTSTRAP_SOURCE_PATHS` em `scripts/manaloom_staged_ui_scope.py`). Um commit local neles vira `AFFECTS_UI` e roda a prova de UI, que está velha.
 - **Decisão do dono:** autorizou rotinas de nuvem só de disparo manual, desligadas depois do uso, para o PR-B, a Frente 2 e, depois do merge do PR-B, o PR-C.
 - **Execução:** quem dispara é a coordenação. O merge na `master` continua pedindo a palavra do dono (D-87).
+
+**D-117 · A coordenação faz o merge de PR revisado (2026-10-10).**
+- **Contexto:** pela D-87 e pela D-116, cada merge na `master` esperava a palavra do dono, e a fila parava até a resposta.
+- **Decisão do dono:** "Sim, autorizo". A coordenação pode fazer o merge na `master` de PR que cumpra três condições:
+  - revisão independente aprovada;
+  - commits pelos hooks verdes;
+  - nenhuma ação na produção.
+- **Continuam pedindo a palavra do dono:** deploy, migration na produção, escrita live e a recaptura da prova de UI, que leva as frases de confirmação dele.
+- **Execução:**
+  - Antes do merge, a branch é atualizada com o `master`, com os gerados refeitos pelos hooks, e o `project_logic --check` roda no merge simulado.
+  - O merge usa `--match-head-commit` com o SHA completo, e cada um vai para o log da coordenação, fora do repositório.
+  - Ressalva média ou maior da revisão é consertada antes do merge.
+  - O primeiro merge por esta decisão foi o do PR #37 (`eac4f401b`), o conserto do `npm audit` da D-115.
+  - Onde a D-87, a D-116 e a linha do `BT-UX-BATCH-001` pedem a palavra do dono para o merge, vale esta decisão para o PR que cumprir as três condições.
+
+**D-118 · Correção 1 da D-85: contar os decks do Generate antes de decidir (2026-10-10).**
+- **Contexto:** a correção 1 da D-85 limpa das descrições de deck o prompt do Generate gravado ali. Sem uma marca de origem, não há como separar a descrição que o jogador escreveu do prompt que o Generate gravou.
+- **Decisão do dono:** na sessão de leituras da produção depois do lote (D-105):
+  - se houver marca de origem, contar os decks vindos do Generate, e o dono decide com o número;
+  - sem marca, a correção 1 vira um no-op, documentado no receipt da sessão.
+- **Execução:**
+  - A contagem entra como mais uma leitura da sessão da D-105.
+  - O script da correção 1 já existe na branch da frente de banco (`feat/db-lot-corrections-077`, `a92a0b85f`, fora do `master`): ele só limpa a descrição igual a um prompt do Generate guardado do mesmo dono. Ele roda só depois do número e da palavra do dono.
+  - As outras quatro correções da D-85 não mudam: vêm depois da promoção (D-102), com contagem antes e depois e a confirmação do dono na hora da escrita.
 
 **Nota sobre o item 15 do pacote (dumps).** Não é decisão.
 - **O que aconteceu:** sumiram de `backups/manaloom-postgres/` em 2026-10-08, às 12:23 no horário local:

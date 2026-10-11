@@ -17,7 +17,7 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
 - Backlog/registry SHA-256 corrente (decisões D-92 a D-116, reconciliação de 2026-10-10 e a revisão
   dela sobre `eac4f401b`):
-  `f42f2fdd61e788f8739353fd68533b9268c1380449b09a084f19bf647a874149` (250 tasks; o valor vivo está em
+  `170a30a3412b96d19efe4d9189e355a1e70b7b64beaed833f8a7f191d7f160c8` (250 tasks; o valor vivo está em
   `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `ba95660b…` na reconciliação
   de 2026-10-10 e `f4effb9a…` com 246 em
   `1f525a1c1`, e `8a73ebe6…` com 244 nas decisões D-79 e D-80 do gate de UI, branch

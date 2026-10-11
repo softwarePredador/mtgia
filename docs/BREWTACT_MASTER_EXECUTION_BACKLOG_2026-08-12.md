@@ -142,7 +142,9 @@ tarefas afetadas trazem a decisão que vale para elas. O essencial:
 
 Em 2026-10-10 o dono aceitou as 23 recomendações do pacote da coordenação sobre o caminho até o
 GO. Elas viraram a D-92 a D-114. No mesmo dia ele deu duas autorizações, registradas como D-115 e
-D-116. O texto integral está em `docs/status/DECISOES_PENDENTES_2026-09-22.md`, e cada linha afetada
+D-116. À noite vieram a D-117 (a coordenação pode fazer o merge de PR com revisão independente
+aprovada, hooks verdes e nenhuma ação na produção) e a D-118 (a correção 1 da D-85 conta os decks
+do Generate antes de decidir). O texto integral está em `docs/status/DECISOES_PENDENTES_2026-09-22.md`, e cada linha afetada
 traz a nota "Decisão do dono em 2026-10-10". O essencial:
 
 - **Prova de UI (D-92, D-113).**
