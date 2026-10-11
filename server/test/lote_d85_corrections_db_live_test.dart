@@ -726,6 +726,71 @@ void main() {
     );
 
     test(
+      'um CHECK com o nome certo e outra definição recusa os três sem criar '
+      'nada',
+      () => withCopy('d85_4_outra_definicao', (copy) async {
+        await productionShape(copy);
+        await copy.sql('DELETE FROM ml_prompt_feedback WHERE effectiveness_score = 11');
+        await copy.sql("DELETE FROM notifications WHERE type = 'tipo_aposentado'");
+        await copy.sql("DELETE FROM user_binder_items WHERE currency = 'EUR'");
+        // O nome da D-85 com uma lista de tipos menor: não é o CHECK do banco novo.
+        await copy.sql('''
+          ALTER TABLE notifications ADD CONSTRAINT notifications_type_check
+          CHECK (type IN ('new_follower', 'direct_message')) NOT VALID
+        ''');
+        final before = await state(copy);
+        expect(before.keys, ['notifications_type_check']);
+
+        final refused = await copy.runScript(script);
+        expect(refused.exitCode, isNot(0), reason: '$refused');
+        expect(refused.stderr, contains('d85_4 recusado'));
+        expect(
+          refused.stderr,
+          contains('já existe restrição com o nome e outra definição'),
+        );
+        expect(
+          refused.stderr,
+          contains('notifications.notifications_type_check (CHECK'),
+        );
+        expect(
+          refused.value('antes', 'notifications.notifications_type_check:estado'),
+          'definicao_divergente',
+        );
+        expect(
+          refused.value(
+            'antes',
+            'user_binder_items.user_binder_items_currency_check:estado',
+          ),
+          'ausente',
+        );
+        final applied = await copy.applyScript(
+          script,
+          expected: {'checks_criados_not_valid': '2', 'checks_validados': '3'},
+        );
+        expect(applied.exitCode, isNot(0), reason: '$applied');
+        expect(applied.stderr, contains('outra definição'));
+        expect(await state(copy), before);
+
+        // Outro tipo de restrição com o nome do CHECK também não conta.
+        await copy.sql('ALTER TABLE notifications DROP CONSTRAINT notifications_type_check');
+        await copy.sql(
+          'ALTER TABLE user_binder_items ADD CONSTRAINT '
+          'user_binder_items_currency_check UNIQUE (id, currency)',
+        );
+        final unique = await copy.runScript(script);
+        expect(unique.exitCode, isNot(0), reason: '$unique');
+        expect(
+          unique.value(
+            'antes',
+            'user_binder_items.user_binder_items_currency_check:estado',
+          ),
+          'definicao_divergente',
+        );
+      }),
+      skip: enabled ? false : LoteDatabase.skipReason,
+    );
+
+    test(
       'um CHECK que ficou NOT VALID numa rodada anterior é só validado',
       () => withCopy('d85_4_retomada', (copy) async {
         await productionShape(copy);

@@ -194,6 +194,32 @@ void main() {
       );
       expect(first.value('acao', 'linhas_que_ficam_com_campo_herdado'), '2');
       expect(first.value('acao', 'linhas_apagadas'), '4');
+      // A fusão inteira no receipt: por campo e por grupo.
+      expect(
+        {
+          for (final row in first.rows)
+            if (row.$1 == 'acao' && row.$2.startsWith('campo_herdado:'))
+              row.$2: row.$3,
+        },
+        {
+          'campo_herdado:release_date': '0',
+          'campo_herdado:type': '1',
+          'campo_herdado:block': '1',
+          'campo_herdado:is_online_only': '1',
+          'campo_herdado:is_foreign_only': '0',
+        },
+      );
+      expect(
+        [
+          for (final row in first.rows)
+            if (row.$1 == 'fusao') '${row.$2} ${row.$3}',
+        ],
+        [
+          'ABC saem=abc;herda=type',
+          'MNO saem=Mno,mno;herda=-',
+          'xyz saem=XYZ;herda=block,is_online_only',
+        ],
+      );
       expect(first.value('depois', 'sets'), '4');
       expect(first.value('depois', 'codigos_sem_caixa'), '4');
       expect(first.value('depois', 'codigos_duplicados'), '0');

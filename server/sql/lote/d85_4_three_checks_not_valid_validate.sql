@@ -8,6 +8,12 @@
 -- `server/sql/readonly/bt_db_005_check_violations.sql`: violação é a linha em que a
 -- condição dá falso (NULL não viola um CHECK).
 --
+-- Um CHECK com o nome certo só conta como presente se a definição for a esperada
+-- (`pg_get_constraintdef`, sem o sufixo NOT VALID, igual ao texto que o PostgreSQL 17
+-- gera para a definição do `database_setup.sql`). Com o mesmo nome e outra definição
+-- (ou outro tipo de restrição), o estado é `definicao_divergente` e o script recusa
+-- os três sem criar nada.
+--
 -- Na gravação (`-v aplicar=1`), duas transações:
 --   1. conta as violações e, só com zero em todas, cria os que faltam como NOT VALID
 --      (trava curta, sem varrer a tabela; a partir daqui linha nova já é conferida).
@@ -31,8 +37,8 @@
 --   ... -v aplicar=1 -v esperado_checks_criados_not_valid=<n da prévia> \
 --       -v esperado_checks_validados=<n da prévia> ...
 -- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao e depois); nas
--- linhas `<CHECK>:estado`, a terceira coluna é ausente, not_valid ou validado.
--- Idempotente: a segunda rodada acha os três validados e não muda nada.
+-- linhas `<CHECK>:estado`, a terceira coluna é ausente, definicao_divergente, not_valid
+-- ou validado. Idempotente: a segunda rodada acha os três validados e não muda nada.
 
 \set ON_ERROR_STOP on
 \if :{?aplicar}
@@ -115,19 +121,28 @@ CREATE TEMP VIEW d85_4_estado AS
 SELECT esperado.tabela || '.' || esperado.nome AS objeto,
        CASE
          WHEN restricao.oid IS NULL THEN 'ausente'
+         WHEN restricao.contype <> 'c'
+              OR regexp_replace(pg_get_constraintdef(restricao.oid), ' NOT VALID$', '')
+                 <> esperado.definicao THEN 'definicao_divergente'
          WHEN restricao.convalidated THEN 'validado'
          ELSE 'not_valid'
-       END AS estado
+       END AS estado,
+       CASE
+         WHEN restricao.oid IS NULL THEN NULL
+         ELSE pg_get_constraintdef(restricao.oid)
+       END AS definicao_atual
 FROM (
   VALUES
-    (1, 'ml_prompt_feedback', 'chk_ml_prompt_feedback_effectiveness_score'),
-    (2, 'notifications', 'notifications_type_check'),
-    (3, 'user_binder_items', 'user_binder_items_currency_check')
-) AS esperado(ordem, tabela, nome)
+    (1, 'ml_prompt_feedback', 'chk_ml_prompt_feedback_effectiveness_score',
+     'CHECK (((effectiveness_score IS NULL) OR ((effectiveness_score >= 1) AND (effectiveness_score <= 10))))'),
+    (2, 'notifications', 'notifications_type_check',
+     'CHECK ((type = ANY (ARRAY[''new_follower''::text, ''trade_offer_received''::text, ''trade_accepted''::text, ''trade_declined''::text, ''trade_shipped''::text, ''trade_delivered''::text, ''trade_completed''::text, ''trade_message''::text, ''direct_message''::text])))'),
+    (3, 'user_binder_items', 'user_binder_items_currency_check',
+     'CHECK ((currency = ANY (ARRAY[''BRL''::text, ''USD''::text])))')
+) AS esperado(ordem, tabela, nome, definicao)
 LEFT JOIN pg_constraint restricao
   ON restricao.conrelid = format('public.%I', esperado.tabela)::regclass
  AND restricao.conname = esperado.nome
- AND restricao.contype = 'c'
 ORDER BY esperado.ordem;
 
 SELECT 'antes' AS fase, objeto || ':violacoes' AS objeto, violacoes::text AS quantidade
@@ -139,6 +154,7 @@ FROM d85_4_estado;
 DO $d85_4_not_valid$
 DECLARE
   recusa TEXT;
+  divergente TEXT;
   criar_previsto INTEGER;
   validar_previsto INTEGER;
   criados INTEGER := 0;
@@ -154,6 +170,19 @@ BEGIN
     RAISE EXCEPTION
       'd85_4 recusado: há linhas que violam %; trate o dado antes (D-85). Nada foi criado.',
       recusa;
+  END IF;
+
+  SELECT string_agg(
+           estado.objeto || ' (' || estado.definicao_atual || ')',
+           ', ' ORDER BY estado.objeto
+         )
+  INTO divergente
+  FROM d85_4_estado estado
+  WHERE estado.estado = 'definicao_divergente';
+  IF divergente IS NOT NULL THEN
+    RAISE EXCEPTION
+      'd85_4 recusado: já existe restrição com o nome e outra definição: %; trate antes (D-85). Nada foi criado.',
+      divergente;
   END IF;
 
   SELECT COUNT(*) FILTER (WHERE estado = 'ausente'),
@@ -282,7 +311,7 @@ FROM d85_4_estado;
 DO $d85_4_pos$
 BEGIN
   IF EXISTS (SELECT 1 FROM d85_4_estado WHERE estado <> 'validado') THEN
-    RAISE EXCEPTION 'd85_4: os três CHECK não ficaram validados';
+    RAISE EXCEPTION 'd85_4: os três CHECK não ficaram validados com a definição esperada';
   END IF;
   IF current_setting('manaloom.lote_aplicar') = '1' THEN
     IF current_setting('manaloom.d85_4_validados')::integer

@@ -144,6 +144,7 @@ void main() {
       expect(first.value('antes', 'uq_user_binder_items_physical_identity'), '1');
       expect(first.value('antes', 'itens_do_fichario'), '1');
       expect(first.value('antes', 'copias_em_mais_de_um_idioma'), '0');
+      expect(first.value('antes', 'itens_com_language_nulo'), '0');
       expect(first.value('acao', 'indices_removidos'), '1');
       expect(first.value('depois', 'uq_binder_user_card_cond_foil_list'), '0');
       expect(first.value('depois', 'uq_user_binder_items_physical_identity'), '1');
@@ -169,6 +170,55 @@ void main() {
       expect(second.value('antes', 'copias_em_mais_de_um_idioma'), '1');
       expect(second.value('acao', 'indices_removidos'), '0');
       expect(second.value('depois', 'itens_do_fichario'), '2');
+    }),
+    skip: skip,
+  );
+
+  test(
+    'conta os itens com language nulo, que a identidade da 049 não barra',
+    () => withCopy('binder_language_nulo', (copy) async {
+      await copy.sql(productionIndex);
+      final owner = await seed(copy);
+      // A produção ainda aceita language nulo (D-67).
+      await copy.sql(
+        'ALTER TABLE user_binder_items ALTER COLUMN language DROP NOT NULL',
+      );
+      await copy.sql(
+        '''
+        INSERT INTO user_binder_items (user_id, card_id, condition, language)
+        VALUES (CAST(@user AS uuid), CAST(@card AS uuid), 'NM', NULL),
+               (CAST(@user AS uuid), CAST(@card AS uuid), 'LP', 'en'),
+               (CAST(@user AS uuid), CAST(@card AS uuid), 'MP', 'pt')
+        ''',
+        {'user': owner.user, 'card': owner.card},
+      );
+
+      final preview = await copy.runScript(script);
+      expect(preview.exitCode, 0, reason: '$preview');
+      expect(preview.value('antes', 'itens_com_language_nulo'), '1');
+      expect(preview.value('depois', 'itens_com_language_nulo'), '1');
+      expect(preview.value('antes', 'itens_do_fichario'), '3');
+
+      final applied = await copy.applyScript(
+        script,
+        expected: {'indices_removidos': '1'},
+      );
+      expect(applied.exitCode, 0, reason: '$applied');
+      expect(applied.value('depois', 'itens_com_language_nulo'), '1');
+      // Sem o índice antigo, a mesma cópia com language nulo entra de novo.
+      await copy.sql(
+        '''
+        INSERT INTO user_binder_items (user_id, card_id, condition, language)
+        VALUES (CAST(@user AS uuid), CAST(@card AS uuid), 'NM', NULL)
+        ''',
+        {'user': owner.user, 'card': owner.card},
+      );
+      expect(
+        await copy.count(
+          'SELECT COUNT(*) FROM user_binder_items WHERE language IS NULL',
+        ),
+        2,
+      );
     }),
     skip: skip,
   );

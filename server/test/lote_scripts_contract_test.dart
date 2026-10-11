@@ -211,6 +211,39 @@ void main() {
     );
   });
 
+  test('d85_4: um CHECK com o nome certo só conta com a definição esperada, '
+      'a mesma que o script cria', () {
+    final body = code(files['d85_4_three_checks_not_valid_validate.sql']!);
+    expect(body, contains('pg_get_constraintdef(restricao.oid)'));
+    expect(body, contains("' NOT VALID\$'"));
+    expect(body, contains("THEN 'definicao_divergente'"));
+    expect(body, contains('já existe restrição com o nome e outra definição'));
+    // A recusa pela definição vem antes de qualquer ADD CONSTRAINT.
+    expect(
+      body.indexOf('outra definição'),
+      lessThan(body.indexOf('ADD CONSTRAINT')),
+    );
+  });
+
+  test('d74: a fusão de campos vai inteira para o receipt e o script roda '
+      'antes da primeira migration', () {
+    final source = files['d74_dedupe_sets_lower_code.sql']!;
+    final body = code(source);
+    expect(body, contains("'campo_herdado:' || campo.nome"));
+    expect(body, contains("SELECT 'fusao' AS fase"));
+    expect(body, contains("'saem=' || fusao.saem || ';herda='"));
+    expect(source, contains('antes da primeira migration e fora da janela'));
+    expect(source, isNot(contains('na janela das migrations')));
+  });
+
+  test('binder_drop: conta os itens com language nulo', () {
+    final body = code(
+      files['binder_drop_uq_binder_user_card_cond_foil_list.sql']!,
+    );
+    expect(body, contains("'itens_com_language_nulo'"));
+    expect(body, contains('WHERE language IS NULL'));
+  });
+
   test('d85_5: o passo b recalcula o mesmo arquivo do passo a', () {
     final archive = code(files['d85_5a_legacy_ruling_poststatus_archive.sql']!);
     final drop = code(files['d85_5b_drop_legacy_ruling_poststatus.sql']!);

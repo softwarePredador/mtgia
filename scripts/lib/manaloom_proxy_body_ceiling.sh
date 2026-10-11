@@ -12,6 +12,13 @@
 # resposta venha do backend: status abaixo de 500 e diferente de 413, com um
 # objeto JSON que tem `error` em texto. Nada é gravado: sem token, o backend
 # recusa (401), ou a capability fechada responde 404, antes de qualquer escrita.
+#
+# Um 413 sempre recusa, e a mensagem diz de quem ele veio pelo envelope: com o
+# objeto JSON do backend (`error` em texto, como `request_body_too_large` com o
+# `limit`), é o teto do próprio backend; sem ele (a página do nginx ou do Traefik),
+# é o proxy. O curl 55 (a conexão fechou antes de o corpo terminar de subir, como
+# num proxy que corta cedo ou numa conexão reaproveitada que caiu) ganha uma
+# retentativa curta; na segunda, o veredito vale.
 
 # O teto do import, em bytes, lido da constante do backend
 # (`const importRequestBodyLimitBytes = 5 * 1024 * 1024;`).
@@ -36,7 +43,7 @@ manaloom_require_proxy_body_ceiling() {
   local api_base_url="$1"
   local limit_bytes="$2"
   local probe_path="${3:-/import/validate}"
-  local work payload response status curl_status verdict
+  local work payload response status curl_status verdict attempt
 
   if [[ ! "$limit_bytes" =~ ^[1-9][0-9]*$ ]]; then
     echo "deploy recusado: teto de corpo do import invalido: '$limit_bytes'" >&2
@@ -63,35 +70,48 @@ PY
     return 2
   fi
 
-  curl_status=0
-  status="$(curl -sS -o "$response" -w '%{http_code}' \
-    --connect-timeout 10 --max-time 120 \
-    -X POST \
-    -H 'Content-Type: application/json' \
-    -H 'Expect:' \
-    --data-binary "@$payload" \
-    "${api_base_url%/}$probe_path")" || curl_status=$?
+  for attempt in 1 2; do
+    curl_status=0
+    status="$(curl -sS -o "$response" -w '%{http_code}' \
+      --connect-timeout 10 --max-time 120 \
+      -X POST \
+      -H 'Content-Type: application/json' \
+      -H 'Expect:' \
+      --data-binary "@$payload" \
+      "${api_base_url%/}$probe_path")" || curl_status=$?
+    if [[ "$curl_status" != "55" || "$attempt" == "2" ]]; then
+      break
+    fi
+    echo "conferencia do teto do proxy: curl 55 (conexao fechada cedo); repetindo uma vez" >&2
+    sleep 2
+  done
 
-  verdict="$(python3 - "$response" "$status" "$curl_status" <<'PY'
+  verdict="$(python3 - "$response" "$status" "$curl_status" "$attempt" <<'PY'
 import json
 import sys
 
-path, status, curl_status = sys.argv[1], sys.argv[2], sys.argv[3]
+path, status, curl_status, attempts = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
 if curl_status != "0":
-    print(f"a conexao caiu antes da resposta (curl {curl_status})")
-    raise SystemExit
-if status == "413":
-    print("413: o proxy recusou o corpo; o teto dele e menor que o do import")
-    raise SystemExit
-if not (status.isdigit() and len(status) == 3 and 100 <= int(status) < 500):
-    print(f"status {status}: a resposta nao veio do backend")
+    print(f"a conexao caiu antes da resposta (curl {curl_status}, {attempts} tentativa(s))")
     raise SystemExit
 try:
     with open(path, "rb") as handle:
         body = json.loads(handle.read().decode("utf-8"))
 except (OSError, UnicodeDecodeError, ValueError):
     body = None
-if not isinstance(body, dict) or not isinstance(body.get("error"), str):
+backend = isinstance(body, dict) and isinstance(body.get("error"), str)
+if status == "413":
+    if backend:
+        limit = body.get("limit")
+        detail = body["error"] + (f", limite {limit} bytes" if isinstance(limit, int) else "")
+        print(f"413 do backend ({detail}): o teto do proprio backend e menor que o do import")
+    else:
+        print("413 do proxy, sem o envelope JSON do backend: o teto dele e menor que o do import")
+    raise SystemExit
+if not (status.isdigit() and len(status) == 3 and 100 <= int(status) < 500):
+    print(f"status {status}: a resposta nao veio do backend")
+    raise SystemExit
+if not backend:
     print(f"status {status} sem o envelope JSON do backend")
     raise SystemExit
 print("ok")

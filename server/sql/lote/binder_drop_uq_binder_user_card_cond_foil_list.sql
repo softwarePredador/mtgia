@@ -12,8 +12,12 @@
 --   - o índice com esse nome não for o da auditoria BT-DB-001: único, de
 --     `user_binder_items`, em (user_id, card_id, condition, is_foil, list_type), sem
 --     expressão nem predicado.
--- A contagem antes e depois traz os dois índices, os itens do fichário e os grupos
--- da mesma cópia em mais de um idioma (zero enquanto o índice existir).
+-- A contagem antes e depois traz os dois índices, os itens do fichário, os grupos
+-- da mesma cópia em mais de um idioma (zero enquanto o índice existir) e os itens
+-- com `language` nulo. Na produção a coluna ainda aceita nulo (D-67), e um índice
+-- único não compara nulos: sem o índice antigo, só a identidade da 049 barra a
+-- mesma cópia, e ela não barra duas linhas iguais com `language` nulo. O número
+-- vai para o receipt, e o aperto do NOT NULL segue a D-67.
 --
 -- Roda no lote de deploy, depois da promoção (decisão do dono de 2026-10-10, item 11),
 -- pelo wrapper de escrita e com as duas aprovações canônicas no processo chamador.
@@ -105,7 +109,10 @@ SELECT 4, 'copias_em_mais_de_um_idioma',
            GROUP BY user_id, card_id, condition, is_foil, list_type
            HAVING COUNT(DISTINCT language) > 1
          ) grupos
-       );
+       )
+UNION ALL
+SELECT 5, 'itens_com_language_nulo',
+       (SELECT COUNT(*) FROM public.user_binder_items WHERE language IS NULL);
 
 SELECT 'antes' AS fase, objeto, quantidade::text FROM binder_contagem ORDER BY ordem;
 

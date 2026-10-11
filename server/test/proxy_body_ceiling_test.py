@@ -10,7 +10,8 @@ servidor real:
   de verdade contra servidores HTTP falsos em loopback: um backend passa; um proxy
   com teto de 1 MiB, um 502, uma página que não é do backend e uma conexão que cai
   barram; o corpo mandado tem exatamente o teto, e um backend com esse teto
-  aceita;
+  aceita; o 413 diz se veio do proxy ou do backend, pelo envelope; o curl 55
+  (conexão fechada cedo) ganha uma retentativa curta, e só ele;
 - o teto vem da constante do backend (`server/lib/request_body_limits.dart`);
 - o deploy do backend calcula o teto do código que vai subir e chama a conferência
   no pré-voo, logo depois da topologia do proxy e antes de qualquer mutação.
@@ -20,7 +21,10 @@ from __future__ import annotations
 
 import http.server
 import json
+import os
+import shutil
 import socket
+import stat
 import subprocess
 import tempfile
 import threading
@@ -140,11 +144,14 @@ class ProxyCeilingTest(unittest.TestCase):
         self.assertIn("status=401", result.stdout)
 
     def test_a_413_from_the_backend_itself_still_refuses(self) -> None:
-        # Um teto do backend menor que o do import também barra o deploy.
+        # Um teto do backend menor que o do import também barra o deploy, e a
+        # mensagem diz que o 413 veio do backend (o envelope JSON dele).
         with _FakeServer("backend_com_teto", limit=32 * 1024) as server:
             result = _ceiling(server.url, 64 * 1024)
         self.assertEqual(result.returncode, 2, result.stdout)
-        self.assertIn("413: o proxy recusou o corpo", result.stderr)
+        self.assertIn("413 do backend (request_body_too_large, limite 32768 bytes)",
+                      result.stderr)
+        self.assertNotIn("413 do proxy", result.stderr)
 
     def test_the_real_import_ceiling_passes_a_backend(self) -> None:
         limit = int(_import_limit(LIMITS).stdout)
@@ -159,7 +166,8 @@ class ProxyCeilingTest(unittest.TestCase):
             result = _ceiling(server.url, limit)
         self.assertEqual(result.returncode, 2)
         self.assertIn("deploy recusado: teto de corpo do proxy (D-83)", result.stderr)
-        self.assertIn("413: o proxy recusou o corpo", result.stderr)
+        self.assertIn("413 do proxy, sem o envelope JSON do backend", result.stderr)
+        self.assertNotIn("413 do backend", result.stderr)
 
     def test_answers_that_are_not_the_backend_refuse(self) -> None:
         for behaviour, reason in (
@@ -192,6 +200,58 @@ class ProxyCeilingTest(unittest.TestCase):
                 capture_output=True, text=True, timeout=120, env={"TMPDIR": tmp, "PATH": "/usr/bin:/bin:/usr/local/bin:/opt/homebrew/bin"})
             self.assertEqual(result.returncode, 2, result.stderr)
             self.assertEqual(list(Path(tmp).iterdir()), [])
+
+
+class CurlRetryTest(unittest.TestCase):
+    """O curl 55 ganha uma retentativa; os outros erros do curl, não. Um `curl`
+    falso na frente do PATH falha as primeiras [fail] chamadas com [code] e depois
+    chama o curl de verdade."""
+
+    def run_with_flaky_curl(self, behaviour: str, code: int, fail: int):
+        real = shutil.which("curl")
+        assert real, "curl ausente"
+        with tempfile.TemporaryDirectory() as folder, _FakeServer(behaviour) as server:
+            shim = Path(folder) / "curl"
+            counter = Path(folder) / "chamadas"
+            counter.write_text("0")
+            shim.write_text(
+                "#!/bin/bash\n"
+                f'n=$(( $(cat "{counter}") + 1 )); echo "$n" > "{counter}"\n'
+                f'if (( n <= {fail} )); then exit {code}; fi\n'
+                f'exec "{real}" "$@"\n')
+            shim.chmod(shim.stat().st_mode | stat.S_IXUSR)
+            result = subprocess.run(
+                [BASH, "-c",
+                 'set -euo pipefail; source "$1"; manaloom_require_proxy_body_ceiling "$2" "$3"',
+                 "_", str(LIB), server.url, str(64 * 1024)],
+                capture_output=True, text=True, timeout=120,
+                env={**os.environ, "PATH": f"{folder}:{os.environ['PATH']}"})
+            return result, int(counter.read_text()), list(server.received)
+
+    def test_one_early_close_is_retried_once(self) -> None:
+        result, calls, received = self.run_with_flaky_curl("backend", 55, 1)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("curl 55 (conexao fechada cedo); repetindo uma vez", result.stderr)
+        self.assertEqual(calls, 2)
+        self.assertEqual(received, [64 * 1024])
+
+    def test_two_early_closes_refuse(self) -> None:
+        result, calls, received = self.run_with_flaky_curl("backend", 55, 2)
+        self.assertEqual(result.returncode, 2, result.stdout)
+        self.assertIn("a conexao caiu antes da resposta (curl 55, 2 tentativa(s))",
+                      result.stderr)
+        self.assertEqual(calls, 2)
+        self.assertEqual(received, [])
+
+    def test_other_curl_errors_are_not_retried(self) -> None:
+        for code in (7, 28, 52, 56):
+            with self.subTest(curl=code):
+                result, calls, received = self.run_with_flaky_curl("backend", code, 1)
+                self.assertEqual(result.returncode, 2, result.stdout)
+                self.assertIn(f"(curl {code}, 1 tentativa(s))", result.stderr)
+                self.assertNotIn("repetindo", result.stderr)
+                self.assertEqual(calls, 1)
+                self.assertEqual(received, [])
 
 
 class ImportLimitTest(unittest.TestCase):
