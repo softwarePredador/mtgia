@@ -14,16 +14,26 @@ import 'package:shared_preferences/shared_preferences.dart';
 // troca o usuário guardado pelo da resposta, na memória e no aparelho. Com o
 // `user` truncado de antes (só id, nome de usuário e e-mail), os três campos
 // sumiam até o próximo login.
+//
+// O servidor é a autoridade do perfil: se ele mudou desde o login (nome e
+// avatar trocados em outro aparelho, por exemplo), o app adota o usuário da
+// resposta, e não o que tinha guardado. Por isso a resposta da troca traz um
+// usuário diferente do login.
 
 /// O perfil completo, com as mesmas chaves que o servidor devolve.
-Map<String, dynamic> _fullProfile() => <String, dynamic>{
+Map<String, dynamic> _fullProfile({
+  String displayName = 'Jogadora Um',
+  String avatarUrl = 'https://example.invalid/avatar.png',
+  String locationCity = 'Campinas',
+  String updatedAt = '2026-09-23T00:00:00.000Z',
+}) => <String, dynamic>{
   'id': '44444444-4444-4444-8444-444444444444',
   'username': 'jogadora',
   'email': 'jogadora@example.invalid',
-  'display_name': 'Jogadora Um',
-  'avatar_url': 'https://example.invalid/avatar.png',
+  'display_name': displayName,
+  'avatar_url': avatarUrl,
   'location_state': 'SP',
-  'location_city': 'Campinas',
+  'location_city': locationCity,
   'trade_notes': 'Troco commander',
   'profile_visibility': 'private',
   'binder_visibility': 'public',
@@ -33,8 +43,21 @@ Map<String, dynamic> _fullProfile() => <String, dynamic>{
   'trade_notes_visibility': 'trade_only',
   'email_verified': true,
   'created_at': '2026-09-01T00:00:00.000Z',
-  'updated_at': '2026-09-23T00:00:00.000Z',
+  'updated_at': updatedAt,
 };
+
+const _nameAfterRotation = 'Jogadora Renomeada';
+const _avatarAfterRotation = 'https://example.invalid/avatar-novo.png';
+const _cityAfterRotation = 'Santos';
+
+/// O usuário que o servidor devolve na troca: o mesmo id, com o perfil
+/// mudado desde o login.
+Map<String, dynamic> _profileAfterRotation() => _fullProfile(
+  displayName: _nameAfterRotation,
+  avatarUrl: _avatarAfterRotation,
+  locationCity: _cityAfterRotation,
+  updatedAt: '2026-10-10T00:00:00.000Z',
+);
 
 class _MemoryTokenBackend implements SecureTokenBackend {
   String? value;
@@ -69,13 +92,13 @@ class _AccountSecurityApi extends ApiClient {
       case '/auth/change-password':
         return ApiResponse(200, {
           'token': 'rotated-token',
-          'user': _fullProfile(),
+          'user': _profileAfterRotation(),
         });
       case '/auth/revoke-sessions':
         return ApiResponse(200, {
           'token': 'rotated-token',
           'sessions_revoked': true,
-          'user': _fullProfile(),
+          'user': _profileAfterRotation(),
         });
     }
     return ApiResponse(404, {'error': 'not_found'});
@@ -92,22 +115,20 @@ Future<AuthProvider> _signedIn(_AccountSecurityApi api) async {
     isTrue,
   );
   expect(auth.user!.emailVerified, isTrue);
+  expect(auth.user!.displayName, 'Jogadora Um');
+  expect(auth.user!.avatarUrl, 'https://example.invalid/avatar.png');
   return auth;
 }
 
-Future<void> _expectProfileKept(AuthProvider auth) async {
+Future<void> _expectServerUserAdopted(AuthProvider auth) async {
   expect(auth.token, 'rotated-token');
   final user = auth.user!;
   expect(user.emailVerified, isTrue, reason: 'e-mail verificado');
-  expect(user.displayName, 'Jogadora Um', reason: 'nome');
-  expect(
-    user.avatarUrl,
-    'https://example.invalid/avatar.png',
-    reason: 'avatar',
-  );
+  expect(user.displayName, _nameAfterRotation, reason: 'nome do servidor');
+  expect(user.avatarUrl, _avatarAfterRotation, reason: 'avatar do servidor');
+  expect(user.locationCity, _cityAfterRotation, reason: 'cidade do servidor');
   expect(user.profileVisibility, 'private');
   expect(user.tradeNotesVisibility, 'trade_only');
-  expect(user.locationCity, 'Campinas');
 
   // O usuário guardado no aparelho é o que o próximo boot carrega.
   final prefs = await SharedPreferences.getInstance();
@@ -118,11 +139,15 @@ Future<void> _expectProfileKept(AuthProvider auth) async {
     isTrue,
     reason: 'e-mail verificado guardado',
   );
-  expect(stored['display_name'], 'Jogadora Um', reason: 'nome guardado');
+  expect(
+    stored['display_name'],
+    _nameAfterRotation,
+    reason: 'nome do servidor guardado',
+  );
   expect(
     stored['avatar_url'],
-    'https://example.invalid/avatar.png',
-    reason: 'avatar guardado',
+    _avatarAfterRotation,
+    reason: 'avatar do servidor guardado',
   );
 }
 
@@ -133,27 +158,25 @@ void main() {
   });
   tearDown(ApiClient.resetForTesting);
 
-  test(
-    'trocar a senha mantém e-mail verificado, nome e avatar (BT-AUTH-007)',
-    () async {
-      final api = _AccountSecurityApi();
-      final auth = await _signedIn(api);
+  test('trocar a senha adota o usuário do servidor, com e-mail verificado, '
+      'nome e avatar (BT-AUTH-007)', () async {
+    final api = _AccountSecurityApi();
+    final auth = await _signedIn(api);
 
-      expect(
-        await auth.changePassword(
-          currentPassword: 'Senha!Atual-Forte-2026',
-          newPassword: 'kX9#vQ2!mZr7@Lp4',
-        ),
-        isTrue,
-      );
+    expect(
+      await auth.changePassword(
+        currentPassword: 'Senha!Atual-Forte-2026',
+        newPassword: 'kX9#vQ2!mZr7@Lp4',
+      ),
+      isTrue,
+    );
 
-      expect(api.endpoints.last, '/auth/change-password');
-      await _expectProfileKept(auth);
-    },
-  );
+    expect(api.endpoints.last, '/auth/change-password');
+    await _expectServerUserAdopted(auth);
+  });
 
-  test('encerrar as outras sessões mantém e-mail verificado, nome e avatar '
-      '(BT-AUTH-007)', () async {
+  test('encerrar as outras sessões adota o usuário do servidor, com e-mail '
+      'verificado, nome e avatar (BT-AUTH-007)', () async {
     final api = _AccountSecurityApi();
     final auth = await _signedIn(api);
 
@@ -163,6 +186,6 @@ void main() {
     );
 
     expect(api.endpoints.last, '/auth/revoke-sessions');
-    await _expectProfileKept(auth);
+    await _expectServerUserAdopted(auth);
   });
 }

@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c6dd8a1b1171c173e2eba71a0eec0a6dac97930ca105ccd7db867b49f7944d40",
+  "source_digest_sha256": "2149a3b286f692edad0155609c838b5c087fc92b8f3ecb1d5adc0f9955fca2fb",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -293112,7 +293112,7 @@
     "schema_version": 2,
     "generated_from": {
       "path": "docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md",
-      "sha256": "dc8a4202832cf4b03b88ced1a7d08fb3c9794736d270547afeebf4fe46a95a75"
+      "sha256": "f42f2fdd61e788f8739353fd68533b9268c1380449b09a084f19bf647a874149"
     },
     "required_task_fields": [
       "id",
@@ -293350,7 +293350,7 @@
         "status": "IMPLEMENTED_LOCAL_PENDING_FULL_GATE",
         "delivery": "Trocar a senha não sobrescreve o usuário completo com um `user` truncado (achado 6 dos fluxos; alcançável hoje).",
         "depends_on": [],
-        "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app. Corrigido no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `POST /auth/change-password` e `POST /auth/revoke-sessions` devolvem o usuário completo, no formato de `GET /users/me`, lido do próprio `UPDATE ... RETURNING`; o app, que já troca o usuário guardado pelo da resposta, deixa de perder os campos sem mudar código. Evidência: `server/test/account_security_full_user_test.dart` (4 testes; a volta do `user` truncado falha em 2). O teste de app pedido no aceite entrou em 2026-10-10: `app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart` faz login com o perfil completo, troca a senha e encerra as outras sessões com a resposta no formato de `GET /users/me` e confere e-mail verificado, nome e avatar na memória e no usuário guardado no aparelho. As duas mutações do app (o usuário truncado no lugar do da resposta e o avatar fora do usuário guardado) fazem o teste falhar. Receipt: `docs/qa/execution/2026-10-10/BT-AUTH-007-teste-de-app.md`. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`).",
+        "acceptance": "Depois de trocar a senha, e-mail verificado, nome e avatar continuam iguais no app; teste de servidor e de app. Corrigido no servidor em 2026-09-23, na branch `seguranca/d19-buracos-2026-09-23`: `POST /auth/change-password` e `POST /auth/revoke-sessions` devolvem o usuário completo, no formato de `GET /users/me`, lido do próprio `UPDATE ... RETURNING`; o app, que já troca o usuário guardado pelo da resposta, deixa de perder os campos sem mudar código. Evidência: `server/test/account_security_full_user_test.dart` (4 testes; a volta do `user` truncado falha em 2). O teste de app pedido no aceite entrou em 2026-10-10: `app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart` faz login com o perfil completo, troca a senha e encerra as outras sessões com a resposta no formato de `GET /users/me`, com nome, avatar e cidade diferentes dos do login, e confere que o app adota o usuário da resposta: e-mail verificado, nome e avatar na memória e no usuário guardado no aparelho. As três mutações do app (o usuário truncado no lugar do da resposta, o usuário de antes no lugar do da resposta e o avatar fora do usuário guardado) fazem o teste falhar. Receipt: `docs/qa/execution/2026-10-10/BT-AUTH-007-teste-de-app.md`. No ar em produção desde 2026-09-23 às 08:08 UTC (`166aaed57`, `docs/qa/execution/2026-09-23/deploy-seguranca-d19.md`).",
         "section": "Épico B — Conta, autorização, privacidade e segurança",
         "source_line": 377
       },
@@ -298424,7 +298424,7 @@
       "schema_version": 1,
       "generated_from": {
         "path": "docs/execution/CURRENT_QUEUE.md",
-        "sha256": "66ec4453bb6665d11325779998e6a7597343567b3302034810e5126bb36b5029"
+        "sha256": "b7b66f9514d206b6c4872f7a1e3b859853b0e7f94f6acadb0a25a185b18ca7de"
       },
       "wip_limit": 1,
       "wip_scope": "per_lane",
@@ -303401,7 +303401,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c6dd8a1b1171c173e2eba71a0eec0a6dac97930ca105ccd7db867b49f7944d40"
+    "project_logic_source_digest_sha256": "2149a3b286f692edad0155609c838b5c087fc92b8f3ecb1d5adc0f9955fca2fb"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
