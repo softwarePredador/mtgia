@@ -22,7 +22,9 @@ import 'support/scripted_pool.dart';
 /// nele o índice com a definição da auditoria BT-DB-001. O `POST /binder` roda de
 /// verdade: com o índice, a mesma carta em outro idioma dá 500; depois do script,
 /// ela entra (201), e a mesma cópia física continua barrada pela identidade da
-/// 049 (409). O script roda pelo `psql`, como no lote, duas vezes.
+/// 049 (409). O script roda pelo `psql`, como no lote: a prévia (o padrão) não
+/// grava nada, e a gravação (`-v aplicar=1`) exige a contagem da prévia; ela roda
+/// duas vezes.
 ///
 /// Requer `RUN_LOTE_DB_TESTS=1` e as variáveis `DB_*` de um banco descartável
 /// em loopback.
@@ -117,8 +119,27 @@ void main() {
       expect((await post(copy, owner, 'pt-br')).statusCode, 500);
       expect(await languages(copy), ['en']);
 
-      final first = await copy.runScript(script);
+      final untouched = await copy.fingerprint();
+      final preview = await copy.runScript(script);
+      expect(preview.exitCode, 0, reason: '$preview');
+      expect(preview.previewRolledBack, isTrue, reason: '$preview');
+      expect(preview.actionCounts, {'indices_removidos': '1'});
+      expect(preview.value('depois', 'uq_binder_user_card_cond_foil_list'), '0');
+      expect(await copy.fingerprint(), untouched);
+      expect((await post(copy, owner, 'pt-br')).statusCode, 500);
+      await expectApplyRefusals(
+        copy,
+        script,
+        expected: preview.actionCounts,
+        refusal: 'binder_drop recusado',
+      );
+
+      final first = await copy.applyScript(
+        script,
+        expected: preview.actionCounts,
+      );
       expect(first.exitCode, 0, reason: '$first');
+      expect(first.appliedCommitted, isTrue, reason: '$first');
       expect(first.value('antes', 'uq_binder_user_card_cond_foil_list'), '1');
       expect(first.value('antes', 'uq_user_binder_items_physical_identity'), '1');
       expect(first.value('antes', 'itens_do_fichario'), '1');
@@ -139,7 +160,10 @@ void main() {
         containsPair('code', 'binder_item_identity_conflict'),
       );
 
-      final second = await copy.runScript(script);
+      final second = await copy.applyScript(
+        script,
+        expected: {'indices_removidos': '0'},
+      );
       expect(second.exitCode, 0, reason: '$second');
       expect(second.value('antes', 'uq_binder_user_card_cond_foil_list'), '0');
       expect(second.value('antes', 'copias_em_mais_de_um_idioma'), '1');

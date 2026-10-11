@@ -16,19 +16,55 @@
 -- da mesma cópia em mais de um idioma (zero enquanto o índice existir).
 --
 -- Roda no lote de deploy, depois da promoção (decisão do dono de 2026-10-10, item 11),
--- com a palavra do dono na hora, pelo wrapper de escrita e com as duas aprovações
--- canônicas no processo chamador:
+-- pelo wrapper de escrita e com as duas aprovações canônicas no processo chamador.
+-- Primeiro a prévia (o padrão): faz tudo, imprime antes, ação e depois e desfaz
+-- (ROLLBACK):
 --   server/bin/with_new_server_pg.sh --write-approved psql -X -v ON_ERROR_STOP=1 \
 --     -At -F $'\t' -f server/sql/lote/binder_drop_uq_binder_user_card_cond_foil_list.sql
--- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases antes, acao e depois).
+-- Depois, com a palavra do dono sobre o número da prévia, a gravação: `-v aplicar=1`
+-- exige a contagem esperada da ação e recusa tudo (RAISE) se ela não bater:
+--   ... -v aplicar=1 -v esperado_indices_removidos=<n da prévia> ...
+-- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao e depois).
 -- Uma transação só. Idempotente: sem o índice, não faz nada.
 
 \set ON_ERROR_STOP on
+\if :{?aplicar}
+\else
+\set aplicar 0
+\endif
+\if :{?esperado_indices_removidos}
+\else
+\set esperado_indices_removidos ''
+\endif
 
 BEGIN;
 SET LOCAL lock_timeout = '10s';
 SET LOCAL statement_timeout = '120s';
+SET LOCAL manaloom.lote_aplicar = :'aplicar';
+SET LOCAL manaloom.lote_esperado_indices_removidos = :'esperado_indices_removidos';
 
+DO $binder_drop_modo$
+BEGIN
+  IF current_setting('manaloom.lote_aplicar') NOT IN ('0', '1') THEN
+    RAISE EXCEPTION
+      'binder_drop recusado: -v aplicar aceita só 1 (gravar); sem ele o script é prévia. Nada foi mudado.';
+  END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.lote_esperado_indices_removidos') !~ '^[0-9]+$' THEN
+      RAISE EXCEPTION
+        'binder_drop recusado: com -v aplicar=1, informe -v esperado_indices_removidos=<n> (a contagem da prévia). Nada foi mudado.';
+    END IF;
+  END IF;
+END;
+$binder_drop_modo$;
+
+SELECT current_setting('manaloom.lote_aplicar') = '1' AS lote_grava \gset
+
+SELECT 'modo' AS fase, 'escrita' AS objeto,
+       CASE WHEN current_setting('manaloom.lote_aplicar') = '1'
+            THEN 'aplicar' ELSE 'previa' END AS quantidade;
+
+-- Objetos temporários dentro da transação: somem no COMMIT ou no ROLLBACK da prévia.
 CREATE TEMP VIEW binder_indices AS
 SELECT index_class.relname::text AS nome,
        index_row.indisunique AS unico,
@@ -128,10 +164,25 @@ BEGIN
   IF to_regclass('public.uq_user_binder_items_physical_identity') IS NULL THEN
     RAISE EXCEPTION 'binder_drop: a identidade física da 049 sumiu';
   END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.binder_drop_removidos')::integer
+       <> current_setting('manaloom.lote_esperado_indices_removidos')::integer THEN
+      RAISE EXCEPTION
+        'binder_drop recusado: a ação removeu % índice(s) e o esperado (-v esperado_indices_removidos) é %. Nada foi gravado.',
+        current_setting('manaloom.binder_drop_removidos'),
+        current_setting('manaloom.lote_esperado_indices_removidos');
+    END IF;
+  END IF;
 END;
 $binder_drop_pos$;
 
 DROP VIEW binder_contagem;
 DROP VIEW binder_indices;
 
+\if :lote_grava
 COMMIT;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'commit' AS quantidade;
+\else
+ROLLBACK;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'rollback' AS quantidade;
+\endif

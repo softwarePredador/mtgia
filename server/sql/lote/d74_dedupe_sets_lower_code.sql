@@ -20,22 +20,76 @@
 --     o script só conta as cartas cujo código exato era o de uma linha que saiu.
 --
 -- Roda no lote de deploy, depois da 076 e antes da 077, na janela das migrations,
--- com a contagem antes e depois no receipt e a palavra do dono na hora, pelo wrapper
--- de escrita e com as duas aprovações canônicas no processo chamador:
+-- pelo wrapper de escrita e com as duas aprovações canônicas no processo chamador.
+-- Primeiro a prévia (o padrão): faz tudo, imprime antes, ação e depois e desfaz
+-- (ROLLBACK):
 --   server/bin/with_new_server_pg.sh --write-approved psql -X -v ON_ERROR_STOP=1 \
 --     -At -F $'\t' -f server/sql/lote/d74_dedupe_sets_lower_code.sql
--- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases antes, acao e depois).
+-- Depois, com a palavra do dono sobre os números da prévia, a gravação: `-v aplicar=1`
+-- exige as três contagens esperadas da ação e recusa tudo (RAISE) se uma não bater:
+--   ... -v aplicar=1 \
+--       -v esperado_referencias_levadas_para_a_linha_que_fica=<n da prévia> \
+--       -v esperado_linhas_que_ficam_com_campo_herdado=<n da prévia> \
+--       -v esperado_linhas_apagadas=<n da prévia> ...
+-- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao e depois).
 -- Uma transação só, com `sets` travada contra escrita (o job do catálogo espera).
 -- Idempotente: sem duplicata, não muda nada.
 
 \set ON_ERROR_STOP on
+\if :{?aplicar}
+\else
+\set aplicar 0
+\endif
+\if :{?esperado_referencias_levadas_para_a_linha_que_fica}
+\else
+\set esperado_referencias_levadas_para_a_linha_que_fica ''
+\endif
+\if :{?esperado_linhas_que_ficam_com_campo_herdado}
+\else
+\set esperado_linhas_que_ficam_com_campo_herdado ''
+\endif
+\if :{?esperado_linhas_apagadas}
+\else
+\set esperado_linhas_apagadas ''
+\endif
 
 BEGIN;
 SET LOCAL lock_timeout = '10s';
 SET LOCAL statement_timeout = '300s';
+SET LOCAL manaloom.lote_aplicar = :'aplicar';
+SET LOCAL manaloom.lote_esperado_apontadas = :'esperado_referencias_levadas_para_a_linha_que_fica';
+SET LOCAL manaloom.lote_esperado_fundidas = :'esperado_linhas_que_ficam_com_campo_herdado';
+SET LOCAL manaloom.lote_esperado_apagadas = :'esperado_linhas_apagadas';
+
+DO $d74_modo$
+BEGIN
+  IF current_setting('manaloom.lote_aplicar') NOT IN ('0', '1') THEN
+    RAISE EXCEPTION
+      'd74 recusado: -v aplicar aceita só 1 (gravar); sem ele o script é prévia. Nada foi mudado.';
+  END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF (
+      current_setting('manaloom.lote_esperado_apontadas') !~ '^[0-9]+$'
+      OR current_setting('manaloom.lote_esperado_fundidas') !~ '^[0-9]+$'
+      OR current_setting('manaloom.lote_esperado_apagadas') !~ '^[0-9]+$'
+    ) THEN
+      RAISE EXCEPTION
+        'd74 recusado: com -v aplicar=1, informe -v esperado_referencias_levadas_para_a_linha_que_fica=<n>, -v esperado_linhas_que_ficam_com_campo_herdado=<n> e -v esperado_linhas_apagadas=<n> (as contagens da prévia). Nada foi mudado.';
+    END IF;
+  END IF;
+END;
+$d74_modo$;
+
+SELECT current_setting('manaloom.lote_aplicar') = '1' AS lote_grava \gset
+
+SELECT 'modo' AS fase, 'escrita' AS objeto,
+       CASE WHEN current_setting('manaloom.lote_aplicar') = '1'
+            THEN 'aplicar' ELSE 'previa' END AS quantidade;
 
 LOCK TABLE public.sets IN SHARE ROW EXCLUSIVE MODE;
 
+-- Tabelas temporárias dentro da transação (ON COMMIT DROP): somem no COMMIT ou no
+-- ROLLBACK da prévia.
 CREATE TEMP TABLE d74_grupo ON COMMIT DROP AS
 SELECT set_row.code,
        LOWER(set_row.code) AS chave,
@@ -203,7 +257,32 @@ BEGIN
   ) THEN
     RAISE EXCEPTION 'd74: ainda há código de set duplicado sem caixa';
   END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF (
+      current_setting('manaloom.d74_apontadas')::bigint
+        <> current_setting('manaloom.lote_esperado_apontadas')::bigint
+      OR current_setting('manaloom.d74_fundidas')::bigint
+        <> current_setting('manaloom.lote_esperado_fundidas')::bigint
+      OR current_setting('manaloom.d74_apagadas')::bigint
+        <> current_setting('manaloom.lote_esperado_apagadas')::bigint
+    ) THEN
+      RAISE EXCEPTION
+        'd74 recusado: a ação levou % referência(s), fundiu % e apagou % linha(s), e o esperado é %, % e %. Nada foi gravado.',
+        current_setting('manaloom.d74_apontadas'),
+        current_setting('manaloom.d74_fundidas'),
+        current_setting('manaloom.d74_apagadas'),
+        current_setting('manaloom.lote_esperado_apontadas'),
+        current_setting('manaloom.lote_esperado_fundidas'),
+        current_setting('manaloom.lote_esperado_apagadas');
+    END IF;
+  END IF;
 END;
 $d74_pos$;
 
+\if :lote_grava
 COMMIT;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'commit' AS quantidade;
+\else
+ROLLBACK;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'rollback' AS quantidade;
+\endif

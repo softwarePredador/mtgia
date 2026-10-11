@@ -2,14 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:postgres/postgres.dart';
+import 'package:test/test.dart';
 
 /// Banco descartável para os scripts do lote de deploy (`server/sql/lote/`).
 ///
 /// Os testes de banco recebem em `DB_*` um PostgreSQL descartável em loopback,
 /// migrado do zero (`database_setup.sql` e `bin/migrate.dart`). Cada cenário roda
-/// numa cópia dele (`CREATE DATABASE ... TEMPLATE`), apagada no fim, porque os
-/// scripts do lote fazem `COMMIT` de verdade. O script roda pelo `psql`, com os
-/// mesmos argumentos do lote, e nunca por uma reescrita em Dart.
+/// numa cópia dele (`CREATE DATABASE ... TEMPLATE`), apagada no fim, porque a
+/// gravação dos scripts do lote (`-v aplicar=1`) faz `COMMIT` de verdade. O script
+/// roda pelo `psql`, com os mesmos argumentos do lote, e nunca por uma reescrita em
+/// Dart. Sem `-v aplicar=1`, o script é a prévia: faz tudo e desfaz (`ROLLBACK`).
 ///
 /// Requer `RUN_LOTE_DB_TESTS=1`; o `psql` vem de `MANALOOM_PSQL_BIN` ou do PATH.
 class LoteDatabase {
@@ -87,7 +89,8 @@ class LoteCopy {
   );
 
   /// Roda um arquivo de `server/sql/lote/` como no lote: `psql -X`,
-  /// `ON_ERROR_STOP`, saída sem alinhamento e separada por TAB.
+  /// `ON_ERROR_STOP`, saída sem alinhamento e separada por TAB. Sem a variável
+  /// `aplicar`, é a prévia.
   Future<PsqlRun> runScript(
     String fileName, {
     Map<String, String> variables = const {},
@@ -123,6 +126,62 @@ class LoteCopy {
       result.stdout as List<int>,
       result.stderr as String,
     );
+  }
+
+  /// A gravação de um script do lote, como depois da prévia: `-v aplicar=1` e,
+  /// para cada objeto da ação, `-v esperado_<objeto>=<n>`.
+  Future<PsqlRun> applyScript(
+    String fileName, {
+    required Map<String, String> expected,
+    Map<String, String> variables = const {},
+  }) => runScript(
+    fileName,
+    variables: {
+      ...variables,
+      'aplicar': '1',
+      for (final entry in expected.entries)
+        'esperado_${entry.key}': entry.value,
+    },
+  );
+
+  /// Impressão digital do schema `public`: relações, restrições (com a
+  /// definição e se está validada), tipos e as linhas de cada tabela. Igual
+  /// antes e depois quer dizer que nada foi gravado.
+  Future<String> fingerprint() async {
+    final result = await sql(r"""
+      SELECT md5(COALESCE(string_agg(item, E'\n' ORDER BY item), ''))
+      FROM (
+        SELECT 'rel:' || c.relname::text || ':' || c.relkind::text AS item
+        FROM pg_class c
+        WHERE c.relnamespace = 'public'::regnamespace
+        UNION ALL
+        SELECT 'con:' || r.conrelid::regclass::text || ':' || r.conname::text || ':'
+               || r.convalidated::text || ':' || pg_get_constraintdef(r.oid)
+        FROM pg_constraint r
+        WHERE r.connamespace = 'public'::regnamespace
+        UNION ALL
+        SELECT 'type:' || t.typname::text
+        FROM pg_type t
+        WHERE t.typnamespace = 'public'::regnamespace
+        UNION ALL
+        SELECT 'rows:' || c.relname::text || ':' || (
+                 xpath(
+                   '/row/h/text()',
+                   query_to_xml(
+                     format(
+                       'SELECT md5(COALESCE(string_agg(t::text, E''\n'' '
+                       'ORDER BY t::text), '''')) AS h FROM %I.%I t',
+                       'public', c.relname
+                     ),
+                     false, true, ''
+                   )
+                 )
+               )[1]::text
+        FROM pg_class c
+        WHERE c.relnamespace = 'public'::regnamespace AND c.relkind IN ('r', 'p')
+      ) items
+    """);
+    return result.single[0] as String;
   }
 
   Future<Result> sql(String statement, [Map<String, Object?>? parameters]) =>
@@ -169,6 +228,23 @@ class PsqlRun {
           .single
           .$3;
 
+  /// As quantidades da fase `acao`, como o operador as lê na prévia para
+  /// passar `-v esperado_<objeto>=<n>` na gravação.
+  Map<String, String> get actionCounts => {
+    for (final row in rows)
+      if (row.$1 == 'acao') row.$2: row.$3,
+  };
+
+  /// A prévia rodou inteira e foi desfeita.
+  bool get previewRolledBack =>
+      value('modo', 'escrita') == 'previa' &&
+      value('modo', 'desfecho') == 'rollback';
+
+  /// A gravação rodou inteira e foi confirmada.
+  bool get appliedCommitted =>
+      value('modo', 'escrita') == 'aplicar' &&
+      value('modo', 'desfecho') == 'commit';
+
   @override
   String toString() => 'exit=$exitCode\nstdout:\n$stdout\nstderr:\n$stderr';
 }
@@ -184,4 +260,52 @@ Future<String> insertLoteUser(LoteCopy copy, String handle) async {
     {'username': handle, 'email': '$handle@example.test'},
   );
   return result.single[0] as String;
+}
+
+/// A gravação recusa, sem gravar nada, quando falta a contagem esperada de algum
+/// objeto da ação, quando uma delas não bate (uma a mais em cada objeto, uma de
+/// cada vez) e quando `-v aplicar` não é `1`. [expected] são as contagens certas;
+/// [refusal] é o prefixo da mensagem (`d85_1 recusado`).
+Future<void> expectApplyRefusals(
+  LoteCopy copy,
+  String fileName, {
+  required Map<String, String> expected,
+  required String refusal,
+  Map<String, String> variables = const {},
+}) async {
+  final before = await copy.fingerprint();
+
+  final missing = await copy.runScript(
+    fileName,
+    variables: {...variables, 'aplicar': '1'},
+  );
+  expect(missing.exitCode, isNot(0), reason: '$missing');
+  expect(missing.stderr, contains(refusal));
+  expect(missing.stderr, contains('informe -v esperado_'));
+
+  for (final key in expected.keys) {
+    final wrong = {
+      for (final entry in expected.entries)
+        entry.key: entry.key == key
+            ? '${int.parse(entry.value) + 1}'
+            : entry.value,
+    };
+    final mismatch = await copy.applyScript(
+      fileName,
+      expected: wrong,
+      variables: variables,
+    );
+    expect(mismatch.exitCode, isNot(0), reason: '$key: $mismatch');
+    expect(mismatch.stderr, contains(refusal), reason: key);
+    expect(mismatch.stderr, contains('o esperado'), reason: key);
+  }
+
+  final invalid = await copy.runScript(
+    fileName,
+    variables: {...variables, 'aplicar': 'sim'},
+  );
+  expect(invalid.exitCode, isNot(0), reason: '$invalid');
+  expect(invalid.stderr, contains('-v aplicar aceita só 1'));
+
+  expect(await copy.fingerprint(), before, reason: 'a recusa gravou algo');
 }

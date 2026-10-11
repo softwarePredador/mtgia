@@ -12,7 +12,10 @@ import 'support/lote_database.dart';
 /// D-85: as cinco correções de dados do lote (`server/sql/lote/d85_*.sql`) num
 /// PostgreSQL descartável, migrado do zero e copiado para cada cenário, com
 /// linhas que a correção pega e linhas que ela não pode tocar. Cada script roda
-/// pelo `psql`, como no lote, duas vezes: a segunda não muda nada.
+/// pelo `psql`, como no lote: primeiro a prévia (o padrão), que imprime antes,
+/// ação e depois e não grava nada; depois a gravação (`-v aplicar=1`) com as
+/// contagens da prévia (`-v esperado_<objeto>=<n>`), duas vezes: a segunda não
+/// muda nada. Sem as contagens, ou com uma errada, a gravação recusa sem gravar.
 ///
 /// Requer `RUN_LOTE_DB_TESTS=1` e as variáveis `DB_*` de um banco descartável
 /// em loopback.
@@ -103,8 +106,22 @@ void main() {
           'SELECT COALESCE(SUM(revision), 0)::bigint FROM decks',
         );
 
-        final first = await copy.runScript(script);
+        final untouched = await copy.fingerprint();
+        final preview = await copy.runScript(script);
+        expect(preview.exitCode, 0, reason: '$preview');
+        expect(preview.previewRolledBack, isTrue, reason: '$preview');
+        expect(preview.value('antes', 'descricao_igual_a_prompt_salvo'), '2');
+        expect(preview.value('acao', 'descricoes_limpas'), '2');
+        expect(preview.value('depois', 'decks_com_descricao'), '2');
+        expect(preview.value('depois', 'descricao_igual_a_prompt_salvo'), '0');
+        expect(await copy.fingerprint(), untouched);
+
+        final first = await copy.applyScript(
+          script,
+          expected: preview.actionCounts,
+        );
         expect(first.exitCode, 0, reason: '$first');
+        expect(first.appliedCommitted, isTrue, reason: '$first');
         expect(first.value('antes', 'decks_com_descricao'), '4');
         expect(first.value('antes', 'descricao_igual_a_prompt_salvo'), '2');
         expect(first.value('acao', 'descricoes_limpas'), '2');
@@ -125,11 +142,29 @@ void main() {
         expect(await copy.count('SELECT COUNT(*) FROM deck_change_events'), 0);
 
         final before = await descriptions(copy);
-        final second = await copy.runScript(script);
+        final second = await copy.applyScript(
+          script,
+          expected: {'descricoes_limpas': '0'},
+        );
         expect(second.exitCode, 0, reason: '$second');
         expect(second.value('antes', 'descricao_igual_a_prompt_salvo'), '0');
         expect(second.value('acao', 'descricoes_limpas'), '0');
         expect(await descriptions(copy), before);
+      }),
+      skip: enabled ? false : LoteDatabase.skipReason,
+    );
+
+    test(
+      'a gravação sem a contagem esperada, ou com ela errada, recusa e não '
+      'grava nada',
+      () => withCopy('d85_1_esperado', (copy) async {
+        await seed(copy);
+        await expectApplyRefusals(
+          copy,
+          script,
+          expected: {'descricoes_limpas': '2'},
+          refusal: 'd85_1 recusado',
+        );
       }),
       skip: enabled ? false : LoteDatabase.skipReason,
     );
@@ -184,8 +219,26 @@ void main() {
             row[0] as String,
         ];
 
-        final first = await copy.runScript(script);
+        final untouched = await copy.fingerprint();
+        final preview = await copy.runScript(script);
+        expect(preview.exitCode, 0, reason: '$preview');
+        expect(preview.previewRolledBack, isTrue, reason: '$preview');
+        expect(preview.actionCounts, {'orfaos_publicos_apagados': '2'});
+        expect(preview.value('depois', 'relatorios'), '3');
+        expect(await copy.fingerprint(), untouched);
+        await expectApplyRefusals(
+          copy,
+          script,
+          expected: preview.actionCounts,
+          refusal: 'd85_2 recusado',
+        );
+
+        final first = await copy.applyScript(
+          script,
+          expected: preview.actionCounts,
+        );
         expect(first.exitCode, 0, reason: '$first');
+        expect(first.appliedCommitted, isTrue, reason: '$first');
         expect(first.value('antes', 'relatorios'), '5');
         expect(first.value('antes', 'orfaos_publicos'), '2');
         expect(first.value('antes', 'orfaos_privados_fora_do_escopo'), '1');
@@ -199,7 +252,10 @@ void main() {
           'orfao_privado',
         ]);
 
-        final second = await copy.runScript(script);
+        final second = await copy.applyScript(
+          script,
+          expected: {'orfaos_publicos_apagados': '0'},
+        );
         expect(second.exitCode, 0, reason: '$second');
         expect(second.value('acao', 'orfaos_publicos_apagados'), '0');
         expect(second.value('depois', 'relatorios'), '3');
@@ -254,8 +310,26 @@ void main() {
       () => withCopy('d85_3', (copy) async {
         await seed(copy);
 
-        final first = await copy.runScript(script);
+        final untouched = await copy.fingerprint();
+        final preview = await copy.runScript(script);
+        expect(preview.exitCode, 0, reason: '$preview');
+        expect(preview.previewRolledBack, isTrue, reason: '$preview');
+        expect(preview.actionCounts, {'eventos_limpos': '4'});
+        expect(preview.value('depois', 'eventos_com_chave_antiga'), '0');
+        expect(await copy.fingerprint(), untouched);
+        await expectApplyRefusals(
+          copy,
+          script,
+          expected: preview.actionCounts,
+          refusal: 'd85_3 recusado',
+        );
+
+        final first = await copy.applyScript(
+          script,
+          expected: preview.actionCounts,
+        );
         expect(first.exitCode, 0, reason: '$first');
+        expect(first.appliedCommitted, isTrue, reason: '$first');
         expect(first.value('antes', 'eventos'), '7');
         expect(first.value('antes', 'eventos_com_chave_antiga'), '4');
         expect(first.value('antes', 'metadata.idempotency_key'), '1');
@@ -295,7 +369,10 @@ void main() {
         });
 
         final before = await metadata(copy);
-        final second = await copy.runScript(script);
+        final second = await copy.applyScript(
+          script,
+          expected: {'eventos_limpos': '0'},
+        );
         expect(second.exitCode, 0, reason: '$second');
         expect(second.value('antes', 'eventos_com_chave_antiga'), '0');
         expect(second.value('acao', 'eventos_limpos'), '0');
@@ -387,8 +464,20 @@ void main() {
         expect(before.keys, unorderedEquals(checks.values));
         expect(before.values.every((value) => value.$2), isTrue);
 
-        final run = await copy.runScript(script);
+        final preview = await copy.runScript(script);
+        expect(preview.exitCode, 0, reason: '$preview');
+        expect(preview.previewRolledBack, isTrue, reason: '$preview');
+        expect(preview.actionCounts, {
+          'checks_criados_not_valid': '0',
+          'checks_validados': '0',
+        });
+
+        final run = await copy.applyScript(
+          script,
+          expected: preview.actionCounts,
+        );
         expect(run.exitCode, 0, reason: '$run');
+        expect(run.appliedCommitted, isTrue, reason: '$run');
         expect(run.value('acao', 'checks_criados_not_valid'), '0');
         expect(run.value('acao', 'checks_validados'), '0');
         expect(await state(copy), before);
@@ -443,8 +532,37 @@ void main() {
         await copy.sql(
           "UPDATE user_binder_items SET currency = 'USD' WHERE currency = 'EUR'",
         );
-        final applied = await copy.runScript(script);
+        // A prévia faz as duas fases numa transação só e desfaz tudo.
+        final untouched = await copy.fingerprint();
+        final preview = await copy.runScript(script);
+        expect(preview.exitCode, 0, reason: '$preview');
+        expect(preview.previewRolledBack, isTrue, reason: '$preview');
+        expect(preview.actionCounts, {
+          'checks_criados_not_valid': '3',
+          'checks_validados': '3',
+        });
+        for (final entry in checks.entries) {
+          expect(
+            preview.value('depois', '${entry.key}.${entry.value}:estado'),
+            'validado',
+          );
+        }
+        expect(await state(copy), isEmpty);
+        expect(await copy.fingerprint(), untouched);
+        await expectApplyRefusals(
+          copy,
+          script,
+          expected: preview.actionCounts,
+          refusal: 'd85_4 recusado',
+        );
+        expect(await state(copy), isEmpty);
+
+        final applied = await copy.applyScript(
+          script,
+          expected: preview.actionCounts,
+        );
         expect(applied.exitCode, 0, reason: '$applied');
+        expect(applied.appliedCommitted, isTrue, reason: '$applied');
         expect(applied.value('acao', 'checks_criados_not_valid'), '3');
         expect(applied.value('acao', 'checks_validados'), '3');
         for (final entry in checks.entries) {
@@ -468,7 +586,10 @@ void main() {
           throwsA(isA<Object>()),
         );
 
-        final second = await copy.runScript(script);
+        final second = await copy.applyScript(
+          script,
+          expected: {'checks_criados_not_valid': '0', 'checks_validados': '0'},
+        );
         expect(second.exitCode, 0, reason: '$second');
         expect(second.value('acao', 'checks_criados_not_valid'), '0');
         expect(second.value('acao', 'checks_validados'), '0');
@@ -491,7 +612,10 @@ void main() {
             'trade_message', 'direct_message')) NOT VALID
         ''');
 
-        final run = await copy.runScript(script);
+        final run = await copy.applyScript(
+          script,
+          expected: {'checks_criados_not_valid': '2', 'checks_validados': '3'},
+        );
         expect(run.exitCode, 0, reason: '$run');
         expect(
           run.value('antes', 'notifications.notifications_type_check:estado'),
@@ -579,16 +703,57 @@ void main() {
           contains('linha 1\nlinha 2\ttab'),
         );
 
-        // Sem o arquivo: nada sai.
-        final withoutArchive = await copy.runScript(dropScript);
+        // A prévia sem o arquivo mostra o sha256 e as linhas que o banco tem, faz
+        // tudo e desfaz: nada sai.
+        final untouched = await copy.fingerprint();
+        final blindPreview = await copy.runScript(dropScript);
+        expect(blindPreview.exitCode, 0, reason: '$blindPreview');
+        expect(blindPreview.previewRolledBack, isTrue, reason: '$blindPreview');
+        expect(blindPreview.value('acao', 'arquivo:conferencia'), 'nao_informado');
+        expect(blindPreview.value('acao', 'arquivo:sha256_no_banco'), first.sha);
+        expect(blindPreview.value('acao', 'arquivo:linhas_no_banco'), first.lines);
+        expect(blindPreview.value('acao', 'linhas_do_arquivo_conferidas'), '0');
+        expect(blindPreview.value('acao', 'objetos_apagados'), '1');
+        expect(
+          blindPreview.value('depois', 'card_rulings_legacy:linhas'),
+          'ausente',
+        );
+        expect(await copy.fingerprint(), untouched);
+
+        // A prévia com o arquivo confere como a gravação.
+        final preview = await copy.runScript(
+          dropScript,
+          variables: {'arquivo_sha256': first.sha, 'arquivo_linhas': first.lines},
+        );
+        expect(preview.exitCode, 0, reason: '$preview');
+        expect(preview.previewRolledBack, isTrue, reason: '$preview');
+        expect(preview.value('acao', 'arquivo:conferencia'), 'conferido');
+        expect(preview.value('acao', 'linhas_do_arquivo_conferidas'), '4');
+        expect(await copy.fingerprint(), untouched);
+
+        // A gravação sem o arquivo: nada sai.
+        final withoutArchive = await copy.applyScript(
+          dropScript,
+          expected: {'objetos_apagados': '1'},
+        );
         expect(withoutArchive.exitCode, isNot(0), reason: '$withoutArchive');
         expect(withoutArchive.stderr, contains('d85_5b recusado'));
         expect(withoutArchive.stderr, contains('informe -v arquivo_sha256'));
         expect(await exists(copy, 'public.card_rulings_legacy'), isTrue);
 
-        // Arquivo de outro conteúdo: nada sai.
-        final wrong = await copy.runScript(
+        // Sem a contagem esperada, ou com ela errada: nada sai.
+        await expectApplyRefusals(
+          copy,
           dropScript,
+          expected: {'objetos_apagados': '1'},
+          refusal: 'd85_5b recusado',
+          variables: {'arquivo_sha256': first.sha, 'arquivo_linhas': first.lines},
+        );
+
+        // Arquivo de outro conteúdo: nada sai.
+        final wrong = await copy.applyScript(
+          dropScript,
+          expected: {'objetos_apagados': '1'},
           variables: {'arquivo_sha256': '0' * 64, 'arquivo_linhas': first.lines},
         );
         expect(wrong.exitCode, isNot(0), reason: '$wrong');
@@ -600,8 +765,9 @@ void main() {
           "UPDATE card_rulings_legacy SET ruling_text = 'mudou' "
           "WHERE card_name = 'Sol Ring'",
         );
-        final stale = await copy.runScript(
+        final stale = await copy.applyScript(
           dropScript,
+          expected: {'objetos_apagados': '1'},
           variables: {'arquivo_sha256': first.sha, 'arquivo_linhas': first.lines},
         );
         expect(stale.exitCode, isNot(0), reason: '$stale');
@@ -613,8 +779,9 @@ void main() {
           'CREATE VIEW lote_dependente AS SELECT card_name FROM card_rulings_legacy',
         );
         final current = await archive(copy);
-        final dependent = await copy.runScript(
+        final dependent = await copy.applyScript(
           dropScript,
+          expected: {'objetos_apagados': '1'},
           variables: {
             'arquivo_sha256': current.sha,
             'arquivo_linhas': current.lines,
@@ -627,14 +794,17 @@ void main() {
         await copy.sql('DROP VIEW lote_dependente');
 
         // Arquivo certo: a tabela sai; o enum fica, porque a posts o usa.
-        final partial = await copy.runScript(
+        final partial = await copy.applyScript(
           dropScript,
+          expected: {'objetos_apagados': '1'},
           variables: {
             'arquivo_sha256': current.sha,
             'arquivo_linhas': current.lines,
           },
         );
         expect(partial.exitCode, 0, reason: '$partial');
+        expect(partial.appliedCommitted, isTrue, reason: '$partial');
+        expect(partial.value('acao', 'objetos_apagados'), '1');
         expect(partial.value('antes', 'card_rulings_legacy:linhas'), '3');
         expect(partial.value('antes', 'poststatus:estado'), 'presente');
         expect(
@@ -656,8 +826,9 @@ void main() {
         await copy.sql('DROP TABLE posts');
         final typeOnly = await archive(copy);
         expect(typeOnly.lines, '1');
-        final complete = await copy.runScript(
+        final complete = await copy.applyScript(
           dropScript,
+          expected: {'objetos_apagados': '1'},
           variables: {
             'arquivo_sha256': typeOnly.sha,
             'arquivo_linhas': typeOnly.lines,
@@ -672,6 +843,12 @@ void main() {
         final again = await copy.runScript(dropScript);
         expect(again.exitCode, 0, reason: '$again');
         expect(again.value('resultado', 'd85_5'), 'nada_a_fazer');
+        final againApplied = await copy.applyScript(
+          dropScript,
+          expected: {'objetos_apagados': '0'},
+        );
+        expect(againApplied.exitCode, 0, reason: '$againApplied');
+        expect(againApplied.value('resultado', 'd85_5'), 'nada_a_fazer');
         final emptyArchive = await archive(copy);
         expect(emptyArchive.lines, '0');
       }),

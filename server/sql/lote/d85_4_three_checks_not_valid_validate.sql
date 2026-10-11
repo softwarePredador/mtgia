@@ -8,25 +8,80 @@
 -- `server/sql/readonly/bt_db_005_check_violations.sql`: violação é a linha em que a
 -- condição dá falso (NULL não viola um CHECK).
 --
--- Duas transações:
+-- Na gravação (`-v aplicar=1`), duas transações:
 --   1. conta as violações e, só com zero em todas, cria os que faltam como NOT VALID
 --      (trava curta, sem varrer a tabela; a partir daqui linha nova já é conferida).
 --      Uma violação em qualquer um recusa os três e nada é criado;
 --   2. valida os que ainda não estão validados (varre a tabela sem bloquear escrita).
 -- Se a validação falhar, o CHECK fica NOT VALID (continua barrando linha nova) e o
 -- script sai com erro: o dado é tratado e o script roda de novo.
+-- Na prévia (o padrão), as duas fases correm numa transação só, que é desfeita
+-- (ROLLBACK) no fim; a trava do ADD CONSTRAINT dura até lá (as três tabelas são
+-- pequenas, e a prévia leva segundos).
 --
 -- Roda no lote de deploy, depois da promoção (decisão do dono de 2026-10-10, item 11),
--- com a contagem antes e depois no receipt e a palavra do dono na hora, pelo wrapper
--- de escrita e com as duas aprovações canônicas no processo chamador:
+-- pelo wrapper de escrita e com as duas aprovações canônicas no processo chamador.
+-- Primeiro a prévia:
 --   server/bin/with_new_server_pg.sh --write-approved psql -X -v ON_ERROR_STOP=1 \
 --     -At -F $'\t' -f server/sql/lote/d85_4_three_checks_not_valid_validate.sql
--- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases antes, acao e depois); nas
--- linhas `<CHECK>:estado`, a terceira coluna é ausente, not_valid ou validado. Idempotente: a segunda
--- rodada acha os três validados e não muda nada.
+-- Depois, com a palavra do dono sobre os números da prévia, a gravação: `-v aplicar=1`
+-- exige as duas contagens esperadas da ação e recusa (RAISE) se não baterem. As duas
+-- são conferidas na transação 1, antes de criar qualquer CHECK, e cada uma de novo
+-- depois da sua ação:
+--   ... -v aplicar=1 -v esperado_checks_criados_not_valid=<n da prévia> \
+--       -v esperado_checks_validados=<n da prévia> ...
+-- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao e depois); nas
+-- linhas `<CHECK>:estado`, a terceira coluna é ausente, not_valid ou validado.
+-- Idempotente: a segunda rodada acha os três validados e não muda nada.
 
 \set ON_ERROR_STOP on
+\if :{?aplicar}
+\else
+\set aplicar 0
+\endif
+\if :{?esperado_checks_criados_not_valid}
+\else
+\set esperado_checks_criados_not_valid ''
+\endif
+\if :{?esperado_checks_validados}
+\else
+\set esperado_checks_validados ''
+\endif
 
+-- Transação 1: contar e, com zero, criar NOT VALID. Na prévia, a única.
+BEGIN;
+SET LOCAL lock_timeout = '10s';
+SET LOCAL statement_timeout = '120s';
+SET LOCAL manaloom.lote_aplicar = :'aplicar';
+SET LOCAL manaloom.lote_esperado_checks_criados_not_valid = :'esperado_checks_criados_not_valid';
+SET LOCAL manaloom.lote_esperado_checks_validados = :'esperado_checks_validados';
+
+DO $d85_4_modo$
+BEGIN
+  IF current_setting('manaloom.lote_aplicar') NOT IN ('0', '1') THEN
+    RAISE EXCEPTION
+      'd85_4 recusado: -v aplicar aceita só 1 (gravar); sem ele o script é prévia. Nada foi mudado.';
+  END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF (
+      current_setting('manaloom.lote_esperado_checks_criados_not_valid') !~ '^[0-9]+$'
+      OR current_setting('manaloom.lote_esperado_checks_validados') !~ '^[0-9]+$'
+    ) THEN
+      RAISE EXCEPTION
+        'd85_4 recusado: com -v aplicar=1, informe -v esperado_checks_criados_not_valid=<n> e -v esperado_checks_validados=<n> (as contagens da prévia). Nada foi mudado.';
+    END IF;
+  END IF;
+END;
+$d85_4_modo$;
+
+SELECT current_setting('manaloom.lote_aplicar') = '1' AS lote_grava \gset
+
+SELECT 'modo' AS fase, 'escrita' AS objeto,
+       CASE WHEN current_setting('manaloom.lote_aplicar') = '1'
+            THEN 'aplicar' ELSE 'previa' END AS quantidade;
+
+-- Objetos temporários dentro da transação. Na prévia, o ROLLBACK os desfaz; na
+-- gravação, a transação 2 os apaga antes do COMMIT.
 CREATE TEMP VIEW d85_4_violacoes AS
 SELECT 'ml_prompt_feedback.chk_ml_prompt_feedback_effectiveness_score' AS objeto,
        (
@@ -75,11 +130,6 @@ LEFT JOIN pg_constraint restricao
  AND restricao.contype = 'c'
 ORDER BY esperado.ordem;
 
--- Transação 1: contar e, com zero, criar NOT VALID.
-BEGIN;
-SET LOCAL lock_timeout = '10s';
-SET LOCAL statement_timeout = '120s';
-
 SELECT 'antes' AS fase, objeto || ':violacoes' AS objeto, violacoes::text AS quantidade
 FROM d85_4_violacoes;
 
@@ -89,6 +139,8 @@ FROM d85_4_estado;
 DO $d85_4_not_valid$
 DECLARE
   recusa TEXT;
+  criar_previsto INTEGER;
+  validar_previsto INTEGER;
   criados INTEGER := 0;
 BEGIN
   SELECT string_agg(
@@ -102,6 +154,25 @@ BEGIN
     RAISE EXCEPTION
       'd85_4 recusado: há linhas que violam %; trate o dado antes (D-85). Nada foi criado.',
       recusa;
+  END IF;
+
+  SELECT COUNT(*) FILTER (WHERE estado = 'ausente'),
+         COUNT(*) FILTER (WHERE estado IN ('ausente', 'not_valid'))
+  INTO criar_previsto, validar_previsto
+  FROM d85_4_estado;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF (
+      criar_previsto
+        <> current_setting('manaloom.lote_esperado_checks_criados_not_valid')::integer
+      OR validar_previsto
+        <> current_setting('manaloom.lote_esperado_checks_validados')::integer
+    ) THEN
+      RAISE EXCEPTION
+        'd85_4 recusado: a ação criaria % e validaria % CHECK(s), e o esperado (-v esperado_checks_criados_not_valid, -v esperado_checks_validados) é % e %. Nada foi criado.',
+        criar_previsto, validar_previsto,
+        current_setting('manaloom.lote_esperado_checks_criados_not_valid'),
+        current_setting('manaloom.lote_esperado_checks_validados');
+    END IF;
   END IF;
 
   IF NOT EXISTS (
@@ -144,6 +215,14 @@ BEGIN
     criados := criados + 1;
   END IF;
 
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF criados
+       <> current_setting('manaloom.lote_esperado_checks_criados_not_valid')::integer THEN
+      RAISE EXCEPTION
+        'd85_4 recusado: a ação criou % CHECK(s) e o esperado é %. Nada foi criado.',
+        criados, current_setting('manaloom.lote_esperado_checks_criados_not_valid');
+    END IF;
+  END IF;
   PERFORM set_config('manaloom.d85_4_criados', criados::text, true);
 END;
 $d85_4_not_valid$;
@@ -151,12 +230,15 @@ $d85_4_not_valid$;
 SELECT 'acao' AS fase, 'checks_criados_not_valid' AS objeto,
        current_setting('manaloom.d85_4_criados') AS quantidade;
 
+-- Transação 2: validar o que ainda está NOT VALID. Na prévia, a mesma transação.
+\if :lote_grava
 COMMIT;
-
--- Transação 2: validar o que ainda está NOT VALID.
 BEGIN;
+\endif
 SET LOCAL lock_timeout = '10s';
 SET LOCAL statement_timeout = '300s';
+SET LOCAL manaloom.lote_aplicar = :'aplicar';
+SET LOCAL manaloom.lote_esperado_checks_validados = :'esperado_checks_validados';
 
 DO $d85_4_validate$
 DECLARE
@@ -202,10 +284,25 @@ BEGIN
   IF EXISTS (SELECT 1 FROM d85_4_estado WHERE estado <> 'validado') THEN
     RAISE EXCEPTION 'd85_4: os três CHECK não ficaram validados';
   END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.d85_4_validados')::integer
+       <> current_setting('manaloom.lote_esperado_checks_validados')::integer THEN
+      RAISE EXCEPTION
+        'd85_4 recusado: a ação validou % CHECK(s) e o esperado (-v esperado_checks_validados) é %. A validação foi desfeita.',
+        current_setting('manaloom.d85_4_validados'),
+        current_setting('manaloom.lote_esperado_checks_validados');
+    END IF;
+  END IF;
 END;
 $d85_4_pos$;
 
-COMMIT;
-
 DROP VIEW d85_4_estado;
 DROP VIEW d85_4_violacoes;
+
+\if :lote_grava
+COMMIT;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'commit' AS quantidade;
+\else
+ROLLBACK;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'rollback' AS quantidade;
+\endif

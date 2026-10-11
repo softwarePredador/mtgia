@@ -11,19 +11,54 @@
 -- do dono, e o ledger só registra o que as rotas mudam.
 --
 -- Roda no lote de deploy, depois da promoção (decisão do dono de 2026-10-10, item 11),
--- com a contagem antes e depois no receipt e a palavra do dono na hora, pelo wrapper
--- de escrita e com as duas aprovações canônicas no processo chamador:
+-- pelo wrapper de escrita e com as duas aprovações canônicas no processo chamador.
+-- Primeiro a prévia (o padrão): faz tudo, imprime antes, ação e depois e desfaz
+-- (ROLLBACK):
 --   server/bin/with_new_server_pg.sh --write-approved psql -X -v ON_ERROR_STOP=1 \
 --     -At -F $'\t' -f server/sql/lote/d85_1_deck_description_generate_prompt.sql
--- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases antes, acao e depois).
+-- Depois, com a palavra do dono sobre o número da prévia, a gravação: `-v aplicar=1`
+-- exige a contagem esperada da ação e recusa tudo (RAISE) se ela não bater:
+--   ... -v aplicar=1 -v esperado_descricoes_limpas=<n da prévia> ...
+-- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao e depois).
 -- Uma transação só: qualquer erro desfaz tudo. Idempotente: a segunda rodada não
 -- acha alvo e não muda nada.
 
 \set ON_ERROR_STOP on
+\if :{?aplicar}
+\else
+\set aplicar 0
+\endif
+\if :{?esperado_descricoes_limpas}
+\else
+\set esperado_descricoes_limpas ''
+\endif
 
 BEGIN;
 SET LOCAL lock_timeout = '10s';
 SET LOCAL statement_timeout = '120s';
+SET LOCAL manaloom.lote_aplicar = :'aplicar';
+SET LOCAL manaloom.lote_esperado_descricoes_limpas = :'esperado_descricoes_limpas';
+
+DO $d85_1_modo$
+BEGIN
+  IF current_setting('manaloom.lote_aplicar') NOT IN ('0', '1') THEN
+    RAISE EXCEPTION
+      'd85_1 recusado: -v aplicar aceita só 1 (gravar); sem ele o script é prévia. Nada foi mudado.';
+  END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.lote_esperado_descricoes_limpas') !~ '^[0-9]+$' THEN
+      RAISE EXCEPTION
+        'd85_1 recusado: com -v aplicar=1, informe -v esperado_descricoes_limpas=<n> (a contagem da prévia). Nada foi mudado.';
+    END IF;
+  END IF;
+END;
+$d85_1_modo$;
+
+SELECT current_setting('manaloom.lote_aplicar') = '1' AS lote_grava \gset
+
+SELECT 'modo' AS fase, 'escrita' AS objeto,
+       CASE WHEN current_setting('manaloom.lote_aplicar') = '1'
+            THEN 'aplicar' ELSE 'previa' END AS quantidade;
 
 DO $d85_1_pre$
 BEGIN
@@ -40,6 +75,7 @@ $d85_1_pre$;
 -- Nenhuma descrição muda entre a contagem e a limpeza.
 LOCK TABLE public.decks IN SHARE ROW EXCLUSIVE MODE;
 
+-- Objeto temporário dentro da transação: some no COMMIT ou no ROLLBACK da prévia.
 CREATE TEMP VIEW d85_1_alvo AS
 SELECT deck.id
 FROM public.decks deck
@@ -75,7 +111,8 @@ WITH limpos AS (
   WHERE deck.id IN (SELECT id FROM d85_1_alvo)
   RETURNING deck.id
 )
-SELECT 'acao' AS fase, 'descricoes_limpas' AS objeto, COUNT(*)::text AS quantidade
+SELECT 'acao' AS fase, 'descricoes_limpas' AS objeto,
+       set_config('manaloom.d85_1_limpas', COUNT(*)::text, true) AS quantidade
 FROM limpos;
 
 SELECT 'depois' AS fase, 'decks_com_descricao' AS objeto, COUNT(*)::text AS quantidade
@@ -91,9 +128,24 @@ BEGIN
   IF EXISTS (SELECT 1 FROM d85_1_alvo) THEN
     RAISE EXCEPTION 'd85_1: ainda há descrição igual a prompt salvo depois da limpeza';
   END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.d85_1_limpas')::bigint
+       <> current_setting('manaloom.lote_esperado_descricoes_limpas')::bigint THEN
+      RAISE EXCEPTION
+        'd85_1 recusado: a ação limpou % descrição(ões) e o esperado (-v esperado_descricoes_limpas) é %. Nada foi gravado.',
+        current_setting('manaloom.d85_1_limpas'),
+        current_setting('manaloom.lote_esperado_descricoes_limpas');
+    END IF;
+  END IF;
 END;
 $d85_1_pos$;
 
 DROP VIEW d85_1_alvo;
 
+\if :lote_grava
 COMMIT;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'commit' AS quantidade;
+\else
+ROLLBACK;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'rollback' AS quantidade;
+\endif

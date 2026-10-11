@@ -9,20 +9,54 @@
 -- para a tabela inteira.
 --
 -- Roda no lote de deploy, depois da 073 e da promoção (decisão do dono de
--- 2026-10-10, item 11), com a contagem antes e depois no receipt e a palavra do dono
--- na hora, pelo wrapper de escrita e com as duas aprovações canônicas no processo
--- chamador:
+-- 2026-10-10, item 11), pelo wrapper de escrita e com as duas aprovações canônicas no
+-- processo chamador. Primeiro a prévia (o padrão): faz tudo, imprime antes, ação e
+-- depois e desfaz (ROLLBACK):
 --   server/bin/with_new_server_pg.sh --write-approved psql -X -v ON_ERROR_STOP=1 \
 --     -At -F $'\t' -f server/sql/lote/d85_3_activation_event_legacy_metadata.sql
--- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases antes, acao e depois).
+-- Depois, com a palavra do dono sobre o número da prévia, a gravação: `-v aplicar=1`
+-- exige a contagem esperada da ação e recusa tudo (RAISE) se ela não bater:
+--   ... -v aplicar=1 -v esperado_eventos_limpos=<n da prévia> ...
+-- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao e depois).
 -- Uma transação só: qualquer erro desfaz tudo. Idempotente: a segunda rodada não
 -- acha alvo e não muda nada.
 
 \set ON_ERROR_STOP on
+\if :{?aplicar}
+\else
+\set aplicar 0
+\endif
+\if :{?esperado_eventos_limpos}
+\else
+\set esperado_eventos_limpos ''
+\endif
 
 BEGIN;
 SET LOCAL lock_timeout = '10s';
 SET LOCAL statement_timeout = '120s';
+SET LOCAL manaloom.lote_aplicar = :'aplicar';
+SET LOCAL manaloom.lote_esperado_eventos_limpos = :'esperado_eventos_limpos';
+
+DO $d85_3_modo$
+BEGIN
+  IF current_setting('manaloom.lote_aplicar') NOT IN ('0', '1') THEN
+    RAISE EXCEPTION
+      'd85_3 recusado: -v aplicar aceita só 1 (gravar); sem ele o script é prévia. Nada foi mudado.';
+  END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.lote_esperado_eventos_limpos') !~ '^[0-9]+$' THEN
+      RAISE EXCEPTION
+        'd85_3 recusado: com -v aplicar=1, informe -v esperado_eventos_limpos=<n> (a contagem da prévia). Nada foi mudado.';
+    END IF;
+  END IF;
+END;
+$d85_3_modo$;
+
+SELECT current_setting('manaloom.lote_aplicar') = '1' AS lote_grava \gset
+
+SELECT 'modo' AS fase, 'escrita' AS objeto,
+       CASE WHEN current_setting('manaloom.lote_aplicar') = '1'
+            THEN 'aplicar' ELSE 'previa' END AS quantidade;
 
 DO $d85_3_pre$
 BEGIN
@@ -38,6 +72,7 @@ $d85_3_pre$;
 -- Nenhum evento muda entre a contagem e a limpeza.
 LOCK TABLE public.activation_funnel_events IN SHARE ROW EXCLUSIVE MODE;
 
+-- Objetos temporários dentro da transação: somem no COMMIT ou no ROLLBACK da prévia.
 CREATE TEMP VIEW d85_3_chaves AS
 SELECT evento.id,
        evento.metadata ? 'idempotency_key' AS idempotency_key,
@@ -105,7 +140,8 @@ WITH limpos AS (
   WHERE evento.id IN (SELECT id FROM d85_3_alvo)
   RETURNING evento.id
 )
-SELECT 'acao' AS fase, 'eventos_limpos' AS objeto, COUNT(*)::text AS quantidade
+SELECT 'acao' AS fase, 'eventos_limpos' AS objeto,
+       set_config('manaloom.d85_3_limpos', COUNT(*)::text, true) AS quantidade
 FROM limpos;
 
 SELECT 'depois' AS fase, 'eventos' AS objeto, COUNT(*)::text AS quantidade
@@ -123,6 +159,15 @@ BEGIN
   IF EXISTS (SELECT 1 FROM d85_3_alvo) THEN
     RAISE EXCEPTION 'd85_3: ainda há evento com chave antiga depois da limpeza';
   END IF;
+  IF current_setting('manaloom.lote_aplicar') = '1' THEN
+    IF current_setting('manaloom.d85_3_limpos')::bigint
+       <> current_setting('manaloom.lote_esperado_eventos_limpos')::bigint THEN
+      RAISE EXCEPTION
+        'd85_3 recusado: a ação limpou % evento(s) e o esperado (-v esperado_eventos_limpos) é %. Nada foi gravado.',
+        current_setting('manaloom.d85_3_limpos'),
+        current_setting('manaloom.lote_esperado_eventos_limpos');
+    END IF;
+  END IF;
 END;
 $d85_3_pos$;
 
@@ -130,4 +175,10 @@ DROP VIEW d85_3_contagem_por_chave;
 DROP VIEW d85_3_alvo;
 DROP VIEW d85_3_chaves;
 
+\if :lote_grava
 COMMIT;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'commit' AS quantidade;
+\else
+ROLLBACK;
+SELECT 'modo' AS fase, 'desfecho' AS objeto, 'rollback' AS quantidade;
+\endif

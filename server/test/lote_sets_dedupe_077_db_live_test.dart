@@ -20,7 +20,9 @@ import 'support/scripted_pool.dart';
 /// Num PostgreSQL descartável migrado do zero, cada cenário copia o banco e volta a
 /// cópia para a 076 (sem o índice e sem a 077 no ledger), como a produção. A 077 roda
 /// pelo `bin/migrate.dart` de verdade: com duplicata ela falha fechada e não grava
-/// nada; depois do script, aplica. O script roda pelo `psql`, como no lote.
+/// nada; depois do script, aplica. O script roda pelo `psql`, como no lote: a
+/// prévia (o padrão) não grava nada, e a gravação (`-v aplicar=1`) exige as
+/// contagens da prévia.
 ///
 /// Requer `RUN_LOTE_DB_TESTS=1` e as variáveis `DB_*` de um banco descartável
 /// em loopback.
@@ -152,8 +154,31 @@ void main() {
       expect(await hasUniqueLowerIndex(copy), isFalse);
       expect(await copy.count('SELECT COUNT(*) FROM sets'), 8);
 
-      final first = await copy.runScript(script);
+      final untouched = await copy.fingerprint();
+      final preview = await copy.runScript(script);
+      expect(preview.exitCode, 0, reason: '$preview');
+      expect(preview.previewRolledBack, isTrue, reason: '$preview');
+      expect(preview.value('acao', 'linhas_apagadas'), '4');
+      expect(preview.value('depois', 'codigos_duplicados'), '0');
+      expect(await copy.fingerprint(), untouched);
+      final expected = {
+        for (final key in const [
+          'referencias_levadas_para_a_linha_que_fica',
+          'linhas_que_ficam_com_campo_herdado',
+          'linhas_apagadas',
+        ])
+          key: preview.value('acao', key),
+      };
+      await expectApplyRefusals(
+        copy,
+        script,
+        expected: expected,
+        refusal: 'd74 recusado',
+      );
+
+      final first = await copy.applyScript(script, expected: expected);
       expect(first.exitCode, 0, reason: '$first');
+      expect(first.appliedCommitted, isTrue, reason: '$first');
       expect(first.value('antes', 'sets'), '8');
       expect(first.value('antes', 'codigos_sem_caixa'), '4');
       expect(first.value('antes', 'codigos_duplicados'), '3');
@@ -248,7 +273,14 @@ void main() {
       expect(card['set_code'], 'abc');
       expect(card['set_name'], 'Alpha Beta (MTGJSON)');
 
-      final second = await copy.runScript(script);
+      final second = await copy.applyScript(
+        script,
+        expected: {
+          'referencias_levadas_para_a_linha_que_fica': '0',
+          'linhas_que_ficam_com_campo_herdado': '0',
+          'linhas_apagadas': '0',
+        },
+      );
       expect(second.exitCode, 0, reason: '$second');
       expect(second.value('antes', 'linhas_a_mais'), '0');
       expect(second.value('acao', 'linhas_apagadas'), '0');
