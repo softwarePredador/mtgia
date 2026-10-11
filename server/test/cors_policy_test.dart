@@ -68,5 +68,84 @@ void main() {
         isFalse,
       );
     });
+
+    test('a deck write from the web app passes the preflight with If-Match '
+        'and Idempotency-Key (DCK-P0-01)', () {
+      final policy = CorsPolicy.fromEnvironment({
+        'ENVIRONMENT': 'production',
+        'MANALOOM_ALLOWED_ORIGINS': 'https://app.manaloom.example',
+      });
+
+      // O que o Chrome manda no preflight da escrita do app: minúsculas, em
+      // ordem, sem espaço.
+      const deckWrite =
+          'authorization,content-type,idempotency-key,if-match,x-request-id';
+      for (final method in const ['POST', 'PUT', 'PATCH', 'DELETE']) {
+        expect(
+          policy.isValidPreflight(
+            requestedMethod: method,
+            requestedHeaders: deckWrite,
+          ),
+          isTrue,
+          reason: method,
+        );
+      }
+      for (final header in const ['If-Match', 'Idempotency-Key']) {
+        expect(
+          policy.isValidPreflight(
+            requestedMethod: 'PATCH',
+            requestedHeaders: header,
+          ),
+          isTrue,
+          reason: header,
+        );
+      }
+      expect(
+        policy.isValidPreflight(
+          requestedMethod: 'PATCH',
+          requestedHeaders: '$deckWrite,x-unlisted-header',
+        ),
+        isFalse,
+        reason: 'one unlisted header refuses the whole preflight',
+      );
+    });
+
+    test('the response headers come from the same lists as the preflight', () {
+      final policy = CorsPolicy.fromEnvironment({
+        'ENVIRONMENT': 'production',
+        'MANALOOM_ALLOWED_ORIGINS': 'https://app.manaloom.example',
+      });
+      Set<String> listed(String name) =>
+          CorsPolicy.responseHeaders[name]!
+              .split(',')
+              .map((value) => value.trim().toLowerCase())
+              .where((value) => value.isNotEmpty)
+              .toSet();
+
+      final allowHeaders = listed('Access-Control-Allow-Headers');
+      expect(allowHeaders, CorsPolicy.allowedHeaders);
+      expect(allowHeaders, containsAll(['if-match', 'idempotency-key']));
+      expect(
+        policy.isValidPreflight(
+          requestedMethod: 'POST',
+          requestedHeaders:
+              CorsPolicy.responseHeaders['Access-Control-Allow-Headers'],
+        ),
+        isTrue,
+        reason: 'every header the response announces passes the preflight',
+      );
+
+      final allowMethods = listed('Access-Control-Allow-Methods');
+      expect(
+        allowMethods,
+        CorsPolicy.allowedMethods.map((m) => m.toLowerCase()).toSet(),
+      );
+
+      // O app lê a revisão do deck e o request id da resposta.
+      expect(
+        listed('Access-Control-Expose-Headers'),
+        containsAll(['etag', 'x-request-id']),
+      );
+    });
   });
 }
