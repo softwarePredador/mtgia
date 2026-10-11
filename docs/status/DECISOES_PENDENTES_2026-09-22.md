@@ -372,6 +372,11 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 **D-84 · Backup local: 30 dias, com cifra em repouso pelo FileVault.**
 - **Decisão do dono:** "30 dias + FileVault". São os 30 dias da D-69, e o disco do Mac que guarda os dumps já é cifrado.
 - **Consequência:** quando a rotação estiver automatizada, o consumidor `backups` da exclusão de conta passa a fechar pelo tempo, em 30 dias mais 1. Até lá, apagar dump continua pedindo o sim do dono na hora.
+- **Execução (2026-10-10, PR #38, `ab0276dbd`):**
+  - A rotação está automatizada. O `scripts/manaloom_backup_cadence.py rotate --apply` apaga só o dump governado com mais de 30 dias e fora do `keep`, e o `scripts/manaloom_backup_cycle.sh` a roda depois de cada backup, com recibo.
+  - O ciclo ainda não está agendado: cada execução lê a produção e pede a aprovação live. Agendar é configuração persistente e fica com o dono. Até lá, o consumidor `backups` continua bloqueado.
+  - Fechar o consumidor pelo tempo é código do backend e pede deploy. Só vale com ensaio aprovado a cada 7 dias (D-83), porque o `keep` guarda o dump mais novo com ensaio aprovado, mesmo vencido.
+  - O roteiro do lote, fora do repositório, ainda manda apagar à mão e precisa ser ajustado.
 
 **D-85 · Correções de dados na produção, aprovadas em princípio.**
 - **Decisão do dono:** "Aprovar em princípio". Cada correção roda no lote de deploy, com contagem antes e depois, receipt e confirmação do dono na hora da escrita.
@@ -436,7 +441,7 @@ plano até o GO (`mvp_plan.md`) e da crítica a esse plano (`mvp_critic.md`), pr
 `wf_21d790dd-9c9` da sessão de coordenação `4d2db55c` sobre o `master` `1f525a1c1`; os dois também
 ficam fora do repositório. Os itens 1 a 14 e 16 a 24 do pacote viraram a D-92 a D-114, nesta ordem. O
 item 15 não é decisão e ficou como nota no fim. A D-115 e a D-116 registram duas autorizações do dono
-no mesmo dia, e a D-117 e a D-118, duas decisões da noite.
+no mesmo dia, e a D-117 a D-120, quatro decisões da noite.
 
 **Caminho crítico aceito:** PR-B → R1 → PR-C → R2 → congelar o candidato → `scope_e2e` → lote →
 leituras da produção → PASS do `BT-REL-001` e do `BT-REL-002` → `release` verde → `BT-REL-003` →
@@ -449,7 +454,8 @@ leituras da produção → PASS do `BT-REL-001` e do `BT-REL-002` → `release` 
   - `BT-UX-BATCH-001`, o PR-C (D-92, D-95);
   - `BT-UX-DEVICE-001`, a sessão de aparelho (D-113);
   - `BT-COH-001`, a abertura da coorte (D-104, D-109);
-  - `DCK-P1-14`, a tela da lixeira (D-96).
+  - `DCK-P1-14`, a tela da lixeira (D-96);
+  - `BT-UX-WAVE-001`, a onda visual (D-119).
 - **Dependências:** o `BT-REL-001` troca o `BT-CAP-002` pelo `BT-CAP-001`, e o `BT-CAP-002` passa a
   vir depois da promoção (D-114).
 
@@ -578,6 +584,11 @@ As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenaç
   - Uma política versionada com exatamente `account_registration` (modo convite), `catalog_private`, `collection_private`, `decks_private` e `life_counter_local`.
   - O contrato do deploy aceita só essa matriz nomeada, numa promoção própria depois do GO.
 - **Execução:** tarefa nova `BT-COH-001`, que depende do `BT-DEC-001`.
+- **Matriz e contrato no `master` (2026-10-10, PR #38, `2feb843be`):**
+  - `server/config/release_capabilities_cohort.json` versiona a matriz `cohort-2026-10`, com o cadastro por convite.
+  - Sem `MANALOOM_RELEASE_CAPABILITY_MATRIX`, o contrato segue exigindo as 29 `off`. Com `cohort-2026-10`, exige exatamente as cinco `on` e `allowed=true`, e o arquivo da matriz no mesmo SHA. Qualquer outro nome, conjunto ou arquivo é recusado.
+  - O deploy do ops confere a política contra esse conjunto.
+  - **Follow-up antes da promoção da matriz:** com `catalog_private` ligado, o daemon do ops agenda mais 3 jobs (`manaloom_sync_card_legalities_from_scryfall`, `manaloom_new_card_candidate_review` e `manaloom_card_data_gap_review`). O deploy espera esse conjunto, mas falta decidir se eles rodam na coorte. Detalhe na linha do `BT-COH-001`.
 
 **D-105 · Uma sessão de leituras da produção depois do lote (item 14).**
 - **Decisão do dono:** uma sessão autorizada, depois do lote, faz três leituras:
@@ -703,6 +714,52 @@ As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenaç
   - A contagem entra como mais uma leitura da sessão da D-105.
   - O script da correção 1 já existe na branch da frente de banco (`feat/db-lot-corrections-077`, `a92a0b85f`, fora do `master`): ele só limpa a descrição igual a um prompt do Generate guardado do mesmo dono. Ele roda só depois do número e da palavra do dono.
   - As outras quatro correções da D-85 não mudam: vêm depois da promoção (D-102), com contagem antes e depois e a confirmação do dono na hora da escrita.
+
+**D-119 · Onda visual nas telas principais da coorte antes da beta (2026-10-10).**
+- **Contexto:**
+  - A auditoria visual de 2026-09-21 deu de 4 a 5 sobre 10 às telas fora do contador, contra a régua dele.
+  - O kit (`BT-UX-KIT-001`) traz as primitivas da régua, mas não redesenha nenhuma tela de produto.
+- **Decisão do dono:**
+  - Uma onda visual antes da beta nas telas principais da coorte, no padrão do contador e com o kit: home, decks, detalhe do deck, fichário e perfil. Soma cerca de 1 semana.
+  - Método: mockups em PNG primeiro, escolhidos pelo dono pelo olho, e depois a implementação.
+  - A onda entra junto com a R2.
+- **Escolha do dono sobre os mockups (mesmo dia):** os mockups cobriram seis telas, a entrada incluída (convite, cadastro e primeiro passo), com duas direções cada. O dono escolheu:
+  - Home A (Tabuleiro);
+  - Decks B (Vitrine);
+  - Detalhe do deck A (Tabuleiro);
+  - Fichário A (Tabuleiro);
+  - Perfil B (Carta de jogador);
+  - Cadastro A (Tabuleiro), que cobre a entrada inteira.
+
+  É a mesma recomendação do julgamento da coordenação, que deu de 8,55 a 8,65 a cada escolhida.
+- **Correções que vão junto (julgamento da coordenação):**
+  - **Já aplicadas nos mockups:** a barra e o rail dos Decks iguais aos das outras telas (D-1); o acento cortado no desktop (D-2); o glifo da marca no rail do Detalhe (DD-1); o degradê de rolagem sob o dock na Home e no Perfil (H-2, P-2); no Perfil, SAIR vira a peça larga e EXCLUIR CONTA fica com uma coluna (P-1); a mesa de fundo da entrada deixa de ler "0!" (E-1).
+  - **Para a implementação:**
+    - Home: a carta dos decks recentes cresce para a peça de estante dos Decks B (H-1), e no desktop os numerais dos decks baixam de escala (H-3).
+    - Decks: uma pílula de retorno só, no topo (D-3). A ficha larga de A entra a partir de 1024 px se 12 decks ou mais pesarem.
+    - Detalhe: no desktop, o palco de B; no celular, a carta sobe para cerca de 160 px (DD-2). A peça do comandante no desktop perde o vazio (DD-3).
+    - Fichário: o herói "Adicionar carta" sai de perto do latão de seleção (F-1), o dock fica igual ao das outras telas (F-2), e o editor é testado com a edição escolhida só com aro de latão (F-3). No desktop, a vitrine de B fica como coluna fixa à direita.
+    - Perfil: o retrato sem foto vira o verso de carta da marca (P-3).
+    - Entrada: só uma frase de apoio no primeiro passo (E-2). No desktop do cadastro, a carta-convite de B, sem cartas reais, porque elas exigiriam imagem da rede antes do login (E-3, D-45).
+  - **Sistema:** uma barra só (`AppNavDock` e `AppNavRail`); uma peça de deck (`AppDeckTile`, nas formas estante e ficha); uma pílula de retorno (`AppReturnPill`) no topo, no lugar do `SnackBar`; dois tipos de herói documentados, o de ação e o de objeto com carta 63:88. As peças derivadas que se repetem entram no kit uma vez só.
+- **Continuam com o dono:**
+  - o tom da cor de "legal";
+  - as revogações (2) `cardGradient` e (4) `inputDecorationTheme` do kit, só necessárias se a implementação reaproveitar `Card` e `TextField` legados;
+  - a palavra final sobre a barra de navegação, que é peça derivada e não existe no kit;
+  - pular o `/verify-email` na conta de convite (CV-04);
+  - o Detalhe só de leitura (DD-07);
+  - o commit do ajuste A8, que esconde troca e venda no editor e nos filtros do fichário e hoje é só uma alteração sem commit, antes do Fichário.
+- **Dados novos que o conjunto pede, nenhum bloqueante:** total de cópias na Home e no Perfil, contagem de partidas guardadas no Perfil (rota nova), 3 imagens por deck sem comandante, preço de mercado por item no Fichário e a rota do link de convite. Sem o dado, a peça fica sem numeral.
+- **Ainda não provado:** o texto a 200% e o piso de 320 px só foram renderizados na entrada (e 320 px a 100% nos Decks e no Perfil). Nada passou por aparelho ou leitor de tela: os mockups são Chromium headless a @2x.
+- **Execução:**
+  - Tarefa nova `BT-UX-WAVE-001`, P0 CORE, que depende do `BT-UX-KIT-001`. O `BT-UX-PROOF-001` (a R2) e o `BT-UX-DEVICE-001` dependem dela, porque a sessão de aparelho tem de percorrer as telas novas.
+  - A implementação mexe em `app/lib`, raiz do digest de UI, e segue a regra das frentes de app: worktree sem commit e um commit só, com a R2 e a prova de UI nova.
+  - Os mockups, o brief e o julgamento ficam fora do repositório, na pasta `visual-wave/` da sessão de coordenação `4d2db55c` (`BRIEF.md`, `JULGAMENTO.md` e a galeria).
+
+**D-120 · O XMage só é atualizado depois do MVP (2026-10-10).**
+- **Contexto:** o XMage está na 1.4.60, com o pin `2c43ec8cd` de 2026-07-28 (`services/xmage-sidecar/XMAGE_COMMIT`, `docs/qa/MANALOOM_XMAGE_PIN_UPDATE_2026-07-28.md`). O Battle está fora do MVP (D-87).
+- **Decisão do dono:** atualizar o XMage só depois do MVP, junto com a abertura do Battle.
+- **Execução:** até lá o pin não muda, e o gate do Battle do modo `release` roda com ele (D-111). A nota está na linha do `BT-BAT-007`.
 
 **Nota sobre o item 15 do pacote (dumps).** Não é decisão.
 - **O que aconteceu:** sumiram de `backups/manaloom-postgres/` em 2026-10-08, às 12:23 no horário local:

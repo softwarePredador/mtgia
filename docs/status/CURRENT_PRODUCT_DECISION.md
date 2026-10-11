@@ -3,7 +3,7 @@
 - Lifecycle: `CURRENT_PRODUCT_DECISION`
 - Data da decisão: `2026-08-25`; atualizada em `2026-09-22` com as decisões do
   dono sobre a beta (`docs/status/DECISOES_PENDENTES_2026-09-22.md`) e em
-  `2026-10-10` com as decisões D-92 a D-116 sobre o caminho até o GO
+  `2026-10-10` com as decisões D-92 a D-120 sobre o caminho até o GO
 - Estado de release: `NO_GO_PUBLIC_RELEASE`
 - Candidato pretendido: `CONTROLLED_FREE_BETA`
 - Público inicial: coorte pequena e controlada
@@ -162,7 +162,7 @@ Decidido em 2026-09-22:
   e a execução diária de 2026-09-24 às 06:20 UTC aplicou os preços
   (`docs/qa/execution/2026-09-23/deploy-preco-de-deck.md`).
 
-Decidido em 2026-10-10 (D-92 a D-116, em `docs/status/DECISOES_PENDENTES_2026-09-22.md`):
+Decidido em 2026-10-10 (D-92 a D-120, em `docs/status/DECISOES_PENDENTES_2026-09-22.md`):
 
 - **Critério de produção do GO (D-93).** Troca "produção na 058" por produção no
   candidato congelado, com as migrations até a última do lote (hoje a 076; a 077
@@ -191,7 +191,8 @@ Decidido em 2026-10-10 (D-92 a D-116, em `docs/status/DECISOES_PENDENTES_2026-09
   Além da matriz toda `off`, o contrato do deploy passa a aceitar só essa matriz
   nomeada. Os convites saem em lotes de 20 a 30, e as variáveis de envio e o
   domínio são conferidos antes do primeiro lote (`BT-COH-001`). Até lá, a matriz
-  continua toda `OFF`.
+  continua toda `OFF`. A matriz `cohort-2026-10` e o contrato estão no `master` desde o
+  PR #38 (`8f371030a`), e ela só vale com `MANALOOM_RELEASE_CAPABILITY_MATRIX=cohort-2026-10`.
 - **Superfícies que ficam escondidas na coorte (D-96).** O Generate, o import
   sobre deck existente e o restaurar pela tela da lixeira ficam fora do app da
   primeira coorte. As P0 deles fecham pelo servidor, e a tela da lixeira vai para
@@ -202,6 +203,14 @@ Decidido em 2026-10-10 (D-92 a D-116, em `docs/status/DECISOES_PENDENTES_2026-09
 - **Prova de UI (D-92, D-113).** Há duas recapturas: a R1 depois do PR-B, e a R2
   depois do PR-C, que é o `BT-UX-PROOF-001`. A sessão de aparelho, com TalkBack e
   teclado, vem junto da R2.
+- **Onda visual (D-119).** Antes da beta, a home, os decks, o detalhe do deck, o
+  fichário, o perfil e a entrada passam ao padrão do contador, com o kit, nas
+  direções que o dono escolheu sobre os mockups (Home A, Decks B, Detalhe A,
+  Fichário A, Perfil B e Cadastro A). A onda é o `BT-UX-WAVE-001` e entra junto
+  com a R2. Nenhuma capability muda, e os dados novos que os mockups pedem não
+  bloqueiam: sem o dado, a peça fica sem numeral.
+- **XMage (D-120).** Fica na 1.4.60 até depois do MVP e sobe junto com a abertura
+  do Battle.
 
 Detalhamento e ordem:
 `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.

@@ -2,7 +2,7 @@
 
 Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 
-- Atualizada em: `2026-10-10` (decisões D-92 a D-116 do dono e reconciliação com o `master` `1f525a1c1`); antes, `2026-09-22` (estado observado após `d15beb05b` e decisões do dono de 2026-09-22 sobre as 55 recomendações de `docs/status/DECISOES_PENDENTES_2026-09-22.md`)
+- Atualizada em: `2026-10-10` (decisões D-92 a D-120 do dono e reconciliação com o `master` `1f525a1c1`, revista sobre `8f371030a`); antes, `2026-09-22` (estado observado após `d15beb05b` e decisões do dono de 2026-09-22 sobre as 55 recomendações de `docs/status/DECISOES_PENDENTES_2026-09-22.md`)
 - Branch de partida: `codex/free-beta-release-candidate-2026-07-17`
 - SHA baseline na abertura de `BT-SCP-001`:
   `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`
@@ -15,10 +15,11 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (decisões D-92 a D-116, reconciliação de 2026-10-10 e a revisão
-  dela sobre `eac4f401b`):
-  `170a30a3412b96d19efe4d9189e355a1e70b7b64beaed833f8a7f191d7f160c8` (250 tasks; o valor vivo está em
-  `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `ba95660b…` na reconciliação
+- Backlog/registry SHA-256 corrente (decisões D-92 a D-120, reconciliação de 2026-10-10 e as revisões
+  dela sobre `eac4f401b` e `8f371030a`):
+  `bef5b8339ecf28b80913ea014cf0dd16bbe3a87c5e0234d133da11c7ee54c75f` (251 tasks; o valor vivo está em
+  `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `170a30a3…` com 250 na revisão
+  sobre `eac4f401b`, `ba95660b…` na reconciliação
   de 2026-10-10 e `f4effb9a…` com 246 em
   `1f525a1c1`, e `8a73ebe6…` com 244 nas decisões D-79 e D-80 do gate de UI, branch
   `integracao/2026-09-23`; antes, `811f5409…` na rodada 2 da privacidade, `810d588d…` no registro do preço de deck, `320ebd9d…` nas decisões D-72 a D-75, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
@@ -49,12 +50,13 @@ corre em quatro frentes paralelas, cada uma com várias tarefas abertas e PR em 
 P0 CORE e P0 LIFE. O slot `NOW` abaixo continua no formato que o gerador valida e marca a frente
 de servidor; as frentes de app e de contador de vida só fazem merge depois do `BT-UIEV-001`.
 
-Em 2026-10-10 o dono aceitou o caminho até o GO (D-92 a D-116). A ordem é esta:
+Em 2026-10-10 o dono aceitou o caminho até o GO (D-92 a D-120). A ordem é esta:
 
 1. PR-B (consertos de app da árvore antiga do gate, na nuvem);
 2. R1 (recaptura que fecha o `BT-UIEV-001` e deixa o `full` verde);
 3. PR-C (`BT-UX-BATCH-001`, o lote de app P0 com os pontos de captura);
-4. R2 (`BT-UX-PROOF-001`), com a sessão de aparelho (`BT-UX-DEVICE-001`);
+4. R2 (`BT-UX-PROOF-001`), com a onda visual (`BT-UX-WAVE-001`, D-119) e a sessão de aparelho
+   (`BT-UX-DEVICE-001`);
 5. congelar o candidato;
 6. `scope_e2e`;
 7. lote;
@@ -67,7 +69,10 @@ Em 2026-10-10 o dono aceitou o caminho até o GO (D-92 a D-116). A ordem é esta
 14. coorte (`BT-COH-001`).
 
 Entre o congelamento e a promoção, nada entra no `master` (D-110). O conserto do `npm audit` do
-site (D-115) entrou pelo PR #37 (`eac4f401b`). Em paralelo e fora do digest de UI correm o gate
+site (D-115) entrou pelo PR #37 (`eac4f401b`). O PR #38 (`8f371030a`) trouxe a lista de jobs do
+ops derivada do daemon (S-01), a matriz nomeada da coorte (S-07), a rotação de 30 dias dos
+backups (`BT-PRIV-002`) e o receipt do receptor de alerta (`BT-OBS-001`).
+Em paralelo e fora do digest de UI correm o gate
 estrito na nuvem (D-116) e as frentes de banco e de promoção. Elas entram antes do `full` da R1.
 
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
@@ -133,8 +138,9 @@ listava já está no `master`, sem `PASS`:
 | Ordem | ID | Por que vem aqui |
 | ---: | --- | --- |
 | 1 | `BT-UX-BATCH-001` | PR-C: o que falta do app para o GO, na nuvem, depois do merge do PR-B e da R1 (D-92) |
-| 2 | `BT-UX-DEVICE-001` | sessão de aparelho junto da R2: TalkBack e teclado (D-113); o `BT-UX-PROOF-001` depende dela |
-| 3 | `BT-UX-PROOF-001` | R2: prova de UI do lote, com a assinatura do dono (D-15, D-92) |
+| 2 | `BT-UX-WAVE-001` | onda visual da D-119, em paralelo com o PR-C e integrada na R2: home, decks, detalhe do deck, fichário, perfil e entrada nas direções que o dono escolheu |
+| 3 | `BT-UX-DEVICE-001` | sessão de aparelho junto da R2: TalkBack e teclado (D-113), já com as telas da onda; o `BT-UX-PROOF-001` depende dela |
+| 4 | `BT-UX-PROOF-001` | R2: prova de UI do lote, com a assinatura do dono (D-15, D-92) |
 
 Analyze/Optimize e suas P0 AI ficam para a segunda onda (D-07).
 
