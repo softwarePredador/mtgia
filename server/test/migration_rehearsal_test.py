@@ -167,6 +167,23 @@ class ClassificationTest(unittest.TestCase):
         self.assertIn("categoria desconhecida gatilho", message)
         self.assertIn("payload[0] sem migration, motivo", message)
 
+    def test_a_row_rule_needs_its_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "lista.json"
+            broken = copy.deepcopy(self.allowlist)
+            broken["payload"] = [
+                {"tabela": "public.sets", "migration": "077", "motivo": "m",
+                 "regra": "fusao_por_lower_code", "chave": "code", "campos_herdados": []},
+                {"tabela": "public.x", "migration": "077", "motivo": "m", "regra": "outra"},
+            ]
+            path.write_text(json.dumps(broken), encoding="utf-8")
+            with self.assertRaises(rehearsal.RehearsalError) as caught:
+                rehearsal.load_allowlist(path)
+        message = str(caught.exception)
+        self.assertIn("payload[0]: regra fusao_por_lower_code sem carimbo", message)
+        self.assertIn("payload[0]: regra fusao_por_lower_code sem campos_herdados", message)
+        self.assertIn("payload[1]: regra desconhecida outra", message)
+
 
 class PayloadTest(unittest.TestCase):
     def test_changed_rows_are_caught_unless_declared(self) -> None:
@@ -183,6 +200,26 @@ class PayloadTest(unittest.TestCase):
         self.assertEqual([i["tabela"] for i in declared["mudancas_declaradas"]], ["public.b"])
         self.assertEqual([i["tabela"] for i in declared["mudancas_inesperadas"]], ["public.c"])
 
+    def test_a_declared_change_with_a_rule_needs_the_row_check(self) -> None:
+        before = {"public.sets": {"linhas": 3, "hash": "x"}}
+        after = {"public.sets": {"linhas": 2, "hash": "y"}}
+        declared = [{"tabela": "public.sets", "migration": "077", "motivo": "m",
+                     "regra": "fusao_por_lower_code"}]
+        unchecked = rehearsal.compare_payload(before, after, declared)
+        self.assertEqual([i["tabela"] for i in unchecked["mudancas_inesperadas"]],
+                         ["public.sets"])
+        self.assertIn("não foi conferida", unchecked["mudancas_inesperadas"][0]["problemas"][0])
+        failed = rehearsal.compare_payload(
+            before, after, declared, {"public.sets": {"problemas": ["abc: mudou name"]}})
+        self.assertEqual(failed["mudancas_inesperadas"][0]["problemas"], ["abc: mudou name"])
+        self.assertEqual(failed["mudancas_declaradas"], [])
+        passed = rehearsal.compare_payload(
+            before, after, declared,
+            {"public.sets": {"problemas": [], "linhas_apagadas": 1}})
+        self.assertEqual(passed["mudancas_inesperadas"], [])
+        self.assertEqual(passed["mudancas_declaradas"][0]["conferencia"],
+                         {"linhas_apagadas": 1})
+
     def test_row_hash_does_not_depend_on_physical_order_and_quotes_names(self) -> None:
         tables, script = rehearsal.payload_script({'public.a"b': ["id", 'x"y']})
         self.assertEqual(tables, ['public.a"b'])
@@ -190,6 +227,104 @@ class PayloadTest(unittest.TestCase):
         self.assertIn('ROW("id", "x""y")', script)
         self.assertIn('"public"."a""b"', script)
         self.assertTrue(script.startswith("BEGIN TRANSACTION READ ONLY;"))
+
+
+def _set(code: str, **fields):
+    row = {"code": code, "name": f"Set {code}", "release_date": None, "type": None,
+           "block": None, "is_online_only": None, "is_foreign_only": None,
+           "created_at": "2026-01-01T00:00:00+00:00", "updated_at": "2026-01-01T00:00:00+00:00",
+           rehearsal.ROW_KEY_COLUMN: code.lower()}
+    row.update(fields)
+    return row
+
+
+class MergeRuleTest(unittest.TestCase):
+    """A regra `fusao_por_lower_code` da D-74, linha a linha, sem banco."""
+
+    RULE = {"chave": "code", "carimbo": "updated_at",
+            "campos_herdados": ["release_date", "type", "block", "is_online_only",
+                                "is_foreign_only"]}
+
+    def setUp(self) -> None:
+        self.before = [_set("ABC", block="Bloco A"), _set("abc", type="expansion"),
+                       _set("Abc", type="core", is_foreign_only=True), _set("LEA", type="core")]
+        self.after = [_set("ABC", block="Bloco A", type="expansion",
+                           updated_at="2026-10-10T00:00:00+00:00"),
+                      _set("LEA", type="core")]
+
+    def check(self, after):
+        return rehearsal.check_merge_by_lower_code(self.before, after, self.RULE)
+
+    def test_the_d74_merge_passes_with_its_counts(self) -> None:
+        self.assertEqual(self.check(self.after), {
+            "problemas": [], "linhas_antes": 4, "linhas_depois": 2, "linhas_apagadas": 2,
+            "linhas_com_campo_herdado": 1})
+
+    def test_nothing_to_merge_means_nothing_changes(self) -> None:
+        only = [_set("LEA", type="core")]
+        self.assertEqual(rehearsal.check_merge_by_lower_code(only, only, self.RULE)["problemas"], [])
+        stamped = [_set("LEA", type="core", updated_at="2026-10-10T00:00:00+00:00")]
+        self.assertEqual(rehearsal.check_merge_by_lower_code(only, stamped, self.RULE)["problemas"],
+                         ["LEA: mudou updated_at sem fusão"])
+
+    def test_everything_outside_the_rule_is_a_problem(self) -> None:
+        cases = {
+            "nome da que fica": ([_set("ABC", block="Bloco A", type="expansion", name="outro",
+                                       updated_at="2026-10-10T00:00:00+00:00"),
+                                  _set("LEA", type="core")],
+                                 "ABC: mudou name, fora dos campos herdados"),
+            "grupo sem linha": ([_set("LEA", type="core")], "grupo abc: 0 linha(s) depois"),
+            "grupo com duas": (self.after + [_set("abc", type="expansion")],
+                               "grupo abc: 2 linha(s) depois"),
+            "linha sozinha apagada": (self.after[:1], "grupo lea: 0 linha(s) depois"),
+            "linha nova": (self.after + [_set("XYZ")], "XYZ: linha nova depois do upgrade"),
+            "valor sobrescrito": ([_set("ABC", block="Outro", type="expansion",
+                                        updated_at="2026-10-10T00:00:00+00:00"),
+                                   _set("LEA", type="core")], "ABC.block: tinha valor e mudou"),
+            "valor inventado": ([_set("ABC", block="Bloco A", type="funny",
+                                      updated_at="2026-10-10T00:00:00+00:00"),
+                                 _set("LEA", type="core")],
+                                "ABC.type: valor que nenhuma linha que saiu tinha"),
+            "carimbo sem herança": ([_set("ABC", block="Bloco A",
+                                          updated_at="2026-10-10T00:00:00+00:00"),
+                                     _set("LEA", type="core")],
+                                    "ABC.updated_at: mudou sem campo herdado"),
+        }
+        for label, (after, problem) in cases.items():
+            with self.subTest(caso=label):
+                problems = self.check(after)["problemas"]
+                self.assertTrue(any(problem in item for item in problems), problems)
+
+    def test_rows_compare_without_the_stamp(self) -> None:
+        later = [dict(row, updated_at="2026-10-11T00:00:00+00:00") if row["code"] == "ABC" else row
+                 for row in self.after]
+        self.assertTrue(rehearsal.rows_equal_except(self.after, later, "code", "updated_at"))
+        renamed = [dict(row, name="outro") if row["code"] == "ABC" else row for row in later]
+        self.assertFalse(rehearsal.rows_equal_except(self.after, renamed, "code", "updated_at"))
+
+
+class DedupeD74Test(unittest.TestCase):
+    """O ensaio roda o dedupe do lote com as contagens que o script declara, e a
+    lista fecha a regra com os mesmos campos que o script herda."""
+
+    def test_the_rehearsal_uses_the_lot_script_and_its_declared_counts(self) -> None:
+        self.assertEqual(rehearsal.DEDUPE_D74,
+                         REPO_ROOT / "server" / "sql" / "lote" / "d74_dedupe_sets_lower_code.sql")
+        self.assertEqual(rehearsal.lote_script_targets(rehearsal.DEDUPE_D74), [
+            "referencias_levadas_para_a_linha_que_fica",
+            "linhas_que_ficam_com_campo_herdado",
+            "linhas_apagadas",
+        ])
+
+    def test_the_closed_list_rule_matches_the_script(self) -> None:
+        allowlist = rehearsal.load_allowlist(ALLOWLIST)
+        rule = {item["tabela"]: item for item in allowlist["payload"]}["public.sets"]
+        self.assertEqual((rule["regra"], rule["migration"], rule["chave"], rule["carimbo"]),
+                         ("fusao_por_lower_code", "077", "code", "updated_at"))
+        script = rehearsal.DEDUPE_D74.read_text(encoding="utf-8")
+        inherited = set(re.findall(r"(\w+) = COALESCE\(fica\.(\w+), herdado\.\2\)", script))
+        self.assertEqual({column for column, _ in inherited}, set(rule["campos_herdados"]))
+        self.assertIn("updated_at = CURRENT_TIMESTAMP", script)
 
 
 class ClosedListTest(unittest.TestCase):
