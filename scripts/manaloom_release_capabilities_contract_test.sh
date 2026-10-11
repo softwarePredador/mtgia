@@ -15,7 +15,10 @@ mkdir -p "$REPO/app" "$REPO/server/config"
 printf 'version: 1.0.0+1\n' > "$REPO/app/pubspec.yaml"
 cp "$ROOT_DIR/server/config/release_capabilities.json" \
   "$REPO/server/config/release_capabilities.json"
-git -C "$REPO" add app/pubspec.yaml server/config/release_capabilities.json
+cp "$ROOT_DIR/server/config/release_capabilities_cohort.json" \
+  "$REPO/server/config/release_capabilities_cohort.json"
+git -C "$REPO" add app/pubspec.yaml server/config/release_capabilities.json \
+  server/config/release_capabilities_cohort.json
 git -C "$REPO" commit --quiet -m fixture
 git -C "$REPO" branch -M master
 git -C "$REPO" remote add origin "$REMOTE"
@@ -140,6 +143,86 @@ expect_invalid_policy invalid-top-level-implementation-status \
   '.implementation_status = "future_unknown"'
 expect_invalid_policy invalid-entry-implementation-status \
   '.capabilities.battle_batch.implementation_status = "future_unknown"'
+
+# S-07 / BT-COH-001 (D-104): sem pedido, so as 29 off; com
+# MANALOOM_RELEASE_CAPABILITY_MATRIX=cohort-2026-10, so a matriz da coorte, com a
+# politica versionada da matriz no mesmo SHA. Qualquer outra recusa.
+# jq source, not shell expansion.
+# shellcheck disable=SC2016
+COHORT_FILTER='reduce ("account_registration", "catalog_private",
+  "collection_private", "decks_private", "life_counter_local") as $key (.;
+  .capabilities[$key].release_capability = "on" |
+  .capabilities[$key].allowed = true)'
+commit_matrix_fixture() {
+  local label="$1" policy_filter="$2" matrix_filter="${3:-.}"
+  git -C "$REPO" show "$SHA:server/config/release_capabilities.json" |
+    jq "$policy_filter" > "$REPO/server/config/release_capabilities.json"
+  if [[ "$matrix_filter" == "absent" ]]; then
+    rm -f "$REPO/server/config/release_capabilities_cohort.json"
+  else
+    git -C "$REPO" show "$SHA:server/config/release_capabilities_cohort.json" |
+      jq "$matrix_filter" > "$REPO/server/config/release_capabilities_cohort.json"
+  fi
+  git -C "$REPO" add -A server/config
+  git -C "$REPO" commit --quiet --allow-empty -m "$label"
+  git -C "$REPO" rev-parse HEAD
+}
+load_with_matrix() {
+  local matrix="$1" candidate_sha="$2"
+  MANALOOM_RELEASE_CAPABILITY_MATRIX="$matrix" bash -c '
+    set -euo pipefail
+    source "$1"
+    manaloom_load_release_capabilities_from_git "$2" "$3"
+    printf "%s|%s|%s\n" "$MANALOOM_RELEASE_CAPABILITY_MATRIX_NAME" \
+      "$MANALOOM_RELEASE_CAPABILITIES_ON_JSON" \
+      "$MANALOOM_RELEASE_CAPABILITIES_ON_PYTHON"
+  ' _ "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh" \
+    "$REPO" "$candidate_sha"
+}
+expect_matrix_refused() {
+  local label="$1" matrix="$2" candidate_sha="$3"
+  if load_with_matrix "$matrix" "$candidate_sha" >/dev/null 2>&1; then
+    echo "S-07: contrato aceitou $label (matriz pedida: '${matrix:-nenhuma}')" >&2
+    exit 1
+  fi
+}
+
+[[ "$(load_with_matrix "" "$SHA")" == "all-off|[]|[]" ]] || {
+  echo "S-07: o padrao sem pedido deixou de ser as 29 off" >&2; exit 1; }
+COHORT_SHA="$(commit_matrix_fixture cohort "$COHORT_FILTER")"
+EXPECTED_COHORT='cohort-2026-10|["account_registration","catalog_private","collection_private","decks_private","life_counter_local"]'
+EXPECTED_COHORT+="|['account_registration', 'catalog_private', 'collection_private', 'decks_private', 'life_counter_local']"
+[[ "$(load_with_matrix cohort-2026-10 "$COHORT_SHA")" == "$EXPECTED_COHORT" ]] || {
+  echo "S-07: a matriz da coorte pedida explicitamente foi recusada" >&2; exit 1; }
+expect_matrix_refused "a matriz da coorte sem pedido explicito" "" "$COHORT_SHA"
+expect_matrix_refused "a matriz all-OFF quando a coorte foi pedida" \
+  cohort-2026-10 "$SHA"
+expect_matrix_refused "matriz desconhecida" cohort-2026-11 "$COHORT_SHA"
+expect_matrix_refused "pedido all-off explicito fora da lista fechada" \
+  all-off "$SHA"
+expect_matrix_refused "a coorte com uma capability a mais (ads)" cohort-2026-10 \
+  "$(commit_matrix_fixture cohort-plus-ads "$COHORT_FILTER |
+    .capabilities.ads.release_capability = \"on\" |
+    .capabilities.ads.allowed = true")"
+expect_matrix_refused "a coorte com uma capability a menos" cohort-2026-10 \
+  "$(commit_matrix_fixture cohort-minus-life-counter "$COHORT_FILTER |
+    .capabilities.life_counter_local.release_capability = \"off\" |
+    .capabilities.life_counter_local.allowed = false")"
+expect_matrix_refused "capability on com allowed=false" cohort-2026-10 \
+  "$(commit_matrix_fixture cohort-on-not-allowed "$COHORT_FILTER |
+    .capabilities.decks_private.allowed = false")"
+expect_matrix_refused "politica da matriz com uma capability a mais" \
+  cohort-2026-10 \
+  "$(commit_matrix_fixture matrix-plus-ads "$COHORT_FILTER" \
+    '.capabilities_on = (.capabilities_on + ["ads"] | sort)')"
+expect_matrix_refused "politica da matriz com cadastro aberto" cohort-2026-10 \
+  "$(commit_matrix_fixture matrix-open-registration "$COHORT_FILTER" \
+    '.registration_admission = "open"')"
+expect_matrix_refused "politica da matriz com outro nome" cohort-2026-10 \
+  "$(commit_matrix_fixture matrix-renamed "$COHORT_FILTER" \
+    '.matrix = "cohort-2026-11"')"
+expect_matrix_refused "politica da matriz ausente no SHA" cohort-2026-10 \
+  "$(commit_matrix_fixture matrix-absent "$COHORT_FILTER" absent)"
 
 MIXED_DIGEST_JSON="$(jq -c \
   '.policy_digest_sha256 = ("b" * 64)' \

@@ -1,0 +1,17 @@
+{
+  "schema_version": "release_capability_matrix_v1",
+  "matrix": "cohort-2026-10",
+  "product": "brewtact",
+  "release_channel": "free_beta",
+  "offer_mode": "free_beta_no_commerce",
+  "decision": "D-104 (item 13 do pacote de decisões de 2026-10-10, BT-COH-001)",
+  "registration_admission": "invite",
+  "capabilities_on": [
+    "account_registration",
+    "catalog_private",
+    "collection_private",
+    "decks_private",
+    "life_counter_local"
+  ],
+  "note": "Matriz da primeira coorte. Liga exatamente estas cinco capabilities (on e allowed=true) e deixa as outras 24 off. O cadastro abre só por convite (MANALOOM_REGISTRATION_ADMISSION=invite, D-16). Vale só numa promoção própria depois do GO, com MANALOOM_RELEASE_CAPABILITY_MATRIX=cohort-2026-10; sem essa variável o contrato do deploy segue exigindo as 29 off. Qualquer outra matriz é recusada (scripts/lib/manaloom_release_capabilities_contract.sh)."
+}

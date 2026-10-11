@@ -1756,31 +1756,37 @@ class ToolTest(unittest.TestCase):
         self.assertEqual(list(self.receipts.glob("promocao-*")), [])
 
     def test_when_a_capability_opens_the_d13_gate_decides(self) -> None:
-        # Um loader futuro que aceite abrir capability: a transação segue o resolvedor
-        # da D-13 (on sem verificação live bloqueia; on verificada vira product_open).
-        library = self.repo / "scripts/lib/manaloom_release_capabilities_contract.sh"
-        text = library.read_text(encoding="utf-8")
-        text = text.replace('      (.release_capability == "off") and\n'
-                            '      (.allowed == false) and\n', "")
-        library.write_text(text, encoding="utf-8")
+        # S-07: o loader abre capability só pela matriz nomeada da coorte, pedida em
+        # MANALOOM_RELEASE_CAPABILITY_MATRIX. Aí a transação segue o resolvedor da D-13
+        # (on sem verificação live bloqueia; on verificada vira product_open).
+        matrix = "server/config/release_capabilities_cohort.json"
+        shutil.copy2(REPO_ROOT / matrix, self.repo / matrix)
+        self._git("add", matrix)
+        cohort = json.loads((REPO_ROOT / matrix).read_text(encoding="utf-8"))
         policy_path = self.repo / "server/config/release_capabilities.json"
         policy = json.loads(policy_path.read_text(encoding="utf-8"))
-        policy["capabilities"]["catalog_private"].update(release_capability="on", allowed=True)
+        for key in cohort["capabilities_on"]:
+            policy["capabilities"][key].update(release_capability="on", allowed=True)
         policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
         self._git("commit", "--quiet", "-am", "capability on sem verificação")
         self._git("push", "--quiet", "origin", "master")
         sha = self._git("rev-parse", "HEAD")
-        blocked = self.run_tool("--execute", "--preflight", "--sha", sha)
+        unrequested = self.run_tool("--execute", "--preflight", "--sha", sha)
+        self.assertEqual(unrequested.returncode, 2, unrequested.stdout + unrequested.stderr)
+        self.assertIn("BLOCKED: release capabilities", unrequested.stderr)
+        cohort_env = dict(self.env, MANALOOM_RELEASE_CAPABILITY_MATRIX=cohort["matrix"])
+        blocked = self.run_tool("--execute", "--preflight", "--sha", sha, env=cohort_env)
         self.assertEqual(blocked.returncode, 2, blocked.stdout + blocked.stderr)
         self.assertIn("capability ON com verificacao live datada ausente", blocked.stderr)
         stamp = "2026-09-28T12:00:00Z"
         policy["live_verified_as_of"] = stamp
-        policy["capabilities"]["catalog_private"]["live_verified_as_of"] = stamp
+        for key in cohort["capabilities_on"]:
+            policy["capabilities"][key]["live_verified_as_of"] = stamp
         policy_path.write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
         self._git("commit", "--quiet", "-am", "capability on verificada")
         self._git("push", "--quiet", "origin", "master")
         sha = self._git("rev-parse", "HEAD")
-        opened = self.run_tool("--execute", "--preflight", "--sha", sha)
+        opened = self.run_tool("--execute", "--preflight", "--sha", sha, env=cohort_env)
         self.assertEqual(opened.returncode, 0, opened.stdout + opened.stderr)
         self.assertEqual(json.loads(opened.stdout)["release_mode"], "product_open")
         self.assertEqual(self.deployed(), [])
