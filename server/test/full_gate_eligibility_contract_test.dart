@@ -10,7 +10,10 @@ import 'package:test/test.dart';
 /// O teste monta um repositório Git descartável com um registry, receipts,
 /// um commit de servidor, um de UI e um fora do SHA, e confere cada classe,
 /// o ponto fixo das dependências, o receipt do full e que nada no repositório
-/// muda.
+/// muda. A prova de UI falha fechada: os commits da tarefa vêm do aceite, dos
+/// receipts citados e das mensagens do SHA (direto, em faixa, em lista e pela
+/// família no escopo); sem nenhum commit que mude código, a tarefa não sai
+/// `elegivel`.
 void main() {
   final script = File(
     '${Directory.current.parent.path}/scripts/manaloom_full_gate_eligibility.py',
@@ -22,6 +25,11 @@ void main() {
   late String serverCommit;
   late String uiCommit;
   late String outsideCommit;
+  late String messageUiCommit;
+  late String seriesCommit;
+  late String familyCommit;
+  late String docsOnlyCommit;
+  late String mergeCommit;
 
   Future<String> git(List<String> args) async {
     final result = await Process.run('git', [
@@ -93,6 +101,50 @@ void main() {
     await git(['commit', '-q', '-m', 'ui']);
     uiCommit = await git(['rev-parse', 'HEAD']);
 
+    // Commits que só a mensagem liga à tarefa: o aceite não os cita.
+    Future<String> commit(String path, String contents, String message) async {
+      write(path, contents);
+      await git(['add', '-A']);
+      await git(['commit', '-q', '-m', message]);
+      return git(['rev-parse', 'HEAD']);
+    }
+
+    messageUiCommit = await commit(
+      'app/lib/tela10.dart',
+      'void t10() {}\n',
+      'feat(T10): tela nova\n\nSem citar caminho no aceite.',
+    );
+    seriesCommit = await commit(
+      'app/lib/serie.dart',
+      'void serie() {}\n',
+      'feat(R-01..02, S-001/003): tela da série',
+    );
+    familyCommit = await commit(
+      'app/lib/familia.dart',
+      'void familia() {}\n',
+      'fix(F-P0): ajuste da tela da família',
+    );
+    docsOnlyCommit = await commit(
+      'docs/T13.md',
+      '# T13\n',
+      'docs(T13): registra a tarefa no backlog',
+    );
+    // Merge que só entra como referência: conta para a UI, nunca como rastro.
+    await git(['checkout', '-q', '-b', 'pr']);
+    await commit(
+      'server/lib/pr.dart',
+      'void pr() {}\n',
+      'feat: servidor do PR',
+    );
+    await git(['checkout', '-q', 'master']);
+    await git(['merge', '-q', '--no-ff', '-m', 'merge do PR', 'pr']);
+    mergeCommit = await git(['rev-parse', 'HEAD']);
+    write('docs/qa/execution/2026-10-03/T10.md', '# receipt T10\n');
+    write(
+      'docs/qa/execution/2026-10-04/T11.md',
+      '# receipt T11\n\nFeito em `${uiCommit.substring(0, 12)}`.\n',
+    );
+
     final s = serverCommit.substring(0, 9);
     final u = uiCommit.substring(0, 10);
     final o = outsideCommit.substring(0, 9);
@@ -134,6 +186,34 @@ void main() {
           ),
           task('T8', pending, acceptance: 'Tela em `app/lib/tela.dart:12`.'),
           task('T9', 'TODO', deps: ['T1']),
+          task(
+            'T10',
+            pending,
+            acceptance: 'Receipt `docs/qa/execution/2026-10-03/T10.md`.',
+          ),
+          task(
+            'T11',
+            pending,
+            acceptance: 'Receipt `docs/qa/execution/2026-10-04/T11.md`.',
+          ),
+          task(
+            'T12',
+            pending,
+            acceptance: 'Evidência: `server/lib/servico.dart:1`.',
+          ),
+          task('T13', pending, acceptance: 'Só o registro.'),
+          task(
+            'T14',
+            pending,
+            acceptance: 'Conferido no master `${mergeCommit.substring(0, 9)}`.',
+          ),
+          task('R-01', pending, acceptance: 'Feito em `$s`.'),
+          task('R-02', pending, acceptance: 'Feito em `$s`.'),
+          task('R-03', pending, acceptance: 'Feito em `$s`.'),
+          task('S-001', pending, acceptance: 'Feito em `$s`.'),
+          task('S-002', pending, acceptance: 'Feito em `$s`.'),
+          task('S-003', pending, acceptance: 'Feito em `$s`.'),
+          task('F-P0-01', pending, acceptance: 'Feito em `$s`.'),
         ],
       }),
     );
@@ -186,14 +266,44 @@ void main() {
         'T4': 'commit_citado_fora_do_sha',
         'T5': 'receipt_ausente_no_sha',
         'T6': 'bloqueada_por_dependencia',
-        'T7': 'elegivel',
+        'T7': 'elegivel_sem_rastro_de_ui',
         'T8': 'elegivel_com_prova_ui',
+        'T10': 'elegivel_com_prova_ui',
+        'T11': 'elegivel_com_prova_ui',
+        'T12': 'elegivel_sem_rastro_de_ui',
+        'T13': 'elegivel_sem_rastro_de_ui',
+        'T14': 'elegivel_sem_rastro_de_ui',
+        'R-01': 'elegivel_com_prova_ui',
+        'R-02': 'elegivel_com_prova_ui',
+        'R-03': 'elegivel',
+        'S-001': 'elegivel_com_prova_ui',
+        'S-002': 'elegivel',
+        'S-003': 'elegivel_com_prova_ui',
+        'F-P0-01': 'elegivel_com_prova_ui',
       });
       final rows = {
         for (final row in result['tasks'] as List<dynamic>)
           (row as Map<String, dynamic>)['id']: row,
       };
       expect(rows['T1']!['cited_commits'], [serverCommit]);
+      expect(rows['T1']!['implementation_commits'], [serverCommit]);
+      expect(rows['T10']!['message_commits'], [messageUiCommit]);
+      expect(rows['T10']!['ui_commits'], [messageUiCommit]);
+      expect(rows['T10']!['ui_paths_from_commits'], ['app/lib/tela10.dart']);
+      expect(rows['T11']!['receipt_commits'], [uiCommit]);
+      expect(rows['T11']!['ui_paths_from_commits'], ['app/lib/tela.dart']);
+      expect(rows['T12']!['implementation_commits'], isEmpty);
+      expect(rows['T13']!['message_commits'], [docsOnlyCommit]);
+      expect(rows['T13']!['implementation_commits'], isEmpty);
+      expect(rows['T14']!['cited_commits'], [mergeCommit]);
+      expect(rows['T14']!['implementation_commits'], isEmpty);
+      for (final id in ['R-01', 'R-02', 'S-001', 'S-003']) {
+        expect(rows[id]!['message_commits'], [seriesCommit], reason: id);
+      }
+      for (final id in ['R-03', 'S-002']) {
+        expect(rows[id]!['message_commits'], isEmpty, reason: id);
+      }
+      expect(rows['F-P0-01']!['message_commits'], [familyCommit]);
       expect(rows['T1']!['receipts'], ['docs/qa/execution/2026-10-01/T1.md']);
       expect(rows['T2']!['ui_paths_from_commits'], ['app/lib/tela.dart']);
       expect(rows['T8']!['ui_paths'], ['app/lib/tela.dart']);
@@ -207,11 +317,12 @@ void main() {
       expect(rows['T7']!['declares_open_items'], isTrue);
       expect(rows['T1']!['declares_open_items'], isFalse);
       expect(result['summary'], {
-        'pending': 8,
+        'pending': 20,
         'bloqueada_por_dependencia': 2,
         'commit_citado_fora_do_sha': 1,
-        'elegivel': 2,
-        'elegivel_com_prova_ui': 2,
+        'elegivel': 3,
+        'elegivel_com_prova_ui': 9,
+        'elegivel_sem_rastro_de_ui': 4,
         'receipt_ausente_no_sha': 1,
       });
     },
@@ -234,7 +345,7 @@ void main() {
       '--registry-file',
       registry.path,
     ]);
-    expect(classes(overridden)['T3'], 'elegivel');
+    expect(classes(overridden)['T3'], 'elegivel_sem_rastro_de_ui');
     expect(
       (overridden['registry'] as Map<String, dynamic>)['source'],
       registry.path,
@@ -349,6 +460,12 @@ void main() {
     expect(output, contains('lista condicional'));
     expect(output, contains('| `T2` | P0 CORE | `elegivel_com_prova_ui` |'));
     expect(output, contains('aceite declara pendência'));
+    expect(
+      output,
+      contains('| `T12` | P0 CORE | `elegivel_sem_rastro_de_ui` |'),
+    );
+    expect(output, contains('sem commit da tarefa no SHA'));
+    expect(output, contains('`${serverCommit.substring(0, 9)}`'));
     expect(
       await git(['status', '--porcelain', '--untracked-files=all']),
       status,

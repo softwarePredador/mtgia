@@ -14,11 +14,24 @@ Para cada tarefa pendente de full gate, confere:
   `receipt_ausente_no_sha`;
 - cada dependência precisa estar em PASS ou ficar elegível nesta mesma
   rodada (ponto fixo); senão: `bloqueada_por_dependencia`;
-- se algum caminho citado, ou arquivo mudado por um commit citado, cai numa
-  raiz do digest de UI, a tarefa é `elegivel_com_prova_ui`: o PASS exige
-  também a prova de UI (PASS_VISUAL_REVIEWED) no mesmo SHA; sem isso,
-  `elegivel`. Commit citado só como referência (a linha de base da produção,
-  por exemplo) também conta: o erro fica do lado de pedir prova a mais.
+- a prova de UI falha fechada. Os commits da tarefa vêm de três lugares: os
+  citados no aceite, os citados dentro dos receipts citados (lidos do SHA) e
+  os commits do SHA, sem merge, cuja mensagem cita o ID (inclusive em faixa,
+  como `LC-P0-01..06` ou `BT-GATE-002/003`, e pela família no escopo do
+  assunto, como `fix(LC-P0): ...`). Se algum caminho citado no aceite ou nos
+  receipts, ou algum arquivo mudado por um desses commits, cai numa raiz do
+  digest de UI, a tarefa é `elegivel_com_prova_ui`: o PASS exige também a
+  prova de UI (PASS_VISUAL_REVIEWED) no mesmo SHA. Commit citado só como
+  referência (a linha de base da produção, por exemplo) também conta: o erro
+  fica do lado de pedir prova a mais;
+- `elegivel` (sem prova de UI) exige rastro: pelo menos um commit da tarefa,
+  ancestral do SHA e que não seja merge, que mude algo fora de `docs/` e do
+  manifesto. Merge citado (o `master` em que o receipt foi conferido, por
+  exemplo) conta para a UI, nunca como rastro. Sem rastro,
+  a tarefa sai `elegivel_sem_rastro_de_ui`: ninguém sabe o que ela mudou, e
+  ela só sobe com a prova de UI ou depois que o aceite citar os commits dela
+  e a lista for refeita. A busca nunca prova que não há outro commit: o
+  receipt lista os commits conferidos.
 O aceite que declara pendência ("Segue aberto", "Falta:") é marcado para
 revisão humana: a elegibilidade nunca decide sozinha que a pendência fechou.
 
@@ -61,6 +74,18 @@ REPO_TOP_DIRS = (
 )
 OPEN_ITEMS = re.compile(r"Segue aberto|Falta:|Falta fazer|pendente de decis", re.I)
 FULL_SHA = re.compile(r"^[0-9a-f]{40}$")
+# Faixa ou lista de IDs numa mensagem: `LC-P0-01..06`, `BT-GATE-002/003`.
+ID_SERIES = re.compile(
+    r"(?<![0-9A-Za-z-])(?P<prefix>[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-)(?P<first>\d+)"
+    r"(?P<rest>(?:(?:\.\.|/)(?:(?P=prefix))?\d+)+)(?![0-9A-Za-z])"
+)
+SERIES_STEP = re.compile(r"(\.\.|/)(?:[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*-)?(\d+)")
+MAX_SERIES = 99
+# Escopo do assunto de um commit convencional: `fix(LC-P0, BT-UX-01): ...`.
+SUBJECT_SCOPE = re.compile(r"^[A-Za-z]+\(([^)]*)\)!?:")
+# Mudança que não conta como rastro de implementação: só documentação e o
+# manifesto gerado (backlog, registry, receipts, fila).
+NON_IMPLEMENTATION = ("docs/", "project_logic_manifest.json")
 
 
 class InvalidInput(Exception):
@@ -70,6 +95,7 @@ class InvalidInput(Exception):
 def git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess:
     result = subprocess.run(
         ["git", "-C", str(repo), *args], capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
     )
     if check and result.returncode != 0:
         raise InvalidInput(f"git {' '.join(args)}: {result.stderr.strip()}")
@@ -143,9 +169,81 @@ def is_ancestor(repo: Path, commit: str, sha: str) -> bool:
                check=False).returncode == 0
 
 
-def changed_files(repo: Path, commit: str) -> list[str]:
+def changed_files(repo: Path, commit: str,
+                  cache: dict[str, list[str]] | None = None) -> list[str]:
+    if cache is not None and commit in cache:
+        return cache[commit]
     result = git(repo, "show", "--name-only", "--format=", "-m", commit, check=False)
-    return [line for line in result.stdout.splitlines() if line.strip()]
+    files = list(dict.fromkeys(
+        line for line in result.stdout.splitlines() if line.strip()))
+    if cache is not None:
+        cache[commit] = files
+    return files
+
+
+def family(task_id: str) -> str | None:
+    """`LC-P0-03` -> `LC-P0`; ID sem número final não tem família."""
+    match = re.match(r"^(.+)-\d+$", task_id)
+    return match.group(1) if match else None
+
+
+def mentioned_ids(message: str, wanted: set[str], direct: re.Pattern[str],
+                  families: dict[str, set[str]]) -> set[str]:
+    """IDs de `wanted` citados numa mensagem de commit: direto, em faixa ou
+    lista (`LC-P0-01..06`, `BT-GATE-002/003`) e pela família no escopo do
+    assunto (`fix(LC-P0): ...`)."""
+    found = set(direct.findall(message))
+    for match in ID_SERIES.finditer(message):
+        prefix, first = match.group("prefix"), match.group("first")
+        width, current = len(first), int(first)
+        numbers = {current}
+        for separator, number in SERIES_STEP.findall(match.group("rest")):
+            value = int(number)
+            if separator == ".." and current < value <= current + MAX_SERIES:
+                numbers.update(range(current, value + 1))
+            else:
+                numbers.add(value)
+            current = value
+        for number in numbers:
+            candidate = f"{prefix}{number:0{width}d}"
+            if candidate in wanted:
+                found.add(candidate)
+    subject = message.split("\n", 1)[0]
+    scope = SUBJECT_SCOPE.match(subject)
+    if scope is not None:
+        for token in re.split(r"[\s,;/]+", scope.group(1)):
+            found.update(families.get(token, ()))
+    return found & wanted
+
+
+def commits_by_task(repo: Path, sha: str, ids: set[str]) -> dict[str, list[str]]:
+    """Commits do SHA (sem merge, do mais novo ao mais velho) cuja mensagem
+    cita cada ID."""
+    if not ids:
+        return {}
+    direct = re.compile(
+        r"(?<![0-9A-Za-z-])("
+        + "|".join(re.escape(task_id) for task_id in sorted(ids, key=len, reverse=True))
+        + r")(?![0-9A-Za-z])"
+    )
+    families: dict[str, set[str]] = {}
+    for task_id in ids:
+        name = family(task_id)
+        if name is not None:
+            families.setdefault(name, set()).add(task_id)
+    log = git(repo, "log", "--no-merges", "--format=%H%x00%B%x1e", sha).stdout
+    found: dict[str, list[str]] = {}
+    for record in log.split("\x1e"):
+        commit, _, message = record.strip("\n").partition("\x00")
+        if not FULL_SHA.match(commit):
+            continue
+        for task_id in mentioned_ids(message, ids, direct, families):
+            found.setdefault(task_id, []).append(commit)
+    return found
+
+
+def is_implementation(files: list[str]) -> bool:
+    return any(not path.startswith(NON_IMPLEMENTATION) for path in files)
 
 
 def check_receipt(path: Path, sha: str) -> dict[str, Any]:
@@ -196,6 +294,22 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             raise InvalidInput("registry com tarefa sem id")
         by_id[task["id"]] = task
     roots = ui_roots(repo, sha)
+    pending_ids = {task["id"] for task in tasks if task.get("status") == PENDING}
+    by_message = commits_by_task(repo, sha, pending_ids)
+    files_cache: dict[str, list[str]] = {}
+    ancestry: dict[str, bool] = {}
+    merges: dict[str, bool] = {}
+
+    def ancestor(commit: str) -> bool:
+        if commit not in ancestry:
+            ancestry[commit] = is_ancestor(repo, commit, sha)
+        return ancestry[commit]
+
+    def merge(commit: str) -> bool:
+        if commit not in merges:
+            parents = git(repo, "rev-list", "--parents", "-n", "1", commit).stdout
+            merges[commit] = len(parents.split()) > 2
+        return merges[commit]
 
     rows: dict[str, dict[str, Any]] = {}
     for task in tasks:
@@ -203,7 +317,7 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             continue
         text = f"{task.get('delivery', '')} {task.get('acceptance', '')}"
         commits, unknown = cited_commits(repo, text)
-        outside = [commit for commit in commits if not is_ancestor(repo, commit, sha)]
+        outside = [commit for commit in commits if not ancestor(commit)]
         paths = cited_paths(text)
         receipts = [path for path in paths
                     if path.startswith("docs/qa/execution/")
@@ -212,13 +326,44 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
         missing_paths = [path for path in paths
                          if path not in receipts and not exists_at(repo, sha, path)]
         ui_paths = sorted(path for path in paths if under(path, roots))
+        # O que os receipts citados (no SHA) dizem: caminhos e commits.
+        receipt_paths: list[str] = []
+        receipt_commits: list[str] = []
+        for receipt_path in receipts:
+            receipt_text = show(repo, sha, receipt_path)
+            if receipt_text is None:
+                continue
+            for path in cited_paths(receipt_text):
+                if path not in receipt_paths:
+                    receipt_paths.append(path)
+            for commit in cited_commits(repo, receipt_text)[0]:
+                if commit not in commits and commit not in receipt_commits:
+                    receipt_commits.append(commit)
+        ui_paths_from_receipts = sorted(
+            path for path in receipt_paths
+            if under(path, roots) and path not in ui_paths
+        )
+        message_commits = [
+            commit for commit in by_message.get(task["id"], [])
+            if commit not in commits and commit not in receipt_commits
+        ]
+        task_commits = commits + receipt_commits + message_commits
+        implementation_commits = [
+            commit for commit in task_commits
+            if ancestor(commit) and not merge(commit) and is_implementation(
+                changed_files(repo, commit, files_cache))
+        ]
+        ui_commits: list[str] = []
         from_commits: set[str] = set()
-        for commit in commits:
-            if commit not in outside:
-                from_commits.update(changed_files(repo, commit))
+        for commit in task_commits:
+            touched = [path for path in changed_files(repo, commit, files_cache)
+                       if under(path, roots)]
+            if touched:
+                ui_commits.append(commit)
+                from_commits.update(touched)
         ui_paths_from_commits = sorted(
             path for path in from_commits
-            if under(path, roots) and path not in ui_paths
+            if path not in ui_paths and path not in ui_paths_from_receipts
         )
         open_items = OPEN_ITEMS.search(text)
         rows[task["id"]] = {
@@ -231,7 +376,15 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             "receipts": receipts,
             "missing_receipts": missing_receipts,
             "missing_paths": missing_paths,
+            "receipt_commits": receipt_commits,
+            "receipt_commits_outside_sha": [
+                commit for commit in receipt_commits if not ancestor(commit)
+            ],
+            "message_commits": message_commits,
+            "implementation_commits": implementation_commits,
+            "ui_commits": ui_commits,
             "ui_paths": ui_paths,
+            "ui_paths_from_receipts": ui_paths_from_receipts,
             "ui_paths_from_commits": ui_paths_from_commits,
             "declares_open_items": open_items is not None,
             "open_items_excerpt": (
@@ -269,8 +422,11 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             row["classification"] = "receipt_ausente_no_sha"
         elif task_id not in eligible:
             row["classification"] = "bloqueada_por_dependencia"
-        elif row["ui_paths"] or row["ui_paths_from_commits"]:
+        elif (row["ui_paths"] or row["ui_paths_from_receipts"]
+              or row["ui_paths_from_commits"]):
             row["classification"] = "elegivel_com_prova_ui"
+        elif not row["implementation_commits"]:
+            row["classification"] = "elegivel_sem_rastro_de_ui"
         else:
             row["classification"] = "elegivel"
         if receipt_blocks and row["classification"].startswith("elegivel"):
@@ -318,12 +474,17 @@ def to_markdown(result: dict[str, Any]) -> str:
             lines.append(f"| `{key}` | {value} |")
     lines += [
         "",
-        "| Tarefa | Prioridade | Classe | Dependências abertas | Receipts | Revisar |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| Tarefa | Prioridade | Classe | Dependências abertas | Receipts "
+        "| Commits da tarefa | Revisar |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for row in result["tasks"]:
         deps = ", ".join(f"`{d['id']}` ({d['status']})" for d in row["open_dependencies"])
         receipts = ", ".join(f"`{path}`" for path in row["receipts"]) or "nenhum citado"
+        shown = row["implementation_commits"][:6]
+        task_commits = ", ".join(f"`{commit[:9]}`" for commit in shown) or "nenhum"
+        if len(row["implementation_commits"]) > len(shown):
+            task_commits += f" e mais {len(row['implementation_commits']) - len(shown)}"
         review = []
         if row["declares_open_items"]:
             review.append("aceite declara pendência")
@@ -334,14 +495,26 @@ def to_markdown(result: dict[str, Any]) -> str:
             review.append("receipt ausente")
         if row["missing_paths"]:
             review.append(f"{len(row['missing_paths'])} caminho(s) citado(s) fora do SHA")
-        if row["ui_paths"] or row["ui_paths_from_commits"]:
+        if row["receipt_commits_outside_sha"]:
+            review.append("receipt cita commit fora do SHA: " + ", ".join(
+                c[:9] for c in row["receipt_commits_outside_sha"]))
+        if (row["ui_paths"] or row["ui_paths_from_receipts"]
+                or row["ui_paths_from_commits"]):
             review.append(
                 f"prova de UI ({len(row['ui_paths'])} caminho(s) citado(s), "
-                f"{len(row['ui_paths_from_commits'])} por commit citado)"
+                f"{len(row['ui_paths_from_receipts'])} pelos receipts, "
+                f"{len(row['ui_paths_from_commits'])} por commit da tarefa: "
+                + ", ".join(c[:9] for c in row["ui_commits"][:6]) + ")"
+            )
+        elif not row["implementation_commits"]:
+            review.append(
+                "sem commit da tarefa no SHA: a prova de UI não pode ser "
+                "dispensada sem citar os commits"
             )
         lines.append(
             f"| `{row['id']}` | {row['priority']} | `{row['classification']}` | "
-            f"{deps or '—'} | {receipts} | {'; '.join(review) or '—'} |"
+            f"{deps or '—'} | {receipts} | {task_commits} | "
+            f"{'; '.join(review) or '—'} |"
         )
     return "\n".join(lines) + "\n"
 

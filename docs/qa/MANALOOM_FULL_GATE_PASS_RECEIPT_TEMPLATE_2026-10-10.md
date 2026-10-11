@@ -29,12 +29,28 @@ Classes:
 
 | Classe | Significado | O que fazer |
 | --- | --- | --- |
-| `elegivel` | evidência no SHA e dependências em PASS ou elegíveis na mesma rodada | sobe para `PASS` com a linha do item 3 |
-| `elegivel_com_prova_ui` | como acima, mas tocou uma raiz do digest de UI (por caminho citado ou por commit citado) | sobe só com a prova de UI no mesmo SHA (`ui-proof` verde e `PASS_VISUAL_REVIEWED`, G-08) |
+| `elegivel` | evidência no SHA, dependências em PASS ou elegíveis na mesma rodada e rastro: pelo menos um commit da tarefa no SHA, que não seja merge, muda algo fora de `docs/`, e nenhum caminho nem commit da tarefa toca uma raiz do digest de UI | sobe para `PASS` com a linha do item 3, citando os commits da coluna "Commits da tarefa" |
+| `elegivel_com_prova_ui` | como acima, mas um caminho citado (no aceite ou nos receipts citados) ou um commit da tarefa toca uma raiz do digest de UI | sobe só com a prova de UI no mesmo SHA (`ui-proof` verde e `PASS_VISUAL_REVIEWED`, G-08) |
+| `elegivel_sem_rastro_de_ui` | evidência e dependências como em `elegivel`, mas nenhum commit da tarefa no SHA, fora os merges, muda algo fora de `docs/`: o script não sabe se ela tocou a UI | não sobe como `elegivel`. Sobe com a prova de UI no mesmo SHA, ou com a confirmação do item 3 (os commits da tarefa e a lista de arquivos de cada um, sem raiz do digest); sem uma das duas, fica |
 | `bloqueada_por_dependencia` | alguma dependência fica fora de PASS | não sobe; a tabela mostra qual dependência falta e em que estado ela está |
 | `commit_citado_fora_do_sha` | um commit citado no aceite não é ancestral do SHA | não sobe; conferir se o trabalho entrou por outro commit e corrigir a citação |
 | `receipt_ausente_no_sha` | o receipt citado não existe no SHA | não sobe; o receipt precisa estar no SHA |
 | `bloqueada_pelo_receipt` | `--receipt` foi dado e não prova o full verde neste SHA | nada sobe (saída 3) |
+
+A prova de UI falha fechada. Os commits da tarefa vêm de três lugares:
+- os citados no aceite;
+- os citados dentro dos receipts que o aceite cita, lidos do SHA;
+- os commits do SHA, sem merge, cuja mensagem cita o ID: direto, em faixa
+  (`LC-P0-01..06`), em lista (`BT-GATE-002/003`) ou pela família no escopo do
+  assunto (`fix(LC-P0): ...`).
+
+Se um caminho citado no aceite ou nos receipts, ou um arquivo mudado por
+qualquer desses commits, cai numa raiz do digest de UI, a tarefa pede a prova
+de UI. Commit citado só como referência também conta: o erro fica do lado de
+pedir prova a mais. Um merge citado (o `master` em que o receipt foi
+conferido, por exemplo) conta para a UI, mas nunca como rastro. A busca nunca
+prova que não existe outro commit da tarefa: quem conhece um commit que não
+aparece na coluna "Commits da tarefa" cita-o no aceite e refaz a lista.
 
 A coluna "Revisar" marca o aceite que declara pendência ("Segue aberto",
 "Falta:"). A elegibilidade nunca decide que a pendência fechou. Se a pendência
@@ -85,10 +101,14 @@ Com a forma B, a lista do script sai como condicional. O receipt diz isso.
 
 | Tarefa | Classe | Evidência de implementação no SHA | Evidência de aceite | Prova de UI | Pendência declarada | Resultado |
 | --- | --- | --- | --- | --- | --- | --- |
-| `<ID>` | `elegivel` | commit(s) ancestrais citados, ou o arquivo e o teste que provam | receipt da tarefa (`docs/qa/execution/...`) e os testes do aceite que rodaram no full | não se aplica | nenhuma | `PASS` |
+| `<ID>` | `elegivel` | os commits da coluna "Commits da tarefa" e o arquivo e o teste que provam | receipt da tarefa (`docs/qa/execution/...`) e os testes do aceite que rodaram no full | não se aplica: nenhum dos commits conferidos (`<sha9>`, ...) toca raiz do digest de UI | nenhuma | `PASS` |
 | `<ID>` | `elegivel_com_prova_ui` | ... | ... | `ui-proof` verde no SHA, `latest.json` com o digest de UI do SHA e a revisão visual assinada (G-08) | ... | `PASS` ou "fica" |
+| `<ID>` | `elegivel_sem_rastro_de_ui` | os commits da tarefa, achados por quem revisa | ... | a prova de UI como na linha acima, ou a confirmação: cada commit da tarefa com a saída de `git show --name-only --format= <commit>` colada, sem raiz do digest de UI | ... | `PASS` ou "fica" |
 
 Para cada linha:
+- "Prova de UI: não se aplica" só vale para `elegivel`, e sempre com os
+  commits conferidos. `elegivel_sem_rastro_de_ui` nunca sobe com "não se
+  aplica" sem a confirmação acima;
 - o teste que prova o aceite precisa estar no inventário que o full rodou.
   Teste com tag `live` ou `live_db_write` não roda no full; ele precisa do
   receipt próprio em PostgreSQL descartável (por exemplo
@@ -102,7 +122,8 @@ Para cada linha:
 ## 4. Tarefas que ficam
 
 Copie da saída do script as linhas `bloqueada_por_dependencia`,
-`commit_citado_fora_do_sha`, `receipt_ausente_no_sha` e as elegíveis com
+`commit_citado_fora_do_sha`, `receipt_ausente_no_sha`, as
+`elegivel_sem_rastro_de_ui` sem prova de UI nem confirmação e as elegíveis com
 pendência declarada. Para cada uma, escreva o motivo e o que destrava.
 
 ## 5. O que este receipt não prova
