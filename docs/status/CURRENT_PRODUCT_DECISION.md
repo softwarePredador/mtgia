@@ -2,7 +2,8 @@
 
 - Lifecycle: `CURRENT_PRODUCT_DECISION`
 - Data da decisão: `2026-08-25`; atualizada em `2026-09-22` com as decisões do
-  dono sobre a beta (`docs/status/DECISOES_PENDENTES_2026-09-22.md`)
+  dono sobre a beta (`docs/status/DECISOES_PENDENTES_2026-09-22.md`) e em
+  `2026-10-10` com as decisões D-92 a D-120 sobre o caminho até o GO
 - Estado de release: `NO_GO_PUBLIC_RELEASE`
 - Candidato pretendido: `CONTROLLED_FREE_BETA`
 - Público inicial: coorte pequena e controlada
@@ -56,14 +57,14 @@ consultar PostgreSQL ou chamar um provedor.
 
 | Área | `implementation_status` | `release_capability` | `live_verified_as_of` |
 | --- | --- | --- | --- |
-| Cadastro de nova conta | Implementado e guardado | `OFF`; a coorte é admitida somente por decisão/receipt próprios, por convite de uso único emitido pelo dono, em lotes de 20 a 30 (D-16, `BT-AUTH-006`) | `null` |
+| Cadastro de nova conta | Implementado e guardado; o app ainda não manda `invite_code` (vai no PR-C, `BT-UX-BATCH-001`) | `OFF`; a coorte é admitida somente por decisão/receipt próprios, por convite de uso único emitido pelo dono, em lotes de 20 a 30 (D-16, `BT-AUTH-006`), e abre em modo convite pela matriz nomeada da D-104 (`BT-COH-001`) | `null` |
 | Login, recuperação, verificação, exportação e exclusão de conta existente | Plano de controle de acesso e privacidade | Disponível; não autoriza nenhuma capability de produto | `null` |
-| Catálogo read-only, cartas, coleção/fichário privado e deck manual | Implementado, com P0 de release ainda abertos | `OFF_UNTIL_P0_RECEIPT` | `null` |
+| Catálogo read-only, cartas, coleção/fichário privado e deck manual | Implementado, com P0 de release ainda abertos | `OFF_UNTIL_P0_RECEIPT`; abre na matriz nomeada da coorte (D-104) | `null` |
 | Analyze/Optimize consultivo, sempre revisável | Experimental guardado, com P0 de IA ainda abertos | `OFF_UNTIL_P0_RECEIPT`; segunda onda, depois da primeira coorte (D-07) | `null` |
 | Generate/Rebuild | Experimental guardado | `OFF`; futura allowlist exige decisão e receipt próprios | `null` |
-| Life Counter local | Implementado; isolamento/saída confiável ainda precisam fechar | `OFF_UNTIL_P0_RECEIPT`; entra na primeira coorte depois dos seus P0 LIFE (D-07) | `null` |
+| Life Counter local | Implementado; isolamento/saída confiável ainda precisam fechar | `OFF_UNTIL_P0_RECEIPT`; entra na primeira coorte depois dos seus P0 LIFE (D-07), na matriz nomeada da D-104 | `null` |
 | Battle batch e Jogar contra IA | Implementação/laboratório existente; Live é infraestrutura interna, não produto espectador | `OFF` até o programa Battle horizontal e a prova de partida real completa | `null` |
-| Scanner/OCR | Implementação/provas históricas existentes | `OFF`; câmera fora do build de release no Android e no Web (D-41) | `null` |
+| Scanner/OCR | Implementação/provas históricas existentes | `OFF`; câmera fora do build de release no Android e no Web (D-41); o scanner sai do código do app, com plugins, rota `/scan` e permissão `CAMERA` (D-95) | `null` |
 | Galeria, perfis públicos, busca social, comments, follows, DMs e push social | Implementação parcial existente | `OFF` | `null` |
 | Binder público, marketplace e trades | Implementação parcial existente | `OFF`; na beta, troca e venda do fichário ficam escondidas e a escrita responde 422 (D-39) | `null` |
 | Checkout, assinatura, anúncios e paywall | Backend de billing contém bloqueio fail-closed | `OFF` | `null` |
@@ -150,11 +151,66 @@ Decidido em 2026-09-22:
   (`price_history` desligada até depois da coorte).
 - Em 2026-09-24 o dono decidiu que o MVP não precisa de backup fora do servidor
   (D-81). O `BT-DR-001` fica com o backup local e o ensaio de restauração.
-- O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, produção na
-  linha de base contida com a 058, catálogo com menos de 7 dias, rollback
-  treinado uma vez e a assinatura do dono (D-18, `BT-DEC-001`). O catálogo está
-  atualizado desde 2026-09-23, com o job diário ativado às 15:34 UTC
-  (`docs/qa/execution/2026-09-23/BT-CAT-01-ativacao-do-catalogo.md`); o preço de deck espera a D-62.
+- O GO da primeira coorte exige todas as P0 CORE e P0 LIFE em `PASS`, menos a abertura da
+  coorte (`BT-COH-001`), que vem depois do GO porque depende dele, e exige produção no
+  candidato congelado (ver as decisões de 2026-10-10 abaixo; até lá dizia "na linha
+  de base contida com a 058"), catálogo com menos de 7 dias, rollback treinado uma
+  vez e a assinatura do dono (D-18, `BT-DEC-001`). O catálogo está atualizado desde
+  2026-09-23, com o job diário ativado às 15:34 UTC
+  (`docs/qa/execution/2026-09-23/BT-CAT-01-ativacao-do-catalogo.md`). O preço de
+  deck pela D-62 e pela D-73 está no ar desde 2026-09-23 às 18:53 UTC (`41bab49c9`),
+  e a execução diária de 2026-09-24 às 06:20 UTC aplicou os preços
+  (`docs/qa/execution/2026-09-23/deploy-preco-de-deck.md`).
+
+Decidido em 2026-10-10 (D-92 a D-120, em `docs/status/DECISOES_PENDENTES_2026-09-22.md`):
+
+- **Critério de produção do GO (D-93).** Troca "produção na 058" por produção no
+  candidato congelado, com as migrations até a última do lote (hoje a 076; a 077
+  da D-112 entra no mesmo lote, e o contrato do deploy e o readiness vão até ela junto),
+  29/29 capabilities `off` e same-SHA. Os outros
+  critérios da D-18 continuam.
+- **Rollback treinado (D-103).** Conta como treino uma promoção com falha induzida,
+  que dispara a compensação automática, somada ao ensaio de restauração do backup
+  do lote. Depois da 059, voltar o backend para `41bab49c9` não vale: rollback é
+  restore.
+- **Ordem do fecho (D-110).** É esta:
+  1. congelar o SHA, com tag;
+  2. rodar o `scope_e2e`;
+  3. fazer o lote;
+  4. fazer as leituras da produção;
+  5. dar `PASS` no `BT-REL-001` e no `BT-REL-002`;
+  6. rodar o `release` até ficar verde;
+  7. `BT-REL-003`;
+  8. `BT-QA-001`;
+  9. GO.
+
+  Entre o congelamento e a promoção, nada entra no `master`.
+- **Abertura da coorte (D-104, D-109).** Depois do GO, numa promoção própria, a
+  política versionada liga exatamente `account_registration` (modo convite),
+  `catalog_private`, `collection_private`, `decks_private` e `life_counter_local`.
+  Além da matriz toda `off`, o contrato do deploy passa a aceitar só essa matriz
+  nomeada. Os convites saem em lotes de 20 a 30, e as variáveis de envio e o
+  domínio são conferidos antes do primeiro lote (`BT-COH-001`). Até lá, a matriz
+  continua toda `OFF`. A matriz `cohort-2026-10` e o contrato estão no `master` desde o
+  PR #38 (`8f371030a`), e ela só vale com `MANALOOM_RELEASE_CAPABILITY_MATRIX=cohort-2026-10`.
+- **Superfícies que ficam escondidas na coorte (D-96).** O Generate, o import
+  sobre deck existente e o restaurar pela tela da lixeira ficam fora do app da
+  primeira coorte. As P0 deles fecham pelo servidor, e a tela da lixeira vai para
+  o P1 (`DCK-P1-14`).
+- **Telemetria (D-107).** Se o parecer do advogado não chegar a tempo, a coorte
+  entra com a telemetria do app desligada, e só a ativação é medida no servidor. A
+  baseline do KPI fica para depois da primeira coorte.
+- **Prova de UI (D-92, D-113).** Há duas recapturas: a R1 depois do PR-B, e a R2
+  depois do PR-C, que é o `BT-UX-PROOF-001`. A sessão de aparelho, com TalkBack e
+  teclado, vem junto da R2.
+- **Onda visual (D-119).** Antes da beta, a home, os decks, o detalhe do deck, o
+  fichário, o perfil e a entrada passam ao padrão do contador, com o kit, nas
+  direções que o dono escolheu sobre os mockups (Home A, Decks B, Detalhe A,
+  Fichário A, Perfil B e Cadastro A). A onda é o `BT-UX-WAVE-001` e entra junto
+  com a R2. Nenhuma capability muda, e os dados novos que os mockups pedem não
+  bloqueiam: sem o dado, a peça fica sem numeral.
+- **XMage (D-120).** Fica na 1.4.60 até depois do MVP e sobe junto com a abertura
+  do Battle.
 
 Detalhamento e ordem:
 `docs/BREWTACT_MASTER_EXECUTION_BACKLOG_2026-08-12.md`.
