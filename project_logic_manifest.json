@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c5778675930b573810a4581362a3a53d9ba853f57b82309577aaa23909d5b085",
+  "source_digest_sha256": "de9da9031c2eacb940be506dfe513dc37a30d08885c65a982a7af9f2ea87e0f1",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,9 +80,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 74,
-    "scripts_and_jobs": 718,
+    "scripts_and_jobs": 719,
     "environment_variables": 737,
-    "tests": 1348,
+    "tests": 1349,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -281417,6 +281417,12 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/manaloom_live_readonly_smoke.py",
+      "role": "operation",
+      "mutation_class": "read_only_or_unknown",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/manaloom_local_ci.sh",
       "role": "operation",
       "mutation_class": "read_only_or_unknown",
@@ -291587,6 +291593,7 @@
     "server/test/legal_acceptance_test.dart",
     "server/test/legal_consent_contract_test.dart",
     "server/test/legal_consent_live_test.dart",
+    "server/test/live_readonly_smoke_contract_test.dart",
     "server/test/local_ci_contract_test.dart",
     "server/test/local_ci_staged_scope_dispatcher_test.py",
     "server/test/lorehold_candidate_patch_contract_test.dart",
@@ -303232,7 +303239,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c5778675930b573810a4581362a3a53d9ba853f57b82309577aaa23909d5b085"
+    "project_logic_source_digest_sha256": "de9da9031c2eacb940be506dfe513dc37a30d08885c65a982a7af9f2ea87e0f1"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305501,6 +305508,7 @@
       "scripts/manaloom_integration_lane_gate.sh",
       "scripts/manaloom_integration_lanes.py",
       "scripts/manaloom_live_credential_audit.py",
+      "scripts/manaloom_live_readonly_smoke.py",
       "scripts/manaloom_local_ci.sh",
       "scripts/manaloom_migration_rehearsal.py",
       "scripts/manaloom_migrations_038_040_isolated.sh",
@@ -306420,6 +306428,7 @@
       "server/test/legal_acceptance_test.dart",
       "server/test/legal_consent_contract_test.dart",
       "server/test/legal_consent_live_test.dart",
+      "server/test/live_readonly_smoke_contract_test.dart",
       "server/test/local_ci_contract_test.dart",
       "server/test/local_ci_staged_scope_dispatcher_test.py",
       "server/test/lorehold_candidate_patch_contract_test.dart",
