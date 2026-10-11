@@ -11,6 +11,13 @@ Subcomandos:
   check --backup-dir D [--policy P] [--now ISO-8601]
   receipt --backup-dir D --backup-file F [--drill-evidence E] --git-sha S
           --out O [--policy P] [--now ISO-8601]
+  rotate --backup-dir D [--apply] [--out O] [--policy P] [--now ISO-8601]
+
+`rotate` é a guarda de 30 dias da D-84. Sem --apply só lista. Com --apply
+apaga só os dumps do padrão governado (manaloom-postgres-AAAAMMDDTHHMMSSZ.dump,
+arquivo comum na raiz do diretório, nunca link) com carimbo de mais de 30 dias,
+e nunca o mais novo nem o mais novo com ensaio aprovado. O ciclo
+(scripts/manaloom_backup_cycle.sh --execute) roda a rotação a cada backup.
 
 Saída: JSON em stdout. Código 0 quando válido ou PASS, 2 para entrada
 inválida e 3 para BLOCKED (a cadência não está cumprida).
@@ -345,7 +352,67 @@ def retention_report(
         "days": days,
         "keep": sorted(keep),
         "expired": expired,
-        "delete": "só com o sim do dono na hora (D-84); este check não apaga nada",
+        "delete": (
+            "o check não apaga nada; a rotação (rotate --apply, que o ciclo roda a "
+            "cada backup) apaga só os vencidos do padrão governado (D-84)"
+        ),
+    }
+
+
+def rotate(
+    backup_dir: Path,
+    policy: dict[str, Any],
+    now: dt.datetime,
+    *,
+    apply: bool,
+) -> dict[str, Any]:
+    """D-84: apaga os dumps vencidos pela guarda de 30 dias.
+
+    Só entra o que é do padrão governado: um arquivo comum, nunca link, na raiz
+    do diretório do backup, com o nome manaloom-postgres-AAAAMMDDTHHMMSSZ.dump
+    e carimbo de mais de `retention_days` dias. O dump mais novo e o mais novo
+    com ensaio aprovado ficam sempre (os mesmos `keep` do check). Recibos,
+    ensaios e qualquer outro arquivo ficam. Sem `apply`, só lista.
+    """
+    backup_dir = durable_dir(backup_dir)
+    days = policy["backup"].get("retention_days")
+    if not isinstance(days, int) or isinstance(days, bool) or days <= 0:
+        raise InvalidInput("a política não tem prazo de guarda; nada a rodar")
+    if not backup_dir.is_dir():
+        raise InvalidInput(f"diretório de backup ausente: {backup_dir}")
+    retention = check(backup_dir, policy, now)["retention"] or {}
+    keep = set(retention.get("keep") or [])
+    expired: list[str] = []
+    skipped: list[str] = []
+    for path in sorted(backup_dir.iterdir()):
+        match = BACKUP_NAME.match(path.name)
+        if not match:
+            continue
+        if path.is_symlink() or not path.is_file():
+            skipped.append(path.name)
+            continue
+        stamp = dt.datetime.strptime(match.group(1), "%Y%m%dT%H%M%SZ").replace(
+            tzinfo=dt.timezone.utc
+        )
+        if (now - stamp).total_seconds() <= days * 86400 or path.name in keep:
+            continue
+        expired.append(path.name)
+    deleted: list[str] = []
+    if apply:
+        for name in expired:
+            (backup_dir / name).unlink()
+            deleted.append(name)
+    return {
+        "schema_version": 1,
+        "kind": "brewtact-backup-rotation",
+        "decisions": ["D-69", "D-84"],
+        "status": "applied" if apply else "dry_run",
+        "recorded_at": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "days": days,
+        "keep": sorted(keep),
+        "expired": expired,
+        "deleted": deleted,
+        "skipped": skipped,
     }
 
 
@@ -418,6 +485,12 @@ def main(argv: list[str] | None = None) -> int:
     record.add_argument("--out", type=Path, required=True)
     record.add_argument("--policy", type=Path, default=DEFAULT_POLICY)
     record.add_argument("--now")
+    rotation = commands.add_parser("rotate")
+    rotation.add_argument("--backup-dir", type=Path, required=True)
+    rotation.add_argument("--apply", action="store_true")
+    rotation.add_argument("--out", type=Path)
+    rotation.add_argument("--policy", type=Path, default=DEFAULT_POLICY)
+    rotation.add_argument("--now")
     args = parser.parse_args(argv)
     try:
         policy = load_policy(args.policy)
@@ -430,6 +503,17 @@ def main(argv: list[str] | None = None) -> int:
             result = check(args.backup_dir, policy, now)
             print(json.dumps(result, ensure_ascii=False))
             return 0 if result["status"] == "PASS" else 3
+        if args.command == "rotate":
+            result = rotate(args.backup_dir, policy, now, apply=args.apply)
+            if args.out is not None:
+                args.out.parent.mkdir(parents=True, exist_ok=True)
+                args.out.write_text(
+                    json.dumps(result, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+                args.out.chmod(0o600)
+            print(json.dumps(result, ensure_ascii=False))
+            return 0
         receipt = build_receipt(
             backup_dir=args.backup_dir,
             backup_file=args.backup_file,

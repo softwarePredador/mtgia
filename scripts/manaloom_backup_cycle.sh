@@ -13,7 +13,10 @@
 # dumps, para a cadência enxergar o histórico (nunca /tmp nem worktree). A
 # evidência do ensaio fica em <dir>/drills/<carimbo>/ e o receipt em
 # <dir>/receipts/<carimbo>.json. No fim confere a cadência da política
-# (server/config/backup_policy.json): sai 0 se cumprida e 3 se não.
+# (server/config/backup_policy.json) e roda a guarda de 30 dias (D-84):
+# manaloom_backup_cadence.py rotate --apply apaga só os dumps vencidos do
+# padrão governado e grava <dir>/rotations/<carimbo>.json. Sai 0 se a
+# cadência foi cumprida e 3 se não.
 set -euo pipefail
 
 ROOT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
@@ -23,7 +26,7 @@ EXECUTE=0
 DRILL=0
 
 usage() {
-  sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 while (( $# > 0 )); do
@@ -48,6 +51,7 @@ print(json.dumps({
         *(["scripts/manaloom_full_restore_drill.sh --execute (PostgreSQL isolado, sem rede)"]
           if sys.argv[2] == "1" else []),
         "scripts/manaloom_backup_cadence.py receipt (confere RPO, RTO e cadência)",
+        "scripts/manaloom_backup_cadence.py rotate --apply (guarda de 30 dias, D-84)",
     ],
     "execute": "--execute [--drill]",
 }, ensure_ascii=False, indent=2))
@@ -95,4 +99,14 @@ if [[ "$DRILL" == "1" ]]; then
     --backup "$backup_file" --execute --evidence-dir "$evidence_dir"
   receipt_args+=(--drill-evidence "$evidence_dir/restore-result.json")
 fi
-python3 "$CADENCE_TOOL" "${receipt_args[@]}"
+cadence_status=0
+python3 "$CADENCE_TOOL" "${receipt_args[@]}" || cadence_status=$?
+if [[ "$cadence_status" != "0" && "$cadence_status" != "3" ]]; then
+  exit "$cadence_status"
+fi
+# D-84: a guarda de 30 dias roda a cada backup novo, com a cadência cumprida ou
+# não. Apaga só o padrão governado vencido; o mais novo e o mais novo com
+# ensaio aprovado ficam.
+python3 "$CADENCE_TOOL" rotate --backup-dir "$BACKUP_DIR" --apply \
+  --out "$BACKUP_DIR/rotations/$STAMP.json"
+exit "$cadence_status"

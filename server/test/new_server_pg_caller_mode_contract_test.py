@@ -37,6 +37,13 @@ EXPECTED_SHELL_MODES = {
         "--read-only",
     ),
     "scripts/manaloom_e2e_suite.sh": ("--write-approved",),
+    # S-05: o passo de migrations do lote; o comentário do uso, a leitura do ledger
+    # (antes e depois) e a aplicação pelo migrate.dart.
+    "scripts/manaloom_lot_apply_migrations.sh": (
+        "--write-approved",
+        "--read-only",
+        "--write-approved",
+    ),
     "scripts/manaloom_global_battle_closure.sh": (
         "--read-only",
         "--read-only",

@@ -832,6 +832,39 @@ def _jobs_for_release_policy(policy: ReleasePolicy) -> list[Job]:
     ]
 
 
+def enabled_job_names(policy: ReleasePolicy) -> list[str]:
+    """S-01: the jobs this daemon schedules for `policy`, in schedule order.
+
+    This is the only list. The ops deploy reads it from the daemon of the
+    candidate commit (`--print-enabled-jobs`, through
+    scripts/lib/manaloom_ops_jobs_contract.sh) and checks `/health` and
+    jobs.json against it, so the post-deploy check never drifts from what the
+    scheduler runs.
+    """
+    return [job.name for job in _jobs_for_release_policy(policy)]
+
+
+def print_enabled_jobs(argv: list[str]) -> int:
+    """`--print-enabled-jobs <policy.json>`: the list as JSON, without side effects.
+
+    Reads only the given file. It creates no directory, starts no job and opens
+    no socket. A policy the daemon would treat as invalid exits 2: a deploy
+    never expects the fail-closed set.
+    """
+    if len(argv) != 2 or argv[0] != "--print-enabled-jobs":
+        print(
+            "uso: manaloom_ops_daemon.py [--print-enabled-jobs <release_capabilities.json>]",
+            file=sys.stderr,
+        )
+        return 2
+    policy = _load_release_policy(Path(argv[1]))
+    if not policy.valid:
+        print("politica de release invalida: nenhuma lista de jobs", file=sys.stderr)
+        return 2
+    print(json.dumps(enabled_job_names(policy)))
+    return 0
+
+
 def _matches_part(value: int, expr: str) -> bool:
     expr = expr.strip()
     if expr == "*":
@@ -1254,4 +1287,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        raise SystemExit(print_enabled_jobs(sys.argv[1:]))
     raise SystemExit(main())
