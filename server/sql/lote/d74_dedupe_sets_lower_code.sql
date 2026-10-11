@@ -41,6 +41,12 @@
 --       -v esperado_referencias_levadas_para_a_linha_que_fica=<n da prévia> \
 --       -v esperado_linhas_que_ficam_com_campo_herdado=<n da prévia> \
 --       -v esperado_linhas_apagadas=<n da prévia> ...
+-- No lote, quem roda este script é o passo de migrations
+-- (scripts/manaloom_lot_apply_migrations.sh, before_first_migration de
+-- server/config/lot_migrations.json): `--execute --preview` faz a prévia e imprime as
+-- contagens; com a palavra do dono, `--execute --apply ... --esperado d74:<objeto>=<n>`
+-- grava depois da conferência do ledger e antes da 059, e o resultado vai para o mesmo
+-- receipt das migrations.
 -- Saída: linhas `fase<TAB>objeto<TAB>quantidade` (fases modo, antes, acao, fusao e
 -- depois). Uma transação só, com `sets` travada contra escrita (o job do catálogo
 -- espera).

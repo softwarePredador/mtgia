@@ -85,7 +85,15 @@ O ciclo sai com 0 quando tudo passa e com 3 quando a cadência não fecha; 1 e 2
 backup ou do ensaio e entrada recusada. Qualquer código diferente de 0 para o lote.
 
 Com o ciclo em 0, o passo seguinte do lote, ainda antes da migration, é o ensaio do upgrade
-com o dump novo (`docs/runbooks/ENSAIO_DE_UPGRADE.md`, modo `completo`).
+com o dump novo (`docs/runbooks/ENSAIO_DE_UPGRADE.md`, modo `completo`). Depois vem o passo
+de migrations (`scripts/manaloom_lot_apply_migrations.sh`):
+
+1. `--execute --preview` faz a prévia do dedupe da D-74 na produção e desfaz (ROLLBACK). Ela
+   imprime as contagens da gravação.
+2. Com a palavra do dono sobre esses números, rode `--execute --apply` com as provas deste
+   ciclo e do ensaio e um `--esperado d74:<objeto>=<n>` para cada contagem. O dedupe grava
+   antes da primeira migration, e o script recusa sem gravar se uma contagem não bater.
+   Depois vêm as migrations, e tudo vai para o mesmo receipt.
 
 ## Receipt
 
