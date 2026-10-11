@@ -170,6 +170,133 @@ void main() {
     );
 
     test(
+      'D-118: a contagem só de leitura acha os decks do Generate pela marca de '
+      'origem e diz quando não há marca',
+      () => withCopy('d85_1_origem', (copy) async {
+        const origin = 'd85_1_generate_origin_count.sql';
+        Future<PsqlRun> count() async {
+          final run = await copy.runScript(
+            origin,
+            directory: 'readonly',
+            tabular: false,
+            readOnly: true,
+          );
+          expect(run.exitCode, 0, reason: '$run');
+          return run;
+        }
+
+        final ana = await insertLoteUser(copy, 'lote_ana');
+        final ids = <String, String>{};
+        for (final (name, description) in const [
+          ('g1_materializado', null),
+          ('g2_materializado_com_descricao', 'Goblins'),
+          ('g3_evento_deck_generated', 'Mono azul'),
+          ('m1_manual_com_descricao', 'Minha lista'),
+          ('m2_manual', null),
+        ]) {
+          ids[name] = (await copy.sql(
+            '''
+            INSERT INTO decks (user_id, name, format, description)
+            VALUES (@ana, @name, 'commander', @description) RETURNING id::text
+            ''',
+            {'ana': ana, 'name': name, 'description': description},
+          )).single[0] as String;
+        }
+        for (final (key, deck) in [
+          ('r1', ids['g1_materializado']!),
+          ('r2', ids['g2_materializado_com_descricao']!),
+        ]) {
+          await copy.sql(
+            '''
+            INSERT INTO ai_generate_requests
+              (user_id, request_key, format, materialized_deck_id)
+            VALUES (@ana, @key, 'commander', CAST(@deck AS uuid))
+            ''',
+            {'ana': ana, 'key': key, 'deck': deck},
+          );
+        }
+        await copy.sql(
+          '''
+          INSERT INTO activation_funnel_events (user_id, event_name, deck_id)
+          VALUES (@ana, 'deck_generated', CAST(@g3 AS uuid)),
+                 (@ana, 'deck_created', CAST(@m1 AS uuid))
+          ''',
+          {
+            'ana': ana,
+            'g3': ids['g3_evento_deck_generated']!,
+            'm1': ids['m1_manual_com_descricao']!,
+          },
+        );
+        final untouched = await copy.fingerprint();
+
+        final marked = await count();
+        expect(
+          marked.value('marca', 'ai_generate_requests.materialized_deck_id'),
+          'presente',
+        );
+        expect(
+          marked.value('marca', 'activation_funnel_events.deck_id:deck_generated'),
+          'presente',
+        );
+        expect(marked.value('marca', 'decks.coluna_de_origem'), 'ausente');
+        expect(
+          marked.value('marca', 'deck_do_app_antigo'),
+          startsWith('sem_marca'),
+        );
+        expect(marked.value('contagem', 'decks_por_materialized_deck_id'), '2');
+        expect(marked.value('contagem', 'decks_por_evento_deck_generated'), '1');
+        expect(marked.value('contagem', 'decks'), '5');
+        expect(marked.value('contagem', 'decks_do_generate'), '3');
+        expect(marked.value('contagem', 'decks_do_generate_com_descricao'), '2');
+        expect(marked.value('contagem', 'decks_com_descricao_sem_marca'), '1');
+        expect(
+          marked.value('resultado', 'd85_1'),
+          startsWith('com_marca: 3 deck(s) vieram do Generate (2 com descrição)'),
+        );
+        expect(await copy.fingerprint(), untouched);
+
+        // A marca existe, mas nenhum deck veio do Generate por ela.
+        await copy.sql('DELETE FROM ai_generate_requests');
+        await copy.sql('DELETE FROM activation_funnel_events');
+        final unmarked = await count();
+        expect(unmarked.value('contagem', 'decks_do_generate'), '0');
+        expect(unmarked.value('contagem', 'decks_com_descricao_sem_marca'), '3');
+        expect(
+          unmarked.value('resultado', 'd85_1'),
+          startsWith('com_marca_sem_deck'),
+        );
+
+        // Sem marca nenhuma: o script diz isso, e a correção 1 é no-op.
+        await copy.sql('DROP TABLE ai_generate_requests CASCADE');
+        await copy.sql('ALTER TABLE activation_funnel_events DROP COLUMN deck_id');
+        final none = await count();
+        expect(
+          none.value('marca', 'ai_generate_requests.materialized_deck_id'),
+          'ausente',
+        );
+        expect(
+          none.value('marca', 'activation_funnel_events.deck_id:deck_generated'),
+          'ausente',
+        );
+        expect(none.value('contagem', 'decks_do_generate'), '0');
+        expect(
+          none.value('resultado', 'd85_1'),
+          allOf(startsWith('sem_marca'), contains('no-op documentado (D-118)')),
+        );
+
+        // Uma coluna de origem em decks é avisada, sem interpretar os valores.
+        await copy.sql('ALTER TABLE decks ADD COLUMN origin TEXT');
+        final column = await count();
+        expect(column.value('marca', 'decks.coluna_de_origem'), 'origin');
+        expect(
+          column.value('resultado', 'd85_1'),
+          startsWith('coluna_de_origem_em_decks: origin'),
+        );
+      }),
+      skip: enabled ? false : LoteDatabase.skipReason,
+    );
+
+    test(
       'recusa sem a 069 e não muda nada',
       () => withCopy('d85_1_sem_069', (copy) async {
         await seed(copy);

@@ -90,11 +90,15 @@ class LoteCopy {
 
   /// Roda um arquivo de `server/sql/lote/` como no lote: `psql -X`,
   /// `ON_ERROR_STOP`, saída sem alinhamento e separada por TAB. Sem a variável
-  /// `aplicar`, é a prévia.
+  /// `aplicar`, é a prévia. Com [directory] `readonly`, roda um arquivo de
+  /// `server/sql/readonly/`; com [readOnly], a sessão nasce como no wrapper
+  /// `--read-only` (`default_transaction_read_only=on`).
   Future<PsqlRun> runScript(
     String fileName, {
     Map<String, String> variables = const {},
     bool tabular = true,
+    String directory = 'lote',
+    bool readOnly = false,
   }) async {
     final result = await Process.run(
       LoteDatabase.psqlBin,
@@ -108,7 +112,7 @@ class LoteCopy {
         ],
         if (tabular) ...['-At', '-F', '\t'],
         '-f',
-        'sql/lote/$fileName',
+        'sql/$directory/$fileName',
       ],
       environment: {
         'PGHOST': LoteDatabase._host,
@@ -117,6 +121,7 @@ class LoteCopy {
         'PGPASSWORD': LoteDatabase._password,
         'PGDATABASE': name,
         'PGAPPNAME': 'manaloom-lote-test',
+        if (readOnly) 'PGOPTIONS': '-c default_transaction_read_only=on',
       },
       stdoutEncoding: null,
       stderrEncoding: utf8,

@@ -10,6 +10,16 @@
 -- A revisão do deck e o ledger da 067 não mudam: é correção governada, não mudança
 -- do dono, e o ledger só registra o que as rotas mudam.
 --
+-- Na produção, o esperado é achar 0 (D-118). O app antigo só deixava o prompt em
+-- `ai_generate_jobs.result`, e a limpeza do próprio backend apaga cada job 30 minutos
+-- depois de criado (`_cleanup` em `server/lib/ai_generate_job.dart`, `_jobTtl`, já
+-- assim em 41bab49c9). O Generate novo (069) materializa o deck com a descrição NULL.
+-- Então a regra não tem com o que comparar a descrição dos decks antigos. Na sessão
+-- de leitura do lote, `server/sql/readonly/d85_1_generate_origin_count.sql` conta os
+-- decks que vieram do Generate pela marca de origem, se houver: com marca, o dono
+-- decide com o número; sem marca, esta correção é um no-op documentado (a prévia
+-- mostra 0 e nada é gravado).
+--
 -- Roda no lote de deploy, depois da promoção (decisão do dono de 2026-10-10, item 11),
 -- pelo wrapper de escrita e com as duas aprovações canônicas no processo chamador.
 -- Primeiro a prévia (o padrão): faz tudo, imprime antes, ação e depois e desfaz

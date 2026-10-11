@@ -174,6 +174,43 @@ void main() {
     );
   });
 
+  test('D-118: a contagem da origem do Generate só lê, e a correção 1 diz '
+      'que na produção o esperado é 0', () {
+    final source = File(
+      'sql/readonly/d85_1_generate_origin_count.sql',
+    ).readAsStringSync();
+    final body = code(source);
+    expect(source, contains('with_new_server_pg.sh --read-only psql'));
+    expect(body, contains('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY;'));
+    expect(body.trimRight(), endsWith('ROLLBACK;'));
+    expect(body, isNot(contains('COMMIT')));
+    for (final verb in const [
+      'INSERT ',
+      'UPDATE ',
+      'DELETE ',
+      'DROP ',
+      'ALTER ',
+      'CREATE ',
+      'TRUNCATE ',
+    ]) {
+      expect(body.toUpperCase(), isNot(contains(verb)), reason: verb);
+    }
+    for (final result in const [
+      'sem_marca:',
+      'com_marca_sem_deck:',
+      "'com_marca: '",
+      "'coluna_de_origem_em_decks: '",
+    ]) {
+      expect(body, contains(result), reason: result);
+    }
+    final correction = files['d85_1_deck_description_generate_prompt.sql']!;
+    expect(correction, contains('Na produção, o esperado é achar 0 (D-118)'));
+    expect(
+      correction,
+      contains('server/sql/readonly/d85_1_generate_origin_count.sql'),
+    );
+  });
+
   test('d85_5: o passo b recalcula o mesmo arquivo do passo a', () {
     final archive = code(files['d85_5a_legacy_ruling_poststatus_archive.sql']!);
     final drop = code(files['d85_5b_drop_legacy_ruling_poststatus.sql']!);
