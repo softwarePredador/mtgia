@@ -534,11 +534,17 @@ def code_latest_migration() -> str:
     return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))["database"]["latest_migration"]
 
 
+# O banco de produção dos testes, e outro (outro cluster: o do ensaio, um restore novo).
+DATABASE = {"name": "halder", "system_identifier": "7400000000000000001"}
+OTHER_DATABASE = {"name": "halder", "system_identifier": "7400000000000000002"}
+
+
 def ledger_snapshot(latest: str, measured: dt.datetime | None = None, **changes: Any) -> str:
     """O ledger que scripts/manaloom_lot_apply_migrations.sh --read-ledger grava."""
     measured = measured or dt.datetime.now(dt.timezone.utc)
     data = {"kind": "manaloom-schema-ledger", "schema_version": 1,
             "measured_at": measured.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "database": DATABASE,
             "latest_migration": latest,
             "versions": [f"{number:03d}" for number in range(1, int(latest) + 1)],
             "source": "server/bin/with_new_server_pg.sh --read-only psql"}
@@ -804,6 +810,8 @@ class LogicTest(unittest.TestCase):
         self.assertIn("não sei qual migration", unknown["rollback_refused_because"])
         # Uma base à frente do banco não é o caso da S-02: ela voltaria ao estado de antes.
         self.assertEqual(guard("058", "058", candidate="058")["backend_rollback"], "allowed")
+        # A guarda diz de qual banco é o ledger (vai para o preflight e para o begin).
+        self.assertEqual(same["database"], DATABASE)
         # O lote não rodou: o candidato exige a 076 e o banco está na 058.
         behind = guard("058", "058")
         self.assertEqual(behind["status"], "BLOCKED")
@@ -818,6 +826,9 @@ class LogicTest(unittest.TestCase):
             "não é o MAX(version)": ledger_snapshot("076", now, latest_migration="058"),
             "v1": ledger_snapshot("076", now, schema_version=2),
             "measured_at": ledger_snapshot("076", now, measured_at="ontem"),
+            "não diz de qual banco veio": ledger_snapshot("076", now, database=None),
+            "não diz de qual banco": ledger_snapshot(
+                "076", now, database={"name": "halder", "system_identifier": "x"}),
         }
         for expected, raw in cases.items():
             with self.subTest(snapshot=expected):

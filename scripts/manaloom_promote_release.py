@@ -23,10 +23,11 @@ MAX(version) de `schema_migrations` seja exatamente a última migration que a
 imagem conhece (`latest_migration_ready` em `server/lib/health_readiness_support.dart`
 do SHA da imagem). Uma imagem que exige uma migration menor que a do banco nunca
 fica pronta: 41bab49c9 exige a 058, e depois da 059 ela responde 503. O
-`schema-guard` lê o ledger do banco (snapshot de no máximo 30 minutos) e a
-exigência do candidato e da imagem de base; a volta do backend para uma imagem
-assim é recusada, inclusive na compensação automática. Depois da 059, rollback é
-restore (docs/runbooks/BACKUP_E_RESTAURACAO.md) ou correção para frente.
+`schema-guard` lê o ledger do banco (snapshot de no máximo 30 minutos, com o nome
+do banco e o system_identifier do cluster) e a exigência do candidato e da imagem
+de base; a volta do backend para uma imagem assim é recusada, inclusive na
+compensação automática. Depois da 059, rollback é restore
+(docs/runbooks/BACKUP_E_RESTAURACAO.md) ou correção para frente.
 
 Subcomandos:
   validate-config [--config C]
@@ -80,6 +81,9 @@ SCHEMA_LEDGER_KIND = "manaloom-schema-ledger"
 SCHEMA_SNAPSHOT_MAX_AGE = dt.timedelta(minutes=30)
 SCHEMA_SNAPSHOT_MAX_SKEW = dt.timedelta(minutes=5)
 MIGRATION_VERSION = re.compile(r"^[0-9]{3}$")
+# O banco de uma leitura do ledger: current_database() e o system_identifier do cluster.
+DATABASE_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,62}$")
+SYSTEM_IDENTIFIER = re.compile(r"^[0-9]{1,20}$")
 READINESS_SQL_LATEST = re.compile(r"=\s*'([0-9]{3})'\s+AS\s+latest_migration_ready\b")
 READINESS_DECLARED_LATEST = re.compile(r"'latest_migration'\s*:\s*'([0-9]{3})'")
 EVENTS = {
@@ -311,11 +315,33 @@ def _parse_utc(value: Any) -> dt.datetime | None:
         return None
 
 
+def database_identity(value: Any) -> dict[str, str] | None:
+    """O banco de uma leitura: `current_database()` e o `system_identifier` do cluster.
+
+    O system_identifier nasce no initdb e muda com outro cluster (o do ensaio L-02, um
+    restore num PostgreSQL novo); o nome separa os bancos do mesmo cluster.
+    """
+    if not isinstance(value, dict):
+        return None
+    name, system = value.get("name"), value.get("system_identifier")
+    if not (isinstance(name, str) and DATABASE_NAME.match(name)
+            and isinstance(system, str) and SYSTEM_IDENTIFIER.match(system)):
+        return None
+    return {"name": name, "system_identifier": system}
+
+
+def database_label(database: dict[str, str] | None) -> str:
+    if not database:
+        return "banco desconhecido"
+    return f"{database['name']} do cluster {database['system_identifier']}"
+
+
 def load_schema_snapshot(raw: str, now: dt.datetime) -> dict[str, Any]:
     """O ledger do banco lido só para leitura (scripts/manaloom_lot_apply_migrations.sh).
 
     Vale por no máximo 30 minutos, como o snapshot de capacidade: a promoção decide a
-    volta do backend pelo banco de agora, não pelo de ontem.
+    volta do backend pelo banco de agora, não pelo de ontem. Diz de qual banco veio
+    (`database`), para a promoção conferir que é o mesmo do preflight.
     """
     try:
         data = json.loads(raw)
@@ -339,6 +365,9 @@ def load_schema_snapshot(raw: str, now: dt.datetime) -> dict[str, Any]:
         raise InvalidInput("o ledger do banco não traz as versões em ordem, sem repetição")
     if data.get("latest_migration") != versions[-1]:
         raise InvalidInput("latest_migration do ledger não é o MAX(version) das versões")
+    if database_identity(data.get("database")) is None:
+        raise InvalidInput("o ledger do banco não diz de qual banco veio (database: nome e "
+                           "system_identifier)")
     return data
 
 
@@ -387,6 +416,7 @@ def schema_guard(
         rollback, reason = "allowed", None
     return {
         "status": "PASS" if not problems else "BLOCKED",
+        "database": database_identity(snapshot.get("database")) if snapshot else None,
         "database_latest": database,
         "measured_at": snapshot.get("measured_at") if snapshot else None,
         "candidate_requires": candidate,
