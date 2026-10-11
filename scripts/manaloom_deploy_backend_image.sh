@@ -123,6 +123,8 @@ source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
 # shellcheck source=scripts/lib/manaloom_proxy_body_ceiling.sh
 source "$ROOT_DIR/scripts/lib/manaloom_proxy_body_ceiling.sh"
+# shellcheck source=scripts/lib/manaloom_backend_rollback_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_backend_rollback_guard.sh"
 XMAGE_INTERACTIVE_SERVICE="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE"
 XMAGE_INTERACTIVE_DNS="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS"
 XMAGE_INTERACTIVE_URL="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL"
@@ -257,6 +259,11 @@ ROLLBACK_SOURCE_IMAGE=""
 PREVIOUS_SPEC_IMAGE=""
 PREVIOUS_RUNNING_IMAGE=""
 PREVIOUS_UPDATE_STATE=""
+PREVIOUS_GIT_SHA=""
+PREVIOUS_REQUIRED_MIGRATION=""
+DATABASE_LATEST_MIGRATION=""
+BACKEND_ROLLBACK_POLICY=""
+SWARM_UPDATE_FAILURE_ACTION="pause"
 cleanup_release_runtime() {
   local status="${1:-$?}"
   trap - EXIT
@@ -1092,6 +1099,14 @@ rollback_backend_deploy() {
   local source_status=1 runtime_status=1 configured_status=1 health_status=1
   local services_json configured_image readiness
 
+  # D-104 (item 12): com o banco além do que a imagem anterior exige, voltar é
+  # restore. Nada vai para o Swarm nem para o EasyPanel.
+  if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
+    echo "deploy backend falhou" >&2
+    manaloom_backend_restore_path "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION"
+    return 1
+  fi
+
   echo "deploy backend falhou; restaurando spec e origem anteriores" >&2
   if [[ "$SOURCE_MUTATED" == "1" && -n "$ROLLBACK_SOURCE_IMAGE" ]]; then
     trpc_post services.app.updateSourceImage "$(jq -cn \
@@ -1373,6 +1388,33 @@ if [[ "$PREVIOUS_SOURCE_IMAGE" != "$ROLLBACK_SOURCE_IMAGE" ]]; then
   echo "origem EasyPanel anterior sera normalizada para o digest imutavel da spec durante eventual rollback" >&2
 fi
 
+# >>> guarda do rollback automatico (revisao da promocao, item 2; D-104, item 12)
+# O readiness exige MAX(version) igual a ultima migration que a imagem conhece.
+# A volta automatica (Swarm e trap) so vale se a imagem anterior exige a migration
+# em que o banco esta; senao o Swarm pausa e o trap recusa e mostra o restore.
+PREVIOUS_GIT_SHA="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '/^GIT_SHA=/{count++; value=substr(\$0,index(\$0,\"=\")+1)} END{if (count == 1) printf \"%s\", value}'
+")" || PREVIOUS_GIT_SHA=""
+PREVIOUS_REQUIRED_MIGRATION="$(
+  manaloom_readiness_required_migration "$ROOT_DIR" "$PREVIOUS_GIT_SHA" || true
+)"
+DATABASE_LATEST_MIGRATION="$(
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
+    psql -X -v ON_ERROR_STOP=1 -At -c \
+    "SELECT COALESCE(MAX(version), '') FROM public.schema_migrations;"
+)"
+BACKEND_ROLLBACK_POLICY="$(
+  manaloom_backend_rollback_policy "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION"
+)"
+SWARM_UPDATE_FAILURE_ACTION="$(
+  manaloom_swarm_update_failure_action "$BACKEND_ROLLBACK_POLICY"
+)"
+if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
+  echo "aviso: sem volta automatica do backend: a imagem anterior (GIT_SHA ${PREVIOUS_GIT_SHA:-ausente}) exige a migration ${PREVIOUS_REQUIRED_MIGRATION:-desconhecida} e o banco esta na ${DATABASE_LATEST_MIGRATION:-desconhecida}; se o update falhar, o Swarm pausa e o caminho e restore" >&2
+fi
+# <<< guarda do rollback automatico
+
 encode_remote_value() {
   printf '%s' "$1" | base64 | tr -d '\r\n'
 }
@@ -1440,7 +1482,7 @@ public_site_url=\$(decode_b64 '$public_site_url_b64')
 sentry_dsn=\$(decode_b64 '$sentry_dsn_b64')
 docker service update \
   --update-order stop-first \
-  --update-failure-action rollback \
+  --update-failure-action '$SWARM_UPDATE_FAILURE_ACTION' \
   --update-monitor 30s \
   --rollback-order stop-first \
   --rollback-failure-action pause \

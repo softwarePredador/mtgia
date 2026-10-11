@@ -14,9 +14,15 @@ void main() {
 
   test('every production service uses monitored automatic Swarm rollback', () {
     for (final entry in deploys.entries) {
+      // O backend escolhe entre rollback e pause pela guarda da migration
+      // (teste abaixo); os outros serviços não dependem do banco.
       expect(
         entry.value,
-        contains('--update-failure-action rollback'),
+        contains(
+          entry.key == 'backend'
+              ? "--update-failure-action '\$SWARM_UPDATE_FAILURE_ACTION'"
+              : '--update-failure-action rollback',
+        ),
         reason: entry.key,
       );
       expect(entry.value, contains('--update-monitor 30s'), reason: entry.key);
@@ -152,6 +158,58 @@ void main() {
     expect(source, contains(r'--arg image "$ROLLBACK_SOURCE_IMAGE"'));
     expect(source, contains('rollback web-public comprovado'));
   });
+
+  test(
+    'backend only rolls back automatically to an image that accepts the '
+    'migrated database (D-104, item 12)',
+    () {
+      final source = deploys['backend']!;
+      final guard = source.indexOf('# >>> guarda do rollback automatico');
+      final guardEnd = source.indexOf('# <<< guarda do rollback automatico');
+      final capture = source.indexOf('previous_runtime_state="\$(ssh');
+      final mutation = source.indexOf('\nDEPLOY_MUTATION_STARTED=1\n');
+      final update = source.indexOf(
+        "--update-failure-action '\$SWARM_UPDATE_FAILURE_ACTION'",
+      );
+
+      expect(
+        source,
+        contains(
+          'source "\$ROOT_DIR/scripts/lib/manaloom_backend_rollback_guard.sh"',
+        ),
+      );
+      expect(guard, greaterThan(capture));
+      expect(guardEnd, greaterThan(guard));
+      expect(mutation, greaterThan(guardEnd));
+      expect(update, greaterThan(mutation));
+      expect(source, isNot(contains('--update-failure-action rollback')));
+      expect(source, contains('SWARM_UPDATE_FAILURE_ACTION="pause"'));
+      final block = source.substring(guard, guardEnd);
+      expect(block, contains("awk '/^GIT_SHA=/"));
+      expect(
+        block,
+        contains(
+          'manaloom_readiness_required_migration "\$ROOT_DIR" "\$PREVIOUS_GIT_SHA"',
+        ),
+      );
+      expect(block, contains('with_new_server_pg.sh" --read-only'));
+      expect(block, contains('MAX(version)'));
+      expect(block, contains('manaloom_swarm_update_failure_action'));
+
+      final rollback = source.indexOf('rollback_backend_deploy() {');
+      final refusal = source.indexOf(
+        'if [[ "\$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then',
+        rollback,
+      );
+      final firstRemote = source.indexOf('trpc_post', rollback);
+      expect(refusal, greaterThan(rollback));
+      expect(refusal, lessThan(firstRemote));
+      expect(
+        source.substring(refusal, firstRemote),
+        contains('manaloom_backend_restore_path'),
+      );
+    },
+  );
 
   test('backend restores the prior full Swarm spec and readiness', () {
     final source = deploys['backend']!;

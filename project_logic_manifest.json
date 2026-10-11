@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "a2c76003ebbae7c1931738b38b56ced74bd717e52dbb40a9b822b62801e4e449",
+  "source_digest_sha256": "d689084d1272f377fa65f35f224861ea583011e03d5b6da1dd7b41220a497b5d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -80,9 +80,9 @@
     "database_tables": 91,
     "database_views": 6,
     "migrations": 75,
-    "scripts_and_jobs": 718,
-    "environment_variables": 736,
-    "tests": 1354,
+    "scripts_and_jobs": 719,
+    "environment_variables": 739,
+    "tests": 1355,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 246,
@@ -280600,6 +280600,12 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/lib/manaloom_backend_rollback_guard.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
       "role": "battle",
       "mutation_class": "read_only_or_unknown",
@@ -281070,6 +281076,7 @@
       "role": "release",
       "mutation_class": "guarded_or_review_required",
       "environment_variables": [
+        "DATABASE_LATEST_MIGRATION",
         "EASYPANEL_APP_NAME",
         "EASYPANEL_BASE_URL",
         "EASYPANEL_PROJECT_NAME",
@@ -281107,6 +281114,8 @@
         "PASSWORD_RESET_APP_URL",
         "PASSWORD_RESET_WEBHOOK_TOKEN",
         "PASSWORD_RESET_WEBHOOK_URL",
+        "PREVIOUS_GIT_SHA",
+        "PREVIOUS_REQUIRED_MIGRATION",
         "RESEND_API_KEY",
         "RESEND_FROM_EMAIL",
         "RESEND_FROM_NAME",
@@ -284061,6 +284070,14 @@
       "classification": "configuration",
       "sources": [
         "server/bin/auto_sync_learned_decks.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "DATABASE_LATEST_MIGRATION",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
       ],
       "value_captured": false
     },
@@ -289377,6 +289394,22 @@
       "value_captured": false
     },
     {
+      "name": "PREVIOUS_GIT_SHA",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "PREVIOUS_REQUIRED_MIGRATION",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PROJECT",
       "classification": "configuration",
       "sources": [
@@ -291359,6 +291392,7 @@
     "server/test/authenticated_visual_fixture_contract_test.dart",
     "server/test/auto_promote_learned_decks_test.py",
     "server/test/auto_sync_learned_decks_test.py",
+    "server/test/backend_rollback_guard_test.py",
     "server/test/backup_cadence_test.py",
     "server/test/backup_cycle_db_live_test.py",
     "server/test/basic_land_utils_test.dart",
@@ -292650,6 +292684,7 @@
         "server/test/production_shape_adoption_test.dart",
         "server/test/lote_scripts_contract_test.dart",
         "server/test/proxy_body_ceiling_test.py",
+        "server/test/backend_rollback_guard_test.py",
         "server/test/release_capability_policy_test.dart",
         "app/test/core/config/release_capabilities_test.dart",
         "app/test/core/config/release_capability_surface_contract_test.dart",
@@ -303236,7 +303271,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "a2c76003ebbae7c1931738b38b56ced74bd717e52dbb40a9b822b62801e4e449"
+    "project_logic_source_digest_sha256": "d689084d1272f377fa65f35f224861ea583011e03d5b6da1dd7b41220a497b5d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -305438,6 +305473,7 @@
       "scripts/dev_full_with_integration.sh",
       "scripts/flutter_run_with_local_sentry.sh",
       "scripts/generate_brewtact_brand_assets.py",
+      "scripts/lib/manaloom_backend_rollback_guard.sh",
       "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
       "scripts/lib/manaloom_captura_card_details_navigation.py",
       "scripts/lib/manaloom_captura_optimization_card_reader.py",
@@ -306200,6 +306236,7 @@
       "server/test/authenticated_visual_fixture_contract_test.dart",
       "server/test/auto_promote_learned_decks_test.py",
       "server/test/auto_sync_learned_decks_test.py",
+      "server/test/backend_rollback_guard_test.py",
       "server/test/backup_cadence_test.py",
       "server/test/backup_cycle_db_live_test.py",
       "server/test/basic_land_utils_test.dart",
