@@ -51,7 +51,7 @@
 # Janela: o backend antigo responde 503 desde a primeira migration até o backend novo
 # (cerca de 5 minutos). Não há volta automática: depois da 059, rollback é restore do
 # dump do L-01 (docs/runbooks/BACKUP_E_RESTAURACAO.md), e a promoção recusa voltar o
-# backend para uma imagem que exige uma migration menor (S-02).
+# backend para uma imagem que exige outra migration (S-02).
 #
 # Códigos: 0 aplicado e conferido (ou plano PASS); 1 o migrate.dart falhou ou o ledger
 # de depois não é o esperado (o receipt diz onde parou); 2 entrada ou ambiente

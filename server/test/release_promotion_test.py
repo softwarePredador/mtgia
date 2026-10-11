@@ -808,8 +808,14 @@ class LogicTest(unittest.TestCase):
         unknown = guard("076", None)
         self.assertEqual(unknown["backend_rollback"], "refused")
         self.assertIn("não sei qual migration", unknown["rollback_refused_because"])
-        # Uma base à frente do banco não é o caso da S-02: ela voltaria ao estado de antes.
+        # A base na migration do banco volta ao estado de antes.
         self.assertEqual(guard("058", "058", candidate="058")["backend_rollback"], "allowed")
+        # O readiness compara por igualdade: a base à frente do banco (exige a 077 com o
+        # banco na 076) também daria 503, e a volta é recusada.
+        ahead = guard("076", "077")
+        self.assertEqual((ahead["status"], ahead["backend_rollback"]), ("PASS", "refused"))
+        self.assertIn("exige a migration 077 e o banco está na 076",
+                      ahead["rollback_refused_because"])
         # A guarda diz de qual banco é o ledger (vai para o preflight e para o begin).
         self.assertEqual(same["database"], DATABASE)
         # O lote não rodou: o candidato exige a 076 e o banco está na 058.
@@ -862,6 +868,46 @@ class LogicTest(unittest.TestCase):
         self.deploy("backend", "fail_self_rollback")
         self.assertEqual(self._decide("backend")["swarm"], "already")
         self.assertEqual(self._decide("backend", refused)["status"], "BLOCKED")
+
+    def test_resolve_marks_a_baseline_the_database_left_behind(self) -> None:
+        now = dt.datetime.now(dt.timezone.utc)
+        latest = code_latest_migration()
+        begin = promote.schema_guard(
+            ledger_snapshot(latest, now - dt.timedelta(minutes=40)),
+            readiness_declaring(latest), "4" * 40, readiness_declaring("058"),
+            now - dt.timedelta(minutes=35))
+        self.assertEqual((begin["backend_rollback"], begin["database"]), ("refused", DATABASE))
+        # Sem ledger novo, vale o banco do preflight: a base na 058 não fica pronta.
+        behind = promote.resolve_baseline(begin, None, now)
+        self.assertEqual((behind["status"], behind["ready"], behind["source"]),
+                         ("PASS", False, "preflight"))
+        self.assertIn(f"exige a migration 058 e o banco está na {latest}",
+                      behind["not_ready_because"])
+        self.assertIn("restore", behind["not_ready_because"])
+        # Um ledger novo do mesmo banco, que voltou à 058 (o restore): a base fica pronta.
+        restored = promote.resolve_baseline(begin, ledger_snapshot("058", now), now)
+        self.assertEqual((restored["status"], restored["ready"], restored["source"],
+                          restored["same_database_as_preflight"]),
+                         ("PASS", True, "schema_snapshot", True))
+        still = promote.resolve_baseline(begin, ledger_snapshot(latest, now), now)
+        self.assertEqual((still["status"], still["ready"]), ("PASS", False))
+        # Um ledger de outro banco não diz nada do backend: BLOCKED, sem decidir.
+        other = promote.resolve_baseline(
+            begin, ledger_snapshot("058", now, database=OTHER_DATABASE), now)
+        self.assertEqual((other["status"], other["ready"], other["same_database_as_preflight"]),
+                         ("BLOCKED", None, False))
+        self.assertTrue(any("o ledger é do halder do cluster 7400000000000000002" in problem
+                            for problem in other["problems"]), other["problems"])
+        stale = promote.resolve_baseline(
+            begin, ledger_snapshot("058", now - dt.timedelta(minutes=31)), now)
+        self.assertEqual(stale["status"], "BLOCKED")
+        # Sem guarda no begin (exigência ou banco desconhecidos): nunca conta como pronta.
+        for schema in ("not_checked", {}, dict(begin, baseline_requires=None)):
+            with self.subTest(schema=str(schema)[:30]):
+                unknown = promote.resolve_baseline(schema, None, now)
+                self.assertEqual((unknown["status"], unknown["ready"]), ("PASS", False))
+        same = promote.resolve_baseline(dict(begin, baseline_requires=latest), None, now)
+        self.assertEqual(same["ready"], True)
 
     def test_restore_is_proven_exact_or_by_identity(self) -> None:
         self.deploy("backend")
@@ -1679,6 +1725,106 @@ class ToolTest(unittest.TestCase):
                                     for problem in failed["problems"]), failed)
                 self.assertEqual(records[-1]["data"]["status"], "rollback_failed")
 
+    def test_a_backend_preflight_without_the_ledger_is_blocked(self) -> None:
+        # Sem --schema-snapshot, o preflight com o backend não sabe se o candidato fica
+        # pronto nem se o backend pode voltar: BLOCKED, nunca PASS com schema not_checked.
+        result = self.run_tool("--execute", "--preflight", "--sha", self.sha,
+                               "--capacity-snapshot", str(self.snapshot))
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        summary = json.loads(result.stdout)
+        self.assertEqual((summary["status"], summary["schema"]["status"],
+                          summary["schema"]["backend_rollback"]),
+                         ("BLOCKED", "BLOCKED", "refused"))
+        self.assertIn("sem o ledger do banco (--schema-snapshot)", summary["reasons"])
+        # Sem o backend no plano, não há o que conferir no banco.
+        site = self.run_tool("--execute", "--preflight", "--sha", self.sha, "--surfaces", "site",
+                             "--capacity-snapshot", str(self.snapshot))
+        self.assertEqual(site.returncode, 0, site.stdout + site.stderr)
+        self.assertEqual(json.loads(site.stdout)["schema"], "not_checked")
+        self.assertEqual(self.deployed(), [])
+        self.assertEqual(self.mutations(), [])
+
+    def test_resolve_marks_a_backend_left_on_a_baseline_behind_the_database(self) -> None:
+        # O deploy do backend recusa antes de mudar: o backend fica na base (058) com o
+        # banco na última. O --resolve não chama isso de "baseline": marca
+        # baseline_not_ready, com o porquê, no diário e na saída.
+        latest = code_latest_migration()
+        self.tearDown()
+        self.build(baseline_requires="058")
+        self.faults(backend="fail_before")
+        self.assertEqual(self.promote().returncode, 1)
+        path, _ = self.journal()
+        resolved = self.run_tool("--execute", "--resolve", str(path), "--receipt-dir",
+                                 str(self.receipts), "--reason", "backend na base, sem restore")
+        self.assertEqual(resolved.returncode, 0, resolved.stdout + resolved.stderr)
+        output = json.loads(resolved.stdout)
+        self.assertEqual(output["surfaces"]["backend"], "baseline_not_ready")
+        self.assertEqual((output["backend_baseline"]["ready"],
+                          output["backend_baseline"]["source"]), (False, "preflight"))
+        self.assertIn(f"exige a migration 058 e o banco está na {latest}",
+                      output["backend_baseline"]["not_ready_because"])
+        self.assertIn("AVISO: o backend está na imagem de base, que não fica pronta",
+                      resolved.stderr)
+        _, records = self.journal()
+        self.assertEqual(records[-1]["event"], "resolved")
+        self.assertEqual(records[-1]["data"]["surfaces"]["backend"], "baseline_not_ready")
+        self.assertFalse(records[-1]["data"]["backend_baseline"]["ready"])
+        # Com um ledger novo: o de outro banco é recusado (o diário segue aberto); o do
+        # mesmo banco do preflight, de volta na 058 (o restore), deixa a base pronta.
+        self.tearDown()
+        self.build(baseline_requires="058")
+        self.faults(backend="fail_before")
+        self.assertEqual(self.promote().returncode, 1)
+        path, _ = self.journal()
+        args = ["--execute", "--resolve", str(path), "--receipt-dir", str(self.receipts),
+                "--reason", "restore conferido", "--schema-snapshot", str(self.schema_snapshot)]
+        self.schema_snapshot.write_text(ledger_snapshot("058", database=OTHER_DATABASE),
+                                        encoding="utf-8")
+        refused = self.run_tool(*args)
+        self.assertEqual(refused.returncode, 3, refused.stdout + refused.stderr)
+        self.assertIn("não é o banco do backend", refused.stderr)
+        self.assertEqual(promote.journal_status(path)["status"], "rollback_failed")
+        self.assertTrue((self.receipts / "EM_ANDAMENTO").exists())
+        self.schema_snapshot.write_text(ledger_snapshot("058"), encoding="utf-8")
+        ready = self.run_tool(*args)
+        self.assertEqual(ready.returncode, 0, ready.stdout + ready.stderr)
+        output = json.loads(ready.stdout)
+        self.assertEqual(output["surfaces"]["backend"], "baseline")
+        self.assertEqual((output["backend_baseline"]["ready"], output["backend_baseline"]["source"],
+                          output["backend_baseline"]["same_database_as_preflight"]),
+                         (True, "schema_snapshot", True))
+        self.assertFalse((self.receipts / "EM_ANDAMENTO").exists())
+        self.assert_contract_kept()
+
+    def test_a_journal_inside_the_repository_is_refused(self) -> None:
+        # Uma cópia durável (fora de /tmp) do repositório descartável e um outro worktree
+        # dele: o diário não fica em nenhum dos dois, mesmo em diretório durável.
+        base = Path.home() / ".cache" / "manaloom-release-promotion-test"
+        durable = Path(tempfile.mkdtemp(prefix="repo-", dir=base))
+        self.addCleanup(shutil.rmtree, durable, True)
+        repo = durable / "repo"
+        shutil.copytree(self.repo, repo, symlinks=True)
+        other = durable / "outro-checkout"
+        subprocess.run(["git", "-C", str(repo), "worktree", "add", "--quiet", "--detach",
+                        str(other)], check=True, capture_output=True,
+                       env={"PATH": "/usr/bin:/bin", "HOME": str(self.tmp),
+                            "GIT_CONFIG_NOSYSTEM": "1"})
+        script = str(repo / "scripts" / "manaloom_promote_release.sh")
+        for receipts in (repo / "diarios", other / "diarios"):
+            receipts.mkdir()
+            for args in (["--status"],
+                         ["--execute", "--promote", "--sha", self.sha,
+                          "--capacity-snapshot", str(self.snapshot),
+                          "--schema-snapshot", str(self.schema_snapshot)]):
+                with self.subTest(receipts=receipts.parent.name, mode=args[0]):
+                    result = subprocess.run(["/bin/bash", script, *args, "--receipt-dir",
+                                             str(receipts)], capture_output=True, text=True,
+                                            env=self.env, check=False, timeout=120)
+                    self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
+                    self.assertIn("o diário não pode ficar dentro do repositório", result.stderr)
+                    self.assertEqual(list(receipts.iterdir()), [])
+        self.assertEqual(self.calls(), [])
+
     def test_preflight_blocks_a_candidate_the_database_is_not_ready_for(self) -> None:
         # O passo de migrations do lote não rodou: o candidato exige a última e o banco
         # está na 058. O backend novo daria 503; nada começa.
@@ -1797,7 +1943,8 @@ class ToolTest(unittest.TestCase):
         self._git("commit", "--quiet", "-am", "capability on verificada")
         self._git("push", "--quiet", "origin", "master")
         sha = self._git("rev-parse", "HEAD")
-        opened = self.run_tool("--execute", "--preflight", "--sha", sha, env=cohort_env)
+        opened = self.run_tool("--execute", "--preflight", "--sha", sha,
+                               "--schema-snapshot", str(self.schema_snapshot), env=cohort_env)
         self.assertEqual(opened.returncode, 0, opened.stdout + opened.stderr)
         self.assertEqual(json.loads(opened.stdout)["release_mode"], "product_open")
         self.assertEqual(self.deployed(), [])

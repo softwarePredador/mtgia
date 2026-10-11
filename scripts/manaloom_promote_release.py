@@ -21,13 +21,14 @@ nenhum valor de env entra no diário, só nomes e impressões digitais.
 Banco migrado (S-02): o readiness do backend (`/health/ready`) exige que o
 MAX(version) de `schema_migrations` seja exatamente a última migration que a
 imagem conhece (`latest_migration_ready` em `server/lib/health_readiness_support.dart`
-do SHA da imagem). Uma imagem que exige uma migration menor que a do banco nunca
+do SHA da imagem). Uma imagem que exige outra migration que não a do banco nunca
 fica pronta: 41bab49c9 exige a 058, e depois da 059 ela responde 503. O
 `schema-guard` lê o ledger do banco (snapshot de no máximo 30 minutos, com o nome
 do banco e o system_identifier do cluster) e a exigência do candidato e da imagem
 de base; a volta do backend para uma imagem assim é recusada, inclusive na
 compensação automática. Depois da 059, rollback é restore
-(docs/runbooks/BACKUP_E_RESTAURACAO.md) ou correção para frente.
+(docs/runbooks/BACKUP_E_RESTAURACAO.md) ou correção para frente. No --resolve, o
+`resolve-baseline` marca o backend na base que não fica pronta.
 
 Subcomandos:
   validate-config [--config C]
@@ -36,6 +37,7 @@ Subcomandos:
   baseline-check --surface ID --view V
   check-deployed --surface ID --baseline V0 --view V --result R --sha SHA --release-mode M
   schema-guard --snapshot S --candidate-readiness F --baseline-sha SHA --baseline-readiness F
+  resolve-baseline --begin-schema G [--snapshot S]   a base do backend fica pronta?
   compensation-decision --surface ID --baseline V0 --view V [--schema-guard G]
   check-restored --surface ID --baseline V0 --view V
   check-converged --surface ID --committed C --view V
@@ -379,9 +381,10 @@ def schema_guard(
 
     BLOCKED (o preflight para) quando o ledger falta, está velho ou ilegível, ou quando o
     candidato exige outra migration que não a do banco. A volta do backend só é
-    `allowed` quando a imagem de base exige uma migration conhecida e não menor que o
-    MAX(version) do banco; senão é `refused`: voltar deixaria o readiness em 503 para
-    sempre, e a saída é restore ou correção para frente.
+    `allowed` quando a imagem de base exige exatamente o MAX(version) do banco: o
+    readiness compara por igualdade, então uma base atrás do banco (ou à frente dele)
+    responderia 503 para sempre. Senão é `refused`, e a saída é restore ou correção para
+    frente.
     """
     problems: list[str] = []
     snapshot = None
@@ -408,7 +411,7 @@ def schema_guard(
     elif baseline is None:
         rollback, reason = "refused", (
             f"não sei qual migration a imagem de base do backend ({short}) exige")
-    elif baseline < database:
+    elif baseline != database:
         rollback, reason = "refused", (
             f"a imagem de base do backend ({short}) exige a migration {baseline} e o banco está "
             f"na {database}: voltar deixaria o /health/ready em 503")
@@ -425,6 +428,75 @@ def schema_guard(
         "backend_rollback": rollback,
         "rollback_refused_because": reason,
         "restore_runbook": RESTORE_RUNBOOK,
+        "problems": problems,
+    }
+
+
+def resolve_baseline(
+    begin_schema: Any, snapshot_raw: str | None, now: dt.datetime,
+) -> dict[str, Any]:
+    """No --resolve, com o backend na imagem de base: ela fica pronta com o banco?
+
+    Só fica se exige exatamente o MAX(version) do banco (o readiness compara por
+    igualdade). Sem ledger novo, vale o banco que o preflight leu (o `schema` do begin).
+    Com --schema-snapshot, o ledger tem de ser fresco e do mesmo banco do preflight
+    (nome e system_identifier): o backend na base fala com esse banco, e o ledger de
+    outro (o do ensaio, um cluster novo) não diz nada dele; é BLOCKED. A resposta nunca
+    some no `baseline`: `ready` false vira `baseline_not_ready` no diário.
+    """
+    guard = begin_schema if isinstance(begin_schema, dict) else {}
+    preflight_database = database_identity(guard.get("database"))
+    requires = guard.get("baseline_requires")
+    requires = requires if isinstance(requires, str) and MIGRATION_VERSION.match(requires) else None
+    latest = guard.get("database_latest")
+    latest = latest if isinstance(latest, str) and MIGRATION_VERSION.match(latest) else None
+    measured = guard.get("measured_at") if latest else None
+    source = "preflight"
+    same_database = None
+    problems: list[str] = []
+    if snapshot_raw is not None:
+        try:
+            snapshot = load_schema_snapshot(snapshot_raw, now)
+        except InvalidInput as error:
+            problems.append(str(error))
+        else:
+            current = database_identity(snapshot.get("database"))
+            same_database = preflight_database is not None and current == preflight_database
+            if same_database:
+                latest, measured = snapshot["latest_migration"], snapshot["measured_at"]
+                source = "schema_snapshot"
+            else:
+                problems.append(
+                    f"o ledger é do {database_label(current)}, e o preflight leu o "
+                    f"{database_label(preflight_database)}: não é o banco do backend")
+    sha = guard.get("baseline_sha")
+    short = sha[:12] if isinstance(sha, str) and GIT_SHA.match(sha) else "desconhecida"
+    if problems:
+        ready, reason = None, None
+    elif requires is None:
+        ready, reason = False, (
+            f"não sei qual migration a imagem de base do backend ({short}) exige")
+    elif latest is None:
+        ready, reason = False, "não sei em que migration o banco está"
+    elif requires != latest:
+        ready, reason = False, (
+            f"a imagem de base do backend ({short}) exige a migration {requires} e o banco "
+            f"está na {latest} (lido no {source} em {measured}): o /health/ready dela "
+            f"responde 503; só fica pronta com o banco na {requires}, pelo restore "
+            f"({RESTORE_RUNBOOK})")
+    else:
+        ready, reason = True, None
+    return {
+        "status": "PASS" if not problems else "BLOCKED",
+        "ready": ready,
+        "baseline_sha": sha if isinstance(sha, str) and GIT_SHA.match(sha) else None,
+        "baseline_requires": requires,
+        "database": preflight_database,
+        "database_latest": latest,
+        "measured_at": measured,
+        "source": source,
+        "same_database_as_preflight": same_database,
+        "not_ready_because": reason,
         "problems": problems,
     }
 
@@ -908,6 +980,9 @@ def main(argv: list[str] | None = None) -> int:
     guarded.add_argument("--candidate-readiness", type=Path, required=True)
     guarded.add_argument("--baseline-sha", default="")
     guarded.add_argument("--baseline-readiness", type=Path, required=True)
+    resolving = commands.add_parser("resolve-baseline")
+    resolving.add_argument("--begin-schema", type=Path, required=True)
+    resolving.add_argument("--snapshot", type=Path)
     converged = commands.add_parser("check-converged")
     converged.add_argument("--surface", required=True)
     converged.add_argument("--committed", type=Path, required=True)
@@ -950,6 +1025,12 @@ def main(argv: list[str] | None = None) -> int:
                 _optional_text(args.snapshot) if args.snapshot else None,
                 _optional_text(args.candidate_readiness), args.baseline_sha,
                 _optional_text(args.baseline_readiness), dt.datetime.now(dt.timezone.utc))
+            print(json.dumps(result, ensure_ascii=False))
+            return 0 if result["status"] == "PASS" else 3
+        if args.command == "resolve-baseline":
+            result = resolve_baseline(
+                _json(args.begin_schema), _read(args.snapshot) if args.snapshot else None,
+                dt.datetime.now(dt.timezone.utc))
             print(json.dumps(result, ensure_ascii=False))
             return 0 if result["status"] == "PASS" else 3
         config = load_config(args.config)
