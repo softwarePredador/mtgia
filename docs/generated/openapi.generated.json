@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "7978fe6784ad6bc1d323e046380258e8eb749311a782c30e97781cd3d70b2b2c",
+  "x-manaloom-source-digest-sha256": "a8ffc3b1a19914bfdb1c9f2f46800fe769e47d835fbf0d39c2349ad0e03c8452",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1039,12 +1039,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "security": [
           {
@@ -1074,12 +1074,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "responses": {
           "default": {
@@ -1104,12 +1104,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "responses": {
           "default": {
@@ -1134,12 +1134,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "security": [
           {
@@ -1169,12 +1169,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "security": [
           {
@@ -1204,12 +1204,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "responses": {
           "default": {
@@ -1234,12 +1234,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "responses": {
           "default": {
@@ -1264,12 +1264,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "security": [
           {
@@ -1299,12 +1299,12 @@
           "app/test/features/auth/providers/auth_provider_life_counter_scope_test.dart",
           "app/test/features/auth/providers/auth_provider_log_sanitization_test.dart",
           "app/test/features/auth/providers/auth_provider_onboarding_test.dart",
+          "app/test/features/auth/providers/auth_provider_password_change_keeps_profile_test.dart",
           "app/test/features/auth/providers/auth_provider_security_test.dart",
           "app/test/features/auth/screens/auth_screens_test.dart",
           "app/test/tool/authenticated_visual_diff_test.dart",
           "app/test/ui/manaloom_auth_ui_audit_test.dart",
-          "app/test/ui/ui_authenticated_visual_matrix_test.dart",
-          "docs/hermes-analysis/manaloom-knowledge/scripts/test_xmage_authoritative_adaptation_queue.py"
+          "app/test/ui/ui_authenticated_visual_matrix_test.dart"
         ],
         "responses": {
           "default": {

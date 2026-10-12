@@ -2,7 +2,7 @@
 
 Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
 
-- Atualizada em: `2026-09-22` (estado observado após `d15beb05b` e decisões do dono de 2026-09-22 sobre as 55 recomendações de `docs/status/DECISOES_PENDENTES_2026-09-22.md`)
+- Atualizada em: `2026-10-10` (decisões D-92 a D-120 do dono e reconciliação com o `master` `1f525a1c1`, revista sobre `8f371030a`); antes, `2026-09-22` (estado observado após `d15beb05b` e decisões do dono de 2026-09-22 sobre as 55 recomendações de `docs/status/DECISOES_PENDENTES_2026-09-22.md`)
 - Branch de partida: `codex/free-beta-release-candidate-2026-07-17`
 - SHA baseline na abertura de `BT-SCP-001`:
   `d9f7a59cd87d032df3d076c35ffbdb17e41525a6`
@@ -15,9 +15,14 @@ Lifecycle: `CURRENT_CONTEXT · DERIVED_QUEUE · NO_PRIORITY_AUTHORITY`
   `0ce0be74f84bd5e8eb25568601a4ce47f46a24dd6766dba67393caadd8f62abd`
 - Project logic baseline na abertura de `BT-SCP-001`:
   `bf7704ee33c99009bc878962409654df0af63d244c1b52c10eccc7aa674c80e0`
-- Backlog/registry SHA-256 corrente (decisões D-79 e D-80 do gate de UI, branch
-  `integracao/2026-09-23`): `8a73ebe6a8d3a0cfb4e6e4c7ce86dc01dbd3d60d0957ef3503d8f4960de06f9b`
-  (244 tasks; antes, `811f5409…` na rodada 2 da privacidade, `810d588d…` no registro do preço de deck, `320ebd9d…` nas decisões D-72 a D-75, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
+- Backlog/registry SHA-256 corrente (decisões D-92 a D-120, reconciliação de 2026-10-10 e as revisões
+  dela sobre `eac4f401b` e `8f371030a`):
+  `bef5b8339ecf28b80913ea014cf0dd16bbe3a87c5e0234d133da11c7ee54c75f` (251 tasks; o valor vivo está em
+  `docs/generated/TASK_REGISTRY.json > generated_from.sha256`; antes, `170a30a3…` com 250 na revisão
+  sobre `eac4f401b`, `ba95660b…` na reconciliação
+  de 2026-10-10 e `f4effb9a…` com 246 em
+  `1f525a1c1`, e `8a73ebe6…` com 244 nas decisões D-79 e D-80 do gate de UI, branch
+  `integracao/2026-09-23`; antes, `811f5409…` na rodada 2 da privacidade, `810d588d…` no registro do preço de deck, `320ebd9d…` nas decisões D-72 a D-75, `aaabfb1f…` no registro da ativação do catálogo, `b938a90f…` no registro do lote integrado, `85eddf57…` no registro do reinício do host, `7fcb7009…` no registro do deploy de segurança, `f4f5405d…` no registro do primeiro deploy e `5b60b6ce…` em `f973f81c5`; antes das decisões, `dd1fe8ff…` com 227; em
   `d15beb05b`, `333b6c0b…` com 220 tasks e 402 arestas, valor de `f6f791098`)
 - Project logic digest em HEAD `d15beb05b`: `556ba631…`. O digest da árvore de trabalho
   não é copiado aqui, porque este arquivo entra no próprio digest: ver
@@ -44,6 +49,31 @@ corre em quatro frentes paralelas, cada uma com várias tarefas abertas e PR em 
 `master`: gate e evidência, servidor e release, app e contador de vida. O escopo fica fechado nas
 P0 CORE e P0 LIFE. O slot `NOW` abaixo continua no formato que o gerador valida e marca a frente
 de servidor; as frentes de app e de contador de vida só fazem merge depois do `BT-UIEV-001`.
+
+Em 2026-10-10 o dono aceitou o caminho até o GO (D-92 a D-120). A ordem é esta:
+
+1. PR-B (consertos de app da árvore antiga do gate, na nuvem);
+2. R1 (recaptura que fecha o `BT-UIEV-001` e deixa o `full` verde);
+3. PR-C (`BT-UX-BATCH-001`, o lote de app P0 com os pontos de captura);
+4. R2 (`BT-UX-PROOF-001`), com a onda visual (`BT-UX-WAVE-001`, D-119) e a sessão de aparelho
+   (`BT-UX-DEVICE-001`);
+5. congelar o candidato;
+6. `scope_e2e`;
+7. lote;
+8. leituras da produção;
+9. `BT-REL-001` e `BT-REL-002`;
+10. `release`;
+11. `BT-REL-003`;
+12. `BT-QA-001`;
+13. GO (`BT-DEC-001`);
+14. coorte (`BT-COH-001`).
+
+Entre o congelamento e a promoção, nada entra no `master` (D-110). O conserto do `npm audit` do
+site (D-115) entrou pelo PR #37 (`eac4f401b`). O PR #38 (`8f371030a`) trouxe a lista de jobs do
+ops derivada do daemon (S-01), a matriz nomeada da coorte (S-07), a rotação de 30 dias dos
+backups (`BT-PRIV-002`) e o receipt do receptor de alerta (`BT-OBS-001`).
+Em paralelo e fora do digest de UI correm o gate
+estrito na nuvem (D-116) e as frentes de banco e de promoção. Elas entram antes do `full` da R1.
 
 Esta fila é derivada. Em qualquer divergência, prevalecem a decisão corrente, o
 backlog mestre e o registry gerado.
@@ -76,17 +106,17 @@ coordenação. Até lá, só a raia de servidor tem slot.
 | Ordem | ID | Por que vem aqui |
 | ---: | --- | --- |
 | 1 | `BT-SCP-001` | fechar com o classificador de escopo (D-03), as correções de UI da contenção social, de trade e do scanner (D-04) e a prova de mecanismo (D-05) |
-| 1a | `BT-WEB-003` | bump feito em 2026-09-22 (D-01): `npm audit` com 0 vulnerabilidades; falta o receipt same-SHA |
-| 1b | `BT-UIEV-001` | recaptura em lote (23/23 e `latest.json`) depois das correções da D-04 |
+| 1a | `BT-WEB-003` | o bump de 2026-09-22 (D-01) regrediu no `full` de 2026-10-09; o PR #37 (`eac4f401b`, D-115) levou `next` 15.5.27, `sharp` 0.35.5 e `source-map-js` 1.2.2, e o gate (`npm audit --omit=dev`) está em 0. O audit completo, com as dependências de desenvolvimento, tem 10 achados de ferramenta de build (`tailwindcss` 3, `fast-glob`, `brace-expansion`) que pedem major e ficam como follow-up; falta o receipt same-SHA |
+| 1b | `BT-UIEV-001` | recaptura em lote (23/23 e `latest.json`) depois das correções da D-04. A recaptura 23/23 entrou em `e873943a0` (2026-10-07) e ficou defasada pelo `4f3820934` (PR #29), que mexeu em 3 raízes do digest; a R1 da D-92 vem depois do merge do PR-B |
 | 2 | `BT-GOV-002` | fila com duas raias (D-02); abre a raia do app |
 | 3 | `BT-REL-000` | **feito em 2026-09-23**, antecipado pelo dono: `87fd5a2e6` no ar no backend, no site e no agendador (receipt em `docs/qa/execution/2026-09-23/`); o reinício do host (D-58) trocou o IP do balanceador e o login ficou em 503 até `22a7749a7` (11:01 UTC) |
 | 4 | `BT-AUTH-003` | login fechado e no ar em 2026-09-23 (`166aaed57`); tempo da recuperação de senha fechado e no ar às 14:49 UTC (`c0f907108`) |
 | 5 | `BT-AUTH-004` | feito e no ar em 2026-09-23 (`166aaed57`); falta a tela de senha no app (lote da sessão do gate) |
-| 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); falta o teste de app |
+| 6 | `BT-AUTH-007` | feito e no ar em 2026-09-23 (`166aaed57`); o teste de app entrou em 2026-10-10 (`docs/qa/execution/2026-10-10/BT-AUTH-007-teste-de-app.md`) |
 | 7 | `BT-AUTH-010` | import no ar em 2026-09-23 (`166aaed57`); escrita de deck com e-mail verificado (D-56) no ar desde as 11:01 UTC (`22a7749a7`) |
 | 8 | `BT-DB-001` | baseline PostgreSQL fresco; cabeça da corrente mais longa; auditor de schema feito e integrado em 2026-09-23 (`e3d306a6c`), com as diferenças decididas na D-65 a D-67 |
 | 9 | `BT-DB-004` | só migrations alteram schema (D-48) |
-| 10 | `DCK-P0-06` | relatório de deck apagado fechado e no ar em 2026-09-23; falta a lixeira (D-30) |
+| 10 | `DCK-P0-06` | relatório de deck apagado fechado e no ar em 2026-09-23; a lixeira está feita no servidor (migration 072, fora do ar) e fecha por ele (D-96); a tela vai para o `DCK-P1-14` |
 | 11 | `BT-OFFER-001` | prova uma única oferta pública, sem comércio ou paywall |
 | 12 | `BT-GATE-001` | SKIP inventariado, nunca silêncio (D-17) |
 | 13 | `BT-GATE-002` | receipts fortes por SHA/digest/target (D-17) |
@@ -97,13 +127,20 @@ coordenação. Até lá, só a raia de servidor tem slot.
 
 ### Raia do app (abre depois de `BT-UIEV-001` e `BT-GOV-002`)
 
+Desde a D-87, a raia do app anda em frentes com PR para o `master`. O que a tabela antiga
+listava já está no `master`, sem `PASS`:
+
+- **Pelo PR #20** (merge `c88c3d05e`, 2026-10-06): `BT-UX-KIT-001`, `BT-UX-ERR-001`,
+  `BT-NAV-02`, `BT-NAV-03`, `DCK-P0-07`, `BT-UX-IMG-001`, `BT-ART-01` e `BT-SCN-00` (em parte),
+  mais a parte do app de `BT-CAT-02`, `DCK-P0-00`, `BT-LEGAL-ACCEPT-001` e `BT-REL-002`.
+- **Pelo PR #22** (merge `ad9f9a07b`) e pelo **PR #29** (merge `1f525a1c1`): `LC-P0-01` a `LC-P0-06`.
+
 | Ordem | ID | Por que vem aqui |
 | ---: | --- | --- |
-| 1 | `BT-UX-KIT-001` | kit de primitivas visuais com as decisões da D-44 (D-06) |
-| 2 | `BT-UX-ERR-001` | erro cru na tela (D-53) |
-| 3 | `BT-NAV-02` | expulsão do usuário no refresh de capabilities (D-53) |
-| 4 | `BT-NAV-03` | onboarding sem saída (D-53) |
-| 5 | `LC-P0-01` | contador de vida isolado por conta, primeira coorte (D-07) |
+| 1 | `BT-UX-BATCH-001` | PR-C: o que falta do app para o GO, na nuvem, depois do merge do PR-B e da R1 (D-92) |
+| 2 | `BT-UX-WAVE-001` | onda visual da D-119, em paralelo com o PR-C e integrada na R2: home, decks, detalhe do deck, fichário, perfil e entrada nas direções que o dono escolheu |
+| 3 | `BT-UX-DEVICE-001` | sessão de aparelho junto da R2: TalkBack e teclado (D-113), já com as telas da onda; o `BT-UX-PROOF-001` depende dela |
+| 4 | `BT-UX-PROOF-001` | R2: prova de UI do lote, com a assinatura do dono (D-15, D-92) |
 
 Analyze/Optimize e suas P0 AI ficam para a segunda onda (D-07).
 
@@ -153,7 +190,9 @@ contador de vida.
   15.5.21 → 15.5.25; `sharp`) e nunca chega a
   ui-audit/custom-lint/patrol-smoke/dependency-audit. 16 dos 19 commits desde
   2026-09-18 declaram `--no-verify`. Em 2026-09-22 o bump foi feito
-  (`BT-WEB-003`) e o `npm audit` do site zerou; o `full` ainda não rodou de novo.
+  (`BT-WEB-003`) e o `npm audit` do site zerou. O `full` de 2026-10-09 caiu de novo nele, com
+  avisos novos, e o PR #37 (`eac4f401b`) zerou o gate (`--omit=dev`) em 2026-10-10; o `full`
+  ainda não rodou de novo.
 - Os registros de abertura e de agosto abaixo são históricos, não uma nova
   observação de Git, runtime ou produção em setembro.
 - Na abertura de `BT-SCP-001`, a branch local estava um commit à frente do
@@ -210,8 +249,9 @@ contador de vida.
 6. remover/arquivar a ficha concluída e criar a ficha do próximo ID elegível;
 7. fazer commit atômico antes de iniciar implementação do ID seguinte.
 
-Estado em 2026-09-22: passos 5 (hashes) e 6 (arquivar fichas fechadas)
-pendentes desde `f6f791098`.
+Estado em 2026-10-10: o passo 5 (hashes) foi feito na reconciliação de 2026-10-10. O
+passo 6 segue pendente desde `f6f791098`: as fichas fechadas de `BT-GOV-001`, `BT-DOC-001` e
+`BT-DOC-004` continuam em `docs/execution/tasks/`, citadas por outros documentos.
 
 ### Duas raias (`BT-GOV-002`, D-02)
 

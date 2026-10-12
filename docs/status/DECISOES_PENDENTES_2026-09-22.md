@@ -91,7 +91,8 @@ segredo que só o Traefik envia) entra no `BT-SEC-001`. Destrava: reinícios sem
 repositório, com restart `no`, e não voltou no reinício. Sem ele, o backup e as migrations falham
 até alguém religar. **Recomendo** `docker update --restart unless-stopped manaloom-pg-local-proxy`
 e registrar a criação dele num script do repositório (`BT-DR-001`). É configuração persistente do
-host, por isso pede a palavra do dono.
+host, por isso pede a palavra do dono. **Fechada em 2026-10-10 pela D-106:** o proxy fica como
+passo manual no roteiro, com checagem no preflight.
 
 **D-61 · Atualizações que não são de segurança.** Ficaram 41 pacotes de `noble-updates` (inclui o
 kernel 6.8.0-142) e 6 do repositório da Docker (Docker 29.6.1 → 29.8.1, containerd 2.2.5 → 2.3.5).
@@ -360,7 +361,7 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
   - Ensaio de restauração toda semana e antes de toda migration na produção.
   - Lista fechada de deriva aprovada, com 94 itens.
   - A 066 adota os 21 índices que só a produção tem, com o nome da produção e `IF NOT EXISTS`. O `uq_binder_user_card_cond_foil_list` fica fora.
-  - A 074 é a última do lote, com down neutro. Da 070 em diante, toda migration com chave para `users` roda o laço de gatilhos de conta ativa.
+  - A 074 é a última do lote, com down neutro. Da 070 em diante, toda migration com chave para `users` roda o laço de gatilhos de conta ativa. Em 2026-10-10, a D-93 passou o fim do lote para a 076, e a D-112 acrescentou a 077.
   - A 075 segue a regra de direção: o lado mais estrito vence, o que é só metadado vai para a produção e nenhum NOT NULL é afrouxado. A 076 é `RESTRICT` nas três chaves.
   - `card_meta_insights.created_at` fica como deriva aceita.
   - `ml_prompt_feedback.user_rating` espera a decisão de exportação da privacidade.
@@ -371,6 +372,11 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 **D-84 · Backup local: 30 dias, com cifra em repouso pelo FileVault.**
 - **Decisão do dono:** "30 dias + FileVault". São os 30 dias da D-69, e o disco do Mac que guarda os dumps já é cifrado.
 - **Consequência:** quando a rotação estiver automatizada, o consumidor `backups` da exclusão de conta passa a fechar pelo tempo, em 30 dias mais 1. Até lá, apagar dump continua pedindo o sim do dono na hora.
+- **Execução (2026-10-10, PR #38, `ab0276dbd`):**
+  - A rotação está automatizada. O `scripts/manaloom_backup_cadence.py rotate --apply` apaga só o dump governado com mais de 30 dias e fora do `keep`, e o `scripts/manaloom_backup_cycle.sh` a roda depois de cada backup, com recibo.
+  - O ciclo ainda não está agendado: cada execução lê a produção e pede a aprovação live. Agendar é configuração persistente e fica com o dono. Até lá, o consumidor `backups` continua bloqueado.
+  - Fechar o consumidor pelo tempo é código do backend e pede deploy. Só vale com ensaio aprovado a cada 7 dias (D-83), porque o `keep` guarda o dump mais novo com ensaio aprovado, mesmo vencido.
+  - O roteiro do lote, fora do repositório, ainda manda apagar à mão e precisa ser ajustado.
 
 **D-85 · Correções de dados na produção, aprovadas em princípio.**
 - **Decisão do dono:** "Aprovar em princípio". Cada correção roda no lote de deploy, com contagem antes e depois, receipt e confirmação do dono na hora da escrita.
@@ -412,7 +418,7 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 **D-89 · Consertos de app da árvore antiga do gate vão por PR feito na nuvem, com uma recaptura única da prova de UI.**
 - **Contexto:** a árvore antiga do gate (`refs/backup/2026-10-08/gate-arvore-1419`) traz, além dos consertos de motor e servidor portados à parte, consertos em `app/`. O app entra no digest de UI, e cada merge que muda o digest deixa a prova de UI defasada.
 - **Decisão do dono:** "Na nuvem, depois recapturar".
-- **Execução:** os consertos de app saem num PR feito numa thread da nuvem. Depois do merge, a prova de UI é recapturada uma vez só, como na D-87. Os insumos dessa thread (um patch por arquivo, manifesto e plano B6–B11) estão na branch `port/gate-arvore-b-insumos`, em `docs/qa/execution/2026-10-08/port-gate-arvore-b/`. A cabeça atual é `6c7668c29`: sobre o pacote inicial (`4b4084582`), ela já traz a correção da D-90 no `PLANO.md` (`62b3844b0`) e o acréscimo obrigatório no B11, o servidor de assets órfão (`6c7668c29`). A cabeça muda se a branch receber commits ou for rebaseada.
+- **Execução:** os consertos de app saem num PR feito numa thread da nuvem. Depois do merge, a prova de UI é recapturada uma vez só, como na D-87. Os insumos dessa thread (um patch por arquivo, manifesto e plano B6–B11) estão na branch `port/gate-arvore-b-insumos`, em `docs/qa/execution/2026-10-08/port-gate-arvore-b/`. A cabeça atual é `6c7668c29`: sobre o pacote inicial (`4b4084582`), ela já traz a correção da D-90 no `PLANO.md` (`62b3844b0`) e o acréscimo obrigatório no B11, o servidor de assets órfão (`6c7668c29`). A cabeça muda se a branch receber commits ou for rebaseada. Em 2026-10-10 ela está em `2560f94f8`, um commit depois, com a recontagem do inventário de UI do B8 depois do #29.
 
 **D-90 · Fichário com troca e venda desligadas: o editor limpa as flags ao salvar um item antigo.**
 - **Contexto:** com troca e venda desligadas, o servidor devolve 422 quando um item antigo do fichário é salvo ainda com troca, venda ou preço, e o jogador não consegue salvar a edição.
@@ -427,7 +433,345 @@ Contexto: a correção da navegação espontânea para `#/home` mexeu em `app/li
 - **Decisão do dono:** "Aprovar se for só subpixel". Cada imagem é conferida uma a uma, como foi feito com o `deck_gallery`. Se alguma tiver diferença além de subpixel, ela não é refeita e volta para o dono.
 - **Execução:** `4205d6c1c`, na branch `fix/home-hero-goldens-macos27`. As quatro imagens foram abertas e a diferença ficou só nas bordas de antialiasing do texto, sem mudança de layout, cor ou posição.
 
-**Ficam para depois:**
+### Decididas em 2026-10-10: o caminho até o GO do MVP
+
+**Origem.** O dono aceitou em 2026-10-10 as 23 recomendações do pacote da coordenação
+(`~/.manaloom/coordenacao/receipts/decisoes-2026-10-10.md`, fora do repositório). O pacote saiu do
+plano até o GO (`mvp_plan.md`) e da crítica a esse plano (`mvp_critic.md`), produzidos pelo workflow
+`wf_21d790dd-9c9` da sessão de coordenação `4d2db55c` sobre o `master` `1f525a1c1`; os dois também
+ficam fora do repositório. Os itens 1 a 14 e 16 a 24 do pacote viraram a D-92 a D-114, nesta ordem. O
+item 15 não é decisão e ficou como nota no fim. A D-115 e a D-116 registram duas autorizações do dono
+no mesmo dia, e a D-117 a D-120, quatro decisões da noite.
+
+**Caminho crítico aceito:** PR-B → R1 → PR-C → R2 → congelar o candidato → `scope_e2e` → lote →
+leituras da produção → PASS do `BT-REL-001` e do `BT-REL-002` → `release` verde → `BT-REL-003` →
+`BT-QA-001` → GO (`BT-DEC-001`) → coorte (`BT-COH-001`).
+
+**Onde ficou registrado:**
+- **Decisão corrente** (`docs/status/CURRENT_PRODUCT_DECISION.md`): D-93, D-104, D-107 e D-110.
+- **Backlog:** §2.6 e a nota "Decisão do dono em 2026-10-10" nas linhas afetadas.
+- **Tarefas novas:**
+  - `BT-UX-BATCH-001`, o PR-C (D-92, D-95);
+  - `BT-UX-DEVICE-001`, a sessão de aparelho (D-113);
+  - `BT-COH-001`, a abertura da coorte (D-104, D-109);
+  - `DCK-P1-14`, a tela da lixeira (D-96);
+  - `BT-UX-WAVE-001`, a onda visual (D-119).
+- **Dependências:** o `BT-REL-001` troca o `BT-CAP-002` pelo `BT-CAP-001`, e o `BT-CAP-002` passa a
+  vir depois da promoção (D-114).
+
+Continuam pedindo a palavra do dono na hora: merge na `master` (a não ser o que a D-117 cobre),
+migration, deploy, escrita ou leitura na produção, emissão de convites e ligar capabilities (regra 6
+da decisão corrente e D-87). Nada
+aqui muda tarefa para `PASS`: isso espera o `full` verde e a recaptura de cada lote.
+
+**D-92 · Duas recapturas da prova de UI: R1 depois do PR-B e R2 depois do PR-C (item 1).**
+- **Contexto:**
+  - A D-89 previa uma recaptura única depois do PR-B, que leva os consertos de app da árvore antiga do gate.
+  - O plano mostrou que o resto do app para o GO também toca `app/lib`, que é raiz do digest de UI. Esse resto inclui o convite no cadastro, o KPI no app, o buraco do boot do `BT-NAV-02`, o `If-Match`, a saída do scanner e as fixtures.
+  - A crítica (C9) achou cinco tarefas que nenhuma recaptura fecha, por falta de ponto de captura:
+    - `LC-P0-03`: o diálogo "A mesa não foi salva";
+    - `LC-P0-05`: a partida de mais de 5 minutos;
+    - `BT-REL-002`: a faixa "Nova versão disponível";
+    - `BT-LEGAL-ACCEPT-001`: o diálogo de reaceite;
+    - `BT-UX-KIT-001`: o `PASS_RUNTIME` em 390, 834, 1440 e 1920.
+- **Decisão do dono:** duas recapturas.
+  - A R1 vem depois do merge do PR-B: fecha o `BT-UIEV-001` e deixa o `full` verde.
+  - A R2 vem depois do merge do PR-C e é o `BT-UX-PROOF-001`.
+  - Os pontos de captura que faltam entram no PR-C, para a R2.
+- **Execução:** a "recaptura única" da D-89 passa a valer só para a árvore antiga. O PR-C virou a tarefa `BT-UX-BATCH-001`, da qual o `BT-UX-PROOF-001` depende.
+
+**D-93 · O GO exige a produção no candidato congelado, não "na 058" (item 2).**
+- **Contexto:**
+  - A D-18 exige "produção na linha de base contida, com a 058", e a D-83 diz que "a 074 é a última do lote".
+  - O `master` tem 74 migrations, até a 076.
+  - O deploy do backend confere da 041 à 076: são 34 linhas em `required_migrations` e a checagem `latest_migration_076`, em `scripts/manaloom_deploy_backend_image.sh`.
+- **Decisão do dono:**
+  - O critério passa a ser "produção no candidato congelado, com as migrations até a 076 (ou até a última do lote), 29/29 capabilities off e same-SHA".
+  - O "a 074 é a última" da D-83 passa a 076. Com a 077 da D-112, vale a última do lote.
+  - Os demais critérios da D-18 continuam.
+- **Execução:** em 2026-10-10 foram alinhadas a decisão corrente, a §2.6 do backlog e a linha do `BT-DEC-001`.
+
+**D-94 · As notas e o outbox antigos do pós-jogo continuam sendo apagados (item 3; item 21 da coordenação).**
+- **Contexto:**
+  - A recomendação de 2026-09-28 era adotar as notas e os envios pendentes de antes do namespace por conta, mas só depois de o servidor confirmar o dono.
+  - O `master` faz outra coisa: no primeiro login, apaga as chaves antigas do contador e do pós-jogo (`manaloom.post_game_notes.*`). Guarda um receipt local só com nomes de chave e contagens (`_purgeLegacyOnce` em `app/lib/features/home/life_counter/life_counter_account_scope.dart`; `LC-P0-01`, `5d1e7cf56`).
+- **Decisão do dono:** ratificar a exclusão, com o receipt de contagem. A capability `life_counter_local` está desligada na produção desde 2026-09-23, então esse dado só existe em aparelho que usou build antigo ou de teste.
+- **Execução:** nada muda no código. A linha do `LC-P0-01` registra a decisão.
+
+**D-95 · O scanner sai do código do app (item 4; D-41 e item 28 da coordenação).**
+- **Contexto:**
+  - O Flutter não tem dependência só do build de release. Tirar `camera`, `google_mlkit_text_recognition` e `permission_handler` do artefato é tirá-los do app (`app/pubspec.yaml:48-50`).
+  - O Web já não pede câmera: `camera=()` em `app/web/nginx.conf:41`, desde `07318d0c1`.
+  - O manifesto de release do Android remove a permissão.
+  - Mas os plugins, a rota `/scan` (`app/lib/main.dart:637-639`) e a permissão `CAMERA` do manifesto principal continuam no código.
+- **Decisão do dono:** o scanner sai do código do app, com plugins, `lib/features/scanner`, rota `/scan` e permissão `CAMERA`. O `BT-SCN-01` o traz de volta pelo histórico.
+- **Execução:** no PR-C (`BT-UX-BATCH-001`), a partir do patch 0005 da série 2 da coordenação. É o que fecha o `BT-SCN-00`.
+
+**D-96 · As P0 com superfície desligada na coorte fecham pelo servidor (item 5).**
+- **Contexto:**
+  - O Generate (`DCK-P0-04`) e o commit do import em deck existente (`DCK-P0-03`, sob `deck_replace_all`) ficam desligados na primeira coorte.
+  - A lixeira (`DCK-P0-06`) tem o servidor pronto e não tem tela.
+- **Decisão do dono:**
+  - `DCK-P0-03` e `DCK-P0-04` podem virar `PASS` com o servidor provado e a superfície escondida no app.
+  - A lixeira vira `PASS` com o servidor, e o restaurar pela UI vai para um P1, porque a exclusão continua reversível no servidor.
+- **Execução:**
+  - As três linhas registram o novo aceite.
+  - O restaurar pela UI virou o `DCK-P1-14`.
+  - Nenhuma mudou de estado: o `PASS` espera o `full` verde e o receipt.
+
+**D-97 · Ratificação do que já está no código (item 6).** Ficam como estão:
+- item 20 da coordenação: o legado global do contador sem dono é apagado no boot, com receipt local só de nomes e contagens (`LC-P0-01`);
+- item 22: logout, sessão expirada e token recusado fecham o namespace da conta sem apagar, e a exclusão de conta apaga (`LC-P0-02`);
+- item 24: na beta, uma nota de pós-jogo por partida (índice `uq_post_game_notes_play_session`, `LC-P0-06`);
+- item 25: a tela de reaceite só aceita a versão que o app traz. A versão nova no servidor sobe só junto com o build que traz o texto, e o `enforce` vem depois (`BT-LEGAL-ACCEPT-001`);
+- o texto da faixa "Nova versão disponível" (`app/lib/core/widgets/release_update_banner.dart`, `e8feb30c7`, `BT-REL-002`).
+
+**D-98 · O evento de abertura do app fica fora da beta (item 7; item 29 da coordenação).**
+- **Contexto:** `app_opened` não está no catálogo `activation_events_v1`. A volta da D-47 já é medida pela ação registrada no servidor, do 7º ao 14º dia.
+- **Decisão do dono:** fora da beta.
+
+**D-99 · `card_combos` e o Optimize determinístico na produção ficam para depois do GO (item 8; itens 26 e 27 da coordenação).**
+- **Contexto:**
+  - O item 26 propõe descartar `card_combos` e `combo_cards` no `BT-DB-005`.
+  - O item 27 propõe usar a ordem canônica e o mesmo sorteio no veredito do Optimize da produção, o que muda a nota de decks reais.
+  - O Optimize está desligado.
+- **Decisão do dono:** adiar os dois para depois do GO.
+
+**D-100 · O `uq_binder_user_card_cond_foil_list` sai da produção no lote (item 9).**
+- **Contexto:** a D-83 deixou o índice fora do banco novo: a 066 adota os 21 índices da produção, menos ele. Na produção, ele faz o `POST /binder` responder 500 para a mesma carta em outro idioma.
+- **Decisão do dono:** remover no lote, com contagem antes e depois.
+- **Execução:**
+  - A frente de banco prepara o script e o testa em PostgreSQL descartável, sem rodar.
+  - Ele roda depois da promoção (D-102), com a palavra do dono na hora.
+
+**D-101 · Frente C: `BT-CAP-002`, `BT-REL-001` e `BT-REL-002`/`BT-OBS-003` ficam como a coordenação propôs (item 10).**
+
+As recomendações de 2026-09-28 estão no `decisoes-pendentes.md` da coordenação, fora do repositório, nas seções do `BT-CAP-002`, do `BT-REL-001` e do `BT-REL-002`/`BT-OBS-003`. O dono aceitou:
+- **`BT-CAP-002`:**
+  - PostgreSQL só com a reserva de 512 MiB, numa janela própria, logo depois do backup com ensaio;
+  - Battle mantém os valores e tira um snapshot novo antes de abrir;
+  - ops com limite de 2 GiB, medido no próximo refresh do catálogo;
+  - os limites do preflight do `BT-CAP-001` confirmados como estão: 2 GiB de memória livre, disco em 85% com 20 GiB livres, swap em 50%, load de 1,5 por vCPU, conexões em 80% e snapshot de até 30 minutos.
+- **`BT-REL-001`:**
+  - promoção tudo ou nada;
+  - Android numa transação própria;
+  - o primeiro `/app` de plano de controle sai sem link no site, e o dono confere isso no primeiro preflight;
+  - só a coordenação resolve uma transação aberta, com a palavra do dono.
+- **`BT-REL-002`/`BT-OBS-003`:**
+  - o SHA fica público no `/release.json` do site;
+  - o núcleo é sempre promovido inteiro;
+  - os limites do alerta de release: 1 h para o núcleo misturado, 10 min para a divergência no mesmo SHA e 24 h de carência para o APK;
+  - a `MANALOOM_RELEASE_PUBLIC_BASE_URL` é conferida no primeiro dia depois da promoção.
+
+**D-102 · Janela do lote (item 11).**
+- **Contexto:** o precedente foi de cerca de 5 min 30 s de 503. Com as correções de dados entre a migration e o backend novo, a janela passaria disso (crítica C5).
+- **Decisão do dono:**
+  - até cerca de 5 min de 503 anunciado no plano de controle, entre a primeira migration e o backend novo;
+  - as migrations rodam por `with_new_server_pg.sh --write-approved`;
+  - as correções da D-85 e o `DROP` do `uq_binder` (D-100) vêm depois da promoção, para não alongar a janela.
+
+**D-103 · O que conta como "rollback treinado uma vez" (item 12; D-18).**
+- **Contexto:**
+  - A promoção só aceita o SHA que é o `origin/master` (`scripts/manaloom_promote_release.sh`, mensagem "o SHA pedido não é o origin/master"). Então "promover A, promover B e voltar para A" não roda com a ferramenta.
+  - Depois da 059, o backend `41bab49c9`, que exige a 058, volta em readiness 503.
+- **Decisão do dono:**
+  - O treino é uma promoção com falha induzida, que dispara a compensação automática da transação, somada ao ensaio de restauração do backup do lote (L-01).
+  - Nunca voltar o backend para `41bab49c9` depois da 059. Dali em diante, rollback é restore.
+
+**D-104 · A coorte abre com uma matriz nomeada (item 13).**
+- **Contexto:** o contrato de capabilities do deploy exige as 29 em `off`, com `allowed=false` (`scripts/lib/manaloom_release_capabilities_contract.sh`). Nenhuma tarefa depois do GO abria a coorte.
+- **Decisão do dono:**
+  - Uma política versionada com exatamente `account_registration` (modo convite), `catalog_private`, `collection_private`, `decks_private` e `life_counter_local`.
+  - O contrato do deploy aceita só essa matriz nomeada, numa promoção própria depois do GO.
+- **Execução:** tarefa nova `BT-COH-001`, que depende do `BT-DEC-001`.
+- **Matriz e contrato no `master` (2026-10-10, PR #38, `2feb843be`):**
+  - `server/config/release_capabilities_cohort.json` versiona a matriz `cohort-2026-10`, com o cadastro por convite.
+  - Sem `MANALOOM_RELEASE_CAPABILITY_MATRIX`, o contrato segue exigindo as 29 `off`. Com `cohort-2026-10`, exige exatamente as cinco `on` e `allowed=true`, e o arquivo da matriz no mesmo SHA. Qualquer outro nome, conjunto ou arquivo é recusado.
+  - O deploy do ops confere a política contra esse conjunto.
+  - **Follow-up antes da promoção da matriz:** com `catalog_private` ligado, o daemon do ops agenda mais 3 jobs (`manaloom_sync_card_legalities_from_scryfall`, `manaloom_new_card_candidate_review` e `manaloom_card_data_gap_review`). O deploy espera esse conjunto, mas falta decidir se eles rodam na coorte. Detalhe na linha do `BT-COH-001`.
+
+**D-105 · Uma sessão de leituras da produção depois do lote (item 14).**
+- **Decisão do dono:** uma sessão autorizada, depois do lote, faz três leituras:
+  - o frescor do catálogo (menos de 7 dias);
+  - o receipt somente leitura do PostgreSQL de produção para o `BT-GATE-003` (D-17);
+  - o preflight.
+
+**D-106 · O `pg-local-proxy` fica como passo manual (item 16; D-59 e D-60).**
+- **Contexto:** a D-60 recomendava `docker update --restart unless-stopped manaloom-pg-local-proxy`, que é configuração persistente de um host compartilhado.
+- **Decisão do dono:** o proxy continua como passo manual no roteiro, com checagem no preflight.
+- **Execução:** isso fecha a D-60. A D-59 (confiança no proxy pelo IP do balanceador) não muda.
+
+**D-107 · Telemetria e prazos de retenção sem o parecer a tempo (item 17; `BT-KPI-001` e `BT-PRIV-003`).**
+- **Contexto:**
+  - O `BT-KPI-001` pede a política pública da telemetria e uma baseline depois da primeira coorte, mas está no fecho do GO.
+  - O `BT-PRIV-003` depende dos prazos da D-69, a confirmar com o advogado.
+- **Decisão do dono:**
+  - Pedir o parecer do advogado já.
+  - Se ele não chegar a tempo, a coorte entra com a telemetria do app desligada e só com a ativação medida no servidor.
+  - A baseline do KPI fica para depois da primeira coorte e não é critério do GO.
+
+**D-108 · Teclado Web real (item 18; D-79).**
+- **Decisão do dono:** o agente faz o manifesto local com WebDriver. O teste com teclado físico fica com um humano, no `BT-QA-001`.
+
+**D-109 · E-mail dos convites (item 19).**
+- **Decisão do dono:** antes de emitir o primeiro lote, conferir as variáveis `BETA_INVITE_WEBHOOK_URL`, `BETA_INVITE_WEBHOOK_TOKEN` e `BETA_INVITE_APP_URL` (`server/bin/beta_invites.dart`) e o domínio.
+- **Execução:** faz parte do aceite do `BT-COH-001`.
+- **Precisão (revisão de 2026-10-10):** as três variáveis acima são só as do webhook e do link. O `server/bin/beta_invites.dart` (linhas 19-20) entrega pela configuração de e-mail da API: `MANALOOM_EMAIL_DELIVERY_PROVIDER` escolhe `webhook` (o padrão) ou `resend` (`server/lib/account_email_delivery_config.dart`). Com `resend`, conferir `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `RESEND_FROM_NAME` e `RESEND_VERIFIED_DOMAIN`; com `webhook`, `BETA_INVITE_WEBHOOK_URL` e `BETA_INVITE_WEBHOOK_TOKEN`. Nos dois casos, `BETA_INVITE_APP_URL` monta o link, e o domínio é conferido.
+
+**D-110 · Ordem do fecho (item 20; críticas C3 e C4).**
+- **Decisão do dono:**
+  1. Congelar o SHA, com tag.
+  2. Rodar o `scope_e2e`.
+  3. Fazer o lote.
+  4. Fazer as leituras da produção (D-105).
+  5. Dar `PASS` no `BT-REL-001` e no `BT-REL-002`.
+  6. Rodar o `release` até ficar verde.
+  7. `BT-REL-003`.
+  8. `BT-QA-001`.
+  9. GO.
+
+  Entre o congelamento e o `promote`, nada entra no `master`, porque a promoção exige o `origin/master`. Os receipts esperam numa branch.
+- **Execução:** registrada na linha do `BT-REL-003`.
+
+**D-111 · O modo `release` (item 21; críticas C3 e C5).**
+- **Contexto:** o `scripts/manaloom_local_ci.sh release` faz duas coisas que pedem atenção:
+  - roda o gate do Battle, com o bootstrap do XMage (`run_battle_gate`), e o Battle está fora do MVP pela D-87;
+  - constrói o APK, que exige o keystore, a senha e o `SENTRY_MOBILE_DSN` (`scripts/manaloom_build_android_release.sh`).
+- **Decisão do dono:**
+  - O gate do Battle fica como está, porque roda local.
+  - O dono fornece o keystore e o DSN pelo caminho de segredo já usado (o keychain lido por `read_manaloom_keychain_secret`), sem exibir.
+
+**D-112 · `BT-CAT-01` e D-74: a migration 077 entra no lote (item 22).**
+- **Contexto:**
+  - A D-74 aprovou um índice único em `LOWER(code)`, mas a migration não existe no `master`.
+  - Há 84 códigos de set duplicados, em maiúscula e em minúscula: 971 linhas para 887 códigos.
+- **Decisão do dono:**
+  - Uma migration nova, a 077, com o índice único em `LOWER(code)`.
+  - A limpeza dos 84 sets duplicados.
+  - As duas no lote, com contagem.
+- **Execução:** feita pela frente de banco, com teste em PostgreSQL descartável. Pela D-93, a 077 passa a ser a última do lote.
+- **O que vai junto (revisão de 2026-10-10):** a 077 não sobe sozinha. O deploy do backend (`scripts/manaloom_deploy_backend_image.sh`, `require_migrations_041_076_contract` e a checagem `latest_migration_076`) e o readiness (`server/lib/health_readiness_support.dart`, `latest_migration_ready` e `required_range` 038-076) exigem que a última migration seja a 076. Com a 077 aplicada e os dois ainda na 076, o deploy recusa e o readiness responde 503. Os dois vão até a 077 no mesmo lote. A branch da frente de banco (`feat/db-lot-corrections-077`, `49a81efd1`) já faz isso.
+
+**D-113 · A sessão de aparelho vem junto da R2 (item 23; crítica C13).**
+- **Contexto:** o `BT-UX-A11Y-001` exige TalkBack lógico e teclado real. Ele vem antes do `BT-UX-PROOF-001`, que vem antes do `BT-REL-003`. Já a D-15 autoriza o aparelho uma vez, perto do release.
+- **Decisão do dono:**
+  - Uma sessão de aparelho, com TalkBack e teclado, junto da R2 e perto do release (D-15). Não fica para o `BT-QA-001`.
+  - O teclado físico no Web continua no `BT-QA-001` (D-108).
+- **Execução:** tarefa nova `BT-UX-DEVICE-001`, da qual dependem o `BT-UX-A11Y-001` e o `BT-UX-PROOF-001`.
+
+**D-114 · O `BT-CAP-002` vem depois da promoção (item 24).**
+- **Contexto:** no registry, o `BT-REL-001` dependia do `BT-CAP-002`, mas o roteiro do lote aplica as reservas e os limites depois dos deploys.
+- **Decisão do dono:** seguir o roteiro e ajustar a dependência.
+- **Execução:**
+  - O `BT-REL-001` passa a depender do `BT-CAP-001`, cujo snapshot de até 30 minutos o `--promote` exige, em vez do `BT-CAP-002`.
+  - O `BT-CAP-002` passa a depender do `BT-REL-001` e entra direto nas dependências do `BT-DEC-001`.
+  - O registry continua acíclico.
+
+**D-115 · Autorizado o download das versões npm que consertam o `npm audit` do site (2026-10-10).**
+- **Contexto:**
+  - O `full` de 2026-10-09 sobre `1f525a1c1` caiu no `npm audit` do site público. A dependência de 15.0.0 a 15.5.26 do `next` é moderada; o `sharp` abaixo de 0.35.5 e o `source-map-js` de 1.0.0 a 1.2.1 são altos.
+  - `web-public/package.json` fixa o `next` 15.5.25 e o override do `sharp` em 0.35.4. O `BT-WEB-003` regrediu.
+  - Os passos do `full` depois do site não rodaram: `ui-audit`, `custom-lint`, `patrol-smoke`, auditoria de dependências e gate de schema.
+- **Decisão do dono:** autorizou baixar do `registry.npmjs.org`:
+  - `next` 15.5.27 (cerca de 141 MB);
+  - `@next/swc-darwin-arm64` (cerca de 130 MB);
+  - `sharp` 0.35.5 com o binário (cerca de 1,3 MB);
+  - `source-map-js` 1.2.2;
+  - `eslint-config-next` 15.5.27.
+- **Execução:**
+  - O bump fica em `web-public/`, fora do digest de UI e do bootstrap do pre-commit, numa frente
+    própria (branch `fix/web-public-audit-2026-10`).
+  - Ele entra antes do `full` da R1.
+  - A linha do `BT-WEB-003` e o receipt same-SHA ficam com essa frente.
+
+**D-116 · Rotinas de nuvem de disparo manual para o PR-B, a Frente 2 e o PR-C (2026-10-10).**
+- **Contexto:**
+  - O PR-B e o PR-C mexem no digest de UI.
+  - A Frente 2 (`BT-GATE-001`, `BT-GATE-003` e o receipt forte no `local_ci`) mexe em arquivos de bootstrap do pre-commit (`BOOTSTRAP_SOURCE_PATHS` em `scripts/manaloom_staged_ui_scope.py`). Um commit local neles vira `AFFECTS_UI` e roda a prova de UI, que está velha.
+- **Decisão do dono:** autorizou rotinas de nuvem só de disparo manual, desligadas depois do uso, para o PR-B, a Frente 2 e, depois do merge do PR-B, o PR-C.
+- **Execução:** quem dispara é a coordenação. O merge na `master` continua pedindo a palavra do dono (D-87).
+
+**D-117 · A coordenação faz o merge de PR revisado (2026-10-10).**
+- **Contexto:** pela D-87 e pela D-116, cada merge na `master` esperava a palavra do dono, e a fila parava até a resposta.
+- **Decisão do dono:** "Sim, autorizo". A coordenação pode fazer o merge na `master` de PR que cumpra três condições:
+  - revisão independente aprovada;
+  - commits pelos hooks verdes;
+  - nenhuma ação na produção.
+- **Continuam pedindo a palavra do dono:** deploy, migration na produção, escrita live e a recaptura da prova de UI, que leva as frases de confirmação dele.
+- **Execução:**
+  - Antes do merge, a branch é atualizada com o `master`, com os gerados refeitos pelos hooks, e o `project_logic --check` roda no merge simulado.
+  - O merge usa `--match-head-commit` com o SHA completo, e cada um vai para o log da coordenação, fora do repositório.
+  - Ressalva média ou maior da revisão é consertada antes do merge.
+  - O primeiro merge por esta decisão foi o do PR #37 (`eac4f401b`), o conserto do `npm audit` da D-115.
+  - Onde a D-87, a D-116 e a linha do `BT-UX-BATCH-001` pedem a palavra do dono para o merge, vale esta decisão para o PR que cumprir as três condições.
+
+**D-118 · Correção 1 da D-85: contar os decks do Generate antes de decidir (2026-10-10).**
+- **Contexto:** a correção 1 da D-85 limpa das descrições de deck o prompt do Generate gravado ali. Sem uma marca de origem, não há como separar a descrição que o jogador escreveu do prompt que o Generate gravou.
+- **Decisão do dono:** na sessão de leituras da produção depois do lote (D-105):
+  - se houver marca de origem, contar os decks vindos do Generate, e o dono decide com o número;
+  - sem marca, a correção 1 vira um no-op, documentado no receipt da sessão.
+- **Execução:**
+  - A contagem entra como mais uma leitura da sessão da D-105.
+  - O script da correção 1 já existe na branch da frente de banco (`feat/db-lot-corrections-077`, `a92a0b85f`, fora do `master`): ele só limpa a descrição igual a um prompt do Generate guardado do mesmo dono. Ele roda só depois do número e da palavra do dono.
+  - As outras quatro correções da D-85 não mudam: vêm depois da promoção (D-102), com contagem antes e depois e a confirmação do dono na hora da escrita.
+
+**D-119 · Onda visual nas telas principais da coorte antes da beta (2026-10-10).**
+- **Contexto:**
+  - A auditoria visual de 2026-09-21 deu de 4 a 5 sobre 10 às telas fora do contador, contra a régua dele.
+  - O kit (`BT-UX-KIT-001`) traz as primitivas da régua, mas não redesenha nenhuma tela de produto.
+- **Decisão do dono:**
+  - Uma onda visual antes da beta nas telas principais da coorte, no padrão do contador e com o kit: home, decks, detalhe do deck, fichário e perfil. Soma cerca de 1 semana.
+  - Método: mockups em PNG primeiro, escolhidos pelo dono pelo olho, e depois a implementação.
+  - A onda entra junto com a R2.
+- **Escolha do dono sobre os mockups (mesmo dia):** os mockups cobriram seis telas, a entrada incluída (convite, cadastro e primeiro passo), com duas direções cada. O dono escolheu:
+  - Home A (Tabuleiro);
+  - Decks B (Vitrine);
+  - Detalhe do deck A (Tabuleiro);
+  - Fichário A (Tabuleiro);
+  - Perfil B (Carta de jogador);
+  - Cadastro A (Tabuleiro), que cobre a entrada inteira.
+
+  É a mesma recomendação do julgamento da coordenação, que deu de 8,55 a 8,65 a cada escolhida.
+- **Correções que vão junto (julgamento da coordenação):**
+  - **Já aplicadas nos mockups:** a barra e o rail dos Decks iguais aos das outras telas (D-1); o acento cortado no desktop (D-2); o glifo da marca no rail do Detalhe (DD-1); o degradê de rolagem sob o dock na Home e no Perfil (H-2, P-2); no Perfil, SAIR vira a peça larga e EXCLUIR CONTA fica com uma coluna (P-1); a mesa de fundo da entrada deixa de ler "0!" (E-1).
+  - **Para a implementação:**
+    - Home: a carta dos decks recentes cresce para a peça de estante dos Decks B (H-1), e no desktop os numerais dos decks baixam de escala (H-3).
+    - Decks: uma pílula de retorno só, no topo (D-3). A ficha larga de A entra a partir de 1024 px se 12 decks ou mais pesarem.
+    - Detalhe: no desktop, o palco de B; no celular, a carta sobe para cerca de 160 px (DD-2). A peça do comandante no desktop perde o vazio (DD-3).
+    - Fichário: o herói "Adicionar carta" sai de perto do latão de seleção (F-1), o dock fica igual ao das outras telas (F-2), e o editor é testado com a edição escolhida só com aro de latão (F-3). No desktop, a vitrine de B fica como coluna fixa à direita.
+    - Perfil: o retrato sem foto vira o verso de carta da marca (P-3).
+    - Entrada: só uma frase de apoio no primeiro passo (E-2). No desktop do cadastro, a carta-convite de B, sem cartas reais, porque elas exigiriam imagem da rede antes do login (E-3, D-45).
+  - **Sistema:** uma barra só (`AppNavDock` e `AppNavRail`); uma peça de deck (`AppDeckTile`, nas formas estante e ficha); uma pílula de retorno (`AppReturnPill`) no topo, no lugar do `SnackBar`; dois tipos de herói documentados, o de ação e o de objeto com carta 63:88. As peças derivadas que se repetem entram no kit uma vez só.
+- **Continuam com o dono:**
+  - o tom da cor de "legal";
+  - as revogações (2) `cardGradient` e (4) `inputDecorationTheme` do kit, só necessárias se a implementação reaproveitar `Card` e `TextField` legados;
+  - a palavra final sobre a barra de navegação, que é peça derivada e não existe no kit;
+  - pular o `/verify-email` na conta de convite (CV-04);
+  - o Detalhe só de leitura (DD-07);
+  - o commit do ajuste A8, que esconde troca e venda no editor e nos filtros do fichário e hoje é só uma alteração sem commit, antes do Fichário.
+- **Dados novos que o conjunto pede, nenhum bloqueante:** total de cópias na Home e no Perfil, contagem de partidas guardadas no Perfil (rota nova), 3 imagens por deck sem comandante, preço de mercado por item no Fichário e a rota do link de convite. Sem o dado, a peça fica sem numeral.
+- **Ainda não provado:** o texto a 200% e o piso de 320 px só foram renderizados na entrada (e 320 px a 100% nos Decks e no Perfil). Nada passou por aparelho ou leitor de tela: os mockups são Chromium headless a @2x.
+- **Execução:**
+  - Tarefa nova `BT-UX-WAVE-001`, P0 CORE, que depende do `BT-UX-KIT-001`. O `BT-UX-PROOF-001` (a R2) e o `BT-UX-DEVICE-001` dependem dela, porque a sessão de aparelho tem de percorrer as telas novas.
+  - A implementação mexe em `app/lib`, raiz do digest de UI, e segue a regra das frentes de app: worktree sem commit e um commit só, com a R2 e a prova de UI nova.
+  - Os mockups, o brief e o julgamento ficam fora do repositório, na pasta `visual-wave/` da sessão de coordenação `4d2db55c` (`BRIEF.md`, `JULGAMENTO.md` e a galeria).
+
+**D-120 · O XMage só é atualizado depois do MVP (2026-10-10).**
+- **Contexto:** o XMage está na 1.4.60, com o pin `2c43ec8cd` de 2026-07-28 (`services/xmage-sidecar/XMAGE_COMMIT`, `docs/qa/MANALOOM_XMAGE_PIN_UPDATE_2026-07-28.md`). O Battle está fora do MVP (D-87).
+- **Decisão do dono:** atualizar o XMage só depois do MVP, junto com a abertura do Battle.
+- **Execução:** até lá o pin não muda, e o gate do Battle do modo `release` roda com ele (D-111). A nota está na linha do `BT-BAT-007`.
+
+**Nota sobre o item 15 do pacote (dumps).** Não é decisão.
+- **O que aconteceu:** sumiram de `backups/manaloom-postgres/` em 2026-10-08, às 12:23 no horário local:
+  - os dumps `manaloom-postgres-20260923T005128Z.dump` e `manaloom-postgres-20260928T114542Z.dump`;
+  - as pastas `receipts/` e `drills/`.
+- **Resposta do dono:** foi ele quem os removeu.
+- **Consequência:**
+  - Até o L-01 do lote, que gera um dump novo antes de qualquer migration, não existe dump local recente da produção.
+  - Pela D-84, apagar dump continua pedindo o sim do dono.
+
+### Ficam para depois
+
 - retenção de analytics (proposta de 180 dias) e o texto da política de privacidade, depois do advogado (D-69);
 - rotação do journal do host (D-78), porque o host é compartilhado com outros projetos;
 - tabela própria do `/ai/explain` antes de ligar a IA (`BT-AI-020`).
@@ -625,6 +969,10 @@ dependem de 6 P1 e 2 P0 AI.
   - cartas com menos de 7 dias de defasagem;
   - rollback treinado uma vez;
   - a sua assinatura.
+- **Em 2026-10-10:**
+  - a D-93 trocou "com a 058" por "no candidato congelado, com as migrations até a última do
+    lote, 29/29 off e same-SHA";
+  - a D-103 definiu o que conta como rollback treinado.
 
 ---
 
