@@ -8,6 +8,7 @@ import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import 'package:test/test.dart';
 
+import '../bin/sync_cards.dart' as sync_cards;
 import '../routes/cards/resolve/index.dart' as resolve_route;
 import 'support/lote_database.dart';
 import 'support/scripted_pool.dart';
@@ -338,6 +339,71 @@ void main() {
       expect(refused.exitCode, isNot(0), reason: '$refused');
       expect(refused.stderr, contains('d74 recusado'));
       expect(await sets(copy), before);
+    }),
+    skip: skip,
+  );
+
+  test(
+    'depois da 077, o sync de sets do sync_cards atualiza a linha que ficou, '
+    'qualquer que seja a caixa dela, sem bater no índice único',
+    () => withCopy('d74_sync_sets', (copy) async {
+      expect(await hasUniqueLowerIndex(copy), isTrue);
+      // O d74 pode deixar a linha em minúscula (a de lançamento mais novo, como a
+      // `xyz` do primeiro cenário); o MTGJSON manda o código em maiúscula.
+      await copy.sql('''
+        INSERT INTO sets (code, name, release_date, type, block, is_online_only) VALUES
+          ('xyz', 'Xis novo', '2021-06-06', 'core', 'Bloco X', TRUE),
+          ('ABC', 'Alpha Beta', '2020-01-01', 'expansion', NULL, FALSE)
+      ''');
+
+      await sync_cards.syncSetsFromData(copy.pool(), [
+        {
+          'code': 'XYZ',
+          'name': 'Xis (MTGJSON)',
+          'releaseDate': '2021-06-07',
+          'type': 'core',
+          'block': 'Bloco X',
+          'isOnlineOnly': false,
+        },
+        {
+          'code': 'abc',
+          'name': 'Alpha Beta (MTGJSON)',
+          'releaseDate': '2020-01-01',
+          'type': 'expansion',
+        },
+        {
+          'code': 'new',
+          'name': 'Novo',
+          'releaseDate': '2026-01-01',
+          'type': 'expansion',
+        },
+      ]);
+
+      // A linha que ficou recebe os dados com a caixa dela; o set novo entra em
+      // maiúscula; nenhuma duplicata pela caixa.
+      expect(await sets(copy), {
+        'ABC': {
+          'name': 'Alpha Beta (MTGJSON)',
+          'release_date': '2020-01-01',
+          'type': 'expansion',
+          'block': null,
+          'is_online_only': null,
+        },
+        'NEW': {
+          'name': 'Novo',
+          'release_date': '2026-01-01',
+          'type': 'expansion',
+          'block': null,
+          'is_online_only': null,
+        },
+        'xyz': {
+          'name': 'Xis (MTGJSON)',
+          'release_date': '2021-06-07',
+          'type': 'core',
+          'block': 'Bloco X',
+          'is_online_only': false,
+        },
+      });
     }),
     skip: skip,
   );

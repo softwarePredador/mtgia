@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "c73033ca9fcf88029b5768632c201339c5b7495ecce80b207c8a6147a466dbea",
+  "source_digest_sha256": "8bd71603e3e7b5f9dec6e159fd9b5b908e6b98411a0e01dcba99e49209148287",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -22786,121 +22786,121 @@
       "name": "_FullAtomicSyncResult",
       "kind": "class",
       "source": "server/bin/sync_cards.dart",
-      "line": 450
+      "line": 456
     },
     {
       "name": "_count",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 264
+      "line": 270
     },
     {
       "name": "_dedupeRowsByKey",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 688
+      "line": 698
     },
     {
       "name": "_downloadAtomicCards",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 385
+      "line": 391
     },
     {
       "name": "_fetchMtgJsonMeta",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 355
+      "line": 361
     },
     {
       "name": "_fetchSetJson",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 374
+      "line": 380
     },
     {
       "name": "_fetchSetListData",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 362
+      "line": 368
     },
     {
       "name": "_getSyncState",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 245
+      "line": 251
     },
     {
       "name": "_httpGetWithRetry",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 269
+      "line": 275
     },
     {
       "name": "_loadCardIdMapForOracleIds",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 750
+      "line": 760
     },
     {
       "name": "_logSync",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 315
+      "line": 321
     },
     {
       "name": "_setSyncState",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 254
+      "line": 260
     },
     {
       "name": "_syncFullAtomicFast",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 406
-    },
-    {
-      "name": "_syncSetsFromData",
-      "kind": "function",
-      "source": "server/bin/sync_cards.dart",
-      "line": 464
+      "line": 412
     },
     {
       "name": "_upsertCardRowsBatch",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 575
+      "line": 585
     },
     {
       "name": "_upsertCardsFromSet",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 543
+      "line": 553
     },
     {
       "name": "_upsertLegalitiesFromSet",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 705
+      "line": 715
     },
     {
       "name": "_upsertLegalityRowsBatch",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 783
+      "line": 793
     },
     {
       "name": "_upsertSetRowsBatch",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 496
+      "line": 506
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 63
+      "line": 69
+    },
+    {
+      "name": "syncSetsFromData",
+      "kind": "function",
+      "source": "server/bin/sync_cards.dart",
+      "line": 470
     },
     {
       "name": "ComboSnapshotMetadata",
@@ -125836,7 +125836,18 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 105,
+        "line": 104,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "requireSchemaObjects",
+        "target": "requireSchemaObjects",
+        "target_library": "package:server/schema_requirements.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/sync_cards.dart",
+        "line": 111,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_fetchSetListData",
@@ -125847,18 +125858,18 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 106,
+        "line": 112,
         "caller": "main",
         "kind": "method",
-        "lexical_target": "_syncSetsFromData",
-        "target": "_syncSetsFromData",
+        "lexical_target": "syncSetsFromData",
+        "target": "syncSetsFromData",
         "target_library": "workspace:server/bin/sync_cards.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 108,
+        "line": 114,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_fetchMtgJsonMeta",
@@ -125869,7 +125880,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 112,
+        "line": 118,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_getSyncState",
@@ -125880,7 +125891,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 128,
+        "line": 134,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_count",
@@ -125891,7 +125902,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 143,
+        "line": 149,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_downloadAtomicCards",
@@ -125902,7 +125913,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 146,
+        "line": 152,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_syncFullAtomicFast",
@@ -125913,7 +125924,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 152,
+        "line": 158,
         "caller": "main",
         "kind": "method",
         "lexical_target": "getNewSetCodesSinceFromData",
@@ -125924,7 +125935,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 168,
+        "line": 174,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_fetchSetJson",
@@ -125935,7 +125946,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 174,
+        "line": 180,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_upsertCardsFromSet",
@@ -125946,7 +125957,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 175,
+        "line": 181,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_upsertLegalitiesFromSet",
@@ -125957,7 +125968,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 183,
+        "line": 189,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_setSyncState",
@@ -125968,7 +125979,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 191,
+        "line": 197,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_logSync",
@@ -125979,7 +125990,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 237,
+        "line": 243,
         "caller": "main",
         "kind": "method",
         "lexical_target": "close",
@@ -126001,7 +126012,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 356,
+        "line": 362,
         "caller": "_fetchMtgJsonMeta",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126012,7 +126023,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 365,
+        "line": 371,
         "caller": "_fetchSetListData",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126023,7 +126034,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 376,
+        "line": 382,
         "caller": "_fetchSetJson",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126034,7 +126045,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 395,
+        "line": 401,
         "caller": "_downloadAtomicCards",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126045,7 +126056,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 443,
+        "line": 449,
         "caller": "_syncFullAtomicFast",
         "kind": "constructor",
         "lexical_target": "_FullAtomicSyncResult",
@@ -126056,8 +126067,8 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 470,
-        "caller": "_syncSetsFromData",
+        "line": 480,
+        "caller": "syncSetsFromData",
         "kind": "method",
         "lexical_target": "normalizeMtgSetCode",
         "target": "normalizeMtgSetCode",
@@ -126067,8 +126078,8 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 489,
-        "caller": "_syncSetsFromData",
+        "line": 499,
+        "caller": "syncSetsFromData",
         "kind": "method",
         "lexical_target": "_dedupeRowsByKey",
         "target": "_dedupeRowsByKey",
@@ -126078,8 +126089,8 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 492,
-        "caller": "_syncSetsFromData",
+        "line": 502,
+        "caller": "syncSetsFromData",
         "kind": "method",
         "lexical_target": "_upsertSetRowsBatch",
         "target": "_upsertSetRowsBatch",
@@ -126089,7 +126100,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 549,
+        "line": 559,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "normalizeMtgSetCode",
@@ -126100,7 +126111,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 552,
+        "line": 562,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -126111,7 +126122,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 556,
+        "line": 566,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "extractSetCardSyncRow",
@@ -126122,7 +126133,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 559,
+        "line": 569,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "_dedupeRowsByKey",
@@ -126133,7 +126144,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 564,
+        "line": 574,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "_upsertCardRowsBatch",
@@ -126144,7 +126155,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 721,
+        "line": 731,
         "caller": "_upsertLegalitiesFromSet",
         "kind": "method",
         "lexical_target": "_loadCardIdMapForOracleIds",
@@ -126155,7 +126166,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 739,
+        "line": 749,
         "caller": "_upsertLegalitiesFromSet",
         "kind": "method",
         "lexical_target": "_dedupeRowsByKey",
@@ -126166,7 +126177,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 744,
+        "line": 754,
         "caller": "_upsertLegalitiesFromSet",
         "kind": "method",
         "lexical_target": "_upsertLegalityRowsBatch",
@@ -126177,7 +126188,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 756,
+        "line": 766,
         "caller": "_loadCardIdMapForOracleIds",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -126188,7 +126199,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 84,
+        "line": 90,
         "caller": "main",
         "kind": "method",
         "lexical_target": "parseSinceDays",
@@ -126199,7 +126210,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 86,
+        "line": 92,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -126210,7 +126221,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 92,
+        "line": 98,
         "caller": "main",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -126221,23 +126232,12 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 93,
+        "line": 99,
         "caller": "main",
         "kind": "method",
         "lexical_target": "connect",
         "target": "Database.connect",
         "target_library": "package:server/database.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/bin/sync_cards.dart",
-        "line": 98,
-        "caller": "main",
-        "kind": "method",
-        "lexical_target": "requireSchemaObjects",
-        "target": "requireSchemaObjects",
-        "target_library": "package:server/schema_requirements.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -210030,7 +210030,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 694,
+        "line": 704,
         "caller": "_dedupeRowsByKey",
         "kind": "function_expression",
         "lexical_target": "keyOf",
@@ -235776,7 +235776,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 406,
+        "line": 412,
         "lexical_type": "_FullAtomicSyncResult",
         "resolved_type": "_FullAtomicSyncResult",
         "target": "_FullAtomicSyncResult",
@@ -235786,7 +235786,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 92,
+        "line": 98,
         "lexical_type": "Database",
         "resolved_type": "Database",
         "target": "Database",
@@ -254372,7 +254372,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 63,
+        "line": 69,
         "lexical_type": "void",
         "occurrences": 7
       },
@@ -303544,7 +303544,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "c73033ca9fcf88029b5768632c201339c5b7495ecce80b207c8a6147a466dbea"
+    "project_logic_source_digest_sha256": "8bd71603e3e7b5f9dec6e159fd9b5b908e6b98411a0e01dcba99e49209148287"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
