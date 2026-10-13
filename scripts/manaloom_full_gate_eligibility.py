@@ -13,7 +13,12 @@ Para cada tarefa pendente de full gate, confere:
 - os receipts citados (`docs/qa/execution/...`) precisam existir no SHA; senão:
   `receipt_ausente_no_sha`;
 - cada dependência precisa estar em PASS ou ficar elegível nesta mesma
-  rodada (ponto fixo); senão: `bloqueada_por_dependencia`;
+  rodada (ponto fixo); senão: `bloqueada_por_dependencia`. A dependência da
+  rodada só satisfaz se subir no mesmo receipt: a tarefa que seria `elegivel`
+  e depende de uma da rodada que não é `elegivel` (pede prova de UI, não tem
+  rastro, também depende da rodada) ou que declara pendência sai
+  `elegivel_se_dependencia_subir` (ponto fixo). Toda linha lista as
+  dependências da rodada com a classe delas: se uma fica, a dependente fica;
 - a prova de UI falha fechada. Os commits da tarefa vêm de três lugares: os
   citados no aceite, os citados dentro dos receipts citados (lidos do SHA) e
   os commits do SHA, sem merge, cuja mensagem cita o ID (inclusive em faixa,
@@ -27,7 +32,8 @@ Para cada tarefa pendente de full gate, confere:
 - `elegivel` (sem prova de UI) exige rastro: pelo menos um commit da tarefa,
   ancestral do SHA e que não seja merge, que mude algo fora de `docs/` e do
   manifesto. Merge citado (o `master` em que o receipt foi conferido, por
-  exemplo) conta para a UI, nunca como rastro. Sem rastro,
+  exemplo) conta para a UI pelo que traz (`git show -m`), nunca como rastro.
+  Commit citado num receipt e fora do SHA também não é rastro. Sem rastro,
   a tarefa sai `elegivel_sem_rastro_de_ui`: ninguém sabe o que ela mudou, e
   ela só sobe com a prova de UI ou depois que o aceite citar os commits dela
   e a lista for refeita. A busca nunca prova que não há outro commit: o
@@ -410,11 +416,16 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
                     break
 
     receipt_blocks = receipt is not None and receipt["status"] != "valido"
+    round_deps: dict[str, list[str]] = {}
     for task_id, row in rows.items():
         row["open_dependencies"] = [
             {"id": dep, "status": by_id.get(dep, {}).get("status", "DESCONHECIDA")}
             for dep in row["depends_on"]
             if by_id.get(dep, {}).get("status") != "PASS" and dep not in eligible
+        ]
+        round_deps[task_id] = [
+            dep for dep in row["depends_on"]
+            if by_id.get(dep, {}).get("status") != "PASS" and dep in eligible
         ]
         if row["commits_outside_sha"]:
             row["classification"] = "commit_citado_fora_do_sha"
@@ -429,6 +440,31 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             row["classification"] = "elegivel_sem_rastro_de_ui"
         else:
             row["classification"] = "elegivel"
+
+    # A dependência da rodada só satisfaz se subir no mesmo receipt. A que
+    # pede prova de UI, não tem rastro, também depende da rodada ou declara
+    # pendência pode ficar: a `elegivel` que depende dela não sobe sozinha.
+    def conditional(dep: str) -> bool:
+        return (rows[dep]["classification"] != "elegivel"
+                or rows[dep]["declares_open_items"])
+
+    changed = True
+    while changed:
+        changed = False
+        for task_id in sorted(eligible):
+            row = rows[task_id]
+            if row["classification"] == "elegivel" and any(
+                    conditional(dep) for dep in round_deps[task_id]):
+                row["classification"] = "elegivel_se_dependencia_subir"
+                changed = True
+
+    for task_id, row in rows.items():
+        row["round_dependencies"] = [
+            {"id": dep, "classification": rows[dep]["classification"],
+             "declares_open_items": rows[dep]["declares_open_items"]}
+            for dep in round_deps[task_id]
+        ]
+    for row in rows.values():
         if receipt_blocks and row["classification"].startswith("elegivel"):
             row["classification"] = "bloqueada_pelo_receipt"
 
@@ -479,7 +515,12 @@ def to_markdown(result: dict[str, Any]) -> str:
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for row in result["tasks"]:
-        deps = ", ".join(f"`{d['id']}` ({d['status']})" for d in row["open_dependencies"])
+        deps = ", ".join(
+            [f"`{d['id']}` ({d['status']})" for d in row["open_dependencies"]]
+            + [f"`{d['id']}` (`{d['classification']}` nesta rodada"
+               + (", com pendência declarada" if d["declares_open_items"] else "")
+               + ")" for d in row["round_dependencies"]]
+        )
         receipts = ", ".join(f"`{path}`" for path in row["receipts"]) or "nenhum citado"
         shown = row["implementation_commits"][:6]
         task_commits = ", ".join(f"`{commit[:9]}`" for commit in shown) or "nenhum"
@@ -491,6 +532,9 @@ def to_markdown(result: dict[str, Any]) -> str:
         if row["commits_outside_sha"]:
             review.append("commit fora do SHA: " + ", ".join(
                 c[:9] for c in row["commits_outside_sha"]))
+        if row["round_dependencies"]:
+            review.append("sobe só se subir no mesmo receipt: " + ", ".join(
+                d["id"] for d in row["round_dependencies"]))
         if row["missing_receipts"]:
             review.append("receipt ausente")
         if row["missing_paths"]:

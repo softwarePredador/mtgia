@@ -12,8 +12,13 @@ import 'package:test/test.dart';
 /// o ponto fixo das dependências, o receipt do full e que nada no repositório
 /// muda. A prova de UI falha fechada: os commits da tarefa vêm do aceite, dos
 /// receipts citados e das mensagens do SHA (direto, em faixa, em lista e pela
-/// família no escopo); sem nenhum commit que mude código, a tarefa não sai
-/// `elegivel`.
+/// família no escopo, inclusive com várias famílias); um merge citado conta
+/// para a UI pelo que traz (`-m`), e o commit fora do SHA citado num receipt
+/// não é rastro; sem nenhum commit que mude código, a tarefa não sai
+/// `elegivel`. A dependência da rodada que pode ficar (prova de UI, sem
+/// rastro, pendência declarada, em cadeia) deixa a dependente em
+/// `elegivel_se_dependencia_subir`, e o comando de confirmação do modelo de
+/// receipt lista o que um merge trouxe.
 void main() {
   final script = File(
     '${Directory.current.parent.path}/scripts/manaloom_full_gate_eligibility.py',
@@ -30,6 +35,8 @@ void main() {
   late String familyCommit;
   late String docsOnlyCommit;
   late String mergeCommit;
+  late String uiMergeCommit;
+  late String multiFamilyCommit;
 
   Future<String> git(List<String> args) async {
     final result = await Process.run('git', [
@@ -139,10 +146,25 @@ void main() {
     await git(['checkout', '-q', 'master']);
     await git(['merge', '-q', '--no-ff', '-m', 'merge do PR', 'pr']);
     mergeCommit = await git(['rev-parse', 'HEAD']);
+    // Merge que traz UI: só o `-m` mostra o que ele trouxe.
+    await git(['checkout', '-q', '-b', 'pr-ui']);
+    await commit('app/lib/pr_ui.dart', 'void prUi() {}\n', 'feat: tela do PR');
+    await git(['checkout', '-q', 'master']);
+    await git(['merge', '-q', '--no-ff', '-m', 'merge do PR de UI', 'pr-ui']);
+    uiMergeCommit = await git(['rev-parse', 'HEAD']);
+    multiFamilyCommit = await commit(
+      'app/lib/familias.dart',
+      'void familias() {}\n',
+      'fix(G-P0, H-UX/K-P1): tela das três famílias',
+    );
     write('docs/qa/execution/2026-10-03/T10.md', '# receipt T10\n');
     write(
       'docs/qa/execution/2026-10-04/T11.md',
       '# receipt T11\n\nFeito em `${uiCommit.substring(0, 12)}`.\n',
+    );
+    write(
+      'docs/qa/execution/2026-10-05/T16.md',
+      '# receipt T16\n\nFeito em `${outsideCommit.substring(0, 12)}`.\n',
     );
 
     final s = serverCommit.substring(0, 9);
@@ -214,6 +236,31 @@ void main() {
           task('S-002', pending, acceptance: 'Feito em `$s`.'),
           task('S-003', pending, acceptance: 'Feito em `$s`.'),
           task('F-P0-01', pending, acceptance: 'Feito em `$s`.'),
+          task(
+            'T15',
+            pending,
+            acceptance:
+                'Conferido no master `${uiMergeCommit.substring(0, 9)}`.',
+          ),
+          task(
+            'T16',
+            pending,
+            acceptance: 'Receipt `docs/qa/execution/2026-10-05/T16.md`.',
+          ),
+          task('G-P0-01', pending, acceptance: 'Feito em `$s`.'),
+          task('H-UX-01', pending, acceptance: 'Feito em `$s`.'),
+          task('K-P1-01', pending, acceptance: 'Feito em `$s`.'),
+          // T17 vem antes de T18 na ordem: só o ponto fixo pega a cadeia.
+          task('T17', pending, deps: ['T18'], acceptance: 'Feito em `$s`.'),
+          task('T18', pending, deps: ['T2'], acceptance: 'Feito em `$s`.'),
+          task('T19', pending, deps: ['T1'], acceptance: 'Feito em `$s`.'),
+          task('T20', pending, deps: ['T12'], acceptance: 'Feito em `$s`.'),
+          task(
+            'T21',
+            pending,
+            acceptance: 'Feito em `$s`. Falta: ligar o job na produção.',
+          ),
+          task('T22', pending, deps: ['T21'], acceptance: 'Feito em `$s`.'),
         ],
       }),
     );
@@ -280,6 +327,17 @@ void main() {
         'S-002': 'elegivel',
         'S-003': 'elegivel_com_prova_ui',
         'F-P0-01': 'elegivel_com_prova_ui',
+        'T15': 'elegivel_com_prova_ui',
+        'T16': 'elegivel_sem_rastro_de_ui',
+        'G-P0-01': 'elegivel_com_prova_ui',
+        'H-UX-01': 'elegivel_com_prova_ui',
+        'K-P1-01': 'elegivel_com_prova_ui',
+        'T17': 'elegivel_se_dependencia_subir',
+        'T18': 'elegivel_se_dependencia_subir',
+        'T19': 'elegivel',
+        'T20': 'elegivel_se_dependencia_subir',
+        'T21': 'elegivel',
+        'T22': 'elegivel_se_dependencia_subir',
       });
       final rows = {
         for (final row in result['tasks'] as List<dynamic>)
@@ -304,6 +362,41 @@ void main() {
         expect(rows[id]!['message_commits'], isEmpty, reason: id);
       }
       expect(rows['F-P0-01']!['message_commits'], [familyCommit]);
+      // Um merge citado que traz app/lib pede a prova de UI, sem rastro.
+      expect(rows['T15']!['cited_commits'], [uiMergeCommit]);
+      expect(rows['T15']!['ui_commits'], [uiMergeCommit]);
+      expect(rows['T15']!['ui_paths_from_commits'], ['app/lib/pr_ui.dart']);
+      expect(rows['T15']!['implementation_commits'], isEmpty);
+      // Commit fora do SHA citado num receipt: não bloqueia, mas não é rastro.
+      expect(rows['T16']!['commits_outside_sha'], isEmpty);
+      expect(rows['T16']!['receipt_commits'], [outsideCommit]);
+      expect(rows['T16']!['receipt_commits_outside_sha'], [outsideCommit]);
+      expect(rows['T16']!['implementation_commits'], isEmpty);
+      for (final id in ['G-P0-01', 'H-UX-01', 'K-P1-01']) {
+        expect(rows[id]!['message_commits'], [multiFamilyCommit], reason: id);
+      }
+      Map<String, Object> dep(String id, String classification, bool open) => {
+        'id': id,
+        'classification': classification,
+        'declares_open_items': open,
+      };
+      expect(rows['T1']!['round_dependencies'], isEmpty);
+      expect(rows['T2']!['round_dependencies'], [dep('T1', 'elegivel', false)]);
+      expect(rows['T17']!['round_dependencies'], [
+        dep('T18', 'elegivel_se_dependencia_subir', false),
+      ]);
+      expect(rows['T18']!['round_dependencies'], [
+        dep('T2', 'elegivel_com_prova_ui', false),
+      ]);
+      expect(rows['T19']!['round_dependencies'], [
+        dep('T1', 'elegivel', false),
+      ]);
+      expect(rows['T20']!['round_dependencies'], [
+        dep('T12', 'elegivel_sem_rastro_de_ui', false),
+      ]);
+      expect(rows['T22']!['round_dependencies'], [
+        dep('T21', 'elegivel', true),
+      ]);
       expect(rows['T1']!['receipts'], ['docs/qa/execution/2026-10-01/T1.md']);
       expect(rows['T2']!['ui_paths_from_commits'], ['app/lib/tela.dart']);
       expect(rows['T8']!['ui_paths'], ['app/lib/tela.dart']);
@@ -317,12 +410,13 @@ void main() {
       expect(rows['T7']!['declares_open_items'], isTrue);
       expect(rows['T1']!['declares_open_items'], isFalse);
       expect(result['summary'], {
-        'pending': 20,
+        'pending': 31,
         'bloqueada_por_dependencia': 2,
         'commit_citado_fora_do_sha': 1,
-        'elegivel': 3,
-        'elegivel_com_prova_ui': 9,
-        'elegivel_sem_rastro_de_ui': 4,
+        'elegivel': 5,
+        'elegivel_com_prova_ui': 13,
+        'elegivel_se_dependencia_subir': 4,
+        'elegivel_sem_rastro_de_ui': 5,
         'receipt_ausente_no_sha': 1,
       });
     },
@@ -465,6 +559,18 @@ void main() {
       contains('| `T12` | P0 CORE | `elegivel_sem_rastro_de_ui` |'),
     );
     expect(output, contains('sem commit da tarefa no SHA'));
+    expect(
+      output,
+      contains(
+        '| `T18` | P0 CORE | `elegivel_se_dependencia_subir` | '
+        '`T2` (`elegivel_com_prova_ui` nesta rodada) |',
+      ),
+    );
+    expect(
+      output,
+      contains('`T21` (`elegivel` nesta rodada, com pendência declarada)'),
+    );
+    expect(output, contains('sobe só se subir no mesmo receipt: T2'));
     expect(output, contains('`${serverCommit.substring(0, 9)}`'));
     expect(
       await git(['status', '--porcelain', '--untracked-files=all']),
@@ -474,4 +580,33 @@ void main() {
     expect(await git(['for-each-ref']), refs);
     expect(await git(['rev-parse', 'HEAD']), head);
   });
+
+  test(
+    'a confirmação do modelo de receipt lista o que um merge citado trouxe',
+    () async {
+      final template =
+          File(
+            '${Directory.current.parent.path}/docs/qa/'
+            'MANALOOM_FULL_GATE_PASS_RECEIPT_TEMPLATE_2026-10-10.md',
+          ).readAsStringSync();
+      final commands = [
+        for (final match in RegExp(
+          r'`git (show [^`]*<commit>)`',
+        ).allMatches(template))
+          match.group(1)!,
+      ];
+      expect(commands, hasLength(greaterThanOrEqualTo(2)));
+      for (final command in commands) {
+        final listed = await git([
+          for (final arg in command.split(' '))
+            arg == '<commit>' ? uiMergeCommit : arg,
+        ]);
+        expect(
+          listed.split('\n'),
+          contains('app/lib/pr_ui.dart'),
+          reason: 'git $command',
+        );
+      }
+    },
+  );
 }
