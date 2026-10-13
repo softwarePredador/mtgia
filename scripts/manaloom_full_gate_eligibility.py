@@ -21,23 +21,30 @@ Para cada tarefa pendente de full gate, confere:
   dependências da rodada com a classe delas: se uma fica, a dependente fica;
 - a prova de UI falha fechada. Os commits da tarefa vêm de três lugares: os
   citados no aceite, os citados dentro dos receipts citados (lidos do SHA) e
-  os commits do SHA, sem merge, cuja mensagem cita o ID (inclusive em faixa,
-  como `LC-P0-01..06` ou `BT-GATE-002/003`, e pela família no escopo do
-  assunto, como `fix(LC-P0): ...`). Se algum caminho citado no aceite ou nos
-  receipts, ou algum arquivo mudado por um desses commits, cai numa raiz do
-  digest de UI, a tarefa é `elegivel_com_prova_ui`: o PASS exige também a
-  prova de UI (PASS_VISUAL_REVIEWED) no mesmo SHA. Commit citado só como
-  referência (a linha de base da produção, por exemplo) também conta: o erro
-  fica do lado de pedir prova a mais;
+  os commits do SHA, sem merge, cujo ASSUNTO (a primeira linha da mensagem)
+  nomeia o ID: direto, em faixa, como `LC-P0-01..06` ou `BT-GATE-002/003`, ou
+  pela família no escopo, como `fix(LC-P0): ...`. O commit que só cita o ID
+  no corpo da mensagem (o exemplo na mensagem de uma ferramenta, por exemplo)
+  conta para a UI, mas não é commit da tarefa nem rastro. Se algum caminho
+  citado no aceite ou nos receipts, ou algum arquivo mudado por um desses
+  commits (inclusive os do corpo), cai numa raiz do digest de UI, a tarefa é
+  `elegivel_com_prova_ui`: o PASS exige também a prova de UI
+  (PASS_VISUAL_REVIEWED) no mesmo SHA. Commit citado só como referência (a
+  linha de base da produção, por exemplo) também conta: o erro fica do lado
+  de pedir prova a mais. A lista de arquivos de um commit não depende da
+  configuração do Git de quem roda: `--diff-merges=separate` (o `-m` segue o
+  `log.diffMerges`) e `--no-renames` (o arquivo movido para fora de uma raiz
+  de UI aparece também no caminho antigo);
 - `elegivel` (sem prova de UI) exige rastro: pelo menos um commit da tarefa,
   ancestral do SHA e que não seja merge, que mude algo fora de `docs/` e do
   manifesto. Merge citado (o `master` em que o receipt foi conferido, por
-  exemplo) conta para a UI pelo que traz (`git show -m`), nunca como rastro.
-  Commit citado num receipt e fora do SHA também não é rastro. Sem rastro,
-  a tarefa sai `elegivel_sem_rastro_de_ui`: ninguém sabe o que ela mudou, e
-  ela só sobe com a prova de UI ou depois que o aceite citar os commits dela
-  e a lista for refeita. A busca nunca prova que não há outro commit: o
-  receipt lista os commits conferidos.
+  exemplo) conta para a UI pelo que traz (`--diff-merges=separate`), nunca
+  como rastro. Commit citado num receipt e fora do SHA também não é rastro,
+  nem o que só cita o ID no corpo da mensagem. Sem rastro, a tarefa sai
+  `elegivel_sem_rastro_de_ui`: ninguém sabe o que ela mudou, e ela só sobe
+  com a prova de UI ou depois que o aceite citar os commits dela e a lista
+  for refeita. A busca nunca prova que não há outro commit: o receipt lista
+  os commits conferidos.
 O aceite que declara pendência ("Segue aberto", "Falta:") é marcado para
 revisão humana: a elegibilidade nunca decide sozinha que a pendência fechou.
 
@@ -179,7 +186,11 @@ def changed_files(repo: Path, commit: str,
                   cache: dict[str, list[str]] | None = None) -> list[str]:
     if cache is not None and commit in cache:
         return cache[commit]
-    result = git(repo, "show", "--name-only", "--format=", "-m", commit, check=False)
+    # Flags explícitas, para não depender da configuração de quem roda: o
+    # `-m` segue o `log.diffMerges` (com `combined` um merge sai vazio), e a
+    # detecção de renomeação esconde o caminho antigo de um arquivo movido.
+    result = git(repo, "show", "--name-only", "--format=", "--diff-merges=separate",
+                 "--no-renames", commit, check=False)
     files = list(dict.fromkeys(
         line for line in result.stdout.splitlines() if line.strip()))
     if cache is not None:
@@ -222,11 +233,13 @@ def mentioned_ids(message: str, wanted: set[str], direct: re.Pattern[str],
     return found & wanted
 
 
-def commits_by_task(repo: Path, sha: str, ids: set[str]) -> dict[str, list[str]]:
+def commits_by_task(repo: Path, sha: str, ids: set[str]
+                    ) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     """Commits do SHA (sem merge, do mais novo ao mais velho) cuja mensagem
-    cita cada ID."""
+    cita cada ID: os que o nomeiam no assunto (commits da tarefa: rastro e
+    UI) e os que só o citam no corpo (contam só para a UI)."""
     if not ids:
-        return {}
+        return {}, {}
     direct = re.compile(
         r"(?<![0-9A-Za-z-])("
         + "|".join(re.escape(task_id) for task_id in sorted(ids, key=len, reverse=True))
@@ -238,14 +251,18 @@ def commits_by_task(repo: Path, sha: str, ids: set[str]) -> dict[str, list[str]]
         if name is not None:
             families.setdefault(name, set()).add(task_id)
     log = git(repo, "log", "--no-merges", "--format=%H%x00%B%x1e", sha).stdout
-    found: dict[str, list[str]] = {}
+    by_subject: dict[str, list[str]] = {}
+    body_only: dict[str, list[str]] = {}
     for record in log.split("\x1e"):
         commit, _, message = record.strip("\n").partition("\x00")
         if not FULL_SHA.match(commit):
             continue
+        subject = message.split("\n", 1)[0]
+        named = mentioned_ids(subject, ids, direct, families)
         for task_id in mentioned_ids(message, ids, direct, families):
-            found.setdefault(task_id, []).append(commit)
-    return found
+            target = by_subject if task_id in named else body_only
+            target.setdefault(task_id, []).append(commit)
+    return by_subject, body_only
 
 
 def is_implementation(files: list[str]) -> bool:
@@ -301,7 +318,7 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
         by_id[task["id"]] = task
     roots = ui_roots(repo, sha)
     pending_ids = {task["id"] for task in tasks if task.get("status") == PENDING}
-    by_message = commits_by_task(repo, sha, pending_ids)
+    by_subject, by_body = commits_by_task(repo, sha, pending_ids)
     files_cache: dict[str, list[str]] = {}
     ancestry: dict[str, bool] = {}
     merges: dict[str, bool] = {}
@@ -349,11 +366,17 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             path for path in receipt_paths
             if under(path, roots) and path not in ui_paths
         )
-        message_commits = [
-            commit for commit in by_message.get(task["id"], [])
+        subject_commits = [
+            commit for commit in by_subject.get(task["id"], [])
             if commit not in commits and commit not in receipt_commits
         ]
-        task_commits = commits + receipt_commits + message_commits
+        # Só o corpo cita o ID: conta para a UI (falha fechada), nunca como
+        # commit da tarefa nem como rastro.
+        body_only_commits = [
+            commit for commit in by_body.get(task["id"], [])
+            if commit not in commits and commit not in receipt_commits
+        ]
+        task_commits = commits + receipt_commits + subject_commits
         implementation_commits = [
             commit for commit in task_commits
             if ancestor(commit) and not merge(commit) and is_implementation(
@@ -361,7 +384,7 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
         ]
         ui_commits: list[str] = []
         from_commits: set[str] = set()
-        for commit in task_commits:
+        for commit in task_commits + body_only_commits:
             touched = [path for path in changed_files(repo, commit, files_cache)
                        if under(path, roots)]
             if touched:
@@ -386,7 +409,8 @@ def evaluate(repo: Path, sha: str, registry: dict[str, Any],
             "receipt_commits_outside_sha": [
                 commit for commit in receipt_commits if not ancestor(commit)
             ],
-            "message_commits": message_commits,
+            "subject_commits": subject_commits,
+            "body_only_commits": body_only_commits,
             "implementation_commits": implementation_commits,
             "ui_commits": ui_commits,
             "ui_paths": ui_paths,
@@ -554,6 +578,14 @@ def to_markdown(result: dict[str, Any]) -> str:
             review.append(
                 "sem commit da tarefa no SHA: a prova de UI não pode ser "
                 "dispensada sem citar os commits"
+            )
+        if row["body_only_commits"]:
+            shown_body = row["body_only_commits"][:6]
+            extra = len(row["body_only_commits"]) - len(shown_body)
+            review.append(
+                "citada só no corpo de " + ", ".join(c[:9] for c in shown_body)
+                + (f" e mais {extra}" if extra else "")
+                + " (conta para a UI, não é rastro)"
             )
         lines.append(
             f"| `{row['id']}` | {row['priority']} | `{row['classification']}` | "

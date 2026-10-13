@@ -32,7 +32,7 @@ Classes:
 | `elegivel` | evidência no SHA; cada dependência em PASS ou `elegivel` nesta rodada, sem pendência declarada; rastro: pelo menos um commit da tarefa no SHA, que não seja merge, muda algo fora de `docs/`; e nenhum caminho nem commit da tarefa toca uma raiz do digest de UI | sobe para `PASS` com a linha do item 3, citando os commits da coluna "Commits da tarefa", se as dependências da rodada subirem no mesmo receipt |
 | `elegivel_se_dependencia_subir` | como `elegivel`, mas uma dependência que não está em PASS pede prova de UI, não tem rastro, também é `elegivel_se_dependencia_subir` ou declara pendência | sobe só se cada dependência da coluna "Dependências abertas" subir neste mesmo receipt; se uma fica, esta fica |
 | `elegivel_com_prova_ui` | evidência e rastro como em `elegivel`, dependências em PASS ou elegíveis na mesma rodada, mas um caminho citado (no aceite ou nos receipts citados) ou um commit da tarefa toca uma raiz do digest de UI | sobe só com a prova de UI no mesmo SHA (`ui-proof` verde e `PASS_VISUAL_REVIEWED`, G-08) e se as dependências da rodada subirem |
-| `elegivel_sem_rastro_de_ui` | evidência e dependências como em `elegivel_com_prova_ui`, mas nenhum commit da tarefa no SHA, fora os merges, muda algo fora de `docs/`: o script não sabe se ela tocou a UI | não sobe como `elegivel`. Sobe com a prova de UI no mesmo SHA, ou com a confirmação do item 3 (cada commit da tarefa com a saída de `git show --name-only --format= -m <commit>`, sem raiz do digest), e se as dependências da rodada subirem; senão, fica |
+| `elegivel_sem_rastro_de_ui` | evidência e dependências como em `elegivel_com_prova_ui`, mas nenhum commit da tarefa no SHA, fora os merges, muda algo fora de `docs/`: o script não sabe se ela tocou a UI | não sobe como `elegivel`. Sobe com a prova de UI no mesmo SHA, ou com a confirmação do item 3 (cada commit da tarefa com a saída de `git show --name-only --format= --diff-merges=separate --no-renames <commit>`, sem raiz do digest), e se as dependências da rodada subirem; senão, fica |
 | `bloqueada_por_dependencia` | alguma dependência fica fora de PASS | não sobe; a tabela mostra qual dependência falta e em que estado ela está |
 | `commit_citado_fora_do_sha` | um commit citado no aceite não é ancestral do SHA | não sobe; conferir se o trabalho entrou por outro commit e corrigir a citação |
 | `receipt_ausente_no_sha` | o receipt citado não existe no SHA | não sobe; o receipt precisa estar no SHA |
@@ -41,19 +41,24 @@ Classes:
 A prova de UI falha fechada. Os commits da tarefa vêm de três lugares:
 - os citados no aceite;
 - os citados dentro dos receipts que o aceite cita, lidos do SHA;
-- os commits do SHA, sem merge, cuja mensagem cita o ID: direto, em faixa
-  (`LC-P0-01..06`), em lista (`BT-GATE-002/003`) ou pela família no escopo do
-  assunto (`fix(LC-P0): ...`).
+- os commits do SHA, sem merge, cujo assunto (a primeira linha da mensagem)
+  nomeia o ID: direto, em faixa (`LC-P0-01..06`), em lista
+  (`BT-GATE-002/003`) ou pela família no escopo (`fix(LC-P0): ...`).
+
+O commit que só cita o ID no corpo da mensagem (o exemplo na mensagem de uma
+ferramenta, por exemplo) conta para a UI, mas não é commit da tarefa nem
+rastro: ele não entra na coluna "Commits da tarefa", e a coluna "Revisar" o
+mostra como "citada só no corpo".
 
 Se um caminho citado no aceite ou nos receipts, ou um arquivo mudado por
-qualquer desses commits, cai numa raiz do digest de UI, a tarefa pede a prova
-de UI. Commit citado só como referência também conta: o erro fica do lado de
-pedir prova a mais. Um merge citado (o `master` em que o receipt foi
-conferido, por exemplo) conta para a UI pelo que traz (`git show -m`), mas
-nunca como rastro. Commit citado num receipt e fora do SHA também não é
-rastro. A busca nunca
-prova que não existe outro commit da tarefa: quem conhece um commit que não
-aparece na coluna "Commits da tarefa" cita-o no aceite e refaz a lista.
+qualquer desses commits (inclusive os que só citam o ID no corpo), cai numa
+raiz do digest de UI, a tarefa pede a prova de UI. Commit citado só como
+referência também conta: o erro fica do lado de pedir prova a mais. Um merge
+citado (o `master` em que o receipt foi conferido, por exemplo) conta para a
+UI pelo que traz (`--diff-merges=separate`), mas nunca como rastro. Commit
+citado num receipt e fora do SHA também não é rastro. A busca nunca prova que
+não existe outro commit da tarefa: quem conhece um commit que não aparece na
+coluna "Commits da tarefa" cita-o no aceite e refaz a lista.
 
 Dependência que não está em PASS e sobe nesta rodada só vale se subir neste
 mesmo receipt. A coluna "Dependências abertas" mostra cada uma com a classe
@@ -113,7 +118,7 @@ Com a forma B, a lista do script sai como condicional. O receipt diz isso.
 | --- | --- | --- | --- | --- | --- | --- |
 | `<ID>` | `elegivel` | os commits da coluna "Commits da tarefa" e o arquivo e o teste que provam | receipt da tarefa (`docs/qa/execution/...`) e os testes do aceite que rodaram no full | não se aplica: nenhum dos commits conferidos (`<sha9>`, ...) toca raiz do digest de UI | nenhuma | `PASS` |
 | `<ID>` | `elegivel_com_prova_ui` | ... | ... | `ui-proof` verde no SHA, `latest.json` com o digest de UI do SHA e a revisão visual assinada (G-08) | ... | `PASS` ou "fica" |
-| `<ID>` | `elegivel_sem_rastro_de_ui` | os commits da tarefa, achados por quem revisa | ... | a prova de UI como na linha acima, ou a confirmação: cada commit da tarefa com a saída de `git show --name-only --format= -m <commit>` colada, sem raiz do digest de UI | ... | `PASS` ou "fica" |
+| `<ID>` | `elegivel_sem_rastro_de_ui` | os commits da tarefa, achados por quem revisa | ... | a prova de UI como na linha acima, ou a confirmação: cada commit da tarefa com a saída de `git show --name-only --format= --diff-merges=separate --no-renames <commit>` colada, sem raiz do digest de UI | ... | `PASS` ou "fica" |
 | `<ID>` | `elegivel_se_dependencia_subir` | como em `elegivel` | ... | como em `elegivel` | ... | `PASS` só se cada dependência da coluna "Dependências abertas" tiver a linha dela com `PASS` neste receipt; senão, "fica" |
 
 Para cada linha:
@@ -121,9 +126,14 @@ Para cada linha:
   `elegivel_se_dependencia_subir`, e sempre com os commits conferidos.
   `elegivel_sem_rastro_de_ui` nunca sobe com "não se aplica" sem a
   confirmação acima;
-- a confirmação usa `git show` com `-m`. Num merge, sem o `-m`, a saída sai
-  vazia e esconde o que o merge trouxe; com o `-m`, ela lista o que cada lado
-  trouxe, e qualquer raiz do digest de UI nessa lista pede a prova de UI;
+- a confirmação usa `git show` com `--diff-merges=separate` e
+  `--no-renames`, escritos assim. Num merge, sem a flag, a saída sai vazia e
+  esconde o que o merge trouxe. O `-m` não basta: ele segue o
+  `log.diffMerges` de quem roda e, com `combined`, `dense-combined`,
+  `remerge` ou `off`, também sai vazio. Com `--diff-merges=separate`, a saída
+  lista o que cada lado trouxe. O `--no-renames` mostra também o caminho
+  antigo de um arquivo movido para fora de uma raiz de UI. Qualquer raiz do
+  digest de UI nessa lista pede a prova de UI;
 - a tarefa com dependência da rodada só sobe se cada uma dessas dependências
   tiver a linha dela com `PASS` neste mesmo receipt;
 - o teste que prova o aceite precisa estar no inventário que o full rodou.

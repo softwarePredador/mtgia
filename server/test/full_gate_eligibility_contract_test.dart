@@ -11,14 +11,17 @@ import 'package:test/test.dart';
 /// um commit de servidor, um de UI e um fora do SHA, e confere cada classe,
 /// o ponto fixo das dependências, o receipt do full e que nada no repositório
 /// muda. A prova de UI falha fechada: os commits da tarefa vêm do aceite, dos
-/// receipts citados e das mensagens do SHA (direto, em faixa, em lista e pela
-/// família no escopo, inclusive com várias famílias); um merge citado conta
-/// para a UI pelo que traz (`-m`), e o commit fora do SHA citado num receipt
-/// não é rastro; sem nenhum commit que mude código, a tarefa não sai
-/// `elegivel`. A dependência da rodada que pode ficar (prova de UI, sem
-/// rastro, pendência declarada, em cadeia) deixa a dependente em
-/// `elegivel_se_dependencia_subir`, e o comando de confirmação do modelo de
-/// receipt lista o que um merge trouxe.
+/// receipts citados e dos commits do SHA cujo assunto nomeia o ID (direto, em
+/// faixa, em lista e pela família no escopo, inclusive com várias famílias);
+/// o commit que só cita o ID no corpo conta para a UI, mas não é rastro; um
+/// merge citado conta para a UI pelo que traz (`--diff-merges=separate`), e o
+/// commit fora do SHA citado num receipt não é rastro; sem nenhum commit que
+/// mude código, a tarefa não sai `elegivel`. A dependência da rodada que pode
+/// ficar (prova de UI, sem rastro, pendência declarada, em cadeia) deixa a
+/// dependente em `elegivel_se_dependencia_subir`. A lista e o comando de
+/// confirmação do modelo de receipt não dependem da configuração do Git de
+/// quem roda (`log.diffMerges`, `diff.renames`): um merge mostra o que
+/// trouxe, e um arquivo movido para fora da UI mostra o caminho antigo.
 void main() {
   final script = File(
     '${Directory.current.parent.path}/scripts/manaloom_full_gate_eligibility.py',
@@ -37,8 +40,18 @@ void main() {
   late String mergeCommit;
   late String uiMergeCommit;
   late String multiFamilyCommit;
+  late String subjectServerCommit;
+  late String bodyUiCommit;
+  late String renameCommit;
 
-  Future<String> git(List<String> args) async {
+  /// Configuração do Git de quem roda que muda a saída de `git show`: com ela,
+  /// `-m` mostra um merge vazio e a renomeação esconde o caminho antigo.
+  const hostileConfig = {'log.diffMerges': 'combined', 'diff.renames': 'true'};
+
+  Future<String> git(
+    List<String> args, {
+    Map<String, String> config = const {},
+  }) async {
     final result = await Process.run('git', [
       '-c',
       'user.name=Teste',
@@ -48,6 +61,10 @@ void main() {
       'commit.gpgsign=false',
       '-c',
       'core.hooksPath=/dev/null',
+      for (final entry in config.entries) ...[
+        '-c',
+        '${entry.key}=${entry.value}',
+      ],
       '-C',
       repo.path,
       ...args,
@@ -87,6 +104,7 @@ void main() {
     );
     write('server/lib/servico.dart', 'void a() {}\n');
     write('app/lib/tela.dart', 'void b() {}\n');
+    write('app/lib/movida.dart', 'void movida() {\n  print(26);\n}\n');
     write('docs/qa/execution/2026-10-01/T1.md', '# receipt T1\n');
     await git(['add', '-A']);
     await git(['commit', '-q', '-m', 'base']);
@@ -157,6 +175,32 @@ void main() {
       'void familias() {}\n',
       'fix(G-P0, H-UX/K-P1): tela das três famílias',
     );
+    // O assunto nomeia T25, V-01..02 e a família X-P0: rastro. O corpo só
+    // cita T23 e Y-01..02, como o exemplo na mensagem de uma ferramenta.
+    subjectServerCommit = await commit(
+      'server/lib/ferramenta.dart',
+      'void ferramenta() {}\n',
+      'fix(T25, V-01..02, X-P0): ferramenta do servidor\n\n'
+          'Exemplo no corpo: T23 e Y-01..02 saem sem rastro.',
+    );
+    // Só o corpo cita T24, mas o commit toca a UI: pede a prova de UI.
+    bodyUiCommit = await commit(
+      'app/lib/corpo_ui.dart',
+      'void corpoUi() {}\n',
+      'chore: ajuste da tela\n\nToca a tela da T24.',
+    );
+    // Arquivo movido para fora da UI: o caminho antigo está em app/lib.
+    File(
+      '${repo.path}/app/lib/movida.dart',
+    ).renameSync('${repo.path}/server/lib/movida.dart');
+    await git(['add', '-A']);
+    await git([
+      'commit',
+      '-q',
+      '-m',
+      'refactor(T26): move a tela para o servidor',
+    ]);
+    renameCommit = await git(['rev-parse', 'HEAD']);
     write('docs/qa/execution/2026-10-03/T10.md', '# receipt T10\n');
     write(
       'docs/qa/execution/2026-10-04/T11.md',
@@ -261,6 +305,18 @@ void main() {
             acceptance: 'Feito em `$s`. Falta: ligar o job na produção.',
           ),
           task('T22', pending, deps: ['T21'], acceptance: 'Feito em `$s`.'),
+          for (final id in [
+            'T23',
+            'T24',
+            'T25',
+            'V-01',
+            'V-02',
+            'X-P0-01',
+            'Y-01',
+            'Y-02',
+            'T26',
+          ])
+            task(id, pending, acceptance: 'Só o registro.'),
         ],
       }),
     );
@@ -273,17 +329,36 @@ void main() {
     await repo.delete(recursive: true);
   });
 
-  Future<(int, String)> run(List<String> args) async {
+  Future<(int, String)> run(
+    List<String> args, {
+    Map<String, String> config = const {},
+  }) async {
+    final entries = config.entries.toList();
     final result = await Process.run(
       'python3',
       [script.path, '--repo', repo.path, ...args],
-      environment: {'PYTHONDONTWRITEBYTECODE': '1'},
+      environment: {
+        'PYTHONDONTWRITEBYTECODE': '1',
+        // A configuração do Git de quem roda, injetada como o Git a lê.
+        if (entries.isNotEmpty) 'GIT_CONFIG_COUNT': '${entries.length}',
+        for (var i = 0; i < entries.length; i++) ...{
+          'GIT_CONFIG_KEY_$i': entries[i].key,
+          'GIT_CONFIG_VALUE_$i': entries[i].value,
+        },
+      },
     );
     return (result.exitCode, '${result.stdout}${result.stderr}');
   }
 
-  Future<Map<String, dynamic>> evaluate(List<String> args) async {
-    final (code, output) = await run([...args, '--format', 'json']);
+  Future<Map<String, dynamic>> evaluate(
+    List<String> args, {
+    Map<String, String> config = const {},
+  }) async {
+    final (code, output) = await run([
+      ...args,
+      '--format',
+      'json',
+    ], config: config);
     expect(code, 0, reason: output);
     return jsonDecode(output) as Map<String, dynamic>;
   }
@@ -338,6 +413,15 @@ void main() {
         'T20': 'elegivel_se_dependencia_subir',
         'T21': 'elegivel',
         'T22': 'elegivel_se_dependencia_subir',
+        'T23': 'elegivel_sem_rastro_de_ui',
+        'T24': 'elegivel_com_prova_ui',
+        'T25': 'elegivel',
+        'V-01': 'elegivel',
+        'V-02': 'elegivel',
+        'X-P0-01': 'elegivel',
+        'Y-01': 'elegivel_sem_rastro_de_ui',
+        'Y-02': 'elegivel_sem_rastro_de_ui',
+        'T26': 'elegivel_com_prova_ui',
       });
       final rows = {
         for (final row in result['tasks'] as List<dynamic>)
@@ -345,23 +429,23 @@ void main() {
       };
       expect(rows['T1']!['cited_commits'], [serverCommit]);
       expect(rows['T1']!['implementation_commits'], [serverCommit]);
-      expect(rows['T10']!['message_commits'], [messageUiCommit]);
+      expect(rows['T10']!['subject_commits'], [messageUiCommit]);
       expect(rows['T10']!['ui_commits'], [messageUiCommit]);
       expect(rows['T10']!['ui_paths_from_commits'], ['app/lib/tela10.dart']);
       expect(rows['T11']!['receipt_commits'], [uiCommit]);
       expect(rows['T11']!['ui_paths_from_commits'], ['app/lib/tela.dart']);
       expect(rows['T12']!['implementation_commits'], isEmpty);
-      expect(rows['T13']!['message_commits'], [docsOnlyCommit]);
+      expect(rows['T13']!['subject_commits'], [docsOnlyCommit]);
       expect(rows['T13']!['implementation_commits'], isEmpty);
       expect(rows['T14']!['cited_commits'], [mergeCommit]);
       expect(rows['T14']!['implementation_commits'], isEmpty);
       for (final id in ['R-01', 'R-02', 'S-001', 'S-003']) {
-        expect(rows[id]!['message_commits'], [seriesCommit], reason: id);
+        expect(rows[id]!['subject_commits'], [seriesCommit], reason: id);
       }
       for (final id in ['R-03', 'S-002']) {
-        expect(rows[id]!['message_commits'], isEmpty, reason: id);
+        expect(rows[id]!['subject_commits'], isEmpty, reason: id);
       }
-      expect(rows['F-P0-01']!['message_commits'], [familyCommit]);
+      expect(rows['F-P0-01']!['subject_commits'], [familyCommit]);
       // Um merge citado que traz app/lib pede a prova de UI, sem rastro.
       expect(rows['T15']!['cited_commits'], [uiMergeCommit]);
       expect(rows['T15']!['ui_commits'], [uiMergeCommit]);
@@ -373,8 +457,33 @@ void main() {
       expect(rows['T16']!['receipt_commits_outside_sha'], [outsideCommit]);
       expect(rows['T16']!['implementation_commits'], isEmpty);
       for (final id in ['G-P0-01', 'H-UX-01', 'K-P1-01']) {
-        expect(rows[id]!['message_commits'], [multiFamilyCommit], reason: id);
+        expect(rows[id]!['subject_commits'], [multiFamilyCommit], reason: id);
       }
+      // Só o assunto dá rastro (direto, em faixa e pela família no escopo).
+      for (final id in ['T25', 'V-01', 'V-02', 'X-P0-01']) {
+        expect(rows[id]!['subject_commits'], [subjectServerCommit], reason: id);
+        expect(rows[id]!['body_only_commits'], isEmpty, reason: id);
+        expect(rows[id]!['implementation_commits'], [
+          subjectServerCommit,
+        ], reason: id);
+      }
+      // Um commit só de servidor que cita o ID só no corpo não é rastro.
+      for (final id in ['T23', 'Y-01', 'Y-02']) {
+        expect(rows[id]!['subject_commits'], isEmpty, reason: id);
+        expect(rows[id]!['body_only_commits'], [
+          subjectServerCommit,
+        ], reason: id);
+        expect(rows[id]!['implementation_commits'], isEmpty, reason: id);
+        expect(rows[id]!['ui_commits'], isEmpty, reason: id);
+      }
+      // Mas a menção só no corpo conta para a UI: falha fechada.
+      expect(rows['T24']!['body_only_commits'], [bodyUiCommit]);
+      expect(rows['T24']!['implementation_commits'], isEmpty);
+      expect(rows['T24']!['ui_commits'], [bodyUiCommit]);
+      expect(rows['T24']!['ui_paths_from_commits'], ['app/lib/corpo_ui.dart']);
+      // O arquivo movido para fora de app/lib pede a prova de UI.
+      expect(rows['T26']!['implementation_commits'], [renameCommit]);
+      expect(rows['T26']!['ui_paths_from_commits'], ['app/lib/movida.dart']);
       Map<String, Object> dep(String id, String classification, bool open) => {
         'id': id,
         'classification': classification,
@@ -410,15 +519,52 @@ void main() {
       expect(rows['T7']!['declares_open_items'], isTrue);
       expect(rows['T1']!['declares_open_items'], isFalse);
       expect(result['summary'], {
-        'pending': 31,
+        'pending': 40,
         'bloqueada_por_dependencia': 2,
         'commit_citado_fora_do_sha': 1,
-        'elegivel': 5,
-        'elegivel_com_prova_ui': 13,
+        'elegivel': 9,
+        'elegivel_com_prova_ui': 15,
         'elegivel_se_dependencia_subir': 4,
-        'elegivel_sem_rastro_de_ui': 5,
+        'elegivel_sem_rastro_de_ui': 8,
         'receipt_ausente_no_sha': 1,
       });
+    },
+  );
+
+  test(
+    'a lista não depende do log.diffMerges nem do diff.renames de quem roda',
+    () async {
+      final baseline = await evaluate(['--sha', head]);
+      for (final config in [
+        hostileConfig,
+        {'log.diffMerges': 'dense-combined'},
+        {'log.diffMerges': 'remerge'},
+        {'log.diffMerges': 'off'},
+        {'diff.renames': 'copies'},
+      ]) {
+        final result = await evaluate(['--sha', head], config: config);
+        final rows = {
+          for (final row in result['tasks'] as List<dynamic>)
+            (row as Map<String, dynamic>)['id']: row,
+        };
+        // O merge de UI citado continua mostrando o que trouxe.
+        expect(
+          rows['T15']!['classification'],
+          'elegivel_com_prova_ui',
+          reason: '$config',
+        );
+        expect(rows['T15']!['ui_paths_from_commits'], [
+          'app/lib/pr_ui.dart',
+        ], reason: '$config');
+        // O arquivo movido para fora de app/lib continua pedindo a prova.
+        expect(
+          rows['T26']!['classification'],
+          'elegivel_com_prova_ui',
+          reason: '$config',
+        );
+        expect(result['tasks'], baseline['tasks'], reason: '$config');
+        expect(result['summary'], baseline['summary'], reason: '$config');
+      }
     },
   );
 
@@ -571,6 +717,17 @@ void main() {
       contains('`T21` (`elegivel` nesta rodada, com pendência declarada)'),
     );
     expect(output, contains('sobe só se subir no mesmo receipt: T2'));
+    // O commit que só cita T23 no corpo não entra em "Commits da tarefa".
+    expect(
+      output,
+      contains(
+        '| `T23` | P0 CORE | `elegivel_sem_rastro_de_ui` | — | nenhum citado '
+        '| nenhum | sem commit da tarefa no SHA: a prova de UI não pode ser '
+        'dispensada sem citar os commits; citada só no corpo de '
+        '${subjectServerCommit.substring(0, 9)} (conta para a UI, não é '
+        'rastro) |',
+      ),
+    );
     expect(output, contains('`${serverCommit.substring(0, 9)}`'));
     expect(
       await git(['status', '--porcelain', '--untracked-files=all']),
@@ -582,7 +739,8 @@ void main() {
   });
 
   test(
-    'a confirmação do modelo de receipt lista o que um merge citado trouxe',
+    'a confirmação do modelo de receipt lista o que um merge trouxe e o '
+    'caminho antigo de um arquivo movido, com qualquer configuração',
     () async {
       final template =
           File(
@@ -597,15 +755,22 @@ void main() {
       ];
       expect(commands, hasLength(greaterThanOrEqualTo(2)));
       for (final command in commands) {
-        final listed = await git([
-          for (final arg in command.split(' '))
-            arg == '<commit>' ? uiMergeCommit : arg,
-        ]);
-        expect(
-          listed.split('\n'),
-          contains('app/lib/pr_ui.dart'),
-          reason: 'git $command',
-        );
+        for (final config in [const <String, String>{}, hostileConfig]) {
+          for (final (commit, uiPath) in [
+            (uiMergeCommit, 'app/lib/pr_ui.dart'),
+            (renameCommit, 'app/lib/movida.dart'),
+          ]) {
+            final listed = await git([
+              for (final arg in command.split(' '))
+                arg == '<commit>' ? commit : arg,
+            ], config: config);
+            expect(
+              listed.split('\n'),
+              contains(uiPath),
+              reason: 'git $command em $commit com $config',
+            );
+          }
+        }
       }
     },
   );
