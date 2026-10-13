@@ -2,9 +2,31 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
+import '../bin/sync_cards.dart' as sync_cards;
 import '../lib/sync_cards_utils.dart';
 
 void main() {
+  // BT-CAT-01 (migration 077, D-74): depois do dedupe a linha que fica pode estar em
+  // minúscula, e o MTGJSON manda o código em maiúscula. O conflito pelo código exato
+  // bateria no uq_sets_code_lower e derrubaria o lote de sets; o upsert resolve pelo
+  // índice em LOWER(code), e o sync exige esse índice antes de escrever. O
+  // comportamento contra um PostgreSQL descartável está em
+  // `lote_sets_dedupe_077_db_live_test.dart`.
+  test('o upsert de sets resolve o conflito pelo LOWER(code) da 077', () {
+    final source = File('bin/sync_cards.dart').readAsStringSync();
+    final upsert = RegExp(
+      r'INSERT INTO sets \(.*?ON CONFLICT \(([^)]*\)?)\) DO UPDATE',
+      dotAll: true,
+    ).allMatches(source).toList();
+
+    expect(upsert, hasLength(1));
+    expect(upsert.single.group(1), 'LOWER(code)');
+    expect(
+      sync_cards.syncCardsSchemaRequirements.indexes,
+      contains('uq_sets_code_lower'),
+    );
+  });
+
   test('incremental upsert never downgrades a direct CDN image', () {
     final source = File('bin/sync_cards.dart').readAsStringSync();
 

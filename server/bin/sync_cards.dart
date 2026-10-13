@@ -40,7 +40,13 @@ const syncCardsSchemaRequirements = SchemaRequirements(
       'is_reserved',
     },
   },
-  indexes: {'idx_cards_color_identity', 'idx_cards_keywords'},
+  // BT-CAT-01 (migration 077, D-74): o upsert de `sets` resolve o conflito pelo
+  // índice único em LOWER(code); sem ele (banco antes da 077), o sync para aqui.
+  indexes: {
+    'idx_cards_color_identity',
+    'idx_cards_keywords',
+    'uq_sets_code_lower',
+  },
 );
 
 const _setListUrl = 'https://mtgjson.com/api/v5/SetList.json';
@@ -103,7 +109,7 @@ Opcoes:
 
     // Baixa SetList.json UMA VEZ e reutiliza
     final setListData = await _fetchSetListData();
-    await _syncSetsFromData(pool, setListData);
+    await syncSetsFromData(pool, setListData);
 
     final meta = await _fetchMtgJsonMeta();
     final remoteVersion = (meta['version'] ?? '').toString().trim();
@@ -461,7 +467,11 @@ class _FullAtomicSyncResult {
 // SYNC DE SETS
 // ═══════════════════════════════════════════════════════════════════════
 
-Future<void> _syncSetsFromData(Pool pool, List<dynamic> setListData) async {
+/// Grava os sets do `SetList.json` do MTGJSON em `sets`, com o código em
+/// maiúscula. Um set que já existe com outra caixa (o dedupe da D-74 pode deixar a
+/// linha em minúscula) é atualizado, não duplicado: o conflito é pelo índice único
+/// `uq_sets_code_lower` da migration 077.
+Future<void> syncSetsFromData(Pool pool, List<dynamic> setListData) async {
   print('📋 Sincronizando ${setListData.length} sets...');
 
   final rows = <List<Object?>>[];
@@ -523,7 +533,7 @@ Future<void> _upsertSetRowsBatch(Pool pool, List<List<Object?>> rows) async {
     Sql.named('''
     INSERT INTO sets (${columns.join(', ')}, updated_at)
     VALUES ${valuesSql.join(', ')}
-    ON CONFLICT (code) DO UPDATE SET
+    ON CONFLICT (LOWER(code)) DO UPDATE SET
       name = EXCLUDED.name,
       release_date = EXCLUDED.release_date,
       type = EXCLUDED.type,

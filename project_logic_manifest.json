@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "279988c5f83362f24045014ff079cca933c218b578b17f188836e578b71705f8",
+  "source_digest_sha256": "4d55854ba58191bfa5eb1f6e381459e88feaaa682e1576ff27f9265e4967443d",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -71,7 +71,7 @@
     "semantic_resolved_files": 748,
     "semantic_unresolved_files": 0,
     "semantic_resolved_call_edges": 44756,
-    "semantic_resolved_call_sites": 70801,
+    "semantic_resolved_call_sites": 70802,
     "semantic_resolved_type_references": 17512,
     "modules": 164,
     "app_routes": 46,
@@ -79,10 +79,10 @@
     "api_routes": 125,
     "database_tables": 91,
     "database_views": 6,
-    "migrations": 74,
-    "scripts_and_jobs": 723,
-    "environment_variables": 738,
-    "tests": 1355,
+    "migrations": 75,
+    "scripts_and_jobs": 725,
+    "environment_variables": 741,
+    "tests": 1362,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 251,
@@ -21008,7 +21008,7 @@
       "name": "Migration",
       "kind": "class",
       "source": "server/bin/migrate.dart",
-      "line": 7634,
+      "line": 7691,
       "members": [
         "fullName"
       ]
@@ -21017,61 +21017,61 @@
       "name": "MigrationRollbackPolicy",
       "kind": "enum",
       "source": "server/bin/migrate.dart",
-      "line": 7698
+      "line": 7755
     },
     {
       "name": "_assertRollbackSafe",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7767
+      "line": 7824
     },
     {
       "name": "_printPreflightRefusal",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7848
+      "line": 7905
     },
     {
       "name": "hasMigrationLiveApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7654
+      "line": 7711
     },
     {
       "name": "hasMigrationWriteApproval",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7650
+      "line": 7707
     },
     {
       "name": "isLoopbackMigrationHost",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7658
+      "line": 7715
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7858
+      "line": 7915
     },
     {
       "name": "migrationDestinationViolation",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7665
+      "line": 7722
     },
     {
       "name": "migrationIdentities",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7843
+      "line": 7900
     },
     {
       "name": "migrationRollbackPolicy",
       "kind": "function",
       "source": "server/bin/migrate.dart",
-      "line": 7700
+      "line": 7757
     },
     {
       "name": "_assertPostMigration",
@@ -22798,121 +22798,121 @@
       "name": "_FullAtomicSyncResult",
       "kind": "class",
       "source": "server/bin/sync_cards.dart",
-      "line": 450
+      "line": 456
     },
     {
       "name": "_count",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 264
+      "line": 270
     },
     {
       "name": "_dedupeRowsByKey",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 688
+      "line": 698
     },
     {
       "name": "_downloadAtomicCards",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 385
+      "line": 391
     },
     {
       "name": "_fetchMtgJsonMeta",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 355
+      "line": 361
     },
     {
       "name": "_fetchSetJson",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 374
+      "line": 380
     },
     {
       "name": "_fetchSetListData",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 362
+      "line": 368
     },
     {
       "name": "_getSyncState",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 245
+      "line": 251
     },
     {
       "name": "_httpGetWithRetry",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 269
+      "line": 275
     },
     {
       "name": "_loadCardIdMapForOracleIds",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 750
+      "line": 760
     },
     {
       "name": "_logSync",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 315
+      "line": 321
     },
     {
       "name": "_setSyncState",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 254
+      "line": 260
     },
     {
       "name": "_syncFullAtomicFast",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 406
-    },
-    {
-      "name": "_syncSetsFromData",
-      "kind": "function",
-      "source": "server/bin/sync_cards.dart",
-      "line": 464
+      "line": 412
     },
     {
       "name": "_upsertCardRowsBatch",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 575
+      "line": 585
     },
     {
       "name": "_upsertCardsFromSet",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 543
+      "line": 553
     },
     {
       "name": "_upsertLegalitiesFromSet",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 705
+      "line": 715
     },
     {
       "name": "_upsertLegalityRowsBatch",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 783
+      "line": 793
     },
     {
       "name": "_upsertSetRowsBatch",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 496
+      "line": 506
     },
     {
       "name": "main",
       "kind": "function",
       "source": "server/bin/sync_cards.dart",
-      "line": 63
+      "line": 69
+    },
+    {
+      "name": "syncSetsFromData",
+      "kind": "function",
+      "source": "server/bin/sync_cards.dart",
+      "line": 470
     },
     {
       "name": "ComboSnapshotMetadata",
@@ -36382,115 +36382,115 @@
       "name": "_validBattleLiveHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1026
+      "line": 1028
     },
     {
       "name": "_validInteractiveBattleHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1292
+      "line": 1294
     },
     {
       "name": "buildReadinessResponseBody",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1763
+      "line": 1765
     },
     {
       "name": "disabledReleaseCapabilityReadinessCheck",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1750
+      "line": 1752
     },
     {
       "name": "evaluateAiJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 742
+      "line": 744
     },
     {
       "name": "evaluateAiRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1662
+      "line": 1664
     },
     {
       "name": "evaluateBattleJobSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 837
+      "line": 839
     },
     {
       "name": "evaluateBattleJobWorkerReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1326
+      "line": 1328
     },
     {
       "name": "evaluateBattleLiveSpectatorReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 940
+      "line": 942
     },
     {
       "name": "evaluateBattleRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1525
+      "line": 1527
     },
     {
       "name": "evaluateCollectionAvailabilitySchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1393
+      "line": 1395
     },
     {
       "name": "evaluateDeckValidationSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1495
+      "line": 1497
     },
     {
       "name": "evaluateInteractiveBattleReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1203
+      "line": 1205
     },
     {
       "name": "evaluateReleaseCapabilityRuntimeReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1682
+      "line": 1684
     },
     {
       "name": "evaluateReleaseSchemaReadiness",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 667
+      "line": 669
     },
     {
       "name": "probeBattleLiveSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 931
+      "line": 933
     },
     {
       "name": "probeBattleSidecarHealth",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1633
+      "line": 1635
     },
     {
       "name": "probeInteractiveBattleSchema",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1194
+      "line": 1196
     },
     {
       "name": "readinessStatusCode",
       "kind": "function",
       "source": "server/lib/health_readiness_support.dart",
-      "line": 1781
+      "line": 1783
     },
     {
       "name": "apiError",
@@ -44141,7 +44141,7 @@
     },
     "files_with_error_diagnostics": [],
     "resolved_call_edge_count": 44756,
-    "resolved_call_site_count": 70801,
+    "resolved_call_site_count": 70802,
     "workspace_call_edge_count": 14297,
     "unresolved_call_edge_count": 544,
     "unresolved_call_site_count": 763,
@@ -120672,11 +120672,11 @@
         "target": "Migration.Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 74
+        "occurrences": 75
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7679,
+        "line": 7736,
         "caller": "migrationDestinationViolation",
         "kind": "method",
         "lexical_target": "isLoopbackMigrationHost",
@@ -120687,7 +120687,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7768,
+        "line": 7825,
         "caller": "_assertRollbackSafe",
         "kind": "method",
         "lexical_target": "migrationRollbackPolicy",
@@ -120698,7 +120698,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7897,
+        "line": 7954,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationWriteApproval",
@@ -120709,7 +120709,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7898,
+        "line": 7955,
         "caller": "main",
         "kind": "method",
         "lexical_target": "hasMigrationLiveApproval",
@@ -120720,7 +120720,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7909,
+        "line": 7966,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -120731,7 +120731,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7912,
+        "line": 7969,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationDestinationViolation",
@@ -120742,7 +120742,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7941,
+        "line": 7998,
         "caller": "main",
         "kind": "method",
         "lexical_target": "runMigrationPreflight",
@@ -120753,7 +120753,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7943,
+        "line": 8000,
         "caller": "main",
         "kind": "method",
         "lexical_target": "migrationIdentities",
@@ -120764,7 +120764,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7945,
+        "line": 8002,
         "caller": "main",
         "kind": "method",
         "lexical_target": "toJson",
@@ -120775,7 +120775,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7988,
+        "line": 8045,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_printPreflightRefusal",
@@ -120786,7 +120786,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 8030,
+        "line": 8087,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_assertRollbackSafe",
@@ -120797,7 +120797,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 8031,
+        "line": 8088,
         "caller": "main",
         "kind": "method",
         "lexical_target": "splitPostgresStatements",
@@ -125934,7 +125934,18 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 105,
+        "line": 104,
+        "caller": "main",
+        "kind": "method",
+        "lexical_target": "requireSchemaObjects",
+        "target": "requireSchemaObjects",
+        "target_library": "package:server/schema_requirements.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/bin/sync_cards.dart",
+        "line": 111,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_fetchSetListData",
@@ -125945,18 +125956,18 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 106,
+        "line": 112,
         "caller": "main",
         "kind": "method",
-        "lexical_target": "_syncSetsFromData",
-        "target": "_syncSetsFromData",
+        "lexical_target": "syncSetsFromData",
+        "target": "syncSetsFromData",
         "target_library": "workspace:server/bin/sync_cards.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 108,
+        "line": 114,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_fetchMtgJsonMeta",
@@ -125967,7 +125978,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 112,
+        "line": 118,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_getSyncState",
@@ -125978,7 +125989,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 128,
+        "line": 134,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_count",
@@ -125989,7 +126000,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 143,
+        "line": 149,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_downloadAtomicCards",
@@ -126000,7 +126011,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 146,
+        "line": 152,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_syncFullAtomicFast",
@@ -126011,7 +126022,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 152,
+        "line": 158,
         "caller": "main",
         "kind": "method",
         "lexical_target": "getNewSetCodesSinceFromData",
@@ -126022,7 +126033,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 168,
+        "line": 174,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_fetchSetJson",
@@ -126033,7 +126044,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 174,
+        "line": 180,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_upsertCardsFromSet",
@@ -126044,7 +126055,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 175,
+        "line": 181,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_upsertLegalitiesFromSet",
@@ -126055,7 +126066,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 183,
+        "line": 189,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_setSyncState",
@@ -126066,7 +126077,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 191,
+        "line": 197,
         "caller": "main",
         "kind": "method",
         "lexical_target": "_logSync",
@@ -126077,7 +126088,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 237,
+        "line": 243,
         "caller": "main",
         "kind": "method",
         "lexical_target": "close",
@@ -126099,7 +126110,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 356,
+        "line": 362,
         "caller": "_fetchMtgJsonMeta",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126110,7 +126121,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 365,
+        "line": 371,
         "caller": "_fetchSetListData",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126121,7 +126132,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 376,
+        "line": 382,
         "caller": "_fetchSetJson",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126132,7 +126143,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 395,
+        "line": 401,
         "caller": "_downloadAtomicCards",
         "kind": "method",
         "lexical_target": "_httpGetWithRetry",
@@ -126143,7 +126154,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 443,
+        "line": 449,
         "caller": "_syncFullAtomicFast",
         "kind": "constructor",
         "lexical_target": "_FullAtomicSyncResult",
@@ -126154,8 +126165,8 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 470,
-        "caller": "_syncSetsFromData",
+        "line": 480,
+        "caller": "syncSetsFromData",
         "kind": "method",
         "lexical_target": "normalizeMtgSetCode",
         "target": "normalizeMtgSetCode",
@@ -126165,8 +126176,8 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 489,
-        "caller": "_syncSetsFromData",
+        "line": 499,
+        "caller": "syncSetsFromData",
         "kind": "method",
         "lexical_target": "_dedupeRowsByKey",
         "target": "_dedupeRowsByKey",
@@ -126176,8 +126187,8 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 492,
-        "caller": "_syncSetsFromData",
+        "line": 502,
+        "caller": "syncSetsFromData",
         "kind": "method",
         "lexical_target": "_upsertSetRowsBatch",
         "target": "_upsertSetRowsBatch",
@@ -126187,7 +126198,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 549,
+        "line": 559,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "normalizeMtgSetCode",
@@ -126198,7 +126209,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 552,
+        "line": 562,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -126209,7 +126220,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 556,
+        "line": 566,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "extractSetCardSyncRow",
@@ -126220,7 +126231,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 559,
+        "line": 569,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "_dedupeRowsByKey",
@@ -126231,7 +126242,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 564,
+        "line": 574,
         "caller": "_upsertCardsFromSet",
         "kind": "method",
         "lexical_target": "_upsertCardRowsBatch",
@@ -126242,7 +126253,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 721,
+        "line": 731,
         "caller": "_upsertLegalitiesFromSet",
         "kind": "method",
         "lexical_target": "_loadCardIdMapForOracleIds",
@@ -126253,7 +126264,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 739,
+        "line": 749,
         "caller": "_upsertLegalitiesFromSet",
         "kind": "method",
         "lexical_target": "_dedupeRowsByKey",
@@ -126264,7 +126275,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 744,
+        "line": 754,
         "caller": "_upsertLegalitiesFromSet",
         "kind": "method",
         "lexical_target": "_upsertLegalityRowsBatch",
@@ -126275,7 +126286,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 756,
+        "line": 766,
         "caller": "_loadCardIdMapForOracleIds",
         "kind": "method",
         "lexical_target": "hasCardIdentityColumns",
@@ -126286,7 +126297,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 84,
+        "line": 90,
         "caller": "main",
         "kind": "method",
         "lexical_target": "parseSinceDays",
@@ -126297,7 +126308,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 86,
+        "line": 92,
         "caller": "main",
         "kind": "method",
         "lexical_target": "loadRuntimeEnvironment",
@@ -126308,7 +126319,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 92,
+        "line": 98,
         "caller": "main",
         "kind": "constructor",
         "lexical_target": "Database",
@@ -126319,23 +126330,12 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 93,
+        "line": 99,
         "caller": "main",
         "kind": "method",
         "lexical_target": "connect",
         "target": "Database.connect",
         "target_library": "package:server/database.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/bin/sync_cards.dart",
-        "line": 98,
-        "caller": "main",
-        "kind": "method",
-        "lexical_target": "requireSchemaObjects",
-        "target": "requireSchemaObjects",
-        "target_library": "package:server/schema_requirements.dart",
         "target_scope": "workspace",
         "occurrences": 1
       },
@@ -169406,7 +169406,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1001,
+        "line": 1003,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "_validBattleLiveHealth",
@@ -169417,7 +169417,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1216,
+        "line": 1218,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleReadiness",
@@ -169428,7 +169428,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1246,
+        "line": 1248,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "constructor",
         "lexical_target": "InteractiveBattleConfiguration.fromEnvironment",
@@ -169439,7 +169439,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1255,
+        "line": 1257,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -169450,7 +169450,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1264,
+        "line": 1266,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "method",
         "lexical_target": "_validInteractiveBattleHealth",
@@ -169461,7 +169461,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1337,
+        "line": 1339,
         "caller": "evaluateBattleJobWorkerReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobWorkerReadiness",
@@ -169472,7 +169472,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1402,
+        "line": 1404,
         "caller": "evaluateCollectionAvailabilitySchemaReadiness",
         "kind": "constructor",
         "lexical_target": "CollectionAvailabilitySchemaReadiness",
@@ -169483,7 +169483,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1505,
+        "line": 1507,
         "caller": "evaluateDeckValidationSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "DeckValidationSchemaReadiness",
@@ -169494,7 +169494,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1535,
+        "line": 1537,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -169505,7 +169505,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1551,
+        "line": 1553,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "BattleRuntimeReadiness",
@@ -169516,7 +169516,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1596,
+        "line": 1598,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -169527,7 +169527,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1663,
+        "line": 1665,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "OpenAiRuntimeConfig",
@@ -169538,7 +169538,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1669,
+        "line": 1671,
         "caller": "evaluateAiRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "AiRuntimeReadiness",
@@ -169549,7 +169549,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1694,
+        "line": 1696,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -169560,7 +169560,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1695,
+        "line": 1697,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleJobWorkerReadiness",
@@ -169571,7 +169571,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1699,
+        "line": 1701,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleRuntimeReadiness",
@@ -169582,7 +169582,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1703,
+        "line": 1705,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "disabledReleaseCapabilityReadinessCheck",
@@ -169593,7 +169593,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1715,
+        "line": 1717,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateAiRuntimeReadiness",
@@ -169604,7 +169604,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1726,
+        "line": 1728,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateBattleLiveSpectatorReadiness",
@@ -169615,7 +169615,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1737,
+        "line": 1739,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "method",
         "lexical_target": "evaluateInteractiveBattleReadiness",
@@ -169626,7 +169626,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1747,
+        "line": 1749,
         "caller": "evaluateReleaseCapabilityRuntimeReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseCapabilityRuntimeReadiness",
@@ -169637,7 +169637,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1754,
+        "line": 1756,
         "caller": "disabledReleaseCapabilityReadinessCheck",
         "kind": "method",
         "lexical_target": "entry",
@@ -169648,7 +169648,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 675,
+        "line": 677,
         "caller": "evaluateReleaseSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "ReleaseSchemaReadiness",
@@ -169659,7 +169659,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 750,
+        "line": 752,
         "caller": "evaluateAiJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "AiJobSchemaReadiness",
@@ -169670,7 +169670,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 847,
+        "line": 849,
         "caller": "evaluateBattleJobSchemaReadiness",
         "kind": "constructor",
         "lexical_target": "BattleJobSchemaReadiness",
@@ -169681,7 +169681,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 947,
+        "line": 949,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "battleLiveSpectatorEnabledValue",
@@ -169692,7 +169692,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 953,
+        "line": 955,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleLiveSpectatorReadiness",
@@ -169703,7 +169703,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 977,
+        "line": 979,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "constructor",
         "lexical_target": "BattleEngineConfig.fromEnvironment",
@@ -169714,7 +169714,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 994,
+        "line": 996,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "method",
         "lexical_target": "externalBattleIdentityValidationError",
@@ -206298,7 +206298,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 10,
-        "occurrences": 86
+        "occurrences": 87
       },
       {
         "target_scope": "workspace",
@@ -210250,7 +210250,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 694,
+        "line": 704,
         "caller": "_dedupeRowsByKey",
         "kind": "function_expression",
         "lexical_target": "keyOf",
@@ -210778,7 +210778,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1251,
+        "line": 1253,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -210786,7 +210786,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1253,
+        "line": 1255,
         "caller": "evaluateInteractiveBattleReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -210794,7 +210794,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1583,
+        "line": 1585,
         "caller": "evaluateBattleRuntimeReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -210802,7 +210802,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 968,
+        "line": 970,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "schemaProbe",
@@ -210810,7 +210810,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 992,
+        "line": 994,
         "caller": "evaluateBattleLiveSpectatorReadiness",
         "kind": "function_expression",
         "lexical_target": "probe",
@@ -235280,11 +235280,11 @@
         "target": "Migration",
         "target_library": "workspace:server/bin/migrate.dart",
         "target_scope": "workspace",
-        "occurrences": 77
+        "occurrences": 78
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7700,
+        "line": 7757,
         "lexical_type": "MigrationRollbackPolicy",
         "resolved_type": "MigrationRollbackPolicy",
         "target": "MigrationRollbackPolicy",
@@ -235294,7 +235294,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7843,
+        "line": 7900,
         "lexical_type": "MigrationIdentity",
         "resolved_type": "({String name, String version})",
         "target": "MigrationIdentity",
@@ -235304,7 +235304,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7848,
+        "line": 7905,
         "lexical_type": "MigrationPreflightResult",
         "resolved_type": "MigrationPreflightResult",
         "target": "MigrationPreflightResult",
@@ -236034,7 +236034,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 406,
+        "line": 412,
         "lexical_type": "_FullAtomicSyncResult",
         "resolved_type": "_FullAtomicSyncResult",
         "target": "_FullAtomicSyncResult",
@@ -236044,7 +236044,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 92,
+        "line": 98,
         "lexical_type": "Database",
         "resolved_type": "Database",
         "target": "Database",
@@ -243524,7 +243524,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1203,
+        "line": 1205,
         "lexical_type": "InteractiveBattleReadiness",
         "resolved_type": "InteractiveBattleReadiness",
         "target": "InteractiveBattleReadiness",
@@ -243534,7 +243534,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1207,
+        "line": 1209,
         "lexical_type": "InteractiveBattleSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "InteractiveBattleSchemaProbe",
@@ -243544,7 +243544,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1246,
+        "line": 1248,
         "lexical_type": "InteractiveBattleConfiguration",
         "resolved_type": "InteractiveBattleConfiguration",
         "target": "InteractiveBattleConfiguration",
@@ -243554,7 +243554,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1326,
+        "line": 1328,
         "lexical_type": "BattleJobWorkerReadiness",
         "resolved_type": "BattleJobWorkerReadiness",
         "target": "BattleJobWorkerReadiness",
@@ -243564,7 +243564,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1393,
+        "line": 1395,
         "lexical_type": "CollectionAvailabilitySchemaReadiness",
         "resolved_type": "CollectionAvailabilitySchemaReadiness",
         "target": "CollectionAvailabilitySchemaReadiness",
@@ -243574,7 +243574,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1495,
+        "line": 1497,
         "lexical_type": "DeckValidationSchemaReadiness",
         "resolved_type": "DeckValidationSchemaReadiness",
         "target": "DeckValidationSchemaReadiness",
@@ -243584,7 +243584,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1529,
+        "line": 1531,
         "lexical_type": "BattleRuntimeReadiness",
         "resolved_type": "BattleRuntimeReadiness",
         "target": "BattleRuntimeReadiness",
@@ -243594,7 +243594,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1550,
+        "line": 1552,
         "lexical_type": "BattleEngineConfigurationException",
         "resolved_type": "BattleEngineConfigurationException",
         "target": "BattleEngineConfigurationException",
@@ -243604,7 +243604,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1662,
+        "line": 1664,
         "lexical_type": "AiRuntimeReadiness",
         "resolved_type": "AiRuntimeReadiness",
         "target": "AiRuntimeReadiness",
@@ -243614,7 +243614,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1663,
+        "line": 1665,
         "lexical_type": "OpenAiRuntimeConfig",
         "resolved_type": "OpenAiRuntimeConfig",
         "target": "OpenAiRuntimeConfig",
@@ -243624,7 +243624,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1685,
+        "line": 1687,
         "lexical_type": "ReleaseCapabilityRuntimeReadiness",
         "resolved_type": "ReleaseCapabilityRuntimeReadiness",
         "target": "ReleaseCapabilityRuntimeReadiness",
@@ -243634,7 +243634,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 1687,
+        "line": 1689,
         "lexical_type": "ReleaseCapabilityPolicy",
         "resolved_type": "ReleaseCapabilityPolicy",
         "target": "ReleaseCapabilityPolicy",
@@ -243644,7 +243644,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 667,
+        "line": 669,
         "lexical_type": "ReleaseSchemaReadiness",
         "resolved_type": "ReleaseSchemaReadiness",
         "target": "ReleaseSchemaReadiness",
@@ -243654,7 +243654,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 742,
+        "line": 744,
         "lexical_type": "AiJobSchemaReadiness",
         "resolved_type": "AiJobSchemaReadiness",
         "target": "AiJobSchemaReadiness",
@@ -243664,7 +243664,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 837,
+        "line": 839,
         "lexical_type": "BattleJobSchemaReadiness",
         "resolved_type": "BattleJobSchemaReadiness",
         "target": "BattleJobSchemaReadiness",
@@ -243674,7 +243674,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 940,
+        "line": 942,
         "lexical_type": "BattleLiveSpectatorReadiness",
         "resolved_type": "BattleLiveSpectatorReadiness",
         "target": "BattleLiveSpectatorReadiness",
@@ -243684,7 +243684,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 943,
+        "line": 945,
         "lexical_type": "BattleSidecarProbe",
         "resolved_type": "Future<Map<String, dynamic>?> Function(String, Uri)",
         "target": "BattleSidecarProbe",
@@ -243694,7 +243694,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 944,
+        "line": 946,
         "lexical_type": "BattleLiveSchemaProbe",
         "resolved_type": "Future<bool> Function(Pool<dynamic>?)",
         "target": "BattleLiveSchemaProbe",
@@ -243704,7 +243704,7 @@
       },
       {
         "source": "server/lib/health_readiness_support.dart",
-        "line": 977,
+        "line": 979,
         "lexical_type": "BattleEngineConfig",
         "resolved_type": "BattleEngineConfig",
         "target": "BattleEngineConfig",
@@ -253112,7 +253112,7 @@
         "target_scope": "workspace",
         "target_library": "workspace:server/bin/migrate.dart",
         "unique_references": 2,
-        "occurrences": 78
+        "occurrences": 79
       },
       {
         "target_scope": "workspace",
@@ -254522,7 +254522,7 @@
       },
       {
         "source": "server/bin/migrate.dart",
-        "line": 7767,
+        "line": 7824,
         "lexical_type": "void",
         "occurrences": 3
       },
@@ -254708,7 +254708,7 @@
       },
       {
         "source": "server/bin/sync_cards.dart",
-        "line": 63,
+        "line": 69,
         "lexical_type": "void",
         "occurrences": 7
       },
@@ -269071,6 +269071,7 @@
         "app/integration_test/sets_catalog_runtime_test.dart",
         "app/integration_test/sets_search_catalog_runtime_test.dart",
         "app/test/features/collection/sets_catalog_screen_test.dart",
+        "server/test/lote_sets_dedupe_077_db_live_test.dart",
         "server/test/sets_route_test.dart"
       ],
       "method_contract": "source"
@@ -269316,8 +269317,8 @@
       "server/bin/migrate.dart",
       "server/bin/migration_038_040_isolated_support.dart"
     ],
-    "migration_count": 74,
-    "latest_migration": "076",
+    "migration_count": 75,
+    "latest_migration": "077",
     "migrations": [
       {
         "version": "001",
@@ -269687,6 +269688,11 @@
       {
         "version": "076",
         "name": "align_message_and_trade_history_user_fks",
+        "source": "server/bin/migrate.dart"
+      },
+      {
+        "version": "077",
+        "name": "enforce_unique_lower_set_code",
         "source": "server/bin/migrate.dart"
       }
     ],
@@ -280937,6 +280943,12 @@
       "environment_variables": []
     },
     {
+      "path": "scripts/lib/manaloom_backend_rollback_guard.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": []
+    },
+    {
       "path": "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
       "role": "battle",
       "mutation_class": "read_only_or_unknown",
@@ -281010,6 +281022,14 @@
     },
     {
       "path": "scripts/lib/manaloom_ops_jobs_contract.sh",
+      "role": "operation",
+      "mutation_class": "guarded_or_review_required",
+      "environment_variables": [
+        "TMPDIR"
+      ]
+    },
+    {
+      "path": "scripts/lib/manaloom_proxy_body_ceiling.sh",
       "role": "operation",
       "mutation_class": "guarded_or_review_required",
       "environment_variables": [
@@ -281421,6 +281441,7 @@
       "role": "release",
       "mutation_class": "guarded_or_review_required",
       "environment_variables": [
+        "DATABASE_LATEST_MIGRATION",
         "EASYPANEL_APP_NAME",
         "EASYPANEL_BASE_URL",
         "EASYPANEL_PROJECT_NAME",
@@ -281458,6 +281479,8 @@
         "PASSWORD_RESET_APP_URL",
         "PASSWORD_RESET_WEBHOOK_TOKEN",
         "PASSWORD_RESET_WEBHOOK_URL",
+        "PREVIOUS_GIT_SHA",
+        "PREVIOUS_REQUIRED_MIGRATION",
         "RESEND_API_KEY",
         "RESEND_FROM_EMAIL",
         "RESEND_FROM_NAME",
@@ -284439,6 +284462,14 @@
       "classification": "configuration",
       "sources": [
         "server/bin/auto_sync_learned_decks.py"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "DATABASE_LATEST_MIGRATION",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
       ],
       "value_captured": false
     },
@@ -289775,6 +289806,22 @@
       "value_captured": false
     },
     {
+      "name": "PREVIOUS_GIT_SHA",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
+      ],
+      "value_captured": false
+    },
+    {
+      "name": "PREVIOUS_REQUIRED_MIGRATION",
+      "classification": "configuration",
+      "sources": [
+        "scripts/manaloom_deploy_backend_image.sh"
+      ],
+      "value_captured": false
+    },
+    {
       "name": "PROJECT",
       "classification": "configuration",
       "sources": [
@@ -290453,6 +290500,7 @@
       "classification": "configuration",
       "sources": [
         "scripts/lib/manaloom_ops_jobs_contract.sh",
+        "scripts/lib/manaloom_proxy_body_ceiling.sh",
         "scripts/manaloom_authenticated_visual_qa_isolated.sh",
         "scripts/manaloom_backup_cycle.sh",
         "scripts/manaloom_battle_learning_visual_qa.sh",
@@ -291761,6 +291809,7 @@
     "server/test/authenticated_visual_fixture_contract_test.dart",
     "server/test/auto_promote_learned_decks_test.py",
     "server/test/auto_sync_learned_decks_test.py",
+    "server/test/backend_rollback_guard_test.py",
     "server/test/backup_cadence_test.py",
     "server/test/backup_cycle_db_live_test.py",
     "server/test/basic_land_utils_test.dart",
@@ -291995,6 +292044,10 @@
     "server/test/lorehold_candidate_patch_contract_test.dart",
     "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
     "server/test/lot_migrations_step_test.py",
+    "server/test/lote_binder_unique_index_drop_db_live_test.dart",
+    "server/test/lote_d85_corrections_db_live_test.dart",
+    "server/test/lote_scripts_contract_test.dart",
+    "server/test/lote_sets_dedupe_077_db_live_test.dart",
     "server/test/magic_rules_source_test.dart",
     "server/test/manaloom_battle_product_e2e_audit_test.py",
     "server/test/manaloom_battle_strategy_audit_runner_test.py",
@@ -292127,6 +292180,7 @@
     "server/test/production_shape_adoption_db_live_test.dart",
     "server/test/production_shape_adoption_test.dart",
     "server/test/profile_community_live_test.dart",
+    "server/test/proxy_body_ceiling_test.py",
     "server/test/public_error_contract_test.dart",
     "server/test/public_error_db_live_test.dart",
     "server/test/public_error_e2e_live_test.dart",
@@ -292183,6 +292237,7 @@
     "server/test/semantic_layer_v2_backfill_preflight_test.dart",
     "server/test/semantic_layer_v2_backfill_source_test.dart",
     "server/test/semantic_tag_query_contract_test.dart",
+    "server/test/set_code_unique_migration_test.dart",
     "server/test/sets_route_test.dart",
     "server/test/shareable_report_deleted_deck_db_live_test.dart",
     "server/test/shareable_report_deleted_deck_test.dart",
@@ -293053,6 +293108,9 @@
         "server/test/data_model_migration_test.dart",
         "server/test/active_user_trigger_rule_test.dart",
         "server/test/production_shape_adoption_test.dart",
+        "server/test/lote_scripts_contract_test.dart",
+        "server/test/proxy_body_ceiling_test.py",
+        "server/test/backend_rollback_guard_test.py",
         "server/test/release_capability_policy_test.dart",
         "app/test/core/config/release_capabilities_test.dart",
         "app/test/core/config/release_capability_surface_contract_test.dart",
@@ -303871,7 +303929,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "279988c5f83362f24045014ff079cca933c218b578b17f188836e578b71705f8"
+    "project_logic_source_digest_sha256": "4d55854ba58191bfa5eb1f6e381459e88feaaa682e1576ff27f9265e4967443d"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -306074,6 +306132,7 @@
       "scripts/dev_full_with_integration.sh",
       "scripts/flutter_run_with_local_sentry.sh",
       "scripts/generate_brewtact_brand_assets.py",
+      "scripts/lib/manaloom_backend_rollback_guard.sh",
       "scripts/lib/manaloom_captura_battle_coach_keyboard.py",
       "scripts/lib/manaloom_captura_card_details_navigation.py",
       "scripts/lib/manaloom_captura_optimization_card_reader.py",
@@ -306084,6 +306143,7 @@
       "scripts/lib/manaloom_flutter_release_sdk.sh",
       "scripts/lib/manaloom_mutation_guard.sh",
       "scripts/lib/manaloom_ops_jobs_contract.sh",
+      "scripts/lib/manaloom_proxy_body_ceiling.sh",
       "scripts/lib/manaloom_public_web_surface_contract.sh",
       "scripts/lib/manaloom_release_capabilities_contract.sh",
       "scripts/lib/manaloom_release_runtime_contract.sh",
@@ -306841,6 +306901,7 @@
       "server/test/authenticated_visual_fixture_contract_test.dart",
       "server/test/auto_promote_learned_decks_test.py",
       "server/test/auto_sync_learned_decks_test.py",
+      "server/test/backend_rollback_guard_test.py",
       "server/test/backup_cadence_test.py",
       "server/test/backup_cycle_db_live_test.py",
       "server/test/basic_land_utils_test.dart",
@@ -307075,6 +307136,10 @@
       "server/test/lorehold_candidate_patch_contract_test.dart",
       "server/test/lorehold_challenger_pg878_runtime_completion_source_test.dart",
       "server/test/lot_migrations_step_test.py",
+      "server/test/lote_binder_unique_index_drop_db_live_test.dart",
+      "server/test/lote_d85_corrections_db_live_test.dart",
+      "server/test/lote_scripts_contract_test.dart",
+      "server/test/lote_sets_dedupe_077_db_live_test.dart",
       "server/test/magic_rules_source_test.dart",
       "server/test/manaloom_battle_product_e2e_audit_test.py",
       "server/test/manaloom_battle_strategy_audit_runner_test.py",
@@ -307207,6 +307272,7 @@
       "server/test/production_shape_adoption_db_live_test.dart",
       "server/test/production_shape_adoption_test.dart",
       "server/test/profile_community_live_test.dart",
+      "server/test/proxy_body_ceiling_test.py",
       "server/test/public_error_contract_test.dart",
       "server/test/public_error_db_live_test.dart",
       "server/test/public_error_e2e_live_test.dart",
@@ -307263,6 +307329,7 @@
       "server/test/semantic_layer_v2_backfill_preflight_test.dart",
       "server/test/semantic_layer_v2_backfill_source_test.dart",
       "server/test/semantic_tag_query_contract_test.dart",
+      "server/test/set_code_unique_migration_test.dart",
       "server/test/sets_route_test.dart",
       "server/test/shareable_report_deleted_deck_db_live_test.dart",
       "server/test/shareable_report_deleted_deck_test.dart",

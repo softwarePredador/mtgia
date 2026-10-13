@@ -9,9 +9,14 @@
 #   scripts/manaloom_lot_apply_migrations.sh --execute --read-ledger --out L
 #       lê o ledger do banco só para leitura e grava o snapshot que a promoção
 #       pede em --schema-snapshot (vale 30 minutos; L não pode existir)
+#   scripts/manaloom_lot_apply_migrations.sh --execute --preview [--policy P]
+#       a prévia dos passos antes da primeira migration (o dedupe da D-74): faz e
+#       desfaz (ROLLBACK) e imprime as contagens que o --apply exige em --esperado
 #   scripts/manaloom_lot_apply_migrations.sh --execute --apply --receipt-dir D
-#       --backup-receipt B --upgrade-rehearsal E [--policy P]
-#       aplica o lote e grava o receipt com o ledger de antes e o de depois
+#       --backup-receipt B --upgrade-rehearsal E --esperado PASSO:OBJETO=N ...
+#       [--policy P]
+#       roda os passos antes da primeira migration com as contagens da prévia, aplica o
+#       lote e grava o receipt com os passos e o ledger de antes e o de depois
 #
 # O lote vem de server/config/lot_migrations.json: a migration em que o banco tem de
 # estar (from), as do lote em ordem numérica e as que vão juntas (same_lot: a 074 com
@@ -28,7 +33,19 @@
 #     scripts/manaloom_migration_rehearsal.py --restore completo com resultado PASS,
 #     sobre o dump desse backup (o mesmo SHA-256);
 #   - ledger fora do from, com lacuna ou com versão de outro código (inclusive o lote
-#     já aplicado).
+#     já aplicado);
+#   - um script de server/sql/lote/ que uma migration do lote pede no código e que o
+#     lote não roda antes da primeira migration (before_first_migration: a 077 pede o
+#     dedupe da D-74), ou que não segue o contrato do lote; e, no --apply, uma contagem
+#     esperada que falta ou que o script não declara (código 2).
+# Antes da primeira migration (D-74): depois da conferência do ledger, com o banco ainda
+# no from e o backend antigo no ar (fora da janela de 503), cada passo de
+# before_first_migration roda pelo server/bin/with_new_server_pg.sh --write-approved
+# psql -X -v ON_ERROR_STOP=1, numa transação. No --preview, sem -v aplicar: faz, imprime
+# antes, ação e depois e desfaz (ROLLBACK). No --apply, com -v aplicar=1 e cada
+# -v esperado_<objeto>=<n> de --esperado: o script recusa (RAISE, nada gravado) se a ação
+# não bater, e o passo para antes do migrate (código 3). A saída vai para o log do lote e
+# o resultado de cada passo para o receipt.
 # Aplicação: server/bin/with_new_server_pg.sh --write-approved dart run
 # bin/migrate.dart --target <última>, a partir de server/. O migrate.dart aplica em
 # ordem numérica, cada migration numa transação com o seu registro no ledger, e para
@@ -37,9 +54,11 @@
 # banco (current_database() e o system_identifier do cluster). Depois, o ledger tem de
 # ser o de antes mais o lote, no mesmo banco.
 #
-# O --apply exige MANALOOM_CONFIRM_LIVE_MUTATIONS e MANALOOM_CONFIRM_POSTGRES_WRITES de
-# quem chama, o checkout limpo no origin/master (o mesmo SHA que a promoção sobe), as
-# provas B e E e um --receipt-dir durável: fora de /tmp, de worktree temporária e do
+# O --apply e o --preview exigem MANALOOM_CONFIRM_LIVE_MUTATIONS e
+# MANALOOM_CONFIRM_POSTGRES_WRITES de quem chama (a prévia escreve e desfaz) e o checkout
+# limpo no origin/master (o mesmo SHA que a promoção sobe). O --apply exige ainda as
+# provas B e E, as contagens da prévia e um --receipt-dir durável: fora de /tmp, de
+# worktree temporária e do
 # repositório (deste checkout e dos outros worktrees dele). O wrapper exige a âncora
 # do host (MANALOOM_EXPECTED_SSH_HOST_KEY_SHA256) e lê só as chaves do banco do
 # server/.env. No diretório ficam o receipt (lote-migrations-<sha>-<carimbo>-<pid>.json),
@@ -53,9 +72,10 @@
 # dump do L-01 (docs/runbooks/BACKUP_E_RESTAURACAO.md), e a promoção recusa voltar o
 # backend para uma imagem que exige outra migration (S-02).
 #
-# Códigos: 0 aplicado e conferido (ou plano PASS); 1 o migrate.dart falhou ou o ledger
-# de depois não é o esperado (o receipt diz onde parou); 2 entrada ou ambiente
-# recusado, nada mudou; 3 BLOCKED pelo plano, pelas provas ou pelo ledger, nada mudou.
+# Códigos: 0 aplicado e conferido (ou plano PASS, ou prévia feita); 1 o migrate.dart ou
+# um passo falhou sem dizer que nada gravou, ou o ledger de depois não é o esperado (o
+# receipt diz onde parou); 2 entrada ou ambiente recusado, nada mudou; 3 BLOCKED pelo
+# plano, pelas provas, pelo ledger ou pela recusa de um passo, nada mudou.
 set -euo pipefail
 umask 077
 
@@ -71,6 +91,8 @@ RECEIPT_DIR=""
 OUT=""
 BACKUP_RECEIPT=""
 UPGRADE_REHEARSAL=""
+ESPERADO=()
+TAB=$'\t'
 
 usage() {
   awk 'NR == 1 { next } /^#/ { sub(/^# ?/, ""); print; next } { exit }' "$0"
@@ -81,6 +103,8 @@ while (( $# > 0 )); do
     --execute) EXECUTE=1; shift ;;
     --apply) MODE=apply; shift ;;
     --read-ledger) MODE=ledger; shift ;;
+    --preview) MODE=preview; shift ;;
+    --esperado) ESPERADO+=("${2:-}"); shift 2 ;;
     --receipt-dir) RECEIPT_DIR="${2:-}"; shift 2 ;;
     --backup-receipt) BACKUP_RECEIPT="${2:-}"; shift 2 ;;
     --upgrade-rehearsal) UPGRADE_REHEARSAL="${2:-}"; shift 2 ;;
@@ -94,7 +118,8 @@ done
 [[ -f "$POLICY" ]] || { echo "política do lote não encontrada: $POLICY" >&2; exit 2; }
 
 if [[ "$EXECUTE" != "1" ]]; then
-  [[ -z "$MODE" ]] || { echo "--apply e --read-ledger exigem --execute" >&2; exit 2; }
+  [[ -z "$MODE" && ${#ESPERADO[@]} -eq 0 ]] || {
+    echo "--apply, --preview, --read-ledger e --esperado exigem --execute" >&2; exit 2; }
   plan_rc=0
   python3 "$LOGIC" plan --policy "$POLICY" || plan_rc=$?
   exit "$plan_rc"
@@ -107,8 +132,14 @@ case "$MODE" in
       echo "--out já existe; recuso sobrescrever: $OUT" >&2; exit 2; }
     ;;
   apply) ;;
-  *) echo "--execute exige --apply ou --read-ledger" >&2; exit 2 ;;
+  preview)
+    (( ${#ESPERADO[@]} == 0 )) || {
+      echo "--esperado é do --apply; a prévia mostra os números" >&2; exit 2; }
+    ;;
+  *) echo "--execute exige --apply, --preview ou --read-ledger" >&2; exit 2 ;;
 esac
+(( ${#ESPERADO[@]} == 0 )) || [[ "$MODE" == "apply" ]] || {
+  echo "--esperado é do --apply" >&2; exit 2; }
 
 RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-lot-migrations.XXXXXX")"
 chmod 700 "$RUN_DIR"
@@ -132,13 +163,97 @@ if [[ "$MODE" == "ledger" ]]; then
   exit 0
 fi
 
-# ------------------------------------------------------------ --apply
+# ------------------------------------------------------------ --apply e --preview
 
-# A aprovação vem só de quem chama, antes de ler o ambiente ou o banco.
+# A aprovação vem só de quem chama, antes de ler o ambiente ou o banco. A prévia também
+# a exige: ela escreve e desfaz (ROLLBACK), pelo wrapper de escrita.
 # shellcheck source=scripts/lib/manaloom_mutation_guard.sh
 source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 require_live_mutation_approval "passo de migrations do lote (S-05)"
 require_postgres_write_approval "passo de migrations do lote (S-05)"
+
+# Um passo antes da primeira migration ($1, o id), na prévia ou na gravação ($2), pelo
+# wrapper de escrita, numa transação: a saída fica em step-<id>.out e .err, e o
+# resultado conferido em step-<id>.json. Devolve o código do step-result: 0 feito, 3
+# recusado sem gravar, 1 falha sem a prova de que nada gravou.
+run_step() {
+  local id="$1" mode="$2" script psql_rc=0 result_rc=0 variable
+  local variables=() expected_args=()
+  script="$(jq -r --arg id "$id" \
+    '.before_first_migration[] | select(.id == $id) | .script' "$RUN_DIR/plan.json")"
+  if [[ "$mode" == "gravacao" ]]; then
+    while IFS= read -r variable; do
+      variables+=(-v "$variable")
+    done < <(jq -r --arg id "$id" \
+      '.steps[] | select(.id == $id) | .psql_variables[]' "$RUN_DIR/expected.json")
+    expected_args=(--expected "$RUN_DIR/expected.json")
+  fi
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --write-approved \
+    psql -X -v ON_ERROR_STOP=1 -At -F "$TAB" ${variables[@]+"${variables[@]}"} \
+    -f "$ROOT_DIR/$script" >"$RUN_DIR/step-$id.out" 2>"$RUN_DIR/step-$id.err" || psql_rc=$?
+  python3 "$LOGIC" step-result --plan "$RUN_DIR/plan.json" --id "$id" --mode "$mode" \
+    --exit "$psql_rc" --stdout "$RUN_DIR/step-$id.out" --stderr "$RUN_DIR/step-$id.err" \
+    ${expected_args[@]+"${expected_args[@]}"} >"$RUN_DIR/step-$id.json" || result_rc=$?
+  return "$result_rc"
+}
+
+step_ids() {
+  jq -r '.before_first_migration[].id' "$RUN_DIR/plan.json"
+}
+
+if [[ "$MODE" == "preview" ]]; then
+  SHA="$(git -C "$ROOT_DIR" rev-parse HEAD)"
+  [[ -z "$(git -C "$ROOT_DIR" status --porcelain --untracked-files=all)" ]] || {
+    echo "checkout sujo: a prévia do lote sai só de SHA limpo" >&2; exit 2; }
+  [[ "$(git -C "$ROOT_DIR" rev-parse origin/master 2>/dev/null || true)" == "$SHA" ]] || {
+    echo "o checkout não é o origin/master (o SHA que a promoção sobe)" >&2; exit 2; }
+  plan_rc=0
+  python3 "$LOGIC" plan --policy "$POLICY" >"$RUN_DIR/plan.json" || plan_rc=$?
+  if [[ "$plan_rc" != "0" ]]; then
+    jq -r '.problems[]? // .error' "$RUN_DIR/plan.json" >&2
+    echo "BLOCKED: o lote não bate com o código deste SHA; a prévia não rodou" >&2
+    [[ "$plan_rc" == "2" ]] && exit 2
+    exit 3
+  fi
+  read_rc=0
+  read_ledger "$RUN_DIR/before.txt" || read_rc=$?
+  if [[ "$read_rc" != "0" ]]; then
+    echo "não li o ledger do banco (o wrapper do PostgreSQL saiu com $read_rc); a prévia não rodou" >&2
+    exit 2
+  fi
+  before_rc=0
+  python3 "$LOGIC" check-before --plan "$RUN_DIR/plan.json" \
+    --ledger-raw "$RUN_DIR/before.txt" >"$RUN_DIR/before.json" || before_rc=$?
+  if [[ "$before_rc" != "0" ]]; then
+    jq -r '.problems[]? // .error' "$RUN_DIR/before.json" >&2
+    echo "BLOCKED: o banco não está onde o lote parte; a prévia não rodou" >&2
+    exit 3
+  fi
+  preview_rc=0
+  step_files=()
+  for id in $(step_ids); do
+    step_rc=0
+    run_step "$id" previa || step_rc=$?
+    step_files+=("$RUN_DIR/step-$id.json")
+    if [[ "$step_rc" != "0" ]]; then
+      preview_rc=1
+      jq -r '.problems[]? // .error' "$RUN_DIR/step-$id.json" >&2
+      tail -5 "$RUN_DIR/step-$id.err" >&2
+    fi
+  done
+  if (( ${#step_files[@]} > 0 )); then
+    jq -s '.' "${step_files[@]}" >"$RUN_DIR/steps.json"
+  else
+    echo '[]' >"$RUN_DIR/steps.json"
+  fi
+  # A prévia e o que o --apply pede: cada contagem da ação, como --esperado.
+  jq -cn --arg sha "$SHA" --argjson rc "$preview_rc" --slurpfile before "$RUN_DIR/before.json" \
+    --slurpfile plan "$RUN_DIR/plan.json" --slurpfile steps "$RUN_DIR/steps.json" \
+    '{status: (if $rc == 0 then "preview" else "failed" end), sha: $sha,
+      database: $before[0].ledger.database, from: $before[0].ledger.latest,
+      to: $plan[0].to, steps: $steps[0], esperado: [$steps[0][].esperado[]?]}'
+  exit "$preview_rc"
+fi
 
 # O diretório (físico) está neste checkout ou em outro worktree do mesmo repositório?
 inside_repository() {
@@ -193,11 +308,23 @@ RECEIPT="$RECEIPT_DIR/lote-migrations-${SHA:0:12}-$RUN_ID.json"
 LOG_NAME="lote-migrations-${SHA:0:12}-$RUN_ID.log"
 LEDGER_AFTER="$RECEIPT_DIR/ledger-${SHA:0:12}-$RUN_ID.json"
 
+# O receipt leva as contagens esperadas e o resultado de cada passo antes da primeira
+# migration, quando já existem.
 receipt() {
-  local status="$1"
+  local status="$1" step
+  local extra=()
   shift
+  if [[ -f "$RUN_DIR/expected.json" ]]; then
+    extra+=(--expected "$RUN_DIR/expected.json")
+  fi
+  for step in "$RUN_DIR"/step-*.json; do
+    if [[ -f "$step" ]]; then
+      extra+=(--steps "$step")
+    fi
+  done
   python3 "$LOGIC" receipt --out "$RECEIPT" --status "$status" --sha "$SHA" \
-    --started-at "$STARTED_AT" --plan "$RUN_DIR/plan.json" "$@" >"$RUN_DIR/receipt.out" || {
+    --started-at "$STARTED_AT" --plan "$RUN_DIR/plan.json" \
+    ${extra[@]+"${extra[@]}"} "$@" >"$RUN_DIR/receipt.out" || {
     echo "CRITICAL: não gravei o receipt: $(jq -r '.error // "?"' "$RUN_DIR/receipt.out" \
       2>/dev/null || echo "?")" >&2
     return 1
@@ -218,6 +345,21 @@ if [[ "$plan_rc" != "0" ]]; then
 fi
 TO="$(jq -r '.to' "$RUN_DIR/plan.json")"
 [[ "$TO" =~ ^[0-9]{3}$ ]] || { echo "plano sem a última migration" >&2; exit 2; }
+
+# As contagens que a gravação de cada passo antes da primeira migration exige (as da
+# prévia que o dono aprovou), antes de qualquer conexão.
+expected_args=()
+for value in ${ESPERADO[@]+"${ESPERADO[@]}"}; do
+  expected_args+=(--esperado "$value")
+done
+expected_rc=0
+python3 "$LOGIC" expected --plan "$RUN_DIR/plan.json" \
+  ${expected_args[@]+"${expected_args[@]}"} >"$RUN_DIR/expected.json" || expected_rc=$?
+if [[ "$expected_rc" != "0" ]]; then
+  echo "contagens esperadas recusadas: $(jq -r '.error // "?"' "$RUN_DIR/expected.json")" >&2
+  rm -f "$RUN_DIR/expected.json"
+  exit 2
+fi
 
 # O L-01 e o L-02, antes de qualquer conexão.
 proofs_rc=0
@@ -255,9 +397,41 @@ if [[ "$before_rc" != "0" ]]; then
   exit 3
 fi
 
-# O log nasce antes do migrate (O_EXCL): se o nome existe, recusa sem escrever.
+# O log nasce antes da primeira escrita (O_EXCL): se o nome existe, recusa sem escrever.
 python3 "$LOGIC" create --out "$RECEIPT_DIR/$LOG_NAME" >/dev/null || {
   echo "recuso sobrescrever $RECEIPT_DIR/$LOG_NAME; nada mudou" >&2; exit 2; }
+
+# Os passos antes da primeira migration (o dedupe da D-74), com o banco no from e o
+# backend antigo no ar: a gravação com as contagens da prévia. Uma recusa do script
+# (RAISE, transação desfeita) para o lote antes do migrate, sem nada gravado.
+for id in $(step_ids); do
+  echo "== $(date -u +%T) passo $id antes da primeira migration (log em $RECEIPT_DIR/$LOG_NAME)" >&2
+  step_rc=0
+  run_step "$id" gravacao || step_rc=$?
+  {
+    echo "== passo $id: $(jq -r '.script' "$RUN_DIR/step-$id.json" 2>/dev/null || echo "?")"
+    cat "$RUN_DIR/step-$id.out" "$RUN_DIR/step-$id.err"
+  } >>"$RECEIPT_DIR/$LOG_NAME"
+  if [[ "$step_rc" == "0" ]]; then
+    continue
+  fi
+  if [[ "$step_rc" == "3" ]]; then
+    receipt blocked --proofs "$RUN_DIR/proofs.json" --before "$RUN_DIR/before.json" \
+      --log "$LOG_NAME" || exit 2
+    jq -r '.problems[]? // .error' "$RUN_DIR/step-$id.json" >&2
+    tail -5 "$RUN_DIR/step-$id.err" >&2
+    echo "BLOCKED: o passo $id recusou a gravação; nada mudou e as migrations não rodaram" \
+      "($RECEIPT)" >&2
+    exit 3
+  fi
+  receipt failed --proofs "$RUN_DIR/proofs.json" --before "$RUN_DIR/before.json" \
+    --log "$LOG_NAME" --reason "o passo $id saiu com $step_rc antes do migrate" || true
+  jq -r '.problems[]? // .error' "$RUN_DIR/step-$id.json" >&2 || true
+  echo "CRITICAL: o passo $id falhou sem a prova de que nada gravou; as migrations não" \
+    "rodaram; confira à mão antes de seguir ($RECEIPT)" >&2
+  exit 1
+done
+
 echo "== $(date -u +%T) migrations $(jq -r '[.migrations[].version] | join(", ")' \
   "$RUN_DIR/plan.json") até a $TO (log em $RECEIPT_DIR/$LOG_NAME)" >&2
 migrate_rc=0

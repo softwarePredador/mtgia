@@ -16,7 +16,10 @@ Fixtures, sem dado da produção:
   (server/test/support/production_drift_fixture.py);
 - misto: o canônico com o ledger de outra linha de código (versão
   desconhecida, nome trocado, pendente antes da última executada) ou sem
-  ledger e com contas.
+  ledger e com contas;
+- caixa: o canônico com sets repetidos só pela caixa (ABC e abc), como os 84
+  da produção (D-74): o ensaio funde antes do migrate, como o lote, e a lista
+  aceita a fusão só linha a linha.
 """
 
 from __future__ import annotations
@@ -69,6 +72,17 @@ INSERT INTO trade_offers (id, sender_id, receiver_id) VALUES
   ('00000000-0000-4000-8000-000000000501', '00000000-0000-4000-8000-000000000001',
    '00000000-0000-4000-8000-000000000002');
 INSERT INTO ml_prompt_feedback (archetype) VALUES ('control');
+"""
+# D-74: um código repetido só pela caixa, que a 077 recusa, e um código sozinho. A
+# linha que fica (ABC: mesma data, código em maiúscula) herda o type da que sai.
+CASE_DUPLICATED_SETS = """
+INSERT INTO sets (code, name, release_date, type, block, is_online_only, updated_at) VALUES
+  ('ABC', 'Alpha Beta (MTGJSON)', '2020-01-01', NULL, 'Bloco A', FALSE, '2026-01-01T00:00:00Z'),
+  ('abc', 'Alpha Beta', '2020-01-01', 'expansion', NULL, NULL, '2026-01-02T00:00:00Z'),
+  ('LEA', 'Limited Edition Alpha', '1993-08-05', 'core', NULL, FALSE, '2026-01-03T00:00:00Z');
+INSERT INTO cards (id, scryfall_id, name, set_code) VALUES
+  ('00000000-0000-4000-8000-000000000103', '00000000-0000-4000-8000-000000000203',
+   'Carta do set abc', 'abc');
 """
 MIXED = {
     "versao_desconhecida": (
@@ -141,6 +155,11 @@ class MigrationRehearsalOnDisposablePostgresTest(unittest.TestCase):
                 cluster.restore(name, cls.dumps["canonico"], "completo")
                 cluster.execute(name, statement + ";")
                 cls.dumps[name] = cls._dump(name)
+
+            cluster.createdb("caixa")
+            cluster.restore("caixa", cls.dumps["canonico"], "completo")
+            cluster.execute("caixa", CASE_DUPLICATED_SETS)
+            cls.dumps["caixa"] = cls._dump("caixa")
         except BaseException:
             cls.tearDownClass()
             raise
@@ -188,6 +207,8 @@ class MigrationRehearsalOnDisposablePostgresTest(unittest.TestCase):
         self.assertTrue(steps["reaplicacao"]["sem_mudanca"])
         self.assertTrue(steps["rollback_por_restore"]["identico_a_antes"])
         self.assertTrue(steps["reforward"]["igual_ao_upgrade"])
+        # Sem sets repetidos pela caixa, o dedupe da D-74 não roda.
+        self.assertEqual(steps["dedupe_d74"]["rodou"], False)
 
     def test_live_drift_upgrade_leaves_only_the_closed_list(self) -> None:
         self.assertGreaterEqual(len(self.drift_groups), 100)
@@ -238,6 +259,55 @@ class MigrationRehearsalOnDisposablePostgresTest(unittest.TestCase):
                 self.assertEqual(preflight["migrate_recusou_com"], 3)
                 self.assertTrue(preflight["intacto_depois_do_migrate"])
                 self.assertNotIn("upgrade", report["etapas"])
+
+    def test_case_duplicated_sets_are_merged_before_the_migrate_like_the_lot(self) -> None:
+        # D-74: a 077 recusa com duplicata; o ensaio roda antes o dedupe do lote
+        # (prévia e gravação com as contagens da prévia), e a lista aceita a fusão
+        # em public.sets só linha a linha.
+        code, report = self._rehearse("caixa")
+        steps = report["etapas"]
+        self.assertEqual((code, report["resultado"]), (0, "PASS"), json.dumps(report)[:4000])
+        dedupe = steps["dedupe_d74"]
+        self.assertTrue(dedupe["rodou"])
+        self.assertEqual(dedupe["codigos_duplicados"], 1)
+        self.assertEqual(dedupe["esperado"], {
+            "esperado_referencias_levadas_para_a_linha_que_fica": "0",
+            "esperado_linhas_que_ficam_com_campo_herdado": "1",
+            "esperado_linhas_apagadas": "1",
+        })
+        self.assertEqual(dedupe["saida"]["modo"], {"escrita": "aplicar", "desfecho": "commit"})
+        self.assertEqual(dedupe["saida"]["depois"]["codigos_duplicados"], "0")
+        self.assertTrue(steps["upgrade"]["ledger"]["igual_ao_da_base"])
+        self.assertTrue(steps["pos_checagem"]["exata"], steps["pos_checagem"])
+        payload = steps["payload"]
+        self.assertEqual(payload["mudancas_inesperadas"], [])
+        declared = {item["tabela"]: item for item in payload["mudancas_declaradas"]}
+        self.assertEqual(sorted(declared), ["public.card_meta_insights", "public.sets"])
+        self.assertEqual(declared["public.sets"]["regra"], "fusao_por_lower_code")
+        self.assertEqual(declared["public.sets"]["conferencia"], {
+            "linhas_antes": 3, "linhas_depois": 2, "linhas_apagadas": 1,
+            "linhas_com_campo_herdado": 1,
+        })
+        # As cartas não mudam: o código exato da linha que saiu fica na carta.
+        self.assertEqual(payload["iguais"] + 2, payload["tabelas"])
+        self.assertTrue(steps["reaplicacao"]["sem_mudanca"])
+        self.assertTrue(steps["rollback_por_restore"]["identico_a_antes"])
+        self.assertTrue(steps["reforward"]["dedupe_d74"])
+        self.assertTrue(steps["reforward"]["igual_ao_upgrade"], steps["reforward"])
+
+    def test_the_merge_is_not_accepted_without_its_rule(self) -> None:
+        # Sem a entrada de public.sets na lista, a mesma fusão é mudança inesperada.
+        allowlist = json.loads(ALLOWLIST.read_text(encoding="utf-8"))
+        allowlist["payload"] = [entry for entry in allowlist["payload"]
+                                if entry["tabela"] != "public.sets"]
+        narrower = self.work / "lista_sem_regra_de_sets.json"
+        narrower.write_text(json.dumps(allowlist), encoding="utf-8")
+        code, report = self._rehearse("caixa", allowlist=narrower)
+        self.assertEqual((code, report["resultado"]), (1, "FAIL"))
+        self.assertTrue(report["etapas"]["dedupe_d74"]["rodou"])
+        self.assertEqual([item["tabela"] for item in
+                          report["etapas"]["payload"]["mudancas_inesperadas"]],
+                         ["public.sets"])
 
     def test_drift_outside_the_closed_list_fails(self) -> None:
         allowlist = json.loads(ALLOWLIST.read_text(encoding="utf-8"))

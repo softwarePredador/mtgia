@@ -58,7 +58,32 @@ void main() {
     );
   });
 
-  test('backend deploy proves migrations 038-076 before remote mutation', () {
+  test('backend deploy ledger contract lists every migration from 041 to the '
+      'last one of bin/migrate.dart', () {
+    final source =
+        File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
+    final migrations = <String, String>{
+      for (final match in RegExp(
+        r"version: '(\d{3})',\s+name: '([^']+)'",
+      ).allMatches(File('bin/migrate.dart').readAsStringSync()))
+        if (match.group(1)!.compareTo('041') >= 0)
+          match.group(1)!: match.group(2)!,
+    };
+    final last = migrations.keys.last;
+    for (final entry in migrations.entries) {
+      expect(
+        source,
+        contains("('${entry.key}', '${entry.value}')"),
+        reason: '${entry.key}_${entry.value}',
+      );
+    }
+    expect(source, contains('SELECT COUNT(*) = ${migrations.length}\n'));
+    expect(source, contains("'latest_migration_$last',"));
+    expect(source, contains("      ) = '$last'\n"));
+    expect(source, contains("'migrations_041_${last}_ready'"));
+  });
+
+  test('backend deploy proves migrations 038-077 before remote mutation', () {
     final source =
         File('../scripts/manaloom_deploy_backend_image.sh').readAsStringSync();
     final guard =
@@ -85,10 +110,10 @@ void main() {
       migration040Definition + 1,
     );
     final migration041To058Definition = source.indexOf(
-      'require_migrations_041_076_contract() {',
+      'require_migrations_041_077_contract() {',
     );
     final migration041To058Call = source.indexOf(
-      '\nrequire_migrations_041_076_contract\n',
+      '\nrequire_migrations_041_077_contract\n',
       migration041To058Definition + 1,
     );
     final environmentSource = source.indexOf(
@@ -177,7 +202,7 @@ void main() {
       'migration_038_ready',
       'migration_039_ready',
       'migration_040_ready',
-      'migrations_041_076_ready',
+      'migrations_041_077_ready',
       'manaloom_deck_cards_require_review',
       'manaloom_deck_format_require_review',
       'idx_decks_user_validation_state',
@@ -193,11 +218,11 @@ void main() {
     expect(source, contains('.checks.release_schema.status == "healthy"'));
     expect(
       source,
-      contains('.checks.release_schema.required_range == "038-076"'),
+      contains('.checks.release_schema.required_range == "038-077"'),
     );
     expect(
       source,
-      contains('.checks.release_schema.latest_migration == "076"'),
+      contains('.checks.release_schema.latest_migration == "077"'),
     );
     expect(source, contains('.checks.battle_job_schema.status == "healthy"'));
     expect(

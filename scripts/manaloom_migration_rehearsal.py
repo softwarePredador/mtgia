@@ -8,12 +8,17 @@ dentro de sandbox-exec sem rede externa), a partir de um dump:
    a referência da pós-checagem;
 2. antes: o dump restaurado e nunca mexido, a referência do estado anterior;
 3. ensaio: o dump restaurado de novo. Passa pelo preflight do runner (perfil
-   misto para aqui, sem DDL, e o banco tem de continuar igual a antes) e pelo
-   upgrade (migrate.dart);
+   misto para aqui, sem DDL, e o banco tem de continuar igual a antes), pelo
+   dedupe da D-74 quando há sets repetidos só pela caixa (como no lote, antes da
+   primeira migration: server/sql/lote/d74_dedupe_sets_lower_code.sql, prévia e
+   gravação com as contagens da prévia; sem ele a 077 recusa) e pelo upgrade
+   (migrate.dart);
 4. pós-checagem: o catálogo do ensaio contra o da base. Cada diferença tem de
    estar na lista fechada da deriva aceita (server/config/schema_drift_allowlist.json);
 5. payload: as linhas de cada tabela de antes, pelas colunas de antes, são as
-   mesmas depois do upgrade, salvo mudança declarada na lista;
+   mesmas depois do upgrade, salvo mudança declarada na lista. Uma mudança com
+   regra (a fusão da D-74 em public.sets) só é aceita se cada linha seguir a
+   regra;
 6. reaplicação: rodar o migrate de novo não muda nada;
 7. rollback: o mesmo dump restaurado outra vez é idêntico a antes (catálogo,
    ledger e dados), e o upgrade dele chega ao mesmo estado do ensaio.
@@ -44,6 +49,7 @@ recusou antes de DDL e o banco ficou igual a antes).
 from __future__ import annotations
 
 import argparse
+import collections
 import datetime as dt
 import hashlib
 import json
@@ -61,6 +67,12 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ALLOWLIST = REPO_ROOT / "server" / "config" / "schema_drift_allowlist.json"
+# D-74 (BT-CAT-01): o lote funde os sets repetidos só pela caixa antes da primeira
+# migration, e a 077 recusa enquanto houver duplicata. O ensaio faz o mesmo.
+DEDUPE_D74 = REPO_ROOT / "server" / "sql" / "lote" / "d74_dedupe_sets_lower_code.sql"
+# Regras de mudança de linha que a lista pode declarar no payload.
+ROW_RULES = ("fusao_por_lower_code",)
+ROW_KEY_COLUMN = "__chave_sem_caixa"
 APPROVAL_PHRASE = "I_APPROVE_DISPOSABLE_LOCAL_POSTGRES"
 WRITE_PHRASE = "I_HAVE_EXPLICIT_APPROVAL"
 DEFAULT_DART = (
@@ -306,9 +318,26 @@ def load_allowlist(path: Path) -> dict[str, Any]:
                    if not isinstance(item.get(key), str) or not item[key].strip()]
         if missing:
             problems.append(f"payload[{index}] sem {', '.join(missing)}")
+        if "regra" in item:
+            problems.extend(f"payload[{index}]: {problem}" for problem in _rule_problems(item))
     if problems:
         raise RehearsalError("lista da deriva aceita inválida: " + "; ".join(problems))
     return data
+
+
+def _rule_problems(item: dict[str, Any]) -> list[str]:
+    """O que falta numa entrada de payload com regra linha a linha."""
+    if item.get("regra") not in ROW_RULES:
+        return [f"regra desconhecida {item.get('regra')}"]
+    problems = []
+    for key in ("chave", "carimbo"):
+        if not isinstance(item.get(key), str) or not item[key].strip():
+            problems.append(f"regra {item['regra']} sem {key}")
+    inherited = item.get("campos_herdados")
+    if (not isinstance(inherited, list) or not inherited
+            or not all(isinstance(field, str) and field.strip() for field in inherited)):
+        problems.append(f"regra {item['regra']} sem campos_herdados")
+    return problems
 
 
 def _owner(category: str, item: dict[str, Any]) -> tuple[str | None, str | None]:
@@ -397,19 +426,41 @@ def payload_script(columns_by_table: dict[str, list[str]]) -> tuple[list[str], s
 def compare_payload(
     before: dict[str, dict[str, Any]],
     after: dict[str, dict[str, Any]],
-    declared: list[dict[str, str]],
+    declared: list[dict[str, Any]],
+    row_checks: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    """Compara o payload de antes e de depois.
+
+    Uma tabela declarada sem regra aceita qualquer mudança. Uma tabela declarada com
+    regra só aceita a mudança se a conferência linha a linha dela
+    ([row_checks], com `problemas` vazio) passou; sem conferência ou com problema, a
+    mudança é inesperada.
+    """
     allowed = {item["tabela"]: item for item in declared}
+    row_checks = row_checks or {}
     changed, declared_changes = [], []
     for table, reading in sorted(before.items()):
         other = after.get(table)
         if other == reading:
             continue
         record = {"tabela": table, "antes": reading, "depois": other}
-        if table in allowed:
-            declared_changes.append({**record, "migration": allowed[table]["migration"]})
-        else:
+        entry = allowed.get(table)
+        if entry is None:
             changed.append(record)
+        elif "regra" in entry:
+            check = row_checks.get(table) or {
+                "problemas": ["a regra linha a linha não foi conferida"]}
+            if check["problemas"]:
+                changed.append({**record, "regra": entry["regra"],
+                                "problemas": check["problemas"]})
+            else:
+                declared_changes.append({**record, "migration": entry["migration"],
+                                         "regra": entry["regra"],
+                                         "conferencia": {key: value for key, value
+                                                         in check.items()
+                                                         if key != "problemas"}})
+        else:
+            declared_changes.append({**record, "migration": entry["migration"]})
     return {
         "tabelas": len(before),
         "linhas": sum(reading.get("linhas", 0) for reading in before.values()),
@@ -417,6 +468,101 @@ def compare_payload(
         "mudancas_declaradas": declared_changes,
         "mudancas_inesperadas": changed,
     }
+
+
+def check_merge_by_lower_code(
+    before_rows: list[dict[str, Any]],
+    after_rows: list[dict[str, Any]],
+    rule: dict[str, Any],
+) -> dict[str, Any]:
+    """Regra `fusao_por_lower_code` (D-74), linha a linha.
+
+    Em cada grupo de LOWER(chave) de antes fica exatamente uma linha, que existia
+    antes; as outras saem e nenhuma linha nova aparece. Grupo sem repetição fica
+    idêntico. A linha que fica num grupo repetido só muda nos campos herdados, de
+    nulo para um valor que uma linha que saiu do grupo tinha, e no carimbo (só se
+    herdou algum campo). Devolve os problemas e as contagens.
+    """
+    key, stamp = rule["chave"], rule["carimbo"]
+    inherited = list(rule["campos_herdados"])
+    problems: list[str] = []
+    before_by_key = {row[key]: row for row in before_rows}
+    after_by_key = {row[key]: row for row in after_rows}
+    if len(before_by_key) != len(before_rows) or len(after_by_key) != len(after_rows):
+        problems.append(f"{key} repetido nas linhas lidas")
+    for code in sorted(set(after_by_key) - set(before_by_key)):
+        problems.append(f"{code}: linha nova depois do upgrade")
+    groups: dict[str, list[str]] = collections.defaultdict(list)
+    for code, row in before_by_key.items():
+        groups[row[ROW_KEY_COLUMN]].append(code)
+    deleted = merged = 0
+    for lowered, codes in sorted(groups.items()):
+        survivors = sorted(code for code in codes if code in after_by_key)
+        if len(survivors) != 1:
+            problems.append(f"grupo {lowered}: {len(survivors)} linha(s) depois, e não 1")
+            continue
+        kept = survivors[0]
+        removed = [code for code in codes if code != kept]
+        deleted += len(removed)
+        old, new = before_by_key[kept], after_by_key[kept]
+        changed = sorted(column for column in old if old[column] != new.get(column))
+        if not removed:
+            if changed:
+                problems.append(f"{kept}: mudou {', '.join(changed)} sem fusão")
+            continue
+        outside = [column for column in changed if column not in inherited and column != stamp]
+        if outside:
+            problems.append(f"{kept}: mudou {', '.join(outside)}, fora dos campos herdados")
+        took = []
+        for column in inherited:
+            if old.get(column) == new.get(column):
+                continue
+            offered = [before_by_key[code].get(column) for code in removed
+                       if before_by_key[code].get(column) is not None]
+            if old.get(column) is not None:
+                problems.append(f"{kept}.{column}: tinha valor e mudou")
+            elif new.get(column) not in offered:
+                problems.append(f"{kept}.{column}: valor que nenhuma linha que saiu tinha")
+            else:
+                took.append(column)
+        if stamp in changed and not took:
+            problems.append(f"{kept}.{stamp}: mudou sem campo herdado")
+        if took:
+            merged += 1
+    return {"problemas": problems, "linhas_antes": len(before_rows),
+            "linhas_depois": len(after_rows), "linhas_apagadas": deleted,
+            "linhas_com_campo_herdado": merged}
+
+
+def rows_equal_except(
+    first: list[dict[str, Any]], second: list[dict[str, Any]], key: str, ignored: str
+) -> bool:
+    """As mesmas linhas pela [key], iguais em tudo menos na coluna [ignored]."""
+    def strip(rows: list[dict[str, Any]]) -> dict[Any, dict[str, Any]]:
+        return {row[key]: {column: value for column, value in row.items() if column != ignored}
+                for row in rows}
+    return len(first) == len(second) and strip(first) == strip(second)
+
+
+def _row_rules(allowlist: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {item["tabela"]: item for item in allowlist.get("payload", []) if "regra" in item}
+
+
+def _psql_rows(output: str) -> list[tuple[str, str, str]]:
+    """As linhas `fase<TAB>objeto<TAB>quantidade` de um script do lote."""
+    rows = []
+    for line in output.splitlines():
+        parts = line.split("\t")
+        if len(parts) == 3:
+            rows.append((parts[0], parts[1], parts[2]))
+    return rows
+
+
+def lote_script_targets(path: Path) -> list[str]:
+    """Os objetos da ação que a gravação de um script do lote exige como
+    `-v esperado_<objeto>=<n>` (as declarações `\\if :{?esperado_<objeto>}`)."""
+    return re.findall(r"^\\if :\{\?esperado_(\w+)\}$", path.read_text(encoding="utf-8"),
+                      flags=re.MULTILINE)
 
 
 def _quote(identifier: str) -> str:
@@ -562,6 +708,42 @@ class Cluster:
                 readings[table] = {"linhas": int(rows), "hash": digest}
         return readings
 
+    def rows(self, database: str, table: str, columns: list[str], key: str
+             ) -> list[dict[str, Any]]:
+        """As linhas de [table] nas [columns], mais LOWER([key]) do próprio banco."""
+        schema, name = table.split(".", 1)
+        selected = ", ".join(_quote(column) for column in columns)
+        script = "\n".join([
+            "BEGIN TRANSACTION READ ONLY;", "SET LOCAL TimeZone = 'UTC';",
+            "SET LOCAL extra_float_digits = 3;",
+            f"SELECT COALESCE(jsonb_agg(to_jsonb(linha)), '[]') FROM (SELECT {selected}, "
+            f"LOWER({_quote(key)}) AS {_quote(ROW_KEY_COLUMN)} "
+            f"FROM {_quote(schema)}.{_quote(name)}) AS linha;",
+            "COMMIT;",
+        ])
+        lines = self._psql_stdin(database, script)
+        if len(lines) != 1:
+            raise RuntimeError(f"linhas de {table} em {database}: {len(lines)} linhas de saída")
+        return json.loads(lines[0])
+
+    def case_duplicated_set_codes(self, database: str) -> int:
+        """Códigos de public.sets repetidos só pela caixa (0 sem a tabela)."""
+        if self.psql(database, "SELECT to_regclass('public.sets') IS NOT NULL").strip() != "t":
+            return 0
+        return int(self.psql(database, """
+            SELECT COUNT(*) FROM (
+              SELECT 1 FROM public.sets GROUP BY LOWER(code) HAVING COUNT(*) > 1
+            ) duplicados""").strip())
+
+    def lote_script(self, database: str, path: Path, variables: dict[str, str]
+                    ) -> subprocess.CompletedProcess:
+        """Um script de server/sql/lote/ como no lote: psql -X, ON_ERROR_STOP,
+        saída sem alinhamento e separada por TAB."""
+        argv = [str(self.pg_bin / "psql"), "-X", "-v", "ON_ERROR_STOP=1", "-At", "-F", "\t"]
+        for name, value in variables.items():
+            argv += ["-v", f"{name}={value}"]
+        return self.run([*argv, *self._connection(database), "-f", str(path)], check=False)
+
     def _psql_stdin(self, database: str, script: str) -> list[str]:
         result = subprocess.run(
             [*self.sandbox, str(self.pg_bin / "psql"), "-X", "-q", "-A", "-t", "-v",
@@ -639,6 +821,43 @@ def _sha256(path: Path) -> str:
 
 def _public(catalog: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in catalog.items() if not key.startswith("_")}
+
+
+def dedupe_case_duplicated_sets(cluster: Cluster, database: str) -> dict[str, Any]:
+    """D-74 antes do migrate, como no lote: com sets repetidos só pela caixa, roda
+    a prévia do server/sql/lote/d74_dedupe_sets_lower_code.sql e depois a gravação
+    com as contagens da prévia (`-v aplicar=1 -v esperado_<objeto>=<n>`). Sem
+    duplicata, não roda nada. Qualquer recusa do script para o ensaio."""
+    duplicated = cluster.case_duplicated_set_codes(database)
+    if not duplicated:
+        return {"rodou": False, "codigos_duplicados": 0}
+    targets = lote_script_targets(DEDUPE_D74)
+    if not targets:
+        raise RuntimeError(f"{DEDUPE_D74.name} não declara as contagens esperadas da gravação")
+    preview = cluster.lote_script(database, DEDUPE_D74, {})
+    preview_rows = _psql_rows(preview.stdout)
+    if preview.returncode != 0 or ("modo", "desfecho", "rollback") not in preview_rows:
+        raise RuntimeError(f"a prévia do dedupe da D-74 falhou ({preview.returncode}): "
+                           f"{(preview.stdout + preview.stderr)[-2000:]}")
+    action = {objeto: quantidade for fase, objeto, quantidade in preview_rows if fase == "acao"}
+    missing = [target for target in targets if target not in action]
+    if missing:
+        raise RuntimeError(f"a prévia do dedupe da D-74 não trouxe {', '.join(missing)}")
+    expected = {f"esperado_{target}": action[target] for target in targets}
+    applied = cluster.lote_script(database, DEDUPE_D74, {"aplicar": "1", **expected})
+    applied_rows = _psql_rows(applied.stdout)
+    if applied.returncode != 0 or ("modo", "desfecho", "commit") not in applied_rows:
+        raise RuntimeError(f"a gravação do dedupe da D-74 falhou ({applied.returncode}): "
+                           f"{(applied.stdout + applied.stderr)[-2000:]}")
+    left = cluster.case_duplicated_set_codes(database)
+    if left:
+        raise RuntimeError(f"o dedupe da D-74 deixou {left} código(s) repetido(s)")
+    phases: dict[str, dict[str, str]] = collections.defaultdict(dict)
+    for fase, objeto, quantidade in applied_rows:
+        phases[fase][objeto] = quantidade
+    return {"rodou": True, "script": str(DEDUPE_D74.relative_to(REPO_ROOT)),
+            "codigos_duplicados": duplicated, "esperado": expected,
+            "saida": dict(phases)}
 
 
 def rehearse(args: argparse.Namespace) -> tuple[int, dict[str, Any]]:
@@ -725,6 +944,11 @@ def _rehearse_steps(args, dump, allowlist, cluster, report, steps, failures, tim
             if entry["categoria"] == "schemas" and entry["tipo"] == "sobrando")
     }
     before_payload = timed("payload_antes", lambda: cluster.payload("antes", payload_columns))
+    # As tabelas com regra linha a linha na lista (a fusão da D-74 em public.sets).
+    rules = {table: rule for table, rule in _row_rules(allowlist).items()
+             if table in payload_columns}
+    before_rows = {table: cluster.rows("antes", table, payload_columns[table], rule["chave"])
+                   for table, rule in rules.items()}
     report["antes"] = {
         "migrations": len(before["ledger"]),
         "ultima": max(before["ledger"]) if before["ledger"] else None,
@@ -757,6 +981,9 @@ def _rehearse_steps(args, dump, allowlist, cluster, report, steps, failures, tim
     steps["base"]["migrations"] = len(base["ledger"])
     steps["base"]["catalogo"] = {category: len(base[category]) for category in CATEGORIES}
 
+    # Como no lote: o dedupe da D-74 antes da primeira migration.
+    dedupe = timed("dedupe_d74", lambda: dedupe_case_duplicated_sets(cluster, "ensaio"))
+    steps["dedupe_d74"].update(dedupe)
     upgrade = timed("upgrade", lambda: cluster.migrate("ensaio"))
     steps["upgrade"]["rc"] = upgrade.returncode
     if upgrade.returncode != 0:
@@ -791,7 +1018,12 @@ def _rehearse_steps(args, dump, allowlist, cluster, report, steps, failures, tim
         failures.append("a pós-checagem achou diferença fora da lista fechada")
 
     after_payload = timed("payload_depois", lambda: cluster.payload("ensaio", payload_columns))
-    payload = compare_payload(before_payload, after_payload, allowlist.get("payload", []))
+    after_rows = {table: cluster.rows("ensaio", table, payload_columns[table], rule["chave"])
+                  for table, rule in rules.items()}
+    row_checks = {table: check_merge_by_lower_code(before_rows[table], after_rows[table], rule)
+                  for table, rule in rules.items()}
+    payload = compare_payload(before_payload, after_payload, allowlist.get("payload", []),
+                              row_checks)
     steps["payload"] = payload
     if payload["mudancas_inesperadas"]:
         failures.append("o upgrade mudou linhas que existiam antes")
@@ -819,13 +1051,29 @@ def _rehearse_steps(args, dump, allowlist, cluster, report, steps, failures, tim
     if not steps["rollback_por_restore"]["identico_a_antes"]:
         failures.append("o restore do mesmo dump não voltou ao estado de antes")
 
-    forward = timed("reforward", lambda: cluster.migrate("rollback"))
+    def forward_upgrade() -> tuple[dict[str, Any], subprocess.CompletedProcess]:
+        # O mesmo caminho do upgrade: o dedupe da D-74 e depois o migrate.
+        return dedupe_case_duplicated_sets(cluster, "rollback"), cluster.migrate("rollback")
+
+    forward_dedupe, forward = timed("reforward", forward_upgrade)
     forward_diff = diff_catalogs(_public(after), _public(cluster.catalog("rollback")))
     forward_payload = cluster.payload("rollback", payload_columns)
+    # A tabela com regra: a mesma regra contra antes e as mesmas linhas do upgrade,
+    # salvo o carimbo (o dedupe grava a hora em que rodou).
+    forward_rows_ok = True
+    for table, rule in rules.items():
+        forward_rows = cluster.rows("rollback", table, payload_columns[table], rule["chave"])
+        forward_rows_ok = forward_rows_ok and not check_merge_by_lower_code(
+            before_rows[table], forward_rows, rule)["problemas"] and rows_equal_except(
+            after_rows[table], forward_rows, rule["chave"], rule["carimbo"])
+    same_forward_payload = forward_rows_ok and all(
+        forward_payload.get(table) == reading for table, reading in after_payload.items()
+        if table not in rules)
     steps["reforward"].update({
         "rc": forward.returncode,
+        "dedupe_d74": forward_dedupe.get("rodou"),
         "igual_ao_upgrade": forward.returncode == 0 and count_differences(forward_diff) == 0
-        and forward_payload == after_payload,
+        and same_forward_payload,
         "diferencas_de_catalogo": count_differences(forward_diff),
     })
     if not steps["reforward"]["igual_ao_upgrade"]:
@@ -856,6 +1104,13 @@ def markdown(report: dict[str, Any]) -> str:
                  f"{len(preflight.get('pendentes', []))}")
     for reason in preflight.get("motivos", []):
         lines.append(f"  - {reason}")
+    dedupe = steps.get("dedupe_d74", {})
+    if dedupe.get("rodou"):
+        action = dedupe["saida"].get("acao", {})
+        lines.append(f"- Dedupe da D-74 antes do migrate: {dedupe['codigos_duplicados']} "
+                     f"código(s) repetido(s); {action.get('linhas_apagadas')} linha(s) "
+                     f"apagada(s), {action.get('linhas_que_ficam_com_campo_herdado')} com "
+                     "campo herdado")
     if "pos_checagem" in steps:
         check = steps["pos_checagem"]
         lines.append(f"- Pós-checagem contra a base: {check['diferencas']} diferenças, "
@@ -867,6 +1122,13 @@ def markdown(report: dict[str, Any]) -> str:
         lines.append(f"- Payload: {payload['iguais']} de {payload['tabelas']} tabelas iguais "
                      f"({payload['linhas']} linhas); {len(payload['mudancas_inesperadas'])} "
                      "mudanças inesperadas")
+        for item in payload["mudancas_declaradas"]:
+            lines.append(f"  - declarada: `{item['tabela']}` (migration {item['migration']}"
+                         + (f", regra {item['regra']}: {json.dumps(item['conferencia'], ensure_ascii=False)}"
+                            if "regra" in item else "") + ")")
+        for item in payload["mudancas_inesperadas"]:
+            lines.append(f"  - inesperada: `{item['tabela']}`"
+                         + (f": {'; '.join(item['problemas'][:20])}" if item.get("problemas") else ""))
     for name in ("reaplicacao", "rollback_por_restore", "reforward"):
         if name in steps:
             lines.append(f"- {name}: {json.dumps({k: v for k, v in steps[name].items()}, ensure_ascii=False)}")

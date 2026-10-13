@@ -238,6 +238,8 @@ PYTHONPYCACHEPREFIX="$TMP_DIR/pycache" \
     "$ROOT_DIR/server/test/migration_rehearsal_db_live_test.py" \
     "$ROOT_DIR/server/test/migration_rehearsal_test.py" \
     "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py" \
+    "$ROOT_DIR/server/test/backend_rollback_guard_test.py" \
+    "$ROOT_DIR/server/test/proxy_body_ceiling_test.py" \
     "$ROOT_DIR/server/test/release_sbom_scope_test.py" \
     "$ROOT_DIR/server/test/slo_alerts_test.py" \
     "$ROOT_DIR/server/test/support/production_drift_fixture.py" \
@@ -280,6 +282,13 @@ PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/release_identity_gate_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
+# S-02 (D-104, item 12): a guarda do rollback automático do backend; o lado do banco
+# é o MAX(version) do ledger, e a volta recusada imprime o estado real do Swarm.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/backend_rollback_guard_test.py"
+# D-83 (S-06): o deploy do backend confere o teto de corpo do proxy no pré-voo.
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/proxy_body_ceiling_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/release_sbom_scope_test.py"
 # BT-OBS-001: SLOs, regras de alerta, receptor humano e teste de alerta.
@@ -692,10 +701,10 @@ grep -Fq "('075', 'adopt_production_ml_tables_and_shapes')" "$ROOT_DIR/scripts/m
 grep -Fq "('076', 'align_message_and_trade_history_user_fks')" "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_039_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'migration_040_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq 'migrations_041_076_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq 'migrations_041_077_ready' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.release_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.required_range == "038-076"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
-grep -Fq '.checks.release_schema.latest_migration == "076"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.required_range == "038-077"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
+grep -Fq '.checks.release_schema.latest_migration == "077"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq '.checks.battle_job_schema.status == "healthy"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'require_live_mutation_approval "deploy do backend ManaLoom"' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"
 grep -Fq 'readonly LIVE_MUTATION_APPROVED=1' "$ROOT_DIR/scripts/manaloom_deploy_backend_image.sh"

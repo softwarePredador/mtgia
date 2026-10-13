@@ -43,12 +43,13 @@ Tudo roda num PostgreSQL 17 local e descartável, só em loopback, sem socket e,
 | Restauração de antes | `pg_restore --exit-on-error`. No modo `estrutura` (padrão), só a estrutura e o ledger: nenhuma outra tabela pode ter linha |
 | Preflight | o perfil do banco pelo runner. No perfil misto, o ensaio roda também o `migrate` de verdade e exige código 3 e o banco igual a antes (catálogo e linhas): sai com 3 (BLOCKED) |
 | Banco novo | `server/database_setup.sql` e todas as migrations: a referência da pós-checagem |
+| Dedupe da D-74 | só com sets repetidos pela caixa (`GROUP BY LOWER(code)`), como no lote, antes da primeira migration: `server/sql/lote/d74_dedupe_sets_lower_code.sql`, primeiro a prévia e depois a gravação com as contagens da prévia (`-v aplicar=1 -v esperado_<objeto>=<n>`). Sem ele a 077 recusa e o ensaio sai FAIL. O resultado vai para `etapas.dedupe_d74` |
 | Upgrade | o `migrate` aplica as pendentes; o ledger fica igual ao do banco novo |
 | Pós-checagem | o catálogo inteiro contra o do banco novo: schemas, extensões, tabelas, colunas, restrições, chaves, índices, views, funções, gatilhos, sequências, enums e ledger. Toda diferença tem de estar na lista fechada |
-| Payload | cada tabela de antes, pelas colunas de antes: mesmas linhas e mesmo hash depois do upgrade, salvo mudança declarada na lista |
+| Payload | cada tabela de antes, pelas colunas de antes: mesmas linhas e mesmo hash depois do upgrade, salvo mudança declarada na lista. Mudança declarada com regra só passa se cada linha seguir a regra: em `public.sets` (`fusao_por_lower_code`, D-74), cada grupo de `LOWER(code)` fica com uma linha que já existia, grupo sem repetição fica idêntico, e a linha que fica só muda nos campos herdados (de nulo para o valor de uma linha que saiu) e no `updated_at` quando herdou algo |
 | Reaplicação | rodar o `migrate` de novo não muda nada |
 | Rollback por restore | o mesmo dump restaurado outra vez é idêntico ao de antes: catálogo, ledger e linhas |
-| Reforward | o upgrade do banco restaurado chega ao mesmo catálogo e às mesmas linhas do primeiro upgrade |
+| Reforward | o upgrade do banco restaurado (com o mesmo dedupe antes) chega ao mesmo catálogo e às mesmas linhas do primeiro upgrade; na tabela com regra, salvo o carimbo (`updated_at` é a hora do dedupe) |
 
 Saídas: `rehearsal.json` e `rehearsal.md` no diretório pedido. Códigos: 0 PASS, 1 FAIL, 2
 entrada ou ambiente recusado, 3 BLOCKED (perfil misto).
@@ -59,7 +60,8 @@ entrada ou ambiente recusado, 3 BLOCKED (perfil misto).
   `server/test/migration_rehearsal_db_live_test.py` monta, sem dado da produção, os perfis
   canônico (o bootstrap da produção, `server/test/fixtures/schema_profiles/database_setup_058.sql`,
   com as migrations até a 058), deriva (o canônico com a deriva publicada pela auditoria
-  BT-DB-001) e misto, e roda o ensaio em cada um.
+  BT-DB-001), misto e caixa (o canônico com sets repetidos só pela caixa), e roda o ensaio
+  em cada um.
 - **Lote de deploy**, depois do backup e do ensaio de restauração e antes da primeira
   migration na produção: o ensaio com o dump novo, no modo `completo`, com a palavra do dono
   (é dado da produção, só na máquina de operação). Qualquer código diferente de 0 para o lote.
