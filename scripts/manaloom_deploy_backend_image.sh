@@ -121,6 +121,10 @@ fi
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
 # shellcheck source=scripts/lib/manaloom_release_capabilities_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_capabilities_contract.sh"
+# shellcheck source=scripts/lib/manaloom_proxy_body_ceiling.sh
+source "$ROOT_DIR/scripts/lib/manaloom_proxy_body_ceiling.sh"
+# shellcheck source=scripts/lib/manaloom_backend_rollback_guard.sh
+source "$ROOT_DIR/scripts/lib/manaloom_backend_rollback_guard.sh"
 XMAGE_INTERACTIVE_SERVICE="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_SERVICE"
 XMAGE_INTERACTIVE_DNS="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_DNS"
 XMAGE_INTERACTIVE_URL="$MANALOOM_PRODUCTION_XMAGE_INTERACTIVE_URL"
@@ -131,6 +135,10 @@ readonly XMAGE_INTERACTIVE_SERVICE XMAGE_INTERACTIVE_DNS
 readonly XMAGE_INTERACTIVE_URL PROJECT_NETWORK INTERACTIVE_BATTLE_ENABLED
 readonly BATTLE_LIVE_SPECTATOR_ENABLED
 validate_manaloom_release_api_base_url "$API_BASE_URL"
+# D-83: o maior corpo que o backend aceita (o import) vem do código que vai
+# subir; o pré-voo confere que o proxy da produção o leva até o backend.
+IMPORT_BODY_LIMIT_BYTES="$(manaloom_import_body_limit_bytes "$ROOT_DIR/server/lib/request_body_limits.dart")"
+readonly IMPORT_BODY_LIMIT_BYTES
 validate_manaloom_exact_coordinate project "$EASYPANEL_PROJECT" \
   "$MANALOOM_PRODUCTION_EASYPANEL_PROJECT"
 validate_manaloom_exact_coordinate backend_service "$SERVICE" \
@@ -251,6 +259,16 @@ ROLLBACK_SOURCE_IMAGE=""
 PREVIOUS_SPEC_IMAGE=""
 PREVIOUS_RUNNING_IMAGE=""
 PREVIOUS_UPDATE_STATE=""
+PREVIOUS_GIT_SHA=""
+PREVIOUS_REQUIRED_MIGRATION=""
+DATABASE_LATEST_MIGRATION=""
+BACKEND_ROLLBACK_POLICY=""
+SWARM_UPDATE_FAILURE_ACTION="pause"
+# 1 depois que o update do Swarm convergiu (imagem nova 1/1, completed): uma falha
+# daqui em diante não deixa o Swarm em paused, e a mensagem de restore diz isso.
+# 0 quando o update foi mandado e não convergiu; vazio enquanto não se sabe se ele
+# chegou ao Swarm (o bloco "update do Swarm" abaixo decide).
+SWARM_UPDATE_CONVERGED=0
 cleanup_release_runtime() {
   local status="${1:-$?}"
   trap - EXIT
@@ -928,7 +946,7 @@ SQL
   fi
 }
 
-require_migrations_041_076_contract() {
+require_migrations_041_077_contract() {
   local contract_status
   contract_status="$(
     "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
@@ -969,7 +987,8 @@ WITH required_migrations(version, name) AS (
     ('073', 'activation_events_dedupe'),
     ('074', 'reinstall_active_user_triggers'),
     ('075', 'adopt_production_ml_tables_and_shapes'),
-    ('076', 'align_message_and_trade_history_user_fks')
+    ('076', 'align_message_and_trade_history_user_fks'),
+    ('077', 'enforce_unique_lower_set_code')
 ), checks(check_name, ok) AS (
   VALUES
     (
@@ -979,7 +998,7 @@ WITH required_migrations(version, name) AS (
     (
       'required_migrations_registered',
       (
-        SELECT COUNT(*) = 34
+        SELECT COUNT(*) = 35
         FROM required_migrations required
         JOIN public.schema_migrations actual
           ON actual.version = required.version
@@ -987,11 +1006,11 @@ WITH required_migrations(version, name) AS (
       )
     ),
     (
-      'latest_migration_076',
+      'latest_migration_077',
       COALESCE(
         (SELECT MAX(version) FROM public.schema_migrations),
         ''
-      ) = '076'
+      ) = '077'
     )
 ), missing AS (
   SELECT check_name
@@ -999,8 +1018,8 @@ WITH required_migrations(version, name) AS (
   WHERE NOT ok
 )
 SELECT CASE
-  WHEN COUNT(*) = 0 THEN 'migrations_041_076_ready'
-  ELSE 'migrations_041_076_incomplete:' ||
+  WHEN COUNT(*) = 0 THEN 'migrations_041_077_ready'
+  ELSE 'migrations_041_077_incomplete:' ||
        string_agg(check_name, ',' ORDER BY check_name)
 END
 FROM missing;
@@ -1008,8 +1027,8 @@ ROLLBACK;
 SQL
   )"
 
-  if [[ "$contract_status" != "migrations_041_076_ready" ]]; then
-    echo "deploy recusado: contrato read-only das migrations 041-076 incompleto: $contract_status" >&2
+  if [[ "$contract_status" != "migrations_041_077_ready" ]]; then
+    echo "deploy recusado: contrato read-only das migrations 041-077 incompleto: $contract_status" >&2
     exit 2
   fi
 }
@@ -1084,6 +1103,16 @@ trpc_post() {
 rollback_backend_deploy() {
   local source_status=1 runtime_status=1 configured_status=1 health_status=1
   local services_json configured_image readiness
+
+  # D-104 (item 12): com o banco além do que a imagem anterior exige, voltar é
+  # restore. Nada vai para o Swarm nem para o EasyPanel.
+  if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
+    echo "deploy backend falhou" >&2
+    manaloom_backend_restore_path "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION" \
+      "$SWARM_UPDATE_CONVERGED" "$SOURCE_MUTATED" "$SERVICE" "$PREVIOUS_SPEC_IMAGE" \
+      "$PREVIOUS_GIT_SHA"
+    return 1
+  fi
 
   echo "deploy backend falhou; restaurando spec e origem anteriores" >&2
   if [[ "$SOURCE_MUTATED" == "1" && -n "$ROLLBACK_SOURCE_IMAGE" ]]; then
@@ -1176,13 +1205,14 @@ exit 1
 cd "$ROOT_DIR"
 require_clean_worktree
 require_trusted_proxy_topology
+manaloom_require_proxy_body_ceiling "$API_BASE_URL" "$IMPORT_BODY_LIMIT_BYTES"
 require_auth_runtime_contract
 "$ROOT_DIR/scripts/manaloom_battle_product_gate.sh"
 require_clean_worktree
 require_migration_038_contract
 require_migration_039_contract
 require_migration_040_contract
-require_migrations_041_076_contract
+require_migrations_041_077_contract
 
 drain_timeout_seconds="${MANALOOM_DEPLOY_AI_DRAIN_TIMEOUT_SECONDS:-300}"
 if ! [[ "$drain_timeout_seconds" =~ ^[0-9]+$ ]]; then
@@ -1365,6 +1395,33 @@ if [[ "$PREVIOUS_SOURCE_IMAGE" != "$ROLLBACK_SOURCE_IMAGE" ]]; then
   echo "origem EasyPanel anterior sera normalizada para o digest imutavel da spec durante eventual rollback" >&2
 fi
 
+# >>> guarda do rollback automatico (revisao da promocao, item 2; D-104, item 12)
+# O readiness exige MAX(version) igual a ultima migration que a imagem conhece.
+# A volta automatica (Swarm e trap) so vale se a imagem anterior exige a migration
+# em que o banco esta; senao o Swarm pausa e o trap recusa e mostra o restore.
+PREVIOUS_GIT_SHA="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
+docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
+  awk '/^GIT_SHA=/{count++; value=substr(\$0,index(\$0,\"=\")+1)} END{if (count == 1) printf \"%s\", value}'
+")" || PREVIOUS_GIT_SHA=""
+PREVIOUS_REQUIRED_MIGRATION="$(
+  manaloom_readiness_required_migration "$ROOT_DIR" "$PREVIOUS_GIT_SHA" || true
+)"
+DATABASE_LATEST_MIGRATION="$(
+  "$ROOT_DIR/server/bin/with_new_server_pg.sh" --read-only \
+    psql -X -v ON_ERROR_STOP=1 -At -c \
+    "SELECT COALESCE(MAX(version), '') FROM public.schema_migrations;"
+)"
+BACKEND_ROLLBACK_POLICY="$(
+  manaloom_backend_rollback_policy "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION"
+)"
+SWARM_UPDATE_FAILURE_ACTION="$(
+  manaloom_swarm_update_failure_action "$BACKEND_ROLLBACK_POLICY"
+)"
+if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
+  echo "aviso: sem volta automatica do backend: a imagem anterior (GIT_SHA ${PREVIOUS_GIT_SHA:-ausente}) exige a migration ${PREVIOUS_REQUIRED_MIGRATION:-desconhecida} e o banco esta na ${DATABASE_LATEST_MIGRATION:-desconhecida}; se o update do Swarm falhar, ele pausa (paused); se uma conferencia depois dele falhar, a imagem nova fica no ar; nos dois casos o caminho e um deploy de correcao ou o restore (docs/runbooks/BACKUP_E_RESTAURACAO.md)" >&2
+fi
+# <<< guarda do rollback automatico
+
 encode_remote_value() {
   printf '%s' "$1" | base64 | tr -d '\r\n'
 }
@@ -1406,13 +1463,20 @@ email_verification_app_url_b64="$(
 public_site_url_b64="$(encode_remote_value "$MANALOOM_PUBLIC_SITE_URL")"
 sentry_dsn_b64="$(encode_remote_value "$SENTRY_DSN")"
 
+# >>> update do Swarm
 # Swarm must keep the full repo@sha256 reference in both its spec and running
 # task. Only fixed, validated identifiers remain embedded directly.
+# O trap trata o Swarm como talvez tocado desde antes do ssh (uma interrupcao no meio
+# deixa o estado desconhecido). O lado remoto sai com 3 se parou antes do
+# docker service update (nada foi mandado), com 4 se o proprio docker service update
+# falhou e com 1 se o update foi mandado e nao convergiu; o ssh sai com 255 se caiu.
 DEPLOY_MUTATION_STARTED=1
+SWARM_UPDATE_CONVERGED=""
+swarm_update_status=0
 # shellcheck disable=SC2087
-ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
+ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE || swarm_update_status=$?
 set -euo pipefail
-decode_b64() { printf '%s' "\$1" | base64 -d; }
+decode_b64() { printf '%s' "\$1" | base64 -d || exit 3; }
 deploy_timestamp_value=\$(decode_b64 '$deploy_timestamp_b64')
 allowed_origins=\$(decode_b64 '$allowed_origins_b64')
 trusted_proxy_hops=\$(decode_b64 '$trusted_proxy_hops_b64')
@@ -1432,7 +1496,7 @@ public_site_url=\$(decode_b64 '$public_site_url_b64')
 sentry_dsn=\$(decode_b64 '$sentry_dsn_b64')
 docker service update \
   --update-order stop-first \
-  --update-failure-action rollback \
+  --update-failure-action '$SWARM_UPDATE_FAILURE_ACTION' \
   --update-monitor 30s \
   --rollback-order stop-first \
   --rollback-failure-action pause \
@@ -1468,7 +1532,9 @@ docker service update \
   --env-add XMAGE_EXPECTED_COMMIT='$XMAGE_EXPECTED_COMMIT' \
   --env-add XMAGE_EXPECTED_PATCH_COMMIT='$XMAGE_EXPECTED_PATCH_COMMIT' \
   --env-add XMAGE_EXPECTED_VERSION='$XMAGE_EXPECTED_VERSION' \
-  '$SERVICE'
+  '$SERVICE' || exit 4
+# Daqui em diante o update foi mandado: toda falha sai com 1.
+trap 'exit 1' ERR
 
 for attempt in \$(seq 1 45); do
   replicas="\$(docker service ls --filter name='$SERVICE' --format '{{.Replicas}}' | head -n 1)"
@@ -1494,6 +1560,24 @@ docker service inspect '$SERVICE' --format 'image={{.Spec.TaskTemplate.Container
 docker service ps '$SERVICE' --no-trunc
 exit 1
 REMOTE
+case "$swarm_update_status" in
+  0) SWARM_UPDATE_CONVERGED=1 ;;
+  1)
+    SWARM_UPDATE_CONVERGED=0
+    echo "deploy backend falhou: o docker service update foi mandado e nao convergiu" >&2
+    exit 1
+    ;;
+  3)
+    DEPLOY_MUTATION_STARTED=0
+    echo "deploy backend falhou antes do docker service update: nada foi mandado ao Swarm nem ao EasyPanel" >&2
+    exit 1
+    ;;
+  *)
+    echo "deploy backend falhou (codigo $swarm_update_status): nao se sabe se o docker service update chegou ao Swarm; confira com docker service inspect '$SERVICE'" >&2
+    exit 1
+    ;;
+esac
+# <<< update do Swarm
 
 spec_allowed_origins_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
@@ -1756,8 +1840,8 @@ for attempt in $(seq 1 "$readiness_attempts"); do
        .checks.release_capabilities.offer_mode == $offer_mode and
        .checks.release_capabilities.policy_digest_sha256 == $policy_digest_sha256 and
        .checks.release_schema.status == "healthy" and
-       .checks.release_schema.required_range == "038-076" and
-       .checks.release_schema.latest_migration == "076" and
+       .checks.release_schema.required_range == "038-077" and
+       .checks.release_schema.latest_migration == "077" and
        .checks.battle_job_schema.status == "healthy" and
        disabled_by_policy(.checks.battle_job_worker; "battle_batch") and
        disabled_by_policy(.checks.battle_runtime; "battle_batch") and

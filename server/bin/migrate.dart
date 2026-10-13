@@ -7629,6 +7629,63 @@ DROP VIEW IF EXISTS collection_availability_snapshot;
       $active_user_triggers$;
     ''',
   ),
+  Migration(
+    version: '077',
+    name: 'enforce_unique_lower_set_code',
+    // BT-CAT-01 (D-74; decisão do dono de 2026-10-10, item 22): um set por código
+    // sem diferença de caixa. A produção tinha 84 códigos repetidos só pela caixa
+    // (971 linhas para 887 códigos), e o lote os funde antes desta migration com
+    // server/sql/lote/d74_dedupe_sets_lower_code.sql. Com duplicata, a 077 falha
+    // fechada com a contagem e o nome do script, e nada é escrito. O índice também
+    // serve às leituras que comparam LOWER(code). Nenhuma chave para users: o laço
+    // da regra da 070 não se aplica. O down só tira o índice.
+    up: r'''
+      LOCK TABLE sets IN SHARE MODE;
+
+      DO $enforce_unique_lower_set_code$
+      DECLARE
+        duplicated_codes BIGINT;
+        extra_rows BIGINT;
+      BEGIN
+        SELECT COUNT(*), COALESCE(SUM(rows_in_group - 1), 0)
+        INTO duplicated_codes, extra_rows
+        FROM (
+          SELECT COUNT(*) AS rows_in_group
+          FROM sets
+          GROUP BY LOWER(code)
+          HAVING COUNT(*) > 1
+        ) duplicated;
+        IF duplicated_codes > 0 THEN
+          RAISE EXCEPTION
+            'migration 077 recusada: % código(s) de set repetidos só pela caixa (% linha(s) a mais). Rode antes server/sql/lote/d74_dedupe_sets_lower_code.sql (D-74). Nada foi escrito.',
+            duplicated_codes, extra_rows
+            USING ERRCODE = 'unique_violation';
+        END IF;
+      END;
+      $enforce_unique_lower_set_code$;
+
+      CREATE UNIQUE INDEX IF NOT EXISTS uq_sets_code_lower ON sets (LOWER(code));
+
+      -- O IF NOT EXISTS aceitaria um índice velho com o mesmo nome.
+      DO $enforce_unique_lower_set_code_check$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1
+          FROM pg_index index_row
+          WHERE index_row.indexrelid = to_regclass('public.uq_sets_code_lower')
+            AND index_row.indrelid = 'public.sets'::regclass
+            AND index_row.indisunique
+            AND index_row.indpred IS NULL
+            AND pg_get_indexdef(index_row.indexrelid) LIKE '% (lower(code))'
+        ) THEN
+          RAISE EXCEPTION
+            'migration 077: uq_sets_code_lower existe sem ser o índice único em LOWER(code)';
+        END IF;
+      END;
+      $enforce_unique_lower_set_code_check$;
+    ''',
+    down: 'DROP INDEX IF EXISTS uq_sets_code_lower;',
+  ),
 ];
 
 class Migration {

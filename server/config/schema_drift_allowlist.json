@@ -427,7 +427,7 @@
       "categoria": "indices",
       "tipo": "sobrando",
       "objeto": "public.uq_binder_user_card_cond_foil_list",
-      "motivo": "não adotado (D-83): UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); na produção a rota POST /binder devolve 500 para a mesma carta em outro idioma, e tirá-lo de lá pede um passo governado",
+      "motivo": "não adotado (D-83): UNIQUE sem language, que contradiz a identidade física da 049 (ADR 0008); na produção a rota POST /binder devolve 500 para a mesma carta em outro idioma. Sai da produção no lote (decisão do dono de 2026-10-10, item 9) pelo passo governado server/sql/lote/binder_drop_uq_binder_user_card_cond_foil_list.sql",
       "decisao": "D-83"
     },
     {
@@ -481,6 +481,21 @@
       "tabela": "public.card_meta_insights",
       "migration": "075",
       "motivo": "versatility_score passa de numeric(6,3) para double precision, como na produção: o valor é o mesmo e o texto da linha muda (0.000 vira 0); na produção a coluna já é double precision e nada muda"
+    },
+    {
+      "tabela": "public.sets",
+      "migration": "077",
+      "motivo": "D-74 (BT-CAT-01, decisão do dono de 2026-10-10, item 22): com sets repetidos só pela caixa, o ensaio roda antes do migrate, como o lote, o server/sql/lote/d74_dedupe_sets_lower_code.sql (prévia e gravação com as contagens da prévia); sem ele a 077 recusa. A mudança só é aceita linha a linha: em cada grupo de LOWER(code) fica uma linha que já existia e as outras saem; grupo sem repetição fica idêntico; a que fica só muda nos campos herdados, de nulo para o valor de uma linha que saiu do grupo, e no updated_at quando herdou algo",
+      "regra": "fusao_por_lower_code",
+      "chave": "code",
+      "campos_herdados": [
+        "release_date",
+        "type",
+        "block",
+        "is_online_only",
+        "is_foreign_only"
+      ],
+      "carimbo": "updated_at"
     }
   ]
 }

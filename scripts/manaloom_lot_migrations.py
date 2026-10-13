@@ -15,12 +15,20 @@ escrita, o plano confere o lote contra o código deste SHA:
   termina na última do código (nada fica pendente nem fora do lote);
 - as regras de `same_lot` valem;
 - o readiness do backend deste SHA (`server/lib/health_readiness_support.dart`) exige
-  exatamente a última do lote e conhece cada migration que exige.
+  exatamente a última do lote e conhece cada migration que exige;
+- todo script de `server/sql/lote/` que uma migration do lote pede no código (a 077
+  pede o dedupe da D-74, `server/sql/lote/d74_dedupe_sets_lower_code.sql`) está em
+  `before_first_migration`, existe neste SHA e segue o contrato do lote: prévia por
+  padrão e, com `-v aplicar=1`, a gravação só com as contagens `-v esperado_<objeto>=<n>`
+  que a prévia mostrou.
 As provas do L-01 (backup com ensaio de restauração) e do L-02 (ensaio do upgrade com o
 dump desse backup) têm de existir, ter passado e ter no máximo 24 h (o RPO da D-12).
 O ledger de antes tem de estar em `from`, sem lacuna e sem versão de outro código.
-Depois, o ledger tem de ser o de antes mais o lote, nem mais nem menos, e do mesmo
-banco (nome e system_identifier do cluster) que o de antes.
+Os passos de `before_first_migration` rodam depois dessa conferência e antes da primeira
+migration, com o banco ainda em `from` e o backend antigo no ar (fora da janela de 503),
+e o resultado de cada um vai para o mesmo receipt. Depois, o ledger tem de ser o de
+antes mais o lote, nem mais nem menos, e do mesmo banco (nome e system_identifier do
+cluster) que o de antes.
 
 Cada leitura do banco começa pela identidade (`database|<current_database()>|
 <system_identifier>`) e segue com o ledger (`versão|nome`, em ordem).
@@ -30,13 +38,16 @@ O_EXCL (`chmod 600`), e um nome que já existe é recusado.
 
 Subcomandos:
   plan --policy P [--root R]
+  expected --plan PLANO [--esperado PASSO:OBJETO=N ...]   as contagens da gravação
+  step-result --plan PLANO --id PASSO --mode previa|gravacao --exit N --stdout O --stderr E
+          [--expected X]                      o que um passo antes da primeira migration fez
   proofs --backup-receipt B --upgrade-rehearsal E   as provas do L-01 e do L-02
   check-before --plan PLANO --ledger-raw L
   check-after --plan PLANO --before-raw L0 --after-raw L1
   snapshot --raw L --out S                    o ledger para o --schema-snapshot da promoção
   create --out F                              cria F vazio, só do dono, se não existe
   receipt --out R --status S --sha SHA --started-at T --plan PLANO [--before B] [--after A]
-          [--proofs P] [--migrate-exit N] [--log NOME] [--reason TEXTO]
+          [--proofs P] [--steps S] [--migrate-exit N] [--log NOME] [--reason TEXTO]
 
 Saída JSON em stdout. Códigos: 0 PASS, 1 FAIL, 2 entrada inválida, 3 BLOCKED.
 """
@@ -77,6 +88,16 @@ REHEARSAL_TOOL = "scripts/manaloom_migration_rehearsal.py --restore completo"
 PROOF_MAX_AGE = dt.timedelta(hours=24)
 PROOF_MAX_SKEW = dt.timedelta(minutes=5)
 SHA256 = re.compile(r"^[0-9a-f]{64}$")
+# Os passos antes da primeira migration: scripts de server/sql/lote/ no contrato do lote
+# (prévia por padrão; -v aplicar=1 com -v esperado_<objeto>=<n>), pedidos no código por
+# uma migration do lote.
+STEP_ID = re.compile(r"^[a-z][a-z0-9_]*$")
+LOT_SCRIPT = re.compile(r"^server/sql/lote/[a-z0-9_]+\.sql$")
+LOT_SCRIPT_MENTION = re.compile(r"server/sql/lote/[a-z0-9_]+\.sql")
+SCRIPT_APPLY_FLAG = re.compile(r"^\\if :\{\?aplicar\}$", re.MULTILINE)
+SCRIPT_TARGET = re.compile(r"^\\if :\{\?esperado_([a-z0-9_]+)\}$", re.MULTILINE)
+EXPECTED_ARG = re.compile(r"^([a-z][a-z0-9_]*):([a-z0-9_]+)=([0-9]{1,12})$")
+STEP_MODES = {"previa": "rollback", "gravacao": "commit"}
 
 # A exigência de schema de uma imagem e o formato do ledger são os da promoção (S-02):
 # os dois passos leem o mesmo arquivo do mesmo jeito.
@@ -144,6 +165,23 @@ def policy_problems(policy: Any) -> list[str]:
                             for item in rule["with"])
                     and isinstance(rule.get("rationale"), str) and rule["rationale"].strip()):
                 problems.append(f"same_lot[{index}] inválido")
+    steps = policy.get("before_first_migration")
+    if not isinstance(steps, list):
+        problems.append("before_first_migration deve ser uma lista")
+    else:
+        seen: set[str] = set()
+        for index, step in enumerate(steps):
+            if not (isinstance(step, dict)
+                    and isinstance(step.get("id"), str) and STEP_ID.match(step["id"])
+                    and step["id"] not in seen
+                    and isinstance(step.get("script"), str) and LOT_SCRIPT.match(step["script"])
+                    and isinstance(step.get("required_by"), str)
+                    and VERSION.match(step["required_by"])
+                    and all(isinstance(step.get(key), str) and step[key].strip()
+                            for key in ("decision", "rationale"))):
+                problems.append(f"before_first_migration[{index}] inválido")
+            else:
+                seen.add(step["id"])
     for key in ("runner", "window", "rollback"):
         if not isinstance(policy.get(key), str) or not policy[key].strip():
             problems.append(f"{key} ausente")
@@ -178,8 +216,68 @@ def readiness_required(text: str) -> dict[str, str]:
     return dict(READINESS_ENTRY.findall(block.group(1)))
 
 
-def plan(policy: dict[str, Any], migrate_text: str, readiness_text: str) -> dict[str, Any]:
-    """O lote contra o código: lacuna, migration fora do lote, regra de lote e readiness."""
+def migration_script_mentions(text: str) -> dict[str, list[str]]:
+    """Os scripts de server/sql/lote/ que cada migration cita no seu bloco do migrate.dart
+    (a 077 manda rodar antes o dedupe da D-74)."""
+    entries = list(MIGRATION_ENTRY.finditer(text))
+    mentions: dict[str, list[str]] = {}
+    for index, entry in enumerate(entries):
+        end = entries[index + 1].start() if index + 1 < len(entries) else len(text)
+        found = sorted(set(LOT_SCRIPT_MENTION.findall(text[entry.start():end])))
+        if found:
+            mentions[entry.group(1)] = found
+    return mentions
+
+
+def script_contract(text: str) -> tuple[bool, list[str]]:
+    """Se um script do lote tem a prévia por padrão (`-v aplicar`) e as contagens que a
+    gravação exige (`-v esperado_<objeto>`), na ordem do arquivo."""
+    return bool(SCRIPT_APPLY_FLAG.search(text)), SCRIPT_TARGET.findall(text)
+
+
+def _steps_plan(policy: dict[str, Any], lot: list[str], mentions: dict[str, list[str]],
+                root: Path, problems: list[str]) -> list[dict[str, Any]]:
+    """Os passos antes da primeira migration: os que o código pede e o contrato de cada um."""
+    steps = policy["before_first_migration"]
+    declared = {step["script"]: step for step in steps}
+    for version in lot:
+        for script in mentions.get(version, []):
+            if script not in declared:
+                problems.append(f"a {version} pede {script} antes dela (no migrate.dart), e o "
+                                "lote não o roda antes da primeira migration "
+                                "(before_first_migration)")
+            elif declared[script]["required_by"] != version:
+                problems.append(f"{script} é pedido pela {version}, e o lote o declara para a "
+                                f"{declared[script]['required_by']}")
+    planned = []
+    for step in steps:
+        entry: dict[str, Any] = {
+            "id": step["id"], "script": step["script"], "required_by": step["required_by"],
+            "decision": step["decision"], "sha256": None, "targets": [],
+        }
+        if step["required_by"] not in lot:
+            problems.append(f"o passo {step['id']} é da {step['required_by']}, que não está "
+                            "no lote")
+        path = root / step["script"]
+        if path.is_symlink() or not path.is_file():
+            problems.append(f"o passo {step['id']}: {step['script']} não existe neste SHA")
+        else:
+            raw = path.read_bytes()
+            entry["sha256"] = hashlib.sha256(raw).hexdigest()
+            has_apply, targets = script_contract(raw.decode("utf-8", errors="replace"))
+            entry["targets"] = targets
+            if not has_apply or not targets or len(set(targets)) != len(targets):
+                problems.append(f"o passo {step['id']}: {step['script']} não segue o contrato "
+                                "do lote (prévia por padrão, -v aplicar=1 e -v esperado_<objeto> "
+                                "para cada contagem da gravação)")
+        planned.append(entry)
+    return planned
+
+
+def plan(policy: dict[str, Any], migrate_text: str, readiness_text: str,
+         root: Path = REPO_ROOT) -> dict[str, Any]:
+    """O lote contra o código: lacuna, migration fora do lote, regra de lote, readiness e
+    os passos que o código pede antes da primeira migration."""
     problems: list[str] = []
     code = code_migrations(migrate_text)
     names = dict(code)
@@ -220,6 +318,7 @@ def plan(policy: dict[str, Any], migrate_text: str, readiness_text: str) -> dict
         if names.get(version) != name:
             problems.append(f"o readiness exige a {version} ({name}), que o migrate.dart não tem "
                             "com esse nome")
+    steps = _steps_plan(policy, lot, migration_script_mentions(migrate_text), root, problems)
     return {
         "status": "PASS" if not problems else "BLOCKED",
         "policy": policy["policy"],
@@ -229,9 +328,137 @@ def plan(policy: dict[str, Any], migrate_text: str, readiness_text: str) -> dict
         "migrations": [{"version": version, "name": names.get(version)} for version in lot],
         "same_lot": [{"version": rule["version"], "with": rule["with"]}
                      for rule in policy["same_lot"]],
+        "before_first_migration": steps,
         "readiness_requires": requires,
         "code_latest": code[-1][0],
         "code": [list(item) for item in code if item[0] <= end],
+        "problems": problems,
+    }
+
+
+# ------------------------------------------------------------ passos antes da 1ª migration
+
+
+def expected_counts(planned: dict[str, Any], arguments: list[str]) -> dict[str, Any]:
+    """As contagens que a gravação de cada passo exige, de `--esperado PASSO:OBJETO=N`.
+
+    Cada contagem que o script declara (`-v esperado_<objeto>`) tem de vir uma vez, e só
+    elas: o número é o que a prévia mostrou e o dono aprovou. O script recusa (RAISE, nada
+    gravado) se a ação não bater.
+    """
+    steps = {step["id"]: step for step in planned.get("before_first_migration") or []}
+    given: dict[str, dict[str, str]] = {step_id: {} for step_id in steps}
+    problems: list[str] = []
+    for argument in arguments:
+        match = EXPECTED_ARG.match(argument)
+        if match is None:
+            problems.append(f"--esperado {argument}: use PASSO:OBJETO=N, com N inteiro")
+            continue
+        step_id, target, count = match.groups()
+        if step_id not in steps:
+            problems.append(f"--esperado {argument}: o lote não tem o passo {step_id}")
+        elif target not in steps[step_id]["targets"]:
+            problems.append(f"--esperado {argument}: o passo {step_id} não conta {target} "
+                            f"(conta {', '.join(steps[step_id]['targets'])})")
+        elif target in given[step_id]:
+            problems.append(f"--esperado {argument}: {step_id}:{target} veio duas vezes")
+        else:
+            given[step_id][target] = str(int(count))
+    for step_id, step in steps.items():
+        missing = [target for target in step["targets"] if target not in given[step_id]]
+        if missing:
+            problems.append(f"falta --esperado para {', '.join(f'{step_id}:{target}' for target in missing)}"
+                            " (rode antes --execute --preview e passe os números que o dono aprovou)")
+    if problems:
+        raise InvalidInput("; ".join(problems))
+    return {
+        "status": "PASS",
+        "steps": [{"id": step_id, "expected": given[step_id],
+                   "psql_variables": ["aplicar=1"] + [f"esperado_{target}={given[step_id][target]}"
+                                                      for target in steps[step_id]["targets"]]}
+                  for step_id in steps],
+    }
+
+
+def _rows(output: str) -> list[tuple[str, str, str]]:
+    """As linhas `fase<TAB>objeto<TAB>quantidade` de um script do lote."""
+    rows = []
+    for line in output.splitlines():
+        parts = line.split("\t")
+        if len(parts) == 3:
+            rows.append((parts[0], parts[1], parts[2]))
+    return rows
+
+
+def step_result(planned: dict[str, Any], step_id: str, mode: str, exit_code: int,
+                stdout: str, stderr: str, expected: dict[str, str] | None) -> dict[str, Any]:
+    """O que um passo antes da primeira migration fez, pela saída do psql.
+
+    - `previa`: saiu 0 e terminou em ROLLBACK, com cada contagem da gravação na ação;
+    - `gravacao`: `applied` só com saída 0, o COMMIT impresso e a ação igual ao esperado;
+      `refused` (nada gravado) quando o script terminou em ROLLBACK, ou quando o COMMIT não
+      saiu e o psql parou num erro do servidor dentro da transação (código 3 com
+      ON_ERROR_STOP), ou quando nada foi impresso; `failed` no resto, quando não dá para
+      afirmar que nada foi gravado.
+    """
+    steps = {step["id"]: step for step in planned.get("before_first_migration") or []}
+    if step_id not in steps:
+        raise InvalidInput(f"o plano não tem o passo {step_id}")
+    if mode not in STEP_MODES:
+        raise InvalidInput(f"modo do passo inválido: {mode}")
+    step = steps[step_id]
+    rows = _rows(stdout)
+    phases: dict[str, dict[str, str]] = {}
+    merges: list[str] = []
+    for phase, target, value in rows:
+        if phase == "fusao":
+            merges.append(f"{target} {value}")
+        else:
+            phases.setdefault(phase, {})[target] = value
+    action = phases.get("acao", {})
+    outcome = phases.get("modo", {}).get("desfecho")
+    problems: list[str] = []
+    if mode == "previa":
+        missing = [target for target in step["targets"] if target not in action]
+        status = "preview"
+        if exit_code != 0 or outcome != "rollback" or missing:
+            status = "failed"
+            problems.append(f"a prévia do passo {step_id} saiu com {exit_code}, desfecho "
+                            f"{outcome or 'ausente'}"
+                            + (f", sem {', '.join(missing)}" if missing else ""))
+    else:
+        expected = expected or {}
+        diverged = [target for target in step["targets"]
+                    if action.get(target) != expected.get(target)]
+        if exit_code == 0 and outcome == "commit" and not diverged:
+            status = "applied"
+        elif outcome == "rollback" or (outcome != "commit" and (exit_code == 3 or not rows)):
+            status = "refused"
+            problems.append(f"o passo {step_id} não gravou (saiu com {exit_code}, desfecho "
+                            f"{outcome or 'sem COMMIT'}): nada foi gravado")
+        else:
+            status = "failed"
+            problems.append(f"o passo {step_id} saiu com {exit_code} e desfecho "
+                            f"{outcome or 'ausente'}"
+                            + (f"; a ação diverge do esperado em {', '.join(diverged)}"
+                               if outcome == "commit" and diverged else "")
+                            + ": confira à mão o que foi gravado")
+    errors = [line.strip() for line in stderr.splitlines() if "ERROR" in line or "FATAL" in line]
+    return {
+        "id": step_id,
+        "script": step["script"],
+        "sha256": step["sha256"],
+        "required_by": step["required_by"],
+        "mode": mode,
+        "exit": exit_code,
+        "status": status,
+        "expected": expected if mode == "gravacao" else None,
+        # Na prévia, o que o --apply pede: cada contagem da ação como --esperado.
+        "esperado": ([f"{step_id}:{target}={action[target]}" for target in step["targets"]]
+                     if status == "preview" else []),
+        "phases": phases,
+        "fusao": merges,
+        "errors": errors[-5:],
         "problems": problems,
     }
 
@@ -473,6 +700,17 @@ def main(argv: list[str] | None = None) -> int:
     planned = commands.add_parser("plan")
     planned.add_argument("--policy", type=Path, required=True)
     planned.add_argument("--root", type=Path, default=REPO_ROOT)
+    expect = commands.add_parser("expected")
+    expect.add_argument("--plan", type=Path, required=True)
+    expect.add_argument("--esperado", action="append", default=[])
+    stepped = commands.add_parser("step-result")
+    stepped.add_argument("--plan", type=Path, required=True)
+    stepped.add_argument("--id", required=True)
+    stepped.add_argument("--mode", required=True, choices=sorted(STEP_MODES))
+    stepped.add_argument("--exit", type=int, required=True)
+    stepped.add_argument("--stdout", type=Path, required=True)
+    stepped.add_argument("--stderr", type=Path, required=True)
+    stepped.add_argument("--expected", type=Path)
     proven = commands.add_parser("proofs")
     proven.add_argument("--backup-receipt", type=Path, required=True)
     proven.add_argument("--upgrade-rehearsal", type=Path, required=True)
@@ -497,6 +735,8 @@ def main(argv: list[str] | None = None) -> int:
     receipt.add_argument("--before", type=Path)
     receipt.add_argument("--after", type=Path)
     receipt.add_argument("--proofs", type=Path)
+    receipt.add_argument("--expected", type=Path)
+    receipt.add_argument("--steps", type=Path, action="append", default=[])
     receipt.add_argument("--migrate-exit", type=int)
     receipt.add_argument("--log")
     receipt.add_argument("--reason", default="")
@@ -505,9 +745,23 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "plan":
             result = plan(load_policy(args.policy), _read(args.root / MIGRATE_SOURCE),
-                          _read(args.root / promote.READINESS_SOURCE))
+                          _read(args.root / promote.READINESS_SOURCE), args.root)
             print(json.dumps(result, ensure_ascii=False))
             return 0 if result["status"] == "PASS" else 3
+        if args.command == "expected":
+            result = expected_counts(_json(args.plan), args.esperado)
+            print(json.dumps(result, ensure_ascii=False))
+            return 0
+        if args.command == "step-result":
+            given = None
+            if args.expected:
+                for item in _json(args.expected)["steps"]:
+                    if item["id"] == args.id:
+                        given = item["expected"]
+            result = step_result(_json(args.plan), args.id, args.mode, args.exit,
+                                 _read(args.stdout), _read(args.stderr), given)
+            print(json.dumps(result, ensure_ascii=False))
+            return {"preview": 0, "applied": 0, "refused": 3}.get(result["status"], 1)
         if args.command == "proofs":
             backup_data, backup_sha = _proof_file(args.backup_receipt)
             rehearsal_data, rehearsal_sha = _proof_file(args.upgrade_rehearsal)
@@ -546,9 +800,26 @@ def main(argv: list[str] | None = None) -> int:
         before_data = _json(args.before) if args.before else None
         after_data = _json(args.after) if args.after else None
         proofs_data = _json(args.proofs) if args.proofs else None
-        for part in (proofs_data, before_data, after_data):
+        for part in (proofs_data, before_data):
             if isinstance(part, dict):
                 problems += part.get("problems") or []
+        # Os passos antes da primeira migration: o que cada um fez, ou que não rodou.
+        given = {item["id"]: item["expected"]
+                 for item in (_json(args.expected)["steps"] if args.expected else [])}
+        ran = {item["id"]: item for item in (_json(path) for path in args.steps)
+               if isinstance(item, dict) and isinstance(item.get("id"), str)}
+        steps_data = []
+        for step in planned_data.get("before_first_migration") or []:
+            if step["id"] in ran:
+                steps_data.append(ran[step["id"]])
+                problems += ran[step["id"]].get("problems") or []
+            else:
+                steps_data.append({"id": step["id"], "script": step["script"],
+                                   "sha256": step.get("sha256"),
+                                   "required_by": step.get("required_by"), "status": "not_run",
+                                   "expected": given.get(step["id"])})
+        if isinstance(after_data, dict):
+            problems += after_data.get("problems") or []
         if args.reason:
             problems.append(args.reason)
         data = {
@@ -566,6 +837,7 @@ def main(argv: list[str] | None = None) -> int:
             "lot": [item["version"] for item in planned_data.get("migrations", [])],
             "same_lot": planned_data.get("same_lot"),
             "proofs": proofs_data,
+            "before_first_migration": steps_data,
             "database": ((before_data or {}).get("ledger") or {}).get("database"),
             "before": (before_data or {}).get("ledger"),
             "after": (after_data or {}).get("ledger"),

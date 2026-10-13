@@ -3,16 +3,21 @@
 
 Sem banco, sempre: o lote versionado (server/config/lot_migrations.json) contra o código
 deste SHA, as recusas de lacuna e de lote (a 074 vai com a 067 e a 069, pela BT-DB-007),
-as provas do L-01 e do L-02, as conferências do ledger de antes e de depois (no mesmo
-banco), a evidência que nunca é sobrescrita (O_EXCL e nome com carimbo e PID, inclusive
-em duas execuções no mesmo segundo) e as recusas antes de qualquer conexão, num
-repositório descartável fora de /tmp.
+o dedupe da D-74 antes da primeira migration (a 077 o pede no código), as contagens
+esperadas da gravação e o resultado de um passo pela saída do psql, as provas do L-01 e
+do L-02, as conferências do ledger de antes e de depois (no mesmo banco), a evidência que
+nunca é sobrescrita (O_EXCL e nome com carimbo e PID, inclusive em duas execuções no
+mesmo segundo) e as recusas antes de qualquer conexão, num repositório descartável fora
+de /tmp.
 
 Com RUN_SCHEMA_DB_TESTS=1 e a aprovação do PostgreSQL descartável
 (MANALOOM_APPROVE_DISPOSABLE_POSTGRES=I_APPROVE_DISPOSABLE_LOCAL_POSTGRES ou git config
 manaloom.localGates.disposablePostgres=true): um PostgreSQL 17 descartável em loopback,
 num diretório temporário e parado no fim, monta o banco da produção na 058 (o bootstrap
-de 41bab49c9 do fixture e o migrate.dart até a 058). O script de verdade roda num
+de 41bab49c9 do fixture e o migrate.dart até a 058), com sets repetidos só pela caixa,
+como na produção. O script de verdade faz a prévia do dedupe da D-74, recusa a gravação
+com uma contagem errada sem gravar nada e, com as contagens da prévia, funde os sets e
+leva o banco até a 077. Ele roda num
 repositório descartável no origin/master, com o server/bin/with_new_server_pg.sh de
 verdade: o ssh é trocado por um túnel falso que só repassa a porta para o banco
 descartável, e o processo inteiro roda sob o sandbox do ensaio (rede só em localhost).
@@ -92,6 +97,14 @@ SCRIPT = REPO_ROOT / "scripts" / "manaloom_lot_apply_migrations.sh"
 POLICY = REPO_ROOT / "server" / "config" / "lot_migrations.json"
 MIGRATE = REPO_ROOT / "server" / "bin" / "migrate.dart"
 READINESS = REPO_ROOT / "server" / "lib" / "health_readiness_support.dart"
+D74 = REPO_ROOT / "server" / "sql" / "lote" / "d74_dedupe_sets_lower_code.sql"
+D74_SCRIPT = "server/sql/lote/d74_dedupe_sets_lower_code.sql"
+D74_TARGETS = ["referencias_levadas_para_a_linha_que_fica",
+               "linhas_que_ficam_com_campo_herdado", "linhas_apagadas"]
+# As contagens da gravação do dedupe no SEED: nenhuma referência por chave estrangeira,
+# o MH3 herda o block do mh3, e saem o ltr e o mh3.
+ESPERADO_D74 = ("d74:referencias_levadas_para_a_linha_que_fica=0",
+                "d74:linhas_que_ficam_com_campo_herdado=1", "d74:linhas_apagadas=2")
 SETUP_058 = REPO_ROOT / "server" / "test" / "fixtures" / "schema_profiles" / "database_setup_058.sql"
 SETUP_058_SHA256 = "857c56423da0519ef12326f8686a37bd8e0c58746338efa5e6c8538f7ab057a9"
 ENABLED = os.environ.get("RUN_SCHEMA_DB_TESTS") == "1"
@@ -118,6 +131,7 @@ REPO_FILES = (
     "scripts/lib/manaloom_dart_toolchain.sh",
     "server/bin/with_new_server_pg.sh",
     "server/bin/migrate.dart",
+    "server/sql/lote/d74_dedupe_sets_lower_code.sql",
     "server/config/lot_migrations.json",
     "server/config/capacity_policy.json",
     "server/pubspec.yaml",
@@ -127,8 +141,16 @@ SEED = """
 INSERT INTO users (id, username, email, password_hash) VALUES
   ('00000000-0000-4000-8000-000000000001', 'lote_ana', 'ana@example.invalid', 'x'),
   ('00000000-0000-4000-8000-000000000002', 'lote_beto', 'beto@example.invalid', 'x');
-INSERT INTO cards (id, scryfall_id, name) VALUES
-  ('00000000-0000-4000-8000-000000000101', '00000000-0000-4000-8000-000000000201', 'Carta A');
+INSERT INTO cards (id, scryfall_id, name, set_code) VALUES
+  ('00000000-0000-4000-8000-000000000101', '00000000-0000-4000-8000-000000000201', 'Carta A',
+   'ltr');
+-- D-74: códigos repetidos só pela caixa, como os 84 da produção (BT-CAT-01).
+INSERT INTO sets (code, name, release_date, type, block) VALUES
+  ('LTR', 'The Lord of the Rings', '2023-06-23', 'expansion', NULL),
+  ('ltr', 'The Lord of the Rings', NULL, NULL, NULL),
+  ('MH3', 'Modern Horizons 3', '2024-06-14', 'draft_innovation', NULL),
+  ('mh3', 'Modern Horizons 3', '2024-06-14', NULL, 'Modern Horizons'),
+  ('DSK', 'Duskmourn: House of Horror', '2024-09-27', 'expansion', NULL);
 INSERT INTO decks (id, user_id, name, format) VALUES
   ('00000000-0000-4000-8000-000000000301', '00000000-0000-4000-8000-000000000001',
    'Deck do lote', 'commander');
@@ -282,6 +304,143 @@ class PlanTest(unittest.TestCase):
         self.assertEqual(policy["same_lot"][0]["version"], "074")
         self.assertEqual(policy["same_lot"][0]["with"], ["067", "069"])
         self.assertIn("BT-DB-007", policy["same_lot"][0]["rationale"])
+        # A 077 (D-74) pede no código o dedupe dos sets repetidos só pela caixa, e o lote o
+        # roda antes da primeira migration, no contrato do lote (prévia e contagens).
+        self.assertIn("077", policy["migrations"])
+        self.assertIn(D74_SCRIPT, lot.migration_script_mentions(
+            MIGRATE.read_text(encoding="utf-8"))["077"])
+        steps = planned["before_first_migration"]
+        self.assertEqual([(step["id"], step["script"], step["required_by"]) for step in steps],
+                         [("d74", D74_SCRIPT, "077")])
+        self.assertEqual(steps[0]["targets"], D74_TARGETS)
+        self.assertEqual(steps[0]["sha256"], hashlib.sha256(D74.read_bytes()).hexdigest())
+
+    def test_a_lot_script_the_code_asks_for_runs_before_the_first_migration(self) -> None:
+        policy = _policy()
+        step = policy["before_first_migration"][0]
+        cases = {
+            "sem o dedupe": (dict(policy, before_first_migration=[]),
+                             [f"a 077 pede {D74_SCRIPT} antes dela"]),
+            "declarado para outra migration": (
+                dict(policy, before_first_migration=[dict(step, required_by="076")]),
+                [f"{D74_SCRIPT} é pedido pela 077, e o lote o declara para a 076"]),
+            "script que não existe": (
+                dict(policy, before_first_migration=[
+                    dict(step, script="server/sql/lote/nao_existe.sql")]),
+                ["o passo d74: server/sql/lote/nao_existe.sql não existe neste SHA",
+                 f"a 077 pede {D74_SCRIPT} antes dela"]),
+            "migration fora do lote": (
+                dict(policy, before_first_migration=[dict(step, required_by="070")]),
+                ["o passo d74 é da 070, que não está no lote"]),
+        }
+        for label, (changed, expected) in cases.items():
+            with self.subTest(case=label):
+                planned = _plan(changed)
+                self.assertEqual(planned["status"], "BLOCKED")
+                for text in expected:
+                    self.assertTrue(any(text in problem for problem in planned["problems"]),
+                                    (text, planned["problems"]))
+        # Um script sem a prévia por padrão ou sem as contagens esperadas não serve.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            target = root / D74_SCRIPT
+            target.parent.mkdir(parents=True)
+            for label, text in (
+                ("sem -v aplicar", D74.read_text(encoding="utf-8").replace(
+                    "\\if :{?aplicar}", "\\if :{?gravar}")),
+                ("sem -v esperado", "\\if :{?aplicar}\n\\endif\nSELECT 1;\n"),
+            ):
+                with self.subTest(case=label):
+                    target.write_text(text, encoding="utf-8")
+                    planned = lot.plan(policy, MIGRATE.read_text(encoding="utf-8"),
+                                       READINESS.read_text(encoding="utf-8"), root)
+                    self.assertEqual(planned["status"], "BLOCKED")
+                    self.assertTrue(any("não segue o contrato do lote" in problem
+                                        for problem in planned["problems"]),
+                                    planned["problems"])
+
+    def test_the_expected_counts_cover_every_count_of_the_script(self) -> None:
+        planned = _plan(_policy())
+        accepted = lot.expected_counts(planned, list(ESPERADO_D74))
+        self.assertEqual(accepted["steps"], [{
+            "id": "d74",
+            "expected": {"referencias_levadas_para_a_linha_que_fica": "0",
+                         "linhas_que_ficam_com_campo_herdado": "1", "linhas_apagadas": "2"},
+            "psql_variables": ["aplicar=1", "esperado_referencias_levadas_para_a_linha_que_fica=0",
+                               "esperado_linhas_que_ficam_com_campo_herdado=1",
+                               "esperado_linhas_apagadas=2"],
+        }])
+        cases = {
+            "falta --esperado para d74:linhas_apagadas (rode antes --execute --preview":
+                list(ESPERADO_D74[:2]),
+            "falta --esperado para d74:referencias_levadas_para_a_linha_que_fica, "
+            "d74:linhas_que_ficam_com_campo_herdado, d74:linhas_apagadas": [],
+            "use PASSO:OBJETO=N": list(ESPERADO_D74[:2]) + ["d74:linhas_apagadas=dois"],
+            "o lote não tem o passo d85": list(ESPERADO_D74) + ["d85:linhas_apagadas=1"],
+            "o passo d74 não conta linhas_novas": list(ESPERADO_D74) + ["d74:linhas_novas=1"],
+            "d74:linhas_apagadas veio duas vezes": list(ESPERADO_D74) + ["d74:linhas_apagadas=2"],
+        }
+        for expected, arguments in cases.items():
+            with self.subTest(case=expected):
+                with self.assertRaises(lot.InvalidInput) as raised:
+                    lot.expected_counts(planned, arguments)
+                self.assertIn(expected, str(raised.exception))
+
+    def test_a_step_is_applied_only_with_the_commit_and_the_expected_counts(self) -> None:
+        planned = _plan(_policy())
+        expected = lot.expected_counts(planned, list(ESPERADO_D74))["steps"][0]["expected"]
+
+        def output(outcome: str | None, mode: str = "aplicar", deleted: str = "2") -> str:
+            lines = [f"modo\tescrita\t{mode}", "antes\tsets\t5",
+                     "acao\treferencias_levadas_para_a_linha_que_fica\t0",
+                     "acao\tlinhas_que_ficam_com_campo_herdado\t1",
+                     f"acao\tlinhas_apagadas\t{deleted}",
+                     "fusao\tMH3\tsaem=mh3;herda=block", "depois\tsets\t3"]
+            return "\n".join(lines + ([f"modo\tdesfecho\t{outcome}"] if outcome else [])) + "\n"
+
+        refusal = "psql:d74.sql:345: ERROR:  d74 recusado: a ação levou 0 referência(s)\n"
+        cases = (
+            ("gravado", "gravacao", 0, output("commit"), "", "applied", 0),
+            ("recusa do script (RAISE)", "gravacao", 3, output(None), refusal, "refused", 3),
+            ("sem -v aplicar: terminou em ROLLBACK", "gravacao", 0,
+             output("rollback", "previa"), "", "refused", 3),
+            ("nada impresso (o wrapper parou antes)", "gravacao", 2, "", "with_new_server_pg: x\n",
+             "refused", 3),
+            ("conexão caiu no meio", "gravacao", 2, output(None), "server closed the connection\n",
+             "failed", 1),
+            ("COMMIT com outra contagem", "gravacao", 0, output("commit", deleted="3"), "",
+             "failed", 1),
+            ("prévia", "previa", 0, output("rollback", "previa"), "", "preview", 0),
+            ("prévia que falhou", "previa", 3, output(None, "previa"), refusal, "failed", 1),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            plan_path = work / "plano.json"
+            plan_path.write_text(json.dumps(planned), encoding="utf-8")
+            expected_path = work / "esperado.json"
+            expected_path.write_text(json.dumps(lot.expected_counts(planned, list(ESPERADO_D74))),
+                                     encoding="utf-8")
+            for label, mode, code, stdout, stderr, status, exit_code in cases:
+                with self.subTest(case=label):
+                    result = lot.step_result(planned, "d74", mode, code, stdout, stderr,
+                                             expected if mode == "gravacao" else None)
+                    self.assertEqual(result["status"], status, result["problems"])
+                    out, err = work / "out", work / "err"
+                    out.write_text(stdout, encoding="utf-8")
+                    err.write_text(stderr, encoding="utf-8")
+                    command = self._module(
+                        "step-result", "--plan", str(plan_path), "--id", "d74", "--mode", mode,
+                        "--exit", str(code), "--stdout", str(out), "--stderr", str(err),
+                        *(["--expected", str(expected_path)] if mode == "gravacao" else []))
+                    self.assertEqual(command.returncode, exit_code, command.stdout)
+                    self.assertEqual(json.loads(command.stdout)["status"], status)
+        applied = lot.step_result(planned, "d74", "gravacao", 0, output("commit"), "", expected)
+        self.assertEqual(applied["phases"]["acao"]["linhas_apagadas"], "2")
+        self.assertEqual(applied["fusao"], ["MH3 saem=mh3;herda=block"])
+        self.assertEqual(applied["sha256"], hashlib.sha256(D74.read_bytes()).hexdigest())
+        preview = lot.step_result(planned, "d74", "previa", 0, output("rollback", "previa"), "",
+                                  None)
+        self.assertEqual(preview["esperado"], list(ESPERADO_D74))
 
     def test_a_gap_or_a_split_lot_is_refused(self) -> None:
         policy = _policy()
@@ -333,6 +492,10 @@ class PlanTest(unittest.TestCase):
             "same_lot[0] inválido": dict(policy, same_lot=[{"version": "074", "with": []}]),
             "rollback ausente": {key: value for key, value in policy.items() if key != "rollback"},
             "v1": dict(policy, schema_version=2),
+            "before_first_migration deve ser uma lista": {
+                key: value for key, value in policy.items() if key != "before_first_migration"},
+            "before_first_migration[0] inválido": dict(policy, before_first_migration=[
+                dict(policy["before_first_migration"][0], script="/tmp/d74.sql")]),
         }
         for expected, changed in cases.items():
             with self.subTest(case=expected):
@@ -433,7 +596,7 @@ class PlanTest(unittest.TestCase):
             self.addCleanup(shutil.rmtree, durable, True)
             cases = (
                 (["--apply"], base, "exigem --execute"),
-                (["--execute"], base, "--execute exige --apply ou --read-ledger"),
+                (["--execute"], base, "--execute exige --apply, --preview ou --read-ledger"),
                 (["--execute", "--read-ledger"], base, "--read-ledger exige --out"),
                 (["--execute", "--apply", "--receipt-dir", str(receipts)], base,
                  "MANALOOM_CONFIRM_LIVE_MUTATIONS"),
@@ -603,12 +766,14 @@ class ScriptWithoutDatabaseTest(unittest.TestCase):
         return subprocess.run(["/bin/bash", str(script), *args], capture_output=True,
                               text=True, check=False, env=self.env, timeout=120)
 
-    def apply(self, *extra: str, receipts: Path | None = None, **proof_changes: Any
+    def apply(self, *extra: str, receipts: Path | None = None,
+              esperado: tuple[str, ...] = ESPERADO_D74, **proof_changes: Any
               ) -> subprocess.CompletedProcess:
         backup, rehearsal = write_proofs(self.proofs_dir, **proof_changes)
+        counts = [argument for item in esperado for argument in ("--esperado", item)]
         return self.run_tool("--execute", "--apply", "--receipt-dir", str(receipts or self.receipts),
                              "--backup-receipt", str(backup), "--upgrade-rehearsal",
-                             str(rehearsal), *extra)
+                             str(rehearsal), *counts, *extra)
 
     def test_two_runs_in_the_same_second_keep_both_receipts(self) -> None:
         # O lote sem a 074 é recusado antes de conectar e grava um receipt blocked. Duas
@@ -652,11 +817,52 @@ class ScriptWithoutDatabaseTest(unittest.TestCase):
                    for path in sorted(self.receipts.glob("lote-migrations-*.json"))]
         self.assertEqual([data["status"] for data in blocked], ["blocked", "blocked"])
         self.assertTrue(all(data["proofs"]["status"] == "BLOCKED" for data in blocked))
+        # O dedupe da D-74 não rodou, e o receipt guarda as contagens que vieram.
+        for data in blocked:
+            self.assertEqual(data["before_first_migration"], [{
+                "id": "d74", "script": D74_SCRIPT,
+                "sha256": hashlib.sha256(D74.read_bytes()).hexdigest(), "required_by": "077",
+                "status": "not_run",
+                "expected": {"referencias_levadas_para_a_linha_que_fica": "0",
+                             "linhas_que_ficam_com_campo_herdado": "1", "linhas_apagadas": "2"},
+            }])
         self.assertFalse(self.ssh_log.exists())
         # Com as provas em dia, o passo segue para o ledger (e o shim do ssh recusa).
         result = self.apply()
         self.assertEqual(result.returncode, 2, result.stdout + result.stderr)
         self.assertIn("não li o ledger do banco antes", result.stderr)
+
+    def test_counts_and_preview_are_refused_before_connecting(self) -> None:
+        # Sem as contagens da prévia, ou com uma que o script não declara, o --apply para
+        # antes de conectar e sem receipt; a prévia não aceita --esperado nem anda sem a
+        # aprovação; sem o dedupe no lote, a prévia nem começa.
+        no_dedupe = self.work / "lote-sem-d74.json"
+        no_dedupe.write_text(json.dumps(dict(_policy(), before_first_migration=[])),
+                             encoding="utf-8")
+        unapproved = {key: value for key, value in self.env.items()
+                      if not key.startswith("MANALOOM_CONFIRM_")}
+        cases = (
+            (self.apply(esperado=()), 2,
+             "falta --esperado para d74:referencias_levadas_para_a_linha_que_fica"),
+            (self.apply(esperado=ESPERADO_D74[:2] + ("d74:linhas_apagadas=duas",)), 2,
+             "use PASSO:OBJETO=N"),
+            (self.run_tool("--execute", "--preview", "--esperado", ESPERADO_D74[0]), 2,
+             "--esperado é do --apply"),
+            (self.run_tool("--esperado", ESPERADO_D74[0]), 2, "exigem --execute"),
+            (subprocess.run(["/bin/bash", str(self.repo / "scripts" /
+                                              "manaloom_lot_apply_migrations.sh"),
+                             "--execute", "--preview"], capture_output=True, text=True,
+                            check=False, env=unapproved, timeout=120), 2,
+             "MANALOOM_CONFIRM_LIVE_MUTATIONS"),
+            (self.run_tool("--execute", "--preview", "--policy", str(no_dedupe)), 3,
+             f"a 077 pede {D74_SCRIPT} antes dela"),
+        )
+        for result, code, expected in cases:
+            with self.subTest(expected=expected):
+                self.assertEqual(result.returncode, code, result.stdout + result.stderr)
+                self.assertIn(expected, result.stderr)
+        self.assertEqual(list(self.receipts.iterdir()), [])
+        self.assertFalse(self.ssh_log.exists())
 
     def test_a_receipt_dir_inside_the_repository_is_refused(self) -> None:
         # O repositório descartável é durável (fora de /tmp): só a regra nova recusa.
@@ -777,12 +983,19 @@ class DisposablePostgresTest(unittest.TestCase):
                                                      "manaloom_lot_apply_migrations.sh"), *args],
             capture_output=True, text=True, env=env or self.env, check=False, timeout=900)
 
-    def apply(self, *args: str) -> subprocess.CompletedProcess:
-        """O --apply com as provas do L-01 e do L-02 em dia."""
+    def apply(self, *args: str, esperado: tuple[str, ...] = ESPERADO_D74
+              ) -> subprocess.CompletedProcess:
+        """O --apply com as provas do L-01 e do L-02 em dia e as contagens da prévia."""
         backup, rehearsal = write_proofs(self.proofs_dir)
+        counts = [argument for item in esperado for argument in ("--esperado", item)]
         return self.run_tool("--execute", "--apply", "--receipt-dir", str(self.receipts),
                              "--backup-receipt", str(backup), "--upgrade-rehearsal",
-                             str(rehearsal), *args)
+                             str(rehearsal), *counts, *args)
+
+    def sets(self) -> list[str]:
+        output = self.cluster.psql("halder", "SELECT code || '|' || COALESCE(block, '-') "
+                                             "FROM sets ORDER BY code COLLATE \"C\"")
+        return [line for line in output.splitlines() if line.strip()]
 
     def ledger(self) -> list[str]:
         output = self.cluster.psql("halder", "SELECT version FROM schema_migrations ORDER BY version")
@@ -870,7 +1083,44 @@ class DisposablePostgresTest(unittest.TestCase):
         self.assertEqual(read[0]["before"]["database"], self.database)
         self.assertEqual(list(self.receipts.glob("*.log")), [])
 
-        # 5. O lote: da 058 à última, em ordem, com o receipt de antes e de depois.
+        # 5. O dedupe da D-74 antes da primeira migration.
+        sets_058 = ["DSK|-", "LTR|-", "MH3|-", "ltr|-", "mh3|Modern Horizons"]
+        self.assertEqual(self.sets(), sets_058)
+        # 5a. A prévia: faz, mostra as contagens e desfaz; o banco fica igual, na 058.
+        tunnels_before = self.tunnels()
+        result = self.run_tool("--execute", "--preview")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        preview = json.loads(result.stdout.splitlines()[-1])
+        self.assertEqual((preview["status"], preview["from"], preview["to"], preview["database"]),
+                         ("preview", "058", last, self.database))
+        self.assertEqual(preview["esperado"], list(ESPERADO_D74))
+        self.assertEqual(preview["steps"][0]["phases"]["modo"],
+                         {"escrita": "previa", "desfecho": "rollback"})
+        self.assertEqual(preview["steps"][0]["fusao"], [
+            "LTR saem=ltr;herda=-", "MH3 saem=mh3;herda=block"])
+        self.assertEqual((self.ledger()[-1], self.sets()), ("058", sets_058))
+        # O ledger (só leitura) e a prévia pelo wrapper de escrita.
+        self.assertEqual(self.tunnels() - tunnels_before, 2)
+        # 5b. Uma contagem que não é a da prévia: o script recusa, nada é gravado e as
+        # migrations não rodam.
+        wrong = ESPERADO_D74[:2] + ("d74:linhas_apagadas=3",)
+        result = self.apply(esperado=wrong)
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        self.assertIn("BLOCKED: o passo d74 recusou a gravação", result.stderr)
+        self.assertIn("d74 recusado", result.stderr)
+        self.assertEqual((self.ledger()[-1], self.sets()), ("058", sets_058))
+        refused = [data for data in self.receipts_with("blocked")
+                   if data["before_first_migration"][0]["status"] == "refused"]
+        self.assertEqual(len(refused), 1)
+        self.assertEqual(refused[0]["before_first_migration"][0]["expected"]["linhas_apagadas"],
+                         "3")
+        self.assertEqual(refused[0]["database"], self.database)
+        self.assertIsNone(refused[0]["after"])
+        self.assertIn("d74 recusado", (self.receipts / refused[0]["migrate_log"]).read_text(
+            encoding="utf-8"))
+
+        # 5c. O lote: o dedupe com as contagens da prévia e as migrations da 058 à última,
+        # em ordem, com o receipt de antes e de depois.
         tunnels_before = self.tunnels()
         result = self.apply()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
@@ -879,8 +1129,9 @@ class DisposablePostgresTest(unittest.TestCase):
                          ("applied", "058", last))
         self.assertEqual(self.ledger(), [version for version, _ in _code()
                                          if version <= last])
-        # Três túneis: o ledger antes (só leitura), o migrate.dart e o ledger depois.
-        self.assertEqual(self.tunnels() - tunnels_before, 3)
+        # Quatro túneis: o ledger antes (só leitura), o dedupe, o migrate.dart e o ledger
+        # depois.
+        self.assertEqual(self.tunnels() - tunnels_before, 4)
         applied = self.receipts_with("applied")
         self.assertEqual(len(applied), 1)
         receipt = applied[0]
@@ -897,9 +1148,30 @@ class DisposablePostgresTest(unittest.TestCase):
                          (self.database,) * 4)
         self.assertEqual(receipt["proofs"]["status"], "PASS")
         self.assertEqual(receipt["proofs"]["backup"]["dump_sha256"], "d" * 64)
+        # O dedupe no mesmo receipt: gravado com as contagens da prévia, antes da 059.
+        dedupe = receipt["before_first_migration"]
+        self.assertEqual([(step["id"], step["status"], step["mode"]) for step in dedupe],
+                         [("d74", "applied", "gravacao")])
+        self.assertEqual(dedupe[0]["phases"]["acao"], {
+            "referencias_levadas_para_a_linha_que_fica": "0",
+            "linhas_que_ficam_com_campo_herdado": "1", "linhas_apagadas": "2",
+            "campo_herdado:release_date": "0", "campo_herdado:type": "0",
+            "campo_herdado:block": "1", "campo_herdado:is_online_only": "0",
+            "campo_herdado:is_foreign_only": "0"})
+        self.assertEqual(dedupe[0]["phases"]["antes"]["cartas_com_codigo_exato_de_linha_que_sai"],
+                         "1")
+        self.assertEqual(dedupe[0]["expected"], {
+            "referencias_levadas_para_a_linha_que_fica": "0",
+            "linhas_que_ficam_com_campo_herdado": "1", "linhas_apagadas": "2"})
+        self.assertEqual(self.sets(), ["DSK|-", "LTR|-", "MH3|Modern Horizons"])
+        self.assertEqual(self.cluster.psql("halder", "SELECT to_regclass('public.uq_sets_code_lower')"
+                                           " IS NOT NULL").strip(), "t")
         log = self.receipts / receipt["migrate_log"]
         self.assertEqual(stat.S_IMODE(log.stat().st_mode), 0o600)
         log_text = log.read_text(encoding="utf-8")
+        self.assertIn(f"== passo d74: {D74_SCRIPT}", log_text)
+        self.assertIn("modo\tdesfecho\tcommit", log_text)
+        self.assertLess(log_text.index("modo\tdesfecho\tcommit"), log_text.index("Executando 059_"))
         for version in policy["migrations"]:
             self.assertIn(f"Executando {version}_", log_text)
         # O ledger de depois serve à promoção (S-02): com ele, o backend não volta para

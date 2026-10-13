@@ -1,10 +1,11 @@
 {
   "schema_version": 1,
   "policy": "manaloom-lot-migrations",
-  "version": "2026-10-10.1",
+  "version": "2026-10-11.1",
   "task": "S-05",
   "decisions": [
     "D-18",
+    "D-74",
     "D-83"
   ],
   "from": "058",
@@ -24,7 +25,8 @@
     "073",
     "074",
     "075",
-    "076"
+    "076",
+    "077"
   ],
   "same_lot": [
     {
@@ -36,7 +38,16 @@
       "rationale": "BT-DB-007 (docs/qa/execution/2026-09-28/BT-DB-007-gatilhos-de-conta-ativa.md): a 067 (deck_change_events) e a 069 (ai_generate_requests) criam chave para users sem rodar o laço da trava de conta ativa da 038. Num banco migrado, que é o caminho da produção, só a 074 reinstala os gatilhos manaloom_active_user_<oid>. Sem ela no mesmo lote, linha nova poderia apontar para conta excluída e o contrato somente leitura da 038 no deploy do backend (active_user_triggers) recusaria o release."
     }
   ],
-  "runner": "server/bin/with_new_server_pg.sh --write-approved dart run bin/migrate.dart --target <última do lote>, a partir de server/; cada migration é uma transação com o seu registro no ledger, em ordem numérica, e o preflight do migrate.dart para um banco de perfil misto antes de qualquer DDL.",
-  "window": "Item 11 do pacote de decisões de 2026-10-10: até cerca de 5 minutos de 503 anunciado, da primeira migration até o backend novo pronto (o precedente da 058 foi de 5 min 30 s). As correções da D-85 e o DROP do uq_binder vêm depois da promoção, para não alongar a janela.",
-  "rollback": "O lote não desce pelo migrate.dart: a 059, a 062 a 066, a 075 e a 076 só voltam por plano manual (manualOnly), e a 060, a 061, a 067, a 069 e a 072 só descem vazias. Com o banco migrado depois da 059, voltar é restaurar o dump do L-01 (docs/runbooks/BACKUP_E_RESTAURACAO.md), e a promoção recusa voltar o backend para uma imagem que exige uma migration menor (S-02)."
+  "before_first_migration": [
+    {
+      "id": "d74",
+      "script": "server/sql/lote/d74_dedupe_sets_lower_code.sql",
+      "required_by": "077",
+      "decision": "D-74",
+      "rationale": "BT-CAT-01 (item 22 do pacote de decisões de 2026-10-10): a 077 cria o índice único em LOWER(code) e falha fechada enquanto houver set repetido só pela caixa (84 códigos na produção). O dedupe roda depois da conferência do ledger e antes da primeira migration, com o banco na 058 e o backend antigo no ar, fora da janela de 503. Primeiro a prévia (--execute --preview, ROLLBACK); depois a gravação com -v aplicar=1 e as contagens da prévia que o dono aprovou (--esperado d74:<objeto>=<n>), e o script recusa sem gravar se uma não bater. Rodar o dedupe depois da 059 deixaria a 077 recusar com a 059 a 076 já aplicadas, alongando a janela."
+    }
+  ],
+  "runner": "Antes da primeira migration, os passos de before_first_migration pelo server/bin/with_new_server_pg.sh --write-approved psql -X -v ON_ERROR_STOP=1 -At -F <TAB> -v aplicar=1 -v esperado_<objeto>=<n> -f <script>, numa transação cada um; depois, server/bin/with_new_server_pg.sh --write-approved dart run bin/migrate.dart --target <última do lote>, a partir de server/; cada migration é uma transação com o seu registro no ledger, em ordem numérica, e o preflight do migrate.dart para um banco de perfil misto antes de qualquer DDL.",
+  "window": "Item 11 do pacote de decisões de 2026-10-10: até cerca de 5 minutos de 503 anunciado, da primeira migration até o backend novo pronto (o precedente da 058 foi de 5 min 30 s). O dedupe da D-74 roda antes da primeira migration, com o backend antigo no ar, e não conta na janela. As correções da D-85 e o DROP do uq_binder vêm depois da promoção, para não alongar a janela.",
+  "rollback": "O lote não desce pelo migrate.dart: a 059, a 062 a 066, a 075 e a 076 só voltam por plano manual (manualOnly), a 060, a 061, a 067, a 069 e a 072 só descem vazias, e a 077 desce tirando só o índice uq_sets_code_lower; as linhas que o dedupe da D-74 fundiu e apagou não voltam por migration. Com o banco migrado depois da 059, voltar é restaurar o dump do L-01 (docs/runbooks/BACKUP_E_RESTAURACAO.md), e a promoção recusa voltar o backend para uma imagem que exige uma migration menor (S-02)."
 }
