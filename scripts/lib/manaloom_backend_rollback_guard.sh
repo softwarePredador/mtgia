@@ -65,26 +65,35 @@ manaloom_swarm_update_failure_action() {
 # verdade sobre o estado em que o deploy deixou o Swarm:
 #   $1 a migration que a imagem anterior exige; $2 a do banco;
 #   $3 1 se o update do Swarm convergiu (a imagem nova rodando, 1/1, completed) antes
-#      da falha, 0 se não convergiu (com --update-failure-action pause, o Swarm para em
-#      paused, ou segue em updating), vazio se não se sabe;
+#      da falha, 0 se o update foi mandado e não convergiu (com --update-failure-action
+#      pause, o Swarm para em paused, ou segue em updating), vazio se não se sabe nem se
+#      o update chegou ao Swarm (o ssh caiu ou foi interrompido, ou o próprio
+#      `docker service update` falhou);
 #   $4 1 se o deploy já trocou a origem no EasyPanel para a imagem nova;
-#   $5 o serviço do Swarm; $6 a imagem anterior (repo@sha256).
+#   $5 o serviço do Swarm; $6 a imagem anterior (repo@sha256); $7 o GIT_SHA dela.
 # O deploy seguinte só aceita o serviço com 1/1, spec igual à tarefa e update vazio,
 # completed ou rollback_completed (scripts/manaloom_deploy_backend_image.sh, baseline
-# rollback-safe); paused e updating são recusados.
+# rollback-safe); paused, rollback_paused e updating são recusados.
+#
+# A volta para a imagem anterior é sempre explícita, pelo digest e com o GIT_SHA dela
+# (a guarda do deploy seguinte lê esse GIT_SHA da spec): `docker service update --image`.
+# Nunca `docker service rollback`: todo update, o `--force` inclusive, grava a spec
+# atual como a anterior (PreviousSpec), então o rollback depois de um `--force` volta
+# para a imagem nova, e ele não é idempotente: rodado duas vezes, volta para ela.
 manaloom_backend_restore_path() {
   local previous_required="${1:-}"
   local database_latest="${2:-}"
   local converged="${3:-}"
   local source_mutated="${4:-0}"
   local service="${5:-<servico>}"
-  local previous_image="${6:-a imagem anterior}"
+  local previous_image="${6:-<imagem anterior repo@sha256>}"
+  local previous_git_sha="${7:-<GIT_SHA da imagem anterior>}"
   local state_line
 
   case "$converged" in
     1) state_line="estado do Swarm: o update terminou (completed) e a imagem nova esta rodando; o que falhou foi uma conferencia depois dele. O Swarm nao pausou nada, e o servico assim (1/1, completed) e aceito pelo proximo deploy." ;;
     0) state_line="estado do Swarm: o update nao convergiu. Com --update-failure-action pause o Swarm para o update em paused (ou ele segue em updating); a replica pode nao estar pronta. O proximo deploy recusa esse servico ate ele voltar a 1/1, spec igual a tarefa e update completed ou rollback_completed." ;;
-    *) state_line="estado do Swarm: desconhecido nesta saida; confira antes de agir. O proximo deploy so aceita o servico com 1/1, spec igual a tarefa e update vazio, completed ou rollback_completed (paused e updating sao recusados)." ;;
+    *) state_line="estado do Swarm: desconhecido; nao se sabe se o docker service update chegou ao Swarm (o ssh caiu ou foi interrompido, ou o comando falhou). Confira com docker service inspect antes de agir. O proximo deploy so aceita o servico com 1/1, spec igual a tarefa e update vazio, completed ou rollback_completed (paused, rollback_paused e updating sao recusados)." ;;
   esac
 
   cat >&2 <<MESSAGE
@@ -99,10 +108,11 @@ MESSAGE
   fi
   cat >&2 <<MESSAGE
   saidas, todas com a palavra do dono (escrita na producao), em docs/runbooks/BACKUP_E_RESTAURACAO.md:
-  - corrigir para frente, sem restore ("Deploy do backend que falhou depois do lote"): com o update em paused ou updating, tire o servico desse estado antes do deploy de correcao.
-    docker service update --force '${service}' refaz o update da mesma imagem (serve se a falha foi passageira);
-    se ela nao sobe, docker service rollback '${service}' volta a spec para ${previous_image}: o servico pode voltar a 1/1 (o healthcheck do container e o /health/live, que nao olha o banco), mas /health/ready segue 503, porque ela exige a ${previous_required:-migration anterior}.
-    com o servico em 1/1 e completed ou rollback_completed, rode o deploy de uma imagem que exige a migration ${database_latest:-do banco}.
-  - restore ("Restauracao da producao (RTO de 4 h)"): o dump do passo 1 do lote (o backup tirado antes da primeira migration); so depois do banco restaurado, o passo 7 volta o backend para ${previous_image}.
+  - corrigir para frente, sem restore ("Deploy do backend que falhou depois do lote"): com o update em paused, rollback_paused ou updating, tire o servico desse estado antes do deploy de correcao. Um docker service update novo, um dos dois abaixo, comeca outro update e sai dele; espere completed e 1/1.
+    docker service update --force '${service}' refaz o update da mesma imagem nova (serve se a falha foi passageira);
+    se ela nao sobe, docker service update --image '${previous_image}' --env-add GIT_SHA=${previous_git_sha} '${service}' poe a imagem anterior pelo digest, com o GIT_SHA dela (o proximo deploy le esse GIT_SHA); repetir o comando nao muda nada. O servico pode voltar a 1/1 (o healthcheck do container e o /health/live, que nao olha o banco), mas /health/ready segue 503, porque ela exige a ${previous_required:-migration anterior}.
+    nao use docker service rollback: todo update, o --force inclusive, grava a spec atual como a anterior, e o rollback volta para a imagem nova.
+    com o servico em 1/1 e completed, rode o deploy de uma imagem que exige a migration ${database_latest:-do banco}.
+  - restore ("Restauracao da producao (RTO de 4 h)"): o dump do passo 1 do lote (o backup tirado antes da primeira migration); so depois do banco restaurado, o passo 7 volta o backend para ${previous_image} com o mesmo docker service update --image.
 MESSAGE
 }

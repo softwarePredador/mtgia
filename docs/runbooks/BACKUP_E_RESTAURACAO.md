@@ -94,6 +94,13 @@ de migrations (`scripts/manaloom_lot_apply_migrations.sh`):
    ciclo e do ensaio e um `--esperado d74:<objeto>=<n>` para cada contagem. O dedupe grava
    antes da primeira migration, e o script recusa sem gravar se uma contagem não bater.
    Depois vêm as migrations, e tudo vai para o mesmo receipt.
+3. Para repetir o `--apply` depois de uma falha, refaça antes o `--execute --preview`. Se o
+   dedupe já gravou e o migrate falhou com o banco ainda na 058 (o receipt diz o passo), os
+   sets já estão fundidos: as contagens da prévia nova (em geral 0) são as que vão no
+   `--esperado`. Com as contagens antigas, o script recusa sem gravar (código 3). As provas
+   do ciclo e do ensaio continuam valendo só dentro das 24 h do RPO. Com o banco além da
+   058 (o migrate gravou parte do lote), o passo recusa repetir; o receipt diz onde parou,
+   e a saída é a palavra do dono: terminar o lote à mão ou o restore da seção abaixo.
 
 ## Receipt
 
@@ -128,14 +135,20 @@ Só com a palavra do dono: é escrita na produção.
    - confira o estado com `docker service inspect <serviço> --format
      '{{if .UpdateStatus}}{{.UpdateStatus.State}}{{end}}'` e
      `docker service ls --filter name=<serviço>`;
-   - só com o banco já restaurado, volte o serviço para a spec anterior com
-     `docker service rollback <serviço>`, a partir de `paused`, `updating` ou `completed`.
-     Espere `rollback_completed`, 1/1 e a imagem anterior (a que a mensagem do deploy
-     imprime) na spec e na tarefa;
+   - só com o banco já restaurado, volte o serviço para a imagem anterior com
+     `docker service update --image <imagem anterior> --env-add GIT_SHA=<GIT_SHA anterior>
+     <serviço>`, a partir de `paused`, `rollback_paused`, `updating` ou `completed`. A
+     imagem anterior (`repo@sha256:…`) e o GIT_SHA dela estão na mensagem do deploy. O
+     comando é explícito e idempotente: rodar de novo não muda nada. Espere `completed`,
+     1/1 e a imagem anterior na spec e na tarefa;
+   - não use `docker service rollback`: ele troca a spec pela anterior (PreviousSpec), e
+     todo update, o `--force` inclusive, grava a spec atual como a anterior. Depois de um
+     `--force`, ele volta para a imagem nova, e ele não é idempotente: rodado duas vezes,
+     volta para ela;
    - se o deploy já tinha trocado a origem no EasyPanel (a mensagem do deploy diz), volte-a
      para o mesmo digest. Sem isso, um redeploy pelo painel sobe a imagem nova de novo;
    - `/health/ready` tem de responder `ready`. Nesse estado (1/1, spec igual à tarefa,
-     `rollback_completed`), o próximo deploy volta a aceitar o serviço.
+     `completed`), o próximo deploy volta a aceitar o serviço.
 8. Registrar o fim e o tempo total no receipt da coordenação.
 
 O ensaio semanal mede só a restauração (passos 4 a 6). Os outros passos dependem de onde a
@@ -153,25 +166,31 @@ O estado em que o serviço fica depende de onde o deploy falhou. A mensagem do d
 
 | Onde falhou | Estado do Swarm | O próximo deploy |
 | --- | --- | --- |
+| Antes do `docker service update` ("nada foi mandado ao Swarm") | o de antes do deploy | aceita |
 | No update do Swarm (a tarefa nova não subiu em 90 s) | `paused`, ou ainda `updating`; a réplica pode estar 0/1 | recusa ("baseline backend nao e rollback-safe") |
+| Sem saber se o update chegou ao Swarm (o ssh caiu ou o `docker service update` falhou) | desconhecido: confira com `docker service inspect` | depende do estado |
 | Numa conferência depois do update (spec, readiness, origem no EasyPanel) | `completed`, com a imagem nova 1/1 | aceita |
 
 O deploy só aceita um serviço com 1/1, a imagem da spec igual à da tarefa e o update vazio,
-`completed` ou `rollback_completed`. Para sair de `paused` ou `updating` antes de um deploy
-de correção:
+`completed` ou `rollback_completed`. Um `docker service update` novo começa outro update e
+tira o serviço de `paused`, `rollback_paused` ou `updating`. Para sair desses estados antes
+de um deploy de correção:
 
-1. `docker service update --force <serviço>` refaz o update da mesma imagem. Serve quando
-   a falha foi passageira. Se ele convergir (`completed`, 1/1), siga para o deploy de
-   correção.
-2. Se a imagem nova não sobe, `docker service rollback <serviço>` volta a spec para a
-   imagem anterior. O serviço pode voltar a 1/1, porque o healthcheck do container é o
-   `/health/live`, que não olha o banco. Mas `/health/ready` segue em 503, porque essa
-   imagem exige a migration de antes do lote. A API já estava fora; o rollback só limpa o
-   estado do Swarm.
-3. Com o serviço em 1/1 e `completed` ou `rollback_completed`, rode o deploy de uma imagem
-   que exige a migration em que o banco está. A guarda decide de novo pela imagem que
-   estiver no serviço: depois do passo 2, ela é a de antes do lote, e o deploy segue sem
-   volta automática (`pause`).
+1. `docker service update --force <serviço>` refaz o update da mesma imagem nova. Serve
+   quando a falha foi passageira. Se ele convergir (`completed`, 1/1), siga para o deploy
+   de correção.
+2. Se a imagem nova não sobe, `docker service update --image <imagem anterior> --env-add
+   GIT_SHA=<GIT_SHA anterior> <serviço>` põe a imagem anterior pelo digest, com o GIT_SHA
+   dela, que a guarda do deploy seguinte lê da spec. A mensagem do deploy imprime os dois.
+   O comando é idempotente: rodar de novo não muda nada. O serviço pode voltar a 1/1,
+   porque o healthcheck do container é o `/health/live`, que não olha o banco. Mas
+   `/health/ready` segue em 503, porque essa imagem exige a migration de antes do lote. A
+   API já estava fora; o comando só limpa o estado do Swarm.
+   Não use `docker service rollback` aqui: todo update, o `--force` do passo 1 inclusive,
+   grava a spec atual como a anterior, e o rollback depois dele volta para a imagem nova.
+3. Com o serviço em 1/1 e `completed`, rode o deploy de uma imagem que exige a migration
+   em que o banco está. A guarda decide de novo pela imagem que estiver no serviço: depois
+   do passo 2, ela é a de antes do lote, e o deploy segue sem volta automática (`pause`).
 
 Se a correção não sair a tempo do RTO, o caminho é o restore da seção anterior, com o
 dump do passo 1 do lote, e o passo 7 dela.

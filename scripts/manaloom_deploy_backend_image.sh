@@ -266,6 +266,8 @@ BACKEND_ROLLBACK_POLICY=""
 SWARM_UPDATE_FAILURE_ACTION="pause"
 # 1 depois que o update do Swarm convergiu (imagem nova 1/1, completed): uma falha
 # daqui em diante não deixa o Swarm em paused, e a mensagem de restore diz isso.
+# 0 quando o update foi mandado e não convergiu; vazio enquanto não se sabe se ele
+# chegou ao Swarm (o bloco "update do Swarm" abaixo decide).
 SWARM_UPDATE_CONVERGED=0
 cleanup_release_runtime() {
   local status="${1:-$?}"
@@ -1107,7 +1109,8 @@ rollback_backend_deploy() {
   if [[ "$BACKEND_ROLLBACK_POLICY" != "rollback" ]]; then
     echo "deploy backend falhou" >&2
     manaloom_backend_restore_path "$PREVIOUS_REQUIRED_MIGRATION" "$DATABASE_LATEST_MIGRATION" \
-      "$SWARM_UPDATE_CONVERGED" "$SOURCE_MUTATED" "$SERVICE" "$PREVIOUS_SPEC_IMAGE"
+      "$SWARM_UPDATE_CONVERGED" "$SOURCE_MUTATED" "$SERVICE" "$PREVIOUS_SPEC_IMAGE" \
+      "$PREVIOUS_GIT_SHA"
     return 1
   fi
 
@@ -1460,13 +1463,20 @@ email_verification_app_url_b64="$(
 public_site_url_b64="$(encode_remote_value "$MANALOOM_PUBLIC_SITE_URL")"
 sentry_dsn_b64="$(encode_remote_value "$SENTRY_DSN")"
 
+# >>> update do Swarm
 # Swarm must keep the full repo@sha256 reference in both its spec and running
 # task. Only fixed, validated identifiers remain embedded directly.
+# O trap trata o Swarm como talvez tocado desde antes do ssh (uma interrupcao no meio
+# deixa o estado desconhecido). O lado remoto sai com 3 se parou antes do
+# docker service update (nada foi mandado), com 4 se o proprio docker service update
+# falhou e com 1 se o update foi mandado e nao convergiu; o ssh sai com 255 se caiu.
 DEPLOY_MUTATION_STARTED=1
+SWARM_UPDATE_CONVERGED=""
+swarm_update_status=0
 # shellcheck disable=SC2087
-ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE
+ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" <<REMOTE || swarm_update_status=$?
 set -euo pipefail
-decode_b64() { printf '%s' "\$1" | base64 -d; }
+decode_b64() { printf '%s' "\$1" | base64 -d || exit 3; }
 deploy_timestamp_value=\$(decode_b64 '$deploy_timestamp_b64')
 allowed_origins=\$(decode_b64 '$allowed_origins_b64')
 trusted_proxy_hops=\$(decode_b64 '$trusted_proxy_hops_b64')
@@ -1522,7 +1532,9 @@ docker service update \
   --env-add XMAGE_EXPECTED_COMMIT='$XMAGE_EXPECTED_COMMIT' \
   --env-add XMAGE_EXPECTED_PATCH_COMMIT='$XMAGE_EXPECTED_PATCH_COMMIT' \
   --env-add XMAGE_EXPECTED_VERSION='$XMAGE_EXPECTED_VERSION' \
-  '$SERVICE'
+  '$SERVICE' || exit 4
+# Daqui em diante o update foi mandado: toda falha sai com 1.
+trap 'exit 1' ERR
 
 for attempt in \$(seq 1 45); do
   replicas="\$(docker service ls --filter name='$SERVICE' --format '{{.Replicas}}' | head -n 1)"
@@ -1548,7 +1560,24 @@ docker service inspect '$SERVICE' --format 'image={{.Spec.TaskTemplate.Container
 docker service ps '$SERVICE' --no-trunc
 exit 1
 REMOTE
-SWARM_UPDATE_CONVERGED=1
+case "$swarm_update_status" in
+  0) SWARM_UPDATE_CONVERGED=1 ;;
+  1)
+    SWARM_UPDATE_CONVERGED=0
+    echo "deploy backend falhou: o docker service update foi mandado e nao convergiu" >&2
+    exit 1
+    ;;
+  3)
+    DEPLOY_MUTATION_STARTED=0
+    echo "deploy backend falhou antes do docker service update: nada foi mandado ao Swarm nem ao EasyPanel" >&2
+    exit 1
+    ;;
+  *)
+    echo "deploy backend falhou (codigo $swarm_update_status): nao se sabe se o docker service update chegou ao Swarm; confira com docker service inspect '$SERVICE'" >&2
+    exit 1
+    ;;
+esac
+# <<< update do Swarm
 
 spec_allowed_origins_sha256="$(ssh -o BatchMode=yes -i "$SSH_KEY" "$SSH_HOST" "
 docker service inspect '$SERVICE' --format '{{range .Spec.TaskTemplate.ContainerSpec.Env}}{{println .}}{{end}}' |
