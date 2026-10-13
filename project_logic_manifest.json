@@ -17,7 +17,7 @@
       "docs/generated/TASK_REGISTRY.json"
     ]
   },
-  "source_digest_sha256": "7f44ef573cc8d4ea37c3489f6266bf3fc5fb20b7e0b558f9e66124f934dc0544",
+  "source_digest_sha256": "bba7f058a5bbd9b134b37a91a7e804c59b9ee7dd5018d3826f2aba35cee41445",
   "source_policy": {
     "product_data": "PostgreSQL plus backend services and versioned migrations",
     "cache_and_laboratory": "Hermes/SQLite; never product source of truth",
@@ -70,9 +70,9 @@
     "dart_symbols": 5579,
     "semantic_resolved_files": 748,
     "semantic_unresolved_files": 0,
-    "semantic_resolved_call_edges": 44754,
-    "semantic_resolved_call_sites": 70797,
-    "semantic_resolved_type_references": 17510,
+    "semantic_resolved_call_edges": 44756,
+    "semantic_resolved_call_sites": 70801,
+    "semantic_resolved_type_references": 17512,
     "modules": 164,
     "app_routes": 46,
     "web_routes": 11,
@@ -82,7 +82,7 @@
     "migrations": 74,
     "scripts_and_jobs": 723,
     "environment_variables": 738,
-    "tests": 1354,
+    "tests": 1355,
     "flows": 13,
     "traceability_rules": 12,
     "tasks": 251,
@@ -40305,43 +40305,43 @@
       "name": "_header",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 370
+      "line": 373
     },
     {
       "name": "_recordHttpObservability",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 378
+      "line": 381
     },
     {
       "name": "_requestLimitResponse",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 338
+      "line": 341
     },
     {
       "name": "_safeUserId",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 449
+      "line": 452
     },
     {
       "name": "isDatabaseIndependentHealthPath",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 327
+      "line": 330
     },
     {
       "name": "middleware",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 47
+      "line": 45
     },
     {
       "name": "middlewareWithReleaseCapabilityPolicy",
       "kind": "function",
       "source": "server/routes/_middleware.dart",
-      "line": 58
+      "line": 56
     },
     {
       "name": "AiEndpointAccessPolicy",
@@ -44140,8 +44140,8 @@
       "INFO": 5
     },
     "files_with_error_diagnostics": [],
-    "resolved_call_edge_count": 44754,
-    "resolved_call_site_count": 70797,
+    "resolved_call_edge_count": 44756,
+    "resolved_call_site_count": 70801,
     "workspace_call_edge_count": 14297,
     "unresolved_call_edge_count": 544,
     "unresolved_call_site_count": 763,
@@ -165996,7 +165996,18 @@
       },
       {
         "source": "server/lib/cors_policy.dart",
-        "line": 108,
+        "line": 100,
+        "caller": "CorsPolicy.headersFor",
+        "kind": "method",
+        "lexical_target": "isAllowed",
+        "target": "CorsPolicy.isAllowed",
+        "target_library": "package:server/cors_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/lib/cors_policy.dart",
+        "line": 130,
         "caller": "CorsPolicy._isSecureProductionOrigin",
         "kind": "method",
         "lexical_target": "_isLoopbackHost",
@@ -166040,7 +166051,7 @@
       },
       {
         "source": "server/lib/cors_policy.dart",
-        "line": 53,
+        "line": 75,
         "caller": "CorsPolicy.isAllowed",
         "kind": "method",
         "lexical_target": "_normalizeOrigin",
@@ -166051,7 +166062,7 @@
       },
       {
         "source": "server/lib/cors_policy.dart",
-        "line": 59,
+        "line": 81,
         "caller": "CorsPolicy.isAllowed",
         "kind": "method",
         "lexical_target": "_isLoopbackHost",
@@ -166062,22 +166073,11 @@
       },
       {
         "source": "server/lib/cors_policy.dart",
-        "line": 77,
+        "line": 99,
         "caller": "CorsPolicy.headersFor",
         "kind": "method",
         "lexical_target": "_normalizeOrigin",
         "target": "CorsPolicy._normalizeOrigin",
-        "target_library": "package:server/cors_policy.dart",
-        "target_scope": "workspace",
-        "occurrences": 1
-      },
-      {
-        "source": "server/lib/cors_policy.dart",
-        "line": 78,
-        "caller": "CorsPolicy.headersFor",
-        "kind": "method",
-        "lexical_target": "isAllowed",
-        "target": "CorsPolicy.isAllowed",
         "target_library": "package:server/cors_policy.dart",
         "target_scope": "workspace",
         "occurrences": 1
@@ -179328,7 +179328,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 112,
+        "line": 115,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "checkRequestUri",
@@ -179339,7 +179339,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 114,
+        "line": 117,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "_requestLimitResponse",
@@ -179350,7 +179350,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 124,
+        "line": 127,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "decisionFor",
@@ -179361,7 +179361,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 132,
+        "line": 135,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "entry",
@@ -179372,7 +179372,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 136,
+        "line": 139,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "record",
@@ -179383,7 +179383,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 141,
+        "line": 144,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "w",
@@ -179394,7 +179394,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 171,
+        "line": 174,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "checkRequestHeaders",
@@ -179405,7 +179405,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 185,
+        "line": 188,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "checkRequestBody",
@@ -179427,7 +179427,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 200,
+        "line": 203,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "ensureObservabilityInitialized",
@@ -179438,7 +179438,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 203,
+        "line": 206,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "connect",
@@ -179449,7 +179449,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 207,
+        "line": 210,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "publicErrorBody",
@@ -179493,7 +179493,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 251,
+        "line": 254,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "sanitizePublicErrorResponse",
@@ -179504,7 +179504,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 283,
+        "line": 286,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "_recordHttpObservability",
@@ -179515,7 +179515,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 293,
+        "line": 296,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "captureObservedException",
@@ -179526,7 +179526,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 302,
+        "line": 305,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "e",
@@ -179537,7 +179537,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 348,
+        "line": 351,
         "caller": "_requestLimitResponse",
         "kind": "method",
         "lexical_target": "record",
@@ -179548,7 +179548,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 355,
+        "line": 358,
         "caller": "_requestLimitResponse",
         "kind": "method",
         "lexical_target": "w",
@@ -179559,7 +179559,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 361,
+        "line": 364,
         "caller": "_requestLimitResponse",
         "kind": "method",
         "lexical_target": "toJson",
@@ -179570,7 +179570,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 402,
+        "line": 405,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "_safeUserId",
@@ -179581,7 +179581,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 416,
+        "line": 419,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "e",
@@ -179592,7 +179592,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 418,
+        "line": 421,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "w",
@@ -179603,7 +179603,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 422,
+        "line": 425,
         "caller": "_recordHttpObservability",
         "kind": "method",
         "lexical_target": "captureObservedMessage",
@@ -179614,7 +179614,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 466,
+        "line": 469,
         "caller": "_safeUserId",
         "kind": "constructor",
         "lexical_target": "AuthService",
@@ -179625,7 +179625,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 466,
+        "line": 469,
         "caller": "_safeUserId",
         "kind": "method",
         "lexical_target": "verifyToken",
@@ -179636,7 +179636,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 50,
+        "line": 48,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "guardBodyWithoutLength",
@@ -179647,7 +179647,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 51,
+        "line": 49,
         "caller": "middleware",
         "kind": "method",
         "lexical_target": "middlewareWithReleaseCapabilityPolicy",
@@ -179658,7 +179658,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 64,
+        "line": 66,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "resolveRequestId",
@@ -179669,7 +179669,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 65,
+        "line": 67,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "constructor",
         "lexical_target": "RequestTrace",
@@ -179680,7 +179680,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 68,
+        "line": 70,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "_header",
@@ -179691,7 +179691,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 71,
+        "line": 74,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "headersFor",
@@ -179702,7 +179702,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 73,
+        "line": 76,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isDatabaseIndependentHealthPath",
@@ -179713,7 +179713,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 77,
+        "line": 80,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isAllowed",
@@ -179724,7 +179724,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 88,
+        "line": 91,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "method",
         "lexical_target": "isValidPreflight",
@@ -201443,8 +201443,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 14537,
-        "occurrences": 24947
+        "unique_references": 14539,
+        "occurrences": 24951
       },
       {
         "target_scope": "dart_sdk",
@@ -211170,7 +211170,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 221,
+        "line": 224,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "function_expression",
         "lexical_target": "handler.use(provider<ReleaseCapabilityPolicy>((_) => releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
@@ -211178,7 +211178,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 228,
+        "line": 231,
         "caller": "middlewareWithReleaseCapabilityPolicy",
         "kind": "function_expression",
         "lexical_target": "handler.use(provider<Pool>((_) => _db.connection)).use(provider<ReleaseCapabilityPolicy>((_) => releaseCapabilityPolicy)).use(provider<RequestTrace>((_) => trace))",
@@ -211297,8 +211297,8 @@
         "occurrences": 1
       }
     ],
-    "resolved_type_reference_count": 17510,
-    "workspace_type_reference_count": 3766,
+    "resolved_type_reference_count": 17512,
+    "workspace_type_reference_count": 3767,
     "unresolved_type_reference_count": 384,
     "resolved_type_references_scope": "workspace_targets_only",
     "resolved_type_references": [
@@ -245594,7 +245594,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 341,
+        "line": 344,
         "lexical_type": "RequestLimitRejection",
         "resolved_type": "RequestLimitRejection",
         "target": "RequestLimitRejection",
@@ -245604,7 +245604,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 466,
+        "line": 469,
         "lexical_type": "AuthService",
         "resolved_type": "AuthService",
         "target": "AuthService",
@@ -245624,7 +245624,17 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 65,
+        "line": 61,
+        "lexical_type": "CorsPolicy?",
+        "resolved_type": "CorsPolicy?",
+        "target": "CorsPolicy",
+        "target_library": "package:server/cors_policy.dart",
+        "target_scope": "workspace",
+        "occurrences": 1
+      },
+      {
+        "source": "server/routes/_middleware.dart",
+        "line": 67,
         "lexical_type": "RequestTrace",
         "resolved_type": "RequestTrace",
         "target": "RequestTrace",
@@ -248991,8 +249001,8 @@
       {
         "target_scope": "dart_sdk",
         "target_library": "dart:core",
-        "unique_references": 6661,
-        "occurrences": 41257
+        "unique_references": 6662,
+        "occurrences": 41262
       },
       {
         "target_scope": "dart_sdk",
@@ -252603,8 +252613,8 @@
       {
         "target_scope": "workspace",
         "target_library": "package:server/cors_policy.dart",
-        "unique_references": 2,
-        "occurrences": 2
+        "unique_references": 3,
+        "occurrences": 3
       },
       {
         "target_scope": "workspace",
@@ -255478,7 +255488,7 @@
       },
       {
         "source": "server/routes/_middleware.dart",
-        "line": 378,
+        "line": 381,
         "lexical_type": "void",
         "occurrences": 1
       },
@@ -291858,6 +291868,7 @@
     "server/test/community_marketplace_trade_visibility_db_live_test.dart",
     "server/test/container_supply_chain_contract_test.dart",
     "server/test/core_flow_smoke_test.dart",
+    "server/test/cors_deck_write_route_test.dart",
     "server/test/cors_policy_test.dart",
     "server/test/data_model_migration_test.dart",
     "server/test/database_pool_settings_test.dart",
@@ -303860,7 +303871,7 @@
       "project_logic_receipt_source_digest_bound": true,
       "registry_source_digest_bound": true
     },
-    "project_logic_source_digest_sha256": "7f44ef573cc8d4ea37c3489f6266bf3fc5fb20b7e0b558f9e66124f934dc0544"
+    "project_logic_source_digest_sha256": "bba7f058a5bbd9b134b37a91a7e804c59b9ee7dd5018d3826f2aba35cee41445"
   },
   "documentation_lifecycle": {
     "schema_version": 1,
@@ -306937,6 +306948,7 @@
       "server/test/community_marketplace_trade_visibility_db_live_test.dart",
       "server/test/container_supply_chain_contract_test.dart",
       "server/test/core_flow_smoke_test.dart",
+      "server/test/cors_deck_write_route_test.dart",
       "server/test/cors_policy_test.dart",
       "server/test/data_model_migration_test.dart",
       "server/test/database_pool_settings_test.dart",

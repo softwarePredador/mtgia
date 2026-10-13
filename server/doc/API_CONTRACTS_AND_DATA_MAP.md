@@ -826,6 +826,13 @@ deck starts it at revision 1 with no event.
   key with a different request answers 422 `idempotency_key_reused`; an
   invalid key answers 400 `idempotency_key_invalid`. Without a key, a retry
   that still sends the old `If-Match` gets 409 instead of a duplicate.
+- Web (CORS): the app on another origin sends every change after an `OPTIONS`
+  preflight. `If-Match` and `Idempotency-Key` are in the single allow list of
+  `server/lib/cors_policy.dart` (`CorsPolicy.allowedHeaders`), which both
+  validates the preflight and fills `Access-Control-Allow-Headers`; `ETag`
+  and `x-request-id` are listed in `Access-Control-Expose-Headers`. A header
+  outside the list answers 403 `cors_preflight_rejected` and the browser
+  never sends the change (`server/test/cors_deck_write_route_test.dart`).
 - Ledger: `deck_change_events` (migration 067) keeps operation, revision
   before/after, only the card rows that changed (`cards_before`/`cards_after`,
   `null` for metadata-only changes), only the metadata fields that changed
