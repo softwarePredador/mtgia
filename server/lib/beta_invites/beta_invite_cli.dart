@@ -218,9 +218,33 @@ String? betaInviteWriteBlockedReason({
   return null;
 }
 
+/// Motivo do bloqueio do `--aplicar` pela entrega, ou `null` quando pode
+/// gravar. O código do convite só existe no e-mail: convite gravado sem e-mail
+/// entregue não chega a ninguém, então o script para antes de gravar.
+String? betaInviteDeliveryBlockedReason({
+  required BetaInviteDeliveryReadiness readiness,
+  required Map<String, String> environment,
+}) {
+  final environmentName =
+      (environment['ENVIRONMENT'] ?? 'development').trim().toLowerCase();
+  if (environment['MANALOOM_PG_WRAPPER_MODE'] == 'write-approved' &&
+      environmentName != 'production') {
+    return 'o banco é o da produção (wrapper), mas ENVIRONMENT=$environmentName: '
+        'defina ENVIRONMENT=production para a entrega seguir as regras da '
+        'produção (link https, webhook https com token, ou Resend)';
+  }
+  if (!readiness.ready) {
+    return 'a entrega de e-mail não está pronta (${readiness.errorCode}); '
+        'nada foi gravado. Confira MANALOOM_EMAIL_DELIVERY_PROVIDER e RESEND_*, '
+        'ou BETA_INVITE_WEBHOOK_URL e BETA_INVITE_WEBHOOK_TOKEN, e '
+        'BETA_INVITE_APP_URL';
+  }
+  return null;
+}
+
 /// Prévia do e-mail do convite, com um código de exemplo.
 String betaInvitePreview(Map<String, String> environment, Duration validity) {
-  const sampleCode = 'XXXX-XXXX-XXXX-XXXX';
+  const sampleCode = betaInviteSampleCode;
   final expires = DateTime.now().toUtc().add(validity).toIso8601String();
   return '''
 Assunto: Seu convite para a beta do BrewTact

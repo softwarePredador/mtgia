@@ -18,6 +18,10 @@
 // wrapper que o chama.
 // A entrega usa a configuração de e-mail da API (MANALOOM_EMAIL_DELIVERY_PROVIDER
 // e RESEND_*, ou BETA_INVITE_WEBHOOK_URL) e BETA_INVITE_APP_URL para o link.
+// Emitir e reenviar fazem antes um ensaio da entrega, pelo mesmo transporte e
+// sem sair da máquina: a simulação mostra o resultado, e o --aplicar para antes
+// de gravar quando a entrega não está pronta, ou quando o banco é o da produção
+// (wrapper) e ENVIRONMENT não é production.
 // O banco guarda só o hash do código e o digest do e-mail; o código só existe
 // no e-mail enviado.
 //
@@ -89,6 +93,34 @@ Future<void> main(List<String> args) async {
     return;
   }
 
+  final deliveryEnvironment = {
+    for (final key in betaInviteDeliveryEnvironmentKeys)
+      if (environment[key] case final String value) key: value,
+  };
+  final deliveryService = BetaInviteDeliveryService(
+    environment: deliveryEnvironment,
+  );
+  // Emitir e reenviar mandam e-mail: o ensaio da entrega roda antes do banco.
+  // Na simulação ele só informa; com --aplicar, entrega que não está pronta
+  // para tudo antes de gravar (o código só existe no e-mail).
+  _DeliveryCheck? deliveryCheck;
+  if (options.command == BetaInviteCommand.emitir ||
+      options.command == BetaInviteCommand.reenviar) {
+    final readiness = await deliveryService.rehearse();
+    deliveryCheck = (
+      readiness: readiness,
+      blockedReason: betaInviteDeliveryBlockedReason(
+        readiness: readiness,
+        environment: environment,
+      ),
+    );
+    if (options.apply && deliveryCheck.blockedReason != null) {
+      stderr.writeln('BLOCKED: ${deliveryCheck.blockedReason}');
+      exitCode = 3;
+      return;
+    }
+  }
+
   final database = Database();
   await database.connect();
   if (!database.isConnected) {
@@ -96,30 +128,61 @@ Future<void> main(List<String> args) async {
     exitCode = 3;
     return;
   }
-  final deliveryEnvironment = {
-    for (final key in betaInviteDeliveryEnvironmentKeys)
-      if (environment[key] case final String value) key: value,
-  };
   final issuer = BetaInviteIssuer(
     database.connection,
-    deliver:
-        BetaInviteDeliveryService(environment: deliveryEnvironment).deliver,
+    deliver: deliveryService.deliver,
   );
 
   try {
-    exitCode = await _run(options, emails, issuer, deliveryEnvironment);
+    exitCode = await _run(
+      options,
+      emails,
+      issuer,
+      deliveryEnvironment,
+      deliveryCheck,
+    );
   } finally {
     await database.connection.close();
   }
 }
+
+typedef _DeliveryCheck =
+    ({BetaInviteDeliveryReadiness readiness, String? blockedReason});
+
+/// Linhas do ensaio da entrega na simulação.
+void _printDeliveryCheck(_DeliveryCheck check) {
+  final readiness = check.readiness;
+  stdout.writeln(
+    readiness.ready
+        ? 'Entrega (ensaio, nada saiu da máquina): pronta, '
+            '${readiness.provider} para ${readiness.target}'
+        : 'Entrega (ensaio, nada saiu da máquina): NÃO pronta '
+            '(${readiness.errorCode})',
+  );
+  stdout.writeln(
+    check.blockedReason == null
+        ? 'Com --aplicar: liberado.'
+        : 'Com --aplicar: BLOQUEADO, ${check.blockedReason}.',
+  );
+}
+
+Map<String, Object?> _deliveryJson(_DeliveryCheck? check) => {
+  if (check != null)
+    'entrega': {
+      ...check.readiness.toJson(),
+      'aplicar': check.blockedReason == null ? 'liberado' : 'bloqueado',
+    },
+};
 
 Future<int> _run(
   BetaInviteCliOptions options,
   List<String> emails,
   BetaInviteIssuer issuer,
   Map<String, String> deliveryEnvironment,
+  _DeliveryCheck? deliveryCheck,
 ) async {
   final mode = options.apply ? 'aplicado' : 'simulacao';
+  final delivery = _deliveryJson(deliveryCheck);
   switch (options.command) {
     case BetaInviteCommand.emitir:
       final plan = await issuer.plan(emails);
@@ -133,12 +196,13 @@ Future<int> _run(
           ..writeln()
           ..writeln('Prévia do e-mail:')
           ..writeln(betaInvitePreview(deliveryEnvironment, options.validity))
-          ..writeln()
-          ..writeln('Simulação: nada foi gravado nem enviado.');
+          ..writeln();
+        _printDeliveryCheck(deliveryCheck!);
+        stdout.writeln('Simulação: nada foi gravado nem enviado.');
         _summary(options, mode, {
           for (final action in BetaInvitePlanAction.values)
             action.label: plan.where((e) => e.action == action).length,
-        });
+        }, extra: delivery);
         return 0;
       }
       final outcomes = await issuer.issue(
@@ -147,7 +211,7 @@ Future<int> _run(
         validity: options.validity,
         issuedBy: options.issuedBy,
       );
-      return _report(options, mode, outcomes);
+      return _report(options, mode, outcomes, extra: delivery);
     case BetaInviteCommand.reenviar:
       final email = emails.single;
       if (!options.apply) {
@@ -163,8 +227,11 @@ Future<int> _run(
               : '${action.label.padRight(16)} ${plan.single.emailHint} '
                   '(nada a reenviar)',
         );
+        _printDeliveryCheck(deliveryCheck!);
         stdout.writeln('Simulação: nada foi gravado nem enviado.');
-        _summary(options, mode, {'reenviaria': wouldResend ? 1 : 0});
+        _summary(options, mode, {
+          'reenviaria': wouldResend ? 1 : 0,
+        }, extra: delivery);
         return 0;
       }
       final outcome = await issuer.resend(
@@ -172,7 +239,7 @@ Future<int> _run(
         validity: options.validity,
         issuedBy: options.issuedBy,
       );
-      return _report(options, mode, [outcome]);
+      return _report(options, mode, [outcome], extra: delivery);
     case BetaInviteCommand.revogar:
       if (!options.apply) {
         String? targetId;
@@ -229,8 +296,9 @@ Future<int> _run(
 int _report(
   BetaInviteCliOptions options,
   String mode,
-  List<BetaInviteIssueOutcome> outcomes,
-) {
+  List<BetaInviteIssueOutcome> outcomes, {
+  Map<String, Object?> extra = const {},
+}) {
   for (final outcome in outcomes) {
     final delivery =
         outcome.inviteId == null ? '' : '  envio=${outcome.delivery.label}';
@@ -251,7 +319,7 @@ int _report(
       counts[key] = (counts[key] ?? 0) + 1;
     }
   }
-  _summary(options, mode, counts);
+  _summary(options, mode, counts, extra: extra);
   final failed = outcomes.any(
     (outcome) =>
         outcome.delivery == BetaInviteDeliveryState.failed ||
@@ -263,14 +331,16 @@ int _report(
 void _summary(
   BetaInviteCliOptions options,
   String mode,
-  Map<String, int> counts,
-) {
+  Map<String, int> counts, {
+  Map<String, Object?> extra = const {},
+}) {
   stdout.writeln(
     jsonEncode({
       'comando': options.command.name,
       'modo': mode,
       if (options.batchLabel != null) 'lote': options.batchLabel,
       'resumo': counts,
+      ...extra,
     }),
   );
 }
