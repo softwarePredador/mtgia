@@ -37,12 +37,34 @@ class CorsPolicy {
     'OPTIONS',
   };
 
+  /// A lista única dos cabeçalhos que o navegador pode mandar: o preflight é
+  /// validado com ela e o `Access-Control-Allow-Headers` sai dela
+  /// ([responseHeaders]). Um cabeçalho fora daqui recusa o preflight (403
+  /// `cors_preflight_rejected`) e a chamada do app Web nem sai.
   static const allowedHeaders = <String>{
     'content-type',
     'authorization',
     'x-request-id',
     'x-manaloom-ops-key',
+    // DCK-P0-01 (D-29): toda escrita num deck leva a revisão conhecida e uma
+    // chave de idempotência (`server/lib/decks/deck_revision_support.dart`).
+    'if-match',
+    'idempotency-key',
   };
+
+  /// Cabeçalhos de resposta que o app Web pode ler além dos simples do CORS:
+  /// o `ETag` com a revisão do deck (DCK-P0-01) e o `x-request-id` que o app
+  /// guarda na observabilidade.
+  static const exposedHeaders = <String>{'etag', 'x-request-id'};
+
+  /// Os cabeçalhos de CORS fixos de toda resposta, tirados das mesmas listas
+  /// que validam o preflight. O middleware raiz não guarda lista própria.
+  static final Map<String, String> responseHeaders = Map.unmodifiable({
+    'Access-Control-Allow-Methods': allowedMethods.join(', '),
+    'Access-Control-Allow-Headers': allowedHeaders.join(', '),
+    'Access-Control-Expose-Headers': exposedHeaders.join(', '),
+    'Access-Control-Max-Age': '86400',
+  });
 
   final Set<String> allowedOrigins;
   final bool allowDevelopmentLoopback;

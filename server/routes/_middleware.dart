@@ -30,11 +30,9 @@ final _corsPolicy = CorsPolicy.fromEnvironment({
       _runtimeEnvironment['MANALOOM_ALLOW_DEV_ORIGINS'] ?? 'false',
 });
 
+// Os cabeçalhos de CORS (métodos, cabeçalhos aceitos e expostos) vêm de
+// `CorsPolicy.responseHeaders`, a mesma lista que valida o preflight.
 const _securityHeaders = {
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers':
-      'Content-Type, Authorization, X-Request-Id, X-ManaLoom-Ops-Key',
-  'Access-Control-Max-Age': '86400',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'no-referrer',
@@ -55,10 +53,14 @@ Handler middleware(Handler handler) {
   );
 }
 
+/// [corsPolicy] troca a política lida do ambiente (os testes de rota passam
+/// uma origem permitida); sem ela vale a de `MANALOOM_ALLOWED_ORIGINS`.
 Handler middlewareWithReleaseCapabilityPolicy(
   Handler handler, {
   required ReleaseCapabilityPolicy releaseCapabilityPolicy,
+  CorsPolicy? corsPolicy,
 }) {
+  final cors = corsPolicy ?? _corsPolicy;
   return (context) async {
     final startedAt = DateTime.now();
     final requestId = resolveRequestId(context.request.headers);
@@ -68,13 +70,14 @@ Handler middlewareWithReleaseCapabilityPolicy(
     final origin = _header(context.request.headers, 'origin');
     final responseHeaders = <String, Object>{
       ..._securityHeaders,
-      ..._corsPolicy.headersFor(origin),
+      ...CorsPolicy.responseHeaders,
+      ...cors.headersFor(origin),
     };
     final processLiveness = isDatabaseIndependentHealthPath(
       context.request.uri.path,
     );
 
-    if (!_corsPolicy.isAllowed(origin)) {
+    if (!cors.isAllowed(origin)) {
       return Response.json(
         statusCode: HttpStatus.forbidden,
         body: {'error': 'cors_origin_denied', 'request_id': requestId},
@@ -85,7 +88,7 @@ Handler middlewareWithReleaseCapabilityPolicy(
     if (context.request.method == HttpMethod.options) {
       final validPreflight =
           origin == null ||
-          _corsPolicy.isValidPreflight(
+          cors.isValidPreflight(
             requestedMethod: _header(
               context.request.headers,
               'access-control-request-method',
