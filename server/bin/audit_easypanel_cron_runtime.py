@@ -41,7 +41,7 @@ DEFAULT_ARTIFACT_DIR = (
     REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_cron_runtime"
 )
 DEFAULT_PROJECT = "evolution"
-PRODUCTION_API_BASE_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host"
+PRODUCTION_API_BASE_URL = "https://evolution-cartinhas.tr5taz.easypanel.host"
 DEFAULT_SERVICES = {
     "manaloom-ops": "evolution_manaloom-ops",
     "hermes-lab": "evolution_hermes-lab",

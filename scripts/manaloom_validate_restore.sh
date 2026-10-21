@@ -13,7 +13,7 @@ fi
 
 MODE="${MANALOOM_RESTORE_MODE:-schema}"
 IMAGE="${MANALOOM_RESTORE_POSTGRES_IMAGE:-postgres:17.10-alpine3.23@sha256:8189a1f6e40904781fc9e2612687877791d21679866db58b1de996b31fc312e4}"
-CONTAINER="manaloom-restore-validate-$(date -u +%Y%m%d%H%M%S)"
+CONTAINER="manaloom-restore-validate-$(date -u +%Y%m%d%H%M%S)-$$"
 DB_NAME="${MANALOOM_RESTORE_DB:-manaloom_restore_check}"
 BACKUP_ABS="$(cd "$(dirname "$BACKUP_FILE")" && pwd)/$(basename "$BACKUP_FILE")"
 
@@ -29,12 +29,35 @@ else
   exit 2
 fi
 
+RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-restore-validate.XXXXXX")"
+CID_FILE="$RUN_DIR/container-id"
 cleanup() {
-  docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
+  local status=$? cid remaining
+  trap - EXIT
+  trap '' INT TERM
+  # Only Docker's ID from this private run directory may be removed.
+  if [[ -s "$CID_FILE" ]]; then
+    cid="$(cat "$CID_FILE")"
+    if [[ "$cid" =~ ^[0-9a-f]{64}$ ]]; then
+      if ! docker rm -f -v "$cid" >/dev/null 2>&1; then
+        if ! remaining="$(docker ps -aq --no-trunc --filter "id=$cid")" || [[ -n "$remaining" ]]; then
+          echo "[restore] falha ao limpar container temporario e volumes: $cid" >&2
+          if [[ "$status" == "0" ]]; then status=1; fi
+        fi
+      fi
+    else
+      echo "[restore] ID temporario invalido; nenhum container removido" >&2
+      if [[ "$status" == "0" ]]; then status=1; fi
+    fi
+  fi
+  rm -rf -- "$RUN_DIR" || status=1
+  exit "$status"
 }
 trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
-docker run -d --name "$CONTAINER" \
+docker run -d --rm --cidfile "$CID_FILE" --name "$CONTAINER" --network none \
   -e POSTGRES_PASSWORD=restore_check \
   "$IMAGE" >/dev/null
 

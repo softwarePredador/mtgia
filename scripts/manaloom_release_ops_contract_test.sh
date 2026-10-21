@@ -134,6 +134,7 @@ SHELL_SCRIPTS=(
   scripts/manaloom_deploy_public_web.sh
   scripts/manaloom_easypanel_backup.sh
   scripts/manaloom_full_restore_drill.sh
+  scripts/manaloom_validate_restore.sh
   scripts/manaloom_global_battle_closure.sh
   scripts/manaloom_install_remote_backup_cron.sh
   scripts/manaloom_xmage_pin_transition_audit.sh
@@ -209,6 +210,8 @@ PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/new_server_pg_caller_mode_contract_test.py"
 PYTHONDONTWRITEBYTECODE=1 \
   python3 "$ROOT_DIR/server/test/release_sbom_scope_test.py"
+PYTHONDONTWRITEBYTECODE=1 \
+  python3 "$ROOT_DIR/server/test/restore_volume_cleanup_contract_test.py"
 
 SAFE_ENV_FIXTURE="$TMP_DIR/safe.env"
 SAFE_ENV_MARKER="$TMP_DIR/env-code-executed"
@@ -283,7 +286,10 @@ grep -Fq '~*^/app/assets/assets/lotus/ "no-cache, must-revalidate"' "$NGINX"
 grep -Fq 'Content-Security-Policy' "$NGINX"
 grep -Fq "object-src 'none'" "$NGINX"
 grep -Fq "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://browser.sentry-cdn.com;" "$NGINX"
-grep -Fq 'Permissions-Policy "camera=(self), microphone=(), geolocation=()"' "$NGINX"
+# D-41: nenhum alvo da beta concede camera. `camera=(self)` era o unico ponto
+# em que o app Web permitia o que o release do Android remove.
+grep -Fq 'Permissions-Policy "camera=(), microphone=(), geolocation=()"' "$NGINX"
+! grep -Fq 'camera=(self)' "$NGINX"
 grep -Fq -- '--no-web-resources-cdn' "$FLUTTER_WEB_DEPLOY"
 if [[ "$(grep -c 'add_header Cache-Control' "$NGINX")" != "1" ]]; then
   echo "nginx deve declarar Cache-Control uma unica vez no server" >&2

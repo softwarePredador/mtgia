@@ -1,0 +1,217 @@
+# `battle-coach-web-keyboard` — 18 de 19, e um achado de foco (2026-09-28)
+
+Arquivo **não commitado** enquanto o gate de UI está vermelho.
+
+## Ambiente, por D-79 e D-80
+
+Corrida no ambiente **local**: PostgreSQL, API e os dois sidecars XMage
+descartáveis em loopback, conta de QA semeada, build Web release das fontes
+atuais. Nada tocando produção. O contrato anterior descrevia um proxy para a
+API implantada; a mudança é de ambiente, autorizada pela D-79, e **nenhuma
+exigência de teclado foi afrouxada**.
+
+Navegador: Google Chrome 153.0.8010.53 headless, ChromeDriver 153.0.8010.52,
+viewport 1280x720. Agente: Claude Opus 5 (Claude Code). A procedência registra o
+navegador e o agente reais, pela D-80.
+
+## Os dezoito que passam, com a evidência de teclado medida
+
+Cada checkpoint lê `document.activeElement` e **falha se o foco não estiver
+onde deveria** — o halo aparece na imagem, mas quem decide é a asserção.
+
+```
+01  foco de entrada em 'Back'
+02  2 Tab(s)        -> 'Abrir replays'
+03  1 Tab           -> 'Escolher adversário'
+04  1 Shift+Tab     -> 'Abrir replays'
+05  Enter abriu o diálogo, foco em 'Buscar adversário'
+06  Escape fechou e devolveu o foco a 'Escolher adversário'
+07  Espaço reabriu o diálogo, foco na busca
+08  digitação física filtrou a lista até o rival validado
+09  1 Tab           -> linha do rival (100 cartas)
+10  Enter selecionou o rival
+11  3 Tab(s)        -> 'Jogar contra IA'
+12  Enter criou sessão interativa real
+13  3 Tab(s)        -> 'Fazer mulligan'
+14  1 Tab           -> 'Manter esta mão'
+15  1 Tab           -> 'Deixar esta ação no automático'
+16  1 Shift+Tab     -> 'Manter esta mão'
+17  Enter manteve a mão e a mesa avançou
+19  2 Tab(s)        -> 'Conceder partida', concedida por teclado, replay pronto
+```
+
+O primeiro Tab depois de entrar na rota **mantém** o foco em `Back` — ele sai do
+envoltório do halo para o próprio botão. Contar Tabs fixos quebraria; por isso o
+driver avança até o alvo e registra quantos Tabs foram.
+
+## O checkpoint 18 reprova, e o motivo é de produto
+
+O contrato diz que o prompt substituído de forma assíncrona **preserva** um halo
+visível numa ação legal. Medido:
+
+```
+depois de Enter em 'Manter esta mão', o foco fica em 'Abrir replays'
+```
+
+Ou seja, o foco de teclado cai na barra do app em vez de permanecer numa ação do
+novo prompt. Para quem navega por teclado, isso significa perder o lugar no meio
+da partida e ter de percorrer a ordem de foco de novo a cada decisão.
+
+Conferido no código: `app/lib/features/battle/screens/battle_coach_screen.dart`
+**não tem nenhum `requestFocus` nem `autofocus`**. Na mesma feature, o diálogo
+do adversário (`battle_replays_screen.dart`) usa `autofocus: true` — e é por isso
+que os checkpoints 05 e 07 passam — e `battle_live_spectator_screen.dart` chama
+`requestFocus` ao repetir. A tela da mesa não faz nem um nem outro.
+
+**Não forjei a captura.** O `18_next_prompt_focus` não foi gravado; a pasta tem
+dezoito imagens, não dezenove. A decisão entre consertar a tela ou reescrever o
+checkpoint não é minha.
+
+## Uma cicatriz que vale para qualquer captura desta base
+
+Minha asserção do 18 aceitava "foco não vazio" e aprovou um foco em
+`flutter typography measurement` — um elemento interno do Flutter cujo texto
+contém a barra inteira do app, inclusive "Jogar contra IA". Casar por substring
+contra esse blob aprova qualquer rótulo. A conferência passou a descartar esse
+elemento antes de olhar o rótulo. É a mesma família do bug em que uma folha
+começando com "Turno 1" virava "1 ponto de vida".
+
+Outra: esperar 180 s pelo foco estourava o prazo de 60 s do prompt e a sessão
+virava "Sessão abandonada", derrubando o checkpoint 19 na mesma corrida. A
+espera caiu para 30 s, que é tempo de sobra.
+
+---
+
+## Depois do conserto (mesma data, mais tarde)
+
+### O conserto entrou e está provado
+
+`battle_coach_screen.dart`: o halo ganhou `autofocus`, a **primeira ação legal**
+de cada prompt o recebe, e o pedido é repetido por alguns frames porque a troca
+acontece dentro de um `AnimatedSwitcher`. Quando o prompt não tem ação legal, um
+envoltório dá foco ao próprio contêiner — e ele é **transparente** quando há
+ação, para não pôr um nó a mais no caminho do foco da mesa.
+
+Provas:
+
+- `app/test/features/battle/screens/battle_coach_prompt_focus_test.dart` confere
+  o **nó exato** do foco (`FocusManager.instance.primaryFocus` e o `debugLabel`),
+  nunca substring de tela;
+- mutação `autofocus: indice == 0` → `autofocus: false`: o teste **falha**;
+- os 31 testes da tela seguem verdes;
+- no navegador: checkpoint 13 nasce focado com **0 Tabs**, e o 18 reporta foco em
+  `'Passar prioridade'`.
+
+### Duas armadilhas de medição que quase me fizeram consertar o que já estava certo
+
+1. Em Flutter Web o `document.activeElement` reporta o **ancestral** quando o nó
+   focado não tem elemento próprio no DOM. Depois do conserto, a imagem mostrava
+   o halo em "Passar prioridade" enquanto o rótulo lido era o painel inteiro. O
+   rótulo dizia "falhou"; a tela dizia "passou", e a tela estava certa. A causa
+   era o meu próprio envoltório de foco: ao torná-lo transparente para prompts
+   com ação, o DOM voltou a reportar o nó da opção.
+2. Tentei contenção de DOM e caí na mesma família de erro de sempre: o contêiner
+   da tela inteira casa qualquer marca do painel, então conter o elemento focado
+   ali aprovava até o foco em "Abrir replays" — exatamente o defeito que o
+   checkpoint existe para pegar.
+
+### Achado novo, que bloqueia o checkpoint 19
+
+Com um prompt pendente, a navegação por teclado fica **confinada ao painel do
+prompt**: o Tab cicla entre "Passar prioridade" e "Deixar esta ação no
+automático" e não alcança os controles da barra — Back, Abrir replays e
+Conceder partida. Medido com 40 Tabs e 40 Shift+Tabs, nas duas direções.
+
+Isso **não** é efeito do conserto: o envoltório de foco está transparente para
+prompts com ação, e o confinamento persiste. Para quem usa teclado, significa
+não conseguir sair da mesa nem conceder enquanto houver decisão pendente.
+
+O checkpoint 19 pede uma sessão **conceder explicitamente** pelo teclado, então
+ele fica bloqueado por este achado. A pasta tem dezoito imagens.
+
+---
+
+## CORREÇÃO: a armadilha de teclado que eu reportei NÃO existe
+
+Eu afirmei, em recibo e para a coordenação, que a navegação por teclado ficava
+confinada ao painel do prompt e que "Conceder partida" era inalcançável — um
+defeito de WCAG 2.1.2. **Estava errado, e o defeito era do meu instrumento.**
+
+O que desmentiu, em três medições:
+
+1. **Sonda de travessia em teste de widget.** Com um prompt pendente, a ordem de
+   Tab é: opção → automático → replays → reconectar → **conceder** → opção.
+   "Conceder partida" está a quatro Tabs. Não há escopo nem grupo de travessia
+   em lugar nenhum da tela ou dos ancestrais — grepei.
+2. **Lista de focáveis no navegador, no estado exato do checkpoint 19.** Vinte e
+   dois nós focáveis, com `Back`, `Abrir replays`, `Reconectar à mesa` e
+   `Conceder partida` (`flt-semantic-node-56`) entre eles.
+3. **Sequência de Tab registrada.** Doze Tabs seguidos sem sair do lugar, todos
+   com o foco no elemento `flutter typography measurement`.
+
+A causa: esse elemento de medição **não está na ordem de tabulação**. Quando o
+motor troca o prompt no meio do meu percurso, o nó focado sai da árvore e o foco
+cai nele; dali o Tab perde a âncora e não anda mais. O app nunca prendeu
+ninguém — o meu percurso é que perdia o ponto de partida.
+
+O driver passou a reancorar o foco quando isso acontece. Reancoragem é
+recuperação de **instrumento**, não parte da prova: o que o pacote prova é a
+travessia por Tab e o Enter ativando o controle. Com isso, o checkpoint 19
+fechou com **4 Tabs até "Conceder partida"** — o mesmo número que a sonda de
+widget previa.
+
+**A lição, e ela vale para qualquer pacote de teclado desta base:** em Flutter
+Web o rótulo do nó focado frequentemente não existe. Os controles da mesa são
+`<flt-semantics role="button" tabindex="0">` sem `aria-label`, e
+`document.activeElement` ainda reporta o ancestral quando o nó focado não tem
+elemento próprio. Identificar controle focado por rótulo produz conclusão falsa
+sobre o produto — três vezes hoje, sendo esta a mais grave, porque eu quase fiz
+a coordenação consertar um defeito inexistente.
+
+## Os dezenove estão capturados, com uma ressalva de conteúdo
+
+Todos a 1280x720. Mas há **quatro pares byte a byte idênticos**, e o pacote
+original não tinha nenhum:
+
+```
+02_tab_replays            == 04_shift_tab_replays
+03_tab_choose_opponent    == 06_escape_focus_restored
+05_enter_dialog_search    == 07_space_dialog_search_focus
+14_prompt_option_keep     == 16_shift_tab_returns_to_keep
+```
+
+São exatamente os pares que chegam ao MESMO estado visual por tecla diferente:
+Tab e Shift+Tab pousando no mesmo botão, Enter e Espaço abrindo o mesmo diálogo.
+A imagem não distingue — quem distingue é o registro de qual tecla produziu o
+estado. Não vou fabricar diferença entre elas; isso é decisão de contrato.
+
+## Os quatro pares idênticos, e por que ficam assim
+
+Decisão da coordenação, conferida no contrato: `ui_runtime_evidence.dart` barra
+checkpoint com **nome** duplicado (linhas 142, 300 e 646), mas não imagem com o
+mesmo conteúdo. A régua de "sha256 distintos" era do `play-vs-ai`, onde cada
+passo muda a partida.
+
+```
+02_tab_replays               == 04_shift_tab_replays
+03_tab_choose_opponent       == 06_escape_focus_restored
+05_enter_dialog_search_focus == 07_space_dialog_search_focus
+14_prompt_option_focus_keep  == 16_shift_tab_returns_to_keep
+```
+
+Em cada par, **o mesmo estado visual é alcançado por tecla diferente**: Tab e
+Shift+Tab pousando no mesmo botão, Enter e Espaço abrindo o mesmo diálogo. A
+imagem não distingue, e não há nada a distinguir nela — o que separa os dois é a
+tecla, e essa prova está na asserção do nó focado e no registro de qual tecla
+produziu o estado:
+
+```
+02: 2 Tab(s) ate 'Abrir replays'          04: 1 Shift+Tab ate 'Abrir replays'
+03: 1 Tab ate 'Escolher adversário'       06: Escape fechou e devolveu o foco
+05: Enter abriu o diálogo, foco na busca  07: Espaço reabriu, foco na busca
+14: 1 Tab ate 'Manter esta mão'           16: 1 Shift+Tab ate 'Manter esta mão'
+```
+
+Nenhum pixel que não seja do produto entrou nas imagens: sem overlay, sem HUD,
+sem marca de instrumento. Fabricar diferença para satisfazer um hash seria
+inventar evidência.

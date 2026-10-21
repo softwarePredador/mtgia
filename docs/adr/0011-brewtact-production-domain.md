@@ -85,3 +85,23 @@ Na revisão corrente, a matriz server-authoritative permanece totalmente
 `200` históricos de `/app` e das rotas profundas não valem como receipt da
 revisão atual. Qualquer abertura futura exige capability, artefato e prova
 same-SHA próprios, conforme a decisão corrente de produto.
+
+## Adendo de infraestrutura — 2026-10-20
+
+Os itens 6 e 7 usam agora as coordenadas técnicas do servidor migrado:
+`https://evolution-manaloom-web-public.tr5taz.easypanel.host` para Web e
+`https://evolution-cartinhas.tr5taz.easypanel.host` para API. A origem pública
+canônica continua `https://brewtact.com`; a autorização para mudar seu DNS não
+altera esta decisão de produto nem autoriza mudanças na DriveMatch.
+
+Os padrões de QA, backup, auditoria e exemplos de configuração devem apontar
+ao novo servidor. O host antigo só permanece na proteção contra testes live,
+em evidência histórica e na allowlist de compatibilidade enquanto houver
+clientes/links antigos. Não remover essa compatibilidade apenas pela ausência
+de tráfego observado. APKs já instalados e atalhos externos não são atualizados
+por uma mudança de código ou de arquivo publicado.
+
+A remoção da ponte e do certificado antigos exige adoção comprovada dos novos
+endereços ou um corte explicitamente aprovado. O DNS compartilhado
+`*.2ta7qx.easypanel.host` não pode ser movido em bloco: ele também atende a
+DriveMatch, que está fora desta migração.

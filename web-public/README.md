@@ -12,7 +12,7 @@ Arquitetura corrente da Beta gratuita:
 - O único fetch público de produto preservado é `/reports/:id`; IDs ausentes
   fecham em `404` e não são substituídos por conteúdo demonstrativo.
 
-`https://evolution-manaloom-web-public.2ta7qx.easypanel.host` permanece como
+`https://evolution-manaloom-web-public.tr5taz.easypanel.host` permanece como
 endpoint técnico de deploy, health check e rollback. Metadata, sitemap, links
 compartilháveis e navegação pública usam `https://brewtact.com`.
 
@@ -44,8 +44,8 @@ NEXT_PUBLIC_MANALOOM_API_BASE_URL=https://seu-backend.example.com npm run dev
 - Flutter autenticado: reservado em `https://brewtact.com/app/`, inacessível na
   matriz corrente all-OFF
 - Android: `https://brewtact.com/downloads/manaloom-android.apk`
-- API BrewTact: `https://evolution-cartinhas.2ta7qx.easypanel.host`
-- Endpoint técnico Web: `https://evolution-manaloom-web-public.2ta7qx.easypanel.host`
+- API BrewTact: `https://evolution-cartinhas.tr5taz.easypanel.host`
+- Endpoint técnico Web: `https://evolution-manaloom-web-public.tr5taz.easypanel.host`
 - Serviço EasyPanel/Swarm: `evolution_manaloom-web-public`
 - Serviço Flutter EasyPanel/Swarm: `evolution_manaloom-app`
 

@@ -18,10 +18,24 @@ class _PrivacyApiClient extends ApiClient {
 
   String? deletedEndpoint;
   Map<String, dynamic>? deletedBody;
+  String? exportedEndpoint;
+  Map<String, dynamic>? exportedBody;
 
   @override
   Future<ApiResponse> get(String endpoint) async {
-    expect(endpoint, '/users/me/export');
+    // BT-AUTH-004: a exportacao deixou de aceitar GET. Se o app voltar a usar
+    // GET, este fake falha aqui em vez de deixar passar um 405 silencioso.
+    fail('exportacao nao pode usar GET: $endpoint');
+  }
+
+  @override
+  Future<ApiResponse> post(
+    String endpoint,
+    Map<String, dynamic> body, {
+    Duration? timeout,
+  }) async {
+    exportedEndpoint = endpoint;
+    exportedBody = Map<String, dynamic>.from(body);
     return exportResponse;
   }
 
@@ -41,12 +55,39 @@ void main() {
     final api = _PrivacyApiClient();
     final service = AccountPrivacyService(apiClient: api);
 
-    final exported = await service.exportPortableData();
+    final exported = await service.exportPortableData(
+      password: 'TestPassword123!',
+    );
     final decoded = jsonDecode(exported) as Map<String, dynamic>;
 
+    expect(api.exportedEndpoint, '/users/me/export');
+    expect(api.exportedBody, {'password': 'TestPassword123!'});
     expect(exported, contains('\n  "schema_version"'));
     expect(decoded['schema_version'], 1);
     expect((decoded['account'] as Map)['email'], 'player@example.com');
+  });
+
+  test('cada recusa da exportacao tem mensagem propria', () async {
+    // Sem isto, senha errada e excesso de tentativas caem na mesma frase, e
+    // quem errou a senha nao sabe que basta tentar de novo.
+    for (final (code, trecho) in const [
+      (400, 'Informe sua senha'),
+      (401, 'Senha incorreta'),
+      (429, 'Muitas tentativas'),
+    ]) {
+      final api = _PrivacyApiClient()..exportResponse = ApiResponse(code, {});
+      final service = AccountPrivacyService(apiClient: api);
+      await expectLater(
+        () => service.exportPortableData(password: 'x'),
+        throwsA(
+          isA<AccountPrivacyException>().having(
+            (e) => e.message,
+            'message ($code)',
+            contains(trecho),
+          ),
+        ),
+      );
+    }
   });
 
   test('exclusão envia frase e senha somente no corpo autenticado', () async {

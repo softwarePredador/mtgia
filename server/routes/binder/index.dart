@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../lib/binder_item_contract.dart';
+import '../../lib/release_capability_policy.dart';
 import '../../lib/logger.dart';
 import '../../lib/observability.dart';
 import '../../lib/scryfall_image_url.dart';
@@ -315,6 +316,12 @@ Future<Response> _addToBinder(RequestContext context) async {
       );
     }
     final body = decoded;
+    final releasePolicy = context.read<ReleaseCapabilityPolicy>();
+    assertBinderCommerceFieldsAllowed(
+      body,
+      tradesAllowed: releasePolicy.isAllowed('trades'),
+      marketplaceAllowed: releasePolicy.isAllowed('marketplace'),
+    );
     final cardId = readBinderCardId(body['card_id']);
 
     // Verifica que a carta existe
@@ -413,6 +420,15 @@ Future<Response> _addToBinder(RequestContext context) async {
         'language': language,
         'list_type': listType,
         'message': 'Carta adicionada ao fichário',
+      },
+    );
+  } on BinderCapabilityDisabledException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: {
+        'error': error.message,
+        'code': error.code,
+        'capability': error.capability,
       },
     );
   } on BinderItemInputException catch (error) {

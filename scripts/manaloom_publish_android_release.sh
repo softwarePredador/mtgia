@@ -33,7 +33,7 @@ MANALOOM_EXPECTED_SENTRY_DSN_SHA256="$CALLER_EXPECTED_SENTRY_DSN_SHA256"
 readonly MANALOOM_EXPECTED_SENTRY_DSN_SHA256
 export MANALOOM_EXPECTED_SENTRY_DSN_SHA256
 
-API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
+API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.tr5taz.easypanel.host}"
 SENTRY_RELEASE_DSN="${SENTRY_MOBILE_DSN:-${SENTRY_DSN:-}}"
 # shellcheck source=scripts/lib/manaloom_release_runtime_contract.sh
 source "$ROOT_DIR/scripts/lib/manaloom_release_runtime_contract.sh"
@@ -71,7 +71,7 @@ EMBEDDED_IDENTITY="$RELEASE_DIR/embedded-release-identity.json"
 PROVENANCE="$RELEASE_DIR/provenance.intoto.json"
 ANDROID_VERIFICATION="$RELEASE_DIR/android-verification.json"
 OBSERVABILITY_EVIDENCE="${MANALOOM_RELEASE_OBSERVABILITY_EVIDENCE:-}"
-PUBLIC_HOST="${MANALOOM_WEB_PUBLIC_HOST:-evolution-manaloom-web-public.2ta7qx.easypanel.host}"
+PUBLIC_HOST="${MANALOOM_WEB_PUBLIC_HOST:-evolution-manaloom-web-public.tr5taz.easypanel.host}"
 PUBLIC_URL="https://$PUBLIC_HOST/downloads/manaloom-android.apk"
 PUBLIC_RELEASE_URL="https://$PUBLIC_HOST/downloads/release.json"
 PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-readonly MANALOOM_PRODUCTION_API_BASE_URL="https://evolution-cartinhas.2ta7qx.easypanel.host"
+readonly MANALOOM_PRODUCTION_API_BASE_URL="https://evolution-cartinhas.tr5taz.easypanel.host"
 # shellcheck disable=SC2034 # consumed by release scripts after sourcing
-readonly MANALOOM_PRODUCTION_PUBLIC_HOST="evolution-manaloom-web-public.2ta7qx.easypanel.host"
+readonly MANALOOM_PRODUCTION_PUBLIC_HOST="evolution-manaloom-web-public.tr5taz.easypanel.host"
 # Canonical user-facing origin. The EasyPanel host above remains the stable
 # infrastructure endpoint used by deploy/rollback probes.
 # shellcheck disable=SC2034 # consumed by release scripts after sourcing

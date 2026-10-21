@@ -272,7 +272,22 @@ class ReleaseCapabilitiesProvider extends ChangeNotifier {
 
   Future<bool> refresh() async {
     final generation = ++_generation;
-    _snapshot = ReleaseCapabilitiesSnapshot.denied();
+    // A snapshot corrente SOBREVIVE ao refresh. Antes ela virava `denied()`
+    // aqui, antes mesmo de perguntar ao servidor, e os listeners eram
+    // notificados nesse estado: durante toda a janela do fetch o app achava
+    // que nenhuma capability existia.
+    //
+    // O estrago era o `redirect` do router, que roda nessa notificacao:
+    // `/decks/<id>/play-vs-ai` batia em `decksPrivate` negada e ia para
+    // `/home`. Como `didChangeAppLifecycleState(resumed)` chama `refresh()`, e
+    // em Flutter Web `resumed` dispara a cada foco da aba, bastava o jogador
+    // trocar de janela e voltar para ser expulso da partida em andamento --
+    // com a mesa seguindo viva no servidor. Medido em 2026-09-23.
+    //
+    // Isto nao afrouxa nada: negar continua sendo a resposta a uma RESPOSTA
+    // (503, corpo invalido, excecao -> `_markUnavailable`) e a `reset()`, que
+    // e o caminho explicito de troca de conta. O que sai e apenas o bloqueio
+    // preventivo, que negava sem ter perguntado.
     _loadState = ReleaseCapabilitiesLoadState.loading;
     _notifyIfMounted();
 

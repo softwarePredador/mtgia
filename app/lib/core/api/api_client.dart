@@ -41,7 +41,7 @@ class ApiClient {
     defaultValue: false,
   );
   static const String _serverFallbackUrl =
-      'https://evolution-cartinhas.2ta7qx.easypanel.host';
+      'https://evolution-cartinhas.tr5taz.easypanel.host';
 
   // ──────────────────────────────────────────
   // Cache do token em memória (evita acessar o cofre seguro a cada request)

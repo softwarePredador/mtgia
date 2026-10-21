@@ -1497,6 +1497,22 @@ final class InteractiveBattleRegistry {
                         break;
                 }
             } catch (Throwable error) {
+                // Sem este log a falha e indiagnosticavel. `fail` guarda apenas
+                // `getSimpleName()`, entao a sessao morre com
+                // `error_code=IllegalArgumentException` e nada mais: nem a
+                // mensagem, nem o callback que estourou, nem o stack. Medido em
+                // 2026-09-23 na captura play-vs-ai-web-real, onde a mesa morreu
+                // ao entrar em combate no turno 6 e o log do XMage nao registrou
+                // nada -- a excecao era do bridge e estava sendo engolida aqui.
+                System.err.println(
+                        "interactive_callback_failed method="
+                                + callback.getMethod()
+                                + " session="
+                                + runtimeId
+                                + " turn="
+                                + (lastView == null ? 0 : lastView.getTurn())
+                );
+                error.printStackTrace(System.err);
                 fail(
                         "engine_error",
                         "interactive_callback_failed",

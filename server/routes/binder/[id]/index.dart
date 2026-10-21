@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dart_frog/dart_frog.dart';
 import 'package:postgres/postgres.dart';
 import '../../../lib/binder_item_contract.dart';
+import '../../../lib/release_capability_policy.dart';
 import '../../../lib/logger.dart';
 import '../../../lib/observability.dart';
 
@@ -541,6 +542,12 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
       );
     }
     final body = decoded;
+    final releasePolicy = context.read<ReleaseCapabilityPolicy>();
+    assertBinderCommerceFieldsAllowed(
+      body,
+      tradesAllowed: releasePolicy.isAllowed('trades'),
+      marketplaceAllowed: releasePolicy.isAllowed('marketplace'),
+    );
 
     // Build dynamic SET
     final setClauses = <String>['updated_at = CURRENT_TIMESTAMP'];
@@ -676,6 +683,15 @@ Future<Response> _updateBinderItem(RequestContext context, String id) async {
       );
       return Response.json(body: {'message': 'Item atualizado', 'id': id});
     });
+  } on BinderCapabilityDisabledException catch (error) {
+    return Response.json(
+      statusCode: HttpStatus.unprocessableEntity,
+      body: {
+        'error': error.message,
+        'code': error.code,
+        'capability': error.capability,
+      },
+    );
   } on BinderItemInputException catch (error) {
     return Response.json(
       statusCode: HttpStatus.badRequest,

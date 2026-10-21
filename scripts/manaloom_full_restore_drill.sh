@@ -94,13 +94,36 @@ ARCHIVE_BYTES="$(wc -c < "$BACKUP_ABS" | tr -d ' ')"
 ENCRYPTED=false
 ENCRYPTION_CHAIN_VERIFIED=false
 
+RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/manaloom-full-restore-run.XXXXXX")"
+CID_FILE="$RUN_DIR/container-id"
 cleanup() {
-  docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
-  if [[ -n "$STAGING_DIR" ]]; then
-    rm -rf "$STAGING_DIR"
+  local status=$? cid remaining
+  trap - EXIT
+  trap '' INT TERM
+  # Only Docker's ID from this private run directory may be removed.
+  if [[ -s "$CID_FILE" ]]; then
+    cid="$(cat "$CID_FILE")"
+    if [[ "$cid" =~ ^[0-9a-f]{64}$ ]]; then
+      if ! docker rm -f -v "$cid" >/dev/null 2>&1; then
+        if ! remaining="$(docker ps -aq --no-trunc --filter "id=$cid")" || [[ -n "$remaining" ]]; then
+          echo "[restore] falha ao limpar container temporario e volumes: $cid" >&2
+          if [[ "$status" == "0" ]]; then status=1; fi
+        fi
+      fi
+    else
+      echo "[restore] ID temporario invalido; nenhum container removido" >&2
+      if [[ "$status" == "0" ]]; then status=1; fi
+    fi
   fi
+  if [[ -n "$STAGING_DIR" ]]; then
+    rm -rf -- "$STAGING_DIR" || status=1
+  fi
+  rm -rf -- "$RUN_DIR" || status=1
+  exit "$status"
 }
 trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 if [[ "$BACKUP_ABS" == *.age ]]; then
   ENCRYPTED=true
@@ -138,7 +161,7 @@ fi
 RESTORED_DUMP_SHA256="$(shasum -a 256 "$RESTORE_BACKUP_ABS" | awk '{print $1}')"
 RESTORED_DUMP_BYTES="$(wc -c < "$RESTORE_BACKUP_ABS" | tr -d ' ')"
 
-docker run -d \
+docker run -d --rm --cidfile "$CID_FILE" \
   --name "$CONTAINER" \
   --network none \
   -e POSTGRES_PASSWORD=restore_check \

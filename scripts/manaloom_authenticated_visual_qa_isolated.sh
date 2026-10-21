@@ -2,6 +2,13 @@
 set +x
 set -euo pipefail
 
+# BT-CI-002: checagem que barra também no /bin/bash 3.2 do macOS, onde um [[ ]] ou
+# (( )) solto que falha não encerra o script com set -e.
+fail_check() {
+  echo "checagem falhou: $*" >&2
+  exit 1
+}
+
 # Capture inherited credentials before invoking any non-database child.
 FIXTURE_DB_PASSWORD="${DB_PASS:-}"
 export -n FIXTURE_DB_PASSWORD
@@ -351,10 +358,14 @@ with socket.socket() as batch, socket.socket() as interactive:
     print(batch.getsockname()[1], interactive.getsockname()[1])
 PY
 )"
-[[ "$INACTIVE_BATCH_PORT" =~ ^[0-9]+$ && "$INACTIVE_INTERACTIVE_PORT" =~ ^[0-9]+$ ]]
-[[ "$INACTIVE_BATCH_PORT" != "$INACTIVE_INTERACTIVE_PORT" ]]
-[[ "$(listener_count "$INACTIVE_BATCH_PORT")" == 0 ]]
-[[ "$(listener_count "$INACTIVE_INTERACTIVE_PORT")" == 0 ]]
+[[ "$INACTIVE_BATCH_PORT" =~ ^[0-9]+$ && "$INACTIVE_INTERACTIVE_PORT" =~ ^[0-9]+$ ]] ||
+  fail_check "portas inativas invalidas"
+[[ "$INACTIVE_BATCH_PORT" != "$INACTIVE_INTERACTIVE_PORT" ]] ||
+  fail_check "portas inativas iguais"
+[[ "$(listener_count "$INACTIVE_BATCH_PORT")" == 0 ]] ||
+  fail_check "porta inativa do batch escutando"
+[[ "$(listener_count "$INACTIVE_INTERACTIVE_PORT")" == 0 ]] ||
+  fail_check "porta inativa do interativo escutando"
 
 (
   export DB_PASS="$FIXTURE_DB_PASSWORD"

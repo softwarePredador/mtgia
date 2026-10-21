@@ -61,8 +61,8 @@ if [[ -f "$ENV_FILE" ]]; then
     MANALOOM_WEB_PUBLIC_HOST SENTRY_DSN SENTRY_MOBILE_DSN
 fi
 
-API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
-PUBLIC_HOST="${MANALOOM_WEB_PUBLIC_HOST:-evolution-manaloom-web-public.2ta7qx.easypanel.host}"
+API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.tr5taz.easypanel.host}"
+PUBLIC_HOST="${MANALOOM_WEB_PUBLIC_HOST:-evolution-manaloom-web-public.tr5taz.easypanel.host}"
 PUBLIC_BASE_URL="https://$PUBLIC_HOST"
 PROJECT="${EASYPANEL_PROJECT_NAME:-evolution}"
 SERVICE="${MANALOOM_FLUTTER_WEB_SERVICE:-manaloom-app}"

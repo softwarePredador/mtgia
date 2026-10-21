@@ -1,8 +1,8 @@
 {
   "schema_version": "manaloom_ui_runtime_capture_v1",
   "status": "PASS_RUNTIME",
-  "generated_at": "2026-09-22T00:17:18.804689Z",
-  "source_digest": "8bba809cb7617445ea8bde807643515ac716a08ef28a554164c3c17d0b090ba4",
+  "generated_at": "2026-09-23T10:19:42.411302Z",
+  "source_digest": "108f74a9b8ab1f02b97261e736ae41786a93817b4e7755b1dbba7b39270fc4e8",
   "surface": "authenticated_p0_matrix",
   "profile": "web_desktop_1440x900",
   "runtime": "flutter_drive",
@@ -12,7 +12,7 @@
     "status": "pass",
     "forbidden_entries": 0
   },
-  "log_sha256": "a87a48056e91cd035ba68cf8c957de584dbb1620e935c98a821a243fe0f41461",
+  "log_sha256": "4a6d1b962ac82b3c27b7791af98bb43fb0f769e3275625c16a24bf5e17b6a083",
   "checkpoint_count": 53,
   "required_checkpoints": [
     "battle_coach_welcome",
@@ -153,16 +153,16 @@
     {
       "checkpoint": "community_deck_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/community_deck_success.png",
-      "sha256": "3c3b3862bde8dafeea8833bb751d9d92ee375153206f5bf354728d699293915e",
-      "bytes": 86128,
+      "sha256": "86857f3454995993afd3f2fe6cc25e700b1b8480dc0ea1dde153f31b5179dcdc",
+      "bytes": 86678,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "community_public_decks",
       "path": "app/test/ui/goldens/runtime/web_desktop/community_public_decks.png",
-      "sha256": "ac09ce8acfd8559cb8d7ecd7645364af8f1e83a8f1a1e647bd0b333d9739dfef",
-      "bytes": 135375,
+      "sha256": "83d4f607b258b2c17187b002d8e995f2163ed8f3b8acba22ae51dfb53fe12fa4",
+      "bytes": 135904,
       "width": 1440,
       "height": 900
     },
@@ -209,8 +209,8 @@
     {
       "checkpoint": "deck_detail_top",
       "path": "app/test/ui/goldens/runtime/web_desktop/deck_detail_top.png",
-      "sha256": "442eee00d3a00bd939faaf492fe8a8cb2aac285627bdc9f3aab45a60d788ac35",
-      "bytes": 172029,
+      "sha256": "a2c9eb99606e82a34bae270656a7ce71ed8d989039258d52b6d9664b4e32ef67",
+      "bytes": 172076,
       "width": 1440,
       "height": 900
     },
@@ -345,16 +345,16 @@
     {
       "checkpoint": "post_game_empty",
       "path": "app/test/ui/goldens/runtime/web_desktop/post_game_empty.png",
-      "sha256": "b9d163e115bbec6da22f76fee0c4812b96ba3f30395671f284d509df86c20477",
-      "bytes": 198877,
+      "sha256": "8a55afce9ea8a54273b95f3f400c059547ea5cb08da30a498779ef5e9f6a8edf",
+      "bytes": 198876,
       "width": 1440,
       "height": 900
     },
     {
       "checkpoint": "profile_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/profile_success.png",
-      "sha256": "46c8298ee5bd6b0d81dcadd68f14a75985e322672b28148a9003ef4181d54a08",
-      "bytes": 174561,
+      "sha256": "184c662f082a4f1e9b3aa157e7eacc4c061b2b93452acda3b770b382fe679810",
+      "bytes": 174396,
       "width": 1440,
       "height": 900
     },
@@ -425,8 +425,8 @@
     {
       "checkpoint": "splash_boot",
       "path": "app/test/ui/goldens/runtime/web_desktop/splash_boot.png",
-      "sha256": "26256dfe8af218a26bf5b821d8daa792f5609196b678c37a67245c54c6774a17",
-      "bytes": 54608,
+      "sha256": "f0768222040c54c49f3545f46dbe3893dfdbf519d4a83c3d39f1f58e450653cc",
+      "bytes": 54592,
       "width": 1440,
       "height": 900
     },
@@ -465,8 +465,8 @@
     {
       "checkpoint": "user_profile_success",
       "path": "app/test/ui/goldens/runtime/web_desktop/user_profile_success.png",
-      "sha256": "1e3c484e825d98faf2af5f9eb87e5981fc435548dda772f7e610cd9e6b6fddbb",
-      "bytes": 99277,
+      "sha256": "59650313bdad5deebfdf3bd6b9e6d90bbb5f0d5686b18f60510ec3fdb84b37b2",
+      "bytes": 99459,
       "width": 1440,
       "height": 900
     },
@@ -481,8 +481,8 @@
     {
       "checkpoint": "user_search_results",
       "path": "app/test/ui/goldens/runtime/web_desktop/user_search_results.png",
-      "sha256": "22fe8aa3b1aae7266dd575f6917337aa8adccee0a775ed77660a8f529dbc37f8",
-      "bytes": 30045,
+      "sha256": "4103c78505f9219a0ba7e618495428225b719a117f7511e8195f7fbf4c40dadd",
+      "bytes": 30852,
       "width": 1440,
       "height": 900
     },

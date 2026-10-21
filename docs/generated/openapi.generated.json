@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "description": "Generated route/method inventory. Payload shapes remain canonical in route tests and API_CONTRACTS_AND_DATA_MAP.md until typed DTO coverage is complete."
   },
-  "x-manaloom-source-digest-sha256": "5db6c75c08f7ca89771c7f01a356c07e11aa1716191e5c34520a074a70674c78",
+  "x-manaloom-source-digest-sha256": "aaad84c391bdc5f976ec5ae20377b9f0cac5d344c5ed86f898e97ddb8e53bee6",
   "x-manaloom-unresolved-method-paths": [],
   "servers": [
     {
@@ -1370,7 +1370,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "security": [
           {
@@ -1403,7 +1403,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "security": [
           {
@@ -1438,7 +1438,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "security": [
           {
@@ -1473,7 +1473,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "security": [
           {
@@ -1508,7 +1508,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "parameters": [
           {
@@ -1551,7 +1551,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "parameters": [
           {
@@ -1594,7 +1594,7 @@
           "app/test/features/binder/screens/binder_screen_resilience_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_accessibility_test.dart",
           "app/test/features/binder/widgets/binder_item_editor_validation_test.dart",
-          "server/test/binder_import_contract_test.dart"
+          "server/test/binder_commerce_capability_test.dart"
         ],
         "parameters": [
           {

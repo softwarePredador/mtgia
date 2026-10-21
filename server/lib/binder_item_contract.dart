@@ -8,6 +8,50 @@ class BinderItemInputException implements Exception {
   String toString() => message;
 }
 
+/// Escrita recusada porque a capability que a governa está desligada.
+///
+/// Separada de [BinderItemInputException] de propósito: aquela é 400, "o que
+/// você mandou está malformado". Esta é 422, "a forma está certa, mas a beta
+/// não oferece esta funcionalidade". Um cliente que receba 400 tende a culpar
+/// o próprio payload e reenviar; 422 diz que reenviar não adianta.
+class BinderCapabilityDisabledException implements Exception {
+  const BinderCapabilityDisabledException(this.code, this.capability, this.message);
+
+  final String code;
+  final String capability;
+  final String message;
+
+  @override
+  String toString() => message;
+}
+
+/// Recusa marcar item para troca ou venda quando a capability está `off`.
+///
+/// O app já esconde os controles (A8), mas esconder UI não é contenção: o
+/// endpoint aceita PUT de qualquer cliente. A checagem é por CAMPO, não por
+/// rota, porque `/binder` pertence a `collection_private` — a coleção é
+/// permitida, marcar para comércio não é.
+void assertBinderCommerceFieldsAllowed(
+  Map<String, dynamic> body, {
+  required bool tradesAllowed,
+  required bool marketplaceAllowed,
+}) {
+  if (!tradesAllowed && readBinderBoolean(body['for_trade']) == true) {
+    throw const BinderCapabilityDisabledException(
+      'binder_trade_capability_disabled',
+      'trades',
+      'Marcar carta para troca está desativado nesta versão.',
+    );
+  }
+  if (!marketplaceAllowed && readBinderBoolean(body['for_sale']) == true) {
+    throw const BinderCapabilityDisabledException(
+      'binder_sale_capability_disabled',
+      'marketplace',
+      'Marcar carta para venda está desativado nesta versão.',
+    );
+  }
+}
+
 const binderConditions = {'NM', 'LP', 'MP', 'HP', 'DMG'};
 const binderListTypes = {'have', 'want'};
 

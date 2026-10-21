@@ -144,8 +144,11 @@ void main() {
     expect(totals, inventory.expectedTotals);
     expect(
       totals.values.reduce((a, b) => a + b),
-      266,
-      reason: 'A baseline corrente classifica exatamente 266 superfícies.',
+      267,
+      // 267 desde BT-AUTH-004: exportar os próprios dados passou a exigir
+      // reverificação de senha, e esse diálogo é a superfície nova em
+      // `profile_screen.dart`, que subiu de 6 para 7 diálogos.
+      reason: 'A baseline corrente classifica exatamente 267 superfícies.',
     );
   });
 }

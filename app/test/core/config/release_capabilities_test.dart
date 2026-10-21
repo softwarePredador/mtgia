@@ -142,6 +142,134 @@ void main() {
   });
 
   group('ReleaseCapabilitiesProvider', () {
+    test(
+      'um refresh em voo nao derruba o acesso ja concedido',
+      () async {
+        // Este era o defeito que expulsava o jogador da mesa. `refresh()`
+        // zerava a snapshot para `denied()` e notificava os listeners ANTES de
+        // buscar. Durante a janela do fetch o app achava que nenhuma
+        // capability existia; o `redirect` do router rodava nesse estado e
+        // `/decks/<id>/play-vs-ai` caia em `/home` por `decksPrivate` negada.
+        //
+        // Em Flutter Web `AppLifecycleState.resumed` dispara a cada foco da
+        // aba, e o app chama `refresh()` nesse evento: bastava trocar de
+        // janela e voltar para perder a partida em andamento. Medido em
+        // 2026-09-23 na captura play-vs-ai-web-real, com a sessao seguindo
+        // `waiting_for_action` no servidor enquanto a tela ia para #/home.
+        final entregar = Completer<ApiResponse>();
+        var chamadas = 0;
+        final provider = ReleaseCapabilitiesProvider(
+          fetcher: (_) {
+            chamadas++;
+            if (chamadas == 1) {
+              return Future<ApiResponse>.value(
+                ApiResponse(
+                  200,
+                  _validPayload(
+                    allowed: const {
+                      ReleaseCapability.decksPrivate,
+                      ReleaseCapability.battleCoach,
+                    },
+                  ),
+                ),
+              );
+            }
+            return entregar.future;
+          },
+        );
+        addTearDown(provider.dispose);
+
+        expect(await provider.refresh(), isTrue);
+        expect(provider.isAllowed(ReleaseCapability.decksPrivate), isTrue);
+
+        // Segundo refresh, ainda em voo.
+        final emVoo = provider.refresh();
+        expect(provider.loadState, ReleaseCapabilitiesLoadState.loading);
+        expect(
+          provider.isAllowed(ReleaseCapability.decksPrivate),
+          isTrue,
+          reason: 'o acesso ja concedido nao pode sumir enquanto o servidor '
+              'ainda nao respondeu',
+        );
+        expect(
+          ReleaseCapabilityRouteGuard.redirectFor(
+            uri: Uri.parse('/decks/abc/play-vs-ai'),
+            capabilities: provider.snapshot,
+            buildSupport: const ReleaseRouteBuildSupport(
+              battleCoach: true,
+              scanner: true,
+              billingCheckout: true,
+            ),
+          ),
+          isNull,
+          reason: 'um refresh em voo nao pode expulsar da mesa',
+        );
+
+        entregar.complete(
+          ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.decksPrivate}),
+          ),
+        );
+        expect(await emVoo, isTrue);
+        expect(provider.loadState, ReleaseCapabilitiesLoadState.ready);
+        // A resposta nova manda: battleCoach saiu.
+        expect(provider.isAllowed(ReleaseCapability.battleCoach), isFalse);
+      },
+    );
+
+    test(
+      'reset() continua negando na hora, e uma resposta ruim tambem',
+      () async {
+        // O contraponto do teste acima: manter a snapshot durante o refresh
+        // nao pode virar desculpa para deixar acesso velho sobreviver a uma
+        // troca de conta ou a uma resposta invalida do servidor.
+        final provider = ReleaseCapabilitiesProvider(
+          fetcher: (_) async => ApiResponse(
+            200,
+            _validPayload(allowed: const {ReleaseCapability.decksPrivate}),
+          ),
+        );
+        addTearDown(provider.dispose);
+
+        expect(await provider.refresh(), isTrue);
+        expect(provider.isAllowed(ReleaseCapability.decksPrivate), isTrue);
+
+        provider.reset();
+        expect(provider.loadState, ReleaseCapabilitiesLoadState.initial);
+        expect(
+          provider.isAllowed(ReleaseCapability.decksPrivate),
+          isFalse,
+          reason: 'reset() e a troca de conta: negar na hora e o certo',
+        );
+
+        var rodada = 0;
+        final ruim = ReleaseCapabilitiesProvider(
+          fetcher: (_) async {
+            rodada++;
+            return rodada == 1
+                ? ApiResponse(
+                    200,
+                    _validPayload(
+                      allowed: const {ReleaseCapability.decksPrivate},
+                    ),
+                  )
+                : ApiResponse(503, const <String, dynamic>{});
+          },
+        );
+        addTearDown(ruim.dispose);
+        expect(await ruim.refresh(), isTrue);
+        expect(ruim.isAllowed(ReleaseCapability.decksPrivate), isTrue);
+        expect(await ruim.refresh(), isFalse);
+        expect(ruim.loadState, ReleaseCapabilitiesLoadState.unavailable);
+        expect(
+          ruim.isAllowed(ReleaseCapability.decksPrivate),
+          isFalse,
+          reason: 'resposta ruim e resposta: negar',
+        );
+      },
+    );
+
     test('loads GET /capabilities and exposes a valid snapshot', () async {
       String? requestedEndpoint;
       final provider = ReleaseCapabilitiesProvider(

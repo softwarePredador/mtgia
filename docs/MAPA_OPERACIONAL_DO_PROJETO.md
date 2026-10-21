@@ -397,6 +397,7 @@ Esta é a seção mais acionável.
 | C15 | O web público é o único deploy **sem nenhuma** referência a capability — zero ocorrências, verificado | `manaloom_deploy_public_web.sh` |
 | C16 | O contrato de egress do harness isolado cobrava quatro trechos que `f6f791098` já havia refatorado — 23 das 27 asserções continuavam válidas, então a deriva passou despercebida | `mutating_e2e_entrypoint_guard_test.dart:371-380` vs `manaloom_server_contract_e2e_isolated.sh:440,674,817` |
 | C17 | O conjunto de evidência viva de UI contém um pack que apresenta marketplace, preços em `R$` e CTAs de compra/venda como superfície ativa, enquanto `marketplace` e `trades` estão `allowed=false` e o contrato de web público proíbe esse vocabulário | `ux-pack-05-social-trade-web-*` vs `server/config/release_capabilities.json` |
+| C18 | O mapeador de erros do app preferia `body['error']` — o **código de máquina** — sobre `body['message']`, e depois o ecoava. Qualquer código que o servidor devolvesse chegava à tela como se fosse frase | `friendly_error_mapper.dart:_messageFromBody` |
 
 C16 foi corrigido em duas etapas. A primeira trocou as âncoras literais por
 outras âncoras literais, e uma revisão adversarial mostrou que ela deixava
@@ -432,6 +433,22 @@ cartas — foi exatamente o que três revisores concluíram. A correção barata
 marcar o pack (no manifest e/ou na captura) como superfície `allowed=false`
 construída diretamente; a cara é aposentar o pack enquanto a capability
 estiver desligada. Decisão do dono.
+
+C18 foi corrigida junto com a `BT-AUTH-010`, e vale o registro porque a ficha
+que a motivou (`BT-UX-ERR-001`) descrevia um sintoma, não a causa. O sintoma
+era "o app mostra `email_verification_required` cru". Implementando o
+mapeamento desse código, descobri que o ramo novo **nunca era alcançado**:
+`_messageFromBody` roda antes de qualquer decisão por status e devolvia
+`body['error']` verbatim.
+
+A causa é a ordem de preferência. `error` carrega o código
+(`invalid_password`, `forbidden`, `email_verification_required`); `message`,
+quando existe, é o texto escrito para quem lê. Preferir o código e ecoá-lo faz
+**todo** código futuro vazar para a tela até alguém notar um por um.
+
+Corrigido na raiz: `message` primeiro, e identificador de máquina — `snake_case`
+ou token único minúsculo — nunca é exibido cru. Um teste impede que o ramo
+novo seja alargado até engolir um 403 legítimo.
 
 C1, C2 e C3 recomendam a mesma correção: separar **implementado** de
 **alcançável** na matriz de prontidão. O repositório já rastreia as duas

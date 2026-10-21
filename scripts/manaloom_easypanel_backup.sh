@@ -7,7 +7,7 @@ source "$ROOT_DIR/scripts/lib/manaloom_mutation_guard.sh"
 require_live_mutation_approval "backup do PostgreSQL de producao ManaLoom"
 readonly LIVE_MUTATION_APPROVED=1
 
-SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-root@evolution-cartinhas.2ta7qx.easypanel.host}"
+SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-root@evolution-cartinhas.tr5taz.easypanel.host}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-$HOME/.ssh/manaloom_easy_parallel_20260703}"
 POSTGRES_SERVICE="${MANALOOM_POSTGRES_SERVICE:-evolution_manaloom-postgres}"
 POSTGRES_USER="${MANALOOM_POSTGRES_USER:-postgres}"

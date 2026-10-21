@@ -31,7 +31,7 @@ from urllib.parse import parse_qsl, urlsplit
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SERVER_DIR = REPO_ROOT / "server"
 DEFAULT_ARTIFACT_DIR = REPO_ROOT / "server" / "test" / "artifacts" / "easypanel_runtime_alignment"
-DEFAULT_HEALTH_URL = "https://evolution-cartinhas.2ta7qx.easypanel.host/health"
+DEFAULT_HEALTH_URL = "https://evolution-cartinhas.tr5taz.easypanel.host/health"
 DEFAULT_SERVICES = ("manaloom-ops",)
 DEFAULT_PROJECT = "evolution"
 EXPECTED_POSTGRES_HOST = "evolution_manaloom-postgres"

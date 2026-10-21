@@ -9,7 +9,10 @@ import sys
 from pathlib import Path
 
 
-PRODUCTION_MARKER = "evolution-cartinhas.2ta7qx.easypanel.host"
+PRODUCTION_MARKERS = (
+    "evolution-cartinhas.tr5taz.easypanel.host",
+    "evolution-cartinhas.2ta7qx.easypanel.host",
+)
 SCOPED_PATH = re.compile(r"^(scripts/|server/(bin|test)/).+\.(dart|sh)$")
 LITERAL_PASSWORD_PATTERNS = (
     re.compile(
@@ -43,7 +46,7 @@ def main() -> int:
             content = path.read_text(encoding="utf-8")
         except (OSError, UnicodeError):
             continue
-        if PRODUCTION_MARKER not in content:
+        if not any(marker in content for marker in PRODUCTION_MARKERS):
             continue
         for line_number, line in enumerate(content.splitlines(), start=1):
             if any(pattern.search(line) for pattern in LITERAL_PASSWORD_PATTERNS):

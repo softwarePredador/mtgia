@@ -5,7 +5,7 @@ http:
         - redirect-to-https
         - bad-gateway-error-page
       priority: 230
-      rule: Host(`evolution-manaloom-web-public.2ta7qx.easypanel.host`) && (Path(`/downloads`) || PathPrefix(`/downloads/`))
+      rule: Host(`evolution-manaloom-web-public.tr5taz.easypanel.host`) && (Path(`/downloads`) || PathPrefix(`/downloads/`))
       service: evolution-manaloom-releases-path
       entryPoints:
         - http
@@ -13,12 +13,12 @@ http:
       middlewares:
         - bad-gateway-error-page
       priority: 230
-      rule: Host(`evolution-manaloom-web-public.2ta7qx.easypanel.host`) && (Path(`/downloads`) || PathPrefix(`/downloads/`))
+      rule: Host(`evolution-manaloom-web-public.tr5taz.easypanel.host`) && (Path(`/downloads`) || PathPrefix(`/downloads/`))
       service: evolution-manaloom-releases-path
       tls:
         certResolver: letsencrypt
         domains:
-          - main: evolution-manaloom-web-public.2ta7qx.easypanel.host
+          - main: evolution-manaloom-web-public.tr5taz.easypanel.host
       entryPoints:
         - https
   services:

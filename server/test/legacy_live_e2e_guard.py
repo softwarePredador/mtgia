@@ -9,7 +9,9 @@ APPROVAL_TOKEN = "I_HAVE_EXPLICIT_APPROVAL"
 BLOCKED_PRODUCTION_HOSTS = frozenset(
     {
         "137.184.5.11",
+        "138.68.56.108",
         "evolution-cartinhas.2ta7qx.easypanel.host",
+        "evolution-cartinhas.tr5taz.easypanel.host",
     }
 )
 

@@ -34,8 +34,8 @@ load_manaloom_env_keys "$ENV_FILE" \
   MANALOOM_OPS_API_KEY MANALOOM_QUALITY_GATE_OUT_DIR \
   MANALOOM_WEB_PUBLIC_URL
 
-API="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
-WEB="${MANALOOM_WEB_PUBLIC_URL:-https://evolution-manaloom-web-public.2ta7qx.easypanel.host}"
+API="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.tr5taz.easypanel.host}"
+WEB="${MANALOOM_WEB_PUBLIC_URL:-https://evolution-manaloom-web-public.tr5taz.easypanel.host}"
 SSH_HOST="${MANALOOM_EASYPANEL_SSH_HOST:-${EASYPANEL_SSH_USER:-root}@${EASYPANEL_SERVER_IP:-}}"
 SSH_KEY="${MANALOOM_EASYPANEL_SSH_KEY:-${EASYPANEL_SSH_KEY:-}}"
 BACKEND_SERVICE="${MANALOOM_BACKEND_SERVICE:-evolution_cartinhas}"

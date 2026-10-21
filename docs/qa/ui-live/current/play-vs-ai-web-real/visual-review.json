@@ -2,60 +2,60 @@
   "schema_version": "manaloom_ui_surface_visual_review_v1",
   "status": "PASS_VISUAL_REVIEWED",
   "scope": "focal_play_vs_ai_real_xmage",
-  "source_digest": "865e6041022cfa28ba153b88d791c47d6ed8e0b4ddd6ddca250fb1e3ac04e7ed",
+  "source_digest": "acd47e2cf319d3d2d8fa6b2be3836fae152d0dc26d8acef236d911685e71e169",
   "surface": "play_vs_ai",
   "profile": "web_play_vs_ai_1440x900",
-  "reviewed_at": "2026-08-26T11:36:32Z",
+  "reviewed_at": "2026-09-29T07:14:38Z",
   "reviewer": {
     "kind": "agent",
-    "name": "Codex primary agent"
+    "name": "Claude Opus 5 (Claude Code)"
   },
-  "visual_thesis": "A mesa mantém cartas, zonas, vida e ações legais como foco principal, deixando claro que o usuário joga diretamente contra a IA.",
-  "content_plan": "Os nove checkpoints cobrem escolha do adversário, mão privada, progressão de turno, dano, reconexão, terminal, replay e rematch.",
-  "interaction_thesis": "A bandeja contextual apresenta somente decisões legais do XMage e mantém a continuidade da mesma sessão após recarregar a página.",
+  "visual_thesis": "A mesa é um tabuleiro escuro com as cartas reais no centro e o painel de decisão fixo à direita: a arte manda, o cromo não. O latão marca só o que é seu agora — prioridade, carta jogável, CTA ativo — e o azul marca o foco de teclado, sem os dois brigarem no mesmo elemento.",
+  "content_plan": "Cada checkpoint entrega um estado que dá para nomear sem legenda: seletor com deck e validação, mão inicial com mulligan, terreno no campo com arte carregada, comandante na mesa, dano de combate com o log de quem bateu em quem, mesa retomada num ponto posterior, painel de concessão com replay e revanche, replay com etapas e zonas honestas, e o seletor de revanche já pronto.",
+  "interaction_thesis": "Toda decisão legal é alcançável pelo painel e pela mesa, com o mesmo rótulo nos dois lugares; o automático é sempre por ação, nunca por partida, e diz isso na tela. O estado terminal troca as opções por Jogar novamente e Analisar replay, sem deixar ação morta na tela.",
   "criteria": {
-    "visual_hierarchy": {
-      "status": "pass",
-      "note": "Mesa e bandeja de decisões dominam a composição, enquanto navegação e status permanecem claramente secundários."
-    },
-    "brand_and_mtg_identity": {
-      "status": "pass",
-      "note": "A paleta escura, cartas reais, zonas e acentos dourados preservam a identidade BrewTact e a linguagem visual de MTG."
-    },
-    "color_and_contrast": {
-      "status": "pass",
-      "note": "Textos, estados de prioridade, vida e botões mantêm contraste suficiente em todos os nove estados revisados."
-    },
-    "typography": {
-      "status": "pass",
-      "note": "Títulos serifados e textos funcionais sans-serif formam uma hierarquia consistente e legível no perfil 1440 por 900."
-    },
-    "spacing_and_density": {
-      "status": "pass",
-      "note": "A densidade elevada da mesa permanece organizada por zonas, com espaçamento previsível entre cartas, painéis e ações."
-    },
-    "responsive_fit": {
-      "status": "pass",
-      "note": "Nenhum controle necessário ficou cortado no viewport governado de 1440 por 900 durante a jornada completa."
-    },
-    "interaction_clarity": {
-      "status": "pass",
-      "note": "Mulligan, terreno, mana, conjuração, combate, concessão, replay e rematch têm ações explícitas e estados reconhecíveis."
-    },
-    "state_coverage": {
-      "status": "pass",
-      "note": "Os checkpoints mostram entrada, mão privada, ações de jogo, dano real, reconexão, terminal, replay e reinício da jornada."
-    },
     "accessibility_visual": {
       "status": "pass",
-      "note": "Ícones são acompanhados por texto, foco visual e estados não dependem apenas de cor; crédito humano de teclado e TalkBack não é reivindicado."
+      "note": "Foco visível em todo controle alcançado por teclado, rótulo semântico em cada carta dizendo inclusive quando está virada, e nenhuma informação entregue só por cor."
     },
     "attractiveness": {
       "status": "pass",
-      "note": "A apresentação é coesa e temática, com cartas reconhecíveis, mesa limpa e feedback visual suficiente para sustentar a partida."
+      "note": "A mesa parece uma partida de verdade e não um formulário: arte grande, fundo quieto e o latão aparecendo só onde importa."
+    },
+    "brand_and_mtg_identity": {
+      "status": "pass",
+      "note": "Arte real das cartas, zonas com nomes de Magic (campo, pilha, cemitério, comando) e o serif do produto só nos títulos de modal."
+    },
+    "color_and_contrast": {
+      "status": "pass",
+      "note": "Fundo abissal com texto claro; latão para o que é acionável agora e vermelho só na vida, que é o número que muda sob pressão."
+    },
+    "interaction_clarity": {
+      "status": "pass",
+      "note": "Cada opção diz o que faz com o nome da carta junto, o halo azul mostra onde está o foco e o aviso do automático explica o escopo antes de o jogador aceitar."
+    },
+    "responsive_fit": {
+      "status": "pass",
+      "note": "Em 1440x900 o tabuleiro e o painel dividem a largura sem rolagem horizontal; a mão fica ancorada embaixo e a fileira rola sozinha quando passa de dez permanentes."
+    },
+    "spacing_and_density": {
+      "status": "pass",
+      "note": "A fileira de permanentes respira: a carta virada reserva o rastro deitado e, medido nas capturas 04, 05, 06 e 07 (dez permanentes com duas viradas), nenhuma carta encosta na vizinha nem e cortada pela borda."
+    },
+    "state_coverage": {
+      "status": "pass",
+      "note": "Nove estados distintos e verificaveis, incluindo os dificeis: dano de combate com a partida em curso, sessao retomada num ponto posterior (fim do combate depois do dano) e mesa terminada por concessao."
+    },
+    "typography": {
+      "status": "pass",
+      "note": "Uma família por papel: serif no título do modal, sans com peso alto nos nomes de jogador e microtipografia nos contadores, sem tamanho órfão."
+    },
+    "visual_hierarchy": {
+      "status": "pass",
+      "note": "O olho vai à fileira de cartas, depois ao painel de prioridade e só então às barras de vida e contadores; o cabeçalho de fase fica no canto sem competir."
     }
   },
-  "reviewed_capture_manifest_sha256": "9a5027328c33bfba08e201ecf6edecf712732be978278d8a7df0e8c8372d742d",
+  "reviewed_capture_manifest_sha256": "9b491686d20247942b24c0680b6836641539d6cb9f556b21ad2d5d832d110d81",
   "reviewed_screenshot_count": 9,
   "reviewed_checkpoints": [
     "01-opponent-picker",
@@ -69,15 +69,15 @@
     "09-rematch-picker"
   ],
   "reviewed_screenshot_sha256": [
-    "18f8f293bba4fdcf4b9926e0d65bbd5501fa7b745f37e6b2f4cb6c9b828f16db",
-    "bc3f0074509aa19fae6ce5b9d491489c37987e003200fffafd142f20ad0455b3",
-    "6b0a20d98bc1efdd952196c2cf2989aa321486dc974af85f0665d6c03254b45d",
-    "2b798e1a052f0b0e2b0050ede6c4995f2da00a3e83cb0378dfb7f743db8612a7",
-    "c932a1f5300fbb2303957c012def0e8d27aa9bf3093b16800d36ad77e0589aab",
-    "6590a5ee3c701eb4706c1070d01f9f0bd38f274c72445a8731e5cc411dec16f6",
-    "f8993443fef321bd487f155d1c947320db1bc96a8175a15ff413d26f1b2dc42e",
-    "3b20c151a9b47ba8488c84693860cbedd22173d9109380b1225eb1ded892bc06",
-    "6479a5b2cea509aa02e8699921769c4f0aebac0bc24cc6cb5fac9247f11fe889"
+    "40dce55a57fd067ad00f9a39472d9a22716468cf0cec1b2b8b26b50b20aebfc8",
+    "4f3ed83589677fab7f7f8d4c531a13b6d3eb89337afa56463715bb035ab402bf",
+    "557f31adfa72fd84618eb618eaa5013d4661ac0f898bb6a7647230b02e8d09bd",
+    "5edfe2daa71ebaebee843e2c32391d6e151c7ad5aaa14bb532884a1144741905",
+    "c486639b55b609d05006674ff2d090fb23c4fe681a2a62f8ce7572979a559ea5",
+    "7364d23e21edd476859f4ea6eef844a3ff4fd6e2969a9cfca310f15dbf972abd",
+    "041d80bf7df3ed9b7f24790fbfca0549e1054b76078c36532854713e22e4895c",
+    "a1b11290907213a123f5558ce4416344803ad1bfad899b4aba63f87b3c641c30",
+    "d5d20edca765997b52ed2a41410de0d805d70d1c257348d2b714c394ac4b1aed"
   ],
   "blocking_findings": [],
   "release_scope": {

@@ -29,6 +29,7 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
   required String cacheKey,
   required int executionTimeMs,
   String? validationRunToken,
+  Map<String, Object?>? provenance,
 }) {
   final normalizedValidationRunToken = _normalizeValidationRunToken(
     validationRunToken,
@@ -114,6 +115,8 @@ Map<String, dynamic> buildOptimizationAnalysisLogEntry({
       'deterministic_swap_candidate_count': deterministicSwapCandidates.length,
       'deterministic_swap_candidate_sample':
           deterministicSwapCandidates.take(10).toList(),
+      // D-82: de onde veio a resposta quando não há provedor configurado.
+      if (provenance != null) ...provenance,
     },
     'swap_analysis': {
       'accepted_pairs': acceptedPairs,
@@ -172,6 +175,7 @@ Future<void> recordOptimizeAnalysisOutcome({
   required String cacheKey,
   required int executionTimeMs,
   String? validationRunToken,
+  Map<String, Object?>? provenance,
 }) async {
   try {
     final entry = buildOptimizationAnalysisLogEntry(
@@ -199,6 +203,7 @@ Future<void> recordOptimizeAnalysisOutcome({
       validationRunToken:
           validationRunToken ??
           Platform.environment['MANALOOM_E2E_VALIDATION_RUN_TOKEN'],
+      provenance: provenance,
     );
 
     await pool.execute(

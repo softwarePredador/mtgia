@@ -60,7 +60,7 @@ case "$REQUIRE_FCM_DELIVERY" in
 esac
 
 if [[ "$EXECUTE" == "0" ]]; then
-  API_BASE_URL="${API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
+  API_BASE_URL="${API_BASE_URL:-https://evolution-cartinhas.tr5taz.easypanel.host}"
   jq -n \
     --arg device "$DEVICE" \
     --arg api_base_url "$API_BASE_URL" \
@@ -145,7 +145,7 @@ fi
 SENTRY_ORG_SLUG="${SENTRY_ORG_SLUG:-$MANALOOM_PRODUCTION_SENTRY_ORG_SLUG}"
 SENTRY_MOBILE_PROJECT_SLUG="${SENTRY_MOBILE_PROJECT_SLUG:-$MANALOOM_PRODUCTION_SENTRY_PROJECT_SLUG}"
 if [[ "$API_BASE_URL_EXPLICIT" == "0" ]]; then
-  API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.2ta7qx.easypanel.host}"
+  API_BASE_URL="${MANALOOM_API_BASE_URL:-https://evolution-cartinhas.tr5taz.easypanel.host}"
 fi
 : "${SENTRY_AUTH_TOKEN:?SENTRY_AUTH_TOKEN ausente}"
 : "${SENTRY_MOBILE_DSN:?SENTRY_MOBILE_DSN ausente}"

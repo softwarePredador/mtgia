@@ -1,19 +1,48 @@
+# Configuração do dependency_validator para o app Flutter.
+
+# `build/` é saída gerada e gitignorada, mas o validador varre diretivas Dart
+# de TODO arquivo fora de lib/ — inclusive dela. Depois de um build iOS ou
+# macOS, `build/{ios,macos}/SourcePackages/firebase_messaging-*/` guarda os
+# TESTES e o app de EXEMPLO do próprio firebase_messaging, que importam
+# mockito, async, flutter_local_notifications e as platform interfaces. Nada
+# disso é código deste projeto, e nenhum desses imports existe em `lib/`,
+# `test/`, `tool/`, `test_driver/`, `integration_test/` ou `patrol_test/`.
+#
+# Sem esta exclusão o gate passa ou falha conforme `app/build/` exista, o que
+# torna o resultado dependente do que se buildou antes.
 exclude:
-  # Generated outputs and platform registrants are dependency consumers of the
-  # toolchain/plugins, not source dependencies declared by the ManaLoom app.
-  - .dart_tool/**
-  - build/**
-  - ios/Flutter/ephemeral/**
-  - linux/flutter/ephemeral/**
-  - macos/Flutter/ephemeral/**
-  - windows/flutter/ephemeral/**
-  # Patrol creates these entrypoints during device/web runs. They import
-  # package:test_api as generated implementation detail, not an app contract.
-  - test_bundle.dart
-  - patrol_test/test_bundle.dart
+  - "build/**"
+  # `test_bundle.dart` e gerado pelo patrol_cli, nao e fonte escrita a mao. O
+  # da raiz e inclusive gitignorado (`.gitignore:69`). Os dois importam
+  # `package:test_api/`, transitiva de `flutter_test`, e por isso o validador
+  # cobrava `test_api` como dev_dependency. Declarar uma transitiva de
+  # `flutter_test` para satisfazer um arquivo gerado seria fixar por fora uma
+  # versao que o SDK ja fixa.
+  - "test_bundle.dart"
+  - "**/test_bundle.dart"
 
 ignore:
+  # `package:file` é usado só em test/core/widgets/cached_card_image_test.dart,
+  # porque `FileInfo`, do flutter_cache_manager, exige um `file.File` — não
+  # serve `dart:io`. O teste usa deliberadamente a versão que o próprio
+  # flutter_cache_manager trava, e diz isso na linha 4 com um
+  # `// ignore: depend_on_referenced_packages`.
+  #
+  # Declarar `file:` aqui como dev_dependency cria uma SEGUNDA fonte de verdade
+  # para essa versão: medido, `file: ^7.0.1` faz o solver rebaixar `meta`
+  # 1.18.0 -> 1.17.0 e `test_api` 0.7.11 -> 0.7.10, e esse par rebaixado quebra
+  # o build de integration_test com
+  # `_TestFlutterView implements FlutterView` sem `displayCornerRadii`. Sem a
+  # declaração, o mesmo `pub get` mantém 1.18.0.
+  - file
+
+  # Consumido pelo analisador, nunca por `import`. As regras
+  # `avoid_legacy_manaloom_endpoint_literal` e `avoid_manaloom_secret_literal`
+  # entram por `analysis_options.yaml`, na lista `custom_lint:`. Remover a
+  # dependencia desliga as duas regras em silencio.
   - manaloom_lints
-  # Flutter's Web build resolves the Cupertino icon font through this package;
-  # it is an asset dependency even though app Dart code does not import it.
+
+  # Pacote de FONTE de icones, sem API Dart usada aqui. Vem do template do
+  # Flutter e existe para o glyph set do Cupertino ficar disponivel em runtime;
+  # o proprio validador avisa "or you may be using assets from these packages".
   - cupertino_icons

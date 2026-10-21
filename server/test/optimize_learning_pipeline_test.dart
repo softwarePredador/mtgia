@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:server/ai/optimize_rejection_history_support.dart';
 import 'package:test/test.dart';
 
+import '../lib/ai/optimize_analysis_support.dart' as optimize_analysis;
 import '../lib/ai/otimizacao.dart';
 import '../routes/ai/optimize/index.dart' as optimize_route;
 
@@ -36,6 +37,53 @@ void main() {
   });
 
   group('buildOptimizationAnalysisLogEntry', () {
+    test('D-82: sem provedor, a proveniência entra no decisions_reasoning', () {
+      Map<String, dynamic> entry({Map<String, Object?>? provenance}) =>
+          optimize_analysis.buildOptimizationAnalysisLogEntry(
+            commanderName: 'D82 Comandante Azul',
+            commanderColors: const ['U'],
+            operationMode: 'optimize',
+            requestedMode: 'optimize',
+            targetArchetype: 'midrange',
+            detectedTheme: null,
+            deckAnalysis: const {},
+            postAnalysis: null,
+            removals: const ['D82 Azul 12'],
+            additions: const ['D82 Candidata 1'],
+            statusCode: 200,
+            qualityError: null,
+            validationReport: null,
+            validationWarnings: const [],
+            blockedByColorIdentity: const [],
+            blockedByBracket: const [],
+            commanderPriorityNames: const [],
+            commanderPrioritySource: 'none',
+            deterministicSwapCandidates: const [],
+            cacheKey: 'cache-d82',
+            executionTimeMs: 10,
+            provenance: provenance,
+          );
+
+      final withoutProvider =
+          entry(
+                provenance: const {
+                  'strategy_source': 'deterministic_first',
+                  'ai_provider': {'configured': false, 'attempted': false},
+                },
+              )['decisions_reasoning']
+              as Map;
+      expect(withoutProvider['strategy_source'], 'deterministic_first');
+      expect(withoutProvider['ai_provider'], {
+        'configured': false,
+        'attempted': false,
+      });
+
+      // Com provedor a rota não passa proveniência: a entrada fica como era.
+      final withProvider = entry()['decisions_reasoning'] as Map;
+      expect(withProvider.containsKey('ai_provider'), isFalse);
+      expect(withProvider.containsKey('strategy_source'), isFalse);
+    });
+
     test(
       'captures rejected optimize outcome with reasons and priority source',
       () {

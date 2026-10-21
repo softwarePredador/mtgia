@@ -365,3 +365,81 @@ estágio esperar a liberação antes de checar.
 **Estado final: 22 de 23 manifests no digest corrente.** `latest.json` segue
 intocado, e a evidência antiga do pack foi restaurada byte a byte ao estado
 commitado depois de cada tentativa.
+
+---
+
+## Adendo 2026-09-23 — a corrida caiu, e o 23º manifest revelou o que ele é
+
+### A corrida de handoff foi corrigida
+
+`manaloom_server_contract_e2e_isolated.sh:353-365` recusava começar se `lsof`
+achasse qualquer processo segurando `server/build`. O E2E invoca esse script
+**duas vezes**, e o servidor da primeira ainda segura o diretório por uma
+fração de segundo quando a segunda começa.
+
+Trocado por **espera limitada de 15s**, com diagnóstico de quem segura quando o
+prazo acaba — a mensagem antiga não permitia diagnóstico nenhum. O guard **não
+foi enfraquecido**: provado que, com um processo que não solta, ele ainda
+bloqueia (`rc=2`), e libera quando ninguém segura. No E2E real, o estágio
+`start_browser_qa_api_fixture`, que falhava 2 de 2, passou.
+
+### O que o 23º manifest exige, e por que não fechou
+
+Passada a corrida, o E2E chega a um ponto que **nenhum script automatiza**:
+sobe a fixture, imprime `READY` e espera até uma hora que um agente **dirija o
+browser** por uma partida completa de XMage, capturando nove checkpoints
+(seletor de oponente, mulligan com mão privada, terreno, comandante, dano de
+combate, reconexão, replay terminal, replay, seletor de revanche).
+
+Tentei. O que aprendi, e que qualquer execução futura precisa saber:
+
+**1. O prazo por prompt é 90 segundos.** O app manda
+`prompt_timeout_seconds: 90` (`interactive_battle_service.dart:15,135`), e o
+sidecar concede o prompt com esse prazo
+(`InteractiveBattleRegistry.java:1031-1033`). Estourado, a sessão vira
+`abandoned` com `interactive_prompt_deadline_expired` (`:426-431`). Eu gastei
+120s tirando screenshots na primeira partida e ela foi abandonada por isso —
+não foi defeito do produto.
+
+Isso é uma restrição dura para qualquer agente: **não dá para parar e pensar
+mais de 90s entre um prompt e a resposta.** Ou se conhece o fluxo de antemão e
+se roteiriza, ou se perde a sessão.
+
+**2. A UI é canvas.** Flutter Web com CanvasKit não expõe DOM: `querySelector`
+de `input`/`textarea`/`flt-semantics` devolve lista vazia. Toda interação é por
+coordenada, o que obriga a uma captura antes de cada clique — e é justamente
+isso que consome o prazo de 90s.
+
+**3. O viewport precisa de compensação.** Janela de 1440×900 dá viewport de
+1440×757, porque a moldura do Chrome come 143px. Janela de **1440×1043** dá o
+viewport exato de 1440×900 que o contrato exige.
+
+O que foi capturado com sucesso: `01-opponent-picker.png`, em 1440×900
+exatos, mostrando o seletor com o deck adversário e o estado
+`Pronto para Battle · 100 cartas verificadas · modo interativo pronto`.
+
+Encerrei sem completar. Captura parcial não serve: o contrato exige os nove
+checkpoints com zero entrada proibida de console. A evidência antiga foi
+restaurada byte a byte ao estado commitado depois de cada tentativa.
+
+### Defeito de contrato corrigido: identidade do browser
+
+O contrato exigia literalmente `.browser.name == "Codex in-app Chromium"`, e o
+literal aparecia em **três** pontos do script — um contrato de release nomeando
+o browser de **um agente específico**. Qualquer outro executor teria de
+declarar-se Codex para passar, o que é falsificar a procedência da evidência.
+
+Agora o executor declara o que usou, via
+`MANALOOM_PLAY_VS_AI_BROWSER_NAME` (default preservado para não quebrar quem já
+usava), e o contrato exige apenas um nome real. Testado: aceita
+`Claude in-app Chromium` e `Codex in-app Chromium`, recusa vazio e recusa
+string só com espaços.
+
+### Estado
+
+**22 de 23 manifests no digest `e3d88a29`**, agora já com toda a contenção da
+D-04 dentro: 18 packs web (216 screenshots) e os 4 perfis do `p0-matrix`,
+inclusive o do emulador Android, todos `PASS_RUNTIME`.
+
+`latest.json` segue intocado. O 23º precisa de uma execução dedicada, com o
+fluxo da partida roteirizado de antemão por causa do prazo de 90s.
